@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,11 +22,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
+final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    private MockObject&Translator $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
     private MockObject&EventScheduler $eventScheduler;
 
@@ -38,19 +40,20 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createStub(Translator::class);
 
         $this->eventScheduler = $this->createMock(EventScheduler::class);
 
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
         $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+        $this->eventExecutioner->method('getExecutionDate')->willReturn(new \DateTime());
 
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives
         $this->redirectionHelper->method('handleEventRedirection')
-            ->willReturnCallback(fn (Event $event) => $event);
+            ->willReturnCallback(fn (Event $event): Event => $event);
     }
 
     public function testNoContactsFoundResultsInNothingExecuted(): void
@@ -65,6 +68,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getEvaluated());
     }
@@ -82,6 +86,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -93,7 +98,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([$decision]));
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 
@@ -144,6 +149,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
@@ -153,7 +159,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 
@@ -191,7 +197,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
     }
 
-    private function getExecutioner()
+    private function getExecutioner(): InactiveExecutioner
     {
         return new InactiveExecutioner(
             $this->inactiveContactFinder,
@@ -200,9 +206,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventScheduler,
             $this->inactiveHelper,
             $this->eventExecutioner,
-            $this->createMock(ProcessSignalService::class),
+            $this->createStub(ProcessSignalService::class),
             $this->redirectionHelper,
-            $this->createMock(LeadRepository::class)
+            $this->createStub(LeadRepository::class)
         );
     }
 }

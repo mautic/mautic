@@ -8,14 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 class FocusViewEvent extends Event
 {
     public function __construct(
-        private Stat $stat,
+        private readonly Stat $stat,
     ) {
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): Stat
     {
         return $this->stat;
     }

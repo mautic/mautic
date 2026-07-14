@@ -13,7 +13,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     public const SEGMENT_LOG = 'segment.log';
 
     public function __construct(
-        private FieldsBuilder $fieldsBuilder,
+        private readonly FieldsBuilder $fieldsBuilder,
     ) {
     }
 
@@ -106,11 +106,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($qb);
     }
 
-    /**
-     * @param string $alias
-     * @param string $action
-     */
-    private function generateLeftJoinCondition($alias, $action): string
+    private function generateLeftJoinCondition(string $alias, string $action): string
     {
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }

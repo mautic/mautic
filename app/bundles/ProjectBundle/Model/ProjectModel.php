@@ -29,7 +29,7 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
-        private ProjectEntityLoaderService $entityLoaderService,
+        private readonly ProjectEntityLoaderService $entityLoaderService,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
@@ -43,8 +43,6 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param string               $type
      * @param string               $filter
      * @param int                  $limit

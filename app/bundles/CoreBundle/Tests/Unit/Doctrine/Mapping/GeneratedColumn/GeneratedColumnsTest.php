@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class GeneratedColumnsTest extends TestCase
+final class GeneratedColumnsTest extends TestCase
 {
     private GeneratedColumns $generatedColumns;
 

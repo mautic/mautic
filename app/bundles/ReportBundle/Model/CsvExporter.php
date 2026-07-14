@@ -12,8 +12,8 @@ class CsvExporter
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

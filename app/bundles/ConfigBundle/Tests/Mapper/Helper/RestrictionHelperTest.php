@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
-class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
+final class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<int|string, mixed>
      */
-    private $restrictedFields = [
+    private array $restrictedFields = [
         'db_host',
         'db_user',
         'monitored_email' => [
@@ -35,7 +37,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
+        $this->assertSame($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Ensure a restrictions are recursively applied')]

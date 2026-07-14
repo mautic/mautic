@@ -11,8 +11,8 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
     private ?TrustOptions $trustOptions = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 
@@ -33,11 +33,7 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
         }
 
         // EntityIds do not match
-        if ($entityId !== $this->entityId) {
-            return false;
-        }
-
-        return true;
+        return $entityId === $this->entityId;
     }
 
     private function createTrustOptions(): TrustOptions

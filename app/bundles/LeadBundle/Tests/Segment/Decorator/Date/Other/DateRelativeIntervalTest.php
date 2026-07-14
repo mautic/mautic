@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -11,12 +13,12 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateRelativeInterval::class)]
-class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
+final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorEqual(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '=',
@@ -31,8 +33,8 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorNotEqual(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '!=',
@@ -48,7 +50,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $dateDecorator->method('getOperator')
             ->with()
@@ -67,7 +69,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValuePlusDaysWithGreaterOperator(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
@@ -89,7 +91,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueMinusMonthWithNotEqualOperator(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
@@ -111,7 +113,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueDaysAgoWithNotEqualOperator(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
@@ -133,7 +135,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueYearsAgoWithGreaterOperator(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
@@ -155,7 +157,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueDaysWithEqualOperator(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
@@ -178,7 +180,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     public function testGetWhereReturnsCompositeExpression(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);
-        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver     = $this->createStub(TimezoneResolver::class);
         $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
         $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
 
@@ -199,7 +201,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     public function testGetWhereReturnsString(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);
-        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver     = $this->createStub(TimezoneResolver::class);
         $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
         $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
 
@@ -216,7 +218,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     public function testGetWhereReturnsNull(): void
     {
         $dateDecorator        = $this->createMock(DateDecorator::class);
-        $timezoneResolver     = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver     = $this->createStub(TimezoneResolver::class);
         $filterCrate          = new ContactSegmentFilterCrate(['operator' => '=']);
         $dateOptionParameters = new DateOptionParameters($filterCrate, [], $timezoneResolver);
 

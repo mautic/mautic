@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class TokenHelper
 {
-    private const CONTACT_FIELD_REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
+    public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
     private const DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
@@ -33,7 +33,7 @@ class TokenHelper
 
         // Search for bracket or bracket encoded
         $tokenList        = [];
-        $foundMatches     = preg_match_all(self::CONTACT_FIELD_REGEX, $content, $matches);
+        $foundMatches     = preg_match_all(self::REGEX, $content, $matches);
         $foundDateMatches = preg_match_all(self::DATETIME_REGEX, $content, $dateMatches);
 
         if ($foundMatches || $foundDateMatches) {
@@ -70,12 +70,12 @@ class TokenHelper
 
     public static function validToken(string $content): bool
     {
-        return (bool) preg_match(self::CONTACT_FIELD_REGEX, $content);
+        return (bool) preg_match(self::REGEX, $content);
     }
 
     public static function getTokenFieldAlias(string $content): string
     {
-        $foundMatches = preg_match(self::CONTACT_FIELD_REGEX, $content, $matches);
+        $foundMatches = preg_match(self::REGEX, $content, $matches);
 
         return $foundMatches ? self::getFieldAlias($matches[2]) : '';
     }
@@ -100,7 +100,7 @@ class TokenHelper
     /**
      * @return mixed
      */
-    private static function getTokenValue(array $lead, $alias, $defaultValue)
+    private static function getTokenValue(array $lead, string $alias, string $defaultValue)
     {
         $value = '';
         if (isset($lead[$alias])) {
@@ -152,7 +152,7 @@ class TokenHelper
         return '' !== $value ? $value : $defaultValue;
     }
 
-    private static function getTokenDefaultValue($match): string
+    private static function getTokenDefaultValue(string $match): string
     {
         $fallbackCheck = explode('|', $match);
         if (!isset($fallbackCheck[1])) {
@@ -162,7 +162,7 @@ class TokenHelper
         return $fallbackCheck[1];
     }
 
-    private static function getFieldAlias($match): string
+    private static function getFieldAlias(string $match): string
     {
         $fallbackCheck = explode('|', $match);
 
@@ -170,11 +170,9 @@ class TokenHelper
     }
 
     /**
-     * @param string $parameter
-     *
      * @return mixed
      */
-    private static function getParameter($parameter)
+    private static function getParameter(string $parameter)
     {
         if (null === self::$parameters) {
             self::$parameters = (new ParamsLoaderHelper())->getParameters();

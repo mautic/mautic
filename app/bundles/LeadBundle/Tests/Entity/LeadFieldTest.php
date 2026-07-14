@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadField;
 
-class LeadFieldTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testNewEntity(): void
     {

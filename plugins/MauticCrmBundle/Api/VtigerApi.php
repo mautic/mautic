@@ -34,8 +34,6 @@ class VtigerApi extends CrmApi
     }
 
     /**
-     * List types.
-     *
      * @return mixed
      */
     public function listTypes()

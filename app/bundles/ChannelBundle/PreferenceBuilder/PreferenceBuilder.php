@@ -17,9 +17,9 @@ class PreferenceBuilder
 
     public function __construct(
         ArrayCollection $logs,
-        private Event $event,
+        private readonly Event $event,
         array $channels,
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
         $this->buildRules($logs, $channels);
     }
@@ -27,7 +27,7 @@ class PreferenceBuilder
     /**
      * @return ChannelPreferences[]
      */
-    public function getChannelPreferences()
+    public function getChannelPreferences(): array
     {
         return $this->channels;
     }
@@ -41,9 +41,8 @@ class PreferenceBuilder
 
     /**
      * @param string $channel
-     * @param int    $priority
      */
-    private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority): void
+    private function addChannelRule($channel, array $rule, LeadEventLog $log, int $priority): void
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
@@ -60,7 +59,7 @@ class PreferenceBuilder
             return;
         }
 
-        $this->logger->debug("MARKETING MESSAGE: Set $channel as priority $priority for contact ID #".$log->getLead()->getId());
+        $this->logger->debug("MARKETING MESSAGE: Set {$channel} as priority {$priority} for contact ID #".$log->getLead()->getId());
 
         $channelPreferences->addLog($log, $priority);
     }
@@ -70,7 +69,7 @@ class PreferenceBuilder
      *
      * @return ChannelPreferences
      */
-    private function getChannelPreferenceObject($channel, $priority)
+    private function getChannelPreferenceObject($channel, int $priority)
     {
         if (!isset($this->channels[$channel])) {
             $this->channels[$channel] = new ChannelPreferences($this->event);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command\Api;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -23,6 +24,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+        /** @var CacheProvider $cacheProvider */
         $cacheProvider = self::getContainer()->get('mautic.cache.provider');
         if ($fromCache) {
             $contactCountDetail = [
@@ -35,7 +37,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         }
         $this->client->request(Request::METHOD_GET, '/api/campaigns?withContactCounts='.$withContactCounts);
         $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
         Assert::assertArrayHasKey('campaigns', $response);
         Assert::assertArrayHasKey($campaign->getId(), $response['campaigns']);

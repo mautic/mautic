@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
@@ -14,9 +15,10 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
+final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
+
     private EmailFixturesHelper $emailFixturesHelper;
 
     protected function setUp(): void
@@ -75,7 +77,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $testData['campaign'];
 
         $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/email-weekdays/{$campaign->getId()}/2024-12-01/2024-12-12");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $content      = $this->client->getResponse()->getContent();
         $crawler      = new Crawler($content);
         $daysJson     = $crawler->filter('canvas')->text(null, false);
@@ -103,7 +105,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $testData['campaign'];
 
         $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/email-hours/{$campaign->getId()}/2024-12-01/2024-12-12");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $content   = $this->client->getResponse()->getContent();
         $crawler   = new Crawler($content);
         $hourJson  = $crawler->filter('canvas')->text(null, false);
@@ -114,6 +116,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(3, $hoursDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
 
         // Get the time format from CoreParametersHelper
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
         $timeFormat           = $coreParametersHelper->get('date_format_timeonly');
 
@@ -311,8 +314,8 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
     private function assertEventDetails(array $actual, array $expected, array $notEmptyFields = []): void
     {
         foreach ($notEmptyFields as $field) {
-            $this->assertNotEmpty($actual[$field]['value'], "$field value should not be empty");
-            $this->assertNotEmpty($actual[$field]['tooltip'], "$field tooltip should not be empty");
+            $this->assertNotEmpty($actual[$field]['value'], "{$field} value should not be empty");
+            $this->assertNotEmpty($actual[$field]['tooltip'], "{$field} tooltip should not be empty");
         }
         foreach ($expected as $key => $value) {
             $this->assertEquals($value, $actual[$key]);

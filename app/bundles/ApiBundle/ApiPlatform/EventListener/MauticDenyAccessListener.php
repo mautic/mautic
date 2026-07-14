@@ -12,12 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-final class MauticDenyAccessListener
+final readonly class MauticDenyAccessListener
 {
     public function __construct(
         private CorePermissions $security,
-        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
-    {
+        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+    ) {
     }
 
     public function onSecurity(RequestEvent $event): void
@@ -71,7 +71,7 @@ final class MauticDenyAccessListener
             } else {
                 $requestObject = $request->attributes->get('data');
                 $property      = 'get'.$objectIdProperty;
-                $objectId      = $requestObject->$property()->getId();
+                $objectId      = $requestObject->{$property}()->getId();
             }
             $isGranted = substr($isGranted, 0, $startParenthesis).$objectId.substr($isGranted, $stopParenthesis + 1);
         }
@@ -81,7 +81,7 @@ final class MauticDenyAccessListener
         if (null !== $objectProperty) {
             $objectPropertyList = explode('.', $objectProperty);
             foreach ($objectPropertyList as $property) {
-                $requestObject = $requestObject->$property();
+                $requestObject = $requestObject->{$property}();
             }
         }
 

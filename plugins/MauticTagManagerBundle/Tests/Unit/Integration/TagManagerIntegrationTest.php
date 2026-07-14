@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Integration;
 
 use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class TagManagerIntegrationTest extends TestCase
+final class TagManagerIntegrationTest extends TestCase
 {
     private TagManagerIntegration $tagManagerIntegration;
 
@@ -14,7 +16,7 @@ class TagManagerIntegrationTest extends TestCase
     {
         parent::setUp();
 
-        $this->tagManagerIntegration = new class extends TagManagerIntegration {
+        $this->tagManagerIntegration = new class() extends TagManagerIntegration {
             public function __construct()
             {
             }

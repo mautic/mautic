@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FocusListType extends AbstractType
 {
-    private $repo;
+    private readonly FocusRepository $repo;
 
     public function __construct(
         protected FocusModel $focusModel,

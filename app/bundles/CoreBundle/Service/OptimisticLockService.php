@@ -9,10 +9,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 
-final class OptimisticLockService implements OptimisticLockServiceInterface
+final readonly class OptimisticLockService implements OptimisticLockServiceInterface
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+    ) {
     }
 
     public function incrementVersion(OptimisticLockInterface $entity): void
@@ -63,7 +64,7 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
             ->createQueryBuilder()
             ->update($metadata->table['name'])
             ->where(implode(' AND ', array_map(
-                fn (string $name) => "{$name} = :{$name}",
+                fn (string $name): string => "{$name} = :{$name}",
                 $metadata->getIdentifierFieldNames(),
             )))
             ->setParameters($identifierValues);

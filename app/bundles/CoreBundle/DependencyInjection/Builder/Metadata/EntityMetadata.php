@@ -13,7 +13,7 @@ class EntityMetadata
     private array $serializerConfig = [];
 
     public function __construct(
-        private BundleMetadata $metadata,
+        private readonly BundleMetadata $metadata,
     ) {
     }
 
@@ -51,7 +51,7 @@ class EntityMetadata
             if (empty($this->serializerConfig) && $reflectionClass->hasMethod('loadApiMetadata')) {
                 $this->serializerConfig = [
                     'namespace_prefix' => $bundleNamespace.'\\Entity',
-                    'path'             => "@$bundleName/Entity",
+                    'path'             => "@{$bundleName}/Entity",
                 ];
             }
 

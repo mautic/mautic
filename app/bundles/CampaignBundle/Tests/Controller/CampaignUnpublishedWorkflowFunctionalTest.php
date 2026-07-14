@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
@@ -11,8 +13,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     {
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', '/s/campaigns/new');
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $attributes = [
             'data-toggle',
@@ -40,8 +41,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
 
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/edit/%d', $campaign->getId()));
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
 
@@ -73,8 +73,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
 
         // Check the message in the Campaign listing page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
 
@@ -103,7 +102,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'campaign', 'id' => $campaign->getId()]);
         $response = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $attributes    = [
             'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
@@ -118,8 +117,8 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $content = $response->getContent();
 
         foreach ($attributes as $key => $val) {
-            $this->assertStringContainsString($key, $content);
-            $this->assertStringContainsString($val, $content);
+            $this->assertStringContainsString($key, (string) $content);
+            $this->assertStringContainsString($val, (string) $content);
         }
     }
 }

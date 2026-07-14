@@ -29,18 +29,14 @@ class PostCountModel extends AbstractCommonModel
 
     /**
      * Get this model's repository.
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
      */
-    public function getRepository()
+    public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
     {
         return $this->em->getRepository(PostCount::class);
     }
 
-    /*
-     * Updates a monitor record's post count on a daily basis
-     *
-     * @return boolean
+    /**
+     * Updates a monitor record's post count on a daily basis.
      */
     public function updatePostCount($monitor, \DateTime $postDate): bool
     {
@@ -55,7 +51,6 @@ class PostCountModel extends AbstractCommonModel
         // ignore paginator so we can use the array later
         $args['ignore_paginator'] = true;
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountsRepository */
         $postCountsRepository = $this->getRepository();
 
         // get any existing records

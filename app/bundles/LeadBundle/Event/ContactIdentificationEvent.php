@@ -15,14 +15,11 @@ class ContactIdentificationEvent extends Event
     private $identifiedByChannel;
 
     public function __construct(
-        private array $clickthrough,
+        private readonly array $clickthrough,
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getClickthrough()
+    public function getClickthrough(): array
     {
         return $this->clickthrough;
     }
@@ -46,10 +43,7 @@ class ContactIdentificationEvent extends Event
         return $this->identifiedByChannel;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getIdentifiedContact()
+    public function getIdentifiedContact(): ?Lead
     {
         return $this->identifiedContact;
     }

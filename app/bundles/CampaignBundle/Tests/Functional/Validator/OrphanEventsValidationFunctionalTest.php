@@ -265,7 +265,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $form       = $crawler->selectButton('Save')->form();
         $newCrawler = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Verify the validation error message is displayed
         Assert::assertStringContainsString(
@@ -276,6 +276,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         // Verify the campaign version was not incremented (save was prevented)
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(Campaign::class, $campaign);
         Assert::assertSame($originalVersion, $campaign->getVersion());
     }
 

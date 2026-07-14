@@ -12,7 +12,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerFunctionalTest extends MauticMysqlTestCase
+final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPagePreview(): void
     {
@@ -35,8 +35,8 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $page->getAlias()));
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('Test Html', $response->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Test Html', (string) $response->getContent());
     }
 
     private function createSegment(): LeadList
@@ -102,6 +102,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedPage = $this->em->find(Page::class, $page->getId());
+        $this->assertInstanceOf(Page::class, $savedPage);
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 
@@ -159,6 +160,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->clear();
         $page = $this->em->find(Page::class, $id);
+        $this->assertInstanceOf(Page::class, $page);
         Assert::assertSame($expectedVersion, $page->getVersion(), $message);
     }
 }

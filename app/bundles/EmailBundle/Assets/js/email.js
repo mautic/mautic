@@ -81,6 +81,10 @@ Mautic.emailOnLoad = function (container, response) {
         });
     }
 
+    if (mQuery('#content_preview_frame').length && Mautic.contentPreviewUrlGenerator) {
+        Mautic.contentPreviewUrlGenerator.init();
+    }
+
     var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
     if ($loadDeliveredElements.length) {
         $loadDeliveredElements.each(function(i, el) {
@@ -157,6 +161,12 @@ Mautic.submitSendForm = function () {
     Mautic.dismissConfirmation();
     mQuery('.btn-send').prop('disabled', true);
     mQuery('form[name=\'batch_send\']').submit();
+};
+
+Mautic.submitAbSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'ab_test_send\']').submit();
 };
 
 Mautic.emailSendOnLoad = function (container, response) {
@@ -241,7 +251,7 @@ Mautic.selectEmailType = function(emailType) {
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
-        mQuery('#leadList').addClass('hide');
+        mQuery('#leadList,#ab-test').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }
 

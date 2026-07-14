@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -12,7 +14,7 @@ use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 
-class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
+final class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ContactLimiterTrait;
     use MockedConnectionTrait;
@@ -23,7 +25,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
@@ -74,7 +76,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testMinContactId(): void
     {
-        $contactLimiter = new ContactLimiter(50, null, 4, null);
+        $contactLimiter = new ContactLimiter(50, null, 4);
 
         $qb             = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
@@ -90,7 +92,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchMinContactId(): void
     {
-        $contactLimiter = new ContactLimiter(50, null, 4, null);
+        $contactLimiter = new ContactLimiter(50, null, 4);
 
         $qb             = new DbalQueryBuilder($this->connection);
         $contactLimiter->setBatchMinContactId(10);

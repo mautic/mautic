@@ -128,7 +128,8 @@ class FileApiController extends CommonApiController
 
         if (!file_exists($filePath)) {
             return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
-        } elseif (!is_writable($filePath)) {
+        }
+        if (!is_writable($filePath)) {
             return $this->returnError('File is not writable');
         }
         unlink($filePath);
@@ -144,10 +145,8 @@ class FileApiController extends CommonApiController
      *
      * @param string $dir
      * @param bool   $createDir
-     *
-     * @return string
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
+    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];

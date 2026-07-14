@@ -26,8 +26,8 @@ class FormFieldFileType extends AbstractType
     public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

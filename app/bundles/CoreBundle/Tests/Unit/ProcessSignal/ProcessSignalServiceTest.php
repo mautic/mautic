@@ -9,7 +9,7 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ProcessSignalServiceTest extends TestCase
+final class ProcessSignalServiceTest extends TestCase
 {
     private ProcessSignalService $processSignalService;
 
@@ -53,7 +53,7 @@ class ProcessSignalServiceTest extends TestCase
     {
         $beforeCallbackCalled = false;
 
-        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled) {
+        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled): void {
             $beforeCallbackCalled = true;
         }, $signals);
 

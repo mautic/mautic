@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Form\DataTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
 use PHPUnit\Framework\TestCase;
 
-class SortableListTransformerTest extends TestCase
+final class SortableListTransformerTest extends TestCase
 {
     /**
      * @param array<string, array<int|string, string>>    $input

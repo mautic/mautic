@@ -18,8 +18,8 @@ class DeleteLeadListsCommand extends Command
     public const COMMAND_NAME = 'mautic:segment:delete';
 
     public function __construct(
-        private ListModel $listModel,
-        private LeadListRepository $leadListRepository,
+        private readonly ListModel $listModel,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct();
     }

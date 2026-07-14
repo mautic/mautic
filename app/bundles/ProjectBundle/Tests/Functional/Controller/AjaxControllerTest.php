@@ -23,7 +23,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectModel = self::getContainer()->get(ProjectModel::class);
 
         $projects = array_map(
-            static function (string $projectName) use ($projectModel) {
+            static function (string $projectName) use ($projectModel): Project {
                 $project = new Project();
                 $project->setName($projectName);
                 $projectModel->saveEntity($project);
@@ -63,8 +63,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testCreatingDuplicateProject(): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         $this->assertCount(
             0,
@@ -123,8 +124,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
     public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with an XSS payload in the name
         $project = new Project();
@@ -157,15 +159,15 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $escapedPayload = htmlspecialchars($xssPayload, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // Assert the malicious payload is properly escaped
-        Assert::assertStringContainsString($escapedPayload, $projectOptions, 'Project name should be HTML-escaped in the response');
+        Assert::assertStringContainsString($escapedPayload, (string) $projectOptions, 'Project name should be HTML-escaped in the response');
 
         // Assert the dangerous substring is NOT present in the response
-        Assert::assertStringNotContainsString($dangerousSubstring, $projectOptions, 'Raw XSS payload should not be present in the response');
+        Assert::assertStringNotContainsString($dangerousSubstring, (string) $projectOptions, 'Raw XSS payload should not be present in the response');
 
         // Assert proper option structure with escaped content
         Assert::assertStringContainsString(
             '<option value="'.$project->getId().'">'.$escapedPayload.'</option>',
-            $projectOptions,
+            (string) $projectOptions,
             'Option should contain properly escaped label'
         );
 
@@ -187,12 +189,12 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         // Verify the malicious project can be selected
         Assert::assertStringContainsString(
             '<option selected="selected" value="'.$project->getId().'">'.$escapedPayload.'</option>',
-            $projectOptions2,
+            (string) $projectOptions2,
             'Malicious project should be selectable with escaped content'
         );
 
         // Verify dangerous content is still not present when selected
-        Assert::assertStringNotContainsString($dangerousSubstring, $projectOptions2, 'Raw XSS payload should not be present even when selected');
+        Assert::assertStringNotContainsString($dangerousSubstring, (string) $projectOptions2, 'Raw XSS payload should not be present even when selected');
     }
 
     /**
@@ -225,8 +227,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('specialCharacterProjectNamesProvider')]
     public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with special characters
         $project = new Project();
@@ -257,19 +260,19 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $escapedName    = htmlspecialchars($projectName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // Verify the project appears correctly with escaped name
-        Assert::assertStringContainsString($escapedName, $projectOptions, 'Project name with special characters should be HTML-escaped');
+        Assert::assertStringContainsString($escapedName, (string) $projectOptions, 'Project name with special characters should be HTML-escaped');
 
         // Verify the selected project has the selected attribute
         Assert::assertStringContainsString(
             '<option selected="selected" value="'.$project->getId().'">'.$escapedName.'</option>',
-            $projectOptions,
+            (string) $projectOptions,
             'Selected project should have selected attribute and escaped name'
         );
 
         // Verify the unselected project appears without selected attribute
         Assert::assertStringContainsString(
             '<option value="'.$unselectedProject->getId().'">Unselected Project</option>',
-            $projectOptions,
+            (string) $projectOptions,
             'Unselected project should not have selected attribute'
         );
 
@@ -291,13 +294,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         // Verify selections are preserved correctly
         Assert::assertStringContainsString(
             '<option selected="selected" value="'.$unselectedProject->getId().'">Unselected Project</option>',
-            $projectOptions2,
+            (string) $projectOptions2,
             'Selection changes should be preserved'
         );
 
         Assert::assertStringContainsString(
             '<option value="'.$project->getId().'">'.$escapedName.'</option>',
-            $projectOptions2,
+            (string) $projectOptions2,
             'Previously selected project should now be unselected'
         );
     }

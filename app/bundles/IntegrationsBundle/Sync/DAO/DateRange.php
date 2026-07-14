@@ -7,23 +7,17 @@ namespace Mautic\IntegrationsBundle\Sync\DAO;
 class DateRange
 {
     public function __construct(
-        private ?\DateTimeInterface $fromDate,
-        private ?\DateTimeInterface $toDate,
+        private readonly ?\DateTimeInterface $fromDate,
+        private readonly ?\DateTimeInterface $toDate,
     ) {
     }
 
-    /**
-     * Get the value of fromDate.
-     */
-    public function getFromDate()
+    public function getFromDate(): ?\DateTimeInterface
     {
         return $this->fromDate;
     }
 
-    /**
-     * Get the value of toDate.
-     */
-    public function getToDate()
+    public function getToDate(): ?\DateTimeInterface
     {
         return $this->toDate;
     }

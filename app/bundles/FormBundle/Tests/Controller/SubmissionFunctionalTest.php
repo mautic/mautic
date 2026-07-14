@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\PageBundle\Entity\Page;
@@ -29,6 +30,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     use FormTestHelperTrait;
 
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
@@ -93,11 +95,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $urlParts   = parse_url($currentUrl);
         parse_str($urlParts['query'], $queryParams);
 
-        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        $this->assertSame('/test-form-redirect-target-page', $urlParts['path']);
         // Test that the redirect didn't remove any additional URL parts
-        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertSame('john@doe.com', $queryParams['email']);
         $this->assertGreaterThan(0, (int) $queryParams['lead']);
-        $this->assertEquals('bar', $queryParams['foo']);
+        $this->assertSame('bar', $queryParams['foo']);
     }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
@@ -155,9 +157,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -171,9 +172,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         /** @var SubmissionRepository $submissionRepository */
         $submissionRepository = $this->em->getRepository(Submission::class);
@@ -192,6 +191,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Australia', $contact->getCountry());
         Assert::assertSame('Victoria', $contact->getState());
@@ -200,9 +200,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testRequiredConditionalFieldIfAllFieldsEmpty(): void
@@ -258,9 +257,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -285,6 +283,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertNull($contact->getCountry());
         Assert::assertNull($contact->getState());
@@ -294,9 +293,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testRequiredConditionalFieldIfRequiredStateShouldKickIn(): void
@@ -352,9 +349,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -378,9 +373,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testProgressiveFormsWithMaximumFieldsDisplayedAtTime(): void
@@ -566,7 +559,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $submission     = $response['submissions'][0];
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         Assert::assertSame($formId, $submission['form']['id']);
         Assert::assertGreaterThanOrEqual(1, $response['total']);
 
@@ -603,7 +596,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
@@ -672,6 +665,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Acquia', $contact->getCompany());
         Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
@@ -681,9 +675,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$form->getId()}/delete");
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testSendSubmissionWhenFieldHaveMysqlReservedWords(): void
@@ -738,6 +730,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('test', $contact->getFirstname());
 
@@ -747,13 +740,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Results for Submission test form', $clientResponse->getContent());
+        $this->assertStringContainsString('Results for Submission test form', (string) $clientResponse->getContent());
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     private function getUserPlainPassword(): string
@@ -868,7 +859,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Get form submissions via API
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $submissionsData = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $submissionsData);
@@ -881,7 +872,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -901,11 +892,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Get contact companies
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact['id']}/companies");
         $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $contactCompanies = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $contactCompanies);
         $this->assertArrayHasKey('companies', $contactCompanies);
-        $this->assertEquals(1, count($contactCompanies['companies']));
+        $this->assertCount(1, $contactCompanies['companies']);
 
         // Check company details
         $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);
@@ -914,8 +905,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -1102,7 +1092,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Get form submissions via API
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions");
         $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $submissionsData = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $submissionsData);
@@ -1115,7 +1105,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -1125,7 +1115,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Get contact
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$submissionContact['id']}");
         $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $contactResponse = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('contact', $contactResponse);
         $contact = $contactResponse['contact'];
@@ -1136,12 +1126,10 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_DELETE, "/api/fields/contact/{$contactCustomField['id']}/delete");
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -1361,7 +1349,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submissionsResponse = $this->client->getResponse();
         $submissionsData     = json_decode($submissionsResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $submissionsResponse->getStatusCode(), $submissionsResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('submissions', $submissionsData);
         $this->assertCount(1, $submissionsData['submissions']);
 
@@ -1397,7 +1385,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $finalSubmissionsResponse = $this->client->getResponse();
         $finalSubmissionsData     = json_decode($finalSubmissionsResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $finalSubmissionsResponse->getStatusCode(), $finalSubmissionsResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('submissions', $finalSubmissionsData);
         $this->assertCount(1, $finalSubmissionsData['submissions']);
 
@@ -1406,6 +1394,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
+        /** @var SubmissionModel $submissionModel */
         $submissionModel = static::getContainer()->get('mautic.form.model.submission');
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);
@@ -1467,10 +1456,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'mauticform[name]' => 'Name',
         ]);
         $this->client->submit($form);
-
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         /** @var SubmissionRepository $submissionRepository */
         $submissionRepository = $this->em->getRepository(Submission::class);
@@ -1484,9 +1470,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
@@ -1517,9 +1502,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submissionId = $submissions[0]->getId();
 
         $this->client->request(Request::METHOD_POST, "/s/forms/results/{$form['id']}/delete/{$submissionId}");
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $conn        = $this->em->getConnection();
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
@@ -1561,9 +1545,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->restart();
 
         $this->client->request(Request::METHOD_POST, "s/forms/results/{$form['id']}/batchDelete?ids={$submissionIdsEncoded}");
-        $clientResponse = $this->client->getResponse();
 
-        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
