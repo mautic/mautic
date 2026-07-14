@@ -161,10 +161,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertStringContainsString($matchingEmail->getName(), $response['newContent']);
-        $this->assertStringNotContainsString($nonMatchingThemeEmail->getName(), $response['newContent']);
-        $this->assertStringNotContainsString($nonMatchingCategoryEmail->getName(), $response['newContent']);
-        $this->assertStringNotContainsString('No Results Found', $response['newContent']);
+        $this->assertStringContainsString($matchingEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingThemeEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCategoryEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $response['newContent']);
     }
 
     public function testIndexActionHandlesEmptyQuickFiltersPayload(): void
