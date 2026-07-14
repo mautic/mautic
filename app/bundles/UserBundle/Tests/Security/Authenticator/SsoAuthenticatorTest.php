@@ -56,7 +56,7 @@ final class SsoAuthenticatorTest extends TestCase
         $request = new Request();
         $request->server->set('REQUEST_METHOD', $method);
 
-        if (true === $expected) {
+        if ($expected) {
             $httpUtils->method('checkRequestPath')
                 ->with($request, $path)
                 ->willReturn(true);
@@ -68,7 +68,7 @@ final class SsoAuthenticatorTest extends TestCase
             }
         }
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideIsPost(): \Generator
@@ -110,7 +110,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($request, $path)
             ->willReturn($expected);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideCheckPath(): \Generator
@@ -152,7 +152,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($request, $path)
             ->willReturn(true);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideFormOnly(): \Generator
@@ -201,7 +201,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($request, $path)
             ->willReturn(true);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideRequestIntegrationParameter(): \Generator
@@ -251,32 +251,32 @@ final class SsoAuthenticatorTest extends TestCase
 
         $passport = $authenticator->authenticate($request);
         $badges   = $passport->getBadges();
-        self::assertCount($enableCsrf ? 4 : 3, $badges);
+        $this->assertCount($enableCsrf ? 4 : 3, $badges);
 
         $userBadge = $passport->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $passwordBadge = $passport->getBadge(PasswordCredentials::class);
         $this->assertInstanceOf(PasswordCredentials::class, $passwordBadge);
-        self::assertSame($password, $passwordBadge->getPassword());
+        $this->assertSame($password, $passwordBadge->getPassword());
 
-        self::assertTrue($passport->hasBadge(RememberMeBadge::class));
+        $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
 
         // Badge will be added later by PasswordStrengthSubscriber
         $passwordStrengthBadge = $passport->getBadge(PasswordStrengthBadge::class);
-        self::assertNull($passwordStrengthBadge);
+        $this->assertNotInstanceOf(PasswordStrengthBadge::class, $passwordStrengthBadge);
 
         if (!$enableCsrf) {
-            self::assertFalse($passport->hasBadge(CsrfTokenBadge::class));
+            $this->assertFalse($passport->hasBadge(CsrfTokenBadge::class));
 
             return;
         }
 
         $csrfTokenBadge = $passport->getBadge(CsrfTokenBadge::class);
         $this->assertInstanceOf(CsrfTokenBadge::class, $csrfTokenBadge);
-        self::assertSame($csrfToken, $csrfTokenBadge->getCsrfToken());
-        self::assertSame('authenticate', $csrfTokenBadge->getCsrfTokenId());
+        $this->assertSame($csrfToken, $csrfTokenBadge->getCsrfToken());
+        $this->assertSame('authenticate', $csrfTokenBadge->getCsrfTokenId());
     }
 
     public static function provideEnableCsrf(): \Generator
@@ -340,7 +340,7 @@ final class SsoAuthenticatorTest extends TestCase
 
         $userBadge = $passport->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $this->expectException(UserNotFoundException::class);
 
@@ -406,8 +406,8 @@ final class SsoAuthenticatorTest extends TestCase
 
         $userBadge = $passport->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
-        self::assertSame($user, $userBadge->getUser());
+        $this->assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($user, $userBadge->getUser());
     }
 
     public function testAuthenticateListenerForcesFailure(): void
@@ -497,7 +497,7 @@ final class SsoAuthenticatorTest extends TestCase
 
         $userBadge = $passport->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage($failedMessage);
@@ -586,8 +586,8 @@ final class SsoAuthenticatorTest extends TestCase
 
         $userBadge = $passport->getBadge(UserBadge::class);
         $this->assertInstanceOf(UserBadge::class, $userBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
-        self::assertSame($user, $userBadge->getUser());
+        $this->assertSame($user, $userBadge->getUser());
     }
 }

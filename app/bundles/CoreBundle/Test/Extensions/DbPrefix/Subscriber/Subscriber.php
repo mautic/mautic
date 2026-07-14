@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Test\Extensions\DbPrefix\DbPrefix;
 
 abstract class Subscriber
 {
-    public function __construct(private DbPrefix $dbPrefix)
-    {
+    public function __construct(
+        private readonly DbPrefix $dbPrefix,
+    ) {
     }
 
     public function dbPrefix(): DbPrefix

@@ -21,8 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class AnalyseCustomFieldCommand extends Command
 {
-    public function __construct(private readonly FieldModel $fieldModel, private readonly LeadModel $leadModel, private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly FieldModel $fieldModel,
+        private readonly LeadModel $leadModel,
+        private readonly TranslatorInterface $translator,
+    ) {
         parent::__construct();
     }
 
@@ -74,7 +77,7 @@ class AnalyseCustomFieldCommand extends Command
 
             $label  = $analysisDetail['label'];
             $rows[] = [
-                "\"$label\"",
+                "\"{$label}\"",
                 $analysisDetail['alias'],
                 $columnLength,
                 $maxLength,

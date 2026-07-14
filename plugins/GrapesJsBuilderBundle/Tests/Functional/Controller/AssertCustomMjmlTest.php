@@ -47,6 +47,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         $responseData = $this->createEmailViaApi();
         $emailId      = $responseData['email']['id'];
         $email        = $this->em->getRepository(Email::class)->find($emailId);
+        $this->assertInstanceOf(Email::class, $email);
         $this->addToGrapesJsBuilder($email);
 
         // Get email & check for both customHtml & customMjml in the response.

@@ -43,15 +43,13 @@ abstract class CampaignTestAbstract extends TestCase
 
         $security = $this->createMock(CorePermissions::class);
 
-        $security->expects($this->any())
+        $security
             ->method('isGranted')
             ->willReturn(true);
 
-        $userHelper = $this->createMock(UserHelper::class);
-
         $formRepository = $this->createMock(FormRepository::class);
 
-        $formRepository->expects($this->any())
+        $formRepository
             ->method('getFormList')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
@@ -60,7 +58,7 @@ abstract class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([6 => $entityManager])
             ->getMock();
 
-        $leadListModel->expects($this->any())
+        $leadListModel
             ->method('getUserLists')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
@@ -69,7 +67,7 @@ abstract class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([12 => $entityManager])
             ->getMock();
 
-        $formModel->expects($this->any())
+        $formModel
             ->method('getRepository')
             ->willReturn($formRepository);
 
@@ -85,7 +83,7 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
-            $userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
         );

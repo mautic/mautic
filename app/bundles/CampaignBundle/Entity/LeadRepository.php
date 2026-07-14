@@ -129,10 +129,9 @@ class LeadRepository extends CommonRepository
     /**
      * Check Lead in campaign.
      *
-     * @param Lead  $lead
-     * @param array $options
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
      */
-    public function checkLeadInCampaigns($lead, $options = []): bool
+    public function checkLeadInCampaigns($lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -620,7 +619,7 @@ class LeadRepository extends CommonRepository
         $leadAlias         = 'l';
 
         $queryBuilder->select(
-            "$leadAlias.country",
+            "{$leadAlias}.country",
             'count(id) AS contacts'
         )
         ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
@@ -628,13 +627,13 @@ class LeadRepository extends CommonRepository
             $leadCampaignAlias,
             MAUTIC_TABLE_PREFIX.'leads',
             $leadAlias,
-            "$leadAlias.id = $leadCampaignAlias.lead_id"
+            "{$leadAlias}.id = {$leadCampaignAlias}.lead_id"
         )
-        ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
-        ->andWhere("$leadCampaignAlias.manually_removed = :false")
-        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
-        ->groupBy("$leadAlias.country")
-        ->orderBy("$leadAlias.country", 'ASC')
+        ->andWhere("{$leadCampaignAlias}.campaign_id = :campaign")
+        ->andWhere("{$leadCampaignAlias}.manually_removed = :false")
+        ->andWhere("{$leadCampaignAlias}.date_added BETWEEN :dateFrom AND :dateTo")
+        ->groupBy("{$leadAlias}.country")
+        ->orderBy("{$leadAlias}.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))

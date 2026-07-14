@@ -85,18 +85,15 @@ final class ContactObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
-                    $this->assertManipulator($lead, 'create');
+            ->willReturnCallback(function (Lead $lead) use ($idMap): void {
+                $this->assertManipulator($lead, 'create');
 
-                    // Set contact ID
-                    $reflection = new \ReflectionClass($lead);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($lead, $idMap[$lead->getEmail()]);
+                // Set contact ID
+                $reflection = new \ReflectionClass($lead);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($lead, $idMap[$lead->getEmail()]);
+            });
 
-                    return true;
-                })
-            );
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
@@ -138,18 +135,14 @@ final class ContactObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
-                    $this->assertManipulator($lead, 'create');
+            ->willReturnCallback(function (Lead $lead) use ($idMap): void {
+                $this->assertManipulator($lead, 'create');
 
-                    // Set contact ID
-                    $reflection = new \ReflectionClass($lead);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
-
-                    return true;
-                })
-            );
+                // Set contact ID
+                $reflection = new \ReflectionClass($lead);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
+            });
 
         $this->repository->expects($this->exactly(3))
             ->method('detachEntity');
@@ -243,7 +236,7 @@ final class ContactObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
 
@@ -328,7 +321,7 @@ final class ContactObjectHelperTest extends TestCase
             ->with(1)
             ->willReturn($contact);
 
-        self::assertSame($contact, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($contact, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
@@ -337,7 +330,7 @@ final class ContactObjectHelperTest extends TestCase
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Lead::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     /**

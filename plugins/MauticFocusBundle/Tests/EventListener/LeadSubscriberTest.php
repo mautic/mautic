@@ -58,7 +58,7 @@ final class LeadSubscriberTest extends CommonMocks
         $matcher              = $this->any();
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.focus.event.view', $parameters[0]);
 
@@ -69,6 +69,8 @@ final class LeadSubscriberTest extends CommonMocks
 
                     return self::EVENT_TYPE_CLICK_NAME;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
     }
 

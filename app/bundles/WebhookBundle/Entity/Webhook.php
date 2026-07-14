@@ -81,7 +81,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['webhook:read', 'webhook:write'])]
     private $category;
 
@@ -534,7 +534,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;

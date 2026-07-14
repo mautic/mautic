@@ -23,7 +23,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getEntities', 'getEntity'])
             ->getMock();
 
-        $mockListModel->expects($this->any())
+        $mockListModel
             ->method('getEntity')
             ->willReturnCallback(function ($id): MockObject {
                 $mockEntity = $this->getMockBuilder(LeadList::class)
@@ -48,7 +48,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity1->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getId')
             ->willReturn(1);
 
@@ -56,7 +56,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity2->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters));
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getId')
             ->willReturn(2);
 
@@ -64,7 +64,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity3->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getId')
             ->willReturn(3);
 
@@ -72,7 +72,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity4->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters4));
-        $mockEntity4->expects($this->any())
+        $mockEntity4
             ->method('getId')
             ->willReturn(4);
 
@@ -101,31 +101,29 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}>
+     * @return \Iterator<int, array{array<int, mixed>, array<int, mixed>, string}>
      */
-    public static function segmentTestDataProvider(): array
+    public static function segmentTestDataProvider(): \Iterator
     {
-        return [
-            [
-                [1],
-                [1 => '1'],
-                '2 is dependent on 1, so 1 cannot be deleted.',
-            ],
-            [
-                [1, 3],
-                [1 => '1', 3 => '3'],
-                '2 is dependent on 1 & 3, so 1 & 3 cannot be deleted.',
-            ],
-            [
-                [1, 2, 3, 4],
-                [],
-                'Since we are deleting all segments, it should not prevent any from being deleted.',
-            ],
-            [
-                [2],
-                [],
-                'Segments without any other segment dependent on them should always be able to be deleted.',
-            ],
+        yield [
+            [1],
+            [1 => '1'],
+            '2 is dependent on 1, so 1 cannot be deleted.',
+        ];
+        yield [
+            [1, 3],
+            [1 => '1', 3 => '3'],
+            '2 is dependent on 1 & 3, so 1 & 3 cannot be deleted.',
+        ];
+        yield [
+            [1, 2, 3, 4],
+            [],
+            'Since we are deleting all segments, it should not prevent any from being deleted.',
+        ];
+        yield [
+            [2],
+            [],
+            'Segments without any other segment dependent on them should always be able to be deleted.',
         ];
     }
 }

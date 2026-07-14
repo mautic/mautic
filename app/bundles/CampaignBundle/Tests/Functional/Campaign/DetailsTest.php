@@ -46,7 +46,7 @@ final class DetailsTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString($campaign->getName(), $response->getContent());
-        Assert::assertStringContainsString(sprintf('data-target-url="/s/campaigns/view/%s/contact/1"', $campaign->getId()), $response->getContent());
+        Assert::assertStringContainsString($campaign->getName(), (string) $response->getContent());
+        Assert::assertStringContainsString(sprintf('data-target-url="/s/campaigns/view/%s/contact/1"', $campaign->getId()), (string) $response->getContent());
     }
 }

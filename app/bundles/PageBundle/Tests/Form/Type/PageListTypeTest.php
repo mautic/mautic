@@ -23,9 +23,8 @@ final class PageListTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        $corePermissionsHelper = $this->createMock(CorePermissions::class);
         $this->pageModelMock   = $this->createMock(PageModel::class);
-        $this->page            = new PageListType($this->pageModelMock, $corePermissionsHelper);
+        $this->page            = new PageListType($this->pageModelMock, $this->createStub(CorePermissions::class));
     }
 
     public function testPageListTypeOptionsChoices(): void

@@ -19,7 +19,7 @@ class WebhookQueue
 
     private ?\DateTime $dateAdded = null;
 
-    private ?\DateTimeImmutable $dateModified = null; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTimeImmutable $dateModified = null;
 
     /**
      * @var string|resource|null

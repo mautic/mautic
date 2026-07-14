@@ -114,7 +114,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
             $additionArguments[$k] = is_numeric($v) && intval($v) === $v ? $v : $this->literal($v);
         }
 
-        return $func.'('.$x.(count($additionArguments) ? ', ' : '').join(',', $additionArguments).')';
+        return $func.'('.$x.(count($additionArguments) ? ', ' : '').implode(',', $additionArguments).')';
     }
 
     /**

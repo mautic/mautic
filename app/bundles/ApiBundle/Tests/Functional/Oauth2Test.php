@@ -152,13 +152,13 @@ final class Oauth2Test extends MauticMysqlTestCase
         );
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('"users":[', (string) $this->client->getResponse()->getContent());
     }
 
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
     {
         $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $accessToken = $this->createUserBoundAccessToken($adminUser);
 
@@ -168,11 +168,11 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         $this->requestWithBearerToken('/api/users', $accessToken->getToken());
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('"users":[', (string) $this->client->getResponse()->getContent());
 
         $this->requestWithBearerToken('/api/v2/users', $accessToken->getToken());
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"member"', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('"member"', (string) $this->client->getResponse()->getContent());
     }
 
     private function requestWithBearerToken(string $uri, string $accessToken): void
@@ -216,7 +216,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->em->clear();
 
         $reloadedToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
-        self::assertInstanceOf(AccessToken::class, $reloadedToken);
+        $this->assertInstanceOf(AccessToken::class, $reloadedToken);
 
         return $reloadedToken;
     }

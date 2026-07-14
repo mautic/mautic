@@ -143,120 +143,118 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<int, array<string, mixed>>>
+     * @return \Iterator<int, array<int, array<string, mixed>>>
      */
-    public static function formDataProvider(): array
+    public static function formDataProvider(): \Iterator
     {
-        return [
+        yield [
             [
-                [
-                    'name'        => 'Form API test',
-                    'formType'    => 'standalone',
-                    'isPublished' => true,
-                    'description' => 'Functional API test',
-                    'fields'      => [
-                        [
-                            'label'     => 'Email',
-                            'alias'     => 'email',
-                            'type'      => 'text',
-                            'leadField' => 'email',
-                        ],
-                        [
-                            'label'        => 'Company Address',
-                            'type'         => 'text',
-                            'alias'        => 'companyaddress1',
-                            'leadField'    => 'companyaddress1',
-                        ],
-                        [
-                            'label'        => 'Company Phone',
-                            'type'         => 'tel',
-                            'alias'        => 'phone',
-                            'leadField'    => 'companyphone',
-                        ],
-                        [
-                            'label'        => 'Country',
-                            'type'         => 'country',
-                            'alias'        => 'country',
-                            'mappedObject' => 'contact',
-                            'mappedField'  => 'country',
-                        ],
+                'name'        => 'Form API test',
+                'formType'    => 'standalone',
+                'isPublished' => true,
+                'description' => 'Functional API test',
+                'fields'      => [
+                    [
+                        'label'     => 'Email',
+                        'alias'     => 'email',
+                        'type'      => 'text',
+                        'leadField' => 'email',
                     ],
-                    'postAction'  => 'return',
+                    [
+                        'label'        => 'Company Address',
+                        'type'         => 'text',
+                        'alias'        => 'companyaddress1',
+                        'leadField'    => 'companyaddress1',
+                    ],
+                    [
+                        'label'        => 'Company Phone',
+                        'type'         => 'tel',
+                        'alias'        => 'phone',
+                        'leadField'    => 'companyphone',
+                    ],
+                    [
+                        'label'        => 'Country',
+                        'type'         => 'country',
+                        'alias'        => 'country',
+                        'mappedObject' => 'contact',
+                        'mappedField'  => 'country',
+                    ],
                 ],
-                [
-                    'newName'      => 'Form API test',
-                    'fields'       => [
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'email',
-                            'mappedField'  => 'email',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyaddress1',
-                            'mappedField'  => 'companyaddress1',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyphone',
-                            'mappedField'  => 'companyphone',
-                        ], [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'country',
-                            'mappedField'  => 'country',
-                        ],
+                'postAction'  => 'return',
+            ],
+            [
+                'newName'      => 'Form API test',
+                'fields'       => [
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'email',
+                        'mappedField'  => 'email',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyaddress1',
+                        'mappedField'  => 'companyaddress1',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyphone',
+                        'mappedField'  => 'companyphone',
+                    ], [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'country',
+                        'mappedField'  => 'country',
                     ],
                 ],
             ],
+        ];
+        yield [
             [
-                [
-                    'name'        => 'Form',
-                    'formType'    => 'standalone',
-                    'isPublished' => true,
-                    'description' => 'Functional API test2',
-                    'fields'      => [
-                        [
-                            'label'        => 'Lastname',
-                            'alias'        => 'lastname',
-                            'type'         => 'text',
-                            'mappedField'  => 'lastname',
-                            'mappedObject' => 'contact',
-                        ],
-                        [
-                            'label'        => 'Company Email',
-                            'type'         => 'text',
-                            'alias'        => 'companyemail1',
-                            'mappedField'  => 'companyemail',
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyemail',
-                        ],
-                        [
-                            'label'        => 'Phone',
-                            'type'         => 'tel',
-                            'alias'        => 'phone',
-                            'leadField'    => 'position',
-                        ],
+                'name'        => 'Form',
+                'formType'    => 'standalone',
+                'isPublished' => true,
+                'description' => 'Functional API test2',
+                'fields'      => [
+                    [
+                        'label'        => 'Lastname',
+                        'alias'        => 'lastname',
+                        'type'         => 'text',
+                        'mappedField'  => 'lastname',
+                        'mappedObject' => 'contact',
                     ],
-                    'postAction'  => 'return',
+                    [
+                        'label'        => 'Company Email',
+                        'type'         => 'text',
+                        'alias'        => 'companyemail1',
+                        'mappedField'  => 'companyemail',
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyemail',
+                    ],
+                    [
+                        'label'        => 'Phone',
+                        'type'         => 'tel',
+                        'alias'        => 'phone',
+                        'leadField'    => 'position',
+                    ],
                 ],
-                [
-                    'newName'      => 'Form API test',
-                    'fields'       => [
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'lastname',
-                            'mappedField'  => 'lastname',
-                        ],
-                        [
-                            'mappedObject' => 'company',
-                            'leadField'    => 'companyemail',
-                            'mappedField'  => 'companyemail',
-                        ],
-                        [
-                            'mappedObject' => 'contact',
-                            'leadField'    => 'position',
-                            'mappedField'  => 'position',
-                        ],
+                'postAction'  => 'return',
+            ],
+            [
+                'newName'      => 'Form API test',
+                'fields'       => [
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'lastname',
+                        'mappedField'  => 'lastname',
+                    ],
+                    [
+                        'mappedObject' => 'company',
+                        'leadField'    => 'companyemail',
+                        'mappedField'  => 'companyemail',
+                    ],
+                    [
+                        'mappedObject' => 'contact',
+                        'leadField'    => 'position',
+                        'mappedField'  => 'position',
                     ],
                 ],
             ],
@@ -271,7 +269,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertTrue(isset($response['form']['id']), $clientResponse->getContent());
+        Assert::assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
 
         $formId = $response['form']['id'];
 
@@ -418,6 +416,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('john@doe.test', $contact->getEmail());
         Assert::assertSame('Czech Republic', $contact->getCountry());

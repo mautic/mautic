@@ -97,7 +97,7 @@ class ListApiController extends CommonApiController
             if (isset($content['lists']) && is_array($content['lists'])) {
                 $segmentIds = array_column($content['lists'], 'id');
 
-                if ($segmentIds) {
+                if ([] !== $segmentIds) {
                     /** @var ListModel $model */
                     $model      = $this->model;
                     $leadCounts = $model->getSegmentContactCount($segmentIds);
@@ -269,7 +269,8 @@ class ListApiController extends CommonApiController
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
-        } elseif ('delete' == $action) {
+        }
+        if ('delete' == $action) {
             return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );

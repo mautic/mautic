@@ -23,10 +23,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 
     private CampaignModel $campaignModel;
 
-    /**
-     * @var string
-     */
-    private $campaignLeadsLabel;
+    private string $campaignLeadsLabel;
 
     protected function setUp(): void
     {
@@ -362,11 +359,11 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Campaign ABC', $response->getContent());
-        self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#actions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
+        $this->assertStringContainsString('Campaign ABC', (string) $response->getContent());
+        $this->assertSame('', trim($crawler->filter('#decisions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#actions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#conditions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
     }
 
     public function testCampaignViewEvents(): void
@@ -378,8 +375,8 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);
-        self::assertCount(2, $body);
+        $this->assertCount(2, $body);
         self::arrayHasKey('actions');
-        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
+        $this->assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', (string) preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
     }
 }

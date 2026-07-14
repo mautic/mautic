@@ -217,7 +217,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->will($this->throwException(new ORMException()));
+            ->willThrowException(new ORMException());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -448,7 +448,7 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository->expects($this->exactly(3))->method('getValue')
             ->willReturnOnConsecutiveCalls(true, false, false);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -457,7 +457,7 @@ final class ImportModelTest extends StandardImportTestHelper
                 ]
             );
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('isOpen')
             ->willReturn(true);
 
@@ -467,7 +467,7 @@ final class ImportModelTest extends StandardImportTestHelper
             ->setConstructorArgs([16 => $this->entityManager])
             ->getMock();
 
-        $leadModel->expects($this->any())
+        $leadModel
             ->method('getEventLogRepository')
             ->willReturn($logRepository);
 

@@ -65,7 +65,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         }
         $report   = $this->createReportData($createByIdUser);
 
-        if ($permissions) {
+        if ([] !== $permissions) {
             $this->setPermission($user, $permissions);
         }
         // Disable the default logging in via username and password.
@@ -95,6 +95,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
+        /** @var RoleModel $roleModel */
         $roleModel = static::getContainer()->get('mautic.user.model.role');
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);

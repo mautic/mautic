@@ -29,10 +29,7 @@ use PHPUnit\Framework\Assert;
  */
 final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ReferenceRepository
-     */
-    private $fixtures;
+    private ReferenceRepository $fixtures;
 
     private ContactSegmentService $contactSegmentService;
 
@@ -134,7 +131,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         // exclude the segment
         $segmentTest3Ref = $this->getReference('segment-test-3');
         $lastRebuiltDate = $segmentTest3Ref->getLastBuiltDate();
-        self::assertNull($lastRebuiltDate);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $lastRebuiltDate);
 
         $this->testSymfonyCommand(
             UpdateLeadListsCommand::NAME,
@@ -144,7 +141,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        self::assertSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was not executed, if excluded.');
+        $this->assertSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was not executed, if excluded.');
 
         $this->testSymfonyCommand(
             'mautic:segments:update',
@@ -162,7 +159,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be 24 contacts in the segment-test-3 segment after rebuilding from the command line.'
         );
 
-        self::assertNotSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was executed, if not excluded.');
+        $this->assertNotSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was executed, if not excluded.');
 
         // Remove the title from all contacts, rebuild the list, and check that list is updated
         $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));

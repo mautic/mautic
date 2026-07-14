@@ -24,7 +24,7 @@ class HandlerContainer
     public function getHandler($transportName)
     {
         if (!isset($this->handlers[$transportName])) {
-            throw new CallbackHandlerNotFound("$transportName has not been registered");
+            throw new CallbackHandlerNotFound("{$transportName} has not been registered");
         }
 
         return $this->handlers[$transportName];

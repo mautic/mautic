@@ -350,7 +350,7 @@ class FormModel extends AbstractCommonModel
         }
         $this->em->flush();
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -422,7 +422,7 @@ class FormModel extends AbstractCommonModel
         $nameGetter = $this->getNameGetter();
 
         return $this->translator->trans($msg, [
-            '%entityName%' => $entity->$nameGetter(),
+            '%entityName%' => $entity->{$nameGetter}(),
             '%entityId%'   => $entity->getId(),
         ]);
     }

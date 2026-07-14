@@ -24,7 +24,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $payload        = json_decode($clientResponse->getContent(), true);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('<option value="email" selected="selected">', $payload['newContent']);
+        Assert::assertStringContainsString('<option value="email" selected="selected">', (string) $payload['newContent']);
     }
 
     public function testNewCaptchaFieldFormCanBeSaved(): void
@@ -145,128 +145,121 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertStringContainsString($expectedHtmlFragment, $response['fieldHtml']);
+        $this->assertStringContainsString($expectedHtmlFragment, (string) $response['fieldHtml']);
     }
 
     /**
-     * @return array<string, array{
-     *     fieldType: string,
-     *     label: string,
-     *     expectedHtmlFragment: string,
-     *     additionalValues: array<string, mixed>|null
-     * }>
+     * @return \Iterator<string, array{fieldType: string, label: string, expectedHtmlFragment: string, additionalValues: (array<string, mixed>|null)}>
      */
-    public static function provideFieldTypesData(): array
+    public static function provideFieldTypesData(): \Iterator
     {
-        return [
-            'email field with link in label' => [
-                'fieldType'            => 'email',
-                'label'                => 'Email <a href="https://example.com" target="_blank">link</a>',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => '',
-                'additionalValues'     => null,
-            ],
-            'email field with link in helpMessage' => [
-                'fieldType'            => 'email',
-                'label'                => 'Email',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => 'Find more info at <a href="https://example.com" target="_blank">link</a>',
-                'additionalValues'     => null,
-            ],
-            'checkbox group field with link in label' => [
-                'fieldType'            => 'checkboxgrp',
-                'label'                => 'Checkbox Group <a href="https://example.com" target="_blank">link</a>',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => '',
-                'additionalValues'     => [
-                    'formfield' => [
-                        'properties' => [
-                            'optionlist' => [
-                                'list' => [
-                                    [
-                                        'label' => 'option1',
-                                        'value' => 'option1',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'checkbox group field with link in helpMessage' => [
-                'fieldType'            => 'checkboxgrp',
-                'label'                => 'Checkbox Group',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => 'Find <a href="https://example.com" target="_blank">link</a>',
-                'additionalValues'     => [
-                    'formfield' => [
-                        'properties' => [
-                            'optionlist' => [
-                                'list' => [
-                                    [
-                                        'label' => 'option1',
-                                        'value' => 'option1',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'checkbox group field with link in option label' => [
-                'fieldType'            => 'checkboxgrp',
-                'label'                => 'Checkbox Group',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">terms and conditions</a>',
-                'helpMessage'          => '',
-                'additionalValues'     => [
-                    'formfield' => [
-                        'properties' => [
-                            'optionlist' => [
-                                'list' => [
-                                    [
-                                        'label' => 'I agree with the <a href="https://example.com" target="_blank">terms and conditions</a>.',
-                                        'value' => '1',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'select field with link in label' => [
-                'fieldType'            => 'select',
-                'label'                => 'Select',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => 'Get <a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'additionalValues'     => [
-                    'formfield' => [
-                        'properties' => [
+        yield 'email field with link in label' => [
+            'fieldType'            => 'email',
+            'label'                => 'Email <a href="https://example.com" target="_blank">link</a>',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => '',
+            'additionalValues'     => null,
+        ];
+        yield 'email field with link in helpMessage' => [
+            'fieldType'            => 'email',
+            'label'                => 'Email',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => 'Find more info at <a href="https://example.com" target="_blank">link</a>',
+            'additionalValues'     => null,
+        ];
+        yield 'checkbox group field with link in label' => [
+            'fieldType'            => 'checkboxgrp',
+            'label'                => 'Checkbox Group <a href="https://example.com" target="_blank">link</a>',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => '',
+            'additionalValues'     => [
+                'formfield' => [
+                    'properties' => [
+                        'optionlist' => [
                             'list' => [
-                                'list' => [
-                                    [
-                                        'label' => 'abc',
-                                        'value' => 'abc',
-                                    ],
+                                [
+                                    'label' => 'option1',
+                                    'value' => 'option1',
                                 ],
                             ],
                         ],
                     ],
                 ],
             ],
-            'select field with link in helpMessage' => [
-                'fieldType'            => 'select',
-                'label'                => 'Select <a href="https://example.com" target="_blank">link</a>',
-                'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
-                'helpMessage'          => '',
-                'additionalValues'     => [
-                    'formfield' => [
-                        'properties' => [
+        ];
+        yield 'checkbox group field with link in helpMessage' => [
+            'fieldType'            => 'checkboxgrp',
+            'label'                => 'Checkbox Group',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => 'Find <a href="https://example.com" target="_blank">link</a>',
+            'additionalValues'     => [
+                'formfield' => [
+                    'properties' => [
+                        'optionlist' => [
                             'list' => [
-                                'list' => [
-                                    [
-                                        'label' => 'abc',
-                                        'value' => 'abc',
-                                    ],
+                                [
+                                    'label' => 'option1',
+                                    'value' => 'option1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        yield 'checkbox group field with link in option label' => [
+            'fieldType'            => 'checkboxgrp',
+            'label'                => 'Checkbox Group',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">terms and conditions</a>',
+            'helpMessage'          => '',
+            'additionalValues'     => [
+                'formfield' => [
+                    'properties' => [
+                        'optionlist' => [
+                            'list' => [
+                                [
+                                    'label' => 'I agree with the <a href="https://example.com" target="_blank">terms and conditions</a>.',
+                                    'value' => '1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        yield 'select field with link in label' => [
+            'fieldType'            => 'select',
+            'label'                => 'Select',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => 'Get <a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'additionalValues'     => [
+                'formfield' => [
+                    'properties' => [
+                        'list' => [
+                            'list' => [
+                                [
+                                    'label' => 'abc',
+                                    'value' => 'abc',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        yield 'select field with link in helpMessage' => [
+            'fieldType'            => 'select',
+            'label'                => 'Select <a href="https://example.com" target="_blank">link</a>',
+            'expectedHtmlFragment' => '<a href="https://example.com" target="_blank" rel="noreferrer noopener">link</a>',
+            'helpMessage'          => '',
+            'additionalValues'     => [
+                'formfield' => [
+                    'properties' => [
+                        'list' => [
+                            'list' => [
+                                [
+                                    'label' => 'abc',
+                                    'value' => 'abc',
                                 ],
                             ],
                         ],

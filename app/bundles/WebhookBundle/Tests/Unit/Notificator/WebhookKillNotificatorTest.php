@@ -81,7 +81,6 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock        = $this->createMock(MailHelper::class);
         $this->coreParamHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->webhook               = $this->createMock(Webhook::class);
-        $userRepositoryMock          = $this->createMock(UserRepository::class);
         $twig                        = $this->createMock(Environment::class);
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
@@ -102,7 +101,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             $this->entityManagerMock,
             $this->mailHelperMock,
             $this->coreParamHelperMock,
-            $userRepositoryMock,
+            $this->createStub(UserRepository::class),
             $eventDispatcher
         );
     }
@@ -212,7 +211,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private function mockCommonMethods(int $sentToAuthor, ?string $emailToSend = null): void
     {
-        $this->coreParamHelperMock->expects($this->any())
+        $this->coreParamHelperMock
             ->method('get')
             ->willReturnOnConsecutiveCalls('from_name', $sentToAuthor, $emailToSend);
 
@@ -225,7 +224,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
         $matcher = $this->exactly(2);
         $this->translatorMock->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.webhook.stopped', $parameters[0]);
 
@@ -242,6 +241,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
                     return $this->details;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->webhook->expects($this->once())
@@ -330,8 +331,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 $modifiedBy
             );
 
-        $modifiedBy->expects(self::atLeastOnce())->method('getEmail')->willReturn($modifiedByEmail);
-        $owner->expects(self::atLeastOnce())->method('getEmail')->willReturn($ownerEmail);
+        $modifiedBy->expects($this->atLeastOnce())->method('getEmail')->willReturn($modifiedByEmail);
+        $owner->expects($this->atLeastOnce())->method('getEmail')->willReturn($ownerEmail);
 
         $this->mailHelperMock
             ->expects($this->once())
@@ -350,7 +351,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $this->coreParamHelperMock->expects(self::atLeastOnce())
+        $this->coreParamHelperMock->expects($this->atLeastOnce())
             ->method('get')
             ->willReturnMap([
                 ['webhook_send_notification_to_author', 1, true],
@@ -439,7 +440,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $this->coreParamHelperMock->expects(self::atLeastOnce())
+        $this->coreParamHelperMock->expects($this->atLeastOnce())
             ->method('get')
             ->willReturnMap([
                 ['webhook_send_notification_to_author', 1, false],

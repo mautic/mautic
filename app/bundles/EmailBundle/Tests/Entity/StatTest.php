@@ -40,20 +40,18 @@ final class StatTest extends TestCase
      * Data provider for addOpenDetails.
      */
     /**
-     * @return array<string, array{0: int}>
+     * @return \Iterator<string, array{int}>
      */
-    public static function addOpenDetailsTestProvider(): array
+    public static function addOpenDetailsTestProvider(): \Iterator
     {
-        return [
-            'no openDetails'            => [0],
-            'one openDetail'            => [1],
-            'low number of openDetails' => [10],
-            'one away from threshold'   => [Stat::MAX_OPEN_DETAILS - 1],
-            'exactly at threshold'      => [Stat::MAX_OPEN_DETAILS],
-            'one past threshold'        => [Stat::MAX_OPEN_DETAILS + 1],
-            'slightly above threshold'  => [Stat::MAX_OPEN_DETAILS + 10],
-            'well beyond threshold'     => [Stat::MAX_OPEN_DETAILS * 10],
-        ];
+        yield 'no openDetails' => [0];
+        yield 'one openDetail' => [1];
+        yield 'low number of openDetails' => [10];
+        yield 'one away from threshold' => [Stat::MAX_OPEN_DETAILS - 1];
+        yield 'exactly at threshold' => [Stat::MAX_OPEN_DETAILS];
+        yield 'one past threshold' => [Stat::MAX_OPEN_DETAILS + 1];
+        yield 'slightly above threshold' => [Stat::MAX_OPEN_DETAILS + 10];
+        yield 'well beyond threshold' => [Stat::MAX_OPEN_DETAILS * 10];
     }
 
     public function testChanges(): void

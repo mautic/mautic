@@ -153,7 +153,8 @@ trait OperatorListTrait
 
         if (is_array($type)) {
             return $this->getOperatorChoiceList($type, $overrideHiddenTypes);
-        } elseif (array_key_exists($type ?? '', $processedTypes)) {
+        }
+        if (array_key_exists($type ?? '', $processedTypes)) {
             return $processedTypes[$type];
         }
 
@@ -180,7 +181,7 @@ trait OperatorListTrait
      *
      * @return mixed[]
      */
-    public function getOperatorChoiceList($definition, $overrideHiddenOperators = []): array
+    public function getOperatorChoiceList(array $definition, $overrideHiddenOperators = []): array
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {

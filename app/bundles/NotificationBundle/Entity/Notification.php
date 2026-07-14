@@ -124,7 +124,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
+     */
     #[Groups(['notification:read', 'notification:write'])]
     private $category;
 
@@ -342,7 +342,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';

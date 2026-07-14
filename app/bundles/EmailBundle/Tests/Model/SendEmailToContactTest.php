@@ -173,7 +173,6 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         $emailMock = $this->createMock(Email::class);
         $emailMock
-            ->expects($this->any())
             ->method('getId')
             ->willReturn(1);
 
@@ -251,7 +250,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         );
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -361,12 +360,12 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (EmailSendEvent $event, $eventName): EmailSendEvent {
+                function (EmailSendEvent $event, ?string $eventName): EmailSendEvent {
                     $lead = $event->getLead();
 
                     $tokens = [];
                     foreach ($lead as $field => $value) {
-                        $tokens["{contactfield=$field}"] = $value;
+                        $tokens["{contactfield={$field}}"] = $value;
                     }
                     $tokens['{hash}'] = $event->getIdHash();
 
@@ -384,7 +383,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
@@ -467,7 +466,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -585,7 +584,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $routerMock = $this->createStub(Router::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -690,7 +689,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $twig = $this->createStub(Environment::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $coreParametersHelper->expects($this->atLeast(3))->method('get')
@@ -739,7 +738,6 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         // Set invalid BCC (should use comma as separator)
         $emailMock
-            ->expects($this->any())
             ->method('getBccAddress')
             ->willReturn('test@mautic.com; test@mautic.com');
 

@@ -11,6 +11,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -34,6 +37,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->generateSmallCSV();
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $tagName = 'tag1';
         $tag     = $this->createTag($tagName);
@@ -347,6 +351,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
         $field->setProperties($properties);
 
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
@@ -402,6 +407,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $this->getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
+        /** @var ImportModel $importModel */
         $importModel = static::getContainer()->get('mautic.lead.model.import');
         $importModel->saveEntity($import);
 
@@ -460,6 +466,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->saveEntity($tag);
 

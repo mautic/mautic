@@ -220,7 +220,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['email:read', 'email:write'])]
     private $category;
 
@@ -627,7 +627,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -1392,7 +1392,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function initListChanges(string $property): void
     {
         if (!isset($this->changes[$property])) {
-            $list                     = $this->$property;
+            $list                     = $this->{$property};
             $current                  = $this->getListKeys($list);
             $this->changes[$property] = [$current, $current];
         }
@@ -1437,7 +1437,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
 
-        return true === (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
+        return (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }
 
     public function getSendingStatus(): string

@@ -101,7 +101,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('config.json', $parameters['%files%']);
+                    $this->assertStringContainsString('config.json', (string) $parameters['%files%']);
                 }
             );
 
@@ -121,7 +121,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('message.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -141,7 +141,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('page.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -235,7 +235,7 @@ final class ThemeHelperTest extends TestCase
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -248,17 +248,17 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
+            new class() extends Filesystem {
                 /**
                  * @param string $files
                  */
@@ -290,7 +290,7 @@ final class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
+            new class() extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -323,7 +323,7 @@ final class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -336,17 +336,17 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
+            new class() extends Filesystem {
                 /**
                  * @param string $files
                  */
@@ -378,7 +378,7 @@ final class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
+            new class() extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -555,8 +555,7 @@ final class ThemeHelperTest extends TestCase
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(5))
-            ->method('exists')
-            ->willReturnOnConsecutiveCalls(true, true, true, true, true);
+            ->method('exists')->willReturn(true);
 
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
 

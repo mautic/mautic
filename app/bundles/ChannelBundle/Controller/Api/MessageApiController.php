@@ -60,7 +60,8 @@ class MessageApiController extends CommonApiController
 
         if ('PATCH' === $this->requestStack->getCurrentRequest()->getMethod() && !isset($params['channels'])) {
             return;
-        } elseif (!isset($params['channels'])) {
+        }
+        if (!isset($params['channels'])) {
             $params['channels'] = [];
         }
 

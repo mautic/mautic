@@ -20,15 +20,13 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, list<array<string, bool>>>
+     * @return \Iterator<int, list<array<string, bool>>>
      */
-    public static function joinIpAddressesProvider(): array
+    public static function joinIpAddressesProvider(): \Iterator
     {
-        return [
-            [[]],
-            [['joinIpAddresses' => true]],
-            [['joinIpAddresses' => false]],
-        ];
+        yield [[]];
+        yield [['joinIpAddresses' => true]];
+        yield [['joinIpAddresses' => false]];
     }
 
     /**
@@ -73,9 +71,9 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         foreach ($finalQueries as $query) {
             if ($args['joinIpAddresses'] ?? true) {
-                $this->assertStringContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+                $this->assertStringContainsString('LEFT JOIN test_ip_addresses', (string) $query['sql']);
             } else {
-                $this->assertStringNotContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+                $this->assertStringNotContainsString('LEFT JOIN test_ip_addresses', (string) $query['sql']);
             }
         }
     }

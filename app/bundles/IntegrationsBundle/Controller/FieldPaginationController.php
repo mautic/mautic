@@ -79,7 +79,7 @@ class FieldPaginationController extends CommonController
             ]
         )->getContent();
 
-        $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
+        $prefix   = "integration_config[featureSettings][sync][fieldMappings][{$object}]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
         if (str_ends_with($idPrefix, '_')) {
             $idPrefix = substr($idPrefix, 0, -1);

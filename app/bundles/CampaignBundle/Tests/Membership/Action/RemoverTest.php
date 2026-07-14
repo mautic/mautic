@@ -47,7 +47,7 @@ final class RemoverTest extends \PHPUnit\Framework\TestCase
 
         $this->getRemover()->updateExistingMembership($campaignMember, false);
 
-        $this->assertNull($campaignMember->getDateLastExited());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $campaignMember->getDateLastExited());
     }
 
     public function testExceptionThrownWhenMemberIsAlreadyRemoved(): void
