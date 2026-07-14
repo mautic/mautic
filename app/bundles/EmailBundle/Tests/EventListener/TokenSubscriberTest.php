@@ -57,7 +57,7 @@ final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $requestStack = new RequestStack();
         $themeHelper  = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $mailHashHelper = new MailHashHelper($coreParametersHelper);

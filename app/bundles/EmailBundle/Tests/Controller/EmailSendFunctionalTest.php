@@ -104,7 +104,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         // malform click through parameter
         parse_str($urlParts['query'], $queryParams);
-        self::assertArrayHasKey('ct', $queryParams);
+        $this->assertArrayHasKey('ct', $queryParams);
         $queryParams['ct'] = substr($queryParams['ct'], 0, -5);
 
         $this->requestUrl($urlParts['path'], $queryParams);
@@ -116,7 +116,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         $urlParts = $this->sendEmailToContact('https://localhost/email-{contactfield=email}/link');
 
         parse_str($urlParts['query'], $queryParams);
-        self::assertArrayHasKey('ct', $queryParams);
+        $this->assertArrayHasKey('ct', $queryParams);
 
         $this->requestUrl($urlParts['path'], $queryParams);
         self::assertResponseRedirects('/email-contact-flood-0@doe.com/link');

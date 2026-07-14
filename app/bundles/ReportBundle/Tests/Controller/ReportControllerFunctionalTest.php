@@ -423,27 +423,22 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<mixed>[]
+     * @return \Iterator<(int|string), array<mixed>>
      */
-    public static function scheduleProvider(): array
+    public static function scheduleProvider(): \Iterator
     {
-        return [
-            'null_to_now'      => [null, null, null, SchedulerEnum::UNIT_NOW, null, null],
-            'null_to_daily'    => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'null_to_weekly'   => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'null_to_monthly'  => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST],
-
-            'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
-
-            'weekly_to_daily'   => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'weekly_to_weekly'  => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null],
-            'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'],
-
-            'monthly_to_daily'   => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null],
-            'monthly_to_weekly'  => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null],
-            'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
-        ];
+        yield 'null_to_now' => [null, null, null, SchedulerEnum::UNIT_NOW, null, null];
+        yield 'null_to_daily' => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'null_to_weekly' => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'null_to_monthly' => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST];
+        yield 'daily_to_weekly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'];
+        yield 'weekly_to_daily' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'weekly_to_weekly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null];
+        yield 'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'];
+        yield 'monthly_to_daily' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'monthly_to_weekly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null];
+        yield 'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'];
     }
 
     public function testDescriptionIsNotEscaped(): void
@@ -549,19 +544,19 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
-        self::assertFileExists($csvPath);
+        $this->assertFileExists($csvPath);
 
         // Pretend Mautic has created a ZIP file as in \Mautic\ReportBundle\Scheduler\Model\FileHandler::zipIt
         $zipPath      = str_replace('.csv', '.zip', $csvPath);
         $bytesWritten = file_put_contents($zipPath, 'ZIP');
-        self::assertNotFalse($bytesWritten);
-        self::assertFileExists($zipPath);
+        $this->assertNotFalse($bytesWritten);
+        $this->assertFileExists($zipPath);
 
         $queuedMessage = self::getMailerMessagesByToAddress($toAddress);
 
-        self::assertCount(1, $queuedMessage);
-        self::assertFileExists($csvPath);
-        self::assertFileExists($zipPath);
+        $this->assertCount(1, $queuedMessage);
+        $this->assertFileExists($csvPath);
+        $this->assertFileExists($zipPath);
     }
 
     /**

@@ -17,7 +17,7 @@ class ObjectExtension extends AbstractExtension
         ];
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('object', fn ($value): bool => is_object($value)),

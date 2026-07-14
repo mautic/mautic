@@ -537,7 +537,7 @@ TEXT;
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
         $token = array_key_first($trackables);
-        self::assertNotNull($token);
+        $this->assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
@@ -572,7 +572,7 @@ TEXT;
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
         $token = array_key_first($trackables);
-        self::assertNotNull($token);
+        $this->assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
@@ -691,14 +691,12 @@ CONTENT;
     }
 
     /**
-     * @return array<array<bool|null>> Use null to include both <a> and <map> tags
+     * @return \Iterator<(int|string), array<(bool|null)>> Use null to include both <a> and <map> tags
      */
-    public static function trackMapProvider(): array
+    public static function trackMapProvider(): \Iterator
     {
-        return [
-            [true],
-            [false],
-            [null],
-        ];
+        yield [true];
+        yield [false];
+        yield [null];
     }
 }

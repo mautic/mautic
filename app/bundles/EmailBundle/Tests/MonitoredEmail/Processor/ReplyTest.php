@@ -93,7 +93,7 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $this->leadRepository->expects(self::atLeastOnce())
+        $this->leadRepository->expects($this->atLeastOnce())
             ->method('detachEntity');
 
         $this->contactFinder->method('findByHash')

@@ -111,14 +111,14 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     } elseif (2 === $dispatcCounter) {
-                        self::assertInstanceOf(ExecutedEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
+                        $this->assertInstanceOf(ExecutedEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                     } elseif (3 === $dispatcCounter) {
-                        self::assertInstanceOf(ExecutedBatchEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
+                        $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                     } elseif (4 === $dispatcCounter) {
-                        self::assertInstanceOf(FailedEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
+                        $this->assertInstanceOf(FailedEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                     } else {
                         self::fail('Unknown event called.');
                     }

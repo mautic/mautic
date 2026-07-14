@@ -551,13 +551,13 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -772,7 +772,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     /**
@@ -901,9 +901,9 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @return array<string, array{republishBehavior: string, triggerMode: string, intervalDays: int, auditLogs: array<array{dateAdded: string, details: array<string, array<int, mixed>>}>, expectedTriggerDate: string, expectedIsScheduled: bool}>
+     * @return \Iterator<string, array{republishBehavior: string, triggerMode: string, intervalDays: int, auditLogs: array<array{dateAdded: string, details: array<string, array<int, mixed>>}>, expectedTriggerDate: string, expectedIsScheduled: bool}>
      */
-    public static function republishBehaviorProvider(): array
+    public static function republishBehaviorProvider(): \Iterator
     {
         $unpublishedAfter5days = 'published, unpublished and published';
         $auditLogs             = [
@@ -928,98 +928,95 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 ],
             ],
         ];
-
-        return [
-            'Same the original trigger date as it should not change' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ALL_TIME->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        yield 'Same the original trigger date as it should not change' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ALL_TIME->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            '10 days after last publish which is 2024-10-10 00:00:00' => [
-                'republishBehavior'      => RepublishBehavior::RESTART_ON_PUBLISH->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-20 00:00:00', // 10 days after last publish
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
-                    [
-                        'changedTo' => '2024-10-20 00:00:00',
-                        'note'      => 'Campaign republish behavior: restart_on_publish',
-                    ],
+        ];
+        yield '10 days after last publish which is 2024-10-10 00:00:00' => [
+            'republishBehavior'      => RepublishBehavior::RESTART_ON_PUBLISH->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-20 00:00:00', // 10 days after last publish
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
+                ],
+                [
+                    'changedTo' => '2024-10-20 00:00:00',
+                    'note'      => 'Campaign republish behavior: restart_on_publish',
                 ],
             ],
-            'Scheduled at 2024-10-02 00:00:00 for 10 days (2024-10-12 00:00:00), unpublished at 2024-10-05 00:00:00 after 3 days, published 2024-10-10 00:00:00 (5 days)' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-17 00:00:00', // 3 days were already published, 7 remaining to go after publish of 2024-10-10 00:00:00.
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
-                    [
-                        'changedTo' => '2024-10-17 00:00:00',
-                        'note'      => 'Campaign republish behavior: count_only_while_published',
-                    ],
+        ];
+        yield 'Scheduled at 2024-10-02 00:00:00 for 10 days (2024-10-12 00:00:00), unpublished at 2024-10-05 00:00:00 after 3 days, published 2024-10-10 00:00:00 (5 days)' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-17 00:00:00', // 3 days were already published, 7 remaining to go after publish of 2024-10-10 00:00:00.
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
+                ],
+                [
+                    'changedTo' => '2024-10-17 00:00:00',
+                    'note'      => 'Campaign republish behavior: count_only_while_published',
                 ],
             ],
-            'Absolute date trigger mode should not do anything' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_DATE,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'Absolute date trigger mode should not do anything' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_DATE,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            'Immediate trigger mode should not extend anything' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_IMMEDIATE,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'Immediate trigger mode should not extend anything' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_IMMEDIATE,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            'If the interval is empty then there will be no extension' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 0,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'If the interval is empty then there will be no extension' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 0,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
         ];
