@@ -95,8 +95,8 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $leadRepository = $this->em->getRepository(Lead::class);
-        self::assertInstanceOf(LeadRepository::class, $leadRepository);
-        self::assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+        $this->assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
 
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);

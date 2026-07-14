@@ -1506,7 +1506,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private function getListIdsByAlias(string $alias): array
     {
         return array_map(
-            'intval',
+            intval(...),
             $this->getEntityManager()
                 ->getConnection()
                 ->createQueryBuilder()
