@@ -46,10 +46,10 @@ final class LeadSubscriberTest extends TestCase
 
         $this->subscriber = new LeadSubscriber(
             $pageModel,
-            $this->createMock(VideoModel::class),
+            $this->createStub(VideoModel::class),
             $translator,
-            $this->createMock(RouterInterface::class),
-            $this->createMock(ModelFactory::class),
+            $this->createStub(RouterInterface::class),
+            $this->createStub(ModelFactory::class),
             $this->primaryCompanyHelper
         );
     }
