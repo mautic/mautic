@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 
-class MessageControllerFunctionalTest extends MauticMysqlTestCase
+final class MessageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testFormWithProject(): void
     {
@@ -33,6 +33,7 @@ class MessageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedMessage = $this->em->find(Message::class, $message->getId());
+        $this->assertInstanceOf(Message::class, $savedMessage);
         Assert::assertSame($project->getId(), $savedMessage->getProjects()->first()->getId());
     }
 }

@@ -92,7 +92,7 @@ class SmsType extends AbstractType
             ]
         );
 
-        $mediaFields = function (FormEvent $event) {
+        $mediaFields = function (FormEvent $event): void {
             $form        = $event->getForm();
             $data        = $event->getData();
             $mediaChoice = $data instanceof Sms ? $data->getMedia() : ($data['media'] ?? []);
@@ -194,7 +194,7 @@ class SmsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 if (isset($data['translationParentSelector'])) {
                     $data['translationParent'] = $data['translationParentSelector'];

@@ -220,12 +220,9 @@ class IntegrationEntityRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->notIn(
                     'i.integration_entity_id',
-                    array_map(
-                        fn ($x): string => "'".$x."'",
-                        $excludeIntegrationIds
-                    )
+                    ':excludeIntegrationIds'
                 )
-            );
+            )->setParameter('excludeIntegrationIds', $excludeIntegrationIds, ArrayParameterType::STRING);
         }
 
         $q->andWhere(
@@ -309,10 +306,8 @@ class IntegrationEntityRepository extends CommonRepository
 
     /**
      * @param int $limit
-     *
-     * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead')
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead'): int|array
     {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
@@ -443,10 +438,11 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->executeQuery()->fetchAllAssociative();
-            $plugins = array_map(static fn ($i): string => "'{$i['name']}'", $rows);
+            $plugins    = $pq->executeQuery()->fetchFirstColumn();
+
             if (count($plugins) > 0) {
-                $q->andWhere($q->expr()->in('i.integration', $plugins));
+                $q->andWhere($q->expr()->in('i.integration', ':plugins'))
+                ->setParameter('plugins', $plugins, ArrayParameterType::STRING);
             } else {
                 return [];
             }
@@ -491,11 +487,12 @@ class IntegrationEntityRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('integration', ':integration'),
-                    $q->expr()->in('integration_entity_id', array_map([$q->expr(), 'literal'], $integrationIds))
+                    $q->expr()->in('integration_entity_id', ':integrationIds')
                 )
             )
             ->setParameter('integration', $integration)
             ->setParameter('entity', $internalEntityType.'-deleted')
+            ->setParameter('integrationIds', $integrationIds, ArrayParameterType::STRING)
             ->executeStatement();
     }
 

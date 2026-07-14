@@ -27,15 +27,12 @@ class ConfigChangeLogger
     private ?array $originalNormData = null;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
     ) {
     }
 
-    /**
-     * @return ConfigChangeLogger
-     */
-    public function setOriginalNormData(array $originalNormData)
+    public function setOriginalNormData(array $originalNormData): static
     {
         $this->originalNormData = $originalNormData;
 

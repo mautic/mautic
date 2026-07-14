@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -104,6 +104,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        // @phpstan-ignore new.deprecated
         $event   = new CampaignExecutionEvent(
             [
                 'lead'            => $contact,

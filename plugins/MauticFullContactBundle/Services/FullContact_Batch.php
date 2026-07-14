@@ -2,6 +2,9 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
+use MauticPlugin\MauticFullContactBundle\Exception\NoCreditException;
+use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
+
 /**
  * This class handles everything related to the Company lookup API.
  *
@@ -15,8 +18,8 @@ class FullContact_Batch extends FullContact_Base
     /**
      * @param array $requests
      *
-     * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit
-     * @throws \MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NotImplemented
+     * @throws NoCreditException
+     * @throws NotImplementedException
      */
     public function sendRequests($requests)
     {

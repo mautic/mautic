@@ -10,7 +10,9 @@ use Mautic\FormBundle\Entity\Field;
 final class FieldTemplateTest extends MauticMysqlTestCase
 {
     private const FIELD_LABEL         = 'Test Field';
+
     private const FULL_WIDTH_CLASS    = 'mauticform-100';
+
     private const TEXT_FIELD_TEMPLATE = '@MauticForm/Field/text.html.twig';
 
     public function testFieldTemplateRendersWithCssClasses(): void

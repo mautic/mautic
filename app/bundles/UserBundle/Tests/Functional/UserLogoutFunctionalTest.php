@@ -11,7 +11,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class UserLogoutFunctionalTest extends MauticMysqlTestCase
+final class UserLogoutFunctionalTest extends MauticMysqlTestCase
 {
     public function testLogout(): void
     {
@@ -27,7 +27,7 @@ class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john.doe@email.com');
         $user->setRole($role);
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
 
@@ -44,7 +44,7 @@ class UserLogoutFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(
             'login',
-            $clientResponse->getContent()
+            (string) $clientResponse->getContent()
         );
     }
 }

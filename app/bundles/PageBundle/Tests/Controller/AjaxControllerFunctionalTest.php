@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetBuilderTokensAction(): void
     {
@@ -31,7 +31,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent) {
+            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 
@@ -51,6 +51,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $page = $this->em->getRepository(Page::class)->find($page->getId());
+        $this->assertInstanceOf(Page::class, $page);
         Assert::assertFalse($page->isPublished(), 'The page should not be published.');
         Assert::assertInstanceOf(PageEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
         Assert::assertSame($page->getId(), $dispatchedEvent->getPage()->getId(), 'The page entity should match the one in the request.');

@@ -32,18 +32,18 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private bool $quiet = false;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private TranslatorInterface $translator,
-        private MembershipBuilder $membershipBuilder,
-        private LoggerInterface $logger,
-        private FormatterHelper $formatterHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly LoggerInterface $logger,
+        private readonly FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)

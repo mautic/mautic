@@ -1,0 +1,23 @@
+@mixin lh-keyframes($name) {
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+@mixin lh-transition($transition...) {
+  -webkit-transition: $transition;
+  transition: $transition;
+}
+
+@mixin lh-animation($animation...) {
+  -webkit-animation: $animation;
+  animation: $animation;
+}
+
+@mixin lh-background-image($image...) {
+  background-image: $image;
+}

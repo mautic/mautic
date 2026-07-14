@@ -12,13 +12,12 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 
-class AbstractIntegrationTest extends AbstractIntegrationTestCase
+final class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail(): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration $integration */
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
@@ -72,9 +71,8 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration $integration */
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
@@ -99,9 +97,10 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
 
         $integration->method('makeHttpClient')
             ->willReturn(
+                /** @phpstan-ignore class.extendsFinalByPhpDoc */
                 new class($assertRequest) extends Client {
                     public function __construct(
-                        private object $assertRequest,
+                        private readonly object $assertRequest,
                     ) {
                     }
 
@@ -134,7 +133,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 'ignore_event_dispatch' => true,
                 'encode_parameters'     => 'json',
             ],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */
@@ -160,7 +159,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
             ['this will be' => 'encoded to form array'],
             'POST',
             ['ignore_event_dispatch' => true],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */

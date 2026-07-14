@@ -10,6 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImportValidateEvent extends Event
 {
     private bool $skipIfExists = false;
+
     private ?int $ownerId      = null;
 
     private ?int $list    = null;
@@ -28,8 +29,8 @@ class ImportValidateEvent extends Event
      * @param FormInterface<mixed> $form
      */
     public function __construct(
-        private string $routeObjectName,
-        private FormInterface $form,
+        private readonly string $routeObjectName,
+        private readonly FormInterface $form,
     ) {
     }
 

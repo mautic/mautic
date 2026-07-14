@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Predis\Replication;
 
-final class StrategyConfig
+final readonly class StrategyConfig
 {
     public function __construct(
         private bool $primaryOnly,

@@ -13,8 +13,8 @@ use Mautic\PageBundle\Model\PageModel;
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private PageModel $pageModel,
-        private SubmissionModel $submissionModel,
+        private readonly PageModel $pageModel,
+        private readonly SubmissionModel $submissionModel,
     ) {
     }
 
@@ -38,7 +38,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                             if ('page' == $col) {
                                 $submission->setReferer($this->pageModel->generateUrl($entity));
                             }
-                            $submission->$setter($entity);
+                            $submission->{$setter}($entity);
                             unset($rows[$col]);
                         } else {
                             // the rest are custom field values

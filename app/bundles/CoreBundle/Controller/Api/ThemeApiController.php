@@ -64,7 +64,8 @@ class ThemeApiController extends CommonApiController
                 $this->translator->trans('mautic.core.theme.upload.empty', [], 'validators'),
                 Response::HTTP_BAD_REQUEST
             );
-        } elseif ('zip' !== $extension) {
+        }
+        if ('zip' !== $extension) {
             return $this->returnError(
                 $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators'),
                 Response::HTTP_BAD_REQUEST
@@ -73,18 +74,12 @@ class ThemeApiController extends CommonApiController
         $fileName  = InputHelper::filename($themeZip->getClientOriginalName());
         $dir       = $pathsHelper->getSystemPath('themes', true);
 
-        if (!empty($themeZip)) {
-            try {
-                $themeZip->move($dir, $fileName);
-                $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
-            } catch (\Exception $e) {
-                return $this->returnError(
-                    $this->translator->trans($e->getMessage(), [], 'validators')
-                );
-            }
-        } else {
+        try {
+            $themeZip->move($dir, $fileName);
+            $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
+        } catch (\Exception $e) {
             return $this->returnError(
-                $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                $this->translator->trans($e->getMessage(), [], 'validators')
             );
         }
 

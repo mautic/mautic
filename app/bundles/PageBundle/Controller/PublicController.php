@@ -84,7 +84,7 @@ class PublicController extends AbstractFormController
                 }
                 $model->hitPage($entity, $request, 401);
 
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $lead  = null;
@@ -192,7 +192,7 @@ class PublicController extends AbstractFormController
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
                             uasort(
                                 $variants,
-                                function ($a, $b): int {
+                                function (array $a, array $b): int {
                                     if ($a['weight_deficit'] === $b['weight_deficit']) {
                                         if ($a['hits'] === $b['hits']) {
                                             return 0;
@@ -346,7 +346,7 @@ class PublicController extends AbstractFormController
             'page:pages:viewother',
             $page->getCreatedBy()
         ))) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
@@ -354,7 +354,7 @@ class PublicController extends AbstractFormController
             'lead:leads:viewother'
         ))) {
             // disallow displaying contact information
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (empty($content) && !empty($BCcontent)) {

@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileControllerTest extends MauticMysqlTestCase
+final class FileControllerTest extends MauticMysqlTestCase
 {
-    private $uploadedFilePath;
+    private ?string $uploadedFilePath = null;
 
     public function testImageUploadSuccess(): void
     {
@@ -24,7 +24,7 @@ class FileControllerTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
         $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
-        Assert::assertTrue(file_exists($uploadedImage));
+        Assert::assertFileExists($uploadedImage);
     }
 
     public function testImageUploadFailure(): void
@@ -44,13 +44,12 @@ class FileControllerTest extends MauticMysqlTestCase
         $filePath = $this->getFixurePath();
         copy($filePath.$fileName, $filePath.$tmpFile);
         $this->uploadedFilePath = $filePath.$tmpFile;
-        $image                  = new UploadedFile(
+
+        return new UploadedFile(
             $filePath.$tmpFile,
             $tmpFile,
             'image/png'
         );
-
-        return $image;
     }
 
     private function getFixurePath(): string

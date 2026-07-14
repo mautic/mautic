@@ -23,10 +23,7 @@ class AuthenticationContentEvent extends Event
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

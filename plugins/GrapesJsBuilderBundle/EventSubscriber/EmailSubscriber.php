@@ -15,13 +15,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     private string $existingMjml = '';
+
     private string $existingHtml = '';
 
     public function __construct(
-        private Config $config,
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
-        private EmailModel $emailModel,
-        private EmailConfigInterface $emailConfig,
+        private readonly Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly EmailModel $emailModel,
+        private readonly EmailConfigInterface $emailConfig,
     ) {
     }
 

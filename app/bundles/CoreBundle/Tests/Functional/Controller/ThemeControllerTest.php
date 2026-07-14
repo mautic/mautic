@@ -24,9 +24,9 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->pathsHelper = $this->getContainer()->get('mautic.helper.paths');
-        \assert($this->pathsHelper instanceof PathsHelper);
+        $this->assertInstanceOf(PathsHelper::class, $this->pathsHelper);
         $this->filesystem  = $this->getContainer()->get('mautic.filesystem');
-        \assert($this->filesystem instanceof Filesystem);
+        $this->assertInstanceOf(Filesystem::class, $this->filesystem);
 
         $themePath = $this->pathsHelper->getThemesPath();
 
@@ -58,21 +58,21 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testBatchDeleteActionValidation(): void
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22,%22brienz%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testBatchDeleteActionWithNonCoreTheme(): void
     {
         $themeHelper = self::getContainer()->get(ThemeHelper::class);
-        \assert($themeHelper instanceof ThemeHelper);
+        $this->assertInstanceOf(ThemeHelper::class, $themeHelper);
         $themeHelper->copy('blank', 'blanktest');
         $themeHelper->copy('blank', 'auroratest');
 
@@ -83,7 +83,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22,%22auroratest%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('2 themes have been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('2 themes have been deleted!', (string) $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
     }
 
     public function testThemeVisibility(): void
@@ -121,6 +121,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         // Reboot kernel to reload all themes
         self::bootKernel();
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Email theme list has hidden 'Aurora' theme

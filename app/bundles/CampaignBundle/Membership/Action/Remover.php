@@ -13,11 +13,11 @@ class Remover
 {
     public const NAME = 'removed';
 
-    private string $unscheduledMessage;
+    private readonly string $unscheduledMessage;
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper,
     ) {
@@ -56,7 +56,7 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember): void
+    private function saveCampaignMember(CampaignMember $campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

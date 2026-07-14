@@ -25,8 +25,8 @@ class MaxMindDoNotSellDownloadHelper
 
     public function __construct(
         $auth,
-        private LoggerInterface $logger,
-        private HttpClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly HttpClientInterface $httpClient,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->auth       = explode(':', (string) $auth, 2);
@@ -105,10 +105,7 @@ class MaxMindDoNotSellDownloadHelper
         return $this->getAuthPart(1);
     }
 
-    /**
-     * @param int $position
-     */
-    private function getAuthPart($position): string
+    private function getAuthPart(int $position): string
     {
         if (array_key_exists($position, $this->auth)) {
             return $this->auth[$position];

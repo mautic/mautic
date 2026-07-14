@@ -35,10 +35,10 @@ class ObjectChangeGenerator
     ];
 
     public function __construct(
-        private SyncJudgeInterface $syncJudge,
-        private ValueHelper $valueHelper,
-        private FieldHelper $fieldHelper,
-        private BulkNotification $bulkNotification,
+        private readonly SyncJudgeInterface $syncJudge,
+        private readonly ValueHelper $valueHelper,
+        private readonly FieldHelper $fieldHelper,
+        private readonly BulkNotification $bulkNotification,
     ) {
     }
 
@@ -162,7 +162,7 @@ class ObjectChangeGenerator
 
             if ($isNewObject) {
                 // Empty required field for new contact means completely rejected contact from sync
-                throw new ObjectSyncSkippedException(sprintf("Skipping creating lead '%s' because required value for internal field '%s' is empty", $integrationInformationChangeRequest->getObjectId(), $fieldMappingDAO->getInternalField()));
+                throw new ObjectSyncSkippedException(sprintf("Skipping creating lead '%s' because required value for internal field '%s' is empty", $integrationInformationChangeRequest->getObjectId(), $fieldMappingDAO->getInternalField()), $e->getCode(), $e);
             }
 
             return; // Empty required field for existing contact is skipped

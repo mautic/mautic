@@ -16,7 +16,7 @@ class BuilderIntegrationsHelper
     private array $builders = [];
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
+        private readonly IntegrationsHelper $integrationsHelper,
     ) {
     }
 
@@ -60,7 +60,7 @@ class BuilderIntegrationsHelper
     public function getIntegration(string $integration): BuilderInterface
     {
         if (!isset($this->builders[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.builder_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.builder_integration");
         }
 
         // Ensure the configuration is hydrated

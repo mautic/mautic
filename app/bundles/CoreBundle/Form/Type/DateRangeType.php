@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DateRangeType extends AbstractType
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

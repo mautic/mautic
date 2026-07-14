@@ -13,6 +13,8 @@ abstract class AbstractFormController extends CommonController
     protected ?string $permissionBase = null;
 
     /**
+     * @param string $objectModel
+     *
      * @return mixed
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
@@ -50,7 +52,7 @@ abstract class AbstractFormController extends CommonController
             return $this->redirect($returnUrl);
         }
 
-        return $this->accessDenied();
+        $this->throwAccessDenied();
     }
 
     /**
@@ -85,7 +87,7 @@ abstract class AbstractFormController extends CommonController
                             'objectModel'  => $model,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
-                            'name'         => urlencode($entity->$nameFunction()),
+                            'name'         => urlencode($entity->{$nameFunction}()),
                         ]
                     ),
                 ]
@@ -96,7 +98,7 @@ abstract class AbstractFormController extends CommonController
             'type'    => 'error',
             'msg'     => 'mautic.core.error.locked',
             'msgVars' => [
-                '%name%'       => $entity->$nameFunction(),
+                '%name%'       => $entity->{$nameFunction}(),
                 '%user%'       => $entity->getCheckedOutByUser(),
                 '%contactUrl%' => $this->generateUrl(
                     'mautic_user_action',
@@ -135,11 +137,7 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isFormCancelled(FormInterface $form): bool
     {
-        $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
+        $request  = $this->getCurrentRequest();
         $formData = $request->request->all()[$form->getName()] ?? [];
 
         return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
@@ -150,11 +148,7 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isFormApplied(FormInterface $form): bool
     {
-        $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
+        $request  = $this->getCurrentRequest();
         $formData = $request->request->all()[$form->getName()] ?? [];
 
         return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
@@ -166,10 +160,6 @@ abstract class AbstractFormController extends CommonController
     protected function isFormValid(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
         // bind request to the form
         $form->handleRequest($request);
 
@@ -199,7 +189,8 @@ abstract class AbstractFormController extends CommonController
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+            }
+            if ($this->security->checkPermissionExists($permissionBase.':edit')) {
                 return $this->security->isGranted(
                     $permissionBase.':edit'
                 );
@@ -226,15 +217,11 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
-     * @return array $postActionVars
+     * @return array
      */
     protected function refererPostActionVars($vars)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
         if (empty($request->server->get('HTTP_REFERER'))) {
             return $vars;
         }

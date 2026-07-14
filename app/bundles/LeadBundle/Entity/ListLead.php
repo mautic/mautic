@@ -14,7 +14,7 @@ class ListLead
 
     /**
      * @var LeadList
-     **/
+     */
     private $list;
 
     /**
@@ -83,7 +83,7 @@ class ListLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {

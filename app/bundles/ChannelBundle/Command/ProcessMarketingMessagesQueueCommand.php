@@ -23,15 +23,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private MessageQueueModel $messageQueueModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MessageQueueModel $messageQueueModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(

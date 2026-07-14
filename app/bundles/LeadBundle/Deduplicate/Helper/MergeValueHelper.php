@@ -29,7 +29,7 @@ class MergeValueHelper
 
         $isDefaultValue = null !== $defaultValue && $newerValue === $defaultValue;
 
-        if (self::isNotEmpty($newerValue) && !($newIsAnonymous && $isDefaultValue)) {
+        if (self::isNotEmpty($newerValue) && (!$newIsAnonymous || !$isDefaultValue)) {
             return $newerValue;
         }
 
