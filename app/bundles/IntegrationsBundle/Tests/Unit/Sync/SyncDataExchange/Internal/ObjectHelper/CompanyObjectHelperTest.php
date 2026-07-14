@@ -60,16 +60,12 @@ final class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($company, $idMap[$company->getEmail()]);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail()]);
+            });
 
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
@@ -112,16 +108,12 @@ final class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($company, $idMap[$company->getEmail() ?? '']);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail() ?? '']);
+            });
 
         $this->repository->expects($this->exactly(3))
             ->method('detachEntity');
@@ -189,7 +181,7 @@ final class CompanyObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
     }

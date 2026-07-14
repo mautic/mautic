@@ -737,7 +737,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function markEventLogsQueued(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

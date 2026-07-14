@@ -85,7 +85,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $ids = array_filter($ids);
 
-        if (!$ids) {
+        if ([] === $ids) {
             return [];
         }
 

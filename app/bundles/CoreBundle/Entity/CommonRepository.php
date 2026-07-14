@@ -1444,7 +1444,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
             }
 
-            if ($partials) {
+            if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {

@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
@@ -93,11 +94,14 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('string', gettype($result));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('stringProvider')]
+    #[DataProvider('stringProvider')]
     public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);
+        $this->assertEquals(
+            $expected,
+            $this->formatterHelper->normalizeStringValue($input)
+        );
     }
 
     /**
@@ -127,7 +131,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlFormatProvider')]
+    #[DataProvider('urlFormatProvider')]
     public function testUrlFormat(string $url, string $expected): void
     {
         $result = $this->formatterHelper->_($url, 'url');
@@ -187,7 +191,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailFormatProvider')]
+    #[DataProvider('emailFormatProvider')]
     public function testEmailFormat(string $email, string $expected): void
     {
         $result = $this->formatterHelper->_($email, 'email');

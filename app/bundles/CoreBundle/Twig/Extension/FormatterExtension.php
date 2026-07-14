@@ -23,7 +23,7 @@ class FormatterExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('format', $this->_(...), ['is_safe' => ['all']]),

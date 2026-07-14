@@ -81,7 +81,7 @@ class TagRepository extends CommonRepository
         $tags = $this->removeMinusFromTags($tags);
         $qb   = $this->createQueryBuilder('t', 't.tag');
 
-        if ($tags) {
+        if ([] !== $tags) {
             $qb->where(
                 $qb->expr()->in('t.tag', ':tags')
             )

@@ -38,7 +38,7 @@ class InstallCommand extends Command
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName(self::COMMAND)

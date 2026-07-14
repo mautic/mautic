@@ -408,7 +408,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the fields returned are what is expected
         foreach ($payload as $key => $value) {
-            $this->assertTrue(isset($response['field'][$key]));
+            $this->assertArrayHasKey($key, $response['field']);
 
             if (Response::HTTP_ACCEPTED === $expectedStatusCode && 'isPublished' === $key) {
                 // This should be false because the background job publishes once ready
@@ -435,7 +435,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the fields returned are what is expected and the field is now published
         foreach ($payload as $key => $value) {
-            $this->assertTrue(isset($response['field'][$key]));
+            $this->assertArrayHasKey($key, $response['field']);
             $this->assertEquals($value, $response['field'][$key]);
         }
     }
@@ -453,7 +453,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that the fields returned are what is expected noting that certain fields should not be editable
         foreach ($payload as $key => $value) {
-            $this->assertTrue(isset($response['field'][$key]));
+            $this->assertArrayHasKey($key, $response['field']);
 
             match ($key) {
                 'alias'  => $this->assertEquals($alias, $response['field'][$key]),

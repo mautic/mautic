@@ -43,13 +43,13 @@ abstract class CampaignTestAbstract extends TestCase
 
         $security = $this->createMock(CorePermissions::class);
 
-        $security->expects($this->any())
+        $security
             ->method('isGranted')
             ->willReturn(true);
 
         $formRepository = $this->createMock(FormRepository::class);
 
-        $formRepository->expects($this->any())
+        $formRepository
             ->method('getFormList')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
@@ -58,7 +58,7 @@ abstract class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([6 => $entityManager])
             ->getMock();
 
-        $leadListModel->expects($this->any())
+        $leadListModel
             ->method('getUserLists')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
@@ -67,7 +67,7 @@ abstract class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([12 => $entityManager])
             ->getMock();
 
-        $formModel->expects($this->any())
+        $formModel
             ->method('getRepository')
             ->willReturn($formRepository);
 

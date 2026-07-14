@@ -33,7 +33,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(

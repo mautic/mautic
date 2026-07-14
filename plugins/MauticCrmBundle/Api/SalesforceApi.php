@@ -286,7 +286,7 @@ class SalesforceApi extends CrmApi
                 $results              = [];
                 foreach ($chunked as $chunk) {
                     // We can only submit 25 at a time
-                    if ($chunk) {
+                    if ([] !== $chunk) {
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;

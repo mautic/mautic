@@ -728,7 +728,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if ($events) {
+            if ([] !== $events) {
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
 
@@ -965,7 +965,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             ];
         }
 
-        if ($deletedIds) {
+        if ([] !== $deletedIds) {
             $this->getEventRepository()->nullEventRelationships($deletedIds);
 
             $this->getEventRepository()->setEventsAsDeletedWithRedirect($deletedData);

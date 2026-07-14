@@ -180,7 +180,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
-            ->will($this->throwException(new IOException('some error message')));
+            ->willThrowException(new IOException('some error message'));
 
         $this->translatorMock->expects($this->once())
             ->method('trans')

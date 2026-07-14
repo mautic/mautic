@@ -1502,7 +1502,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if ($fieldErrors) {
+        if ([] !== $fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
 
             throw new \Exception($fieldErrors);

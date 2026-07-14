@@ -189,7 +189,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 

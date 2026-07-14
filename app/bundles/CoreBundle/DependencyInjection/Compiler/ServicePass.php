@@ -118,7 +118,7 @@ final class ServicePass implements CompilerPassInterface
                         if ($container->hasDefinition($details['class'])) {
                             $definition = $container->getDefinition($details['class']);
 
-                            if ($definitionArguments) {
+                            if ([] !== $definitionArguments) {
                                 $definition->setArguments($definitionArguments);
                             }
                         } else {

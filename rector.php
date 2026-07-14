@@ -18,7 +18,11 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true, typeDeclarations: true)
+    ->withPreparedSets(
+        deadCode: true,
+        typeDeclarations: true,
+        phpunitCodeQuality: true,
+    )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
@@ -41,7 +45,6 @@ return RectorConfig::configure()
 
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ChangeMockObjectReturnUnionToIntersectionRector::class,
         TypedPropertyFromAssignsRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
@@ -50,7 +53,6 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(38)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
@@ -58,9 +60,21 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
+        ],
+
+        // waits for descission
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
+
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
+        ],
+
+        Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Model/VariantModelTrait.php',
         ],
 
         // offer next
@@ -125,6 +139,19 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
+
+        // phpunit
+        Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+        // will be fixed
+        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveNeverUsedMockPropertyRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Tests/Entity/LeadListRepositoryTest.php',
+        ],
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector::class => [
+            __DIR__.'/app/bundles/ReportBundle/Tests/Builder/MauticReportBuilderTest.php',
+        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
