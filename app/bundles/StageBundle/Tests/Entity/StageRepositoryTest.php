@@ -18,7 +18,7 @@ final class StageRepositoryTest extends MauticMysqlTestCase
         $this->seedStagesWithLeads();
 
         $repository = $this->em->getRepository(Stage::class);
-        \assert($repository instanceof StageRepository);
+        $this->assertInstanceOf(StageRepository::class, $repository);
 
         $results = $repository->getEntities([
             'withContactCount' => true,
@@ -30,7 +30,7 @@ final class StageRepositoryTest extends MauticMysqlTestCase
         $counts = [];
         foreach ($results as $row) {
             $stage = $row[0];
-            \assert($stage instanceof Stage);
+            $this->assertInstanceOf(Stage::class, $stage);
             $counts[$stage->getName()] = (int) $row['contactCount'];
         }
 

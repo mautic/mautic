@@ -20,7 +20,7 @@ final class StageControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $content = $response->getContent();
-        self::assertStringContainsString('View 2 Contacts', $content);
-        self::assertStringContainsString('No Contacts', $content);
+        $this->assertStringContainsString('View 2 Contacts', (string) $content);
+        $this->assertStringContainsString('No Contacts', (string) $content);
     }
 }
