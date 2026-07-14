@@ -543,8 +543,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Get a model instance from the service container.
-     *
-     * @return AbstractCommonModel<E>
      */
     protected function getModel(string $modelNameKey): AbstractCommonModel
     {

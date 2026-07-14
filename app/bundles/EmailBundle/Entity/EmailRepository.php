@@ -903,7 +903,7 @@ class EmailRepository extends CommonRepository
             ->setParameter('listId', $listId)
             ->fetchFirstColumn();
 
-        return array_values(array_unique(array_map('intval', [...$includedIds, ...$excludedIds])));
+        return array_values(array_unique(array_map(intval(...), [...$includedIds, ...$excludedIds])));
     }
 
     private function getExcludedListQuery(int $emailId): ?QueryBuilder

@@ -223,7 +223,7 @@ class UrlHelper
         if (!empty($query)) {
             $parsedQuery = Query::parse($query);
 
-            if ($parsedQuery) {
+            if ([] !== $parsedQuery) {
                 $queryItems = [];
 
                 // Remove duplicate query parameters from query.

@@ -187,6 +187,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter1 = $this->scheduledExecutioner->executeByIds([$log1->getId()]);
         $counter2 = $this->scheduledExecutioner->executeByIds([$log2->getId()]);
         $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter1);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter2);
 
         $totalEvaluated = $counter1->getTotalEvaluated() + $counter2->getTotalEvaluated();
 
