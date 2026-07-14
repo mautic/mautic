@@ -112,7 +112,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $parentEvent  = $this->createEvent($campaign,
+        $parentEvent  = $this->createEvent(
+            $campaign,
             'Check if contact is in segment',
             'lead.segments',
             'condition',
@@ -123,7 +124,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $expectedPoints = 10;
 
-        $childEvent = $this->createEvent($campaign,
+        $childEvent = $this->createEvent(
+            $campaign,
             'Update points',
             'lead.updatelead',
             'action',
@@ -165,7 +167,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($tag);
         $this->em->flush();
 
-        $parentEvent  = $this->createEvent($campaign,
+        $parentEvent  = $this->createEvent(
+            $campaign,
             'Check if contact has tag',
             'lead.tags',
             'condition',
@@ -176,7 +179,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $expectedPoints = 10;
 
-        $childEvent = $this->createEvent($campaign,
+        $childEvent = $this->createEvent(
+            $campaign,
             'Update points',
             'lead.updatelead',
             'action',

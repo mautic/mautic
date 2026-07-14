@@ -31,10 +31,14 @@ class InstallDataCommand extends Command
         $this
             ->setDefinition([
                 new InputOption(
-                    'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
+                    'force',
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Bypasses the verification check.'
                 ),
             ])
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command re-installs Mautic with sample data.
 
 <info>php %command.full_name%</info>

@@ -77,11 +77,13 @@ class AjaxController extends CommonAjaxController
                         ]
                     );
 
-                    $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                        'form'      => $form->createView(),
-                        'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-                        'function'  => 'row',
-                    ]
+                    $html = $this->render(
+                        '@MauticCore/Helper/blank_form.html.twig',
+                        [
+                            'form'      => $form->createView(),
+                            'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+                            'function'  => 'row',
+                        ]
                     )->getContent();
 
                     if (!isset($settings['prefix'])) {

@@ -30,7 +30,8 @@ final class Version20240226114528 extends PreUpAssertionMigration
     {
         $tableName = $this->getTableName();
 
-        $this->addSql(sprintf('
+        $this->addSql(sprintf(
+            '
             CREATE TABLE %s (
                 email_id INT %s NOT NULL,
                 leadlist_id INT %s NOT NULL,
@@ -44,12 +45,14 @@ final class Version20240226114528 extends PreUpAssertionMigration
             $this->getIndexName('email_id'),
             $this->getIndexName('leadlist_id')
         ));
-        $this->addSql(sprintf('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (email_id) REFERENCES %semails (id) ON DELETE CASCADE',
+        $this->addSql(sprintf(
+            'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (email_id) REFERENCES %semails (id) ON DELETE CASCADE',
             $tableName,
             $this->getForeignKeyName('email_id'),
             $this->prefix
         ));
-        $this->addSql(sprintf('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (leadlist_id) REFERENCES %slead_lists (id) ON DELETE CASCADE',
+        $this->addSql(sprintf(
+            'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (leadlist_id) REFERENCES %slead_lists (id) ON DELETE CASCADE',
             $tableName,
             $this->getForeignKeyName('leadlist_id'),
             $this->prefix

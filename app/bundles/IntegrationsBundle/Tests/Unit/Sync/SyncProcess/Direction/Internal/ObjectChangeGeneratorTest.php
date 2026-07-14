@@ -422,7 +422,8 @@ final class ObjectChangeGeneratorTest extends TestCase
             'email',
             'email',
             ObjectMappingDAO::SYNC_BIDIRECTIONALLY,
-            true);
+            true
+        );
         $objectMapping->addFieldMapping(
             'firstname',
             'first_name'

@@ -322,10 +322,13 @@ final class FullObjectReportBuilderTest extends TestCase
         $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject,
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use (
+                $matcher,
+                $internalObject,
                 $fromDateTime,
                 $toDateTime,
-                $companyEntity): object {
+                $companyEntity
+            ): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindEvent $event) use (
                         $internalObject,

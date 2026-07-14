@@ -97,8 +97,10 @@ class LeadSubscriber implements EventSubscriberInterface
                     && !empty($log['metadata']['redirect_applied'])
                     && !empty($log['metadata']['originalEventName'])) {
                     $label = $log['event_name'].' / '.$log['campaign_name'].
-                        ' <span class="small">'.$this->translator->trans('mautic.campaign.event.redirected',
-                            ['%original%' => $log['metadata']['originalEventName']]).'</span>';
+                        ' <span class="small">'.$this->translator->trans(
+                            'mautic.campaign.event.redirected',
+                            ['%original%' => $log['metadata']['originalEventName']]
+                        ).'</span>';
                 }
 
                 // Case 2: Event executed before being deleted - show "Deleted" label

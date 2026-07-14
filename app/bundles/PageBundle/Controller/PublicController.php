@@ -60,8 +60,8 @@ class PublicController extends AbstractFormController
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
-        $slug)
-    {
+        $slug,
+    ) {
         /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
 

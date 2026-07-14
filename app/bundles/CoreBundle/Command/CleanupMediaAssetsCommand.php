@@ -73,7 +73,8 @@ EOT
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
-                '<question>delete files?</question> ', false
+                '<question>delete files?</question> ',
+                false
             );
 
             if ($helper->ask($input, $output, $question)) {

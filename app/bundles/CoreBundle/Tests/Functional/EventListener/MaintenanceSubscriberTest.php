@@ -20,7 +20,8 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         $today         = (new \DateTime('+1 min', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
 
         $connection    = $this->em->getConnection();
-        $connection->executeQuery("INSERT INTO {$prefix}audit_log (user_id, user_name, bundle, object, object_id, action, details, date_added, ip_address)
+        $connection->executeQuery(
+            "INSERT INTO {$prefix}audit_log (user_id, user_name, bundle, object, object_id, action, details, date_added, ip_address)
             VALUES
                 (1, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
                 (1, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
@@ -35,7 +36,8 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
                 (1, 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1');"
         );
 
-        $connection->executeQuery("INSERT INTO {$prefix}notifications (user_id, type, header, message, date_added, icon_class, is_read, deduplicate)
+        $connection->executeQuery(
+            "INSERT INTO {$prefix}notifications (user_id, type, header, message, date_added, icon_class, is_read, deduplicate)
             VALUES
               (1, 'notice', NULL, 'Some data', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
               (1, 'info', 'NULL', 'View details', '{$today}', 'fa-download', 0, NULL),

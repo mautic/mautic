@@ -1359,12 +1359,14 @@ class MailHelper
 
             if ($toEmail) {
                 $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
-                $url             = $this->router->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate(
+                    'mautic_email_unsubscribe',
                     ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
             } else {
-                $url             = $this->router->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate(
+                    'mautic_email_unsubscribe',
                     ['idHash' => $this->idHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
@@ -1877,8 +1879,10 @@ class MailHelper
                 try {
                     if (in_array(strtolower($headerKey), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
                         // Handling headers that require MailboxListHeader
-                        $headerValue = array_map(fn ($address): Address => new Address($address),
-                            explode(',', $headerValue));
+                        $headerValue = array_map(
+                            fn ($address): Address => new Address($address),
+                            explode(',', $headerValue)
+                        );
                     }
                     if ($messageHeaders->has($headerKey)) {
                         $header = $messageHeaders->get($headerKey);

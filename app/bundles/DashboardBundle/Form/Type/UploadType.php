@@ -36,7 +36,8 @@ class UploadType extends AbstractType
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'dashboard_upload\']').submit();",
                 ],
                 'label' => 'mautic.lead.import.upload',
-            ]);
+            ]
+        );
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }

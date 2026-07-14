@@ -25,7 +25,9 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Fetch the form
-        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/forms/action/new',
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/forms/action/new',
             [
                 'formId' => $form->getId(),
                 'type'   => 'form.email',

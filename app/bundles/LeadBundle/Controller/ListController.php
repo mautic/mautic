@@ -151,15 +151,16 @@ class ListController extends FormController
         ];
 
         return $this->delegateView(
-            $this->getViewArguments([
-                'viewParameters'  => $parameters,
-                'contentTemplate' => '@MauticLead/List/list.html.twig',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_segment_index',
-                    'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
-                    'mauticContent' => 'leadlist',
+            $this->getViewArguments(
+                [
+                    'viewParameters'  => $parameters,
+                    'contentTemplate' => '@MauticLead/List/list.html.twig',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_segment_index',
+                        'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
+                        'mauticContent' => 'leadlist',
+                    ],
                 ],
-            ],
                 'index'
             )
         );
@@ -293,7 +294,9 @@ class ListController extends FormController
         }
 
         if (!$this->security->hasEntityAccess(
-            $ownPermission, $otherPermission, $segment->getCreatedBy()
+            $ownPermission,
+            $otherPermission,
+            $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -509,7 +512,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_DELETE_OWN,
+                LeadPermissions::LISTS_DELETE_OTHER,
+                $list->getCreatedBy()
             )
             ) {
                 $this->throwAccessDenied();
@@ -578,7 +583,9 @@ class ListController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                    LeadPermissions::LISTS_DELETE_OWN,
+                    LeadPermissions::LISTS_DELETE_OTHER,
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
@@ -676,7 +683,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $leadId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
+                LeadPermissions::LISTS_EDIT_OWN,
+                LeadPermissions::LISTS_EDIT_OTHER,
+                $lead->getPermissionUser()
             )) {
                 $this->throwAccessDenied();
             } elseif (null === $list) {
@@ -686,7 +695,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_VIEW_OWN,
+                LeadPermissions::LISTS_VIEW_OTHER,
+                $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
             } elseif ($model->isLocked($lead)) {

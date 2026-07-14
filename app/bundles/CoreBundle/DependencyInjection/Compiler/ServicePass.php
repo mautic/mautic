@@ -258,7 +258,8 @@ final class ServicePass implements CompilerPassInterface
                     $options,
                 ]
             ))
-                ->addTag('knp_menu.renderer',
+                ->addTag(
+                    'knp_menu.renderer',
                     [
                         'alias' => $alias,
                     ]

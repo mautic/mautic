@@ -143,9 +143,11 @@ class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
-                    'objectAction' => 'view',
-                    'objectId'     => $entity->getId(), ]
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
+                        'objectAction' => 'view',
+                        'objectId'     => $entity->getId(), ]
                 ),
             ],
         ]);
@@ -269,9 +271,11 @@ class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
-                    'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
-                    'objectId'     => $entity->getId(), ]
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
+                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                        'objectId'     => $entity->getId(), ]
                 ),
             ],
         ]);
@@ -442,9 +446,11 @@ class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(), ]
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId(), ]
                 ),
             ],
         ]);

@@ -322,13 +322,14 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'l.firstname',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
             [
-                'column'    => 'l.firstname',
-                'glue'      => 'and',
-                'value'     => 'Test',
-                'condition' => 'notLike',
-            ]]
+                [
+                    'column'    => 'l.firstname',
+                    'glue'      => 'and',
+                    'value'     => 'Test',
+                    'condition' => 'notLike',
+                ]]
         );
 
         $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
@@ -351,13 +352,14 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'utm.utm_campaign',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
             [
-                'column'    => 'utm.utm_campaign',
-                'glue'      => 'and',
-                'value'     => 'Test',
-                'condition' => 'contains',
-            ]]
+                [
+                    'column'    => 'utm.utm_campaign',
+                    'glue'      => 'and',
+                    'value'     => 'Test',
+                    'condition' => 'contains',
+                ]]
         );
 
         $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);

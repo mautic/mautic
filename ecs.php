@@ -27,10 +27,12 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\SpaceAfterCommaHereNowDocFixer::class,
+        PhpCsFixer\Fixer\Semicolon\SpaceAfterSemicolonFixer::class,
     ])
     ->withRules([
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        \PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
+        PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
@@ -38,5 +40,5 @@ return ECSConfig::configure()
         namespaces: true,
         cleanup: true,
         controlStructures: true,
-        // spaces: true,
+        spaces: true,
     );

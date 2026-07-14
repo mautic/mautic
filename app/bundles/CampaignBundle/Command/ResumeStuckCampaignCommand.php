@@ -226,13 +226,22 @@ final class ResumeStuckCampaignCommand extends Command
     /**
      * Process campaign events in batches.
      */
-    private function processEvents(int $campaignId, int $batchLimit, ContactLimiter $contactLimiter,
-        bool $isDryRun, OutputInterface $output): int
-    {
+    private function processEvents(
+        int $campaignId,
+        int $batchLimit,
+        ContactLimiter $contactLimiter,
+        bool $isDryRun,
+        OutputInterface $output,
+    ): int {
         $recordsProcessed   = 0;
         $recordsAfter       = $this->coreParametersHelper->get('campaigns_resume_stuck_records_after');
-        while ($nextEvents = $this->campaignRepository->findStuckEventsToExecute($campaignId, $batchLimit,
-            $contactLimiter->getMinContactId(), $contactLimiter->getMaxContactId(), $recordsAfter)) {
+        while ($nextEvents = $this->campaignRepository->findStuckEventsToExecute(
+            $campaignId,
+            $batchLimit,
+            $contactLimiter->getMinContactId(),
+            $contactLimiter->getMaxContactId(),
+            $recordsAfter
+        )) {
             if ($isDryRun) {
                 $this->displayNextEvents($nextEvents, $output);
                 $output->writeln('<comment>Dry run only. No events were executed.</comment>');

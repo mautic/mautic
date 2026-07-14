@@ -96,7 +96,8 @@ class CategorySubscriber implements EventSubscriberInterface
                     '%entities%'     => implode(', ', array_map(fn (array $entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
                     '%categoryName%' => $event->getCategory()->getTitle(),
                 ],
-                'validators');
+                'validators'
+            );
             $event->addDependencyError($message);
         }
     }

@@ -39,7 +39,11 @@ final class PathsHelperTest extends TestCase
                 }
             );
         $this->helper = new PathsHelper(
-            $this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
+            $this->createStub(UserHelper::class),
+            $this->coreParametersHelper,
+            $this->cacheDir,
+            $this->logsDir,
+            $this->rootDir
         );
     }
 

@@ -873,7 +873,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $q  = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(*) as count')
             ->from(
-                sprintf('(%s)', $allQ->getSQL()), 'tt'
+                sprintf('(%s)', $allQ->getSQL()),
+                'tt'
             );
         $q->setParameters($allQ->getParameters());
         $all       = $query->fetchCount($q);
@@ -883,7 +884,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $q  = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(*) as count')
             ->from(
-                sprintf('(%s)', $allQ->getSQL()), 'tt'
+                sprintf('(%s)', $allQ->getSQL()),
+                'tt'
             );
         $q->setParameters($allQ->getParameters());
         $returning = $query->fetchCount($q);

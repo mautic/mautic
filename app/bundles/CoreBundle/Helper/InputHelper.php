@@ -71,7 +71,11 @@ class InputHelper
                     'strong',
                     'a',
                     'span',
-                ], [], 0, 1);
+                ],
+                [],
+                0,
+                1
+            );
 
             self::$strictHtmlFilter->blockedAttributes = [
                 'codebase',
@@ -395,13 +399,19 @@ class InputHelper
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
                 fn ($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
-                $value, -1, $needsDecoding);
+                $value,
+                -1,
+                $needsDecoding
+            );
 
             // Special handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
                 fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
-                $value, -1, $needsScriptDecoding);
+                $value,
+                -1,
+                $needsScriptDecoding
+            );
 
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
@@ -437,14 +447,16 @@ class InputHelper
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
                     fn ($matches): string => htmlspecialchars_decode($matches[1]),
-                    $value);
+                    $value
+                );
             }
 
             if ($needsScriptDecoding) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
                     fn ($matches): string => base64_decode($matches[1]),
-                    $value);
+                    $value
+                );
             }
         }
 

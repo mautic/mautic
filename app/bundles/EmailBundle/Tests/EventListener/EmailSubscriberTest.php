@@ -253,7 +253,6 @@ CONTENT,
         </div>
 </body></html>
 CONTENT,
-
             function (string $content): void {
                 $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
                 $this->assertStringContainsString($preheaderTextHtml, $content);

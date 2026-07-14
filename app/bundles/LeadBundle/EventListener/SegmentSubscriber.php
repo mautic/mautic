@@ -81,7 +81,8 @@ class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             throw new RecordCanNotUnpublishException($message);
         }
 
@@ -105,7 +106,8 @@ class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             $event->addDependencyError($message);
         }
 

@@ -1029,10 +1029,15 @@ class CampaignController extends AbstractStandardFormController
         switch ($action) {
             case 'index':
                 $args['viewParameters']['filters']     = $this->listFilters;
-                $args['viewParameters']['permissions'] = array_merge($args['viewParameters']['permissions'],
-                    $this->security->isGranted('campaign:imports:create', 'RETURN_ARRAY',
+                $args['viewParameters']['permissions'] = array_merge(
+                    $args['viewParameters']['permissions'],
+                    $this->security->isGranted(
+                        'campaign:imports:create',
+                        'RETURN_ARRAY',
                         null,
-                        true));
+                        true
+                    )
+                );
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
                 break;
             case 'view':

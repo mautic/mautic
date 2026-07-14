@@ -65,7 +65,9 @@ class MonitoringType extends AbstractType
 
             $formType = $this->monitoringModel->getFormByType($options['networkType']);
 
-            $builder->add('properties', $formType,
+            $builder->add(
+                'properties',
+                $formType,
                 [
                     'label' => false,
                     'data'  => $properties,

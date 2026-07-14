@@ -25,9 +25,7 @@ use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
-
 use function Symfony\Component\Clock\now;
-
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -762,7 +760,15 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+<<<<<<< HEAD
         $this->assertStringContainsString('The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.', $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.');
+=======
+        Assert::assertStringContainsString(
+            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
+            $crawler->text(),
+            'There should be an optimistic error as the form was not refreshed after the previous submission.',
+        );
+>>>>>>> b89ba97224 ([cs] apply united arguments spacing)
     }
 
     /**

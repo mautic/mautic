@@ -241,7 +241,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
-            ->with('SUM(DISTINCT e.sent_count) as sent_count,
+            ->with(
+                'SUM(DISTINCT e.sent_count) as sent_count,
                         SUM(DISTINCT e.read_count) as read_count,
                         count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
@@ -354,22 +355,26 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
-            ->with('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
+            ->with(
+                'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('andWhere')
-            ->with('es.is_failed = 1'
+            ->with(
+                'es.is_failed = 1'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('groupBy')
-            ->with('e.id, e.subject'
+            ->with(
+                'e.id, e.subject'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('having')
-            ->with('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
+            ->with(
+                'count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
             )->willReturn($queryBuilderMock);
 
         $this->subscriber->onReportGraphGenerate($eventMock);

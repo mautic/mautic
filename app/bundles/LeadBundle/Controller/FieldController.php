@@ -329,10 +329,12 @@ class FieldController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
-                    array_merge($postActionVars, [
-                        'viewParameters'  => ['objectId' => $field->getId()],
-                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
-                    ]
+                    array_merge(
+                        $postActionVars,
+                        [
+                            'viewParameters'  => ['objectId' => $field->getId()],
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                        ]
                     )
                 );
             }
@@ -494,8 +496,10 @@ class FieldController extends FormController
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $flashes = array_merge($flashes,
-                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars));
+                $flashes = array_merge(
+                    $flashes,
+                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars)
+                );
             }
 
             // Delete everything we are able to

@@ -108,7 +108,8 @@ class UserRepository extends CommonRepository
                     $q->expr()->like('u.firstName', ':search'),
                     $q->expr()->like('u.lastName', ':search'),
                     $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
+                        $q->expr()->concat(
+                            'u.firstName',
                             $q->expr()->concat(
                                 $q->expr()->literal(' '),
                                 'u.lastName'

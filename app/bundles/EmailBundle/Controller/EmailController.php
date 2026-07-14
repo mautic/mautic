@@ -1749,7 +1749,8 @@ class EmailController extends FormController
                 }
 
                 if ($previewForContactId
-                    && (!$security->isAdmin()
+                    && (
+                        !$security->isAdmin()
                         || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {

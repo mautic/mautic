@@ -23,13 +23,14 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function (string $name): bool {
-                $expected = [
-                    ['label', 'value'],
-                ];
+            ->with(
+                $this->callback(function (string $name): bool {
+                    $expected = [
+                        ['label', 'value'],
+                    ];
 
-                return in_array($name, $expected[0], true);
-            }),
+                    return in_array($name, $expected[0], true);
+                }),
                 TextType::class,
                 $this->callback(function (array $options) use (&$call): bool {
                     $expectedOptions = [

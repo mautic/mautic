@@ -209,7 +209,8 @@ class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $submission->getForm()->getCreatedBy())
+            $submission->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }
@@ -239,7 +240,8 @@ class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $fieldEntity->getForm()->getCreatedBy())
+            $fieldEntity->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }

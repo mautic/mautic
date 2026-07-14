@@ -104,7 +104,8 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $failedEvent->getId());
 
         // Do not increase if under LOOPS_TO_FAIL || Do not increase twice
-        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || ($countFailedLeadEvent > self::LOOPS_TO_FAIL
+        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || (
+            $countFailedLeadEvent > self::LOOPS_TO_FAIL
                 && $this->leadEventLogRepository->isLastFailed($lead->getId(), $failedEvent->getId())
         )) {
             return;

@@ -348,7 +348,8 @@ class PageType extends AbstractType
         if (!empty($draftActionButtons)) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }
-        $builder->add('buttons',
+        $builder->add(
+            'buttons',
             FormButtonsType::class,
             $extraButtons
         );

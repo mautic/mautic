@@ -109,7 +109,8 @@ final class Version20211020114811 extends PreUpAssertionMigration
             $this->addSql(
                 sprintf(
                     'ALTER TABLE %s CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;',
-                    $tableName)
+                    $tableName
+                )
             );
         }
         $this->addSql('SET FOREIGN_KEY_CHECKS=1;');

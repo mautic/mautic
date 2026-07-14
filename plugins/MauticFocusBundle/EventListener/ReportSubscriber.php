@@ -317,25 +317,45 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'focus_stats', self::PREFIX_STATS)
-            ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'focus', self::PREFIX_FOCUS,
-                self::PREFIX_FOCUS.'.id = '.self::PREFIX_STATS.'.focus_id')
-            ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'channel_url_trackables', self::PREFIX_TRACKABLES,
+            ->leftJoin(
+                self::PREFIX_STATS,
+                MAUTIC_TABLE_PREFIX.'focus',
+                self::PREFIX_FOCUS,
+                self::PREFIX_FOCUS.'.id = '.self::PREFIX_STATS.'.focus_id'
+            )
+            ->leftJoin(
+                self::PREFIX_STATS,
+                MAUTIC_TABLE_PREFIX.'channel_url_trackables',
+                self::PREFIX_TRACKABLES,
                 self::PREFIX_TRACKABLES.'.channel_id = '.self::PREFIX_STATS.'.focus_id AND '.
-                self::PREFIX_TRACKABLES.'.channel = "focus"')
-            ->leftJoin(self::PREFIX_STATS, MAUTIC_TABLE_PREFIX.'page_redirects', self::PREFIX_REDIRECTS,
-                self::PREFIX_REDIRECTS.'.id = '.self::PREFIX_TRACKABLES.'.redirect_id')
+                self::PREFIX_TRACKABLES.'.channel = "focus"'
+            )
+            ->leftJoin(
+                self::PREFIX_STATS,
+                MAUTIC_TABLE_PREFIX.'page_redirects',
+                self::PREFIX_REDIRECTS,
+                self::PREFIX_REDIRECTS.'.id = '.self::PREFIX_TRACKABLES.'.redirect_id'
+            )
             ->orderBy(self::PREFIX_FOCUS.'.name', 'ASC')
             ->addOrderBy(self::PREFIX_STATS.'.type', 'ASC');
 
         if ($event->hasColumn(self::PREFIX_FOCUS.'.category')) {
-            $queryBuilder->leftJoin(self::PREFIX_FOCUS, MAUTIC_TABLE_PREFIX.'categories', self::PREFIX_CATEGORIES,
-                self::PREFIX_FOCUS.'.category_id = '.self::PREFIX_CATEGORIES.'.id');
+            $queryBuilder->leftJoin(
+                self::PREFIX_FOCUS,
+                MAUTIC_TABLE_PREFIX.'categories',
+                self::PREFIX_CATEGORIES,
+                self::PREFIX_FOCUS.'.category_id = '.self::PREFIX_CATEGORIES.'.id'
+            );
         }
 
         switch ($event->getContext()) {
             case self::CONTEXT_FOCUS_LEADS:
-                $queryBuilder->leftJoin(self::PREFIX_FOCUS, MAUTIC_TABLE_PREFIX.'leads', self::PREFIX_LEADS,
-                    self::PREFIX_STATS.'.lead_id = '.self::PREFIX_LEADS.'.id');
+                $queryBuilder->leftJoin(
+                    self::PREFIX_FOCUS,
+                    MAUTIC_TABLE_PREFIX.'leads',
+                    self::PREFIX_LEADS,
+                    self::PREFIX_STATS.'.lead_id = '.self::PREFIX_LEADS.'.id'
+                );
 
                 $queryBuilder->groupBy(
                     self::PREFIX_STATS.'.focus_id',

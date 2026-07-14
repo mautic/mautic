@@ -121,7 +121,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->campaign = $this->createCampaign('Campaign');
         $this->campaign->addList($segment);
 
-        $this->createEvent('Add 10 points', $this->campaign,
+        $this->createEvent(
+            'Add 10 points',
+            $this->campaign,
             'lead.changepoints',
             'action',
             ['points' => 10]

@@ -272,7 +272,9 @@ class ListApiController extends CommonApiController
         }
         if ('delete' == $action) {
             return $this->security->hasEntityAccess(
-                true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                true,
+                LeadPermissions::LISTS_DELETE_OTHER,
+                $entity->getCreatedBy()
             );
         }
 

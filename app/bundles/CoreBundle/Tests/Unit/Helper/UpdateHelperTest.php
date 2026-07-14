@@ -85,7 +85,8 @@ final class UpdateHelperTest extends TestCase
             $pathsHelper,
             $this->logger,
             $this->coreParametersHelper,
-            $this->client, $this->releaseParser,
+            $this->client,
+            $this->releaseParser,
             $this->preUpdateCheckHelper
         );
     }

@@ -46,7 +46,9 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $lead2    = $this->createLeadData($segment, $object, $fieldDetails, ['v2'], 2); // no path
         $campaign = $this->createCampaign('c1', $segment);
 
-        $parentEvent = $this->createEvent('Field Value Condition', $campaign,
+        $parentEvent = $this->createEvent(
+            'Field Value Condition',
+            $campaign,
             'lead.field_value',
             'condition',
             [
@@ -58,7 +60,9 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
             ]
         );
 
-        $this->createEvent('Add 10 points', $campaign,
+        $this->createEvent(
+            'Add 10 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 10],
@@ -66,7 +70,9 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
             $parentEvent
         );
 
-        $this->createEvent('Add 5 points', $campaign,
+        $this->createEvent(
+            'Add 5 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 5],

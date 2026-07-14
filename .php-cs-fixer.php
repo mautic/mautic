@@ -28,6 +28,7 @@ return (new PhpCsFixer\Config())
                 '='  => null,
             ],
         ],
+        'blank_line_between_import_groups' => false,
         'phpdoc_to_comment' => false,
         'ordered_imports'   => true,
         'array_syntax'      => [

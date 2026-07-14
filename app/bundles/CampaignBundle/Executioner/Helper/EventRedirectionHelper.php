@@ -112,8 +112,10 @@ class EventRedirectionHelper
         }
 
         $this->logger->debug(
-            sprintf('CAMPAIGN: Redirect event ID %d is also deleted, following redirect chain',
-                $redirectEvent->getId())
+            sprintf(
+                'CAMPAIGN: Redirect event ID %d is also deleted, following redirect chain',
+                $redirectEvent->getId()
+            )
         );
 
         return $this->findRedirectEventInCampaign($redirectEvent, $visited, $depth + 1);

@@ -36,7 +36,8 @@ final class SendWinnerEmailCommand extends ModeratedCommand
         $this
             ->setName(self::COMMAND_NAME)
             ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.')
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of time
 
 <info>php %command.full_name%</info>

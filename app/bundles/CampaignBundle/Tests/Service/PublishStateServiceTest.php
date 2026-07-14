@@ -50,7 +50,8 @@ final class PublishStateServiceTest extends MauticMysqlTestCase
             fn (PublishStateDateRange $range): array => [
                 'fromDate' => $range->getFromDate()->format(DateTimeHelper::FORMAT_DB),
                 'toDate'   => $range->getToDate()?->format(DateTimeHelper::FORMAT_DB),
-            ], $unpublishStateService->generateUnpublishDateRanges($campaign)
+            ],
+            $unpublishStateService->generateUnpublishDateRanges($campaign)
         ));
 
         $this->assertSame($expectedLastPublishedDate, $unpublishStateService->getLastPublishDate($campaign)?->format(DateTimeHelper::FORMAT_DB));

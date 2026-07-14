@@ -380,9 +380,11 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      *
      * @throws NoResultException|NonUniqueResultException
      */
-    private function updateLogsForRedirectedEvent(Event $redirectEvent, Collection $logs,
-        Event $originalEvent): void
-    {
+    private function updateLogsForRedirectedEvent(
+        Event $redirectEvent,
+        Collection $logs,
+        Event $originalEvent,
+    ): void {
         if ($logs->isEmpty()) {
             return;
         }
@@ -412,7 +414,9 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
             // 1. Find the rotation for this contact/campaign combination.
             $rotation = $this->leadRepository->getContactRotations(
-                [$contactId], $redirectEvent->getCampaign()->getId());
+                [$contactId],
+                $redirectEvent->getCampaign()->getId()
+            );
             $rotationValue = $rotation[$contactId]['rotation'] ?? 0;
             $newRotation   = $rotationValue + 1;
 

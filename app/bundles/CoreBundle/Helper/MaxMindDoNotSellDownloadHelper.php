@@ -52,9 +52,11 @@ class MaxMindDoNotSellDownloadHelper
         ];
 
         try {
-            $response = $this->httpClient->request('GET',
+            $response = $this->httpClient->request(
+                'GET',
                 $this->getRemoteDataStoreDownloadUrl(),
-                $httpClientOptions);
+                $httpClientOptions
+            );
         } catch (TransportExceptionInterface $e) {
             $this->logger->error('Failed to fetch remote Do Not Sell data: '.$e->getMessage());
 

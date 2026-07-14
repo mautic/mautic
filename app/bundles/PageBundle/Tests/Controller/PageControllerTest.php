@@ -88,11 +88,13 @@ final class PageControllerTest extends MauticMysqlTestCase
         $newLeads = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
-        $leadEventLogs = $this->connection->fetchAllAssociative('
+        $leadEventLogs = $this->connection->fetchAllAssociative(
+            '
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+          AND `bundle` = "page" AND `object` = "page";',
+            ['leadId' => $leadId]
         );
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
@@ -126,21 +128,25 @@ final class PageControllerTest extends MauticMysqlTestCase
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
-        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative('
+        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative(
+            '
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+          AND `bundle` = "page" AND `object` = "page";',
+            ['leadId' => $leadId]
         );
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
-        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
+        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative(
+            '
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
-          AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
+          AND `bundle` = "page" AND `object` = "page";',
+            ['leadId' => $leadId]
         );
         $this->assertCount(1, $eventLogsAfterSecondVisit);
         $this->assertSame(reset($eventLogsAfterFirstVisit)['id'], reset($eventLogsAfterSecondVisit)['id']);

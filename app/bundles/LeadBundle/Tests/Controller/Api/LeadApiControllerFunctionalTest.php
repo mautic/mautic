@@ -962,7 +962,9 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test fetching the batch of contacts
         $this->client->request(
-            'GET', '/api/contacts');
+            'GET',
+            '/api/contacts'
+        );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 

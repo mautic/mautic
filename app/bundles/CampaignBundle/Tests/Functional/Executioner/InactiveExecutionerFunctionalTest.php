@@ -166,8 +166,12 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $originalDecision->setParent($parentEvent);
 
         // Create negative child for the original decision (should NOT be executed)
-        $originalNegativeAction = $this->createActionEvent($campaign,
-            'Original Negative Action', $originalDecision, 'no');
+        $originalNegativeAction = $this->createActionEvent(
+            $campaign,
+            'Original Negative Action',
+            $originalDecision,
+            'no'
+        );
         $originalDecision->addChild($originalNegativeAction);
 
         // Create target condition that we redirect to
@@ -211,8 +215,11 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Assertions - verify basic redirection to condition works
         $this->assertGreaterThan(0, count($redirectConditionLogs), 'Expected redirect condition to be executed');
-        $this->assertCount(0, $originalNegativeActionLogs,
-            'Original decision negative action should NOT be executed');
+        $this->assertCount(
+            0,
+            $originalNegativeActionLogs,
+            'Original decision negative action should NOT be executed'
+        );
         $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Verify execution counters
@@ -461,9 +468,12 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         return $event;
     }
 
-    private function createActionEvent(Campaign $campaign, string $name, ?Event $parent = null,
-        ?string $decisionPath = null): Event
-    {
+    private function createActionEvent(
+        Campaign $campaign,
+        string $name,
+        ?Event $parent = null,
+        ?string $decisionPath = null,
+    ): Event {
         $event = new Event();
         $event->setCampaign($campaign);
         $event->setName($name);

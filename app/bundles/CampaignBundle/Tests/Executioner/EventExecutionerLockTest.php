@@ -56,8 +56,17 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
+<<<<<<< HEAD
         $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should not be added as the log has been executed already.');
         $this->assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+=======
+        Assert::assertSame(
+            self::ADD_POINTS,
+            $contact->getPoints(),
+            'Points should not be added as the log has been executed already.'
+        );
+        Assert::assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+>>>>>>> b89ba97224 ([cs] apply united arguments spacing)
             'Campaign event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),
         )), 'There should be an error log regarding the skipped log.');
@@ -74,7 +83,15 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $listener = $this->makeEventExecutionFail();
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
+<<<<<<< HEAD
         $this->assertSame(0, $contact->getPoints(), 'Points should not be added as the execution failed.');
+=======
+        Assert::assertSame(
+            0,
+            $contact->getPoints(),
+            'Points should not be added as the execution failed.'
+        );
+>>>>>>> b89ba97224 ([cs] apply united arguments spacing)
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
         $this->assertCount(1, $logs);
@@ -85,8 +102,17 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
         $this->makeEventExecutionPass($listener);
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
+<<<<<<< HEAD
         $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added as the log\'s version has been reset when execution failed.');
         $this->assertFalse($this->testHandler->hasWarningThatContains(sprintf(
+=======
+        Assert::assertSame(
+            self::ADD_POINTS,
+            $contact->getPoints(),
+            'Points should be added as the log\'s version has been reset when execution failed.'
+        );
+        Assert::assertFalse($this->testHandler->hasWarningThatContains(sprintf(
+>>>>>>> b89ba97224 ([cs] apply united arguments spacing)
             'Campaign event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),
         )), 'There should not be any warning log regarding skipped logs.');

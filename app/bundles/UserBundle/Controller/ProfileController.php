@@ -21,9 +21,13 @@ class ProfileController extends FormController
     /**
      * Generate's account profile.
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher,
-        TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
-    {
+    public function indexAction(
+        Request $request,
+        LanguageHelper $languageHelper,
+        UserPasswordHasherInterface $hasher,
+        TokenStorageInterface $tokenStorage,
+        SAMLHelper $samlHelper,
+    ): Response|RedirectResponse {
         // get current user
         $me = $tokenStorage->getToken()->getUser();
         \assert($me instanceof User);

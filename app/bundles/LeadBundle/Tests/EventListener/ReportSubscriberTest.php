@@ -266,7 +266,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                     ],
-                ]);
+                ]
+            );
 
         $this->translatorMock
             ->method('hasId')
