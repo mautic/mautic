@@ -270,8 +270,8 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $parentEmail->setName('Test change');
         $this->emailModel->saveEntity($parentEmail);
 
-        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
-        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
+        $this->assertSame($customHtmlParent, $parentEmail->getCustomHtml());
+        $this->assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
     }
 
     /**

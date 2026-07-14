@@ -64,9 +64,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
         ],
 
-        // waits for descission
-        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
@@ -135,9 +132,6 @@ return RectorConfig::configure()
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
-        // phpunit
-        Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,

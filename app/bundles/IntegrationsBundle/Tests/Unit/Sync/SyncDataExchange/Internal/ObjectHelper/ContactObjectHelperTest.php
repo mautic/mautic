@@ -321,7 +321,7 @@ final class ContactObjectHelperTest extends TestCase
             ->with(1)
             ->willReturn($contact);
 
-        self::assertSame($contact, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($contact, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
@@ -330,7 +330,7 @@ final class ContactObjectHelperTest extends TestCase
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Lead::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     /**

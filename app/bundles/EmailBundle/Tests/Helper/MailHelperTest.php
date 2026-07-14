@@ -625,17 +625,14 @@ final class MailHelperTest extends TestCase
 
         $mailer->flushQueue([]);
 
-        self::assertEmpty($mailer->getErrors()['failures']);
+        $this->assertEmpty($mailer->getErrors()['failures']);
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
 
         $this->assertCount(3, $fromAddresses);
         $this->assertCount(3, $metadatas);
-        self::assertSame(
-            ['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'],
-            $fromAddresses
-        );
+        $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
     }
 
     public function testGlobalFromThatAllFromAddressesAreTheSame(): void
@@ -1532,20 +1529,17 @@ final class MailHelperTest extends TestCase
             $realHeaders[$header->getName()] = $header->getBodyAsString();
         }
 
-        self::assertSame(
-            $realHeaders,
-            [
-                'To'                    => 'contact1@somewhere.com',
-                'From'                  => 'No Body <nobody@nowhere.com>',
-                'Sender'                => 'No Body <nobody@nowhere.com>',
-                'Reply-To'              => 'nobody@nowhere.com',
-                'Subject'               => 'Test',
-                'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
-                'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
-                'List-Unsubscribe'      => '<{unsubscribe_url}>',
-                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
-            ]
-        );
+        $this->assertSame($realHeaders, [
+            'To'                    => 'contact1@somewhere.com',
+            'From'                  => 'No Body <nobody@nowhere.com>',
+            'Sender'                => 'No Body <nobody@nowhere.com>',
+            'Reply-To'              => 'nobody@nowhere.com',
+            'Subject'               => 'Test',
+            'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
+            'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
+            'List-Unsubscribe'      => '<{unsubscribe_url}>',
+            'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+        ]);
     }
 
     public function testThatHtmlIsCorrectlyProcessedWhenTheAreEmbeddedImages(): void
@@ -2075,7 +2069,7 @@ final class MailHelperTest extends TestCase
         $mailer->addTo($this->contacts[0]['email']);
 
         $onSendDispatchCount = 0;
-        $eventDispatcher->expects(self::atLeastOnce())
+        $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->willReturnCallback(function (object $event, ?string $eventName = null) use (&$onSendDispatchCount): object {
                 if ($event instanceof EmailSendEvent && EmailEvents::EMAIL_ON_SEND === $eventName) {

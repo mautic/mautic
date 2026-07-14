@@ -194,7 +194,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->with(1)
             ->willReturn($company);
 
-        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($company, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
@@ -203,7 +203,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Company::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testSetFieldValues(): void

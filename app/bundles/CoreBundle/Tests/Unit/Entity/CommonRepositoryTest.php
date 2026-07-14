@@ -179,7 +179,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         foreach ($expectedValues as $expectedValue) {
-            self::assertSame($expectedValue, $this->repo->generateRandomParameterName());
+            $this->assertSame($expectedValue, $this->repo->generateRandomParameterName());
         }
     }
 

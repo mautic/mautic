@@ -74,14 +74,14 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testMultipleAssignedCompany(): void
     {
-        self::assertCount(2, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
-        self::assertCount(1, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(1, $this->getContactWithAssignTwoCompanies());
     }
 
     /**

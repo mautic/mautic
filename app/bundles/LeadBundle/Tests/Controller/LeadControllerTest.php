@@ -767,8 +767,8 @@ EMAIL;
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
-        self::assertCount(1, $errorContainer);
-        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
+        $this->assertCount(1, $errorContainer);
+        $this->assertSame('This field must be unique.', $errorContainer->text(null, true));
     }
 
     public function testEditRendersErrorOnEmailDuplicate(): void
@@ -1145,7 +1145,7 @@ EMAIL;
     {
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
-        self::assertSame('multiple', $multiple);
+        $this->assertSame('multiple', $multiple);
     }
 
     public function testCompanyMergeList(): void
