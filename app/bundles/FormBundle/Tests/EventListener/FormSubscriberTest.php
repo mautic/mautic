@@ -148,19 +148,19 @@ New line',
         if (null !== $to) {
             $this->mailer->expects($this->once())
                 ->method('setTo')
-                ->with(array_fill_keys(array_map('trim', explode(',', $to)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $to)), null));
         }
 
         if (null !== $cc) {
             $this->mailer->expects($this->once())
                 ->method('setCc')
-                ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
         }
 
         if (null !== $bcc) {
             $this->mailer->expects($this->once())
                 ->method('setBcc')
-                ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $bcc)), null));
         }
 
         $this->mailer->expects($this->once())
@@ -231,10 +231,10 @@ New line',
             ->method('setTo');
         $this->mailer->expects($this->once())
             ->method('setCc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
         $this->mailer->expects($this->once())
             ->method('setBcc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $bcc)), null));
         $this->mailer->expects($this->once())
             ->method('setSubject')
             ->with($subject);
@@ -437,7 +437,7 @@ New line',
             });
         $this->mailer->expects($this->once())
             ->method('setCc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
         $this->mailer->expects($this->once())
             ->method('setBcc')
             ->with([$bcc => null]);
