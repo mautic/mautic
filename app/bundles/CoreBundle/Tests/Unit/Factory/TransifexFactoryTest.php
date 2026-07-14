@@ -43,6 +43,6 @@ final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
         $transifex = $this->transifexFactory->getTransifex();
 
         // Getting a connector validates the config, so this should throw an exception.
-        Assert::assertTrue($transifex->getConnector(Resources::class) instanceof Resources);
+        Assert::assertInstanceOf(Resources::class, $transifex->getConnector(Resources::class));
     }
 }

@@ -7,8 +7,8 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
+use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
-use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
 final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
@@ -24,15 +24,15 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $mockBuilder = $this->getMockBuilder(StubIntegration::class);
+        $mockBuilder = $this->getMockBuilder(VtigerIntegration::class);
         $mockBuilder->disableOriginalConstructor();
 
-        /** @var StubIntegration $integration */
+        /** @var VtigerIntegration $integration */
         $integration = $mockBuilder->getMock();
 
-        $methodMautic = new \ReflectionMethod(StubIntegration::class, 'getPriorityFieldsForMautic');
+        $methodMautic = new \ReflectionMethod(VtigerIntegration::class, 'getPriorityFieldsForMautic');
 
-        $methodIntegration = new \ReflectionMethod(StubIntegration::class, 'getPriorityFieldsForIntegration');
+        $methodIntegration = new \ReflectionMethod(VtigerIntegration::class, 'getPriorityFieldsForIntegration');
 
         $fieldsForMautic = $methodMautic->invokeArgs($integration, [$config]);
 
@@ -92,7 +92,7 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 ],
             ]);
 
-        $integration = $this->getMockBuilder(StubIntegration::class)
+        $integration = $this->getMockBuilder(VtigerIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
                 $this->cache,
@@ -128,9 +128,9 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
     public function testLimitString(): void
     {
-        $integration = $this->createStub(StubIntegration::class);
+        $integration = $this->createStub(VtigerIntegration::class);
 
-        $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
+        $methodLimitString = new \ReflectionMethod(VtigerIntegration::class, 'limitString');
 
         $string = 'SomeRandomString';
 

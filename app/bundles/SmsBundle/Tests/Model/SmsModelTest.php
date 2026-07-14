@@ -122,8 +122,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setId(1);
         $results = $this->smsModel->sendSms($sms, $lead);
-        self::assertFalse((bool) $results[1]['sent']);
-        self::assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);
+        $this->assertFalse((bool) $results[1]['sent']);
+        $this->assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);
     }
 
     public function testSendSMSTest(): void

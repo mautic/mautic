@@ -395,7 +395,7 @@ class ListController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
@@ -588,7 +588,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $deletedEntities = $model->deleteEntities($deleteIds);
                 } catch (DeleteEntitiesDependencyException $e) {
@@ -605,7 +605,7 @@ class ListController extends FormController
                     }
                 }
 
-                if ($deletedEntities) {
+                if ([] !== $deletedEntities) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.lead.list.notice.batch_deleted',

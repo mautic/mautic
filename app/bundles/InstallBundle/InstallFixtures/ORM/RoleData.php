@@ -37,7 +37,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
         $this->addReference('admin-role', $role);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

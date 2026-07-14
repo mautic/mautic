@@ -192,10 +192,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $successful = $pendingEvent->getSuccessful();
 
         // SMS should be noted as DNC
-        $this->assertFalse(empty($successful->get(2)->getMetadata()['sms']['dnc']));
+        $this->assertNotEmpty($successful->get(2)->getMetadata()['sms']['dnc']);
 
         // Nothing recorded for success
-        $this->assertTrue(empty($successful->get(1)->getMetadata()));
+        $this->assertEmpty($successful->get(1)->getMetadata());
     }
 
     public function sendMarketingMessageEmail(PendingEvent $event): void

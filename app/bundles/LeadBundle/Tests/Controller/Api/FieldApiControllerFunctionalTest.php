@@ -219,12 +219,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('bramborak|makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('bramborak|makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
 
         // Test patch and values should be updated
         $updatedValues = [
@@ -238,12 +238,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
 
         // Test empty patch and values should be updated
         $updatedValues = [
@@ -258,12 +258,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
     }
 
     /**
@@ -331,12 +331,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('makovec', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
 
         // Test patch and values should be updated
         $updatedValues = [
@@ -350,12 +350,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('halusky', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
 
         // Test empty patch and values should be updated
         $updatedValues = [
@@ -370,12 +370,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $responseJson   = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('contact', $responseJson);
-        self::assertArrayHasKey('fields', $responseJson['contact']);
-        self::assertArrayHasKey('core', $responseJson['contact']['fields']);
-        self::assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
-        self::assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
-        self::assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
+        $this->assertArrayHasKey('contact', $responseJson);
+        $this->assertArrayHasKey('fields', $responseJson['contact']);
+        $this->assertArrayHasKey('core', $responseJson['contact']['fields']);
+        $this->assertArrayHasKey($fieldAlias, $responseJson['contact']['fields']['core']);
+        $this->assertArrayHasKey('value', $responseJson['contact']['fields']['core'][$fieldAlias]);
+        $this->assertSame('', $responseJson['contact']['fields']['core'][$fieldAlias]['value']);
     }
 
     /**

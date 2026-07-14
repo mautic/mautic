@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method ZohoApi getApiHelper()
+ * @extends CrmAbstractIntegration<ZohoApi>
  */
 class ZohoIntegration extends CrmAbstractIntegration
 {

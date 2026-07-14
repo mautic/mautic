@@ -73,12 +73,12 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('MySeg', (string) $response->getContent());
+        $this->assertStringContainsString('MySeg', (string) $response->getContent());
         // Make sure that contact grid is not loaded synchronously
-        self::assertStringNotContainsString('Kane', (string) $response->getContent());
-        self::assertStringNotContainsString('Jacques', (string) $response->getContent());
+        $this->assertStringNotContainsString('Kane', (string) $response->getContent());
+        $this->assertStringNotContainsString('Jacques', (string) $response->getContent());
         // Make sure the data-target-url is not an absolute URL
-        self::assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), (string) $response->getContent());
+        $this->assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), (string) $response->getContent());
     }
 
     public function testSegmentContactGrid(): void
@@ -89,8 +89,8 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segment/view/%d/contact/%d', $segment->getId(), $pageId));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Kane', (string) $response->getContent());
-        self::assertStringContainsString('Jacques', (string) $response->getContent());
+        $this->assertStringContainsString('Kane', (string) $response->getContent());
+        $this->assertStringContainsString('Jacques', (string) $response->getContent());
     }
 
     private function createList(string $suffix = 'A'): LeadList
@@ -189,7 +189,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200.');
-        self::assertStringContainsString('Segment clone', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('Segment clone', (string) $clientResponse->getContent());
     }
 
     public function testSegmentSearchFilters(): void

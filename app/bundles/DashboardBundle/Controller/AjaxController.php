@@ -21,9 +21,9 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
 
-        /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
-        $pageRepository               = $entityManager->getRepository(Hit::class);
-        $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
+        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
+        $hitRepository               = $entityManager->getRepository(Hit::class);
+        $dataArray['viewingVisitors'] = $hitRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
 

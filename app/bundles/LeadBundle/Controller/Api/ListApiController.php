@@ -97,7 +97,7 @@ class ListApiController extends CommonApiController
             if (isset($content['lists']) && is_array($content['lists'])) {
                 $segmentIds = array_column($content['lists'], 'id');
 
-                if ($segmentIds) {
+                if ([] !== $segmentIds) {
                     /** @var ListModel $model */
                     $model      = $this->model;
                     $leadCounts = $model->getSegmentContactCount($segmentIds);

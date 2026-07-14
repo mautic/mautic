@@ -38,21 +38,19 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array{0: int, 1: int, 2: int}>
+     * @return \Iterator<int, array{int, int, int}>
      */
-    public static function pageProvider(): array
+    public static function pageProvider(): \Iterator
     {
-        return [
-            [0, 10, 1],
-            [1, 10, 1],
-            [5, 10, 1],
-            [10, 10, 1],
-            [11, 10, 2],
-            [20, 10, 2],
-            [21, 10, 3],
-            [15, 15, 1],
-            [16, 15, 2],
-        ];
+        yield [0, 10, 1];
+        yield [1, 10, 1];
+        yield [5, 10, 1];
+        yield [10, 10, 1];
+        yield [11, 10, 2];
+        yield [20, 10, 2];
+        yield [21, 10, 3];
+        yield [15, 15, 1];
+        yield [16, 15, 2];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('startProvider')]
@@ -67,15 +65,13 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array{0: int, 1: int, 2: int}>
+     * @return \Iterator<int, array{int, int, int}>
      */
-    public static function startProvider(): array
+    public static function startProvider(): \Iterator
     {
-        return [
-            [0, 10, 1],
-            [1, 10, 1],
-            [10, 10, 1],
-            [11, 10, 2],
-        ];
+        yield [0, 10, 1];
+        yield [1, 10, 1];
+        yield [10, 10, 1];
+        yield [11, 10, 2];
     }
 }

@@ -15,7 +15,7 @@ class DateExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('dateToText', $this->toText(...), ['is_safe' => ['all']]),

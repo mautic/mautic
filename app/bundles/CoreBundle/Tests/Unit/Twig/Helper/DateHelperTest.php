@@ -64,19 +64,19 @@ final class DateHelperTest extends TestCase
         // Setup translator mock for humanized dates
         $this->translator->method('trans')
             ->willReturnCallback(fn (string $key, array $parameters = []): string => match ($key) {
-                'mautic.core.date.years.ago' => $parameters['%count%'].' year(s) ago',
-                'mautic.core.date.years.in' => 'in '.$parameters['%count%'].' year(s)',
-                'mautic.core.date.months.ago' => $parameters['%count%'].' month(s) ago',
-                'mautic.core.date.months.in' => 'in '.$parameters['%count%'].' month(s)',
-                'mautic.core.date.days.ago' => $parameters['%count%'].' day(s) ago',
-                'mautic.core.date.days.in' => 'in '.$parameters['%count%'].' day(s)',
-                'mautic.core.date.hours.ago' => $parameters['%count%'].' hour(s) ago',
-                'mautic.core.date.hours.in' => 'in '.$parameters['%count%'].' hour(s)',
+                'mautic.core.date.years.ago'   => $parameters['%count%'].' year(s) ago',
+                'mautic.core.date.years.in'    => 'in '.$parameters['%count%'].' year(s)',
+                'mautic.core.date.months.ago'  => $parameters['%count%'].' month(s) ago',
+                'mautic.core.date.months.in'   => 'in '.$parameters['%count%'].' month(s)',
+                'mautic.core.date.days.ago'    => $parameters['%count%'].' day(s) ago',
+                'mautic.core.date.days.in'     => 'in '.$parameters['%count%'].' day(s)',
+                'mautic.core.date.hours.ago'   => $parameters['%count%'].' hour(s) ago',
+                'mautic.core.date.hours.in'    => 'in '.$parameters['%count%'].' hour(s)',
                 'mautic.core.date.minutes.ago' => $parameters['%count%'].' minute(s) ago',
-                'mautic.core.date.minutes.in' => 'in '.$parameters['%count%'].' minute(s)',
-                'mautic.core.date.just.now' => 'just now',
-                'mautic.core.date.today' => 'Today',
-                default => $key,
+                'mautic.core.date.minutes.in'  => 'in '.$parameters['%count%'].' minute(s)',
+                'mautic.core.date.just.now'    => 'just now',
+                'mautic.core.date.today'       => 'Today',
+                default                         => $key,
             });
     }
 

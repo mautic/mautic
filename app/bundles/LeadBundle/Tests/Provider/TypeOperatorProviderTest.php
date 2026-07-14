@@ -157,7 +157,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (TypeOperatorsEvent $event): void {
                         // Emulate a subscriber.

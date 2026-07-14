@@ -909,7 +909,7 @@ class Field implements UuidInterface
         $properties = $this->getProperties();
 
         return 'checkboxgrp' === $this->getType()
-            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+            || (array_key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**
