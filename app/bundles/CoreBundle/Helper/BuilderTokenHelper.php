@@ -74,7 +74,7 @@ class BuilderTokenHelper
     public function getTokens(
         $tokenRegex,
         $filter = '',
-        $labelColumn = 'name',
+        string $labelColumn = 'name',
         $valueColumn = 'id',
         ?CompositeExpression $expr = null,
     ) {

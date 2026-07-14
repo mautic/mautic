@@ -39,8 +39,6 @@ final class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \PHPUnit\Framework\MockObject\MockObject&VersionProvider $versionProvider;
-
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     private ReportSubscriber $subscriber;
@@ -52,14 +50,13 @@ final class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->versionProvider     = $this->createMock(VersionProvider::class);
         $this->connection          = $this->createMock(Connection::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
             $this->createStub(DncReportService::class),
-            $this->versionProvider,
+            $this->createStub(VersionProvider::class),
         );
 
         // Default to MySQL platform for backward compatibility with existing tests

@@ -159,7 +159,7 @@ final class EmailRepositoryTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with($this->equalTo("SUM(tr.unique_hits) as $uniqueClicksCol"))
+            ->with("SUM(tr.unique_hits) as $uniqueClicksCol")
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);
