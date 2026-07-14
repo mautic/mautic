@@ -1023,9 +1023,11 @@ class SubmissionModel extends CommonFormModel
             } else {
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
-                // Merge the found lead with currently tracked lead
+                // Merge the found lead with currently tracked lead.
+                // $foundLead (the existing identified contact) is the winner so its ID is preserved;
+                // $lead (the anonymous session contact) is the loser and gets deleted.
                 try {
-                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                    $lead = $this->contactMerger->merge($foundLead, $lead);
                 } catch (SameContactException) {
                 }
             }
