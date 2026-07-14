@@ -31,7 +31,7 @@ class Engine
             return;
         }
 
-        if (!$migrationClasses) {
+        if ([] === $migrationClasses) {
             return;
         }
 

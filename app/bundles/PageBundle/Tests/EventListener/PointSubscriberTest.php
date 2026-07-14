@@ -18,13 +18,10 @@ final class PointSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        self::assertSame(
-            [
-                'mautic.point_on_build' => ['onPointBuild', 0],
-                'mautic.page_on_hit'    => ['onPageHit', 0],
-            ],
-            PointSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            'mautic.point_on_build' => ['onPointBuild', 0],
+            'mautic.page_on_hit'    => ['onPageHit', 0],
+        ], PointSubscriber::getSubscribedEvents());
     }
 
     public function testPointBuildAddsActions(): void
@@ -32,7 +29,7 @@ final class PointSubscriberTest extends TestCase
         $pointModel        = $this->createStub(PointModel::class);
         $pointBuilderEvent = $this->createMock(PointBuilderEvent::class);
         $pointActionHelper = $this->createStub(PointActionHelper::class);
-        $matcher           = self::exactly(2);
+        $matcher           = $this->exactly(2);
 
         $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper): void {
             if (1 === $matcher->numberOfInvocations()) {

@@ -30,7 +30,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $this->setReference('page-cat-1', $cat);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

@@ -79,15 +79,15 @@ final class NotificationTypeTest extends TypeTestCase
 
             if (in_array($fieldName, $invalidFields, true)) {
                 ++$errorCount;
-                self::assertCount(1, $errors);
+                $this->assertCount(1, $errors);
                 continue;
             }
 
-            self::assertCount(0, $errors);
+            $this->assertCount(0, $errors);
         }
 
-        self::assertCount($errorCount, $invalidFields);
-        self::assertCount(0, $view->vars['errors']);
+        $this->assertCount($errorCount, $invalidFields);
+        $this->assertCount(0, $view->vars['errors']);
     }
 
     public function testSubmitValidData(): void
@@ -128,9 +128,9 @@ final class NotificationTypeTest extends TypeTestCase
         foreach ($view->children as $fieldName => $child) {
             $errors = $view->children[$fieldName]->vars['errors'];
             $this->assertInstanceOf(FormErrorIterator::class, $errors);
-            self::assertCount(0, $errors);
+            $this->assertCount(0, $errors);
         }
 
-        self::assertCount(0, $view->vars['errors']);
+        $this->assertCount(0, $view->vars['errors']);
     }
 }

@@ -192,7 +192,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturnCallback(
-                function ($string, $params) {
+                function (string $string, array $params): string {
                     $expectedStrings = [
                         'mautic.integration.sync.user_notification.header',
                         'mautic.integration.sync.user_notification.count_message',

@@ -89,7 +89,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
 
-        self::assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 
         $form = $crawler->filter(static::FORM_SELECTOR);
         $html = $form->html();

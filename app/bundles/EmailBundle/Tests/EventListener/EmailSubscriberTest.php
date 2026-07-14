@@ -270,7 +270,7 @@ CONTENT,
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $coreParametersHelper->method('get')

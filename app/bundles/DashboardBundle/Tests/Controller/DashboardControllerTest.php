@@ -180,7 +180,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
-            ->will($this->throwException(new IOException('some error message')));
+            ->willThrowException(new IOException('some error message'));
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
@@ -215,7 +215,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn(null);
 
-        $this->containerMock->expects(self::never())
+        $this->containerMock->expects($this->never())
             ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
@@ -247,6 +247,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
 
-        self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
+        $this->assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }
 }
