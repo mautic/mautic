@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\UtmTag;
-use PHPUnit\Framework\Assert;
 
 final class UtmTagTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +14,7 @@ final class UtmTagTest extends \PHPUnit\Framework\TestCase
         $utmTag = new UtmTag();
         $utmTag->setUtmContent($utmContent);
 
-        Assert::assertSame($expected, mb_strlen($utmTag->getUtmContent()));
+        $this->assertSame($expected, mb_strlen($utmTag->getUtmContent()));
     }
 
     /**

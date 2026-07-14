@@ -9,7 +9,6 @@ use Doctrine\Common\Cache\CacheProvider;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -60,7 +59,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
         $this->getContacts(5, ['where' => [['col' => 'l.points', 'expr' => 'lt', 'val' => 5]]]);
 
         // Without the cache, there would be 4 COUNT queries. With the cache, there is just one.
-        Assert::assertCount(2, $this->findCountQueries());
+        $this->assertCount(2, $this->findCountQueries());
     }
 
     /**
@@ -79,8 +78,8 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertSame($expectedCount, (int) $response['total']);
-        Assert::assertCount($expectedCount, $response['contacts']);
+        $this->assertSame($expectedCount, (int) $response['total']);
+        $this->assertCount($expectedCount, $response['contacts']);
     }
 
     /**

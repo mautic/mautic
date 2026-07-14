@@ -29,7 +29,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -1603,7 +1602,7 @@ final class MailHelperTest extends TestCase
 
         $metadata = $transport->getMessage()->getMetadata();
         foreach ($this->contacts as $contact) {
-            Assert::assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
+            $this->assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
         }
     }
 
@@ -2016,17 +2015,14 @@ final class MailHelperTest extends TestCase
             $mailer->message->getBody();
             $this->fail('The body should be empty before send');
         } catch (LogicException $e) {
-            Assert::assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
+            $this->assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
         }
 
-        Assert::assertSame($trackedHtml, $mailer->getBody());
+        $this->assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
 
-        Assert::assertMatchesRegularExpression(
-            '#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#',
-            $mailer->message->getHtmlBody()
-        );
-        Assert::assertSame($trackedHtml, $mailer->getBody());
+        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
+        $this->assertSame($trackedHtml, $mailer->getBody());
     }
 
     public function testEmailWithDefaultSignature(): void
@@ -2085,9 +2081,9 @@ final class MailHelperTest extends TestCase
         $email->setCustomHtml('{signature}');
         $mailer->setEmail($email);
 
-        Assert::assertNull($mailer->message->getHtmlBody());
+        $this->assertNull($mailer->message->getHtmlBody());
         $mailer->send(true);
-        Assert::assertSame(1, $onSendDispatchCount);
-        Assert::assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
+        $this->assertSame(1, $onSendDispatchCount);
+        $this->assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
     }
 }

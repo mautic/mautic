@@ -9,7 +9,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -50,7 +49,7 @@ final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
             $hasNotWeakConstraintViolation |= $violation->getConstraint() instanceof NotWeak;
         }
 
-        Assert::assertGreaterThanOrEqual(1, count($violations));
-        Assert::assertTrue((bool) $hasNotWeakConstraintViolation);
+        $this->assertGreaterThanOrEqual(1, count($violations));
+        $this->assertTrue((bool) $hasNotWeakConstraintViolation);
     }
 }
