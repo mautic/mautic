@@ -184,7 +184,7 @@ class UserRepository extends CommonRepository
             ->where('IDENTITY(u.role) = :roleId')
             ->setParameter('roleId', $roleId);
 
-        return array_map('intval', array_column($q->getQuery()->getScalarResult(), 'id'));
+        return array_map(intval(...), array_column($q->getQuery()->getScalarResult(), 'id'));
     }
 
     /**

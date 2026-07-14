@@ -26,7 +26,7 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 
     private UserHelper&MockObject $userHelper;
 
-    private TranslatorInterface&MockObject $translator;
+    private TranslatorInterface&\PHPUnit\Framework\MockObject\Stub $translator;
 
     private UserRepository&MockObject $userRepository;
 
@@ -34,7 +34,7 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createStub(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->userRepository       = $this->createMock(UserRepository::class);
         $this->corePermissions      = new CorePermissions(

@@ -240,7 +240,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $userCreator = $this->getUser($userCreatorUN);
         if (!$userCreator && self::SALES_USER_2 === $userCreatorUN) {
             $sales       = $this->getUser(self::SALES_USER);
-            \assert($sales instanceof User);
+            $this->assertInstanceOf(User::class, $sales);
             $userCreator = new User();
             $userCreator->setUsername(self::SALES_USER_2);
             $userCreator->setFirstName('Sales');
@@ -252,9 +252,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             $this->em->persist($userCreator);
             $this->em->flush();
         }
-        \assert($userCreator instanceof User);
+        $this->assertInstanceOf(User::class, $userCreator);
         $userEditor  = $this->getUser(self::SALES_USER);
-        \assert($userEditor instanceof User);
+        $this->assertInstanceOf(User::class, $userEditor);
         $this->setPermission($userEditor, ['asset:assets' => $permission]);
 
         $asset = new Asset();

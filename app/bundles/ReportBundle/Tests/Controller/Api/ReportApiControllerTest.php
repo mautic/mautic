@@ -92,7 +92,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/api/reports');
         $this->assertResponseIsSuccessful();
-        self::assertStringContainsString('Contact report', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Contact report', (string) $this->client->getResponse()->getContent());
     }
 
     /**

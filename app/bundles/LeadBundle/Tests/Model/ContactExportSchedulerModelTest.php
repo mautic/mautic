@@ -63,7 +63,7 @@ final class ContactExportSchedulerModelTest extends TestCase
             'lead:leads:viewsamerole' => true,
         ]);
 
-        self::assertSame([
+        $this->assertSame([
             [
                 'column' => 'l.dateIdentified',
                 'expr'   => 'isNotNull',
@@ -85,14 +85,14 @@ final class ContactExportSchedulerModelTest extends TestCase
             }
         };
 
-        $model = $this->createModel($this->createMock(EntityManager::class), $user);
+        $model = $this->createModel($this->createStub(EntityManager::class), $user);
 
         $data = $model->prepareData([
             'lead:leads:viewother'    => false,
             'lead:leads:viewsamerole' => false,
         ]);
 
-        self::assertSame([
+        $this->assertSame([
             [
                 'column' => 'l.dateIdentified',
                 'expr'   => 'isNotNull',
@@ -127,16 +127,16 @@ final class ContactExportSchedulerModelTest extends TestCase
 
         return new ContactExportSchedulerModel(
             $requestStack,
-            $this->createMock(LeadModel::class),
-            $this->createMock(ExportHelper::class),
-            $this->createMock(MailHelper::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(ExportHelper::class),
+            $this->createStub(MailHelper::class),
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translator,
             $userHelper,
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(LoggerInterface::class),
             $coreParametersHelper
         );
     }
