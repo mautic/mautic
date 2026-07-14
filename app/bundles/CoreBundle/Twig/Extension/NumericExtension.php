@@ -10,7 +10,7 @@ use Twig\TwigTest;
 
 class NumericExtension extends AbstractExtension
 {
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('numeric', fn ($value): bool => !is_array($value) && is_numeric($value)),
