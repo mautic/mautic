@@ -844,21 +844,19 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<int, bool|string|null>>
+     * @return \Iterator<int, array<int, (bool|string|null)>>
      */
-    public static function dateFieldProvider(): array
+    public static function dateFieldProvider(): \Iterator
     {
-        return [
-            ['Today', false],
-            ['Not-a-date', true],
-            ['birthday', false],
-            ['2023-01-01 11:00', false],
-            ['2023-01-01 11:00:00', false],
-            ['2023-01-01', false],
-            ['next week', false],
-            [null, false],
-            ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
-        ];
+        yield ['Today', false];
+        yield ['Not-a-date', true];
+        yield ['birthday', false];
+        yield ['2023-01-01 11:00', false];
+        yield ['2023-01-01 11:00:00', false];
+        yield ['2023-01-01', false];
+        yield ['next week', false];
+        yield [null, false];
+        yield ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'];
     }
 
     public function testRecentActivityFeedOnSegmentDetailsPage(): void
