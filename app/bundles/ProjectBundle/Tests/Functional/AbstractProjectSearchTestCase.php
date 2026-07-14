@@ -77,15 +77,7 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
             return;
         }
 
-<<<<<<< HEAD
         $this->assertEqualsCanonicalizing(['id', 'name'], array_keys(reset($projectData)), 'Project data should contain only "id" and "name".');
-=======
-        Assert::assertEqualsCanonicalizing(
-            ['id', 'name'],
-            array_keys(reset($projectData)),
-            'Project data should contain only "id" and "name".'
-        );
->>>>>>> b89ba97224 ([cs] apply united arguments spacing)
     }
 
     /**

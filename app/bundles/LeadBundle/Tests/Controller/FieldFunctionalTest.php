@@ -107,14 +107,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
             $this->createAjaxHeaders()
         );
 
-<<<<<<< HEAD
         $this->assertStringContainsString('please go back and check mentioned resource(s) before deleting.', strip_tags($this->client->getResponse()->getContent()));
-=======
-        Assert::assertStringContainsString(
-            'please go back and check mentioned resource(s) before deleting.',
-            strip_tags($this->client->getResponse()->getContent())
-        );
->>>>>>> b89ba97224 ([cs] apply united arguments spacing)
 
         // Try deleting multiple fields.
         $parameters = 'ids=["'.$field_first->getId().'","'.$field_second->getId().'"]';
@@ -126,14 +119,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
             $this->createAjaxHeaders()
         );
 
-<<<<<<< HEAD
         $this->assertStringContainsString('cannot be deleted because they are in use by other entities.', strip_tags($this->client->getResponse()->getContent()));
-=======
-        Assert::assertStringContainsString(
-            'cannot be deleted because they are in use by other entities.',
-            strip_tags($this->client->getResponse()->getContent())
-        );
->>>>>>> b89ba97224 ([cs] apply united arguments spacing)
     }
 
     public function testNewSelectField(): void
