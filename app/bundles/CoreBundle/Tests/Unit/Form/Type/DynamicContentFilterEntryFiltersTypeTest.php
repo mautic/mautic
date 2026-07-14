@@ -15,17 +15,14 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DynamicContentFilterEntryFiltersTypeTest extends TestCase
+final class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 {
     private DynamicContentFilterEntryFiltersType $form;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $translator       = $this->createMock(TranslatorInterface::class);
-        $listModel        = $this->createMock(ListModel::class);
-        $this->form       =  new DynamicContentFilterEntryFiltersType($translator, $listModel);
+        $this->form       =  new DynamicContentFilterEntryFiltersType($this->createStub(TranslatorInterface::class), $this->createStub(ListModel::class));
     }
 
     public function testBuildForm(): void

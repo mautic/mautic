@@ -31,7 +31,7 @@ class Engine
             return;
         }
 
-        if (!$migrationClasses) {
+        if ([] === $migrationClasses) {
             return;
         }
 
@@ -81,8 +81,6 @@ class Engine
     }
 
     /**
-     * Get migration file names.
-     *
      * @return string[]
      */
     private function getMigrationFileNames(): array

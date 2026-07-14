@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigSubscriberTest extends TestCase
+final class ConfigSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&ConfigChangeLogger
@@ -26,10 +26,7 @@ class ConfigSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->logger     = $this->createMock(ConfigChangeLogger::class);
-        $ipAddressRepo    = $this->createMock(IpAddressRepository::class);
-        $coreParamHelper  = $this->createMock(CoreParametersHelper::class);
-        $auditLogRepo     = $this->createMock(AuditLogRepository::class);
-        $this->subscriber = new ConfigSubscriber($this->logger, $ipAddressRepo, $coreParamHelper, $auditLogRepo);
+        $this->subscriber = new ConfigSubscriber($this->logger, $this->createStub(IpAddressRepository::class), $this->createStub(CoreParametersHelper::class), $this->createStub(AuditLogRepository::class));
     }
 
     public function testGetSubscribedEvents(): void

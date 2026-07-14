@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -9,7 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
@@ -57,7 +59,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $matcher   = $this->exactly(4);
 
         $repo->expects($matcher)
-            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
+            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
@@ -168,6 +170,8 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');

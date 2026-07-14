@@ -59,7 +59,7 @@ class ConfigController extends FormController
         $openTab    = null;
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {

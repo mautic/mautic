@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AssetRepositoryTest extends TestCase
+final class AssetRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -21,7 +21,7 @@ class AssetRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.asset.asset.searchcommand.isexpired' => 'is:expired',
             'mautic.asset.asset.searchcommand.ispending' => 'is:pending',
             default                                      => $id,

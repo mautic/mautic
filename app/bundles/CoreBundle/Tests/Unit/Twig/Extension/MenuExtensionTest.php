@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 use PHPUnit\Framework\Assert;
 
-class MenuExtensionTest extends AbstractMauticTestCase
+final class MenuExtensionTest extends AbstractMauticTestCase
 {
     public function testParseMenuAttributes(): void
     {
@@ -44,9 +44,11 @@ class MenuExtensionTest extends AbstractMauticTestCase
 
         $itemFirst  = $menu->getChild('First item');
         $itemSecond = $menu->getChild('Second item');
+        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemFirst);
 
         // test an item which has no class
         Assert::assertSame([], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
+        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemSecond);
 
         // test an item with an inherrent class
         Assert::assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));

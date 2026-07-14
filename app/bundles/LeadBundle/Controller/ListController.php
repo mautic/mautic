@@ -317,7 +317,7 @@ class ListController extends FormController
         $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
         // Check for a submitted form and process it
-        if (!$ignorePost && Request::METHOD_POST == $request->getMethod()) {
+        if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -345,7 +345,8 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]));
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
@@ -587,7 +588,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $deletedEntities = $model->deleteEntities($deleteIds);
                 } catch (DeleteEntitiesDependencyException $e) {
@@ -604,7 +605,7 @@ class ListController extends FormController
                     }
                 }
 
-                if ($deletedEntities) {
+                if ([] !== $deletedEntities) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.lead.list.notice.batch_deleted',
@@ -692,7 +693,7 @@ class ListController extends FormController
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list, true);
+                $model->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -758,7 +759,8 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()
@@ -827,9 +829,6 @@ class ListController extends FormController
         return $this->getModel('lead.list')->getPermissionBase();
     }
 
-    /**
-     * Get List Model.
-     */
     protected function getListModel(): ListModel
     {
         /** @var ListModel $model */
@@ -954,13 +953,13 @@ class ListController extends FormController
         }
 
         if (!empty($filters)) {
-            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+            if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+            if (in_array('manually_removed', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+            if (in_array('filter_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 0]);
             }
         }

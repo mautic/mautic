@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\SmsBundle\Helper\ContactHelper;
@@ -9,13 +11,8 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
+final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContactHelper|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $contactHelper;
-
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Configuration
      */
@@ -23,7 +20,6 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contactHelper = $this->createStub(ContactHelper::class);
         $this->configuration = $this->createMock(Configuration::class);
         $this->configuration->method('getAccountSid')
             ->willReturn('123');
@@ -88,11 +84,11 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request->request = $inputBag;
 
-        $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
+        $this->assertSame('Hello', $this->getCallback()->getMessage($request));
     }
 
     private function getCallback(): TwilioCallback
     {
-        return new TwilioCallback($this->contactHelper, $this->configuration);
+        return new TwilioCallback($this->createStub(ContactHelper::class), $this->configuration);
     }
 }

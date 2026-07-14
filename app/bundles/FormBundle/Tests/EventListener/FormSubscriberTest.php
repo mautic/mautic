@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     private FormSubscriber $subscriber;
 
@@ -32,24 +34,18 @@ class FormSubscriberTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $ipLookupHelper    = $this->createMock(IpLookupHelper::class);
-        $auditLogModel     = $this->createMock(AuditLogModel::class);
         $this->mailer      = $this->createMock(MailHelper::class);
-        $translator        = $this->createMock(TranslatorInterface::class);
-        $router            = $this->createMock(RouterInterface::class);
-        $languageHelper    = $this->createMock(LanguageHelper::class);
         $this->mailer->expects($this->once())
             ->method('getMailer')
             ->willReturnSelf();
 
         $this->subscriber = new FormSubscriber(
-            $ipLookupHelper,
-            $auditLogModel,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(AuditLogModel::class),
             $this->mailer,
-            $translator,
-            $router,
-            $languageHelper
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(RouterInterface::class),
+            $this->createStub(LanguageHelper::class)
         );
     }
 

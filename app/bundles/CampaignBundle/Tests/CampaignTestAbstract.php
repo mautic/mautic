@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -21,7 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends TestCase
+abstract class CampaignTestAbstract extends TestCase
 {
     protected static int $mockId       = 232;
 
@@ -29,7 +31,9 @@ class CampaignTestAbstract extends TestCase
 
     protected static string $mockAlias = 'Mock alias';
 
-    /** @var EntityManager&MockObject */
+    /**
+     * @var EntityManager&MockObject
+     */
     protected ?MockObject $entityManager = null;
 
     protected function initCampaignModel(): CampaignModel
@@ -39,15 +43,13 @@ class CampaignTestAbstract extends TestCase
 
         $security = $this->createMock(CorePermissions::class);
 
-        $security->expects($this->any())
+        $security
             ->method('isGranted')
             ->willReturn(true);
 
-        $userHelper = $this->createMock(UserHelper::class);
-
         $formRepository = $this->createMock(FormRepository::class);
 
-        $formRepository->expects($this->any())
+        $formRepository
             ->method('getFormList')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName]]);
 
@@ -56,7 +58,7 @@ class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([6 => $entityManager])
             ->getMock();
 
-        $leadListModel->expects($this->any())
+        $leadListModel
             ->method('getUserLists')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
@@ -65,7 +67,7 @@ class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([12 => $entityManager])
             ->getMock();
 
-        $formModel->expects($this->any())
+        $formModel
             ->method('getRepository')
             ->willReturn($formRepository);
 
@@ -81,7 +83,7 @@ class CampaignTestAbstract extends TestCase
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
-            $userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
         );

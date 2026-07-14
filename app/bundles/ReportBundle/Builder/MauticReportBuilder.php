@@ -353,13 +353,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = $filter['expr'] ?? $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
-                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' == trim((string) $filter['value'])) {
+                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' === trim((string) $filter['value'])) {
                     // Ignore empty values before applying glue so they do not create empty OR groups.
                     continue;
                 }
 
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
-                    if ($andGroup) {
+                    if ([] !== $andGroup) {
                         $orGroups[] = CompositeExpression::and(...$andGroup);
                         $andGroup   = [];
                     }
@@ -397,16 +397,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $andGroup[] = $expression;
                         break;
                     case 'neq':
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                            $queryBuilder->expr()->{$exprFunction}($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
                         $andGroup[] = $expression;
                         break;
                     default:
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $type        = $filterDefinitions[$filter['column']]['type'];
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
                             $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
@@ -467,9 +467,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        if ($orGroups) {
+        if ([] !== $orGroups) {
             // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
-            if ($andGroup) {
+            if ([] !== $andGroup) {
                 $orGroups[] = CompositeExpression::and(...$andGroup);
             }
 
@@ -478,7 +478,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             } else {
                 $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
             }
-        } elseif ($andGroup) {
+        } elseif ([] !== $andGroup) {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
     }
@@ -502,7 +502,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
             return $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL());
-        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
+        }
+        if (in_array($filter['condition'], ['notIn', 'empty'])) {
             return $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL());
         }
 

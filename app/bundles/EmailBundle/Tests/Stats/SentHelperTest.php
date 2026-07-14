@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SentHelperTest extends TestCase
+final class SentHelperTest extends TestCase
 {
     private DateTimeHelper $dateTimeHelper;
 
@@ -62,7 +62,7 @@ class SentHelperTest extends TestCase
 
     public function testGenerateStatsDaily(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
@@ -108,7 +108,7 @@ class SentHelperTest extends TestCase
 
     public function testGenerateStatsHourly(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 

@@ -29,11 +29,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&CacheStorageHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $cacheStorageHelper;
-
     private MockObject&EntityManagerInterface $entityManger;
 
     private \PHPUnit\Framework\MockObject\Stub&LeadModel $leadModel;
@@ -63,8 +58,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->pageTrackableModel   = $this->createStub(TrackableModel::class);
         $this->leadModel            = $this->createStub(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->cacheStorageHelper   = $this->createStub(CacheStorageHelper::class);
         $this->entityManger         = $this->createMock(EntityManagerInterface::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
@@ -79,7 +72,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->pageTrackableModel,
             $this->leadModel,
             $this->transport,
-            $this->cacheStorageHelper,
+            $this->createStub(CacheStorageHelper::class),
             $this->entityManger,
             $this->security,
             $this->dispatcher,
@@ -145,9 +138,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private function sendMessage(bool $isMMS = false): void
     {
-        $repositoryMock     = $this->createMock(SmsRepository::class);
-        $statRepositoryMock = $this->createMock(StatRepository::class);
-
         $sms = new Sms();
         ReflectionHelper::setValue($sms, 'id', 1);
         $sms->setMessage('test');
@@ -169,7 +159,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->pageTrackableModel,
                 $this->leadModel,
                 $this->transport,
-                $this->cacheStorageHelper,
+                $this->createStub(CacheStorageHelper::class),
                 $this->entityManger,
                 $this->security,
                 $this->dispatcher,
@@ -192,10 +182,10 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             ->with($sms->getId(), 'sent', 2);
 
         $smsModel->method('getRepository')
-            ->willReturn($repositoryMock);
+            ->willReturn($this->createStub(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
-            ->willReturn($statRepositoryMock);
+            ->willReturn($this->createStub(StatRepository::class));
 
         if ($isMMS) {
             $this->transport->expects($this->once())

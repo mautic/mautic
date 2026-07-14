@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class ApiUserSubscriberTest extends TestCase
+final class ApiUserSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
@@ -201,11 +201,9 @@ class ApiUserSubscriberTest extends TestCase
         $userBadge->expects($this->once())
             ->method('setUserLoader')
             // After update to PHP 8.2 change return type to `null`.
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): ?UserInterface {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
                 self::assertNull($loaderResult);
-
-                return $loaderResult;
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -275,11 +273,9 @@ class ApiUserSubscriberTest extends TestCase
 
         $userBadge->expects($this->once())
             ->method('setUserLoader')
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): User {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
                 self::assertNotNull($loaderResult);
-
-                return $loaderResult;
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -351,11 +347,9 @@ class ApiUserSubscriberTest extends TestCase
 
         $userBadge->expects($this->once())
             ->method('setUserLoader')
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): User {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
                 self::assertNotNull($loaderResult);
-
-                return $loaderResult;
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);

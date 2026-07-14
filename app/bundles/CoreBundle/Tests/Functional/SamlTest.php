@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SamlTest extends MauticMysqlTestCase
+final class SamlTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -24,7 +24,7 @@ class SamlTest extends MauticMysqlTestCase
         $twig    = static::getContainer()->get('twig');
         $content = $twig->render('@LightSamlSp/discovery.html.twig', ['parties' => []]);
 
-        Assert::assertStringContainsString('SAML not configured or configured incorrectly.', $content);
+        Assert::assertStringContainsString('SAML not configured or configured incorrectly.', (string) $content);
     }
 
     /**
@@ -112,7 +112,7 @@ class SamlTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
-        Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', $clientResponse->headers->get('Location'));
+        Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', (string) $clientResponse->headers->get('Location'));
 
         // Here need to replicate the browser. The default client will not work, because the test must request an external service.
         $url          = $clientResponse->headers->get('Location');

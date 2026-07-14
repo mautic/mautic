@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,18 +12,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PathsHelperTest extends TestCase
+final class PathsHelperTest extends TestCase
 {
     private string $cacheDir = __DIR__.'/resource/paths/cache';
 
     private string $logsDir  = __DIR__.'/resource/paths/logs';
 
     private string $rootDir  = __DIR__.'/resource/paths';
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|UserHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $userHelper;
 
     /**
      * @var MockObject&CoreParametersHelper
@@ -32,18 +29,17 @@ class PathsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userHelper           = $this->createStub(UserHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'image_path' => 'media/images',
                     'tmp_path'   => __DIR__.'/resource/paths/tmp',
                     default      => '',
                 }
             );
         $this->helper = new PathsHelper(
-            $this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
+            $this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
         );
     }
 
@@ -109,7 +105,7 @@ class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'import_campaigns_dir' => $campaignImportPath,
                     'image_path'           => 'media/images',
                     'tmp_path'             => __DIR__.'/resource/paths/tmp',
@@ -117,7 +113,7 @@ class PathsHelperTest extends TestCase
                 }
             );
 
-        $helper = new PathsHelper($this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
+        $helper = new PathsHelper($this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
 
         $this->assertSame($campaignImportPath, $helper->getImportCampaignsPath());
     }
@@ -133,7 +129,7 @@ class PathsHelperTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'tmp_path' => $tempPath,
                     default    => '',
                 }
@@ -168,7 +164,7 @@ class PathsHelperTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'dashboard_import_dir' => $dashboardDir,
                     default                => '',
                 }

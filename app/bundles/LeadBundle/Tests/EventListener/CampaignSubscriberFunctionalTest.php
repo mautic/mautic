@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
@@ -29,7 +30,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use LeadFieldTestTrait;
 
@@ -435,6 +436,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead3      = $this->createContact('test_true_'.uniqid().'@example.com');
         $contactId3 = $lead3->getId();
 
+        /** @var LeadModel $leadModel */
         $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
 
         $leadModel->setFieldValues($lead1, [
@@ -490,17 +492,20 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead1 = $this->contactRepository->getEntity($contactId1);
         $lead2 = $this->contactRepository->getEntity($contactId2);
         $lead3 = $this->contactRepository->getEntity($contactId3);
+        $this->assertInstanceOf(Lead::class, $lead1);
 
         $result1 = [
             $lead1->getFieldValue('bool1'),
             $lead1->getFieldValue('bool2'),
             $lead1->getFieldValue('bool3'),
         ];
+        $this->assertInstanceOf(Lead::class, $lead2);
         $result2 = [
             $lead2->getFieldValue('bool1'),
             $lead2->getFieldValue('bool2'),
             $lead2->getFieldValue('bool3'),
         ];
+        $this->assertInstanceOf(Lead::class, $lead3);
         $result3 = [
             $lead3->getFieldValue('bool1'),
             $lead3->getFieldValue('bool2'),
@@ -557,7 +562,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     private function addStageToContacts(array $contacts, int $stageId): void
     {
         foreach ($contacts as $contact) {
-            $this->client->request('POST', "/api/stages/$stageId/contact/{$contact->getId()}/add");
+            $this->client->request('POST', "/api/stages/{$stageId}/contact/{$contact->getId()}/add");
             $clientResponse = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -1087,6 +1092,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Create a contact and set the custom field value
         $contact   = $this->createContact('john.doe@example.com');
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $leadModel->setFieldValues($contact, ['test_date' => $fieldValue]);
         $leadModel->saveEntity($contact);
@@ -1123,6 +1129,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedResult, $event->getResult(), 'Regex operator should not cause exception and should match as expected.');
 
         // Clean up
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $fieldModel->getEntityByAlias('test_date');
         if ($field) {

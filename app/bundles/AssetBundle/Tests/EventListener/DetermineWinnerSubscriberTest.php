@@ -12,7 +12,7 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&EntityManagerInterface
@@ -70,19 +70,19 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($repoMock);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('getId')
             ->willReturn(2);
 

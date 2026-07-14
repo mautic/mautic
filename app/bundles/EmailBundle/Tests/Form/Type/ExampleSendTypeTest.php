@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExampleSendTypeTest extends TestCase
+final class ExampleSendTypeTest extends TestCase
 {
     private ExampleSendType $form;
 
@@ -103,7 +103,7 @@ class ExampleSendTypeTest extends TestCase
         $userId  = 37;
         $matcher = self::exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
@@ -114,6 +114,8 @@ class ExampleSendTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);

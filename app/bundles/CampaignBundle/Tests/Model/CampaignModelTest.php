@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -7,15 +9,15 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class CampaignModelTest extends CampaignTestAbstract
+final class CampaignModelTest extends CampaignTestAbstract
 {
     public function testGetSourceListsWithNull(): void
     {
         $model = $this->initCampaignModel();
         $lists = $model->getSourceLists();
-        $this->assertTrue(isset($lists['lists']));
+        $this->assertArrayHasKey('lists', $lists);
         $this->assertSame([parent::$mockAlias => parent::$mockName], $lists['lists']);
-        $this->assertTrue(isset($lists['forms']));
+        $this->assertArrayHasKey('forms', $lists);
         $this->assertSame([parent::$mockId => parent::$mockName], $lists['forms']);
     }
 

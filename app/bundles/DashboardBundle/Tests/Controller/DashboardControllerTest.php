@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class DashboardControllerTest extends \PHPUnit\Framework\TestCase
+final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Request
@@ -67,28 +67,21 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
-
-        $doctrine                 = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
-        $userHelper               = $this->createMock(UserHelper::class);
-        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $flashBagMock             = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
-        $securityMock             = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
-            $doctrine,
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->translatorMock,
-            $flashBagMock,
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $securityMock
+            $this->createStub(CorePermissions::class)
         );
         $this->controller->setContainer($this->containerMock);
     }
@@ -140,7 +133,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
                 return $this->routerMock;
             });
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -169,7 +162,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -187,7 +180,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
-            ->will($this->throwException(new IOException('some error message')));
+            ->willThrowException(new IOException('some error message'));
 
         $this->translatorMock->expects($this->once())
             ->method('trans')

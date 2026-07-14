@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class UrlHelperTest extends \PHPUnit\Framework\TestCase
+final class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAppendQueryToUrl(): void
     {
@@ -21,7 +23,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
             'https://mautic.org#anchor'        => 'https://mautic.org?'.$appendQueryString.'#anchor',
         ];
         foreach ($urls as $url=>$expectedUrl) {
-            $this->assertEquals(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
+            $this->assertSame(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
         }
     }
 

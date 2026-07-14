@@ -25,7 +25,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
+final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&KickoffContactFinder $kickoffContactFinder;
 
@@ -65,6 +65,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -85,7 +86,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $event    = new Event();
         $event2   = new Event();
-        $campaign = new class extends Campaign {
+        $campaign = new class() extends Campaign {
             /**
              * @var ArrayCollection<int,Event>
              */
@@ -127,6 +128,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             });
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
         $this->assertEquals(2, $counter->getTotalScheduled());

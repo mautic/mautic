@@ -152,8 +152,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -162,8 +160,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      */
     public function setName($name): static
@@ -175,8 +171,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -205,8 +199,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get permissions.
-     *
      * @return ArrayCollection<int, Permission>
      */
     public function getPermissions()
@@ -215,8 +207,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      */
     public function setDescription($description): static
@@ -228,8 +218,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string|null
      */
     public function getDescription()
@@ -238,8 +226,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set isAdmin.
-     *
      * @param bool $isAdmin
      */
     public function setIsAdmin($isAdmin): static
@@ -251,8 +237,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get isAdmin.
-     *
      * @return bool
      */
     public function getIsAdmin()
@@ -280,8 +264,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get rawPermissions.
-     *
      * @return array|null
      */
     public function getRawPermissions()
@@ -308,8 +290,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get users.
-     *
      * @return ArrayCollection<int, User>
      */
     public function getUsers()

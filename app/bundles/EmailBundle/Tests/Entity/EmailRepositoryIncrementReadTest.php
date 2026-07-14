@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
+final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -82,7 +82,7 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-            ->will($this->throwException(new DBALException()));
+            ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
         $this->repo->incrementRead(45, '616');

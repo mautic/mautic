@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -15,7 +17,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CookieHelper::class)]
-class CookieHelperTest extends TestCase
+final class CookieHelperTest extends TestCase
 {
     /**
      * @var MockObject&RequestStack
@@ -25,9 +27,8 @@ class CookieHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $requestMock            = $this->createMock(Request::class);
         $this->requestStackMock->method('getMainRequest')
-            ->willReturn($requestMock);
+            ->willReturn($this->createStub(Request::class));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]

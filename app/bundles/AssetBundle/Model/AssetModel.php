@@ -89,7 +89,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -280,18 +280,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\AssetRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
     {
         return $this->em->getRepository(Asset::class);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\DownloadRepository
-     */
-    public function getDownloadRepository()
+    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
     {
         return $this->em->getRepository(Download::class);
     }
@@ -411,7 +405,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
         $routeParams = ['slug' => $entity->getSlug()];
-        if (!is_null($stream)) {
+        if (null !== $stream) {
             $routeParams['stream'] = $stream;
         }
 
@@ -454,10 +448,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $number;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getTotalFilesize($assets)
+    public function getTotalFilesize($assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
@@ -517,26 +508,39 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
-     * @param bool   $canViewOthers
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param mixed[]   $filters
+     * @param bool      $canViewOthers
      */
     public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $allQ    = $query->getCountQuery('asset_downloads', 'id', 'date_download', $filters);
-        $uniqueQ = $query->getCountQuery('asset_downloads', 'lead_id', 'date_download', $filters, ['getUnique' => true]);
+        $uniqueBaseQ = $this->em->getConnection()->createQueryBuilder();
+        $uniqueBaseQ->select('t.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 't')
+            ->having('COUNT(*) = 1')
+            ->groupBy('t.lead_id');
+
+        $query->applyFilters($uniqueBaseQ, $filters);
+        $query->applyDateFilters($uniqueBaseQ, 'date_download');
 
         if (!$canViewOthers) {
             $allQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
-            $uniqueQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
+
+            $uniqueBaseQ->join('t', MAUTIC_TABLE_PREFIX.'assets', 'a', 'a.id = t.asset_id')
                 ->andWhere('a.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
+
+        $uniqueQ = $this->em->getConnection()->createQueryBuilder();
+        $uniqueQ->select('COUNT(tt.lead_id) AS count')
+            ->from('('.$uniqueBaseQ->getSQL().')', 'tt')
+            ->setParameters($uniqueBaseQ->getParameters());
 
         $all    = $query->fetchCount($allQ);
         $unique = $query->fetchCount($uniqueQ);
@@ -584,16 +588,15 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 't')
             ->setMaxResults($limit);
 
-        if (!empty($options['canViewOthers'])) {
+        if (empty($options['canViewOthers'])) {
             $q->andWhere('t.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
@@ -606,7 +609,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Asset-specific override for legacy public asset URLs.
      *

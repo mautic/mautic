@@ -14,15 +14,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class HubspotIntegrationTest extends AbstractIntegrationTestCase
+final class HubspotIntegrationTest extends AbstractIntegrationTestCase
 {
     private HubspotIntegration $integration;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $userHelper        = $this->createMock(UserHelper::class);
         $this->integration = new HubspotIntegration(
             $this->dispatcher,
             $this->cache,
@@ -40,7 +38,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            $userHelper
+            $this->createStub(UserHelper::class)
         );
     }
 

@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -77,7 +77,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
-        /** @var MockObject&LeadRepository */
+        /** @var MockObject&LeadRepository $repository */
         $repository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])

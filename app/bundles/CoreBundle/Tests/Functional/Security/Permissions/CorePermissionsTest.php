@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class CorePermissionsTest extends MauticMysqlTestCase
+final class CorePermissionsTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<array{bool}>
@@ -26,7 +26,9 @@ class CorePermissionsTest extends MauticMysqlTestCase
     public function testVirtualPermission(bool $grant): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
+        /** @var CorePermissions $permissions */
         $permissions = self::getContainer()->get('mautic.security');
         $this->assertInstanceOf(CorePermissions::class, $permissions);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));

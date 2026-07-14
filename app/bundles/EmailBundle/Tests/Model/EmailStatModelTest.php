@@ -18,10 +18,10 @@ final class EmailStatModelTest extends TestCase
 {
     public function testSave(): void
     {
-        /** @var MockObject&EntityManager */
+        /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
 
-        /** @var MockObject&StatRepository */
+        /** @var MockObject&StatRepository $statRepository */
         $statRepository = $this->createMock(StatRepository::class);
 
         $entityManager->method('getRepository')->willReturn($statRepository);
@@ -38,7 +38,7 @@ final class EmailStatModelTest extends TestCase
                 }
             );
 
-        $dispatcher = new class extends EventDispatcher {
+        $dispatcher = new class() extends EventDispatcher {
             public int $dispatchMethodCounter = 0;
 
             public function dispatch(object $event, ?string $eventName = null): object

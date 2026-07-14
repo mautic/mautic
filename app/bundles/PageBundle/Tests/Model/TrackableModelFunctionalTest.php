@@ -42,13 +42,13 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedTrackedUrls, $trackableUrls);
 
         foreach ($expectedUntrackedHtml as $untrackedHtml) {
-            $this->assertStringContainsString($untrackedHtml, $newContent);
+            $this->assertStringContainsString($untrackedHtml, (string) $newContent);
         }
 
         if (empty($expectedTrackedUrls)) {
-            $this->assertStringNotContainsString('{trackable=', $newContent);
+            $this->assertStringNotContainsString('{trackable=', (string) $newContent);
         } else {
-            $this->assertStringContainsString('{trackable=', $newContent);
+            $this->assertStringContainsString('{trackable=', (string) $newContent);
         }
     }
 

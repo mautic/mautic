@@ -106,7 +106,7 @@ trait VariantModelTrait
                 // Reset counters
                 foreach ($resetVariantCounterMethods as $method) {
                     if (method_exists($entity, $method)) {
-                        $entity->$method(0);
+                        $entity->{$method}(0);
                     }
                 }
 

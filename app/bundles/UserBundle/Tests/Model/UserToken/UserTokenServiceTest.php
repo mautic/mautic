@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
+final class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&RandomHelperInterface
@@ -56,7 +56,7 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
         $secretToken      = $userTokenService->generateSecret($token, $secretLength);
         $this->assertSame($randomSecret, $secretToken->getSecret());
         $this->assertTrue($secretToken->isOneTimeOnly());
-        $this->assertNull($secretToken->getExpiration());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $secretToken->getExpiration());
     }
 
     public function testVerify(): void

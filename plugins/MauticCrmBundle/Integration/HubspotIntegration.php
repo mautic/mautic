@@ -32,6 +32,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper()
+ *
+ * @extends CrmAbstractIntegration<HubspotApi>
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
@@ -348,10 +350,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return array
-     */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         if (!isset($data['properties'])) {
             return [];
@@ -428,10 +427,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param bool  $id
+     * @param bool $id
      */
-    public function getCompanies($params = [], $id = false, &$executed = null)
+    public function getCompanies(array $params = [], $id = false, &$executed = null)
     {
         $results = [];
         try {
@@ -562,10 +560,8 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

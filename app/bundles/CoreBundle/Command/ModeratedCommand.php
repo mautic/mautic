@@ -53,7 +53,7 @@ abstract class ModeratedCommand extends Command
     /**
      * Set moderation options.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--bypass-locking', null, InputOption::VALUE_NONE, 'Bypass locking.')

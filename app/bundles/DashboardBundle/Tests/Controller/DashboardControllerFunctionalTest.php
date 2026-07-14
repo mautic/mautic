@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class DashboardControllerFunctionalTest extends MauticMysqlTestCase
+final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -37,6 +37,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['graph' => sprintf('%s:mautic.lead.graph.line.leads', $report->getId())]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -63,7 +64,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('widgetHeight', $data);
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('View Full Report', $data['widgetHtml']);
+        Assert::assertStringContainsString('View Full Report', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithBestHours(): void
@@ -76,6 +77,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['timeFormat' => 24, 'segmentId' => $segment->getId()]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -99,12 +101,13 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('widgetHeight', $data);
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('Best email read hours', $data['widgetHtml']);
+        Assert::assertStringContainsString('Best email read hours', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithSegmentBuildTime(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
         $this->createSegment('C', 'c', 66, $user);
@@ -154,11 +157,13 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('recent.activity');
         $widget->setWidth(100);
         $widget->setHeight(300);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
         $this->em->flush();
         $contact = new Lead();
         $contact->setFirstName('John');
+        /** @var LeadModel $contactModel */
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
@@ -211,6 +216,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('upcoming.emails');
         $widget->setWidth(50);
         $widget->setHeight(330);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
 
         $this->em->persist($widget);
@@ -240,6 +246,6 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('TestFN TestLN', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('TestFN TestLN', (string) $this->client->getResponse()->getContent());
     }
 }

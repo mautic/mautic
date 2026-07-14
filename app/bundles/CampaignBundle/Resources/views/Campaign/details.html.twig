@@ -55,9 +55,9 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
-  <div class="label__divider"></div>
-  
+
   {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
+    <div class="label__divider"></div>
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [{
             label: 'mautic.campaign.allow_restart'|trans,

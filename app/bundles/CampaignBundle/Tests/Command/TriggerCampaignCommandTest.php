@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
-class TriggerCampaignCommandTest extends AbstractCampaignCommand
+final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
 
@@ -208,7 +208,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(21, $tags['NonUK:NotOpen']);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertFalse(isset($tags['EmailNotOpen']));
+        $this->assertArrayNotHasKey('EmailNotOpen', $tags);
     }
 
     /**
@@ -242,11 +242,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 0 contacts are from the US and should be labeled with US:Action
         $this->assertCount(0, $byEvent[12]);
-        $this->assertTrue(empty($tags['US:Action']));
+        $this->assertArrayNotHasKey('US:Action', $tags);
 
         // None tagged with US:Action, so none should be tagged with ChainedAction by a chained event.
         $this->assertCount(0, $byEvent[16]);
-        $this->assertTrue(empty($tags['ChainedAction']));
+        $this->assertArrayNotHasKey('ChainedAction', $tags);
 
         // The rest (1) contacts are not from the US and should be labeled with NonUS:Action
         $this->assertCount(1, $byEvent[13]);
@@ -357,22 +357,22 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Of those that did not open the email, 0 should be tagged US:NotOpen
         $this->assertCount(0, $byEvent[6]);
-        $this->assertTrue(empty($tags['US:NotOpen']));
+        $this->assertArrayNotHasKey('US:NotOpen', $tags);
 
         // And 0 should be tagged NonUS:NotOpen
         $this->assertCount(0, $byEvent[7]);
-        $this->assertTrue(empty($tags['NonUS:NotOpen']));
+        $this->assertArrayNotHasKey('NonUS:NotOpen', $tags);
 
         // And 0 should be tagged UK:NotOpen
         $this->assertCount(0, $byEvent[8]);
-        $this->assertTrue(empty($tags['UK:NotOpen']));
+        $this->assertArrayNotHasKey('UK:NotOpen', $tags);
 
         // And 0 should be tagged NonUK:NotOpen
         $this->assertCount(0, $byEvent[9]);
-        $this->assertTrue(empty($tags['NonUK:NotOpen']));
+        $this->assertArrayNotHasKey('NonUK:NotOpen', $tags);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertTrue(empty($tags['EmailNotOpen']));
+        $this->assertArrayNotHasKey('EmailNotOpen', $tags);
     }
 
     public function testCampaignExecutionForSome(): void
@@ -535,7 +535,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(1, $tags['NonUK:NotOpen']);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertFalse(isset($tags['EmailNotOpen']));
+        $this->assertArrayNotHasKey('EmailNotOpen', $tags);
     }
 
     /**
@@ -775,7 +775,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         self::assertSame(50, $count);
     }
 
-    /** @return array<string, int> */
+    /**
+     * @return array<string, int>
+     */
     private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
@@ -794,7 +796,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         return $tagCounts;
     }
 
-    /** @param array<int, array<string, mixed>> $logs */
+    /**
+     * @param array<int, array<string, mixed>> $logs
+     */
     private function getNonActionPathTakenCount(array $logs): int
     {
         $nonActionCount = 0;

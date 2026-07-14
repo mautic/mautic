@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Integration;
 
 use Doctrine\ORM\EntityManager;
@@ -22,7 +24,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTestCase extends TestCase
+abstract class AbstractIntegrationTestCase extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -18,7 +20,7 @@ use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class ConfigFormTest extends KernelTestCase
+final class ConfigFormTest extends KernelTestCase
 {
     protected function setUp(): void
     {
@@ -126,12 +128,9 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject(): IntegrationHelper
     {
-        // create an integration object
-        $pathsHelper          = $this->createMock(PathsHelper::class);
         $bundleHelper         = $this->createMock(BundleHelper::class);
         $pluginModel          = $this->createMock(PluginModel::class);
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $twig                 = $this->createMock(Environment::class);
         $entityManager        = $this->createMock(EntityManager::class);
 
         $pluginRepository = $this->createMock(PluginRepository::class);
@@ -169,10 +168,10 @@ class ConfigFormTest extends KernelTestCase
         return new IntegrationHelper(
             self::getContainer(),
             $entityManager,
-            $pathsHelper,
+            $this->createStub(PathsHelper::class),
             $bundleHelper,
             $coreParametersHelper,
-            $twig,
+            $this->createStub(Environment::class),
             $pluginModel
         );
     }

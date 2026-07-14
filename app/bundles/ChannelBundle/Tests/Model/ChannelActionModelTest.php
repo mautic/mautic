@@ -11,13 +11,16 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
+final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Lead
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
     private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
     /**
@@ -40,11 +43,10 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactMock6     = $this->createStub(Lead::class);
         $this->contactModelMock = $this->createMock(LeadModel::class);
         $this->doNotContactMock = $this->createMock(DoNotContact::class);
-        $translatorMock         = $this->createMock(TranslatorInterface::class);
         $this->actionModel      = new ChannelActionModel(
             $this->contactModelMock,
             $this->doNotContactMock,
-            $translatorMock
+            $this->createStub(TranslatorInterface::class)
         );
 
         $this->contactMock5->method('getId')->willReturn(5);

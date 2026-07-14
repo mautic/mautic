@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -8,7 +10,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class PointEventHelperTest extends \PHPUnit\Framework\TestCase
+final class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSendEmail(): void
     {
@@ -57,7 +59,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getEntity', 'sendEmail'])
             ->getMock();
 
-        $mock->expects($this->any())
+        $mock
             ->method('getEntity')
             ->willReturnCallback(function ($id) use ($published): Email {
                 $email = new Email();
@@ -66,7 +68,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
                 return $email;
             });
 
-        $mock->expects($this->any())
+        $mock
             ->method('sendEmail')
             ->willReturn($sendEmail);
 

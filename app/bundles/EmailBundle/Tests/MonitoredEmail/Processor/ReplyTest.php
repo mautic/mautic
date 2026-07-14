@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +26,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&StatRepository
@@ -67,7 +69,6 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->contactFinder      = $this->createMock(ContactFinder::class);
         $leadModel                = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $logger                   = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $emailAddressHelper       = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
@@ -77,7 +78,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
             $this->contactFinder,
             $leadModel,
             $this->dispatcher,
-            $logger,
+            $this->createStub(Logger::class),
             $this->contactTracker,
             $emailAddressHelper
         );
@@ -166,18 +167,16 @@ BODY;
             ->method('setDateRead')
             ->with($this->isInstanceOf(\DateTime::class));
 
-        $stat->expects($this->any())
+        $stat
             ->method('getReplies')
             ->willReturn(new ArrayCollection());
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat): true {
+            ->willReturnCallback(function (EmailReply $emailReply) use ($stat): void {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
-
-                return true;
-            }));
+            });
 
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
@@ -12,7 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-class ApiSubscriberTest extends CommonMocks
+final class ApiSubscriberTest extends CommonMocks
 {
     /**
      * @var MockObject&CoreParametersHelper
@@ -36,13 +38,12 @@ class ApiSubscriberTest extends CommonMocks
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $translator                 = $this->createMock(Translator::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new HeaderBag();
         $this->event                = $this->createMock(RequestEvent::class);
         $this->subscriber           = new ApiSubscriber(
             $this->coreParametersHelper,
-            $translator
+            $this->createStub(Translator::class)
         );
     }
 

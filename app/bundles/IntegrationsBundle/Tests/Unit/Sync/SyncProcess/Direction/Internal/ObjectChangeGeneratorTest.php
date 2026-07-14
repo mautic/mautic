@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
      * @var MockObject&SyncJudgeInterface
@@ -36,11 +36,6 @@ class ObjectChangeGeneratorTest extends TestCase
     private MockObject $valueHelper;
 
     /**
-     * @var FieldHelper&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $fieldHelper;
-
-    /**
      * @var MockObject&BulkNotification
      */
     private MockObject $bulkNotification;
@@ -49,7 +44,6 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper      = $this->createMock(ValueHelper::class);
-        $this->fieldHelper      = $this->createStub(FieldHelper::class);
         $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 
@@ -96,7 +90,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -104,7 +98,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Robert', $changedFields['firstname']->getValue()->getNormalizedValue());
@@ -163,7 +157,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -171,7 +165,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Bob', $changedFields['firstname']->getValue()->getNormalizedValue());
@@ -360,7 +354,7 @@ class ObjectChangeGeneratorTest extends TestCase
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class implements SyncJudgeInterface {
+            new class() implements SyncJudgeInterface {
                 public function adjudicate(
                     $mode,
                     InformationChangeRequestDAO $leftChangeRequest,
@@ -369,9 +363,9 @@ class ObjectChangeGeneratorTest extends TestCase
                     return $leftChangeRequest;
                 }
             },
-            new class extends ValueHelper {
+            new class() extends ValueHelper {
             },
-            new class extends FieldHelper {
+            new class() extends FieldHelper {
                 public function __construct()
                 {
                 }
@@ -383,7 +377,7 @@ class ObjectChangeGeneratorTest extends TestCase
                     return ['email' => []];
                 }
             },
-            new class extends BulkNotification {
+            new class() extends BulkNotification {
                 public function __construct()
                 {
                 }
@@ -466,7 +460,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return new ObjectChangeGenerator(
             $this->syncJudge,
             $this->valueHelper,
-            $this->fieldHelper,
+            $this->createStub(FieldHelper::class),
             $this->bulkNotification
         );
     }

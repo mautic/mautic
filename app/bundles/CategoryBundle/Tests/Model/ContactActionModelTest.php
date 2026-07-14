@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class ContactActionModelTest extends \PHPUnit\Framework\TestCase
+final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
     private Lead $contactMock5;
 
@@ -42,7 +42,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -53,6 +53,8 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -74,7 +76,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -85,6 +87,8 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -165,7 +169,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('getLeadCategories')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getLeadCategories')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -176,6 +180,8 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return [2, 3];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
         $matcher = $this->exactly(2);
 

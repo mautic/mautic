@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelExporterTest extends TestCase
+final class ExcelExporterTest extends TestCase
 {
     private ExcelExporter $excelExporter;
 
@@ -25,7 +25,7 @@ class ExcelExporterTest extends TestCase
     protected function setUp(): void
     {
         $translator       = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');

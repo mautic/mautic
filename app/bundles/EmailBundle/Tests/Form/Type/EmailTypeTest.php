@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTypeTest extends \PHPUnit\Framework\TestCase
+final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface
@@ -37,23 +37,19 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $translator                 = $this->createMock(TranslatorInterface::class);
-        $entityManager              = $this->createMock(EntityManager::class);
-        $stageModel                 = $this->createMock(StageModel::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $corePermissions            = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $emailConfig                = $this->createMock(EmailConfigInterface::class);
-        $defaultsHelper             = $this->createMock(EmailDefaultsHelper::class);
         $this->form                 = new EmailType(
             $translator,
-            $entityManager,
-            $stageModel,
-            $coreParametersHelper,
+            $this->createStub(EntityManager::class),
+            $this->createStub(StageModel::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->themeHelper,
             $corePermissions,
             $emailConfig,
-            $defaultsHelper,
+            $this->createStub(EmailDefaultsHelper::class),
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
@@ -73,7 +69,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
-                    function ($name) use (&$names): true {
+                    function (string|FormBuilderInterface $name) use (&$names): true {
                         $names[] = $name;
 
                         return true;

@@ -21,7 +21,7 @@ class ButtonExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),
@@ -119,10 +119,10 @@ class ButtonExtension extends AbstractExtension
                 case 'clone':
                 case 'abtest':
                     $actionQuery = [
-                        'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
+                        'objectId' => ('abtest' === $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                             ? $item->getVariantParent()->getId() : $item->getId(),
                     ];
-                    $icon = ('clone' == $action) ? 'file-copy-line' : 'a-b';
+                    $icon = ('clone' === $action) ? 'file-copy-line' : 'a-b';
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     break;
                 case 'close':
@@ -134,8 +134,8 @@ class ButtonExtension extends AbstractExtension
                     break;
                 case 'new':
                 case 'edit':
-                    $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
-                    $icon        = ('edit' == $action) ? 'edit-line' : 'add-line';
+                    $actionQuery = ('edit' === $action) ? ['objectId' => $item->getId()] : [];
+                    $icon        = ('edit' === $action) ? 'edit-line' : 'add-line';
                     $path        = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     $primary     = true;
                     break;
@@ -145,7 +145,7 @@ class ButtonExtension extends AbstractExtension
                             'confirm' => [
                                 'message' => $this->translator->trans(
                                     'mautic.'.$langVar.'.form.confirmdelete',
-                                    ['%name%' => $item->$nameGetter().' ('.$item->getId().')']
+                                    ['%name%' => $item->{$nameGetter}().' ('.$item->getId().')']
                                 ),
                                 'confirmAction' => $this->router->generate(
                                     $actionRoute,

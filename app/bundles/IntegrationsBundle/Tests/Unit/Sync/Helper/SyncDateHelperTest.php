@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class SyncDateHelperTest extends TestCase
+final class SyncDateHelperTest extends TestCase
 {
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject

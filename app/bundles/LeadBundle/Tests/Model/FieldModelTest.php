@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -24,7 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends MauticMysqlTestCase
+final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -96,6 +98,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleContactFieldIsCreatedAndDeleted(): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
 
         $field = new LeadField();
@@ -112,6 +115,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleCompanyFieldIsCreatedAndDeleted(): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
 
         $field = new LeadField();
@@ -128,6 +132,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testMultipleFieldsAreCreatedAndDeleted(): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
 
         $leadField = new LeadField();
@@ -255,8 +260,10 @@ class FieldModelTest extends MauticMysqlTestCase
     {
         // Log queries so we can detect if alter queries were executed
         /**  $stack */
-        $stack                    = new class implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
-            /** @var array<mixed> */
+        $stack                    = new class() implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
+            /**
+             * @var array<mixed>
+             */
             private array $indexQueries = [];
 
             public function startQuery($sql, ?array $params = null, ?array $types = null): void
@@ -290,6 +297,7 @@ class FieldModelTest extends MauticMysqlTestCase
         };
 
         $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 
         // Ensure the index exists
@@ -368,7 +376,7 @@ class FieldModelTest extends MauticMysqlTestCase
         $stmt = $this->connection->executeQuery(
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
             .MAUTIC_TABLE_PREFIX
-            ."$table' AND COLUMN_NAME = '$column'"
+            ."{$table}' AND COLUMN_NAME = '{$column}'"
         );
 
         return $stmt->fetchAllAssociative();

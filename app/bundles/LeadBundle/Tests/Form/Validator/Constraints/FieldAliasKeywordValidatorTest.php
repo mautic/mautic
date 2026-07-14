@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
 use Doctrine\ORM\EntityManager;
@@ -13,7 +15,7 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
@@ -30,8 +32,6 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $fieldAliasHelperlMock                = $this->createMock(FieldAliasHelper::class);
         $listModelMock                        = $this->createMock(ListModel::class);
         $this->executionContextMock           = $this->createMock(ExecutionContextInterface::class);
         $entityManagerMock                    = $this->createMock(EntityManager::class);
@@ -71,7 +71,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->validator = new FieldAliasKeywordValidator(
             $listModelMock,
-            $fieldAliasHelperlMock,
+            $this->createStub(FieldAliasHelper::class),
             $entityManagerMock,
             $translatorMock,
             $contactSegmentFilterDictionary

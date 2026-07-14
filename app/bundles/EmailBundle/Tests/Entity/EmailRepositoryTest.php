@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailRepositoryTest extends TestCase
+final class EmailRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -27,7 +27,7 @@ class EmailRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.email.email.searchcommand.isexpired' => 'is:expired',
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
@@ -123,7 +123,7 @@ class EmailRepositoryTest extends TestCase
             'listIds'      => $listIds,
         ];
 
-        if ($excludedListIds) {
+        if ([] !== $excludedListIds) {
             $expectedParams['excludedListIds'] = $excludedListIds;
         }
 

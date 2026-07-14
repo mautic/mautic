@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -15,7 +17,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class SalesforceIntegrationTest extends AbstractIntegrationTestCase
+final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
     public const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
 
@@ -27,41 +29,57 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
-    /** @var array<string, int> */
+    /**
+     * @var array<string, int>
+     */
     protected array $maxInvocations = [];
 
     protected ?string $specialSfCase = null;
 
-    /** @var array<int, mixed> */
+    /**
+     * @var array<int, mixed>
+     */
     protected array $persistedIntegrationEntities = [];
 
-    /** @var array<int, mixed> */
+    /**
+     * @var array<int, mixed>
+     */
     protected array $returnedSfEntities = [];
 
-    /** @var array<int|string, mixed> */
+    /**
+     * @var array<int|string, mixed>
+     */
     protected array $mauticContacts = [
         'Contact' => [],
         'Lead'    => [],
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfObjects = [
         'Lead',
         'Contact',
         'company',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockMethods = [
         'makeRequest',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockResetMethods = [
         'makeRequest',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockResetObjects = [
         'Lead',
         'Contact',
@@ -70,7 +88,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected int $idCounter = 1;
 
-    /** @var array<string, int> */
+    /**
+     * @var array<string, int>
+     */
     protected array $leadsUpdatedCounter = [
         'Lead'    => 0,
         'Contact' => 0,
@@ -116,7 +136,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_LEADS;
@@ -134,7 +154,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_CONTACTS;
@@ -398,7 +418,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lead->setEmail('Lead1@sftest.com');
         $lead->setId(1);
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -434,7 +454,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $company->setName('MyCompanyName');
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -621,8 +641,8 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf
                 ->method('getDncHistory')
                 ->willReturn(
                     $this->getSalesforceDNCHistory($object, 'SF')
@@ -657,8 +677,8 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
 
             $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
             foreach ($mappedData as $assertion) {
@@ -711,7 +731,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->expects($spy = $this->any())
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
-                function () use ($spy) {
+                function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
                     $spyParentProperties = self::getParentPrivateProperties($spy);
@@ -728,7 +748,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $auditLogRepo = $this->createMock(AuditLogRepository::class);
 
         $auditLogRepo
-            ->expects($this->any())
             ->method('getAuditLogsForLeads')
             ->willReturn(
                 [
@@ -854,7 +873,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache->expects($this->any())
+        $this->cache
             ->method('get')
             ->willReturnMap(
                 [
@@ -868,7 +887,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @return SalesforceIntegration|MockObject
+     * @return SalesforceIntegration&MockObject
      */
     protected function getSalesforceIntegration(int $maxUpdate = 100, int $maxCreate = 200, int $maxSfLeads = 25, int $maxSfContacts = 25, ?string $updateObject = null): MockObject
     {
@@ -962,23 +981,27 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         case str_contains($args[0], '/query'):
                             if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
                                 return [];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
+                            }
+                            if (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
                                 return [
                                     'records' => [
                                         ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                     ],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
                                 return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                             }
                             // Extract emails
@@ -997,7 +1020,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
-        /* @var \PHPUnit\Framework\MockObject\MockObject $this->>dispatcher */
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
                 function () use ($sf, $integration): PluginIntegrationKeyEvent {
@@ -1180,7 +1202,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             $records[] = [
                 'attributes' => [
                     'type' => $object,
-                    'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
+                    'url'  => "/services/data/v34.0/sobjects/{$object}/SF{$id}",
                 ],
                 'Id'        => 'SF'.$id,
                 'FirstName' => $object.$id,
@@ -1338,7 +1360,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         return $entities;
     }
 
-    /** @return array<int, mixed> */
+    /**
+     * @return array<int, mixed>
+     */
     protected function getReturnedSfEntities(): array
     {
         $entities                 = $this->returnedSfEntities;
@@ -1347,7 +1371,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         return $entities;
     }
 
-    /** @return array<int|string, mixed> */
+    /**
+     * @return array<int|string, mixed>
+     */
     protected function getMauticContacts(): array
     {
         $contacts             = $this->mauticContacts;
@@ -1372,7 +1398,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      *
      * @throws \ReflectionException
      */
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private static function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);

@@ -292,7 +292,8 @@ class EmailController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()
@@ -687,7 +688,8 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'email:emails:editown',
             'email:emails:editother',
             $entity->getCreatedBy()
@@ -729,7 +731,7 @@ class EmailController extends FormController
                     try {
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                        if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        if ($emailConfig->isDraftEnabled() && !empty($entity->getId())) {
                             $this->dispatcher->dispatch(new EmailEditSubmitEvent(
                                 $existingEmail,
                                 $entity,
@@ -810,7 +812,8 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
                 $this->setOptimisticLockVersion($entity, $form);
@@ -851,7 +854,7 @@ class EmailController extends FormController
             'RETURN_ARRAY'
         );
         $draftPreviewUrl = '';
-        if (true === $emailConfig->isDraftEnabled() && $entity->hasDraft()) {
+        if ($emailConfig->isDraftEnabled() && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
                 'mautic_email_preview',
                 ['objectId'       => $entity->getId(),
@@ -942,7 +945,8 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->isGranted('email:emails:create')
+        }
+        if (!$this->security->isGranted('email:emails:create')
             || !$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -1488,7 +1492,7 @@ class EmailController extends FormController
         $form     = $this->formFactory->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $request->request->get('complete', false);
 
-        if ('POST' == $request->getMethod() && ($complete || $this->isFormValid($form))) {
+        if ('POST' === $request->getMethod() && ($complete || $this->isFormValid($form))) {
             if (!$complete) {
                 $progress = [0, (int) $pending];
                 $session->set('mautic.email.send.progress', $progress);
@@ -1785,7 +1789,7 @@ class EmailController extends FormController
                     }
                 }
 
-                if (0 != count($errors)) {
+                if (0 !== count($errors)) {
                     $this->addFlashMessage(implode('; ', $errors));
                 } else {
                     $this->addFlashMessage('mautic.email.notice.test_sent_multiple.success');

@@ -13,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReportGeneratorEventTest extends TestCase
+final class ReportGeneratorEventTest extends TestCase
 {
     /**
      * @var MockObject&Report

@@ -17,7 +17,7 @@ use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testEmailReportGraphWithMostClickedLinks(): void
     {
@@ -44,6 +44,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertResponseIsSuccessful();
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
+        $this->assertInstanceOf(Crawler::class, $crawlerTable);
 
         // convert html table to php array
         $table = array_slice($this->domTableToArray($crawlerTable), 1);
@@ -105,6 +106,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 
         // convert html table to php array
         $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 3);
+        $this->assertInstanceOf(Crawler::class, $crawlerGraphTable);
         $graphTableArray    = array_slice($this->domTableToArray($crawlerGraphTable), 1);
 
         $this->assertSame([
@@ -365,6 +367,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $emailStat->setDateRead(new \DateTime());
         $emailStat->setOpenCount(1);
         $email = $emailStat->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
         $email->setReadCount($email->getReadCount() + 1);
         $this->em->persist($emailStat);
         $this->em->persist($email);

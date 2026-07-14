@@ -10,7 +10,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ConfigControllerFunctionalTest extends MauticMysqlTestCase
+final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 
@@ -64,7 +64,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
             :
             '';
-        Assert::assertStringNotContainsString('Could not save updated configuration:', $response, $message);
+        Assert::assertStringNotContainsString('Could not save updated configuration:', (string) $response, $message);
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
@@ -94,7 +94,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return static::getContainer()->get('kernel')->getLocalConfigFile();
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private function getConfigParameters(): array
     {
         $parameters = [];

@@ -14,7 +14,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit\Framework\TestCase
+final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     private int $formId1   = 1;
 
@@ -92,7 +92,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $fileUploaderMock->expects($matcher)
-            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock) {
+            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path1, $parameters[0]);
                     $this->assertSame($file1Mock, $parameters[1]);
@@ -105,6 +105,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
                     return 'upload2.txt';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formUploader->uploadFiles($filesToUpload, $submission);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use DeviceDetector\DeviceDetector;
@@ -12,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
-class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
@@ -96,7 +98,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->expects($this->any())
+        $mockCoreParametersHelper
             ->method('get')
             ->willReturnCallback(
                 fn ($param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
@@ -189,24 +191,24 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         }
 
         $mockRepository = $this->createMock(IpAddressRepository::class);
-        $mockRepository->expects($this->any())
+        $mockRepository
             ->method('__call')
-            ->with($this->equalTo('findOneByIpAddress'))
+            ->with('findOneByIpAddress')
             ->willReturn(null);
 
         $mockEm = $this->createMock(EntityManager::class);
-        $mockEm->expects($this->any())
+        $mockEm
             ->method('getRepository')
             ->willReturn($mockRepository);
 
-        if (is_null($mockCoreParametersHelper)) {
+        if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-            $mockCoreParametersHelper->expects($this->any())
+            $mockCoreParametersHelper
                 ->method('get')
                 ->willReturn(null);
         }
 
-        $this->deviceDetectorFactory->expects($this->any())
+        $this->deviceDetectorFactory
             ->method('create')
             ->willReturnCallback(
                 fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector

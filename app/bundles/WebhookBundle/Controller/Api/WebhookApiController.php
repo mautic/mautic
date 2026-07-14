@@ -63,7 +63,7 @@ class WebhookApiController extends CommonApiController
     }
 
     /**
-     * @param Webhook              &$entity
+     * @param Webhook              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

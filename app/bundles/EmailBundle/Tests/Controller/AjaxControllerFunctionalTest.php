@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
     public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
@@ -99,6 +99,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
         Assert::assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email->getTo());
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         Assert::assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
         Assert::assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
     }
@@ -323,8 +324,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertFalse($email->isPublished(), 'The email should not be published.');
         Assert::assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
     }
 

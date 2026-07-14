@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,7 +17,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends TestCase
+final class IpAddressModelTest extends TestCase
 {
     /**
      * @var MockObject&EntityManager
@@ -29,8 +31,7 @@ class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $logger               = $this->createMock(LoggerInterface::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $logger);
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class));
     }
 
     /**

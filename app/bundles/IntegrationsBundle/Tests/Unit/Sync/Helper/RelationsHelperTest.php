@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use PHPUnit\Framework\TestCase;
 
-class RelationsHelperTest extends TestCase
+final class RelationsHelperTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
@@ -65,7 +65,7 @@ class RelationsHelperTest extends TestCase
             ->method('getRelations')
             ->willReturn($relationsObject);
 
-        $this->mappingManual->expects($this->any())
+        $this->mappingManual
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
@@ -119,7 +119,7 @@ class RelationsHelperTest extends TestCase
             ->method('getObject')
             ->willReturn($objectDao);
 
-        $this->mappingManual->expects($this->any())
+        $this->mappingManual
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 

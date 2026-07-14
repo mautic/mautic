@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(TrackableModel::class)]
-class TrackableModelTest extends TestCase
+final class TrackableModelTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as HTML')]
     public function testHtmlIsDetectedInContent(): void
@@ -344,7 +346,7 @@ class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($content, $url), 'https:// should have been stripped from the token URL');
+        $this->assertStringNotContainsString($url, (string) $content, 'https:// should have been stripped from the token URL');
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that tokens that are supposed to be ignored are')]
@@ -406,7 +408,23 @@ class TrackableModelTest extends TestCase
             1
         );
 
-        $this->assertTrue(str_contains($content, $url), $content);
+        $this->assertStringContainsString($url, (string) $content, $content);
+    }
+
+    public function testMalformedUrlDoesNotCrashTrackingParsing(): void
+    {
+        $url   = '://example.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+        $this->assertStringContainsString($url, (string) $content);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -433,7 +451,7 @@ class TrackableModelTest extends TestCase
         );
         $token = array_key_first($trackables);
         Assert::assertNotEmpty($trackables, $content);
-        Assert::assertStringContainsString($token, $content);
+        Assert::assertStringContainsString($token, (string) $content);
 
         // Assert that exactly one trackable found
         Assert::assertCount(1, $trackables);
@@ -470,7 +488,7 @@ class TrackableModelTest extends TestCase
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertNotFalse(strpos($content, (string) $redirectId), $content);
+            Assert::assertStringContainsString((string) $redirectId, (string) $content, $content);
         }
     }
 
@@ -600,7 +618,7 @@ TEXT;
             ->method('getDoNotTrackList')
             ->willReturn($doNotTrack);
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getEntitiesFromUrls')
             ->willReturnCallback(
                 function ($trackableUrls, $channel, $channelId): array {
@@ -613,7 +631,7 @@ TEXT;
                 }
             );
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getContactFieldUrlTokens')
             ->willReturn($urlFieldsForPlaintext);
 
@@ -653,18 +671,18 @@ TEXT;
                 if ($useMap) {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <map><area href="$url"$dnc alt="alt" /></map> 321ABC
+    ABC123 <map><area href="{$url}"{$dnc} alt="alt" /></map> 321ABC
 CONTENT;
                 } else {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <a href="$url"$dnc>$url</a> 321ABC
+    ABC123 <a href="{$url}"{$dnc}>{$url}</a> 321ABC
 CONTENT;
                 }
             } else {
                 $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 $url 321ABC
+    ABC123 {$url} 321ABC
 CONTENT;
             }
         }

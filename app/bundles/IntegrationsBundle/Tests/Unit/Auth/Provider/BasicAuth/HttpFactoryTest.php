@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
@@ -21,7 +21,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getUsername(): string
             {
                 return '';
@@ -40,7 +40,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getUsername(): string
             {
                 return '123';
@@ -57,7 +57,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getUsername(): string
             {
                 return 'foo';
@@ -73,9 +73,9 @@ class HttpFactoryTest extends TestCase
 
         $client1 = $factory->getClient($credentials);
         $client2 = $factory->getClient($credentials);
-        $this->assertTrue($client1 === $client2);
+        $this->assertSame($client2, $client1);
 
-        $credentials2 = new class implements CredentialsInterface {
+        $credentials2 = new class() implements CredentialsInterface {
             public function getUsername(): string
             {
                 return 'bar';
@@ -88,12 +88,12 @@ class HttpFactoryTest extends TestCase
         };
 
         $client3 = $factory->getClient($credentials2);
-        $this->assertFalse($client1 === $client3);
+        $this->assertNotSame($client3, $client1);
     }
 
     public function testHeaderIsSet(): void
     {
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getUsername(): string
             {
                 return 'foo';

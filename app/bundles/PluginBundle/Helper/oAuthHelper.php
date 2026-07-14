@@ -16,16 +16,16 @@ class oAuthHelper
 
     private $accessToken;
 
-    private $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 
-    private $settings;
+    private array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly ?Request $request = null,
-        $settings = [],
+        array $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -74,7 +74,7 @@ class oAuthHelper
      */
     private function getCompositeKey(): string
     {
-        if (strlen($this->accessTokenSecret) > 0) {
+        if ('' !== $this->accessTokenSecret) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         } else {
             $composite_key = $this->encode($this->clientSecret).'&';
@@ -136,8 +136,6 @@ class oAuthHelper
     }
 
     /**
-     * Normalize parameters.
-     *
      * @param array<string, mixed> $parameters
      * @param bool                 $encode
      *
@@ -186,14 +184,14 @@ class oAuthHelper
         $result          = '';
         $accumulatedBits = 0;
         $random          = mt_getrandmax();
-        for ($totalBits = 0; 0 != $random; $random >>= 1) {
+        for ($totalBits = 0; 0 !== $random; $random >>= 1) {
             ++$totalBits;
         }
         $usableBits = intval($totalBits / 8) * 8;
 
         while ($accumulatedBits < $bits) {
             $bitsToAdd = min($totalBits - $usableBits, $bits - $accumulatedBits);
-            if (0 != $bitsToAdd % 4) {
+            if (0 !== $bitsToAdd % 4) {
                 // add bits in whole increments of 4
                 $bitsToAdd += 4 - $bitsToAdd % 4;
             }

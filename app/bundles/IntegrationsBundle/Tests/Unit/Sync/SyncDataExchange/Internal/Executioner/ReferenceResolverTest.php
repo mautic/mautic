@@ -16,7 +16,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ReferenceResolverTest extends TestCase
+final class ReferenceResolverTest extends TestCase
 {
     /**
      * @var MockObject&Connection

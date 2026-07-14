@@ -19,17 +19,11 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 
-class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
+final class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $logger;
-
     protected function setUp(): void
     {
         parent::setup();
-        $this->logger = $this->createStub(LoggerInterface::class);
         $this->router = $this->createMock(Router::class);
         $this->router->expects($this->once())->method('generate')->willReturn('saml/login_retry');
     }
@@ -42,7 +36,7 @@ class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
 
         // creating a saml response which will return above status
         $lightSAMLResponse = $this->createMock(LightSamlResponse::class);
-        $lightSAMLResponse->expects($this->any())->method('getStatus')->willReturn($status);
+        $lightSAMLResponse->method('getStatus')->willReturn($status);
 
         // creating inbound context which will return lightsaml response
         $inboundContext = $this->createMock(MessageContext::class);
@@ -67,7 +61,7 @@ class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
             $exception
         );
 
-        $subscriber = new ExceptionListener($this->router, 'MauticCoreBundle:Exception:show', $this->logger);
+        $subscriber = new ExceptionListener($this->router, 'MauticCoreBundle:Exception:show', $this->createStub(LoggerInterface::class));
 
         $subscriber->onKernelException($event);
     }

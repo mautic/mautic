@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,7 +22,7 @@ class MauticSocialMonitoringCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
@@ -80,7 +79,6 @@ class MauticSocialMonitoringCommand extends Command
             'limit' => 100,
         ];
 
-        /** @var MonitoringRepository $repository */
         $repository = $this->monitoringModel->getRepository();
 
         if (null !== $id) {
@@ -118,7 +116,7 @@ class MauticSocialMonitoringCommand extends Command
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ('' == $commandName) {
+        if ('' === $commandName) {
             $output->writeln('Matching command not found.');
 
             return 1;

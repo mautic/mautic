@@ -16,10 +16,13 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class EntityEventValidatorTest extends TestCase
+final class EntityEventValidatorTest extends TestCase
 {
     private EventDispatcherInterface $dispatcher;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&ExecutionContextInterface
+     */
     private \PHPUnit\Framework\MockObject\Stub $context;
 
     private ConstraintValidatorInterface $validator;

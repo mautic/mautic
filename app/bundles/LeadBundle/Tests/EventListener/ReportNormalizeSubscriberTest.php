@@ -13,7 +13,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
+final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -23,6 +23,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $field = new LeadField();

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ClientTypeTest extends TestCase
+final class ClientTypeTest extends TestCase
 {
     private ClientType $clientType;
 
@@ -31,9 +31,6 @@ class ClientTypeTest extends TestCase
     protected function setUp(): void
     {
         $requestStack       = $this->createMock(RequestStack::class);
-        $translator         = $this->createMock(TranslatorInterface::class);
-        $validator          = $this->createMock(ValidatorInterface::class);
-        $router             = $this->createMock(RouterInterface::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
         $request            = $this->createMock(Request::class);
         $this->client       = new Client();
@@ -48,9 +45,9 @@ class ClientTypeTest extends TestCase
 
         $this->clientType = new ClientType(
             $requestStack,
-            $translator,
-            $validator,
-            $router
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(ValidatorInterface::class),
+            $this->createStub(RouterInterface::class)
         );
     }
 
@@ -60,7 +57,7 @@ class ClientTypeTest extends TestCase
             'data' => $this->client,
         ];
 
-        $this->builder->expects($this->any())
+        $this->builder
             ->method('create')
             ->willReturnSelf();
 

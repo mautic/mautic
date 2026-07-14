@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
-class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, mixed>

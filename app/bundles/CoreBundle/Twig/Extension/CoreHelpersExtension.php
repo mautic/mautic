@@ -20,7 +20,7 @@ class CoreHelpersExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             // Used by CoreBundle:Helper:list_filters.html.twig
@@ -105,7 +105,7 @@ class CoreHelpersExtension extends AbstractExtension
         }
 
         if ($jsCallback) {
-            if ($jsArguments) {
+            if ([] !== $jsArguments) {
                 foreach ($jsArguments as $key => $argument) {
                     if (is_array($argument)) {
                         $jsArguments[$key] = json_encode($argument);
@@ -114,12 +114,12 @@ class CoreHelpersExtension extends AbstractExtension
                     }
                 }
 
-                return 'href="javascript:void(0);"'." onclick='".$jsCallback.'('.implode(',', $jsArguments).", $page, this);'";
+                return 'href="javascript:void(0);"'." onclick='".$jsCallback.'('.implode(',', $jsArguments).", {$page}, this);'";
             }
 
-            return 'href="javascript:void(0);"'." onclick='".$jsCallback."($page, this);'";
+            return 'href="javascript:void(0);"'." onclick='".$jsCallback."({$page}, this);'";
         }
 
-        return "href=\"$baseUrl/$page{$queryString}\"";
+        return "href=\"{$baseUrl}/{$page}{$queryString}\"";
     }
 }

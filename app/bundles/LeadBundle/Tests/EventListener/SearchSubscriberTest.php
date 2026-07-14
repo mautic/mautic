@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -21,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriberTest extends TestCase
+final class SearchSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;
 
@@ -51,14 +53,14 @@ class SearchSubscriberTest extends TestCase
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
-                        $q->$joinType(
+                        $q->{$joinType}(
                             $primaryTable['from_alias'],
                             MAUTIC_TABLE_PREFIX.$primaryTable['table'],
                             $primaryTable['alias'],
                             $primaryTable['condition']
                         );
                         foreach ($tables as $table) {
-                            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+                            $q->{$joinType}($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
                         }
                         if ($whereExpression) {
                             $q->andWhere($whereExpression);
@@ -86,9 +88,9 @@ class SearchSubscriberTest extends TestCase
         $leadModel->method('getRepository')
             ->willReturn($contactRepository);
 
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
-            ->willReturnCallback(function ($key): string|array|null {
+            ->willReturnCallback(function (string $key): ?string {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 

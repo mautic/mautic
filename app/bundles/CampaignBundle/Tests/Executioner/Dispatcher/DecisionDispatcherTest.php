@@ -17,7 +17,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends TestCase
+final class DecisionDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $dispatcher;
 

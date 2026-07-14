@@ -85,7 +85,7 @@ final class TransportChainTest extends MauticMysqlTestCase
 
     public function testSendBatchSms(): void
     {
-        $bulkSmsTransport = new class implements BulkTransportInterface {
+        $bulkSmsTransport = new class() implements BulkTransportInterface {
             public function sendBatchSms(RecipientCollection $collection, string $content): RecipientCollection
             {
                 foreach ($collection as &$recipient) {
@@ -105,7 +105,7 @@ final class TransportChainTest extends MauticMysqlTestCase
 
     public function testSendMessage(): void
     {
-        $mmsTransport = new class implements TransportInterface, MMSTransportInterface {
+        $mmsTransport = new class() implements TransportInterface, MMSTransportInterface {
             public function sendMms(Lead $lead, string $content, array $media): bool
             {
                 return true;
@@ -126,7 +126,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             {
                 $transports = $this->getTransports();
 
-                return array_map(fn ($v): TransportInterface => $v['service'], $transports);
+                return array_map(fn (array $v): TransportInterface => $v['service'], $transports);
             }
         };
 

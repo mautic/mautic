@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileControllerTest extends MauticMysqlTestCase
+final class FileControllerTest extends MauticMysqlTestCase
 {
     private ?string $uploadedFilePath = null;
 
@@ -24,7 +24,7 @@ class FileControllerTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
         $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
-        Assert::assertTrue(file_exists($uploadedImage));
+        Assert::assertFileExists($uploadedImage);
     }
 
     public function testImageUploadFailure(): void

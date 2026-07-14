@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 
-class SegmentFilterFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var Lead[]
@@ -144,6 +144,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->em->remove($segment);
         foreach ($this->leads as $lead) {
             $deleteLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+            $this->assertInstanceOf(Lead::class, $deleteLead);
             $this->em->remove($deleteLead);
         }
         $this->em->flush();

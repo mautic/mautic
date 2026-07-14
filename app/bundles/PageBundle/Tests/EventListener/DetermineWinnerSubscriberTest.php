@@ -13,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&HitRepository
@@ -158,7 +158,7 @@ class DetermineWinnerSubscriberTest extends TestCase
             ],
         ];
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn($translation);
 
@@ -166,7 +166,7 @@ class DetermineWinnerSubscriberTest extends TestCase
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 

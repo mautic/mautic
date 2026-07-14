@@ -15,7 +15,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceTest extends TestCase
+final class TokenPersistenceTest extends TestCase
 {
     /**
      * @var MockObject&IntegrationsHelper
@@ -158,8 +158,8 @@ class TokenPersistenceTest extends TestCase
         $this->assertFalse($this->tokenPersistence->hasToken());
 
         $apiKeys = $integration->getApiKeys();
-        $this->assertFalse(isset($apiKeys['access_token']));
-        $this->assertFalse(isset($apiKeys['expires_in']));
+        $this->assertArrayNotHasKey('access_token', $apiKeys);
+        $this->assertArrayNotHasKey('expires_in', $apiKeys);
 
         $newToken = $this->tokenPersistence->restoreToken($token);
         $this->assertTrue($newToken->isExpired());

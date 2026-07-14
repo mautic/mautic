@@ -192,7 +192,7 @@ class PublicController extends AbstractFormController
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
                             uasort(
                                 $variants,
-                                function ($a, $b): int {
+                                function (array $a, array $b): int {
                                     if ($a['weight_deficit'] === $b['weight_deficit']) {
                                         if ($a['hits'] === $b['hits']) {
                                             return 0;

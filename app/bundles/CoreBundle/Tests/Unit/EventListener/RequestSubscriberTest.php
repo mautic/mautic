@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
@@ -12,7 +14,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
+final class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private RequestSubscriber $subscriber;
 
@@ -47,12 +49,10 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->event->method('getRequest')->willReturn($this->request);
 
-        $twig = $this->createMock(Environment::class);
-
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,
             $this->createStub(TranslatorInterface::class),
-            $twig
+            $this->createStub(Environment::class)
         );
     }
 

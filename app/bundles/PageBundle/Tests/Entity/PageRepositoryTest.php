@@ -11,7 +11,7 @@ use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageRepositoryTest extends TestCase
+final class PageRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -21,7 +21,7 @@ class PageRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.page.searchcommand.isexpired' => 'is:expired',
             'mautic.page.searchcommand.ispending' => 'is:pending',
             default                               => $id,

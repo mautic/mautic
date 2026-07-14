@@ -149,11 +149,9 @@ class ContactLimiter
     }
 
     /**
-     * @return int
-     *
      * @throws \Exception
      */
-    public function getCampaignLimitRemaining()
+    public function getCampaignLimitRemaining(): int
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');
@@ -169,7 +167,8 @@ class ContactLimiter
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');
-        } elseif ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
+        }
+        if ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
             throw new \Exception('Campaign Limit exceeded');
         }
         $this->campaignLimitUsed += $reduction;

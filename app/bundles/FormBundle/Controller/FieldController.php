@@ -62,7 +62,7 @@ class FieldController extends CommonFormController
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $formField = $request->request->all()['formfield'] ?? [];
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
@@ -95,7 +95,7 @@ class FieldController extends CommonFormController
         }
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -254,7 +254,7 @@ class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;

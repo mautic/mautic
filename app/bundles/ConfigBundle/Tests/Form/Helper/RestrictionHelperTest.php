@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;
@@ -43,11 +45,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
-class RestrictionHelperTest extends TypeTestCase
+final class RestrictionHelperTest extends TypeTestCase
 {
     private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $restrictedFields = [
         'monitored_email' => [
             'EmailBundle_bounces',
@@ -57,7 +61,9 @@ class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
@@ -195,13 +201,15 @@ class RestrictionHelperTest extends TypeTestCase
         );
     }
 
-    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    /**
+     * @return array<int, PreloadedExtension|ValidatorExtension>
+     */
     protected function getExtensions(): array
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
 
         $validator = $this->createMock(ValidatorInterface::class);
@@ -212,16 +220,10 @@ class RestrictionHelperTest extends TypeTestCase
             ->method('getMetadataFor')
             ->willReturn(new ClassMetadata(Form::class));
 
-        $imapHelper = $this->createMock(Mailbox::class);
-
         // Register monitored email listeners
         $dispatcher = new EventDispatcher();
-        $bouncer    = $this->createMock(Bounce::class);
-        $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
-
-        $unsubscriber = $this->createMock(Unsubscribe::class);
-        $looper       = $this->createMock(FeedbackLoop::class);
-        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createStub(CoreParametersHelper::class)));
+        $dispatcher->addSubscriber(new ProcessBounceSubscriber($this->createStub(Bounce::class)));
+        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($this->createStub(Unsubscribe::class), $this->createStub(FeedbackLoop::class), $this->createStub(CoreParametersHelper::class)));
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
@@ -248,7 +250,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
                     new PreferenceCenterListType($pageModelMock, $this->createStub(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
-                    new ConfigMonitoredMailboxesType($imapHelper),
+                    new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),
                     new ConfigType($restrictionHelper, $escapeTransformer),
                 ],
                 []

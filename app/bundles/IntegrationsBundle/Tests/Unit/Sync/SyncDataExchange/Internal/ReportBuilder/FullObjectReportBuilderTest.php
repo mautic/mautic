@@ -27,7 +27,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FullObjectReportBuilderTest extends TestCase
+final class FullObjectReportBuilderTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
@@ -112,7 +112,7 @@ class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -166,7 +166,7 @@ class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -210,7 +210,7 @@ class FullObjectReportBuilderTest extends TestCase
                 return true;
             });
 
-        $contactEntity = new class extends Lead {
+        $contactEntity = new class() extends Lead {
             public function getId(): int
             {
                 return 1;
@@ -219,7 +219,7 @@ class FullObjectReportBuilderTest extends TestCase
         $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject, $fromDateTime, $toDateTime, $contactEntity) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject, $fromDateTime, $toDateTime, $contactEntity): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindEvent $event) use (
                         $internalObject,
@@ -269,7 +269,7 @@ class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -313,7 +313,7 @@ class FullObjectReportBuilderTest extends TestCase
                 return true;
             });
 
-        $companyEntity = new class extends CompanyEntity {
+        $companyEntity = new class() extends CompanyEntity {
             public function getId(): int
             {
                 return 1;
@@ -325,7 +325,7 @@ class FullObjectReportBuilderTest extends TestCase
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject,
                 $fromDateTime,
                 $toDateTime,
-                $companyEntity) {
+                $companyEntity): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindEvent $event) use (
                         $internalObject,
@@ -375,7 +375,7 @@ class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 }

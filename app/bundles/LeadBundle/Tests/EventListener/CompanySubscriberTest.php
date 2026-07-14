@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -13,7 +15,7 @@ use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
@@ -128,18 +130,13 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with($log);
-
-        $entityManager         = $this->createMock(EntityManager::class);
-        $coreParameters        = $this->createMock(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
-        $companyModel          = $this->createMock(CompanyModel::class);
         $subscriber            = new CompanySubscriber(
             $ipLookupHelper,
             $auditLogModel,
-            $entityManager,
-            $coreParameters,
-            $companyLeadRepository,
-            $companyModel,
+            $this->createStub(EntityManager::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(CompanyLeadRepository::class),
+            $this->createStub(CompanyModel::class),
         );
 
         $company = $this->createMock(Company::class);

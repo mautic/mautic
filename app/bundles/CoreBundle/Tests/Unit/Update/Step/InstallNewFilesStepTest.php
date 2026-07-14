@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -10,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InstallNewFilesStepTest extends AbstractStepTestCase
+final class InstallNewFilesStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -65,7 +67,7 @@ class InstallNewFilesStepTest extends AbstractStepTestCase
             ->method('getRootPath')
             ->willReturn($resourcePath);
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -101,7 +103,7 @@ class InstallNewFilesStepTest extends AbstractStepTestCase
             ->with('update-package')
             ->willReturn($resourcePath.'/update-test.zip');
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -146,7 +148,7 @@ class InstallNewFilesStepTest extends AbstractStepTestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

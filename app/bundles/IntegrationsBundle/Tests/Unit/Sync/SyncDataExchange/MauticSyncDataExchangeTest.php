@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class MauticSyncDataExchangeTest extends TestCase
+final class MauticSyncDataExchangeTest extends TestCase
 {
     /**
      * @var MockObject&FieldChangeRepository
@@ -59,8 +59,6 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->mappingHelper              = $this->createMock(MappingHelper::class);
         $this->fullObjectReportBuilder    = $this->createMock(FullObjectReportBuilder::class);
         $this->partialObjectReportBuilder = $this->createMock(PartialObjectReportBuilder::class);
-        $orderExecutioner                 = $this->createMock(OrderExecutioner::class);
-        $syncDateHelper                   = $this->createMock(SyncDateHelper::class);
 
         $this->mauticSyncDataExchange = new MauticSyncDataExchange(
             $this->fieldChangeRepository,
@@ -68,8 +66,8 @@ class MauticSyncDataExchangeTest extends TestCase
             $this->mappingHelper,
             $this->fullObjectReportBuilder,
             $this->partialObjectReportBuilder,
-            $orderExecutioner,
-            $syncDateHelper
+            $this->createStub(OrderExecutioner::class),
+            $this->createStub(SyncDateHelper::class)
         );
     }
 

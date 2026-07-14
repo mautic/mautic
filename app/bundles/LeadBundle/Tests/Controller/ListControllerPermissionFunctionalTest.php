@@ -662,6 +662,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);
@@ -720,7 +721,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment->setAlias(str_shuffle('abcdefghijklmnopqrstuvwxyz'));
         $segment->setCreatedBy($user);
 
-        if ($filters) {
+        if ([] !== $filters) {
             $segment->setFilters($filters);
         }
 

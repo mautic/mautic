@@ -13,17 +13,11 @@ use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $logger;
-
     private string $packageName;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->logger      = $this->createStub(LoggerInterface::class);
         $this->packageName = 'koco/mautic-recaptcha-bundle';
     }
 
@@ -35,7 +29,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn(['koco/mautic-recaptcha-bundle']);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',
@@ -54,7 +48,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',
@@ -73,7 +67,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(1, 'Error while removing package'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',

@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactTrackerTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&LeadRepository
@@ -44,11 +44,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&CorePermissions
      */
     private MockObject $securityMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|Logger
-     */
-    private \PHPUnit\Framework\MockObject\Stub $loggerMock;
 
     /**
      * @var MockObject&IpLookupHelper
@@ -81,7 +76,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
         $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
-        $this->loggerMock                 = $this->createStub(Logger::class);
         $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
         $this->requestStack               = new RequestStack();
 
@@ -98,7 +92,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->leadRepositoryMock->expects($this->any())
+        $this->leadRepositoryMock
             ->method('getFieldValues')
             ->willReturn([]);
 
@@ -139,6 +133,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($device);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getFieldValue('email'));
     }
@@ -158,6 +153,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($lead);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -180,7 +176,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedLead')
             ->willReturn(null);
 
-        $this->coreParametersHelperMock->expects($this->any())
+        $this->coreParametersHelperMock
             ->method('get')
             ->willReturn(true);
 
@@ -189,6 +185,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$lead]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -215,9 +212,10 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepositoryMock->expects($this->never())
             ->method('getLeadsByIp');
-        $this->leadFieldModelMock->expects($this->any())->method('getFieldListWithProperties')->willReturn([]);
+        $this->leadFieldModelMock->method('getFieldListWithProperties')->willReturn([]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
         $this->assertEquals(true, $contact->isNewlyCreated());
     }
 
@@ -266,7 +264,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             $this->contactTrackingServiceMock,
             $this->deviceTrackerMock,
             $this->securityMock,
-            $this->loggerMock,
+            $this->createStub(Logger::class),
             $this->ipLookupHelperMock,
             $this->requestStack,
             $this->coreParametersHelperMock,

@@ -286,7 +286,7 @@ class PlainTextHelper
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, $text);
-        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
+        $text = preg_replace_callback($this->callbackSearch, $this->pregCallback(...), $text);
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
@@ -352,7 +352,8 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         }   // link_method defaults to inline
 
@@ -368,7 +369,7 @@ class PlainTextHelper
             // Run our defined tags search-and-replace with callback
             $this->preContent = preg_replace_callback(
                 $this->callbackSearch,
-                [$this, 'pregCallback'],
+                $this->pregCallback(...),
                 $this->preContent
             );
 
@@ -381,7 +382,7 @@ class PlainTextHelper
             // replace the content (use callback because content can contain $0 variable)
             $text = preg_replace_callback(
                 '/<pre[^>]*>.*<\/pre>/ismU',
-                [$this, 'pregPreCallback'],
+                $this->pregPreCallback(...),
                 $text,
                 1
             );
@@ -437,7 +438,7 @@ class PlainTextHelper
                         unset($body);
                     }
                 } else {
-                    if (0 == $level) {
+                    if (0 === $level) {
                         $start  = $m[1];
                         $taglen = strlen($m[0]);
                     }
@@ -454,7 +455,7 @@ class PlainTextHelper
      *
      * @return string
      */
-    protected function pregCallback($matches)
+    protected function pregCallback(array $matches)
     {
         switch (strtolower($matches[1])) {
             case 'b':

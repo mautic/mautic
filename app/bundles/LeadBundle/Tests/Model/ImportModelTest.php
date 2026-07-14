@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImportModelTest extends StandardImportTestHelper
+final class ImportModelTest extends StandardImportTestHelper
 {
     public function testInitEventLog(): void
     {
@@ -217,7 +217,7 @@ class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->will($this->throwException(new ORMException()));
+            ->willThrowException(new ORMException());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -436,19 +436,19 @@ class ImportModelTest extends StandardImportTestHelper
         $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        /** @var MockObject&UserHelper */
+        /** @var MockObject&UserHelper $userHelper */
         $userHelper = $this->createStub(UserHelper::class);
 
-        /** @var MockObject&LeadEventLogRepository */
+        /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createStub(LeadEventLogRepository::class);
 
-        /** @var MockObject&ImportRepository */
+        /** @var MockObject&ImportRepository $importRepository */
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->expects($this->exactly(3))->method('getValue')
             ->willReturnOnConsecutiveCalls(true, false, false);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -457,7 +457,7 @@ class ImportModelTest extends StandardImportTestHelper
                 ]
             );
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('isOpen')
             ->willReturn(true);
 
@@ -467,7 +467,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->setConstructorArgs([16 => $this->entityManager])
             ->getMock();
 
-        $leadModel->expects($this->any())
+        $leadModel
             ->method('getEventLogRepository')
             ->willReturn($logRepository);
 

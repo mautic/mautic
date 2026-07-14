@@ -177,7 +177,7 @@ class PathsHelper
                 // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ('dashboard.global' == $name) {
+                if ('dashboard.global' === $name) {
                     return $globalPath;
                 }
 
@@ -206,7 +206,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 

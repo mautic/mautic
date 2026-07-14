@@ -14,7 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PreviewFunctionalTest extends MauticMysqlTestCase
+final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -293,6 +293,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";

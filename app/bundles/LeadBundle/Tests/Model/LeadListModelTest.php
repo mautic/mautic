@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\Serializer;
@@ -7,9 +9,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadListModelTest extends \PHPUnit\Framework\TestCase
+final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ListModel&MockObject */
+    /**
+     * @var ListModel&MockObject
+     */
     protected MockObject $fixture;
 
     protected function setUp(): void
@@ -19,7 +23,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getEntities', 'getEntity'])
             ->getMock();
 
-        $mockListModel->expects($this->any())
+        $mockListModel
             ->method('getEntity')
             ->willReturnCallback(function ($id): MockObject {
                 $mockEntity = $this->getMockBuilder(LeadList::class)
@@ -44,7 +48,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity1->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getId')
             ->willReturn(1);
 
@@ -52,7 +56,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity2->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters));
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getId')
             ->willReturn(2);
 
@@ -60,7 +64,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity3->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getId')
             ->willReturn(3);
 
@@ -68,7 +72,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity4->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters4));
-        $mockEntity4->expects($this->any())
+        $mockEntity4
             ->method('getId')
             ->willReturn(4);
 
@@ -96,7 +100,9 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $message);
     }
 
-    /** @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}> */
+    /**
+     * @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}>
+     */
     public static function segmentTestDataProvider(): array
     {
         return [

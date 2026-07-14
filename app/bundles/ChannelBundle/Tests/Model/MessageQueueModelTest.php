@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
+final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string
@@ -36,30 +38,31 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $message;
 
-    /** @var MockObject&LeadModel */
+    /**
+     * @var MockObject&LeadModel
+     */
     protected MockObject $leadModel;
 
-    /** @var \PHPUnit\Framework\MockObject\Stub|CompanyModel */
-    protected \PHPUnit\Framework\MockObject\Stub $companyModel;
-
-    /** @var MockObject&EntityManagerInterface */
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
     protected MockObject $entityManager;
 
-    /** @var MockObject&MessageQueueRepository */
+    /**
+     * @var MockObject&MessageQueueRepository
+     */
     protected MockObject $messageQueueRepository;
 
     protected function setUp(): void
     {
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->companyModel           = $this->createStub(CompanyModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
-        $coreHelper                   = $this->createMock(CoreParametersHelper::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->leadModel,
-            $this->companyModel,
-            $coreHelper,
+            $this->createStub(CompanyModel::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),

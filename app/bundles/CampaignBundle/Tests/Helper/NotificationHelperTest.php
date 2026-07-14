@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -13,7 +15,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Router;
 
-class NotificationHelperTest extends \PHPUnit\Framework\TestCase
+final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&UserModel
@@ -24,11 +26,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
      * @var \PHPUnit\Framework\MockObject\MockObject&NotificationModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|Router
-     */
-    private \PHPUnit\Framework\MockObject\Stub $router;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Translator
@@ -45,8 +42,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->userModel = $this->createMock(UserModel::class);
 
         $this->notificationModel = $this->createMock(NotificationModel::class);
-
-        $this->router = $this->createStub(Router::class);
 
         $this->translator = $this->createMock(Translator::class);
 
@@ -243,7 +238,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getOwner')
             ->willReturn(null);
 
@@ -256,7 +251,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($user);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
     }
@@ -267,7 +261,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             $this->userModel,
             $this->notificationModel,
             $this->translator,
-            $this->router,
+            $this->createStub(Router::class),
             $this->coreParametersHelper
         );
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -9,7 +11,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CompanyReportData::class)]
-class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
+final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Translator
@@ -22,7 +24,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
     }
 
@@ -123,7 +125,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             ->method('getEntities')
             ->willReturn([$field]);
 
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('hasColumn')
             ->willReturn(false);
 

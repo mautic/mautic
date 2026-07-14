@@ -142,7 +142,7 @@ EOT
             $debug = $event->getDebug();
 
             foreach ($debug as $key => $query) {
-                $output->writeln("<info>$key</info>");
+                $output->writeln("<info>{$key}</info>");
                 $output->writeln($query);
             }
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -25,7 +27,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends AbstractMauticTestCase
+final class ReportSubscriberTest extends AbstractMauticTestCase
 {
     /**
      * @var MockObject&CompanyReportData
@@ -49,11 +51,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
     private ReportHelper $reportHelper;
 
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translator;
-
     private ReportSubscriber $subscriber;
 
     protected function setUp(): void
@@ -67,17 +64,14 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->reportHelper         = new ReportHelper($this->createStub(EventDispatcher::class));
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createStub(TranslatorInterface::class);
-        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $coreParametersHelper,
-            $this->translator,
-            $dncReportService
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(DncReportService::class)
         );
     }
 
@@ -158,7 +152,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     public function testOnReportBuilderWithWrongContext(): void
     {
         $reportBuilderEvent = new ReportBuilderEvent(
-            $this->translator,
+            $this->createStub(TranslatorInterface::class),
             $this->createStub(ChannelListHelper::class),
             'test',
             [],
@@ -174,7 +168,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     public function testOnReportBuilderAddsFormAndFormResultReports(): void
     {
         $reportBuilderEvent = new ReportBuilderEvent(
-            $this->translator,
+            $this->createStub(TranslatorInterface::class),
             $this->createStub(ChannelListHelper::class),
             ReportSubscriber::CONTEXT_FORM_RESULT,
             [],
@@ -335,7 +329,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $mockQueryBuilder = $this->createStub(QueryBuilder::class);
         $mockChartQuery   = $this->createMock(ChartQuery::class);
 
-        $mockTrans->expects($this->any())
+        $mockTrans
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -343,15 +337,15 @@ class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('getQueryBuilder')
             ->willReturn($mockQueryBuilder);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('loadAndBuildTimeData')
             ->willReturn(['a', 'b', 'c']);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCount')
             ->willReturn(2);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCountDateDiff')
             ->willReturn(2);
 
@@ -366,7 +360,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('checkContext')
             ->willReturn(true);
 
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getOptions')
             ->willReturn($graphOptions);
 

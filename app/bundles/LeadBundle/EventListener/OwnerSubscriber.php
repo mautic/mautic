@@ -18,6 +18,9 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     private string $ownerFieldSprintf = '{ownerfield=%s}';
 
+    /**
+     * @var array<int, mixed>|null
+     */
     private ?array $owners = null;
 
     public function __construct(
@@ -137,9 +140,9 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array|null
+     * @return mixed[]|null
      */
-    private function getOwner($ownerId)
+    private function getOwner(int $ownerId)
     {
         if (!isset($this->owners[$ownerId])) {
             $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);
@@ -149,11 +152,11 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array<int|string> $contact
+     * @param array<int|string>|null $contact
      *
      * @return array|string[]
      */
-    private function getOwnerTokens($contact, string $content): array
+    private function getOwnerTokens(?array $contact, string $content): array
     {
         if (empty($contact['owner_id'])) {
             return $this->getEmptyTokens();

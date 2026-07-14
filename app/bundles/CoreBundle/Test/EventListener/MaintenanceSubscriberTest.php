@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -11,16 +13,13 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MaintenanceSubscriber $subscriber;
 
     protected function setUp(): void
     {
-        $connection          = $this->createMock(Connection::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
-        $translator          = $this->createMock(TranslatorInterface::class);
-        $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
+        $this->subscriber    = new MaintenanceSubscriber($this->createStub(Connection::class), $this->createStub(UserTokenRepositoryInterface::class), $this->createStub(TranslatorInterface::class));
     }
 
     public function testGetSubscribedEvents(): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 
@@ -268,8 +270,8 @@ class LeadTest extends TestCase
         $lead->addUpdatedField('email', $email);
         $changes = $lead->getChanges();
 
-        $this->assertFalse(empty($changes['email']));
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['email']);
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['email'][1]);
         $this->assertEquals($email, $changes['fields']['email'][1]);

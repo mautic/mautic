@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ScheduledExecutionerTest extends TestCase
+final class ScheduledExecutionerTest extends TestCase
 {
     private MockObject&LeadEventLogRepository $repository;
 
@@ -76,6 +76,7 @@ class ScheduledExecutionerTest extends TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -149,6 +150,7 @@ class ScheduledExecutionerTest extends TestCase
             ->method('hydrateContacts');
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Two events were evaluated
         $this->assertEquals(2, $counter->getTotalEvaluated());
@@ -223,6 +225,7 @@ class ScheduledExecutionerTest extends TestCase
             ->method('hydrateContacts');
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Two events were evaluated but not executed because campaign was unpublished
         $this->assertEquals(2, $counter->getTotalEvaluated());

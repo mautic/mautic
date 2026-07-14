@@ -11,30 +11,18 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
+final class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|InputInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $input;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|OutputInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $output;
-
     private ConsoleErrorListener $listener;
 
     protected function setUp(): void
     {
         $this->logger   = $this->createMock(LoggerInterface::class);
-        $this->input    = $this->createStub(InputInterface::class);
-        $this->output   = $this->createStub(OutputInterface::class);
 
         $this->listener = new ConsoleErrorListener($this->logger);
     }
@@ -45,8 +33,8 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     public function testConsoleErrorWithNullCommand(): void
     {
         $event = new ConsoleErrorEvent(
-            $this->input,
-            $this->output,
+            $this->createStub(InputInterface::class),
+            $this->createStub(OutputInterface::class),
             new \Exception('Example exception')
         );
 

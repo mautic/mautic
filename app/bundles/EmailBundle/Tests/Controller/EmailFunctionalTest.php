@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailFunctionalTest extends MauticMysqlTestCase
+final class EmailFunctionalTest extends MauticMysqlTestCase
 {
     public const SAVE_AND_CLOSE = 'Save & Close';
 
@@ -89,12 +89,14 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(Email::class, $email);
 
         // assert lists/excludedLists changed accordingly
         $this->assertEmailLists([
             $listOne->getId(),
             $listFour->getId(),
         ], $email->getLists());
+        $this->assertInstanceOf(Email::class, $email);
         $this->assertEmailLists([
             $listTwo->getId(),
             $listThree->getId(),
@@ -152,6 +154,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(Email::class, $email);
 
         Assert::assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 

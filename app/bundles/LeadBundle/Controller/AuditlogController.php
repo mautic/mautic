@@ -14,7 +14,7 @@ class AuditlogController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, $page = 1)
+    public function indexAction(Request $request, $leadId, int $page = 1)
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -28,7 +28,7 @@ class AuditlogController extends CommonController
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -82,7 +82,7 @@ class AuditlogController extends CommonController
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -100,7 +100,7 @@ class AuditlogController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $userName = $event['userName'] ?? $event['eventType'];
             if (is_array($userName)) {
                 $userName = $userName['label'];

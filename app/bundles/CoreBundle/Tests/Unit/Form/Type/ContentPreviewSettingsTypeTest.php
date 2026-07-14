@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContentPreviewSettingsTypeTest extends TestCase
+final class ContentPreviewSettingsTypeTest extends TestCase
 {
     private ContentPreviewSettingsType $form;
 
@@ -114,7 +114,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $matcher = self::exactly(2);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
@@ -125,6 +125,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -209,7 +211,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $matcher = self::exactly(2);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
@@ -220,6 +222,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -273,7 +277,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $matcher = self::exactly(2);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
@@ -284,6 +288,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -307,17 +313,17 @@ class ContentPreviewSettingsTypeTest extends TestCase
     {
         $parentEmailId = 1;
         $parentEmail   = $this->createEmail();
-        $parentEmail->setId($parentEmailId); // @phpstan-ignore-line
+        $parentEmail->setId($parentEmailId);
         $parentEmail->setName('Parent');
         $parentEmail->setLanguage('en');
 
         $translationEmail1 = $this->createEmail();
-        $translationEmail1->setId(2); // @phpstan-ignore-line
+        $translationEmail1->setId(2);
         $translationEmail1->setName('Translation 1');
         $translationEmail1->setLanguage('cs_CZ');
 
         $translationEmail2 = $this->createEmail();
-        $translationEmail2->setId(3); // @phpstan-ignore-line
+        $translationEmail2->setId(3);
         $translationEmail2->setName('Translation 2');
         $translationEmail2->setLanguage('dz_BT');
 
@@ -328,11 +334,11 @@ class ContentPreviewSettingsTypeTest extends TestCase
         ];
 
         $variantEmail1 = $this->createEmail();
-        $variantEmail1->setId(2); // @phpstan-ignore-line
+        $variantEmail1->setId(2);
         $variantEmail1->setName('Variant 1');
 
         $variantEmail2 = $this->createEmail();
-        $variantEmail2->setId(3); // @phpstan-ignore-line
+        $variantEmail2->setId(3);
         $variantEmail2->setName('Variant 2');
 
         $expectedVariantChoices = [
@@ -367,7 +373,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $matcher = self::exactly(4);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.form.chooseone', $parameters[0]);
 
@@ -388,6 +394,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -430,7 +438,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
 
     private function createEmail(): Email
     {
-        return new class extends Email {
+        return new class() extends Email {
             private int $id = 0;
 
             public function getId(): int

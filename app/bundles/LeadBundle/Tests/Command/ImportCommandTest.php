@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -17,12 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportCommandTest extends TestCase
+final class ImportCommandTest extends TestCase
 {
     public function testExecuteFailsIfModifiedByIsNotSet(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
         $importMock       = $this->createStub(Import::class);
         $importModelMock  = $this->createMock(ImportModel::class);
         $loggerMock       = $this->createStub(Logger::class);
@@ -53,7 +55,7 @@ class ImportCommandTest extends TestCase
     {
         // Translator
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
         // Import entity
         $importMock = $this->createMock(Import::class);
@@ -98,7 +100,7 @@ class ImportCommandTest extends TestCase
         // InputInterface
         $inputInterfaceMock = $this->createMock(InputInterface::class);
         $matcher            = $this->exactly(2);
-        $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher): int {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('id', $parameters[0]);
 
@@ -109,6 +111,8 @@ class ImportCommandTest extends TestCase
 
                 return 10;
             }
+
+            throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
         });
 
         // OutputInterface
@@ -120,7 +124,7 @@ class ImportCommandTest extends TestCase
     public function testExecuteAddsNotificationOnFailure(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
         $importMock = $this->createMock(Import::class);
         $importMock->expects($this->once())

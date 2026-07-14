@@ -13,12 +13,16 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FromEmailHelperTest extends TestCase
+final class FromEmailHelperTest extends TestCase
 {
-    /** @var MockObject&CoreParametersHelper */
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     private MockObject $coreParametersHelper;
 
-    /** @var MockObject&LeadRepository */
+    /**
+     * @var MockObject&LeadRepository
+     */
     private MockObject $leadRepository;
 
     protected function setUp(): void
@@ -554,7 +558,7 @@ class FromEmailHelperTest extends TestCase
 
         $owner = $this->getHelper()->getContactOwner(1);
 
-        $this->assertTrue($user === $owner);
+        $this->assertSame($user, $owner);
     }
 
     public function testExceptionIsThrownWhenMailAsOwnerIsDisabled(): void

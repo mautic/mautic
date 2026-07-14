@@ -23,15 +23,19 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function ($name): bool {
+            ->with($this->callback(function (string $name): bool {
                 $expected = [
                     ['label', 'value'],
                 ];
 
                 return in_array($name, $expected[0], true);
             }),
-                $this->callback(fn ($type): bool => TextType::class === $type),
-                $this->callback(function ($options) use (&$call): bool {
+                $this->callback(function (string $type): bool {
+                    $this->assertSame(TextType::class, $type);
+
+                    return true;
+                }),
+                $this->callback(function (array $options) use (&$call): bool {
                     $expectedOptions = [
                         [
                             'label'          => 'mautic.core.label',
@@ -134,7 +138,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expectedValue));
+                ->willReturnCallback(function (array $newData) use ($data, $expectedValue): void {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expectedValue, $newData['value']);
+                });
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -187,7 +194,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expected));
+                ->willReturnCallback(function (array $newData) use ($data, $expected): void {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expected, $newData['value']);
+                });
         } else {
             $event->expects($this->never())
                 ->method('setData');

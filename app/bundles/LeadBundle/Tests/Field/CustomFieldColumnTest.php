@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&ColumnSchemaHelper
@@ -54,19 +54,17 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $this->schemaDefinition      = $this->createMock(SchemaDefinition::class);
-        $logger                      = $this->createMock(Logger::class);
         $this->leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
         $this->customFieldIndex      = $this->createMock(CustomFieldIndex::class);
         $this->fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
-        $translator                  = $this->createMock(TranslatorInterface::class);
         $this->customFieldColumn     = new CustomFieldColumn(
             $this->columnSchemaHelper,
             $this->schemaDefinition,
-            $logger,
+            $this->createStub(Logger::class),
             $this->leadFieldSaver,
             $this->customFieldIndex,
             $this->fieldColumnDispatcher,
-            $translator
+            $this->createStub(TranslatorInterface::class)
         );
     }
 

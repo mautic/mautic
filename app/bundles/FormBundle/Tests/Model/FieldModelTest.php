@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
@@ -16,16 +18,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends TestCase
+final class FieldModelTest extends TestCase
 {
     public function testGenerateAlias(): void
     {
         $connection = $this->createMock(Connection::class);
 
-        $platform = new class {
+        $platform = new class() {
             public function getReservedKeywordsList(): object
             {
-                return new class {
+                return new class() {
                     public function isKeyword(): bool
                     {
                         return false;
@@ -59,7 +61,7 @@ class FieldModelTest extends TestCase
             $schemaHelper
         );
 
-        $entityManager->expects($this->any())
+        $entityManager
             ->method('getConnection')
             ->willReturn($connection);
 

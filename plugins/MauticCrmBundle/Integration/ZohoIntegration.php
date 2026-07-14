@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method ZohoApi getApiHelper()
+ * @extends CrmAbstractIntegration<ZohoApi>
  */
 class ZohoIntegration extends CrmAbstractIntegration
 {
@@ -478,10 +478,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
      * @param array $result
      */
-    public function getCompanies($params = [], $query = null, &$executed = null, &$result = []): int
+    public function getCompanies(array $params = [], $query = null, &$executed = null, &$result = []): int
     {
         $executed = 0;
         $object   = 'company';
@@ -579,7 +578,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $authType = $this->getAuthenticationType();
 
-        if ('oauth2' == $authType) {
+        if ('oauth2' === $authType) {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
             $state       = $this->getAuthLoginState();
@@ -774,11 +773,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         $maxRecords = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -821,7 +818,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $progress = new ProgressBar($output, $totalCount);
             }
         }
@@ -1008,10 +1005,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param Lead|array $lead
      * @param array      $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config  = $this->mergeConfigToFeatureSettings($config);
         $zObject = 'Leads';
@@ -1166,7 +1161,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array<mixed, mixed> $fields
      */
-    private function parseZohoRecord($data, array $fields): array
+    private function parseZohoRecord(array $data, array $fields): array
     {
         $parsedData = [];
         if (empty($data['data'])) {

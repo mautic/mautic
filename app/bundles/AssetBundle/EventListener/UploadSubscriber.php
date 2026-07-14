@@ -70,13 +70,13 @@ class UploadSubscriber implements EventSubscriberInterface
         try {
             $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize);
         } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage());
+            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
         }
 
         try {
             $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions);
         } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage());
+            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
         }
 
         \assert($file instanceof UploadedFile);
@@ -87,7 +87,7 @@ class UploadSubscriber implements EventSubscriberInterface
                 $file->getMimeType(),
             ], $file->getExtension());
         } catch (FileInvalidException $e) {
-            throw new ValidationException($e->getMessage());
+            throw new ValidationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

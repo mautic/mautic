@@ -20,16 +20,24 @@ use Twig\Environment;
 
 final class InjectCustomContentSubscriberTest extends TestCase
 {
-    /** @var MockObject&Config */
+    /**
+     * @var MockObject&Config
+     */
     private MockObject $config;
 
-    /** @var MockObject&GrapesJsBuilderModel */
+    /**
+     * @var MockObject&GrapesJsBuilderModel
+     */
     private MockObject $model;
 
-    /** @var MockObject&Environment */
+    /**
+     * @var MockObject&Environment
+     */
     private MockObject $twig;
 
-    /** @var MockObject&RouterInterface */
+    /**
+     * @var MockObject&RouterInterface
+     */
     private MockObject $router;
 
     protected function setUp(): void

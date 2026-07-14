@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
@@ -208,7 +210,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $bypassLockingOption = 'bypass-locking';
 
         if ($command->getDefinition()->hasOption($bypassLockingOption)) {
-            $params["--$bypassLockingOption"] = true;
+            $params["--{$bypassLockingOption}"] = true;
         }
 
         $command       = $application->find($name);

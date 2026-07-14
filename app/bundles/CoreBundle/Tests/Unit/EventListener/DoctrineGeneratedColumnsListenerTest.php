@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
+final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&GenerateSchemaEventArgs
@@ -37,11 +37,10 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $generatedColumnsProvider       = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $logger                         = $this->createMock(LoggerInterface::class);
         $this->event                    = $this->createMock(GenerateSchemaEventArgs::class);
         $this->schema                   = $this->createMock(Schema::class);
         $this->table                    = $this->createMock(Table::class);
-        $this->listener                 = new DoctrineGeneratedColumnsListener($generatedColumnsProvider, $logger);
+        $this->listener                 = new DoctrineGeneratedColumnsListener($generatedColumnsProvider, $this->createStub(LoggerInterface::class));
 
         $generatedColumn  = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
         $generatedColumns = new GeneratedColumns();

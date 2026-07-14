@@ -15,7 +15,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class RouteHelperTest extends TestCase
+final class RouteHelperTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
@@ -139,7 +139,7 @@ class RouteHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectRouteEvent $event) use ($internalObject): void {
                         $this->assertSame($internalObject, $event->getObject());

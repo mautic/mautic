@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends TestCase
+final class LegacyEventDispatcherTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface
@@ -441,7 +441,9 @@ class LegacyEventDispatcherTest extends TestCase
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, true, $this->pendingEvent);
     }
 
-    /** @phpstan-ignore return.deprecatedClass */
+    /**
+     * @phpstan-ignore return.deprecatedClass
+     */
     private function getLegacyEventDispatcher(): LegacyEventDispatcher
     {
         /** @phpstan-ignore new.deprecated */

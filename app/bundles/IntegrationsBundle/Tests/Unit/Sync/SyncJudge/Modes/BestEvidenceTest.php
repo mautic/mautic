@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
 use PHPUnit\Framework\TestCase;
 
-class BestEvidenceTest extends TestCase
+final class BestEvidenceTest extends TestCase
 {
     public function testLeftWinnerWithCertainChangeDateTime(): void
     {

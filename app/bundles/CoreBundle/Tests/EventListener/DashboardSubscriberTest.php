@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriberTest extends TestCase
+final class DashboardSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&AuditLogModel
@@ -41,11 +41,6 @@ class DashboardSubscriberTest extends TestCase
      * @var MockObject&Router
      */
     private MockObject $router;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&CorePermissions
-     */
-    private \PHPUnit\Framework\MockObject\Stub $security;
 
     /**
      * @var MockObject&EventDispatcherInterface
@@ -69,7 +64,6 @@ class DashboardSubscriberTest extends TestCase
         $this->auditLogModel = $this->createMock(AuditLogModel::class);
         $this->translator    = $this->createMock(TranslatorInterface::class);
         $this->router        = $this->createMock(Router::class);
-        $this->security      = $this->createStub(CorePermissions::class);
         $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
         $this->modelFactory  = $this->createMock(ModelFactory::class);
         $this->event         = $this->createMock(WidgetDetailEvent::class);
@@ -92,7 +86,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -119,7 +113,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -228,7 +222,7 @@ class DashboardSubscriberTest extends TestCase
         $routeCollection = $this->createMock(RouteCollection::class);
         $matcher         = self::exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?\PHPUnit\Framework\MockObject\Stub {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_model_action', $parameters[0]);
 
@@ -254,6 +248,8 @@ class DashboardSubscriberTest extends TestCase
 
                     return null;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->router->expects(self::exactly(5))
@@ -267,7 +263,7 @@ class DashboardSubscriberTest extends TestCase
                 ['mautic_lead_action', ['objectAction' => 'view', 'objectId' => 567], UrlGeneratorInterface::ABSOLUTE_PATH, '/not-anonymous'],
             ]);
 
-        $iconEvent = new IconEvent($this->security);
+        $iconEvent = new IconEvent($this->createStub(CorePermissions::class));
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($iconEvent);
@@ -293,7 +289,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Stat;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -10,7 +12,7 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
-class StatHelperTest extends \PHPUnit\Framework\TestCase
+final class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStatsAreCreatedAndDeleted(): void
     {
@@ -56,7 +58,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals($reference->getLeadId(), $counter * 10);
                 $statHelper->markForDeletion($reference);
             } catch (StatNotFoundException) {
-                $this->fail("Stat not found for $emailAddress");
+                $this->fail("Stat not found for {$emailAddress}");
             }
 
             ++$counter;

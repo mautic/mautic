@@ -110,11 +110,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission(array $post, array $server, Form $form, Request $request, $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 
@@ -182,7 +180,8 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
-            } elseif ($f->isFileType()) {
+            }
+            if ($f->isFileType()) {
                 try {
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
@@ -330,10 +329,10 @@ class SubmissionModel extends CommonFormModel
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
 
-        /*
+        /**
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
-         * The action can still be invalidated below - deleteEntity takes care for File deletion
+         * The action can still be invalidated below - deleteEntity takes care for File deletion.
          *
          * @todo Refactor form validation to execute this code only if Submission is valid
          */
@@ -460,9 +459,11 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param array<string, mixed> $queryArgs
+     *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs): StreamedResponse|Response
+    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -571,7 +572,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs): StreamedResponse|Response
+    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -928,7 +929,7 @@ class SubmissionModel extends CommonFormModel
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
         // Closure to get data and unique fields
-        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
+        $getData = function (array $currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
@@ -946,7 +947,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields): array {
+        $getCompanyData = function (array $currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company' => 'company']);
@@ -961,7 +962,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
+        $checkForIdentifierConflict = function (array $fieldSet1, array $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)

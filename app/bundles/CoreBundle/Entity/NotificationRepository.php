@@ -58,7 +58,7 @@ class NotificationRepository extends CommonRepository
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
                 $this->getEntityManager()->getConnection()->executeStatement(
-                    $qb->getSQL()." LIMIT $limit"
+                    $qb->getSQL()." LIMIT {$limit}"
                 );
             } else {
                 $qb->executeStatement();

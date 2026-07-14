@@ -22,7 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailTypeTest extends MauticMysqlTestCase
+final class EmailTypeTest extends MauticMysqlTestCase
 {
     /**
      * @var array<mixed>

@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
-class FileEncodingValidatorTest extends MauticMysqlTestCase
+final class FileEncodingValidatorTest extends MauticMysqlTestCase
 {
     public function testFileNONUTF8(): void
     {

@@ -27,8 +27,9 @@ class IndexHelper
      */
     private int $indexCount = 0;
 
-    public function __construct(private readonly EntityManager $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManager $entityManager,
+    ) {
     }
 
     /**
@@ -74,7 +75,7 @@ class IndexHelper
 
         $tableName = $this->entityManager->getClassMetadata(Lead::class)->getTableName();
 
-        $sql = "SHOW INDEXES FROM `$tableName`";
+        $sql = "SHOW INDEXES FROM `{$tableName}`";
 
         $stmt    = $this->entityManager->getConnection()->prepare($sql);
         $indexes = $stmt->executeQuery()->fetchAllAssociative();

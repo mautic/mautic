@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
@@ -17,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTestCase
+final class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -42,7 +44,6 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $kernel               = $this->createMock(KernelInterface::class);
-        $helperSet            = $this->createMock(HelperSet::class);
         $kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -55,7 +56,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn($helperSet);
+            ->willReturn($this->createStub(HelperSet::class));
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -118,7 +119,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -144,7 +145,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

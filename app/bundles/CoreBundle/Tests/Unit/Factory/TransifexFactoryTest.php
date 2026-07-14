@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
-class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
+final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper
@@ -23,9 +23,8 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $client                     = $this->createMock(ClientInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->transifexFactory     = new TransifexFactory($client, $this->coreParametersHelper);
+        $this->transifexFactory     = new TransifexFactory($this->createStub(ClientInterface::class), $this->coreParametersHelper);
     }
 
     public function testCreatingTransifexWithoutCredentials(): void
@@ -44,6 +43,6 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
         $transifex = $this->transifexFactory->getTransifex();
 
         // Getting a connector validates the config, so this should throw an exception.
-        Assert::assertTrue($transifex->getConnector(Resources::class) instanceof Resources);
+        Assert::assertInstanceOf(Resources::class, $transifex->getConnector(Resources::class));
     }
 }
