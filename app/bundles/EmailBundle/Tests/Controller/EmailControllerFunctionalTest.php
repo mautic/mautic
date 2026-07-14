@@ -37,8 +37,11 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     use ControllerTrait;
 
     private const SUBJECT_A      = 'Subject A';
+
     private const SUBJECT_B      = 'Subject B';
+
     private const SUBJECT_C      = 'Subject C';
+
     private const CLICK_URL_LOW  = 'https://example.com/low';
 
     private const CLICK_URL_MID  = 'https://example.com/mid';
@@ -121,9 +124,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertStringContainsString($matchingEmail->getName(), $response['newContent']);
-        $this->assertStringNotContainsString($nonMatchingEmail->getName(), $response['newContent']);
-        $this->assertStringNotContainsString('No Results Found', $response['newContent']);
+        $this->assertStringContainsString($matchingEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString($nonMatchingEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $response['newContent']);
     }
 
     public function testIndexActionFiltersEmailsByCategoryAndThemeQuickFilters(): void

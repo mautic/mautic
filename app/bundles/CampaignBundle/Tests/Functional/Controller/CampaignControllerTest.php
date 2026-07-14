@@ -234,9 +234,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertStringContainsString($matchingCampaign->getName(), $responseData['newContent']);
-        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), $responseData['newContent']);
-        $this->assertStringNotContainsString('No Results Found', $responseData['newContent']);
+        $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
     }
 
     public function testIndexActionFiltersCampaignsByFormQuickFilter(): void

@@ -19,10 +19,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
     private const SEGMENTS_ROUTE = '/s/segments';
 
-    /**
-     * @var User
-     */
-    private $nonAdminUser;
+    private User $nonAdminUser;
 
     private User $userOne;
 
@@ -136,9 +133,9 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
         $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertStringContainsString($matchingSegment->getName(), $responseData['newContent']);
-        $this->assertStringNotContainsString($nonMatchingSegment->getName(), $responseData['newContent']);
-        $this->assertStringNotContainsString('No Results Found', $responseData['newContent']);
+        $this->assertStringContainsString($matchingSegment->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingSegment->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
     }
 
     public function testCreateSegmentForUserWithoutPermission(): void
