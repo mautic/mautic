@@ -118,7 +118,7 @@ final readonly class CampaignShareService
 
         $keywords = [];
         if (!empty($metadata['keywords'])) {
-            $keywords = array_map('trim', explode(',', (string) $metadata['keywords']));
+            $keywords = array_map(trim(...), explode(',', (string) $metadata['keywords']));
             $keywords = array_filter($keywords);
         }
 

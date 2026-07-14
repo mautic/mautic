@@ -41,7 +41,7 @@ final class DynamicContentExportListEventSubscriberTest extends TestCase
             ['content' => '<img src="https://example.ddev.site/media/images/promo.png">'],
         );
 
-        self::assertSame([$this->imageDir.'/promo.png'], $event->getList());
+        $this->assertSame([$this->imageDir.'/promo.png'], $event->getList());
     }
 
     public function testCollectsImagesFromStructuredBuilderContent(): void
@@ -52,7 +52,7 @@ final class DynamicContentExportListEventSubscriberTest extends TestCase
             ['content' => ['slots' => ['main' => 'https://example.ddev.site/media/images/slot.png']]],
         );
 
-        self::assertSame([$this->imageDir.'/slot.png'], $event->getList());
+        $this->assertSame([$this->imageDir.'/slot.png'], $event->getList());
     }
 
     public function testIgnoresMissingFilesAndForeignUrls(): void
@@ -62,7 +62,7 @@ final class DynamicContentExportListEventSubscriberTest extends TestCase
                 .'<img src="https://cdn.example.com/assets/remote.png">',
         ]);
 
-        self::assertSame([], $event->getList());
+        $this->assertSame([], $event->getList());
     }
 
     /**

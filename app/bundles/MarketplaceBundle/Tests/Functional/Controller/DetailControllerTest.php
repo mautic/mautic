@@ -72,10 +72,10 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify reviews from object format (keyed by username) are displayed correctly
-        Assert::assertStringContainsString('john_doe', $responseContent);
-        Assert::assertStringContainsString('Excellent reCAPTCHA integration!', $responseContent);
-        Assert::assertStringContainsString('jane_smith', $responseContent);
-        Assert::assertStringContainsString('Works great with Mautic forms', $responseContent);
+        Assert::assertStringContainsString('john_doe', (string) $responseContent);
+        Assert::assertStringContainsString('Excellent reCAPTCHA integration!', (string) $responseContent);
+        Assert::assertStringContainsString('jane_smith', (string) $responseContent);
+        Assert::assertStringContainsString('Works great with Mautic forms', (string) $responseContent);
 
         // Verify star ratings are rendered (john_doe has 5 stars, jane_smith has 4)
         $starRows = $crawler->filter('.ri-star-fill');
@@ -96,7 +96,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify the page renders successfully with no reviews
-        Assert::assertStringContainsString('Mautic Recaptcha Bundle', $responseContent);
+        Assert::assertStringContainsString('Mautic Recaptcha Bundle', (string) $responseContent);
 
         // Verify no review blocks are rendered
         Assert::assertCount(0, $crawler->filter('blockquote'));

@@ -43,10 +43,7 @@ final class EmailExportListEventSubscriberTest extends TestCase
 
         $event = $this->dispatchForEmail($email);
 
-        self::assertEqualsCanonicalizing(
-            [$this->imageDir.'/banner.png', $this->imageDir.'/sub/inline.jpg'],
-            $event->getList(),
-        );
+        $this->assertEqualsCanonicalizing([$this->imageDir.'/banner.png', $this->imageDir.'/sub/inline.jpg'], $event->getList());
     }
 
     public function testIgnoresMissingFilesAndForeignUrls(): void
@@ -58,7 +55,7 @@ final class EmailExportListEventSubscriberTest extends TestCase
 
         $event = $this->dispatchForEmail($email);
 
-        self::assertSame([], $event->getList());
+        $this->assertSame([], $event->getList());
     }
 
     public function testGuardsAgainstPathTraversal(): void
@@ -71,7 +68,7 @@ final class EmailExportListEventSubscriberTest extends TestCase
 
         $event = $this->dispatchForEmail($email);
 
-        self::assertSame([], $event->getList());
+        $this->assertSame([], $event->getList());
     }
 
     /**

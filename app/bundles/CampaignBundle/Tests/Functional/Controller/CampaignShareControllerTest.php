@@ -67,7 +67,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
         $content = $response->getContent();
-        $this->assertStringContainsString(self::CAMPAIGN_NAME, $content);
+        $this->assertStringContainsString(self::CAMPAIGN_NAME, (string) $content);
     }
 
     public function testShareFormAccessDenied(): void
@@ -115,7 +115,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
-        $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
     }
 
     public function testSharePublishRedirectsToMarketplace(): void
@@ -141,7 +141,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $content  = $response->getContent();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('Publishing to Marketplace', $content);
+        $this->assertStringContainsString('Publishing to Marketplace', (string) $content);
         // The publish flow should hand the marketplace a token URL pointing back at the share
         // download endpoint — not a Mautic Asset URL — so the marketplace can fetch the ZIP
         // without depending on the Asset table. The URL is rendered into the
@@ -167,7 +167,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     public function testShareDownloadServesStoredZip(): void
     {
         $shareService = self::getContainer()->get(CampaignShareService::class);
-        \assert($shareService instanceof CampaignShareService);
+        $this->assertInstanceOf(CampaignShareService::class, $shareService);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
@@ -178,7 +178,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $zipPath = $shareDir.'/'.$token.'.zip';
 
         $zip = new \ZipArchive();
-        $this->assertTrue(true === $zip->open($zipPath, \ZipArchive::CREATE));
+        $this->assertTrue($zip->open($zipPath, \ZipArchive::CREATE));
         $zip->addFromString('composer.json', '{"name":"acme/test","type":"mautic-resource","version":"1.0.0"}');
         $zip->close();
         $this->assertFileExists($zipPath);
@@ -198,7 +198,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
     public function testShareDownloadReturnsGoneForExpiredFile(): void
     {
         $shareService = self::getContainer()->get(CampaignShareService::class);
-        \assert($shareService instanceof CampaignShareService);
+        $this->assertInstanceOf(CampaignShareService::class, $shareService);
         $shareDir = $shareService->getShareDir();
 
         if (!is_dir($shareDir)) {
@@ -312,7 +312,7 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         ]);
         $pngPath     = $this->createTempPng();
         $bannerField = $form['campaign_share[bannerImage]'];
-        \assert($bannerField instanceof FileFormField);
+        $this->assertInstanceOf(FileFormField::class, $bannerField);
         $bannerField->upload($pngPath);
 
         $crawler  = $this->client->submit($form);

@@ -26,15 +26,9 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     private MockObject&ClientInterface $httpClient;
 
-    private MockObject&PathsHelper $pathsHelper;
-
     private MockObject&EventDispatcherInterface $dispatcher;
 
-    private MockObject&LoggerInterface $logger;
-
     private string $tmpRoot;
-
-    private string $importDir;
 
     private ResourceInstaller $installer;
 
@@ -43,28 +37,27 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         parent::setUp();
 
         $this->tmpRoot   = sys_get_temp_dir().'/mautic_resource_installer_'.bin2hex(random_bytes(4));
-        $this->importDir = $this->tmpRoot.'/import';
+        $importDir = $this->tmpRoot.'/import';
 
         (new Filesystem())->mkdir([$this->tmpRoot, $this->tmpRoot.'/var']);
 
         $this->marketplaceConnection  = $this->createMock(Connection::class);
         $this->httpClient             = $this->createMock(ClientInterface::class);
-        $this->pathsHelper            = $this->createMock(PathsHelper::class);
+        $pathsHelper            = $this->createMock(PathsHelper::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->logger                 = $this->createMock(LoggerInterface::class);
 
-        $this->pathsHelper->method('getImportCampaignsPath')->willReturn($this->importDir);
-        $this->pathsHelper->method('getSystemPath')->with('root')->willReturn($this->tmpRoot);
-        $this->pathsHelper->method('getTemporaryPath')->willReturn($this->tmpRoot.'/tmp');
-        $this->pathsHelper->method('getMediaPath')->willReturn($this->tmpRoot.'/media');
+        $pathsHelper->method('getImportCampaignsPath')->willReturn($importDir);
+        $pathsHelper->method('getSystemPath')->with('root')->willReturn($this->tmpRoot);
+        $pathsHelper->method('getTemporaryPath')->willReturn($this->tmpRoot.'/tmp');
+        $pathsHelper->method('getMediaPath')->willReturn($this->tmpRoot.'/media');
 
         $this->installer = new ResourceInstaller(
             $this->marketplaceConnection,
             $this->httpClient,
-            $this->pathsHelper,
+            $pathsHelper,
             $this->dispatcher,
-            $this->logger,
-            new ImportHelper($this->pathsHelper),
+            $this->createStub(LoggerInterface::class),
+            new ImportHelper($pathsHelper),
         );
     }
 
@@ -255,7 +248,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
     {
         $path = $this->tmpRoot.'/fixture_'.bin2hex(random_bytes(4)).'.zip';
         $zip  = new \ZipArchive();
-        Assert::assertTrue(true === $zip->open($path, \ZipArchive::CREATE));
+        Assert::assertTrue($zip->open($path, \ZipArchive::CREATE));
 
         foreach ($files as $name => $content) {
             $zip->addFromString($name, $content);

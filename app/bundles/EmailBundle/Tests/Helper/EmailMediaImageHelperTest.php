@@ -51,10 +51,7 @@ final class EmailMediaImageHelperTest extends TestCase
         $content = '<img src="https://example.ddev.site/media/images/banner.png">'
             .'background:url(https://example.ddev.site/media/images/sub/inline.jpg)';
 
-        self::assertEqualsCanonicalizing(
-            [$this->imageDir.'/banner.png', $this->imageDir.'/sub/inline.jpg'],
-            $this->helper->extractLocalImageFiles($content),
-        );
+        $this->assertEqualsCanonicalizing([$this->imageDir.'/banner.png', $this->imageDir.'/sub/inline.jpg'], $this->helper->extractLocalImageFiles($content));
     }
 
     public function testExtractLocalImageFilesIgnoresMissingForeignAndTraversal(): void
@@ -65,7 +62,7 @@ final class EmailMediaImageHelperTest extends TestCase
             .'<img src="https://cdn.example.com/assets/remote.png">'
             .'<img src="/media/images/../secret.png">';
 
-        self::assertSame([], $this->helper->extractLocalImageFiles($content));
+        $this->assertSame([], $this->helper->extractLocalImageFiles($content));
     }
 
     public function testRestoreInHtmlRelocatesFileAndRewritesUrl(): void
@@ -77,9 +74,9 @@ final class EmailMediaImageHelperTest extends TestCase
 
         $result = $this->helper->restoreInHtml($html);
 
-        self::assertSame('<img src="/media/images/banner.png">', $result);
-        self::assertFileExists($this->imageDir.'/banner.png');
-        self::assertSame('png-bytes', file_get_contents($this->imageDir.'/banner.png'));
+        $this->assertSame('<img src="/media/images/banner.png">', $result);
+        $this->assertFileExists($this->imageDir.'/banner.png');
+        $this->assertSame('png-bytes', file_get_contents($this->imageDir.'/banner.png'));
     }
 
     public function testRestoreInContentRewritesNestedReferences(): void
@@ -95,9 +92,9 @@ final class EmailMediaImageHelperTest extends TestCase
 
         $result = $this->helper->restoreInContent($content);
 
-        self::assertSame('<img src="/media/images/hero.png">', $result['slots']['hero']);
-        self::assertSame('No image here', $result['meta']['title']);
-        self::assertFileExists($this->imageDir.'/hero.png');
+        $this->assertSame('<img src="/media/images/hero.png">', $result['slots']['hero']);
+        $this->assertSame('No image here', $result['meta']['title']);
+        $this->assertFileExists($this->imageDir.'/hero.png');
     }
 
     private function coreParametersHelper(): CoreParametersHelper&MockObject

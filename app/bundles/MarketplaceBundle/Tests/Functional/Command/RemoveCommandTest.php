@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
-    private MockObject&LoggerInterface $logger;
+    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
 
     private MockObject&PackageModel $packageModel;
 
@@ -29,7 +29,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->logger            = $this->createMock(LoggerInterface::class);
+        $this->logger            = $this->createStub(LoggerInterface::class);
         $this->packageModel      = $this->createMock(PackageModel::class);
         $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->packageName       = 'koco/mautic-recaptcha-bundle';
@@ -110,7 +110,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveResourceCommand(): void
     {
         $resourcePackageName = 'vukovicpredrag/mautic-test-campaign-template';
-        $composer            = $this->createMock(ComposerHelper::class);
+        $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
             ->with($resourcePackageName)
@@ -135,7 +135,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveResourceCommandWhenNotInstalled(): void
     {
         $resourcePackageName = 'vukovicpredrag/mautic-test-campaign-template';
-        $composer            = $this->createMock(ComposerHelper::class);
+        $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
             ->with($resourcePackageName)
@@ -160,7 +160,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveResourceCommandWithError(): void
     {
         $resourcePackageName = 'vukovicpredrag/mautic-test-campaign-template';
-        $composer            = $this->createMock(ComposerHelper::class);
+        $composer            = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
             ->with($resourcePackageName)
@@ -189,7 +189,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     public function testRemoveCommandWithNonExistingPackage(): void
     {
         $packageName = 'mautic/non-existent-plugin';
-        $composer    = $this->createMock(ComposerHelper::class);
+        $composer    = $this->createStub(ComposerHelper::class);
 
         $this->packageModel->method('getPackageDetail')
             ->with($packageName)

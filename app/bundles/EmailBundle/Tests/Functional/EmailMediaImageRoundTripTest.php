@@ -72,14 +72,14 @@ final class EmailMediaImageRoundTripTest extends MauticMysqlTestCase
         $assetListEvent = $dispatcher->dispatch(new AssetExportListEvent($data));
         $assetList      = $assetListEvent->getList() ?? [];
 
-        self::assertContains($sourceFile, $assetList, 'The builder image must be collected for the export archive.');
+        $this->assertContains($sourceFile, $assetList, 'The builder image must be collected for the export archive.');
 
         $zipFilePath          = $exportHelper->writeToZipFile((string) json_encode($data), $assetList, '');
         $this->createdFiles[] = $zipFilePath;
 
         $zip = new \ZipArchive();
-        self::assertTrue(true === $zip->open($zipFilePath));
-        self::assertNotFalse($zip->locateName('assets/'.$fileName), 'The archive must contain the image file.');
+        $this->assertTrue($zip->open($zipFilePath));
+        $this->assertNotFalse($zip->locateName('assets/'.$fileName), 'The archive must contain the image file.');
         $zip->close();
 
         // Simulate importing onto a fresh instance: neither the served copy nor the restored copy exists yet.
@@ -90,13 +90,13 @@ final class EmailMediaImageRoundTripTest extends MauticMysqlTestCase
 
         // 2) Import: readZipFile must not flag the highly-compressible JSON as a zip bomb and restores assets.
         $importHelper->readZipFile($zipFilePath);
-        self::assertFileExists($restoredFile, 'The image is restored into the media files directory.');
+        $this->assertFileExists($restoredFile, 'The image is restored into the media files directory.');
 
         // 3) Import rewrite: relocate to the served images directory and produce a host-relative URL.
         $rewritten = $mediaImageHelper->restoreInHtml($customHtml);
 
-        self::assertSame('<img src="/media/images/'.$fileName.'">', $rewritten);
-        self::assertFileExists($imageDir.'/'.$fileName, 'The image is available where the builder serves images.');
-        self::assertSame($bytes, file_get_contents($imageDir.'/'.$fileName));
+        $this->assertSame('<img src="/media/images/'.$fileName.'">', $rewritten);
+        $this->assertFileExists($imageDir.'/'.$fileName, 'The image is available where the builder serves images.');
+        $this->assertSame($bytes, file_get_contents($imageDir.'/'.$fileName));
     }
 }

@@ -45,10 +45,7 @@ final class PageExportListEventSubscriberTest extends TestCase
 
         $event = $this->dispatchForPage($page);
 
-        self::assertEqualsCanonicalizing(
-            [$this->imageDir.'/hero.png', $this->imageDir.'/sub/inline.jpg'],
-            $event->getList(),
-        );
+        $this->assertEqualsCanonicalizing([$this->imageDir.'/hero.png', $this->imageDir.'/sub/inline.jpg'], $event->getList());
     }
 
     public function testIgnoresMissingFilesAndForeignUrls(): void
@@ -60,7 +57,7 @@ final class PageExportListEventSubscriberTest extends TestCase
 
         $event = $this->dispatchForPage($page);
 
-        self::assertSame([], $event->getList());
+        $this->assertSame([], $event->getList());
     }
 
     /**

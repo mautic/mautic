@@ -111,7 +111,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             ->willReturn(['success' => true, 'summary' => [], 'errors' => []]);
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             ->willReturn(true);
@@ -136,7 +136,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             ->willReturn(true);
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             ->willReturn(true);
@@ -160,7 +160,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             ->willReturn(true);
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
             ->willReturn(true);
@@ -185,7 +185,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             ->willReturn(false);
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
             ->willReturn(true);
