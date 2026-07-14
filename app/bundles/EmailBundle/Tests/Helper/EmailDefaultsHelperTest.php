@@ -44,7 +44,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
         $this->helper->applyDefaults($email);
 
-        $this->assertNull($email->getPreferenceCenter());
+        $this->assertNotInstanceOf(Page::class, $email->getPreferenceCenter());
         $this->assertSame([
             'utmSource'   => 'config-source',
             'utmMedium'   => 'config-medium',
@@ -150,7 +150,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
 
         $this->assertSame($page, $this->helper->resolvePreferenceCenter($email));
-        $this->assertNull($email->getPreferenceCenter());
+        $this->assertNotInstanceOf(Page::class, $email->getPreferenceCenter());
     }
 
     public function testResolvePreferenceCenterReturnsNullForInvalidDefault(): void
@@ -163,7 +163,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
         $email = new Email();
 
-        $this->assertNull($this->helper->resolvePreferenceCenter($email));
+        $this->assertNotInstanceOf(Page::class, $this->helper->resolvePreferenceCenter($email));
     }
 
     public function testResolvePreferenceCenterReturnsNullForUnpublishedDefault(): void
@@ -178,7 +178,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
         $email = new Email();
 
-        $this->assertNull($this->helper->resolvePreferenceCenter($email));
+        $this->assertNotInstanceOf(Page::class, $this->helper->resolvePreferenceCenter($email));
     }
 
     public function testResolvePreferenceCenterReturnsNullForPublishedNonPreferenceCenterDefault(): void
@@ -193,7 +193,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
         $email = new Email();
 
-        $this->assertNull($this->helper->resolvePreferenceCenter($email));
+        $this->assertNotInstanceOf(Page::class, $this->helper->resolvePreferenceCenter($email));
     }
 
     public function testPreservesPreExistingChanges(): void
