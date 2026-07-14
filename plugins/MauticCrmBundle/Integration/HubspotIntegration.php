@@ -32,6 +32,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper()
+ *
+ * @extends CrmAbstractIntegration<HubspotApi>
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {

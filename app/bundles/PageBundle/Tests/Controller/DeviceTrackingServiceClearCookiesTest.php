@@ -12,14 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
 {
     /**
-     * @return array<string, array{bool}>
+     * @return \Iterator<string, array{bool}>
      */
-    public static function blockedTrackingCookieDataProvider(): array
+    public static function blockedTrackingCookieDataProvider(): \Iterator
     {
-        return [
-            'with blocked tracking cookie'    => [true],
-            'without blocked tracking cookie' => [false],
-        ];
+        yield 'with blocked tracking cookie' => [true];
+        yield 'without blocked tracking cookie' => [false];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieDataProvider')]

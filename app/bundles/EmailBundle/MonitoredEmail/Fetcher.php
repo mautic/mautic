@@ -62,7 +62,7 @@ class Fetcher
                     $messages  = $this->getMessages($mailIds, $limit, $markAsSeen);
                     $processed = count($messages);
 
-                    if ($messages) {
+                    if ([] !== $messages) {
                         $event->setMessages($messages)
                             ->setKeys($mailboxes);
                         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PARSE);

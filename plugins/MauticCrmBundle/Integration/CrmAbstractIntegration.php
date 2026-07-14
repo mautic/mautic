@@ -10,6 +10,9 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
+/**
+ * @template TApiHelper of CrmApi
+ */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
@@ -148,7 +151,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return CrmApi
+     * @return TApiHelper
      */
     public function getApiHelper()
     {
@@ -332,7 +335,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param mixed|null  $identifiers
      * @param string|null $object
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
@@ -348,7 +351,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -373,7 +376,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 'matchedFields'    => $matchedFields,
             ]);
 
-            return;
+            return null;
         }
 
         // Default to new lead
@@ -399,7 +402,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (empty($fieldsToUpdateInMautic)) {
                 $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
 
-                return;
+                return null;
             }
 
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
@@ -505,7 +508,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $objects
+     * @param string[]|string|null $objects
      *
      * @return array
      */

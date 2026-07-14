@@ -18,7 +18,7 @@ class AssetExtension extends AbstractExtension
     /**
      * @see Twig_Extension::getFunctions()
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('outputScripts', $this->outputScripts(...), ['is_safe' => ['all']]),

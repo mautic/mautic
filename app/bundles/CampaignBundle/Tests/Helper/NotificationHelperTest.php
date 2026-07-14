@@ -221,7 +221,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')
-            ->with(array_map('trim', explode(',', $emails)), 'test', 'test');
+            ->with(array_map(trim(...), explode(',', $emails)), 'test', 'test');
 
         $this->userModel->expects($this->never())
             ->method('emailUser');
