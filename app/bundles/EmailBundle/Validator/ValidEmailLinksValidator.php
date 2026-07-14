@@ -98,6 +98,6 @@ final class ValidEmailLinksValidator extends ConstraintValidator
 
         $scheme = parse_url($url, PHP_URL_SCHEME);
 
-        return null !== $scheme && '' !== $scheme;
+        return in_array($scheme, ['http', 'https', 'mailto', 'tel', 'ftp', 'sms'], true);
     }
 }
