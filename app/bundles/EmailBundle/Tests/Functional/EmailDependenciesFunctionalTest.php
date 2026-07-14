@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Entity\Report;
 final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
+
     private EmailFixturesHelper $emailFixturesHelper;
 
     protected function setUp(): void
@@ -72,7 +73,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$segmentRead->getId(), $segmentSent->getId()]);
-        $this->assertStringContainsString("/s/segments?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/segments?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageInCampaigns(): void
@@ -87,7 +88,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$campaign->getId()]);
-        $this->assertStringContainsString("/s/campaigns?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/campaigns?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageWithoutDuplicates(): void
@@ -104,7 +105,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $formId = $formWithEmailSend->getId();
-        $this->assertStringNotContainsString("/s/forms?search=ids:{$formId},{$formId}", $jsonResponse['usagesHtml']);
+        $this->assertStringNotContainsString("/s/forms?search=ids:{$formId},{$formId}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageInForms(): void
@@ -123,7 +124,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$formWithEmailSend->getId(), $formWithEmailSendToUser->getId()]);
-        $this->assertStringContainsString("/s/forms?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/forms?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageInPointActions(): void
@@ -139,7 +140,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$pointActionIsSent->getId(), $pointActionIsOpen->getId()]);
-        $this->assertStringContainsString("/s/points?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/points?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageInPointTriggers(): void
@@ -154,7 +155,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$pointActionIsSent->getId()]);
-        $this->assertStringContainsString("/s/points/triggers?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/points/triggers?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     public function testEmailUsageInReports(): void
@@ -170,7 +171,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
         $searchIds = join(',', [$emailReport->getId(), $emailStatsReport->getId()]);
-        $this->assertStringContainsString("/s/reports?search=ids:{$searchIds}", $jsonResponse['usagesHtml']);
+        $this->assertStringContainsString("/s/reports?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
     private function createEmailReport(int $emailId): Report

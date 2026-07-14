@@ -14,32 +14,26 @@ class DecisionResultsEvent extends Event
      * @param ArrayCollection<int, LeadEventLog> $eventLogs
      */
     public function __construct(
-        private AbstractEventAccessor $eventConfig,
-        private ArrayCollection $eventLogs,
-        private EvaluatedContacts $evaluatedContacts,
+        private readonly AbstractEventAccessor $eventConfig,
+        private readonly ArrayCollection $eventLogs,
+        private readonly EvaluatedContacts $evaluatedContacts,
     ) {
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getEventConfig()
+    public function getEventConfig(): AbstractEventAccessor
     {
         return $this->eventConfig;
     }
 
     /**
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
-    public function getLogs()
+    public function getLogs(): ArrayCollection
     {
         return $this->eventLogs;
     }
 
-    /**
-     * @return EvaluatedContacts
-     */
-    public function getEvaluatedContacts()
+    public function getEvaluatedContacts(): EvaluatedContacts
     {
         return $this->evaluatedContacts;
     }

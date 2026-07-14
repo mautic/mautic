@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
 
-class NotifierTest extends MauticMysqlTestCase
+final class NotifierTest extends MauticMysqlTestCase
 {
     public function testNotifications(): void
     {

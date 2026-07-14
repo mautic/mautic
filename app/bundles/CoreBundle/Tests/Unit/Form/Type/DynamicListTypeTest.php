@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvents;
 final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FormBuilderInterface<FormBuilderInterface>
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -33,7 +33,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')
             ->with(
                 FormEvents::PRE_SUBMIT,
-                $this->callback(function ($formModifier) {
+                $this->callback(function ($formModifier): true {
                     $formEvent = $this->createMock(FormEvent::class);
 
                     $formEvent->expects($this->once())
@@ -58,7 +58,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addEventListener')
             ->with(
                 FormEvents::PRE_SUBMIT,
-                $this->callback(function ($formModifier) {
+                $this->callback(function ($formModifier): true {
                     $formEvent = $this->createMock(FormEvent::class);
                     $data      = [['content' => 'dynamic slot content']];
 

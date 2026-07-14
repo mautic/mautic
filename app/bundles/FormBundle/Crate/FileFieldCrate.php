@@ -8,23 +8,17 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileFieldCrate
 {
     public function __construct(
-        private UploadedFile $uploadedFile,
-        private Field $field,
+        private readonly UploadedFile $uploadedFile,
+        private readonly Field $field,
     ) {
     }
 
-    /**
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
+    public function getUploadedFile(): UploadedFile
     {
         return $this->uploadedFile;
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }

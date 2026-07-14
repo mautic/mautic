@@ -41,10 +41,8 @@ class CategoryApiController extends CommonApiController
      *
      * @param Category $entity
      * @param string   $action view|create|edit|publish|delete
-     *
-     * @return bool
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess($entity, $action = 'view'): bool
     {
         if (!$bundle = $entity->getBundle()) {
             $bundle = 'category';
@@ -58,13 +56,13 @@ class CategoryApiController extends CommonApiController
         }
 
         if ('create' != $action) {
-            $ownPerm   = "$permissionBase:{$action}own";
-            $otherPerm = "$permissionBase:{$action}other";
+            $ownPerm   = "{$permissionBase}:{$action}own";
+            $otherPerm = "{$permissionBase}:{$action}other";
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
         }
 
-        return $this->security->isGranted("$permissionBase:create");
+        return $this->security->isGranted("{$permissionBase}:create");
     }
 
     /**

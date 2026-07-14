@@ -1,5 +1,7 @@
-export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
+import { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
 import { patchBlocks, createBlockPatcher } from './blocks';
+
+export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser };
 
 export default (editor, opts = {}) => {
   const options = {
@@ -10,6 +12,11 @@ export default (editor, opts = {}) => {
     // Default token mapping for newly dropped components
     defaults: {
       text: 't-body',
+      heading1: 't-h1',
+      heading2: 't-h2',
+      heading3: 't-h3',
+      heading4: 't-h4',
+      subtitle: 't-lead',
       button: 't-btn t-btn-primary',
       buttonSecondary: 't-btn t-btn-secondary',
       section: 't-section t-surface-1',
@@ -194,7 +201,6 @@ export default (editor, opts = {}) => {
   registerHiddenMjAttributesTypes();
 
   editor.on('component:add', onComponentAdd);
-
 
   const patchBlocksWithContext = createBlockPatcher({
     editor,

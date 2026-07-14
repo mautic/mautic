@@ -29,8 +29,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FormType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
-        private LanguageHelper $langHelper,
+        private readonly CorePermissions $security,
+        private readonly LanguageHelper $langHelper,
     ) {
     }
 

@@ -9,11 +9,12 @@ use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
-    public static function validatePageHit($eventDetails, $action): bool
+    public static function validatePageHit($eventDetails, array $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
@@ -30,15 +31,11 @@ class PointActionHelper
             $limitToPages = $action['properties']['pages'];
         }
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToPages) || in_array($pageHitId, $limitToPages);
     }
 
-    public function validateUrlHit($eventDetails, $action): bool
+    public function validateUrlHit($eventDetails, array $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();

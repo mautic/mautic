@@ -51,7 +51,7 @@ class SubmitActionEmailType extends AbstractType
             $message = '';
 
             foreach ($fields as $token => $label) {
-                $message .= "<strong>$label</strong>: $token<br />";
+                $message .= "<strong>{$label}</strong>: {$token}<br />";
             }
         } else {
             $message = $options['data']['message'];

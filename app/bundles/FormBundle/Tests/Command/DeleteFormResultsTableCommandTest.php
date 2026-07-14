@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
+final class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
 {
     use FormTestHelperTrait;
 
@@ -62,7 +62,7 @@ class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
 
         $commandTester->execute([]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
         $outputMessage = $commandTester->getDisplay();
         $message       = "Dropped {$deletedForms} form results table whose forms have been deleted";
 

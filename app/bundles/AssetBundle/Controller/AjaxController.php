@@ -16,6 +16,7 @@ class AjaxController extends CommonAjaxController
     public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $assetModel = $this->getModel('asset');
+
         \assert($assetModel instanceof AssetModel);
         $filter     = InputHelper::clean($request->query->get('filter'));
         $results    = $assetModel->getLookupResults('category', $filter, 10);

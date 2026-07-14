@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerRedirectTest extends MauticMysqlTestCase
+final class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
@@ -31,7 +31,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        Assert::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -74,7 +74,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl());
     }
@@ -121,7 +121,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 

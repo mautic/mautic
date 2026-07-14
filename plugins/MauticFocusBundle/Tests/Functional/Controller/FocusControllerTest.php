@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Assert;
 
-class FocusControllerTest extends MauticMysqlTestCase
+final class FocusControllerTest extends MauticMysqlTestCase
 {
     public function testFocusWithProject(): void
     {
@@ -35,6 +35,7 @@ class FocusControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedFocus = $this->em->find(Focus::class, $focus->getId());
+        $this->assertInstanceOf(Focus::class, $savedFocus);
         Assert::assertSame($project->getId(), $savedFocus->getProjects()->first()->getId());
     }
 }

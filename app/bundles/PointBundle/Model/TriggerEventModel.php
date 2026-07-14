@@ -14,10 +14,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class TriggerEventModel extends CommonFormModel
 {
-    /**
-     * @return TriggerEventRepository
-     */
-    public function getRepository()
+    public function getRepository(): TriggerEventRepository
     {
         return $this->em->getRepository(TriggerEvent::class);
     }

@@ -17,11 +17,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private PointModel $pointModel,
-        private TriggerModel $pointTriggerModel,
-        private PointGroupModel $pointGroupModel,
-        private CorePermissions $security,
-        private GlobalSearch $globalSearch,
+        private readonly PointModel $pointModel,
+        private readonly TriggerModel $pointTriggerModel,
+        private readonly PointGroupModel $pointGroupModel,
+        private readonly CorePermissions $security,
+        private readonly GlobalSearch $globalSearch,
     ) {
     }
 

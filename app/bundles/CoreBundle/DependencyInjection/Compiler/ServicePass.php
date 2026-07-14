@@ -62,7 +62,7 @@ final class ServicePass implements CompilerPassInterface
 
                     foreach ($services as $name => $details) {
                         if (isset($serviceNames[$name])) {
-                            throw new \InvalidArgumentException("$name is already registered");
+                            throw new \InvalidArgumentException("{$name} is already registered");
                         }
                         $serviceNames[$name] = true;
 
@@ -118,7 +118,7 @@ final class ServicePass implements CompilerPassInterface
                         if ($container->hasDefinition($details['class'])) {
                             $definition = $container->getDefinition($details['class']);
 
-                            if ($definitionArguments) {
+                            if ([] !== $definitionArguments) {
                                 $definition->setArguments($definitionArguments);
                             }
                         } else {
@@ -272,7 +272,7 @@ final class ServicePass implements CompilerPassInterface
      * @param mixed   $argument
      * @param mixed[] $definitionArguments
      */
-    private function processArgument($argument, ContainerBuilder $container, &$definitionArguments): void
+    private function processArgument($argument, ContainerBuilder $container, array &$definitionArguments): void
     {
         if ('' === $argument) {
             // To be added during compilation

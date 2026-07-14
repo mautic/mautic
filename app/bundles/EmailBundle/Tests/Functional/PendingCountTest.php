@@ -42,7 +42,7 @@ final class PendingCountTest extends MauticMysqlTestCase
 
         $emailStat = new Stat();
         $emailStat->setEmail($email);
-        $emailStat->setLead(null);
+        $emailStat->setLead();
         $emailStat->setEmailAddress('deleted@contact.email');
         $emailStat->setDateSent(new \DateTime());
 

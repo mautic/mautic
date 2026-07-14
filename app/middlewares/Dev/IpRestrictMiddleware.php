@@ -44,7 +44,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      * This check prevents access to debug front controllers
      * that are deployed by accident to production servers.
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {

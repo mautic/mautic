@@ -17,12 +17,9 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
-class RelativeDateFunctionalTest extends MauticMysqlTestCase
+final class RelativeDateFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ReferenceRepository
-     */
-    private $fixtures;
+    private ReferenceRepository $fixtures;
 
     protected function setUp(): void
     {

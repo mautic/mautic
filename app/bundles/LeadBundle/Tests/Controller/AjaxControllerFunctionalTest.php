@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -58,7 +58,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->client->getResponse()->getContent()
         );
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
         // Let's remove the member now.
@@ -77,7 +77,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
     }
 
@@ -87,14 +87,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact  = $this->createContact('blabla@contact.email');
 
         $userRepository = $this->em->getRepository(User::class);
-        \assert($userRepository instanceof UserRepository);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
         $roleRepository = $this->em->getRepository(Role::class);
-        \assert($roleRepository instanceof RoleRepository);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -157,7 +157,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(400);
-        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
+        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', (string) $response->getContent());
     }
 
     public function testCompanyLookupWithLimit(): void
@@ -481,7 +481,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
-        $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
+        $this->assertInstanceOf(Lead::class, $updatedLead);
+        $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
     public function testContactListActionSuggestionsByAdminUser(): void
@@ -507,7 +508,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
 
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($owner);
             $leads[] = $lead;
         }
@@ -545,7 +546,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by admin user.
         for ($i = 1; $i <= 2; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($adminUser);
             $leads[] = $lead;
         }
@@ -587,7 +588,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by non-admin user.
         for ($i = 3; $i <= 4; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($nonAdminUser);
             $nonAdminLeads[] = $lead;
         }
@@ -634,8 +635,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert the response is successful
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('<form', $htmlContent, 'Response contains a form instead of just field order.');
-        $this->assertStringContainsString('<select', $htmlContent, 'Response contains select tag.');
+        $this->assertStringNotContainsString('<form', (string) $htmlContent, 'Response contains a form instead of just field order.');
+        $this->assertStringContainsString('<select', (string) $htmlContent, 'Response contains select tag.');
 
         // Parse the HTML content using DOMDocument
         $dom = new \DOMDocument();
@@ -655,7 +656,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {
-            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '$expectedValue' for object: $object, group: $group");
+            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '{$expectedValue}' for object: {$object}, group: {$group}");
         }
     }
 
@@ -691,12 +692,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
-        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
-        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
     public function testRemoveBounceStatusActionWithFlashMessage(): void
@@ -723,12 +724,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
-        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
-        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
     public function testFieldListAction(): void
@@ -845,10 +846,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         Assert::assertArrayHasKey('viewParameters', $response);
-        Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
+        Assert::assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()

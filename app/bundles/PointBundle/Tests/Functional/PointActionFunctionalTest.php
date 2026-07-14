@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\Point;
 
-class PointActionFunctionalTest extends MauticMysqlTestCase
+final class PointActionFunctionalTest extends MauticMysqlTestCase
 {
     public function testPointActionReadEmail(): void
     {
@@ -31,6 +31,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
 
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertEquals($pointAction->getDelta(), $lead->getPoints());
     }
@@ -52,9 +53,11 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
         $this->em->clear(Lead::class);
         $lead        = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
         $groupScore  = $lead->getGroupScores()->first();
 
         $this->assertEquals($pointAction->getDelta(), $groupScore->getScore());
+        $this->assertInstanceOf(Lead::class, $lead);
         // group point action shouldn't update main contact points
         $this->assertEquals(0, $lead->getPoints());
     }
@@ -75,9 +78,11 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
 
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         // Points should remain unchanged as no point actions are available
         $this->assertEquals($initialPoints, $lead->getPoints());
+        $this->assertInstanceOf(Lead::class, $lead);
         $this->assertEquals(0, $lead->getPoints());
     }
 

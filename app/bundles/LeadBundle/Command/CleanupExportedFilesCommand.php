@@ -22,7 +22,7 @@ class CleanupExportedFilesCommand extends Command
     private const CLEANUP_DAYS = 'cleanupAfterDays';
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }

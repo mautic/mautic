@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class EmailModelBuildUrlTest extends MauticMysqlTestCase
+final class EmailModelBuildUrlTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

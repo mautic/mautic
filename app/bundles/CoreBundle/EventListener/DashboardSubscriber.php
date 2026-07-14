@@ -27,7 +27,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Define the widget(s).
      *
-     * @var string
+     * @var array<string, array<string, string>>
      */
     protected $types = [
         self::TYPE_RECENT_ACTIVITY => [],
@@ -37,11 +37,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        private AuditLogModel $auditLogModel,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private CorePermissions $security,
-        private EventDispatcherInterface $dispatcher,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly CorePermissions $security,
+        private readonly EventDispatcherInterface $dispatcher,
         protected ModelFactory $modelFactory,
     ) {
     }
