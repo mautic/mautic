@@ -42,15 +42,15 @@ class InstallService
     public const FINAL_STEP = 3;
 
     public function __construct(
-        private Configurator $configurator,
-        private CacheHelper $cacheHelper,
+        private readonly Configurator $configurator,
+        private readonly CacheHelper $cacheHelper,
         protected PathsHelper $pathsHelper,
-        private EntityManager $entityManager,
-        private TranslatorInterface $translator,
-        private KernelInterface $kernel,
-        private ValidatorInterface $validator,
-        private UserPasswordHasher $hasher,
-        private FixturesLoaderInterface $fixturesLoader,
+        private readonly EntityManager $entityManager,
+        private readonly TranslatorInterface $translator,
+        private readonly KernelInterface $kernel,
+        private readonly ValidatorInterface $validator,
+        private readonly UserPasswordHasher $hasher,
+        private readonly FixturesLoaderInterface $fixturesLoader,
     ) {
     }
 
@@ -128,11 +128,7 @@ class InstallService
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been
         // performed; manually deleting these values or deleting the config file will be required to re-enter
         // installation.
-        if (empty($params['db_driver']) || empty($params['site_url'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($params['db_driver']) && !empty($params['site_url']);
     }
 
     /**
@@ -351,7 +347,7 @@ class InstallService
     {
         $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
-        if (!$fixtures) {
+        if ([] === $fixtures) {
             throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 

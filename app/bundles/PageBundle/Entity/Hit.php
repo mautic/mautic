@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
+
     /**
      * @var string
      */
@@ -110,7 +111,7 @@ class Hit
 
     /**
      * @var string
-     **/
+     */
     private $trackingId;
 
     /**
@@ -291,22 +292,15 @@ class Hit
         $metadata->addConstraint(new PageHit());
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set dateHit.
-     *
      * @param \DateTime $dateHit
-     *
-     * @return Hit
      */
-    public function setDateHit($dateHit)
+    public function setDateHit($dateHit): static
     {
         $this->dateHit = $dateHit;
 
@@ -314,8 +308,6 @@ class Hit
     }
 
     /**
-     * Get dateHit.
-     *
      * @return \DateTimeInterface
      */
     public function getDateHit()
@@ -333,10 +325,8 @@ class Hit
 
     /**
      * @param \DateTime $dateLeft
-     *
-     * @return Hit
      */
-    public function setDateLeft($dateLeft)
+    public function setDateLeft($dateLeft): static
     {
         $this->dateLeft = $dateLeft;
 
@@ -344,13 +334,9 @@ class Hit
     }
 
     /**
-     * Set country.
-     *
      * @param string $country
-     *
-     * @return Hit
      */
-    public function setCountry($country)
+    public function setCountry($country): static
     {
         $this->country = $country;
 
@@ -358,8 +344,6 @@ class Hit
     }
 
     /**
-     * Get country.
-     *
      * @return string
      */
     public function getCountry()
@@ -368,13 +352,9 @@ class Hit
     }
 
     /**
-     * Set region.
-     *
      * @param string $region
-     *
-     * @return Hit
      */
-    public function setRegion($region)
+    public function setRegion($region): static
     {
         $this->region = $region;
 
@@ -382,8 +362,6 @@ class Hit
     }
 
     /**
-     * Get region.
-     *
      * @return string
      */
     public function getRegion()
@@ -392,13 +370,9 @@ class Hit
     }
 
     /**
-     * Set city.
-     *
      * @param string $city
-     *
-     * @return Hit
      */
-    public function setCity($city)
+    public function setCity($city): static
     {
         $this->city = $city;
 
@@ -406,8 +380,6 @@ class Hit
     }
 
     /**
-     * Get city.
-     *
      * @return string
      */
     public function getCity()
@@ -416,13 +388,9 @@ class Hit
     }
 
     /**
-     * Set isp.
-     *
      * @param string $isp
-     *
-     * @return Hit
      */
-    public function setIsp($isp)
+    public function setIsp($isp): static
     {
         $this->isp = $isp;
 
@@ -430,8 +398,6 @@ class Hit
     }
 
     /**
-     * Get isp.
-     *
      * @return string
      */
     public function getIsp()
@@ -440,13 +406,9 @@ class Hit
     }
 
     /**
-     * Set organization.
-     *
      * @param string $organization
-     *
-     * @return Hit
      */
-    public function setOrganization($organization)
+    public function setOrganization($organization): static
     {
         $this->organization = $organization;
 
@@ -454,8 +416,6 @@ class Hit
     }
 
     /**
-     * Get organization.
-     *
      * @return string
      */
     public function getOrganization()
@@ -464,13 +424,9 @@ class Hit
     }
 
     /**
-     * Set code.
-     *
      * @param int $code
-     *
-     * @return Hit
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -478,8 +434,6 @@ class Hit
     }
 
     /**
-     * Get code.
-     *
      * @return int
      */
     public function getCode()
@@ -488,13 +442,9 @@ class Hit
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
-     *
-     * @return Hit
      */
-    public function setReferer($referer)
+    public function setReferer($referer): static
     {
         $this->referer = $referer;
 
@@ -502,8 +452,6 @@ class Hit
     }
 
     /**
-     * Get referer.
-     *
      * @return string
      */
     public function getReferer()
@@ -512,13 +460,9 @@ class Hit
     }
 
     /**
-     * Set url.
-     *
      * @param string $url
-     *
-     * @return Hit
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
@@ -526,8 +470,6 @@ class Hit
     }
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl()
@@ -536,13 +478,9 @@ class Hit
     }
 
     /**
-     * Set url title.
-     *
      * @param string $urlTitle
-     *
-     * @return Hit
      */
-    public function setUrlTitle($urlTitle)
+    public function setUrlTitle($urlTitle): static
     {
         $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
@@ -551,8 +489,6 @@ class Hit
     }
 
     /**
-     * Get url title.
-     *
      * @return string
      */
     public function getUrlTitle()
@@ -561,13 +497,9 @@ class Hit
     }
 
     /**
-     * Set userAgent.
-     *
      * @param string $userAgent
-     *
-     * @return Hit
      */
-    public function setUserAgent($userAgent)
+    public function setUserAgent($userAgent): static
     {
         $this->userAgent = $userAgent;
 
@@ -575,8 +507,6 @@ class Hit
     }
 
     /**
-     * Get userAgent.
-     *
      * @return string
      */
     public function getUserAgent()
@@ -585,13 +515,9 @@ class Hit
     }
 
     /**
-     * Set remoteHost.
-     *
      * @param string $remoteHost
-     *
-     * @return Hit
      */
-    public function setRemoteHost($remoteHost)
+    public function setRemoteHost($remoteHost): static
     {
         $this->remoteHost = $remoteHost;
 
@@ -599,8 +525,6 @@ class Hit
     }
 
     /**
-     * Get remoteHost.
-     *
      * @return string
      */
     public function getRemoteHost()
@@ -608,30 +532,19 @@ class Hit
         return $this->remoteHost;
     }
 
-    /**
-     * Set page.
-     *
-     * @return Hit
-     */
-    public function setPage(?Page $page = null)
+    public function setPage(?Page $page = null): static
     {
         $this->page = $page;
 
         return $this;
     }
 
-    /**
-     * @return ?Page
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }
 
-    /**
-     * @return Hit
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -648,10 +561,8 @@ class Hit
 
     /**
      * @param string $trackingId
-     *
-     * @return Hit
      */
-    public function setTrackingId($trackingId)
+    public function setTrackingId($trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -659,8 +570,6 @@ class Hit
     }
 
     /**
-     * Get trackingId.
-     *
      * @return string|null
      */
     public function getTrackingId()
@@ -669,13 +578,9 @@ class Hit
     }
 
     /**
-     * Set pageLanguage.
-     *
      * @param string $pageLanguage
-     *
-     * @return Hit
      */
-    public function setPageLanguage($pageLanguage)
+    public function setPageLanguage($pageLanguage): static
     {
         $this->pageLanguage = $pageLanguage;
 
@@ -683,8 +588,6 @@ class Hit
     }
 
     /**
-     * Get pageLanguage.
-     *
      * @return string
      */
     public function getPageLanguage()
@@ -693,13 +596,9 @@ class Hit
     }
 
     /**
-     * Set browserLanguages.
-     *
      * @param array<string> $browserLanguages
-     *
-     * @return Hit
      */
-    public function setBrowserLanguages($browserLanguages)
+    public function setBrowserLanguages($browserLanguages): static
     {
         $this->browserLanguages = $browserLanguages;
 
@@ -707,8 +606,6 @@ class Hit
     }
 
     /**
-     * Get browserLanguages.
-     *
      * @return array<string>
      */
     public function getBrowserLanguages()
@@ -724,10 +621,7 @@ class Hit
         return $this->lead;
     }
 
-    /**
-     * @return Hit
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -744,10 +638,8 @@ class Hit
 
     /**
      * @param string $source
-     *
-     * @return Hit
      */
-    public function setSource($source)
+    public function setSource($source): static
     {
         $this->source = $source;
 
@@ -764,10 +656,8 @@ class Hit
 
     /**
      * @param int $sourceId
-     *
-     * @return Hit
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): static
     {
         $this->sourceId = (int) $sourceId;
 
@@ -782,10 +672,7 @@ class Hit
         return $this->redirect;
     }
 
-    /**
-     * @return Hit
-     */
-    public function setRedirect(Redirect $redirect)
+    public function setRedirect(Redirect $redirect): static
     {
         $this->redirect = $redirect;
 
@@ -812,10 +699,8 @@ class Hit
 
     /**
      * @param array $query
-     *
-     * @return Hit
      */
-    public function setQuery($query)
+    public function setQuery($query): static
     {
         $this->query = $query;
 
@@ -830,10 +715,7 @@ class Hit
         return $this->device;
     }
 
-    /**
-     * @return Hit
-     */
-    public function setDeviceStat(LeadDevice $device)
+    public function setDeviceStat(LeadDevice $device): static
     {
         $this->device = $device;
 

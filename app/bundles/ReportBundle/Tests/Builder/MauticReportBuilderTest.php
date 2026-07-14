@@ -22,10 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class MauticReportBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
 
     /**
      * @var MockObject|Connection
@@ -37,10 +33,8 @@ final class MauticReportBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->connection          = $this->getMockedConnection();
-        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             new QueryBuilder($this->connection),
@@ -283,7 +277,7 @@ final class MauticReportBuilderTest extends TestCase
     private function buildBuilder(Report $report): MauticReportBuilder
     {
         return new MauticReportBuilder(
-            $this->dispatcher,
+            $this->createStub(EventDispatcherInterface::class),
             $this->connection,
             $report,
             $this->channelListHelper

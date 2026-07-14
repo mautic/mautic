@@ -43,7 +43,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($success, $responseData['success'], $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, $responseData['newContent']);
+            Assert::assertStringContainsString($expectedString, (string) $responseData['newContent']);
         }
     }
 
@@ -203,7 +203,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, $response->getContent());
+            Assert::assertStringContainsString($expectedString, (string) $response->getContent());
         }
     }
 }

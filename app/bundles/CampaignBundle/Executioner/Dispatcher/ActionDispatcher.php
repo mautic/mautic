@@ -21,10 +21,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ActionDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
-        private EventScheduler $scheduler,
-        private LegacyEventDispatcher $legacyDispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly EventScheduler $scheduler,
+        private readonly LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 
@@ -47,11 +47,11 @@ class ActionDispatcher
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success) {
+            if ($success->count()) {
                 $this->dispatchExecutedEvent($config, $event, $success);
             }
 
-            if ($failed) {
+            if ($failed->count()) {
                 $this->dispatchFailedEvent($config, $failed);
             }
 

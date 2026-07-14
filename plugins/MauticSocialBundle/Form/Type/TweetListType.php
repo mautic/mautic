@@ -26,7 +26,7 @@ class TweetListType extends AbstractType
                     'limit'  => 0,
                     'start'  => 0,
                 ],
-                'ajax_lookup_action' => fn (Options $options) => 'mauticSocial:getLookupChoiceList',
+                'ajax_lookup_action' => fn (Options $options): string => 'mauticSocial:getLookupChoiceList',
                 'multiple'           => true,
                 'required'           => false,
             ]

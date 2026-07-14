@@ -9,7 +9,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use PHPUnit\Framework\Assert;
 
-class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
+final class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
 {
     public function testHideSocialMonitoring(): void
     {

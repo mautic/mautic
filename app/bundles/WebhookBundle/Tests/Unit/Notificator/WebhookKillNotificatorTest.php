@@ -71,14 +71,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private ?string $modifiedBy = null;
 
-    /**
-     * @var MockObject|UserRepository
-     */
-    private $userRepositoryMock;
-
     private WebhookNotificationSender $webhookNotificationSender;
-
-    private EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -88,18 +81,17 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock        = $this->createMock(MailHelper::class);
         $this->coreParamHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->webhook               = $this->createMock(Webhook::class);
-        $this->userRepositoryMock    = $this->createMock(UserRepository::class);
         $twig                        = $this->createMock(Environment::class);
-        $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
         $webhookNotificationEventMock =  $this->createMock(WebhookNotificationEvent::class);
         $webhookNotificationEventMock->method('canSend')->willReturn(true);
 
-        $twig->expects(self::once())
+        $twig->expects($this->once())
             ->method('render')
             ->willReturn($this->details);
 
-        $this->eventDispatcher->method('dispatch')
+        $eventDispatcher->method('dispatch')
             ->willReturn(
                 $webhookNotificationEventMock
             );
@@ -109,8 +101,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             $this->entityManagerMock,
             $this->mailHelperMock,
             $this->coreParamHelperMock,
-            $this->userRepositoryMock,
-            $this->eventDispatcher
+            $this->createStub(UserRepository::class),
+            $eventDispatcher
         );
     }
 
@@ -219,7 +211,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private function mockCommonMethods(int $sentToAuthor, ?string $emailToSend = null): void
     {
-        $this->coreParamHelperMock->expects($this->any())
+        $this->coreParamHelperMock
             ->method('get')
             ->willReturnOnConsecutiveCalls('from_name', $sentToAuthor, $emailToSend);
 
@@ -232,7 +224,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
         $matcher = $this->exactly(2);
         $this->translatorMock->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.webhook.stopped', $parameters[0]);
 
@@ -249,6 +241,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
                     return $this->details;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->webhook->expects($this->once())
@@ -287,7 +281,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $modifiedByEmail = 'modified-by@email.com';
         $htmlUrl         = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
 
-        $this->translatorMock
+        $this->translatorMock->expects($this->exactly(2))
             ->method('trans')
             ->willReturnMap([
                 ['mautic.webhook.stopped', [], null, null, $subject],
@@ -317,7 +311,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('getModifiedBy')
             ->willReturn($modifiedById);
 
-        $this->entityManagerMock
+        $this->entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->willReturnMap([
                 [User::class, $createdById, $owner],
@@ -379,12 +373,12 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $generatedRoute = 'generatedRoute';
         $details        = 'details';
         $createdById    = 1;
-        $owner          = $this->createMock(User::class);
+        $owner          = $this->createStub(User::class);
         $ownerEmail     = 'owner@email.com';
         $modifiedBy     = null;
         $htmlUrl        = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
 
-        $this->translatorMock
+        $this->translatorMock->expects($this->exactly(2))
             ->method('trans')
             ->willReturnMap([
                 ['mautic.webhook.stopped', [], null, null, $subject],

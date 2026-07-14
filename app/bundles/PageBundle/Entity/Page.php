@@ -171,7 +171,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $category;
 
@@ -326,7 +326,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $metadata->addConstraint(new Callback(
             function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
-                if (!is_null($type)) {
+                if (null !== $type) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
@@ -414,8 +414,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -424,13 +422,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set title.
-     *
      * @param string $title
-     *
-     * @return Page
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -439,8 +433,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get title.
-     *
      * @return string
      */
     public function getTitle()
@@ -449,13 +441,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
-     *
-     * @return Page
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -464,8 +452,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get alias.
-     *
      * @return string
      */
     public function getAlias()
@@ -474,13 +460,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set content.
-     *
      * @param array<string> $content
-     *
-     * @return Page
      */
-    public function setContent($content)
+    public function setContent($content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -489,8 +471,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get content.
-     *
      * @return array<string>
      */
     public function getContent()
@@ -499,13 +479,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
-     *
-     * @return Page
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -514,8 +490,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -524,13 +498,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
-     *
-     * @return Page
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -539,8 +509,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()
@@ -549,13 +517,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set hits.
-     *
      * @param int $hits
-     *
-     * @return Page
      */
-    public function setHits($hits)
+    public function setHits($hits): static
     {
         $this->hits = $hits;
 
@@ -563,8 +527,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get hits.
-     *
      * @param bool $includeVariants
      *
      * @return int|mixed
@@ -575,13 +537,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set revision.
-     *
      * @param int $revision
-     *
-     * @return Page
      */
-    public function setRevision($revision)
+    public function setRevision($revision): static
     {
         $this->revision = $revision;
 
@@ -589,8 +547,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get revision.
-     *
      * @return int
      */
     public function getRevision()
@@ -599,13 +555,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set metaDescription.
-     *
      * @param string $metaDescription
-     *
-     * @return Page
      */
-    public function setMetaDescription($metaDescription)
+    public function setMetaDescription($metaDescription): static
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -614,8 +566,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get metaDescription.
-     *
      * @return string|null
      */
     public function getMetaDescription()
@@ -624,13 +574,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set headScript.
-     *
      * @param string $headScript
-     *
-     * @return Page
      */
-    public function setHeadScript($headScript)
+    public function setHeadScript($headScript): static
     {
         $this->headScript = $headScript;
 
@@ -638,8 +584,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get headScript.
-     *
      * @return string|null
      */
     public function getHeadScript()
@@ -648,13 +592,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set footerScript.
-     *
      * @param string $footerScript
-     *
-     * @return Page
      */
-    public function setFooterScript($footerScript)
+    public function setFooterScript($footerScript): static
     {
         $this->footerScript = $footerScript;
 
@@ -662,8 +602,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get footerScript.
-     *
      * @return string|null
      */
     public function getFooterScript()
@@ -673,10 +611,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * @param ?string $redirectType
-     *
-     * @return Page
      */
-    public function setRedirectType($redirectType)
+    public function setRedirectType($redirectType): static
     {
         $this->isChanged('redirectType', $redirectType);
         $this->redirectType = $redirectType;
@@ -693,13 +629,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set redirectUrl.
-     *
      * @param string $redirectUrl
-     *
-     * @return Page
      */
-    public function setRedirectUrl($redirectUrl)
+    public function setRedirectUrl($redirectUrl): static
     {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
@@ -708,8 +640,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get redirectUrl.
-     *
      * @return string|null
      */
     public function getRedirectUrl()
@@ -717,12 +647,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectUrl;
     }
 
-    /**
-     * Set category.
-     *
-     * @return Page
-     */
-    public function setCategory(?Category $category = null)
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -731,8 +656,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get category.
-     *
      * @return Category|null
      */
     public function getCategory()
@@ -742,10 +665,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * @param bool|null $isPreferenceCenter
-     *
-     * @return Page
      */
-    public function setIsPreferenceCenter($isPreferenceCenter)
+    public function setIsPreferenceCenter($isPreferenceCenter): static
     {
         $sanitizedValue = null === $isPreferenceCenter ? null : (bool) $isPreferenceCenter;
         $this->isChanged('isPreferenceCenter', $sanitizedValue);
@@ -781,13 +702,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set sessionId.
-     *
      * @param string $id
-     *
-     * @return Page
      */
-    public function setSessionId($id)
+    public function setSessionId($id): static
     {
         $this->sessionId = $id;
 
@@ -795,8 +712,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get sessionId.
-     *
      * @return string
      */
     public function getSessionId()
@@ -805,13 +720,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set template.
-     *
      * @param string $template
-     *
-     * @return Page
      */
-    public function setTemplate($template)
+    public function setTemplate($template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -820,8 +731,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get template.
-     *
      * @return string|null
      */
     public function getTemplate()
@@ -829,10 +738,10 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->template;
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -846,13 +755,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set uniqueHits.
-     *
      * @param int $uniqueHits
-     *
-     * @return Page
      */
-    public function setUniqueHits($uniqueHits)
+    public function setUniqueHits($uniqueHits): static
     {
         $this->uniqueHits = $uniqueHits;
 
@@ -860,8 +765,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get uniqueHits.
-     *
      * @return int
      */
     public function getUniqueHits($includeVariants = false)
@@ -905,7 +808,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function hasDraft(): bool
     {
-        return !is_null($this->getDraft());
+        return null !== $this->getDraft();
     }
 
     public function getDraftContent(): ?string

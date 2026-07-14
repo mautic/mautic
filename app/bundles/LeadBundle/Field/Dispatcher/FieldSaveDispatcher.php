@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldSaveDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EntityManager $entityManager,
     ) {
     }
 

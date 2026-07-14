@@ -52,7 +52,7 @@ class TagModel extends FormModel
      */
     public function getEntity($id = null): ?Tag
     {
-        if (is_null($id)) {
+        if (null === $id) {
             return new Tag();
         }
 
@@ -103,7 +103,7 @@ class TagModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new TagEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

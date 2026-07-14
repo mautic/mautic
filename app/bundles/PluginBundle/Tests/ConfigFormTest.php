@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -18,24 +20,34 @@ use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class ConfigFormTest extends KernelTestCase
+final class ConfigFormTest extends KernelTestCase
 {
     protected function setUp(): void
     {
         self::bootKernel();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
+    }
+
     public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
-        foreach ($plugins as $name => $s) {
-            $featureSettings = $s->getFormSettings();
+        foreach ($plugins as $plugin) {
+            $featureSettings = $plugin->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);
             $this->assertArrayHasKey('requires_authorization', $featureSettings);
             if ($featureSettings['requires_callback']) {
-                $this->assertNotEmpty($s->getAuthCallbackUrl());
+                $this->assertNotEmpty($plugin->getAuthCallbackUrl());
             }
         }
     }
@@ -116,12 +128,9 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject(): IntegrationHelper
     {
-        // create an integration object
-        $pathsHelper          = $this->createMock(PathsHelper::class);
         $bundleHelper         = $this->createMock(BundleHelper::class);
         $pluginModel          = $this->createMock(PluginModel::class);
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $twig                 = $this->createMock(Environment::class);
         $entityManager        = $this->createMock(EntityManager::class);
 
         $pluginRepository = $this->createMock(PluginRepository::class);
@@ -135,7 +144,7 @@ class ConfigFormTest extends KernelTestCase
 
         $integrationRepository = $this->createMock(IntegrationRepository::class);
 
-        $entityManager
+        $entityManager->expects($this->exactly(3))
                 ->method('getRepository')
                 ->willReturnMap(
                     [
@@ -156,16 +165,14 @@ class ConfigFormTest extends KernelTestCase
                 'MauticCrmBundle' => ['id' => 1],
             ]);
 
-        $integrationHelper = new IntegrationHelper(
+        return new IntegrationHelper(
             self::getContainer(),
             $entityManager,
-            $pathsHelper,
+            $this->createStub(PathsHelper::class),
             $bundleHelper,
             $coreParametersHelper,
-            $twig,
+            $this->createStub(Environment::class),
             $pluginModel
         );
-
-        return $integrationHelper;
     }
 }

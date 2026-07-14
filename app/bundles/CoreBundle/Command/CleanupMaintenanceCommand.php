@@ -29,12 +29,12 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     public const NAME = 'mautic:maintenance:cleanup';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -142,7 +142,7 @@ EOT
             $debug = $event->getDebug();
 
             foreach ($debug as $key => $query) {
-                $output->writeln("<info>$key</info>");
+                $output->writeln("<info>{$key}</info>");
                 $output->writeln($query);
             }
         }

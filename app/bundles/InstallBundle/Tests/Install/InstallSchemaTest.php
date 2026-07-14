@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\DBAL\Connection;
@@ -15,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @template T of AbstractPlatform
  */
-class InstallSchemaTest extends TestCase
+final class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 
@@ -31,7 +33,7 @@ class InstallSchemaTest extends TestCase
      */
     private AbstractSchemaManager $schemaManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         EnvLoader::load();
@@ -65,7 +67,7 @@ class InstallSchemaTest extends TestCase
         $this->schemaManager->createTable($t);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

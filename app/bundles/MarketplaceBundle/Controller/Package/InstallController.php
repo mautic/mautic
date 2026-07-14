@@ -23,9 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 class InstallController extends CommonController
 {
     public function __construct(
-        private PackageModel $packageModel,
-        private RouteProvider $routeProvider,
-        private Config $config,
+        private readonly PackageModel $packageModel,
+        private readonly RouteProvider $routeProvider,
+        private readonly Config $config,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -47,7 +47,7 @@ class InstallController extends CommonController
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             || !$this->config->isComposerEnabled()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(

@@ -48,17 +48,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailType extends AbstractType
 {
-    private bool $isDraftEnabled;
+    private readonly bool $isDraftEnabled;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EntityManagerInterface $em,
-        private StageModel $stageModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private ThemeHelperInterface $themeHelper,
-        private CorePermissions $corePermissions,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $em,
+        private readonly StageModel $stageModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
-        private EmailDefaultsHelper $defaultsHelper,
+        private readonly EmailDefaultsHelper $defaultsHelper,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
@@ -230,7 +230,7 @@ class EmailType extends AbstractType
         );
 
         $template = $emailEntity->getTemplate() ?? 'blank';
-        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getTemplate())) {
+        if ($this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getTemplate())) {
             $template = $emailEntity->getDraft()->getTemplate();
         }
         // If theme does not exist, set empty
@@ -283,7 +283,7 @@ class EmailType extends AbstractType
         );
 
         $html = $emailEntity->getCustomHtml();
-        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getHtml())) {
+        if ($this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getHtml())) {
             $html = $emailEntity->getDraft()->getHtml();
         }
         $builder->add(
@@ -407,26 +407,30 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isVariant): void {
-            if ($isVariant) {
-                $event->getForm()->add(
-                    'variantSettings',
-                    VariantType::class,
-                    [
-                        'label' => false,
-                    ]
-                );
-            }
+        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false): void {
+            $event->getForm()->add(
+                'variantSettings',
+                VariantType::class,
+                [
+                    'label'       => 'mautic.core.ab_test.form.abtest_settings',
+                    'required'    => false,
+                    'is_parent'   => $isParent,
+                    'is_existing' => $isExisting,
+                    'data'        => $event->getData() instanceof Email ? $event->getData()->getVariantSettings() : [],
+                ]
+            );
         };
 
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier): void {
-                $variantSettingsModifier(
-                    $event,
-                    $event->getData()->getVariantParent()
-                );
+                /** @var Email $emailEntity */
+                $emailEntity     = $event->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
+                $isExisting      = $event->getData()->getId() > 0;
+                $variantSettingsModifier($event, $isParent, $isExisting);
             }
         );
 
@@ -435,10 +439,13 @@ class EmailType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($variantSettingsModifier): void {
                 $data = $event->getData();
-                $variantSettingsModifier(
-                    $event,
-                    !empty($data['variantParent'])
-                );
+
+                /** @var Email $emailEntity */
+                $emailEntity     = $event->getForm()->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent        = $variantChildren && count($variantChildren) > 0;
+
+                $variantSettingsModifier($event, $isParent);
 
                 $emailType = $data['emailType'] ?? null;
 

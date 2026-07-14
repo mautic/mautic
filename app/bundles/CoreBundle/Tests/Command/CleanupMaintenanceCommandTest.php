@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 
-class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
+final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

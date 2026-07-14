@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 
-class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
+final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -42,6 +42,7 @@ class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         self::assertNull($listModel->getEntity($segmentId));
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
+        $this->assertInstanceOf(LeadList::class, $deletedEntity);
         self::assertSame($segmentId, $deletedEntity->getId());
 
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME, ['list-id' => $segmentId]);
@@ -78,6 +79,7 @@ class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         self::assertNull($listModel->getEntity($segmentBId));
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentBId);
+        $this->assertInstanceOf(LeadList::class, $deletedEntity);
         self::assertSame($segmentBId, $deletedEntity->getId());
         // command without  args --list-id
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME);
@@ -114,7 +116,7 @@ class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
     {
         // Add 1 segment
         $segmentRepo = $this->em->getRepository(LeadList::class);
-        \assert($segmentRepo instanceof LeadListRepository);
+        $this->assertInstanceOf(LeadListRepository::class, $segmentRepo);
 
         $segment = new LeadList();
         $filters = [

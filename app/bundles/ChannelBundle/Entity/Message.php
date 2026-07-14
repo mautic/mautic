@@ -173,10 +173,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?string $name
-     *
-     * @return Message
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -194,10 +192,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?string $description
-     *
-     * @return Message
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -215,10 +211,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?\DateTime $publishUp
-     *
-     * @return Message
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -236,10 +230,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?\DateTime $publishDown
-     *
-     * @return Message
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -257,10 +249,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?Category $category
-     *
-     * @return Message
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -278,10 +268,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ArrayCollection<int,Channel> $channels
-     *
-     * @return Message
      */
-    public function setChannels($channels)
+    public function setChannels($channels): static
     {
         $this->isChanged('channels', $channels);
         $this->channels = $channels;

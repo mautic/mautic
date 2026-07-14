@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
-class MailboxTest extends \PHPUnit\Framework\TestCase
+final class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig(): void
     {
@@ -18,9 +20,9 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             'use_attachments' => false,
         ];
 
-        $parametersHelper = $this->createMock(CoreParametersHelper::class);
+        $parametersHelper = $this->createStub(CoreParametersHelper::class);
 
-        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper = $this->createStub(PathsHelper::class);
 
         $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 
@@ -179,7 +181,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper = $this->createStub(PathsHelper::class);
 
         $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 

@@ -9,11 +9,11 @@ use Twig\TwigFunction;
 
 final class HtmlExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
-            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
+            new TwigFunction('htmlAttributesStringToArray', $this->convertHtmlAttributesToArray(...)),
+            new TwigFunction('htmlEntityDecode', $this->htmlEntityDecode(...)),
         ];
     }
 
@@ -41,7 +41,7 @@ final class HtmlExtension extends AbstractExtension
         }
 
         try {
-            $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
+            $attributes = current((array) new \SimpleXMLElement("<element {$attributes} />"));
         } catch (\Exception) {
             return [];
         }
