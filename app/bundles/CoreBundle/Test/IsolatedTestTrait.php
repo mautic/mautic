@@ -11,10 +11,10 @@ trait IsolatedTestTrait
      */
     public static function setUpBeforeClass(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            EnvLoader::load();
-            $prefix = false === getenv('MAUTIC_DB_PREFIX') ? 'test_' : getenv('MAUTIC_DB_PREFIX');
-            define('MAUTIC_TABLE_PREFIX', $prefix);
-        }
+        //        if (!defined('MAUTIC_TABLE_PREFIX')) {
+        //            EnvLoader::load();
+        //            $prefix = false === getenv('MAUTIC_DB_PREFIX') ? 'test_' : getenv('MAUTIC_DB_PREFIX');
+        //            define('MAUTIC_TABLE_PREFIX', $prefix);
+        //        }
     }
 }

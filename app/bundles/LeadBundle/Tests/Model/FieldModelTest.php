@@ -258,8 +258,6 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testUniqueIdentifierIndexToggleForContacts(): void
     {
         // Log queries so we can detect if alter queries were executed
-
-        /** @phpstan-ignore-line SQLLogger is deprecated */
         $stack = new class() implements SQLLogger {
             /**
              * @var array<mixed>
