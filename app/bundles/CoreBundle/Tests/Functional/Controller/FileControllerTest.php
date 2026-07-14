@@ -24,7 +24,7 @@ final class FileControllerTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
         $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
-        Assert::assertTrue(file_exists($uploadedImage));
+        Assert::assertFileExists($uploadedImage);
     }
 
     public function testImageUploadFailure(): void

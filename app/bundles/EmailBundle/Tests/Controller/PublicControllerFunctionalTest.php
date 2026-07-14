@@ -95,7 +95,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
     }
 
     public function testContactPreferencesLandingPageTracking(): void
@@ -159,7 +159,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -173,7 +173,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -187,7 +187,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringNotContainsString('form/submit?formId=', $crawler->html());
+        $this->assertStringNotContainsString('form/submit?formId=', $crawler->html());
         $this->assertResponseIsSuccessful();
     }
 
@@ -213,7 +213,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
-        $this->assertEquals(0, $dncCollection->count());
+        $this->assertCount(0, $dncCollection);
     }
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void

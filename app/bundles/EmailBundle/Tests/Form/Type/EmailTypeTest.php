@@ -69,7 +69,7 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
-                    function ($name) use (&$names): true {
+                    function (string|FormBuilderInterface $name) use (&$names): true {
                         $names[] = $name;
 
                         return true;

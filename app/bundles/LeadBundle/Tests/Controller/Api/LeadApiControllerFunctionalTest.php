@@ -1119,7 +1119,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($clientResponse->getContent(), true);
 
-        self::assertCount(3, $response['contacts']);
+        $this->assertCount(3, $response['contacts']);
 
         $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertSame($contact1->getId(), $response['contacts'][0]['id']);
