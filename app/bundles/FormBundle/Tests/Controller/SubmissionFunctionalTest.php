@@ -149,6 +149,20 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             'expectedRedirectContains'    => '/form/message',
             'expectedRedirectNotContains' => 'any-domain.com',
         ];
+
+        yield 'relative URL with backslash is rejected' => [
+            'returnUrl'                   => '/\attacker.example/evil',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.example',
+        ];
+
+        yield 'absolute URL with backslash is rejected' => [
+            'returnUrl'                   => 'https://attacker.example\@mautic7.ddev.site/evil',
+            'corsValidDomains'            => ['https://mautic7.ddev.site'],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.example',
+        ];
     }
 
     /**

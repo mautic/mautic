@@ -122,7 +122,14 @@ final class PublicController extends CommonFormController
             return null;
         }
 
-        $return = InputHelper::url((string) $return, false, null, null, ['mauticError', 'mauticMessage'], true);
+        $rawReturn = (string) $return;
+        $return = InputHelper::url($rawReturn, false, null, null, ['mauticError', 'mauticMessage'], true);
+
+        // Reject URLs containing backslashes or @ signs that could be misinterpreted
+        // by browsers differently than PHP's parse_url.
+        if (str_contains($return, '\\') || (str_contains($return, '@') && !str_starts_with($return, '/'))) {
+            return null;
+        }
 
         // Allow relative URLs (starting with /)
         if (str_starts_with($return, '/') && !str_starts_with($return, '//')) {
@@ -134,11 +141,23 @@ final class PublicController extends CommonFormController
             return null;
         }
 
-        // Allow same-origin URLs
+        // Allow same-origin URLs (comparing scheme, host, and port)
         $siteUrl = (string) $this->coreParametersHelper->get('site_url');
         if ('' !== $siteUrl) {
-            $siteHost = parse_url($siteUrl, PHP_URL_HOST);
-            if ($siteHost && strtolower($siteHost) === strtolower($returnHost)) {
+            $siteScheme = parse_url($siteUrl, PHP_URL_SCHEME);
+            $siteHost   = parse_url($siteUrl, PHP_URL_HOST);
+            $sitePort   = parse_url($siteUrl, PHP_URL_PORT);
+
+            $returnScheme = parse_url($return, PHP_URL_SCHEME);
+            $returnPort   = parse_url($return, PHP_URL_PORT);
+
+            // Normalize ports: null means default port for the scheme
+            $sitePort   = $sitePort ?? ('https' === $siteScheme ? 443 : 80);
+            $returnPort = $returnPort ?? ('https' === $returnScheme ? 443 : 80);
+
+            if ($siteHost && strtolower($siteScheme) === strtolower($returnScheme)
+                && strtolower($siteHost) === strtolower($returnHost)
+                && $sitePort === $returnPort) {
                 return $return;
             }
         }
@@ -254,9 +273,17 @@ final class PublicController extends CommonFormController
         $post   = $this->getSubmittedPost($request);
         $server = $request->server->all();
 
-        // Remove the user-controlled 'return' field so it is not stored as the submission referrer.
-        // The SubmissionModel will fall back to HTTP_REFERER which is a trusted browser header.
-        unset($post['return']);
+        // Validate and replace the user-controlled 'return' field with a trusted URL.
+        // This preserves the submission referrer metadata and repost actions, but prevents
+        // untrusted URLs from being stored or used for redirects.
+        $trustedReturn = $this->getTrustedReturnUrl($request);
+        if (null !== $trustedReturn) {
+            $post['return'] = $trustedReturn;
+        } else {
+            // If the provided return URL is untrusted, remove it so SubmissionModel falls back
+            // to HTTP_REFERER which is a trusted browser header.
+            unset($post['return']);
+        }
 
         $result = $this->submissionModel->saveSubmission($post, $server, $form, $request, true);
 
