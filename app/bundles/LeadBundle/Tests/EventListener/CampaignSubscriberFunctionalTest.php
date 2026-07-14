@@ -1142,20 +1142,18 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array{string, string, string, bool}>
+     * @return \Iterator<int, array{string, string, string, bool}>
      */
-    public static function regexOperatorProvider(): array
+    public static function regexOperatorProvider(): \Iterator
     {
-        return [
-            // [operator, regex, fieldValue, expectedResult]
-            [OperatorOptions::REGEXP, "^\d{4}-03-24$", '2026-03-24', true],
-            [OperatorOptions::REGEXP, "^\d{4}-12-31$", '2026-03-24', false],
-            [OperatorOptions::REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', true],
-            [OperatorOptions::REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', false],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-31$", '2026-03-24', true],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-24$", '2026-03-24', false],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', true],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', false],
-        ];
+        // [operator, regex, fieldValue, expectedResult]
+        yield [OperatorOptions::REGEXP, "^\d{4}-03-24$", '2026-03-24', true];
+        yield [OperatorOptions::REGEXP, "^\d{4}-12-31$", '2026-03-24', false];
+        yield [OperatorOptions::REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', true];
+        yield [OperatorOptions::REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', false];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-12-31$", '2026-03-24', true];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-03-24$", '2026-03-24', false];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', true];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', false];
     }
 }
