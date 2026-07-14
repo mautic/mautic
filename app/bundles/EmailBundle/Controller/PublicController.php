@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
@@ -226,8 +227,8 @@ class PublicController extends CommonFormController
 
                 $formView = $form->createView();
 
-                /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $emailDefaultsHelper->resolvePreferenceCenter($email))) {
+                $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
+                if ($prefCenter instanceof Page) {
                     // Set the page language if there is no lead preferred locale
                     if (empty($language) && $language = $prefCenter->getLanguage()) {
                         $this->translator->setLocale($language);
