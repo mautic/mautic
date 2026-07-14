@@ -511,17 +511,14 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content, $response->getContent());
-        self::assertArrayHasKey('success', $content);
-        self::assertSame(0, $content['success']);
-        self::assertArrayHasKey('error', $content);
+        $this->assertCount(2, $content, $response->getContent());
+        $this->assertArrayHasKey('success', $content);
+        $this->assertSame(0, $content['success']);
+        $this->assertArrayHasKey('error', $content);
         // Check the logged/displayed URL has no auth details.
-        self::assertStringStartsWith(
-            'Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to',
-            $content['error']
-        );
+        $this->assertStringStartsWith('Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to', $content['error']);
 
-        self::assertCount(0, $mockHandler);
+        $this->assertCount(0, $mockHandler);
     }
 
     public function testGetIpLookupForm(): void
@@ -542,13 +539,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content);
-        self::assertArrayHasKey('attribution', $content);
-        self::assertArrayHasKey('html', $content);
-        self::assertIsString($content['html']);
-        self::assertStringContainsString('ip_lookup_config', $content['html']);
+        $this->assertCount(2, $content);
+        $this->assertArrayHasKey('attribution', $content);
+        $this->assertArrayHasKey('html', $content);
+        $this->assertIsString($content['html']);
+        $this->assertStringContainsString('ip_lookup_config', $content['html']);
 
-        self::assertStringNotContainsString('_token', $content['html']);
+        $this->assertStringNotContainsString('_token', $content['html']);
     }
 
     private function loginOtherUser(string $name): void

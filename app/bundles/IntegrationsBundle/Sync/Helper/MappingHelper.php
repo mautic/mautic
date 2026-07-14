@@ -94,7 +94,7 @@ class MappingHelper
 
         $foundObjects = $event->getFoundObjects();
 
-        if (!$foundObjects) {
+        if ([] === $foundObjects) {
             // No contacts were found
             return new ObjectDAO($internalObjectName, null);
         }

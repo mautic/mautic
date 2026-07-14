@@ -367,10 +367,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('getOneOrNullResult')
             ->willReturn($leadField);
 
-        self::assertSame(
-            $leadField,
-            $this->repository->getFieldThatIsMissingColumn()
-        );
+        $this->assertSame($leadField, $this->repository->getFieldThatIsMissingColumn());
     }
 
     private function createQueryMock(): MockObject

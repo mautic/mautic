@@ -63,7 +63,7 @@ abstract class MonitorTwitterBaseCommand extends Command
     /**
      * Command configuration. Set the name, description, and options here.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(

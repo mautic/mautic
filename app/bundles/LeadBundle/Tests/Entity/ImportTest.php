@@ -99,7 +99,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity()
             ->setLineCount(100);
 
-        $this->assertSame(0.0, $import->getProgressPercentage());
+        $this->assertEqualsWithDelta(0.0, $import->getProgressPercentage(), PHP_FLOAT_EPSILON);
 
         $import->setIgnoredCount(3);
 
@@ -177,26 +177,26 @@ final class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(0.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
 
         $import->setInsertedCount(900);
         $import->end(false);
 
         $this->fakeImportStartDate($import, 600);
 
-        $this->assertSame(1.5, $import->getSpeed());
+        $this->assertEqualsWithDelta(1.5, $import->getSpeed(), PHP_FLOAT_EPSILON);
     }
 
     public function testGetSpeedWhenRunTimeIsUnderOneSecond(): void
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(0.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
 
         $import->setInsertedCount(3);
         $import->end(false);
 
-        $this->assertSame(3.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(3.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
     }
 
     /**

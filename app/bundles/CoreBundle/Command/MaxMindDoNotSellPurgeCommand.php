@@ -31,7 +31,7 @@ class MaxMindDoNotSellPurgeCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -122,7 +122,7 @@ EOT
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
         $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
 
-        if (!$matchedIps) {
+        if ([] === $matchedIps) {
             return;
         }
 

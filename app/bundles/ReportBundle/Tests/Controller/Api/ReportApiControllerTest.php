@@ -108,7 +108,7 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
         }
         $report   = $this->createReportData($createByIdUser);
 
-        if ($permissions) {
+        if ([] !== $permissions) {
             $this->setPermission($user, $permissions);
         }
         // Disable the default login.

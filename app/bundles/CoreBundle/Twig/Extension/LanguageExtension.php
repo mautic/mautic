@@ -15,7 +15,7 @@ class LanguageExtension extends AbstractExtension
     ) {
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('language_name', $this->getLanguageName(...)),

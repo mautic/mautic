@@ -29,12 +29,12 @@ final class GrapeJsDataTest extends MauticMysqlTestCase
             'bundle'      => 'GrapesJsBuilderBundle',
         ];
         $plugin = $this->em->getRepository(Plugin::class)->findOneBy($findOneByCriteria);
-        self::assertNull($plugin);
+        $this->assertNotInstanceOf(Plugin::class, $plugin);
 
         $this->loadFixtures([GrapesJsData::class]);
 
         $plugin = $this->em->getRepository(Plugin::class)->findOneBy($findOneByCriteria);
-        self::assertInstanceOf(Plugin::class, $plugin);
+        $this->assertInstanceOf(Plugin::class, $plugin);
 
         $integration = $this->em->getRepository(Integration::class)->findOneBy(
             [
@@ -43,6 +43,6 @@ final class GrapeJsDataTest extends MauticMysqlTestCase
                 'plugin'      => $plugin,
             ]
         );
-        self::assertInstanceOf(Integration::class, $integration);
+        $this->assertInstanceOf(Integration::class, $integration);
     }
 }

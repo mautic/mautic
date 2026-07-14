@@ -118,7 +118,7 @@ final class UpdateHelperTest extends TestCase
         $this->assertFalse($result['error']);
 
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
-        $this->assertTrue(file_exists($updatePackage));
+        $this->assertFileExists($updatePackage);
         @unlink($updatePackage);
     }
 

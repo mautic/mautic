@@ -269,7 +269,7 @@ final class OwnerSubscriberTest extends TestCase
             );
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);

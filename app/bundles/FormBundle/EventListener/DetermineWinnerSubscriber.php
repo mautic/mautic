@@ -50,7 +50,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         if (null != $startDate) {
             $counts = ('page' === $type) ? $this->submissionRepository->getSubmissionCountsByPage($ids, $startDate) : $this->submissionRepository->getSubmissionCountsByEmail($ids, $startDate);
 
-            if ($counts) {
+            if ([] !== $counts) {
                 $submissions = $support = $data = [];
                 $hasResults  = [];
 
