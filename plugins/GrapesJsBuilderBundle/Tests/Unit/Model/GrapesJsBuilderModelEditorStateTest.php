@@ -88,7 +88,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EmailRepository $emailRepository */
         $emailRepository = $this->createMock(EmailRepository::class);
-        $emailRepository->expects(self::never())->method('saveEntity');
+        $emailRepository->expects($this->never())->method('saveEntity');
 
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
@@ -97,7 +97,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects(self::never())->method('getRepository');
+        $entityManager->expects($this->never())->method('getRepository');
 
         $model = $this->getModel($requestStack, $emailModel, $entityManager);
 
@@ -143,8 +143,8 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EntityManager $entityManagerNoEditor */
         $entityManagerNoEditor = $this->createMock(EntityManager::class);
-        $entityManagerNoEditor->expects(self::never())->method('persist');
-        $entityManagerNoEditor->expects(self::never())->method('flush');
+        $entityManagerNoEditor->expects($this->never())->method('persist');
+        $entityManagerNoEditor->expects($this->never())->method('flush');
 
         $modelNoEditor = $this->getModel($requestStackNoEditor, $emailModel, $entityManagerNoEditor);
         $modelNoEditor->addOrEditPageEntity(new Page());

@@ -40,14 +40,14 @@ final class TokenHelperTest extends TestCase
     {
         $content = 'content';
 
-        self::assertSame([], $this->helper->findFocusTokens($content));
+        $this->assertSame([], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFound(): void
     {
         $content = 'content {focus=1}';
 
-        self::assertSame(['{focus=1}' => ''], $this->helper->findFocusTokens($content));
+        $this->assertSame(['{focus=1}' => ''], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFoundAddScriptByFocusPublishedStatus(): void
@@ -63,10 +63,7 @@ final class TokenHelperTest extends TestCase
             ->with($focusItemId)
             ->willReturn($focusItem);
 
-        self::assertSame(
-            ['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'],
-            $this->helper->findFocusTokens($content)
-        );
+        $this->assertSame(['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFoundAddScriptByAccessCheck(): void
@@ -93,9 +90,6 @@ final class TokenHelperTest extends TestCase
             )
             ->willReturn(true);
 
-        self::assertSame(
-            ['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'],
-            $this->helper->findFocusTokens($content)
-        );
+        $this->assertSame(['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'], $this->helper->findFocusTokens($content));
     }
 }

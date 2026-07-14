@@ -121,7 +121,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with([], $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException('Something happened')));
+            ->willThrowException(new EmailCouldNotBeSentException('Something happened'));
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
         $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);

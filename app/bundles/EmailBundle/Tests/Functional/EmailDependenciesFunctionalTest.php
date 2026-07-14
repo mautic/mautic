@@ -72,7 +72,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$segmentRead->getId(), $segmentSent->getId()]);
+        $searchIds = implode(',', [$segmentRead->getId(), $segmentSent->getId()]);
         $this->assertStringContainsString("/s/segments?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
@@ -87,7 +87,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$campaign->getId()]);
+        $searchIds = implode(',', [$campaign->getId()]);
         $this->assertStringContainsString("/s/campaigns?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
@@ -123,7 +123,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$formWithEmailSend->getId(), $formWithEmailSendToUser->getId()]);
+        $searchIds = implode(',', [$formWithEmailSend->getId(), $formWithEmailSendToUser->getId()]);
         $this->assertStringContainsString("/s/forms?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
@@ -139,7 +139,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$pointActionIsSent->getId(), $pointActionIsOpen->getId()]);
+        $searchIds = implode(',', [$pointActionIsSent->getId(), $pointActionIsOpen->getId()]);
         $this->assertStringContainsString("/s/points?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
@@ -154,7 +154,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$pointActionIsSent->getId()]);
+        $searchIds = implode(',', [$pointActionIsSent->getId()]);
         $this->assertStringContainsString("/s/points/triggers?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 
@@ -170,7 +170,7 @@ final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $jsonResponse   = json_decode($clientResponse->getContent(), true);
 
-        $searchIds = join(',', [$emailReport->getId(), $emailStatsReport->getId()]);
+        $searchIds = implode(',', [$emailReport->getId(), $emailStatsReport->getId()]);
         $this->assertStringContainsString("/s/reports?search=ids:{$searchIds}", (string) $jsonResponse['usagesHtml']);
     }
 

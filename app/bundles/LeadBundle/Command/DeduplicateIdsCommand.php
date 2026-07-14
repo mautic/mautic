@@ -61,7 +61,7 @@ EOT
         $progressBar    = new ProgressBar($output, $duplicateCount);
         $stopwatch      = new Stopwatch();
 
-        if (!$contactIds) {
+        if ([] === $contactIds) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
             return Command::FAILURE;

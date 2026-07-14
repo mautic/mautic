@@ -13,7 +13,7 @@ class DateTimeExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('dateTimeGetUtcDateTime', $this->getUtcDateTime(...), ['is_safe' => ['all']]),
