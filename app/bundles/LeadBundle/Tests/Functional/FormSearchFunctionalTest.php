@@ -27,8 +27,8 @@ final class FormSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $leadRepository = $this->em->getRepository(Lead::class);
-        self::assertInstanceOf(LeadRepository::class, $leadRepository);
-        self::assertContains('mautic.lead.lead.searchcommand.form', $leadRepository->getSearchCommands());
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
+        $this->assertContains('mautic.lead.lead.searchcommand.form', $leadRepository->getSearchCommands());
 
         $this->assertSearchResult('form%3Anewsletter-form', [$submittedContact], [$otherSubmittedContact, $notSubmittedContact]);
         $this->assertSearchResult('!form%3Anewsletter-form', [$otherSubmittedContact, $notSubmittedContact], [$submittedContact]);
@@ -77,11 +77,11 @@ final class FormSearchFunctionalTest extends MauticMysqlTestCase
         $responseText = $crawler->text();
 
         foreach ($expectedContacts as $expectedContact) {
-            self::assertStringContainsString($expectedContact->getEmail(), $responseText);
+            $this->assertStringContainsString($expectedContact->getEmail(), $responseText);
         }
 
         foreach ($notExpectedContacts as $notExpectedContact) {
-            self::assertStringNotContainsString($notExpectedContact->getEmail(), $responseText);
+            $this->assertStringNotContainsString($notExpectedContact->getEmail(), $responseText);
         }
     }
 }
