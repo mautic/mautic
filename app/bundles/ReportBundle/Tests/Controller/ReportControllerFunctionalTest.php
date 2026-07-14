@@ -544,19 +544,19 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
-        self::assertFileExists($csvPath);
+        $this->assertFileExists($csvPath);
 
         // Pretend Mautic has created a ZIP file as in \Mautic\ReportBundle\Scheduler\Model\FileHandler::zipIt
         $zipPath      = str_replace('.csv', '.zip', $csvPath);
         $bytesWritten = file_put_contents($zipPath, 'ZIP');
-        self::assertNotFalse($bytesWritten);
-        self::assertFileExists($zipPath);
+        $this->assertNotFalse($bytesWritten);
+        $this->assertFileExists($zipPath);
 
         $queuedMessage = self::getMailerMessagesByToAddress($toAddress);
 
-        self::assertCount(1, $queuedMessage);
-        self::assertFileExists($csvPath);
-        self::assertFileExists($zipPath);
+        $this->assertCount(1, $queuedMessage);
+        $this->assertFileExists($csvPath);
+        $this->assertFileExists($zipPath);
     }
 
     /**

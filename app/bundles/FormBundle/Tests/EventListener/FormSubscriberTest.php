@@ -103,7 +103,7 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::never())
+        $this->mailer->expects($this->never())
             ->method('send');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -227,7 +227,7 @@ New line',
         $this->mailer->expects($this->once())
             ->method('send');
 
-        $this->mailer->expects(self::never())
+        $this->mailer->expects($this->never())
             ->method('setTo');
         $this->mailer->expects($this->once())
             ->method('setCc')
@@ -415,11 +415,11 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('reset');
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('send');
-        $matcher = self::exactly(3);
+        $matcher = $this->exactly(3);
 
         $this->mailer->expects($matcher)
             ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail): true {
@@ -441,20 +441,20 @@ New line',
         $this->mailer->expects($this->once())
             ->method('setBcc')
             ->with([$bcc => null]);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
