@@ -50,8 +50,9 @@ final class LeadDeviceRepositoryTest extends MauticMysqlTestCase
         $existingDevice       = $leadDeviceRepository->findExistingDevice($newDevice);
 
         // Using assertTrue instead of assertNull to reduce test output
-        $this->assertTrue(
-            null === $existingDevice,
+        $this->assertNotInstanceOf(
+            LeadDevice::class,
+            $existingDevice,
             'The existing device should be null because the device has a different OS.'
         );
     }

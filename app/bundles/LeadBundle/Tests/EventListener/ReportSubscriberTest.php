@@ -286,32 +286,28 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return \Iterator<int, array<int, string>>
      */
-    public static function eventDataProvider(): array
+    public static function eventDataProvider(): \Iterator
     {
-        return [
-            ['leads'],
-            ['contact.frequencyrules'],
-            ['lead.pointlog'],
-            ['contact.attribution.first'],
-            ['contact.attribution.multi'],
-            ['contact.attribution.last'],
-            ['companies'],
-        ];
+        yield ['leads'];
+        yield ['contact.frequencyrules'];
+        yield ['lead.pointlog'];
+        yield ['contact.attribution.first'];
+        yield ['contact.attribution.multi'];
+        yield ['contact.attribution.last'];
+        yield ['companies'];
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return \Iterator<int, array<int, string>>
      */
-    public static function reportGraphEventDataProvider(): array
+    public static function reportGraphEventDataProvider(): \Iterator
     {
-        return [
-            ['leads'],
-            ['lead.pointlog'],
-            ['contact.attribution.multi'],
-            ['companies'],
-        ];
+        yield ['leads'];
+        yield ['lead.pointlog'];
+        yield ['contact.attribution.multi'];
+        yield ['companies'];
     }
 
     public function testNotRelevantContextBuilder(): void

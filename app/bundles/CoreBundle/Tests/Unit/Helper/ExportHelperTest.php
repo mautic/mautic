@@ -116,9 +116,9 @@ final class ExportHelperTest extends TestCase
         $zip = new \ZipArchive();
         $zip->open($zipFilePath);
 
-        $this->assertTrue(false !== $zip->locateName('entity_data.json'));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath1)));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath2)));
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
 
         $zip->close();
 

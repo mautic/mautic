@@ -150,7 +150,7 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
             ->executeQuery()
             ->fetchAllAssociative();
 
-        $actualLeadIds  = array_map('intval', array_column($result, 'id'));
+        $actualLeadIds  = array_map(intval(...), array_column($result, 'id'));
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadFour->getId(), $leadFive->getId()];

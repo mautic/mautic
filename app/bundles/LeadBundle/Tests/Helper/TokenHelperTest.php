@@ -273,16 +273,13 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array<int, int|string>>
+     * @return \Iterator<int, array<int, (int|string)>>
      */
-    public static function dataLabelProvider(): array
+    public static function dataLabelProvider(): \Iterator
     {
-        return
-            [
-                ['{contactfield=select}', 'first'],
-                ['{contactfield=select|label}', 'First option'],
-                ['{contactfield=bool}', 1],
-                ['{contactfield=bool|label}', 'Yes'],
-            ];
+        yield ['{contactfield=select}', 'first'];
+        yield ['{contactfield=select|label}', 'First option'];
+        yield ['{contactfield=bool}', 1];
+        yield ['{contactfield=bool|label}', 'Yes'];
     }
 }

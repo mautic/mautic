@@ -696,7 +696,8 @@ class FormController extends CommonFormController
                     )
                 );
             }
-            if ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+
+            if ($valid && $this->isButtonClicked($form, 'apply')) {
                 // Rebuild everything to include new ids
                 $reorder    = true;
 

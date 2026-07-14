@@ -14,9 +14,9 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
     {
         $providers = BlockedFreeEmailProvidersHelper::load();
 
-        self::assertIsArray($providers);
-        self::assertNotEmpty($providers);
-        self::assertContainsOnly('string', $providers);
+        $this->assertIsArray($providers);
+        $this->assertNotEmpty($providers);
+        $this->assertContainsOnly('string', $providers);
     }
 
     public function testLoadReturnsArrayOfStrings(): void
@@ -24,8 +24,8 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
         $providers = BlockedFreeEmailProvidersHelper::load();
 
         foreach ($providers as $provider) {
-            self::assertIsString($provider);
-            self::assertNotEmpty($provider);
+            $this->assertIsString($provider);
+            $this->assertNotEmpty($provider);
         }
     }
 
@@ -34,6 +34,6 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
         $providers = BlockedFreeEmailProvidersHelper::load();
 
         // The JSON file should contain providers
-        self::assertGreaterThan(0, count($providers));
+        $this->assertGreaterThan(0, count($providers));
     }
 }

@@ -217,7 +217,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->will($this->throwException(new ORMException()));
+            ->willThrowException(new ORMException());
 
         $entity = $this->initImportEntity(['canProceed']);
 

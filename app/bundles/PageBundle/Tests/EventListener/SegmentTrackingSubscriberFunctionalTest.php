@@ -161,9 +161,9 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
             Assert::assertGreaterThan(0, (int) $id, 'Segment ID should be positive');
         }
 
-        $sortedIds = array_map('intval', $segmentIds);
+        $sortedIds = array_map(intval(...), $segmentIds);
         sort($sortedIds);
-        Assert::assertSame($sortedIds, array_map('intval', $segmentIds), 'Segment IDs should be sorted numerically');
+        Assert::assertSame($sortedIds, array_map(intval(...), $segmentIds), 'Segment IDs should be sorted numerically');
     }
 
     /**
