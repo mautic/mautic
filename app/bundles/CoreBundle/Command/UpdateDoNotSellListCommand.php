@@ -16,13 +16,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateDoNotSellListCommand extends Command
 {
     public function __construct(
-        private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
-        private TranslatorInterface $translator,
+        private readonly MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
+        private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(

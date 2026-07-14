@@ -10,13 +10,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class PageHelperTest extends \PHPUnit\Framework\TestCase
+final class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SessionInterface $session;
-
-    private MockObject&RequestStack $requestStack;
-
-    private MockObject&CoreParametersHelper $coreParametersHelper;
 
     private PageHelper $pageHelper;
 
@@ -24,11 +20,10 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->session              = $this->createMock(SessionInterface::class);
-        $this->requestStack         = $this->createMock(RequestStack::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pageHelper           = new PageHelper($this->requestStack, $this->coreParametersHelper, 'mautic.test', 0);
+        $requestStack               = $this->createMock(RequestStack::class);
+        $this->pageHelper           = new PageHelper($requestStack, $this->createStub(CoreParametersHelper::class), 'mautic.test', 0);
 
-        $this->requestStack->method('getSession')->willReturn($this->session);
+        $requestStack->method('getSession')->willReturn($this->session);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('PageProvider')]
@@ -42,7 +37,9 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    /**
+     * @return array<int, array{0: int, 1: int, 2: int}>
+     */
     public static function pageProvider(): array
     {
         return [
@@ -69,7 +66,9 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    /**
+     * @return array<int, array{0: int, 1: int, 2: int}>
+     */
     public static function startProvider(): array
     {
         return [

@@ -72,6 +72,9 @@ class FieldType extends AbstractType
                 $formTypeOptions = array_merge($formTypeOptions, $customParams['formTypeOptions']);
             }
 
+            $addInputAttributes     = (bool) ($customParams['builderOptions']['addInputAttributes'] ?? true);
+            $addContainerAttributes = (bool) ($customParams['builderOptions']['addContainerAttributes'] ?? true);
+
             $addFields = [
                 'labelText',
                 'addHelpMessage',
@@ -80,9 +83,7 @@ class FieldType extends AbstractType
                 'addDefaultValue',
                 'addLabelAttributes',
                 'labelAttributesText',
-                'addInputAttributes',
                 'inputAttributesText',
-                'addContainerAttributes',
                 'containerAttributesText',
                 'addMappedFieldList',
                 'addSaveResult',
@@ -300,7 +301,7 @@ class FieldType extends AbstractType
                 'labelAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
+                    'label'      => $labelAttributesText ?? 'mautic.form.field.form.labelattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
@@ -317,7 +318,7 @@ class FieldType extends AbstractType
                 'inputAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
+                    'label'      => $inputAttributesText ?? 'mautic.form.field.form.inputattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
@@ -372,7 +373,7 @@ class FieldType extends AbstractType
         }
 
         if ($addSaveResult) {
-            $default = (!isset($options['data']['saveResult']) || null === $options['data']['saveResult']) ? true
+            $default = !isset($options['data']['saveResult']) ? true
                 : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
@@ -401,7 +402,7 @@ class FieldType extends AbstractType
                 ]
             );
 
-            $default = (!isset($options['data']['showWhenValueExists']) || null === $options['data']['showWhenValueExists']) ? true
+            $default = !isset($options['data']['showWhenValueExists']) ? true
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
                 'showWhenValueExists',
@@ -498,7 +499,7 @@ class FieldType extends AbstractType
                     ChoiceType::class,
                     [
                         'choices'     => $fields->toChoices(),
-                        'choice_attr' => function ($val) use ($fields): array {
+                        'choice_attr' => function (string $val) use ($fields): array {
                             try {
                                 $field = $fields->getFieldByKey($val);
                                 if ($field->isListType()) {
@@ -537,7 +538,7 @@ class FieldType extends AbstractType
 
         $builder->add('type', HiddenType::class);
 
-        $update = (!empty($options['data']['id'])) ? true : false;
+        $update = !empty($options['data']['id']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
             $btnIcon  = 'ri-edit-line';

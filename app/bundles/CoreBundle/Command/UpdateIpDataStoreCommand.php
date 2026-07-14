@@ -20,13 +20,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AbstractLookup $ipService,
+        private readonly TranslatorInterface $translator,
+        private readonly AbstractLookup $ipService,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setHelp(
@@ -51,7 +51,7 @@ EOT
                     $output->writeln('<error>'.$this->translator->trans(
                         'mautic.core.ip_lookup.remote_fetch_error',
                         [
-                            '%remoteUrl%' => $remoteUrl,
+                            '%remoteUrl%' => AbstractLocalDataLookup::cleanUrl($remoteUrl),
                             '%localPath%' => $localPath,
                         ]
                     ).'</error>');

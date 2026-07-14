@@ -10,10 +10,10 @@ use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ShortenerTest extends TestCase
+final class ShortenerTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -29,7 +29,7 @@ class ShortenerTest extends TestCase
     public function testAddService(): void
     {
         /** @var ShortenerServiceInterface|MockObject $service */
-        $service = $this->createMock(ShortenerServiceInterface::class);
+        $service = $this->createStub(ShortenerServiceInterface::class);
 
         $this->shortener->addService($service);
 
@@ -39,7 +39,7 @@ class ShortenerTest extends TestCase
     public function testGetService(): void
     {
         /** @var ShortenerServiceInterface|MockObject $service */
-        $service = $this->createMock(ShortenerServiceInterface::class);
+        $service = $this->createStub(ShortenerServiceInterface::class);
 
         $this->coreParametersHelper
             ->expects($this->once())
@@ -83,7 +83,7 @@ class ShortenerTest extends TestCase
 
     public function testGetEnabledServices(): void
     {
-        $enabledService = new class implements ShortenerServiceInterface {
+        $enabledService = new class() implements ShortenerServiceInterface {
             public function shortenUrl(string $url): string
             {
                 return 'shortUrl';
@@ -100,7 +100,7 @@ class ShortenerTest extends TestCase
             }
         };
 
-        $disabledService = new class implements ShortenerServiceInterface {
+        $disabledService = new class() implements ShortenerServiceInterface {
             public function shortenUrl(string $url): string
             {
                 return 'shortUrl';

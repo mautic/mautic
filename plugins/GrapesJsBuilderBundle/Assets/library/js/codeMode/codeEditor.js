@@ -1,6 +1,5 @@
-// import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
-import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import MjmlService from '../preset-mautic/mjml/mjml.service';
+import ContentService from '../preset-mautic/content.service';
 
 class CodeEditor {
   editor;
@@ -101,6 +100,8 @@ class CodeEditor {
         const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
         this.editor.setComponents(parsedContent);
       }
+
+      this.editor.trigger('mautic:code-editor-update');
 
       this.editor.Modal.close();
     } catch (e) {

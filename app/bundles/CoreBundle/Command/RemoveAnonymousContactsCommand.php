@@ -20,9 +20,9 @@ class RemoveAnonymousContactsCommand extends Command
     public const COMMAND_NAME = 'mautic:remove:anonymous_contacts';
 
     public function __construct(
-        private ListLeadRepository $listLeadRepository,
-        private LeadRepository $campaignLeadRepository,
-        private LeadEventLogRepository $campaignLeadEventLog,
+        private readonly ListLeadRepository $listLeadRepository,
+        private readonly LeadRepository $campaignLeadRepository,
+        private readonly LeadEventLogRepository $campaignLeadEventLog,
     ) {
         parent::__construct();
     }

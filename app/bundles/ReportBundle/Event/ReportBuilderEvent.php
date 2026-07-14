@@ -35,12 +35,12 @@ class ReportBuilderEvent extends AbstractReportEvent
      * @param mixed[]|Paginator|array $leadFields list of published array of lead fields
      */
     public function __construct(
-        private TranslatorInterface $translator,
-        private ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly ChannelListHelper $channelListHelper,
         string $context,
-        private array|Paginator $leadFields,
-        private ReportHelper $reportHelper,
-        private ?string $reportSource = null,
+        private readonly array|Paginator $leadFields,
+        private readonly ReportHelper $reportHelper,
+        private readonly ?string $reportSource = null,
     ) {
         $this->context = $context;
     }
@@ -54,10 +54,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $context Context for data
      * @param array  $data    Data array for the table
-     *
-     * @return ReportBuilderEvent
      */
-    public function addTable($context, array $data, $group = null)
+    public function addTable($context, array $data, $group = null): static
     {
         $data['group'] = (null == $group) ? $context : $group;
 
@@ -98,10 +96,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Fetch the tables in the lookup array.
-     *
-     * @return array
      */
-    public function getTables()
+    public function getTables(): array
     {
         return $this->tableArray;
     }
@@ -117,11 +113,11 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param string $prefix
+     * @param string[] $removeColumns
      *
      * @return array<string,array<string,string>>
      */
-    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null): array
+    public function getStandardColumns(string $prefix, array $removeColumns = [], $idLink = null): array
     {
         return $this->reportHelper->getStandardColumns($prefix, $removeColumns, (string) $idLink);
     }
@@ -273,10 +269,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * @param array $options
-     *
-     * @return $this
      */
-    public function addGraph($context, $type, $graphId, $options = [])
+    public function addGraph($context, $type, $graphId, $options = []): static
     {
         if (in_array($type, $this->supportedGraphs)) {
             $this->graphArray[$context][$graphId] = [
@@ -288,12 +282,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * Get graphs.
-     *
-     * @return array
-     */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphArray;
     }

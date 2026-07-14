@@ -29,10 +29,7 @@ class BatchIdToEntityHelper
         return !empty($this->ids);
     }
 
-    /**
-     * @return array
-     */
-    public function getIds()
+    public function getIds(): array
     {
         return $this->ids;
     }
@@ -42,10 +39,7 @@ class BatchIdToEntityHelper
         return !empty($this->errors);
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -78,7 +72,7 @@ class BatchIdToEntityHelper
                     fn ($entity): bool => $id == $entity->getPreviousId()
                 );
 
-                if ($hasPreviousId) {
+                if ([] !== $hasPreviousId) {
                     $orderedEntities[$key] = array_shift($hasPreviousId);
                 }
 

@@ -19,8 +19,8 @@ class TransifexFactory
     private ?TransifexInterface $transifex = null;
 
     public function __construct(
-        private ClientInterface $client,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly ClientInterface $client,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

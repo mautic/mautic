@@ -31,9 +31,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private UserModel $model,
-        private LanguageHelper $languageHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly UserModel $model,
+        private readonly LanguageHelper $languageHelper,
     ) {
     }
 
@@ -107,7 +107,7 @@ class UserType extends AbstractType
         $existing    = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
-        $required = ($existing) ? false : true;
+        $required = !$existing;
         $builder->add(
             'plainPassword',
             RepeatedType::class,

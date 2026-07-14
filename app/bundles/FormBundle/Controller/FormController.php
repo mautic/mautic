@@ -36,8 +36,8 @@ class FormController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
-        private MappedObjectCollector $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -52,12 +52,7 @@ class FormController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -76,7 +71,7 @@ class FormController extends CommonFormController
         );
 
         if (!$permissions['form:forms:viewown'] && !$permissions['form:forms:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -155,10 +150,8 @@ class FormController extends CommonFormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         /** @var FormModel $model */
         $model      = $this->getModel('form');
@@ -189,13 +182,14 @@ class FormController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $activeForm->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $permissions = $this->security->isGranted(
@@ -300,7 +294,7 @@ class FormController extends CommonFormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('form:forms:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -320,7 +314,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -554,13 +548,14 @@ class FormController extends CommonFormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:editown',
             'form:forms:editother',
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'form.form');
@@ -570,7 +565,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // set added/updated fields
@@ -689,7 +684,8 @@ class FormController extends CommonFormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            }
+            if ($valid && $form->get('buttons')->get('apply')->isClicked()) {
                 // Rebuild everything to include new ids
                 $reorder    = true;
 
@@ -871,7 +867,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -1014,7 +1010,7 @@ class FormController extends CommonFormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'form.form');
             }
@@ -1084,7 +1080,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {
@@ -1146,7 +1142,7 @@ class FormController extends CommonFormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var FormModel $model */
             $model = $this->getModel('form');
             $ids   = json_decode($request->query->get('ids', ''));
@@ -1167,7 +1163,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {

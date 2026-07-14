@@ -67,15 +67,13 @@ class LeadController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
     public function indexAction(
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
         $page = 1,
-    ) {
+    ): Response {
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -93,7 +91,7 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -115,7 +113,7 @@ class LeadController extends FormController
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -130,13 +128,13 @@ class LeadController extends FormController
         $anonymousShowing = false;
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         $results = $model->getEntities([
@@ -185,7 +183,7 @@ class LeadController extends FormController
 
         $listArgs = [];
         if (!$this->security->isGranted('lead:lists:viewother')) {
-            $listArgs['filter']['force'] = " $mine";
+            $listArgs['filter']['force'] = " {$mine}";
         }
 
         $leadListModel = $this->getModel('lead.list');
@@ -193,10 +191,10 @@ class LeadController extends FormController
         $lists = $leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = 1 === substr_count($search, "$listCommand:");
+        $inSingleList = 1 === substr_count($search, "{$listCommand}:");
         $list         = [];
         if ($inSingleList) {
-            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+            preg_match("/{$listCommand}:(.*?)(?=\s|$)/", $search, $matches);
 
             if (!empty($matches[1])) {
                 $alias = $matches[1];
@@ -266,7 +264,7 @@ class LeadController extends FormController
             && !$permissions['lead:leads:editown']
             && !$permissions['lead:leads:editother']
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -337,10 +335,8 @@ class LeadController extends FormController
 
     /**
      * Loads a specific lead into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -397,7 +393,7 @@ class LeadController extends FormController
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fields            = $lead->getFields();
@@ -497,7 +493,7 @@ class LeadController extends FormController
         $lead  = $model->getEntity();
 
         if (!$this->security->isGranted('lead:leads:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -702,13 +698,14 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($lead)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $lead, 'lead.lead');
@@ -759,8 +756,8 @@ class LeadController extends FormController
                     $image = $form['preferred_profile_image']->getData();
                     if ('custom' == $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        $file = $form['custom_avatar']->getData();
+                        if ($file instanceof UploadedFile) {
                             $this->uploadAvatar($request, $avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update
@@ -813,7 +810,8 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
@@ -980,11 +978,12 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {
-                        return $this->accessDenied();
+                        $this->throwAccessDenied();
                     } elseif ($model->isLocked($mainLead)) {
                         // deny access if the entity is locked
                         return $this->isLocked($postActionVars, $secLead, 'lead');
@@ -1055,10 +1054,8 @@ class LeadController extends FormController
 
     /**
      * Generates contact frequency rules form and action.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactFrequencyAction(Request $request, $objectId)
+    public function contactFrequencyAction(Request $request, $objectId): Response
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -1071,7 +1068,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $viewParameters = [
@@ -1169,7 +1166,7 @@ class LeadController extends FormController
                 $entity->getPermissionUser()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'lead.lead');
             } else {
@@ -1238,7 +1235,7 @@ class LeadController extends FormController
                     $entity->getPermissionUser()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
                 } else {
@@ -1583,10 +1580,8 @@ class LeadController extends FormController
      * Bulk edit lead campaigns.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0)
+    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
@@ -1705,10 +1700,8 @@ class LeadController extends FormController
 
     /**
      * Bulk add leads to the DNC list.
-     *
-     * @return JsonResponse|Response
      */
-    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model)
+    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model): JsonResponse|Response
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
@@ -1783,10 +1776,8 @@ class LeadController extends FormController
      * Bulk edit lead stages.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchStagesAction(Request $request, $objectId = 0)
+    public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             /** @var LeadModel $model */
@@ -1888,16 +1879,14 @@ class LeadController extends FormController
      * Bulk edit lead owner.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchOwnersAction(Request $request, $objectId = 0)
+    public function batchOwnersAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
@@ -2004,7 +1993,7 @@ class LeadController extends FormController
             (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'])
             || (!$permissions['lead:leads:editown'] && !$permissions['lead:leads:editother'])
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -2029,7 +2018,7 @@ class LeadController extends FormController
             $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
             $updated  = $this->replaceContactFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
 
-            if ($updated) {
+            if ([] !== $updated) {
                 $model->saveEntities($updated);
             }
         }
@@ -2159,11 +2148,11 @@ class LeadController extends FormController
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         return $filter;
@@ -2191,9 +2180,9 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fileType = $request->get('filetype', 'csv');
@@ -2205,7 +2194,7 @@ class LeadController extends FormController
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $request->get('ids');
 
@@ -2226,11 +2215,11 @@ class LeadController extends FormController
         } else {
             if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
+                $filter['force'] .= " !{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
         }
 
@@ -2266,7 +2255,7 @@ class LeadController extends FormController
         $iterator = new IteratorExportDataModel(
             $model,
             $args,
-            fn ($contact): array => $exportHelper->parseLeadToExport($contact)
+            fn (Lead $contact): array => $exportHelper->parseLeadToExport($contact)
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
@@ -2296,9 +2285,9 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var LeadModel $leadModel */
@@ -2338,7 +2327,7 @@ class LeadController extends FormController
             ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var ContactExportSchedulerModel $model */
@@ -2375,10 +2364,8 @@ class LeadController extends FormController
 
     /**
      * Loads a specific lead statistic info.
-     *
-     * @return JsonResponse|Response
      */
-    public function contactStatsAction(int $objectId)
+    public function contactStatsAction(int $objectId): Response
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -2392,7 +2379,7 @@ class LeadController extends FormController
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(
@@ -2420,7 +2407,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $pointGroups = $pointGroupModel->getEntities();
@@ -2451,12 +2438,12 @@ class LeadController extends FormController
                         $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];
-                        if (!is_null($oldScore) && is_null($newScore)) {
+                        if (null !== $oldScore && null === $newScore) {
                             // set 0 when the new score is not present, but the record exists
                             $newScore = 0;
                         }
 
-                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                        if (null !== $newScore && $newScore !== $oldScore) {
                             $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
                             $delta = $newScore - ($oldScore ?? 0);
 

@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
+final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -53,7 +53,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(3);
 
         foreach ($this->getMailerMessages() as $message) {
-            \assert($message instanceof MauticMessage);
+            $this->assertInstanceOf(MauticMessage::class, $message);
             $clickThrough = $this->parseClickThrough($message->getHtmlBody());
             $email        = $message->getTo()[0]->getAddress();
             Assert::assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');
@@ -140,6 +140,6 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $string, $match);
         parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
 
-        return unserialize(base64_decode($queryParams['ct']));
+        return \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
     }
 }

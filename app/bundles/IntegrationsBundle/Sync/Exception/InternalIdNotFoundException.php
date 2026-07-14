@@ -8,6 +8,6 @@ class InternalIdNotFoundException extends \Exception
 {
     public function __construct(string $object)
     {
-        parent::__construct("ID for object $object not found");
+        parent::__construct("ID for object {$object} not found");
     }
 }

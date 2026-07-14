@@ -28,7 +28,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                fn (array $record): Version => Version::fromArray($record),
+                Version::fromArray(...),
                 $array
             )
         );
@@ -109,7 +109,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->records[] = $value;
         } else {
             $this->records[$offset] = $value;

@@ -120,10 +120,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param string $integration
-     *
-     * @return IntegrationEntity
      */
-    public function setIntegration($integration)
+    public function setIntegration($integration): static
     {
         $this->integration = $integration;
 
@@ -140,10 +138,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param string $integrationEntity
-     *
-     * @return IntegrationEntity
      */
-    public function setIntegrationEntity($integrationEntity)
+    public function setIntegrationEntity($integrationEntity): static
     {
         $this->integrationEntity = $integrationEntity;
 
@@ -160,10 +156,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param string $integrationEntityId
-     *
-     * @return IntegrationEntity
      */
-    public function setIntegrationEntityId($integrationEntityId)
+    public function setIntegrationEntityId($integrationEntityId): static
     {
         $this->integrationEntityId = $integrationEntityId;
 
@@ -180,10 +174,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param \DateTime $dateAdded
-     *
-     * @return IntegrationEntity
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -200,10 +192,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param \DateTime $lastSyncDate
-     *
-     * @return IntegrationEntity
      */
-    public function setLastSyncDate($lastSyncDate)
+    public function setLastSyncDate($lastSyncDate): static
     {
         $this->lastSyncDate = $lastSyncDate;
 
@@ -220,10 +210,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param string $internalEntity
-     *
-     * @return IntegrationEntity
      */
-    public function setInternalEntity($internalEntity)
+    public function setInternalEntity($internalEntity): static
     {
         $this->internalEntity = $internalEntity;
 
@@ -240,10 +228,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param int $internalEntityId
-     *
-     * @return IntegrationEntity
      */
-    public function setInternalEntityId($internalEntityId)
+    public function setInternalEntityId($internalEntityId): static
     {
         $this->internalEntityId = $internalEntityId;
 
@@ -260,10 +246,8 @@ class IntegrationEntity extends CommonEntity
 
     /**
      * @param array $internal
-     *
-     * @return IntegrationEntity
      */
-    public function setInternal($internal)
+    public function setInternal($internal): static
     {
         $this->internal = $internal;
 

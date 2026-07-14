@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -9,7 +11,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     /**
      * Index should return status code 200.
@@ -76,6 +78,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCampaign = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(Campaign::class, $savedCampaign);
         Assert::assertSame($project->getId(), $savedCampaign->getProjects()->first()->getId());
     }
 
@@ -117,9 +120,9 @@ class CampaignControllerTest extends MauticMysqlTestCase
 
         // Check that the campaign elements data includes isRedirectTarget
         $content = $clientResponse->getContent();
-        Assert::assertStringContainsString('isRedirectTarget', $content);
+        Assert::assertStringContainsString('isRedirectTarget', (string) $content);
 
         // Verify that the target event is marked as a redirect target
-        Assert::assertStringContainsString('"isRedirectTarget": true', $content);
+        Assert::assertStringContainsString('"isRedirectTarget": true', (string) $content);
     }
 }

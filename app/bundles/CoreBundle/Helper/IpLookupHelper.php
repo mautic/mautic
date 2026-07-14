@@ -37,7 +37,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private readonly CoreParametersHelper $coreParametersHelper;
 
     /**
      * @var array<string, IpAddress>
@@ -48,7 +48,7 @@ class IpLookupHelper
         protected RequestStack $requestStack,
         protected EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         protected ?AbstractLookup $ipLookup = null,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');

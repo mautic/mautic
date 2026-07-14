@@ -40,7 +40,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private UserPasswordHasherInterface $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -132,7 +132,7 @@ class UserApiController extends CommonApiController
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ('PATCH' == $method) {
+            if ('PATCH' === $method) {
                 // PATCH will accept a diff so just remove the entities
 
                 // Changing username via API is forbidden
@@ -150,7 +150,7 @@ class UserApiController extends CommonApiController
     }
 
     /**
-     * @param User                 &$entity
+     * @param User                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
@@ -194,7 +194,8 @@ class UserApiController extends CommonApiController
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 

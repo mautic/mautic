@@ -23,17 +23,15 @@ class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
-    public function __construct(private WebhookModel $webhookModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private WebhookService $webhookService,
+    public function __construct(
+        private readonly WebhookModel $webhookModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly WebhookService $webhookService,
     ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             '--webhook-id',

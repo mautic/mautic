@@ -80,13 +80,11 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Just selected get tokens from email  builder.
-     *
-     * @param string|null $query
+     * Just selected get tokens from email builder.
      *
      * @return array<string, string>
      */
-    protected function getBuilderTokens($query): array
+    protected function getBuilderTokens(string $query): array
     {
         /** @var EmailModel $model */
         $model        = $this->getModel('email');
@@ -96,7 +94,7 @@ class AjaxController extends CommonAjaxController
         $tokens       = $components['tokens'];
 
         array_map(
-            function ($token, $value) use ($findTokens, &$returnTokens): void {
+            function (string $token, string $value) use ($findTokens, &$returnTokens): void {
                 foreach ($findTokens as $findToken) {
                     if (str_starts_with($token, $findToken)) {
                         $returnTokens[$token] = $value;
