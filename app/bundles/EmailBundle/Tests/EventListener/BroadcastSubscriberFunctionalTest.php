@@ -67,7 +67,7 @@ final class BroadcastSubscriberFunctionalTest extends MauticMysqlTestCase
         $event->setMaxThreads(1);
 
         $subscriber = self::getContainer()->get(BroadcastSubscriber::class);
-        self::assertInstanceOf(BroadcastSubscriber::class, $subscriber);
+        $this->assertInstanceOf(BroadcastSubscriber::class, $subscriber);
 
         $subscriber->onBroadcast($event);
         $results = $event->getResults();

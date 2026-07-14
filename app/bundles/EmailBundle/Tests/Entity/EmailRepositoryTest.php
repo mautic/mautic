@@ -27,7 +27,7 @@ final class EmailRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.email.email.searchcommand.isexpired' => 'is:expired',
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
@@ -306,11 +306,8 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertSame(
-            '(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
@@ -322,17 +319,14 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertSame(
-            '(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repo->getSearchCommands();
-        self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.ispending', $commands);
     }
 }

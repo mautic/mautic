@@ -266,7 +266,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
-        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
+        $this->assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
     }
 
     public function testSegmentEmailVariationChildrenParents(): void
@@ -962,12 +962,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
         Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
-        Assert::assertTrue(null === $isUnpublishedInput->attr('checked'));
+        Assert::assertNull($isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
         Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
-        Assert::assertTrue(null !== $isPublishedInput->attr('checked'));
+        Assert::assertNotNull($isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
