@@ -28,7 +28,7 @@ final class DynamicContentFilterEntryFiltersTypeTest extends TestCase
     public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(4);
+        $matcher = $this->exactly(4);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -82,7 +82,7 @@ final class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 
     public function testGetBlockPrefix(): void
     {
-        self::assertSame('dynamic_content_filter_entry_filters', $this->form->getBlockPrefix());
+        $this->assertSame('dynamic_content_filter_entry_filters', $this->form->getBlockPrefix());
     }
 
     public function testConfigureOptions(): void

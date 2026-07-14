@@ -20,7 +20,7 @@ class StorageExtension extends AbstractExtension
      */
     protected array $storage = [];
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('save', $this->save(...), ['needs_context' => true]),

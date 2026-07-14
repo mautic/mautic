@@ -415,7 +415,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if (0 !== count($keys) && 0 === count($decrypted)) {
                 $decrypted = $this->decryptApiKeys($keys);
                 $this->encryptAndSetApiKeys($decrypted, $entity);
-                $this->em->flush($entity);
+                $this->em->flush();
             }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
                 PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,

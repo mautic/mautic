@@ -21,7 +21,7 @@ class ButtonExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),

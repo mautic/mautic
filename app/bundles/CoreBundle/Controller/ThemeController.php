@@ -215,7 +215,7 @@ class ThemeController extends FormController
                 ];
             }
 
-            if ($error) {
+            if ([] !== $error) {
                 $flashes = array_merge($flashes, $error);
             }
         }

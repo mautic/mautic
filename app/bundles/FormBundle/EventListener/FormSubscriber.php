@@ -321,7 +321,7 @@ class FormSubscriber implements EventSubscriberInterface
             $body = $json;
         } else {
             parse_str($body, $output);
-            if ($output) {
+            if ([] !== $output) {
                 $body = $output;
             }
         }

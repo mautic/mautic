@@ -333,7 +333,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The first log was scheduled to 10 minutes.

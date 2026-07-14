@@ -27,7 +27,7 @@ class ExportSchedulerCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
         $this->addOption('--cleanup-only', 'co', InputOption::VALUE_NONE, 'Only cleanup old files without processing new export.');
