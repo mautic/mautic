@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Crate;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 
-final class FieldCrate
+final readonly class FieldCrate
 {
     /**
      * @param mixed[] $properties

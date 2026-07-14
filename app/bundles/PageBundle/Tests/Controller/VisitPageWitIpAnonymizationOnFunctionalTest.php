@@ -11,7 +11,7 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class VisitPageWitIpAnonymizationOnFunctionalTest extends MauticMysqlTestCase
+final class VisitPageWitIpAnonymizationOnFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

@@ -98,7 +98,7 @@ class Asset extends FormEntity implements UuidInterface
     private $originalFileName;
 
     /**
-     * @var File
+     * @var File|null
      */
     private $file;
 
@@ -109,6 +109,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Holds max size of uploaded file.
+     *
+     * @var float
      */
     private $maxSize;
 
@@ -389,10 +391,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set title.
      *
      * @param string $title
-     *
-     * @return Asset
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -444,10 +444,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set originalFileName.
      *
      * @param string $originalFileName
-     *
-     * @return Asset
      */
-    public function setOriginalFileName($originalFileName)
+    public function setOriginalFileName($originalFileName): static
     {
         $this->isChanged('originalFileName', $originalFileName);
         $this->originalFileName = $originalFileName;
@@ -469,10 +467,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set storage location.
      *
      * @param string $storageLocation
-     *
-     * @return Asset
      */
-    public function setStorageLocation($storageLocation)
+    public function setStorageLocation($storageLocation): static
     {
         $this->isChanged('storageLocation', $storageLocation);
         $this->storageLocation = $storageLocation;
@@ -557,10 +553,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set publishUp.
      *
      * @param \DateTime $publishUp
-     *
-     * @return Asset
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -582,10 +576,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set publishDown.
      *
      * @param \DateTimeInterface $publishDown
-     *
-     * @return Asset
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -607,10 +599,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set downloadCount.
      *
      * @param int $downloadCount
-     *
-     * @return Asset
      */
-    public function setDownloadCount($downloadCount)
+    public function setDownloadCount($downloadCount): static
     {
         $this->downloadCount = $downloadCount;
 
@@ -631,10 +621,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set revision.
      *
      * @param int $revision
-     *
-     * @return Asset
      */
-    public function setRevision($revision)
+    public function setRevision($revision): static
     {
         $this->revision = $revision;
 
@@ -655,10 +643,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set language.
      *
      * @param string $language
-     *
-     * @return Asset
      */
-    public function setLanguage($language)
+    public function setLanguage($language): static
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -678,10 +664,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Set category.
-     *
-     * @return Asset
      */
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null)
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -703,10 +687,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set uniqueDownloadCount.
      *
      * @param int $uniqueDownloadCount
-     *
-     * @return Asset
      */
-    public function setUniqueDownloadCount($uniqueDownloadCount)
+    public function setUniqueDownloadCount($uniqueDownloadCount): static
     {
         $this->uniqueDownloadCount = $uniqueDownloadCount;
 
@@ -881,10 +863,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set uploadDir.
      *
      * @param string $uploadDir
-     *
-     * @return Asset
      */
-    public function setUploadDir($uploadDir)
+    public function setUploadDir($uploadDir): static
     {
         $this->uploadDir = $uploadDir;
 
@@ -895,7 +875,7 @@ class Asset extends FormEntity implements UuidInterface
      * Returns maximal uploadable size in bytes.
      * If not set, 6000000 is default.
      *
-     * @return string
+     * @return float
      */
     protected function getMaxSize()
     {
@@ -909,11 +889,9 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Set max size.
      *
-     * @param string $maxSize
-     *
-     * @return Asset
+     * @param float $maxSize
      */
-    public function setMaxSize($maxSize)
+    public function setMaxSize($maxSize): static
     {
         $this->maxSize = $maxSize;
 
@@ -947,7 +925,7 @@ class Asset extends FormEntity implements UuidInterface
      *
      * @return array<string, float|string|false|null>|string
      */
-    public function getFileInfo()
+    public function getFileInfo(): array|string
     {
         $fileInfo = [];
 
@@ -1030,11 +1008,7 @@ class Asset extends FormEntity implements UuidInterface
 
         $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
-        if (in_array($fileType, $imageTypes)) {
-            return true;
-        }
-
-        return false;
+        return in_array($fileType, $imageTypes);
     }
 
     /**
@@ -1120,10 +1094,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Load the file object from it's path.
-     *
-     * @return File|null
      */
-    public function loadFile($temp = false)
+    public function loadFile($temp = false): ?File
     {
         if ($temp) {
             $path = $this->getAbsoluteTempPath();
@@ -1187,10 +1159,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set temporary ID.
      *
      * @param string $tempId
-     *
-     * @return Asset
      */
-    public function setTempId($tempId)
+    public function setTempId($tempId): static
     {
         $this->tempId = $tempId;
 
@@ -1211,10 +1181,8 @@ class Asset extends FormEntity implements UuidInterface
      * Set temporary file name.
      *
      * @param string $tempName
-     *
-     * @return Asset
      */
-    public function setTempName($tempName)
+    public function setTempName($tempName): static
     {
         $this->tempName = $tempName;
 
@@ -1264,10 +1232,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $size
-     *
-     * @return Asset
      */
-    public function setSize($size)
+    public function setSize($size): static
     {
         $this->size = $size;
 
@@ -1284,7 +1250,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         $value = ini_get($setting);
 
-        if (-1 == $value || 0 === $value) {
+        if ('-1' === $value || '0' === $value) {
             return PHP_INT_MAX;
         }
 
@@ -1318,13 +1284,13 @@ class Asset extends FormEntity implements UuidInterface
     {
         $unit = strtoupper($unit);
 
-        if ((!$unit && $size >= 1 << 30) || 'GB' == $unit || 'G' == $unit) {
+        if ((!$unit && $size >= 1 << 30) || 'GB' === $unit || 'G' === $unit) {
             return [$size / (1 << 30), 'GB'];
         }
-        if ((!$unit && $size >= 1 << 20) || 'MB' == $unit || 'M' == $unit) {
+        if ((!$unit && $size >= 1 << 20) || 'MB' === $unit || 'M' === $unit) {
             return [$size / (1 << 20), 'MB'];
         }
-        if ((!$unit && $size >= 1 << 10) || 'KB' == $unit || 'K' == $unit) {
+        if ((!$unit && $size >= 1 << 10) || 'KB' === $unit || 'K' === $unit) {
             return [$size / (1 << 10), 'KB'];
         }
 
@@ -1342,10 +1308,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @param string|null $downloadUrl
-     *
-     * @return Asset
      */
-    public function setDownloadUrl($downloadUrl)
+    public function setDownloadUrl($downloadUrl): static
     {
         $this->downloadUrl = $downloadUrl;
 

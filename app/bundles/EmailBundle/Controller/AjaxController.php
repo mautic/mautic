@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
                 $stats['failed'] += $batchFailedCount;
 
                 foreach ($batchFailedRecipients as $emails) {
-                    $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
+                    $stats['failedRecipients'] += $emails;
                 }
 
                 $session->set('mautic.email.send.progress', $progress);
@@ -285,7 +285,7 @@ class AjaxController extends CommonAjaxController
             $email->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content           = $email->getCustomHtml();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
@@ -14,12 +16,18 @@ use PHPUnit\Framework\MockObject\MockObject;
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated.
  */
-class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
+final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
+    /**
+     * @var MockObject&Client
+     */
     protected MockObject $mockHttp;
 
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     protected MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void

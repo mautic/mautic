@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -8,9 +10,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback     = false;
+
     private const ADMINISTRATOR_VALUE = "administrator's";
 
     public function testCompareValueEqualsOperator(): void
@@ -158,13 +161,13 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         );
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('colors', 'green|blue');
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();
@@ -198,13 +201,13 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         );
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('job_title', self::ADMINISTRATOR_VALUE);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();

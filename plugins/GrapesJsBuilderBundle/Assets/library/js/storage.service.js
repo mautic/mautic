@@ -12,14 +12,73 @@ export default class StorageService {
     init() {
         this.storageKey = 'gjs-storage';
         this.restoreMessage = null;
+        this.restoreCheckDone = false;
+        this.baselineContent = null;
+        this.suppressBackup = true;
+        this.editor.on('update', () => this.handleUpdate());
+        this.addFormSubmitListeners();
+        this.scheduleBaselineCapture();
+        this.editor.on('hide', () => this.handleEditorHide());
+    }
+
+    scheduleBaselineCapture() {
+        const captureBaseline = () => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    this.baselineContent = this.getEditorContent();
+                    this.suppressBackup = false;
+                    this.runRestoreCheck();
+                    this.scheduleDeferredRestoreCheck();
+                });
+            });
+        };
+
+        this.editor.on('load', captureBaseline);
+        captureBaseline();
+    }
+
+    runRestoreCheck() {
+        this.restoreCheckDone = false;
+        this.checkForStoredBackup();
+    }
+
+    scheduleDeferredRestoreCheck() {
+        // Editor state can hydrate asynchronously after the initial MJML load.
+        setTimeout(() => {
+            if (this.restoreMessage) {
+                return;
+            }
+
+            const storageItem = this.getStorageItemById(this.getStackItemId());
+            if (!storageItem) {
+                return;
+            }
+
+            if (this.getEditorContent() !== storageItem.content) {
+                this.runRestoreCheck();
+            }
+        }, 500);
+    }
+
+    checkForStoredBackup() {
+        if (this.restoreMessage || this.restoreCheckDone) {
+            return;
+        }
+
+        this.restoreCheckDone = true;
+
         const stackItemId = this.getStackItemId();
         const storageItem = this.getStorageItemById(stackItemId);
-        const editorContent = this.getEditorContent();
-        if (storageItem && editorContent !== storageItem.content) {
-            this.displayRestoreMessage(storageItem);
+        if (!storageItem) {
+            return;
         }
-        this.editor.on("update", () => this.handleUpdate());
-        this.addFormSubmitListeners();
+
+        const editorContent = this.getEditorContent();
+        if (editorContent === storageItem.content) {
+            return;
+        }
+
+        this.displayRestoreMessage(storageItem);
     }
 
     displayRestoreMessage(storedContent) {
@@ -59,22 +118,21 @@ export default class StorageService {
     addMessageEventListeners(restoreButton, dismissButtom, closeButton) {
         restoreButton.addEventListener('click', (event) => {
             this.load();
+            this.baselineContent = this.getEditorContent();
             this.dismissRestoreMessage();
             event.preventDefault();
         });
 
         dismissButtom.addEventListener('click', (event) => {
-            this.handleUpdate();
+            this.baselineContent = this.getEditorContent();
             this.dismissRestoreMessage();
             this.removeStorageItemById(this.getStackItemId());
             event.preventDefault();
         });
 
         closeButton.addEventListener('click', () => {
-            this.handleUpdate();
+            this.baselineContent = this.getEditorContent();
         });
-
-        this.editor.on('hide', () => this.dismissRestoreMessage());
     }
 
     addFormSubmitListeners() {
@@ -85,22 +143,58 @@ export default class StorageService {
             // Check if the form was submitted for a new entity and the response contains the entity id
             // The success response code alone does not guarantee that the form was saved,
             // so we need to validate the URL changes and the presence of the entity id
-            if (lastRequestUrlPart === 'new' && !isNaN(lastResponseUrlPart)){
+            if (lastRequestUrlPart === 'new' && !isNaN(lastResponseUrlPart)) {
                 // Remove the local storage item for the newly created entity after successful form submission
                 this.removeStorageItemById(`gjs-${this.mode}-${Mautic.builderTheme}-new`);
             }
+
+            // The saved entity is the source of truth; drop any stale local backup.
+            this.markContentSaved();
         });
     }
 
-    handleUpdate() {
-        // update the storage content only when the restore prompt is not available
-        if (!this.restoreMessage) {
-            const editorContent = this.getEditorContent();
-            const dateTime = new Date().toISOString();
-            const stackItemId = this.getStackItemId();
-            const contentWithDateTime = { id: stackItemId, content: editorContent, date: dateTime };
-            this.saveStorageItem(contentWithDateTime);
+    markContentSaved() {
+        this.removeStorageItemById(this.getStackItemId());
+        this.suppressBackup = true;
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                this.baselineContent = this.getEditorContent();
+                this.suppressBackup = false;
+            });
+        });
+    }
+
+    handleEditorHide() {
+        this.dismissRestoreMessage();
+
+        if (this.baselineContent === null) {
+            return;
         }
+
+        const editorContent = this.getEditorContent();
+        if (editorContent !== this.baselineContent) {
+            this.persistBackup(editorContent);
+        }
+    }
+
+    handleUpdate() {
+        if (this.restoreMessage || this.suppressBackup || this.baselineContent === null) {
+            return;
+        }
+
+        const editorContent = this.getEditorContent();
+        if (editorContent === this.baselineContent) {
+            return;
+        }
+
+        this.persistBackup(editorContent);
+    }
+
+    persistBackup(content) {
+        const dateTime = new Date().toISOString();
+        const stackItemId = this.getStackItemId();
+        const contentWithDateTime = { id: stackItemId, content: content, date: dateTime };
+        this.saveStorageItem(contentWithDateTime);
     }
 
     load() {

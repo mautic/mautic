@@ -629,10 +629,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * Set id.
      *
      * @param int $id
-     *
-     * @return Lead
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = (string) $id;
 
@@ -649,10 +647,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set owner.
-     *
-     * @return Lead
      */
-    public function setOwner(?User $owner = null)
+    public function setOwner(?User $owner = null): static
     {
         $this->isChanged('owner', $owner);
         $this->owner = $owner;
@@ -816,10 +812,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @param int    $points
      * @param string $operator
-     *
-     * @return Lead
      */
-    public function adjustPoints($points, $operator = self::POINTS_ADD)
+    public function adjustPoints($points, $operator = self::POINTS_ADD): static
     {
         if (!$points = (int) $points) {
             return $this;
@@ -877,10 +871,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * Set points.
      *
      * @param int $points
-     *
-     * @return Lead
      */
-    public function setPoints($points)
+    public function setPoints($points): static
     {
         $this->isChanged('points', $points);
         $this->points = (int) $points;
@@ -918,10 +910,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Reset point changes.
-     *
-     * @return $this
      */
-    public function resetPointChanges()
+    public function resetPointChanges(): static
     {
         $this->actualPoints  = null;
         $this->pointChanges  = [];
@@ -957,10 +947,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Add pointsChangeLog.
-     *
-     * @return Lead
      */
-    public function addPointsChangeLog(PointsChangeLog $pointsChangeLog)
+    public function addPointsChangeLog(PointsChangeLog $pointsChangeLog): static
     {
         $this->pointsChangeLog[] = $pointsChangeLog;
 
@@ -984,10 +972,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Add StagesChangeLog.
-     *
-     * @return Lead
      */
-    public function stageChangeLog(StagesChangeLog $stageChangeLog)
+    public function stageChangeLog(StagesChangeLog $stageChangeLog): static
     {
         $this->stageChangeLog[] = $stageChangeLog;
 
@@ -1042,10 +1028,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Add Company ChangeLog.
-     *
-     * @return Lead
      */
-    public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
+    public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog): static
     {
         $this->companyChangeLog[] = $companyChangeLog;
 
@@ -1063,10 +1047,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param bool $enabled
      * @param bool $mobile
-     *
-     * @return $this
      */
-    public function addPushIDEntry($identifier, $enabled = true, $mobile = false)
+    public function addPushIDEntry($identifier, $enabled = true, $mobile = false): static
     {
         $entity = new PushID();
 
@@ -1093,10 +1075,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addPushID(PushID $pushID)
+    public function addPushID(PushID $pushID): static
     {
         $this->pushIds[] = $pushID;
 
@@ -1116,10 +1095,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pushIds;
     }
 
-    /**
-     * @return $this
-     */
-    public function addEventLog(LeadEventLog $log)
+    public function addEventLog(LeadEventLog $log): static
     {
         $this->eventLog[] = $log;
         $log->setLead($this);
@@ -1143,10 +1119,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->eventLog->matching($criteria)->first() ?: null;
     }
 
-    /**
-     * @return $this
-     */
-    public function addDoNotContactEntry(DoNotContact $doNotContact)
+    public function addDoNotContactEntry(DoNotContact $doNotContact): static
     {
         $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
             'reason'   => $doNotContact->getReason(),
@@ -1267,10 +1240,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return false;
     }
 
-    /**
-     * @return self
-     */
-    public function setManipulator(?LeadManipulator $manipulator = null)
+    public function setManipulator(?LeadManipulator $manipulator = null): static
     {
         $this->manipulator = $manipulator;
 
@@ -1366,10 +1336,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Add tag.
-     *
-     * @return Lead
      */
-    public function addTag(Tag $tag)
+    public function addTag(Tag $tag): static
     {
         $this->isChanged('tags', $tag);
         $this->tags[$tag->getTag()] = $tag;
@@ -1398,10 +1366,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set tags.
-     *
-     * @return $this
      */
-    public function setTags($tags)
+    public function setTags($tags): static
     {
         $this->tags = $tags;
 
@@ -1420,10 +1386,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set utm tags.
-     *
-     * @return $this
      */
-    public function setUtmTags($utmTags)
+    public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmtags', $utmTags);
         $this->utmtags[] = $utmTags;
@@ -1439,10 +1403,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set stage.
-     *
-     * @return Stage
      */
-    public function setStage(?Stage $stage = null)
+    public function setStage(?Stage $stage = null): static
     {
         $this->isChanged('stage', $stage);
         $this->stage = $stage;
@@ -1464,10 +1426,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * Set frequency rules.
      *
      * @param FrequencyRule[] $frequencyRules
-     *
-     * @return Lead
      */
-    public function setFrequencyRules($frequencyRules)
+    public function setFrequencyRules($frequencyRules): static
     {
         $this->frequencyRules = new ArrayCollection($frequencyRules);
 
@@ -1556,10 +1516,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $primaryCompany
-     *
-     * @return Lead
      */
-    public function setPrimaryCompany($primaryCompany)
+    public function setPrimaryCompany($primaryCompany): static
     {
         $this->primaryCompany = $primaryCompany;
 
@@ -1576,10 +1534,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $title
-     *
-     * @return Lead
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -1597,10 +1553,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $firstname
-     *
-     * @return Lead
      */
-    public function setFirstname($firstname)
+    public function setFirstname($firstname): static
     {
         $this->isChanged('firstname', $firstname);
         $this->firstname = $firstname;
@@ -1618,10 +1572,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $lastname
-     *
-     * @return Lead
      */
-    public function setLastname($lastname)
+    public function setLastname($lastname): static
     {
         $this->isChanged('lastname', $lastname);
         $this->lastname = $lastname;
@@ -1639,10 +1591,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $position
-     *
-     * @return Lead
      */
-    public function setPosition($position)
+    public function setPosition($position): static
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -1660,10 +1610,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $phone
-     *
-     * @return Lead
      */
-    public function setPhone($phone)
+    public function setPhone($phone): static
     {
         $this->isChanged('phone', $phone);
         $this->phone = $phone;
@@ -1681,10 +1629,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $mobile
-     *
-     * @return Lead
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->isChanged('mobile', $mobile);
         $this->mobile = $mobile;
@@ -1710,10 +1656,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $address1
-     *
-     * @return Lead
      */
-    public function setAddress1($address1)
+    public function setAddress1($address1): static
     {
         $this->isChanged('address1', $address1);
         $this->address1 = $address1;
@@ -1731,10 +1675,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $address2
-     *
-     * @return Lead
      */
-    public function setAddress2($address2)
+    public function setAddress2($address2): static
     {
         $this->isChanged('address2', $address2);
         $this->address2 = $address2;
@@ -1752,10 +1694,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $city
-     *
-     * @return Lead
      */
-    public function setCity($city)
+    public function setCity($city): static
     {
         $this->isChanged('city', $city);
         $this->city = $city;
@@ -1773,10 +1713,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $state
-     *
-     * @return Lead
      */
-    public function setState($state)
+    public function setState($state): static
     {
         $this->isChanged('state', $state);
         $this->state = $state;
@@ -1794,10 +1732,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $zipcode
-     *
-     * @return Lead
      */
-    public function setZipcode($zipcode)
+    public function setZipcode($zipcode): static
     {
         $this->isChanged('zipcode', $zipcode);
         $this->zipcode = $zipcode;
@@ -1815,10 +1751,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param string $timezone
-     *
-     * @return Lead
      */
-    public function setTimezone($timezone)
+    public function setTimezone($timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
@@ -1836,10 +1770,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $country
-     *
-     * @return Lead
      */
-    public function setCountry($country)
+    public function setCountry($country): static
     {
         $this->isChanged('country', $country);
         $this->country = $country;
@@ -1857,10 +1789,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $company
-     *
-     * @return Lead
      */
-    public function setCompany($company)
+    public function setCompany($company): static
     {
         $this->isChanged('company', $company);
         $this->company = $company;
@@ -1878,10 +1808,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param mixed $email
-     *
-     * @return Lead
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->isChanged('email', $email);
         $this->email = $email;
@@ -1911,10 +1839,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->channelRules;
     }
 
-    /**
-     * @return $this
-     */
-    public function setChannelRules(array $rules)
+    public function setChannelRules(array $rules): static
     {
         $this->channelRules = $rules;
 
@@ -1959,7 +1884,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         /* @var FrequencyRule $rule */
         usort(
             $frequencyRules,
-            function ($a, $b): int {
+            function (array $a, array $b): int {
                 if ($a['pause_from_date'] && $a['pause_to_date']) {
                     $now = new \DateTime();
                     if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {

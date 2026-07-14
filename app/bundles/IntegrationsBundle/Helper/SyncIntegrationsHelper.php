@@ -25,8 +25,8 @@ class SyncIntegrationsHelper
     private ?array $enabled = null;
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
-        private ObjectProvider $objectProvider,
+        private readonly IntegrationsHelper $integrationsHelper,
+        private readonly ObjectProvider $objectProvider,
     ) {
     }
 
@@ -50,9 +50,9 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @return array<int,string>|null
+     * @return array<int,string>
      */
-    public function getEnabledIntegrations()
+    public function getEnabledIntegrations(): array
     {
         if (null !== $this->enabled) {
             return $this->enabled;

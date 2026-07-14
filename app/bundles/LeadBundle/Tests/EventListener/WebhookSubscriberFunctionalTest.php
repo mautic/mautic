@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -14,7 +16,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 
-class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
+final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -34,13 +36,13 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
     public function testOnSegmentChange(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         $segmentModel = static::getContainer()->get('mautic.lead.model.list');
-        \assert($segmentModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $segmentModel);
 
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
-        \assert($webhookQueueRepository instanceof WebhookQueueRepository);
+        $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
 
         $webhook = $this->createWebhook();
 

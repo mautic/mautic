@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
 {
     private ContactTracker $contactTracker;
+
     private RequestStack $requestStack;
 
     protected function setUp(): void

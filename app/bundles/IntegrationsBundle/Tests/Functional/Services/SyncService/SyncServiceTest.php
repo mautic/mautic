@@ -14,9 +14,9 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
 
-class SyncServiceTest extends MauticMysqlTestCase
+final class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         /** @var SyncService $syncService */
         $syncService = $this->getContainer()->get('mautic.integrations.sync.service');
 
-        $syncService->processIntegrationSync(ExampleIntegration::NAME, true);
+        $syncService->processIntegrationSync(ExampleIntegration::NAME);
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 48 known contacts already in Mautic

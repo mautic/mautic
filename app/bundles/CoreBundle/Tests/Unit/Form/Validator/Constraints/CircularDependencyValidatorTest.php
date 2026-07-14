@@ -13,13 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
+final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&ListModel $mockListModel;
 
     private MockObject&ExecutionContext $context;
-
-    private MockObject&RequestStack $requestStack;
 
     private Request $request;
 
@@ -31,14 +29,14 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel = $this->createMock(ListModel::class);
         $this->context       = $this->createMock(ExecutionContext::class);
-        $this->requestStack  = $this->createMock(RequestStack::class);
+        $requestStack        = $this->createMock(RequestStack::class);
         $this->request       = new Request();
 
-        $this->requestStack->expects($this->once())
+        $requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->validator = new CircularDependencyValidator($this->mockListModel, $this->requestStack);
+        $this->validator = new CircularDependencyValidator($this->mockListModel, $requestStack);
         $this->validator->initialize($this->context);
     }
 
@@ -131,7 +129,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(fn ($id) => $entities[$id]);
+            ->willReturnCallback(fn ($id): LeadList&\PHPUnit\Framework\MockObject\MockObject => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())

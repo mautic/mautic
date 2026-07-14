@@ -20,9 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private DynamicContentModel $dynamicContentModel,
+        private readonly DynamicContentModel $dynamicContentModel,
         protected CacheProvider $cache,
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -79,11 +79,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return false|CampaignExecutionEvent
-     *
      * @throws InvalidArgumentException
      */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): false|CampaignExecutionEvent
     {
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();
@@ -113,7 +111,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
@@ -143,10 +141,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $event->stopPropagation();
 
-            $result = $event->setResult($content);
+            $event->setResult($content);
             $event->setChannel('dynamicContent', $dwc->getId());
-
-            return $result;
         }
     }
 }

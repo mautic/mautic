@@ -20,6 +20,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+
     public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])
@@ -407,11 +408,9 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $eventId
      *
-     * @return ArrayCollection
-     *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): ArrayCollection
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return new ArrayCollection();
@@ -653,11 +652,7 @@ SQL;
         /** @var LeadEventLog $log */
         $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
 
-        if (null !== $log && null !== $log->getFailedLog()) {
-            return true;
-        }
-
-        return false;
+        return null !== $log && null !== $log->getFailedLog();
     }
 
     public function deleteAnonymousContacts(): int

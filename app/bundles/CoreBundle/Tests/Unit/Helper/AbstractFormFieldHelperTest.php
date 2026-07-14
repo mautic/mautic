@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
-class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void
@@ -258,7 +258,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($array);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanBarStringList(): void
@@ -271,7 +271,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanJsonStringList(): void
@@ -284,7 +284,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testNumericalJsonStringList(): void

@@ -18,9 +18,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private VersionProviderInterface $versionProvider,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private Connection $connection,
+        private readonly VersionProviderInterface $versionProvider,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -96,10 +96,6 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
     {
         $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
 
-        if (isset($tableColumns[$generatedColumn->getColumnName()])) {
-            return true;
-        }
-
-        return false;
+        return isset($tableColumns[$generatedColumn->getColumnName()]);
     }
 }

@@ -16,25 +16,25 @@ class PathsHelper
      */
     private $theme;
 
-    private string $imagePath;
+    private readonly string $imagePath;
 
-    private string $dashboardImportDir;
+    private readonly string $dashboardImportDir;
 
-    private string $dashboardUserImportDir;
+    private readonly string $dashboardUserImportDir;
 
-    private string $kernelCacheDir;
+    private readonly string $kernelCacheDir;
 
-    private string $kernelLogsDir;
+    private readonly string $kernelLogsDir;
 
-    private string $kernelRootDir;
+    private readonly string $kernelRootDir;
 
-    private string $temporaryDir;
+    private readonly string $temporaryDir;
 
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    private string $importLeadsDir;
+    private readonly string $importLeadsDir;
 
-    private string $importCampaignDir;
+    private readonly string $importCampaignDir;
 
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
@@ -177,7 +177,7 @@ class PathsHelper
                 // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ('dashboard.global' == $name) {
+                if ('dashboard.global' === $name) {
                     return $globalPath;
                 }
 

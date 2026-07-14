@@ -17,10 +17,10 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChang
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
@@ -33,7 +33,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -82,7 +82,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -160,10 +160,7 @@ class ObjectChangeGeneratorTest extends TestCase
         Assert::assertSame($integrationName, $objectChange->getIntegration());
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
@@ -174,12 +171,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $mappingManual;
     }
 
-    /**
-     * @param bool $includeFirstNameField
-     *
-     * @return ReportDAO
-     */
-    private function getInternalSyncReport($includeFirstNameField = true)
+    private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
@@ -196,10 +188,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectChangeGenerator()
+    private function getObjectChangeGenerator(): ObjectChangeGenerator
     {
         return new ObjectChangeGenerator($this->valueHelper);
     }

@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\ConfigFormNotesTrait;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use PHPUnit\Framework\TestCase;
 
-class ConfigFormNotesTraitTest extends TestCase
+final class ConfigFormNotesTraitTest extends TestCase
 {
     public function testConfigFormNotesTraitFormDefaultValues(): void
     {

@@ -114,11 +114,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             }
         }
 
-        if (empty($this->keys['accountId']) || empty($this->keys['clientFolderId'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($this->keys['accountId']) && !empty($this->keys['clientFolderId']);
     }
 
     /**
@@ -154,7 +150,7 @@ class IcontactIntegration extends EmailAbstractIntegration
                 $leadFields[$f] = [
                     'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
                     'type'     => 'string',
-                    'required' => 'email' == $f,
+                    'required' => 'email' === $f,
                 ];
             }
 

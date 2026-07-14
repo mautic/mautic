@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class ImportTest extends StandardImportTestHelper
+final class ImportTest extends StandardImportTestHelper
 {
     public function testSetPath(): void
     {
@@ -153,8 +155,9 @@ class ImportTest extends StandardImportTestHelper
 
         $this->fakeImportStartDate($import, 10 * 60);
 
-        $this->assertTrue($import->getRunTime() instanceof \DateInterval);
-        $this->assertSame(10, $import->getRunTime()->i);
+        $runTime = $import->getRunTime();
+        $this->assertInstanceOf(\DateInterval::class, $runTime);
+        $this->assertSame(10, $runTime->i);
     }
 
     public function testGetRunTimeSeconds(): void

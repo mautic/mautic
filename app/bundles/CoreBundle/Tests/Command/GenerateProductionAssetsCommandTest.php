@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Command;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
+final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
 {
     private const CKEDITOR_FILE_NAME      = 'ckeditor.js';
 
@@ -31,7 +31,7 @@ class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
     {
         $commandTester = $this->testSymfonyCommand('mautic:assets:generate');
         $this->assertStringContainsString('Production assets have been regenerated.', $commandTester->getDisplay());
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
     }
 
     public function testCkeditorFileNotExist(): void
@@ -43,7 +43,7 @@ class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand('mautic:assets:generate');
         $this->assertStringContainsString("{$ckeditorFilePath} does not exist. Execute `npm install` to generate it.", $commandTester->getDisplay());
-        $this->assertEquals(1, $commandTester->getStatusCode());
+        $this->assertSame(1, $commandTester->getStatusCode());
     }
 
     protected function beforeTearDown(): void

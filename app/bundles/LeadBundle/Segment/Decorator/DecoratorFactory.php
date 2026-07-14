@@ -13,19 +13,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class DecoratorFactory
 {
     public function __construct(
-        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
-        private BaseDecorator $baseDecorator,
-        private CustomMappedDecorator $customMappedDecorator,
-        private DateOptionFactory $dateOptionFactory,
-        private CompanyDecorator $companyDecorator,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private readonly BaseDecorator $baseDecorator,
+        private readonly CustomMappedDecorator $customMappedDecorator,
+        private readonly DateOptionFactory $dateOptionFactory,
+        private readonly CompanyDecorator $companyDecorator,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
-    /**
-     * @return FilterDecoratorInterface
-     */
-    public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate): FilterDecoratorInterface|DateCompanyDecorator|CustomMappedDecorator|CompanyDecorator|BaseDecorator
     {
         $decoratorEvent = new LeadListFiltersDecoratorDelegateEvent($contactSegmentFilterCrate);
 

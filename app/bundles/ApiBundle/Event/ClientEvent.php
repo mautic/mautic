@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class ClientEvent extends CommonEvent
 {
-    private string $apiMode;
+    private readonly string $apiMode;
 
     public function __construct(Client $client, $isNew = false)
     {

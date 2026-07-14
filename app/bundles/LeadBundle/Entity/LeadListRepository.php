@@ -277,11 +277,9 @@ class LeadListRepository extends CommonRepository
      *
      * @param int|int[] $listIds
      *
-     * @return array|int
-     *
      * @throws \Exception
      */
-    public function getLeadCount($listIds)
+    public function getLeadCount($listIds): int|array
     {
         if (!is_array($listIds)) {
             $listIds = [$listIds];
@@ -923,6 +921,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row): int => (int) $row[0], $result);
+        return array_map(fn (array $row): int => (int) $row[0], $result);
     }
 }

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -22,6 +23,7 @@ class EmailRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
+
     public const EMAILS_PREFIX        = 'e';
 
     public const DNC_PREFIX           = 'dnc';
@@ -68,7 +70,7 @@ class EmailRepository extends CommonRepository
      *
      * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
-    public function checkDoNotEmail($email)
+    public function checkDoNotEmail($email): false|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')
@@ -164,8 +166,6 @@ class EmailRepository extends CommonRepository
      * @param int|null       $maxContactId
      * @param bool           $countWithMaxMin
      * @param \DateTime|null $maxDate
-     *
-     * @return QueryBuilder|int|array
      */
     public function getEmailPendingQuery(
         $emailId,
@@ -180,7 +180,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
-    ) {
+    ): array|int|QueryBuilder {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
@@ -189,7 +189,8 @@ class EmailRepository extends CommonRepository
                 $dncQb->expr()->and(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
-                ));
+                )
+            );
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -405,7 +406,7 @@ class EmailRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
@@ -426,7 +427,6 @@ class EmailRepository extends CommonRepository
         }
 
         if ($topLevel) {
-            // BC layer
             if (true === $topLevel || '1' === $topLevel) {
                 $topLevel = ['variant', 'translation'];
             } elseif (is_string($topLevel)) {
@@ -437,7 +437,7 @@ class EmailRepository extends CommonRepository
                 match ($type) {
                     'variant'     => $q->andWhere($q->expr()->isNull('e.variantParent')),
                     'translation' => $q->andWhere($q->expr()->isNull('e.translationParent')),
-                    default       => null, // BC: ignore unknown values
+                    default       => null,
                 };
             }
         }
@@ -711,6 +711,35 @@ class EmailRepository extends CommonRepository
             ->executeStatement();
     }
 
+    /**
+     * Clones email list cross-reference records and updates child emails to match the parent email.
+     *
+     * @param Email $entity the parent email entity
+     */
+    public function cloneFromParentToVariant(Email $entity): void
+    {
+        /** @var Email $parent */
+        $parent    = $entity->getVariantParent() ?: $entity;
+        $hasParent = $entity->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface;
+
+        if ($hasParent) {
+            $entity->setPublishUp($parent->getPublishUp());
+            $entity->setPublishDown($parent->getPublishDown());
+            $entity->setIsPublished($parent->getIsPublished());
+            $entity->setLists($parent->getLists()->toArray());
+        } else {
+            $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
+            foreach ($variantsToUpdateFromParent as $variant) {
+                \assert($variant instanceof Email);
+                $variant->setPublishUp($parent->getPublishUp());
+                $variant->setPublishDown($parent->getPublishDown());
+                $variant->setIsPublished($parent->getIsPublished());
+                $variant->setLists(!empty($parent->getLists()) ? $parent->getLists()->toArray() : []);
+            }
+            $this->saveEntities($variantsToUpdateFromParent);
+        }
+    }
+
     public function upCountSent(int $id, int $increaseBy = 1, bool $variant = false): void
     {
         if ($increaseBy <= 0) {
@@ -818,11 +847,10 @@ class EmailRepository extends CommonRepository
     /**
      * Set Max and/or Min ID where conditions to the query builder.
      *
-     * @param string $column
-     * @param int    $minContactId
-     * @param int    $maxContactId
+     * @param int $minContactId
+     * @param int $maxContactId
      */
-    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId): QueryBuilder
+    private function setMinMaxIds(QueryBuilder $q, string $column, $minContactId, $maxContactId): QueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');
@@ -876,5 +904,26 @@ class EmailRepository extends CommonRepository
             ->setParameter('excludedListIds', $excludedListIds, ArrayParameterType::INTEGER);
 
         return $queryBuilder;
+    }
+
+    /**
+     * Gets emails with published variants.
+     *
+     * @return array<Email>
+     */
+    public function getPublishedEmailsWithVariant(): array
+    {
+        $qb   = $this->getEntityManager()->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+        $qb->select($this->getTableAlias())
+            ->from(Email::class, $this->getTableAlias())
+            ->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
+            ))
+            ->where($expr);
+
+        return $qb->getQuery()->getResult();
     }
 }

@@ -18,16 +18,13 @@ class Fetcher
     private int $processedMessageCounter = 0;
 
     public function __construct(
-        private Mailbox $imapHelper,
-        private EventDispatcherInterface $dispatcher,
-        private TranslatorInterface $translator,
+        private readonly Mailbox $imapHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
-    /**
-     * @return $this
-     */
-    public function setMailboxes(array $mailboxes)
+    public function setMailboxes(array $mailboxes): static
     {
         $this->mailboxes = $mailboxes;
 
@@ -86,10 +83,7 @@ class Fetcher
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }

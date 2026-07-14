@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use PHPUnit\Framework\Assert;
 
-class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet(): void
     {
@@ -15,7 +17,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function get($name, $default = null)
+            public function get($name, $default = null): string
             {
                 Assert::assertEquals('param_a', $name);
 
@@ -38,6 +40,6 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertEquals('config', $helper->getName());
+        Assert::assertSame('config', $helper->getName());
     }
 }

@@ -202,10 +202,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function delegateRedirect($url)
+    public function delegateRedirect($url): JsonResponse|RedirectResponse
     {
         $request = $this->getCurrentRequest();
 
@@ -390,13 +388,7 @@ class CommonController extends AbstractController implements MauticController
             );
         }
 
-        if ($newContent instanceof Response) {
-            $response = $newContent;
-        } else {
-            $response = new JsonResponse($dataArray, $code);
-        }
-
-        return $response;
+        return new JsonResponse($dataArray, $code);
     }
 
     /**
@@ -449,31 +441,43 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
+     * @throws AccessDeniedHttpException
+     */
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
+    {
+        throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
+    }
+
+    /**
+     * @return array{type: string, msg: string}
+     */
+    public function getAccessDeniedFlash(): array
+    {
+        return [
+            'type' => 'error',
+            'msg'  => $this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'),
+        ];
+    }
+
+    /**
      * Generates access denied message.
+     *
+     * @deprecated Use getAccessDeniedFlash or throwAccessDenied
      *
      * @param bool   $batch Flag if a batch action is being performed
      * @param string $msg   Message that is logged
      *
-     * @return JsonResponse|RedirectResponse|array
+     * @return array{type: string, msg: string}
      *
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
+    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401'): array
     {
-        $request = $this->getCurrentRequest();
-
-        $anonymous = $this->security->isAnonymous();
-
-        if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $request->getRequestUri()]));
+        if ($this->security->isAnonymous() || !$batch) {
+            $this->throwAccessDenied($msg);
         }
 
-        if ($batch) {
-            return [
-                'type' => 'error',
-                'msg'  => $this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'),
-            ];
-        }
+        return $this->getAccessDeniedFlash();
     }
 
     /**
@@ -491,7 +495,7 @@ class CommonController extends AbstractController implements MauticController
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
             $page = $pageModel->getEntity($page404);
-            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug     = $pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
@@ -551,7 +555,7 @@ class CommonController extends AbstractController implements MauticController
         if ($request->query->has('orderby')) {
             $orderBy = InputHelper::clean($request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
+            $dir     = $orderBy === $session->get("$name.orderby") || false === $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }

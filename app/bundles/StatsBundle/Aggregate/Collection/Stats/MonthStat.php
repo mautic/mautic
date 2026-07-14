@@ -38,7 +38,7 @@ class MonthStat implements StatInterface
     /**
      * @return DayStat[]
      */
-    public function getStats()
+    public function getStats(): array
     {
         return $this->stats;
     }
@@ -46,7 +46,7 @@ class MonthStat implements StatInterface
     /**
      * @return int
      */
-    public function getSum()
+    public function getSum(): int|float
     {
         $sum = 0;
         foreach ($this->stats as $stat) {

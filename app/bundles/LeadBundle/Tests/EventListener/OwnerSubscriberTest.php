@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class OwnerSubscriberTest extends TestCase
+final class OwnerSubscriberTest extends TestCase
 {
     /** @var array<int, array<string, int|string|null>> */
     protected array $contacts = [
@@ -76,15 +78,12 @@ class OwnerSubscriberTest extends TestCase
         ],
     ];
 
-    /** @var MockObject&CoreParametersHelper */
-    private $coreParametersHelper;
-
     private MailHashHelper $mailHashHelper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $this->mailHashHelper       = new MailHashHelper($coreParametersHelper);
     }
 
     public function testOnEmailBuild(): void
@@ -206,7 +205,7 @@ class OwnerSubscriberTest extends TestCase
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 
-        $mockLeadRepository->method('getLeadOwner')
+        $mockLeadRepository->expects($this->atLeast(0))->method('getLeadOwner')
             ->willReturnMap(
                 [
                     [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],
@@ -273,7 +272,7 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->atLeast(1))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -304,15 +303,15 @@ class OwnerSubscriberTest extends TestCase
             $router,
             $twig,
             $themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class),
-            $this->createMock(SMimeHelper::class),
-            $this->createMock(EmailStatModel::class),
+            $this->createStub(AssetModel::class),
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
+            $this->createStub(SMimeHelper::class),
+            $this->createStub(EmailStatModel::class),
         );
         $mailerHelper->setLead($lead);
 

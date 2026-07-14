@@ -15,10 +15,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
+final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 {
     private const STAGE_NAME_TOKEN       = '%stage_name%';
+
     private const SALES_USER_EMAIL_TOKEN = '%sales_user_email%';
+
     private const STAGE_NAME             = 'Test Stage';
 
     protected $useCleanupRollback   = false;
@@ -138,9 +140,7 @@ class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
      */
     private function replacePlaceholders(array $data, array $replacements): array
     {
-        return array_map(function ($value) use ($replacements) {
-            return str_replace(array_keys($replacements), array_values($replacements), $value);
-        }, $data);
+        return array_map(fn ($value): string => str_replace(array_keys($replacements), array_values($replacements), $value), $data);
     }
 
     /**

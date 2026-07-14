@@ -22,7 +22,7 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SmsModel $smsModel;
 
-    private MockObject&TransportChain $transportChain;
+    private \PHPUnit\Framework\MockObject\Stub&TransportChain $transportChain;
 
     private MockObject&TranslatorInterface $translator;
 
@@ -31,14 +31,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->smsModel       = $this->createMock(SmsModel::class);
-        $this->transportChain = $this->createMock(TransportChain::class);
+        $this->transportChain = $this->createStub(TransportChain::class);
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->subscriber     = new CampaignSendSubscriber($this->smsModel, $this->transportChain, $this->translator);
     }
 
     public function testSendDeletedSms(): void
     {
-        $this->smsModel->expects(self::once())->method('getEntity')->willReturn(null);
+        $this->smsModel->expects($this->once())->method('getEntity')->willReturn(null);
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.missing_entity');
 
         $event    = new Event();
@@ -96,7 +96,7 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $event->setType('sms.send_text_sms');
 
-        $this->smsModel->expects(self::once())->method('getEntity')->willReturn($sms);
+        $this->smsModel->expects($this->once())->method('getEntity')->willReturn($sms);
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.unpublished');
 
         $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));

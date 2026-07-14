@@ -183,10 +183,8 @@ class Redirect extends FormEntity
 
     /**
      * @param ArrayCollection $trackables
-     *
-     * @return Redirect
      */
-    public function setTrackables($trackables)
+    public function setTrackables($trackables): static
     {
         $this->trackables = $trackables;
 

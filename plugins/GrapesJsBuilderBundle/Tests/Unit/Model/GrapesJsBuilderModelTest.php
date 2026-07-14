@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {
@@ -73,7 +73,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -91,13 +91,13 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $requestStack,
             $emailModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Router::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
             $this->getTranslator(),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
@@ -176,7 +176,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -194,13 +194,13 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $requestStack,
             $emailModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Router::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
             $this->getTranslator(),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
@@ -214,7 +214,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($emailRepository) extends EmailModel {
             public function __construct(
-                private EmailRepository $emailRepository,
+                private readonly EmailRepository $emailRepository,
             ) {
             }
 

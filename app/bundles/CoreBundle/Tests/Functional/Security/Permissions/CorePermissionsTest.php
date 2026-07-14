@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class CorePermissionsTest extends MauticMysqlTestCase
+final class CorePermissionsTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<array{bool}>
@@ -28,7 +28,7 @@ class CorePermissionsTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
         $this->loginUser($user);
         $permissions = self::getContainer()->get('mautic.security');
-        \assert($permissions instanceof CorePermissions);
+        $this->assertInstanceOf(CorePermissions::class, $permissions);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));
 
         Assert::assertSame($grant, $permissions->isGranted('test:group:action', 'MATCH_ALL', $user));

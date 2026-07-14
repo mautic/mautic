@@ -14,7 +14,9 @@ trait LoggerTrait
      * @var ?HandlerInterface[]
      */
     private ?array $originalHandlers = null;
+
     private Logger $logger;
+
     private TestHandler $testHandler;
 
     protected function setUp(): void

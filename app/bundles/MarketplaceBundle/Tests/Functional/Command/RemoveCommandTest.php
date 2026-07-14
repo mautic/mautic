@@ -9,22 +9,15 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
-    /**
-     * @var MockObject&LoggerInterface
-     */
-    private MockObject $logger;
-
     private string $packageName;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->logger      = $this->createMock(LoggerInterface::class);
         $this->packageName = 'koco/mautic-recaptcha-bundle';
     }
 
@@ -36,7 +29,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn(['koco/mautic-recaptcha-bundle']);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',
@@ -55,7 +48,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',
@@ -74,7 +67,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             ->willReturn(new ConsoleOutput(1, 'Error while removing package'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
-        $command = new RemoveCommand($composer, $this->logger);
+        $command = new RemoveCommand($composer, $this->createStub(LoggerInterface::class));
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:remove',

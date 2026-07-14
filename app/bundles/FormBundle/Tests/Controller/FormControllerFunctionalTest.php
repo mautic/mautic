@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
@@ -20,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormControllerFunctionalTest extends MauticMysqlTestCase
+final class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -109,7 +111,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
-        $this->assertEquals('message', $selectedValue);
+        $this->assertSame('message', $selectedValue);
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
 
@@ -133,7 +135,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
-        $this->assertEquals('message', $selectedValue);
+        $this->assertSame('message', $selectedValue);
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
 
@@ -406,7 +408,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $this->createForm('test', 'test');
 
         // Persist entities if provided
-        if (!empty($inputValues['entities'])) {
+        if (isset($inputValues['entities'])) {
             foreach ($inputValues['entities'] as $entity) {
                 $this->em->persist($entity);
             }
@@ -424,7 +426,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $translator = $this->getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {
             $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);
@@ -665,7 +667,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $fields = $clonedForm->getFields()->getValues();
         Assert::assertCount(3, $fields);
 
-        list($clonedField1, $clonedField2, $clonedSubmit) = $fields;
+        [$clonedField1, $clonedField2, $clonedSubmit] = $fields;
         Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
     }
 

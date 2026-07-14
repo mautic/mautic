@@ -42,7 +42,7 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
             array_push($queueIds, $addedLog->getId());
 
             $handlerStack->append(
-                function (RequestInterface $request) {
+                function (RequestInterface $request): Response {
                     Assert::assertSame('POST', $request->getMethod());
                     Assert::assertSame('https://httpbin.org/post', $request->getUri()->__toString());
 

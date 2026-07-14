@@ -73,7 +73,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test that the command will create the field
         $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         // Test fetching
         $this->assertGetResponse($payload, $id);
@@ -171,7 +171,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldAlias = 'test_multi';
 
         $fieldModel = $this->getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         Assert::assertEmpty($fields, 'There are no Custom Fields.');
@@ -207,14 +207,14 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, ['bramborak', 'makovec']);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $this->client->request('GET', '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -283,7 +283,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldAlias = 'test_single';
 
         $fieldModel = $this->getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         Assert::assertEmpty($fields, 'There are no Custom Fields.');
@@ -319,14 +319,14 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, ['makovec']);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $this->client->request('GET', '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
@@ -535,7 +535,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Execute the command to create the field
         $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         // Create a segment which uses the custom field we just created.
         $segment = new LeadList();

@@ -232,9 +232,12 @@ class PublicController extends FormController
     /**
      * This is only called internally.
      *
+     * @param mixed[] $result
+     * @param mixed[] $validatedRequest
+     *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction(LoggerInterface $mauticLogger, $result, $validatedRequest): Response
+    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, array $validatedRequest): Response
     {
         $notify = $validatedRequest['notify'];
 
@@ -275,8 +278,8 @@ class PublicController extends FormController
                         $phone = $result['organization']['contactInfo']['phoneNumbers'][0];
                         foreach ($result['organization']['contactInfo']['phoneNumbers'] as $phoneNumber) {
                             if (array_key_exists('label', $phoneNumber)
-                                && 0 >= strpos(
-                                    strtolower($phoneNumber['label']),
+                                && 0 >= stripos(
+                                    $phoneNumber['label'],
                                     'fax'
                                 )
                             ) {

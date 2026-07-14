@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Accessor;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
-class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
+final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, string> */
     protected array $config = [
@@ -30,7 +32,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
     {
         $configAccessor = new ConfigAccessor($this->config);
 
-        $this->assertEquals('path_user', $configAccessor->getKey());
+        $this->assertSame('path_user', $configAccessor->getKey());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test its considered configured if we have a host and a folder')]

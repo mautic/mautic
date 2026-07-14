@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FilePathResolver
 {
     public function __construct(
-        private Filesystem $filesystem,
-        private InputHelper $inputHelper,
+        private readonly Filesystem $filesystem,
+        private readonly InputHelper $inputHelper,
     ) {
     }
 
@@ -82,10 +82,8 @@ class FilePathResolver
 
     /**
      * @param string $uploadDir
-     * @param string $fileName
-     * @param string $ext
      */
-    private function getFilePath($uploadDir, $fileName, $ext): string
+    private function getFilePath($uploadDir, string $fileName, string $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
     }

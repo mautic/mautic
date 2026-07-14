@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -10,7 +12,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, array<string, int|string>> */
     protected array $mailboxes = [
@@ -55,7 +57,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $mailbox = $this->createMock(Mailbox::class);
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                fn ($mailbox) => $this->mailboxes[$mailbox]
+                fn ($mailbox): array => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);
@@ -68,7 +70,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->willReturn($event);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
         $fetcher = new Fetcher($mailbox, $dispatcher, $translator);
         $fetcher->setMailboxes(array_keys($this->mailboxes))

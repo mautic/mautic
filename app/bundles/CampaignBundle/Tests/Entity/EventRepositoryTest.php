@@ -76,7 +76,7 @@ final class EventRepositoryTest extends TestCase
 
         $eventRepository = $this->configureRepository(Event::class, $emMock);
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(fn () => $queryBuilderMock);
+            ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
 
         $eventMock       = $this->createMock(Event::class);
         $eventMock->method('getId')

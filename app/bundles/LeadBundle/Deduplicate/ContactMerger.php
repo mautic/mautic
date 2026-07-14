@@ -77,10 +77,8 @@ class ContactMerger
 
     /**
      * Merge timestamps.
-     *
-     * @return $this
      */
-    public function mergeTimestamps(Lead $winner, Lead $loser)
+    public function mergeTimestamps(Lead $winner, Lead $loser): static
     {
         // The winner should keep the most recent last active timestamp of the two
         if ($loser->getLastActive() > $winner->getLastActive()) {
@@ -102,10 +100,8 @@ class ContactMerger
 
     /**
      * Merge IP history into the winner.
-     *
-     * @return $this
      */
-    public function mergeIpAddressHistory(Lead $winner, Lead $loser)
+    public function mergeIpAddressHistory(Lead $winner, Lead $loser): static
     {
         $ipAddresses = $loser->getIpAddresses();
 
@@ -120,10 +116,8 @@ class ContactMerger
 
     /**
      * Merge custom field data into winner.
-     *
-     * @return $this
      */
-    public function mergeFieldData(Lead $winner, Lead $loser)
+    public function mergeFieldData(Lead $winner, Lead $loser): static
     {
         // Use the modified date if applicable or date added if the contact has never been edited
         $loserDate  = $loser->getDateModified() ?: $loser->getDateAdded();
@@ -180,10 +174,8 @@ class ContactMerger
 
     /**
      * Merge owners if the winner isn't already assigned an owner.
-     *
-     * @return $this
      */
-    public function mergeOwners(Lead $winner, Lead $loser)
+    public function mergeOwners(Lead $winner, Lead $loser): static
     {
         $oldOwner = $winner->getOwner();
         $newOwner = $loser->getOwner();
@@ -199,10 +191,8 @@ class ContactMerger
 
     /**
      * Sum points from both contacts.
-     *
-     * @return $this
      */
-    public function mergePoints(Lead $winner, Lead $loser)
+    public function mergePoints(Lead $winner, Lead $loser): static
     {
         $winnerPoints = (int) $winner->getPoints();
         $loserPoints  = (int) $loser->getPoints();
@@ -218,10 +208,8 @@ class ContactMerger
 
     /**
      * Merge tags from loser into winner.
-     *
-     * @return $this
      */
-    public function mergeTags(Lead $winner, Lead $loser)
+    public function mergeTags(Lead $winner, Lead $loser): static
     {
         $loserTags = $loser->getTags();
         $addTags   = $loserTags->getKeys();
@@ -285,10 +273,8 @@ class ContactMerger
 
     /**
      * Merge past merge records into the winner.
-     *
-     * @return $this
      */
-    private function updateMergeRecords(Lead $winner, Lead $loser)
+    private function updateMergeRecords(Lead $winner, Lead $loser): static
     {
         // Update merge records for the lead about to be deleted
         $this->repo->moveMergeRecord($loser->getId(), $winner->getId());

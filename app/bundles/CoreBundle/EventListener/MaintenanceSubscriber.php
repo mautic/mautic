@@ -13,9 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Connection $db,
-        private UserTokenRepositoryInterface $userTokenRepository,
-        private TranslatorInterface $translator,
+        private readonly Connection $db,
+        private readonly UserTokenRepositoryInterface $userTokenRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -35,10 +35,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $event->setStat($this->translator->trans('mautic.maintenance.user_tokens'), $rows);
     }
 
-    /**
-     * @param string $table
-     */
-    private function cleanupData(MaintenanceEvent $event, $table): void
+    private function cleanupData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -75,7 +72,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'id', ':ids'
                       )
                   )
-                  ->setParameter('ids', array_map('intval', $ids), ArrayParameterType::INTEGER)
+                  ->setParameter('ids', array_map(intval(...), $ids), ArrayParameterType::INTEGER)
                   ->executeStatement();
             }
         }

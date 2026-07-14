@@ -17,7 +17,7 @@ class ConditionExecutioner implements EventInterface
     public const TYPE = 'condition';
 
     public function __construct(
-        private ConditionDispatcher $dispatcher,
+        private readonly ConditionDispatcher $dispatcher,
     ) {
     }
 

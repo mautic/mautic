@@ -10,11 +10,7 @@ class PointActionHelper
         $formId       = $form->getId();
         $limitToForms = $action['properties']['forms'];
 
-        if (!empty($limitToForms) && !in_array($formId, $limitToForms)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToForms) || in_array($formId, $limitToForms);
     }
 }

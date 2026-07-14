@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
-        private FormModel $model,
+        private readonly FormModel $model,
     ) {
     }
 
@@ -99,7 +99,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
-                                } elseif (!is_array($option)) {
+                                } else {
                                     // Kept here for BC
                                     $options[$field->getAlias()][$option] = $option;
                                 }

@@ -16,9 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LeadControllerTest extends MauticMysqlTestCase
+final class LeadControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
+
     /**
      * @var array<string>
      */
@@ -178,7 +179,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 

@@ -62,10 +62,8 @@ class LineChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and data. Method will add the rest.
      *
      * @param string $label
-     *
-     * @return $this
      */
-    public function setDataset($label, array $data)
+    public function setDataset($label, array $data): static
     {
         $datasetId = count($this->datasets);
 

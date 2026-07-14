@@ -71,12 +71,12 @@ class AjaxController extends CommonController
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
 
-                if (3 == count($parts) && 'plugin' == $parts['0']) {
+                if (3 === count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
                 }
 
-                if (2 == count($parts)) {
+                if (2 === count($parts)) {
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
