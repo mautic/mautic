@@ -53,7 +53,7 @@ final class InstallCommandTest extends TestCase
 
     public function testCommandWhenSiteInstalled(): void
     {
-        $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(true);
+        $this->installer->method('checkIfInstalled')->willReturn(true);
 
         $input  = new ArrayInput(['site_url' => 'localhost']);
         $output = new BufferedOutput();
@@ -64,7 +64,7 @@ final class InstallCommandTest extends TestCase
 
     public function testCommandWhenSiteNotInstalled(): void
     {
-        $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(false);
+        $this->installer->method('checkIfInstalled')->willReturn(false);
 
         $this->doctrineRegistry->method('getConnection')->willReturn($this->createStub(ConnectionWrapper::class));
 

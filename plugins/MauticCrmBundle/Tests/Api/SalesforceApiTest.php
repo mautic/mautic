@@ -442,7 +442,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $api = new SalesforceApi($integration);
 
-        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+        $this->assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
 
         $api->getLeads($params, 'Lead');
     }
@@ -515,7 +515,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $api = new SalesforceApi($integration);
 
-        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+        $this->assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
 
         $api->getLeads($params, 'Lead');
     }

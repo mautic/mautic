@@ -205,7 +205,7 @@ final class HttpFactoryTest extends TestCase
 
         $client1 = $factory->getClient($credentials);
         $client2 = $factory->getClient($credentials);
-        $this->assertTrue($client1 === $client2);
+        $this->assertSame($client2, $client1);
 
         $credentials2 = new class() implements ClientCredentialsGrantInterface {
             public function getAuthorizationUrl(): string
@@ -225,7 +225,7 @@ final class HttpFactoryTest extends TestCase
         };
 
         $client3 = $factory->getClient($credentials2);
-        $this->assertFalse($client1 === $client3);
+        $this->assertNotSame($client3, $client1);
     }
 
     public function testReAuthClientConfiguration(): void
@@ -333,7 +333,7 @@ final class HttpFactoryTest extends TestCase
         $client              = (new \Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory())->getClient($credentials, $clientCredentialSigner);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner') === $signerInterface);
+        $this->assertSame($signerInterface, $this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner'));
 
         $tokenPersistence = $this->createMock(ConfigTokenPersistenceInterface::class);
         $tokenPersistence->expects($this->once())
@@ -343,7 +343,7 @@ final class HttpFactoryTest extends TestCase
         $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence') === $kamermansTokenPersistence);
+        $this->assertSame($kamermansTokenPersistence, $this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence'));
 
         $tokenPersistence = $this->createMock(ConfigTokenSignerInterface::class);
         $tokenPersistence->expects($this->once())
@@ -353,7 +353,7 @@ final class HttpFactoryTest extends TestCase
         $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner') === $accessTokenSigner);
+        $this->assertSame($accessTokenSigner, $this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner'));
     }
 
     /**

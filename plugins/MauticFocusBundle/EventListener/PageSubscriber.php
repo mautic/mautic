@@ -45,7 +45,7 @@ class PageSubscriber implements EventSubscriberInterface
                 TokenFormatOptions::simplePrefix('mautic.focus.focus_item'),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }

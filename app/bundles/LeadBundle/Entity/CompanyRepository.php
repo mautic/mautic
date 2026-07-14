@@ -349,7 +349,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     public function getCompaniesForContacts(array $contacts): array
     {
-        if (!$contacts) {
+        if ([] === $contacts) {
             return [];
         }
 

@@ -40,7 +40,7 @@ class AjaxController extends CommonAjaxController
 
         $selectedTypes = InputHelper::cleanArray($request->request->all()['types'] ?? []);
 
-        if (!$selectedTypes) {
+        if ([] === $selectedTypes) {
             throw new \InvalidArgumentException('mautic.webhook.label.no.events');
         }
 

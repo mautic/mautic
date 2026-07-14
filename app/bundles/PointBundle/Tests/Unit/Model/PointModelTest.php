@@ -137,17 +137,17 @@ final class PointModelTest extends TestCase
         $repository->expects($this->once())
             ->method('getCompletedLeadActions')
             ->willReturn([]);
-        $repository->expects(self::never())
+        $repository->expects($this->never())
             ->method('saveEntities');
-        $repository->expects(self::never())
+        $repository->expects($this->never())
             ->method('detachEntities');
 
-        $this->dispatcher->expects(self::exactly(2))
+        $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (Event $event, string $eventName) use ($pointActionHelper, $type, $lead, $point): Event {
                 if (PointEvents::POINT_ON_BUILD === $eventName) {
-                    self::assertInstanceOf(PointBuilderEvent::class, $event);
-                    self::assertEquals(new PointBuilderEvent($this->translator), $event);
+                    $this->assertInstanceOf(PointBuilderEvent::class, $event);
+                    $this->assertEquals(new PointBuilderEvent($this->translator), $event);
                     $event->addAction(
                         $type,
                         [
@@ -165,7 +165,7 @@ final class PointModelTest extends TestCase
 
                 if (PointEvents::POINT_ON_ACTION === $eventName) {
                     $pointActionEvent = new PointActionEvent($point, $lead);
-                    self::assertEquals($pointActionEvent, $event);
+                    $this->assertEquals($pointActionEvent, $event);
 
                     return $pointActionEvent;
                 }

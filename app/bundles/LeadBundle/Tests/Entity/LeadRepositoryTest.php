@@ -163,10 +163,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('createQuery')
             ->willReturn($query);
 
-        self::assertSame(
-            [1, 2],
-            $this->repository->getContactIdsByEmails($emails)
-        );
+        $this->assertSame([1, 2], $this->repository->getContactIdsByEmails($emails));
     }
 
     public function testGetUniqueIdentifiersOperator(): void
