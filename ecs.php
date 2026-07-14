@@ -36,6 +36,7 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\LanguageConstruct\IsNullFixer::class,
         PhpCsFixer\Fixer\LanguageConstruct\ExplicitIndirectVariableFixer::class,
         PhpCsFixer\Fixer\Operator\NewWithParenthesesFixer::class,
+        PhpCsFixer\Fixer\ClassNotation\SelfAccessorFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
