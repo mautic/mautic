@@ -8,8 +8,9 @@ use GuzzleHttp\Client;
 
 class ClientFactory
 {
-    public function __construct(private Client $httpClient)
-    {
+    public function __construct(
+        private readonly Client $httpClient,
+    ) {
     }
 
     public function __invoke(): Client

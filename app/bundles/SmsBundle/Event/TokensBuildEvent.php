@@ -9,8 +9,9 @@ class TokensBuildEvent extends Event
     /**
      * @param array<string, string> $tokens
      */
-    public function __construct(private array $tokens)
-    {
+    public function __construct(
+        private array $tokens,
+    ) {
     }
 
     /**

@@ -30,7 +30,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
 
     public function getSimpleCache(): Psr16Cache
     {
-        if (is_null($this->psr16)) {
+        if (null === $this->psr16) {
             $this->psr16 = new Psr16Cache($this->getCacheAdapter());
         }
 

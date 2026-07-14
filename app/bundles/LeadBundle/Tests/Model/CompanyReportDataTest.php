@@ -24,7 +24,7 @@ final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
     }
 
@@ -125,7 +125,7 @@ final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             ->method('getEntities')
             ->willReturn([$field]);
 
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('hasColumn')
             ->willReturn(false);
 

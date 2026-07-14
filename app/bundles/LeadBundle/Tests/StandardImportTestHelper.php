@@ -143,19 +143,16 @@ abstract class StandardImportTestHelper extends CommonMocks
         $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        /** @var MockObject&UserHelper */
-        $userHelper = $this->createMock(UserHelper::class);
-
-        /** @var MockObject&LeadEventLogRepository */
+        /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createMock(LeadEventLogRepository::class);
 
-        /** @var MockObject&ImportRepository */
+        /** @var MockObject&ImportRepository $importRepository */
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->method('getValue')
             ->willReturn(true);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -164,7 +161,7 @@ abstract class StandardImportTestHelper extends CommonMocks
                 ]
             );
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('isOpen')
             ->willReturn($entityManagerOpen);
 
@@ -174,7 +171,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->setConstructorArgs([16 => $this->entityManager])
             ->getMock();
 
-        $leadModel->expects($this->any())
+        $leadModel
             ->method('getEventLogRepository')
             ->willReturn($logRepository);
 
@@ -203,7 +200,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             $this->dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
             $translator,
-            $userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             new ProcessSignalService()
         );

@@ -19,7 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectEntityLoaderService
 {
-    /** @var array<string, EntityTypeConfig> */
+    /**
+     * @var array<string, EntityTypeConfig>
+     */
     private array $entityTypesCache = [];
 
     public function __construct(
@@ -275,8 +277,8 @@ final class ProjectEntityLoaderService
     {
         // Try possible translation keys in order
         $keys = [
-            "mautic.project.$entityType",
-            "mautic.$entityType.$entityType",
+            "mautic.project.{$entityType}",
+            "mautic.{$entityType}.{$entityType}",
         ];
 
         foreach ($keys as $key) {

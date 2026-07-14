@@ -172,25 +172,25 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @var ArrayCollection<int, Event>
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $children;
 
     /**
      * @var Event|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $parent;
 
     /**
      * @var string|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $decisionPath;
 
     /**
      * @var string|null
-     **/
+     */
     private $tempId;
 
     /**
@@ -528,7 +528,7 @@ class Event implements ChannelInterface, UuidInterface
     private function isChanged(string $prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' === $prop || 'parent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -537,8 +537,8 @@ class Event implements ChannelInterface, UuidInterface
 
                 return true;
             }
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        } elseif ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
 
             return true;
         }
@@ -691,9 +691,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * Remove log.
-     */
     public function removeLog(LeadEventLog $log): void
     {
         $this->log->removeElement($log);
@@ -800,9 +797,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->getChildren()->matching($criteria);
     }
 
-    /**
-     * Set parent.
-     */
     public function setParent(?Event $parent = null): static
     {
         $isChanged = $this->isChanged('parent', $parent);
@@ -814,9 +808,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * Remove parent.
-     */
     public function removeParent(): void
     {
         $this->isChanged('parent', '');
@@ -1152,7 +1143,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getFailedCount(): int

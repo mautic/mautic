@@ -179,8 +179,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count email clickthrough.
-     *
      * @return int
      */
     public function countEmailClickthrough()
@@ -281,9 +279,9 @@ class HitRepository extends CommonRepository
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
+        $pages      = $q->select("p.id, p.{$hitsColumn} as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->$inOrEq('p.id', $pageIds))
+            ->where($q->expr()->{$inOrEq}('p.id', $pageIds))
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -301,7 +299,7 @@ class HitRepository extends CommonRepository
         // else we would have recorded the date_left on a subsequent page hit
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
-            $q->expr()->$inOrEq('h.page_id', $pageIds),
+            $q->expr()->{$inOrEq}('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),
             $q->expr()->isNull('h.date_left')
         );

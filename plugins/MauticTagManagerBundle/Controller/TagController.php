@@ -481,7 +481,8 @@ class TagController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->isGranted(self::PERMISSION_VIEW)) {
+        }
+        if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
         }
 

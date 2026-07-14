@@ -411,13 +411,15 @@ final class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
-    /** @param array<string, array{0: mixed, 1: mixed}> $fieldChanges */
+    /**
+     * @param array<string, array{0: mixed, 1: mixed}> $fieldChanges
+     */
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
-        $this->syncIntegrationsHelper->expects($this->any())
+        $this->syncIntegrationsHelper
             ->method('getEnabledIntegrations')
             ->willReturn($enabledIntegrations);
 

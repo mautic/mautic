@@ -9,8 +9,10 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
@@ -37,6 +39,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
+        /** @var PageModel $pageModel */
         $pageModel = self::getContainer()->get('mautic.page.model.page');
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
@@ -113,6 +116,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+        $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         self::assertResponseIsSuccessful();
@@ -124,6 +128,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+        $this->assertInstanceOf(Report::class, $reportClone);
 
         Assert::assertSame($report->getId() + 1, $reportClone->getId());
     }
@@ -181,6 +186,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
@@ -286,6 +292,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactReportNotLikeExpression(): void
     {
+        /** @var LeadModel $contactModel */
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
@@ -396,10 +403,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue($newScheduleUnit);
-        if (!is_null($newScheduleDay)) {
+        if (null !== $newScheduleDay) {
             $form['report[scheduleDay]']->setValue($newScheduleDay);
         }
-        if (!is_null($newScheduleMonthFrequency)) {
+        if (null !== $newScheduleMonthFrequency) {
             $form['report[scheduleMonthFrequency]']->setValue($newScheduleMonthFrequency);
         }
 
@@ -451,13 +458,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/reports/'.$report->getId());
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
 
         // Check the list
         $this->client->request('GET', '/s/reports');
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
     }
 
     public function testXssUrlFromQuery(): void
@@ -481,10 +488,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $this->assertResponseStatusCodeSame(200);
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
     }
 
     public function testDelayedTransport(): void
@@ -636,7 +643,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', $url);
         $this->assertStringNotContainsString(
             'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -666,7 +673,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, $content);
+        Assert::assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -711,6 +718,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, $content);
+        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

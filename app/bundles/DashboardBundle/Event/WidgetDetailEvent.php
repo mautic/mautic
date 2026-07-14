@@ -38,8 +38,12 @@ class WidgetDetailEvent extends CommonEvent
 
     private bool $isPreview = false;
 
-    public function __construct(private readonly TranslatorInterface $translator, private readonly CorePermissions $security, protected Widget $widget, private readonly ?CacheProviderTagAwareInterface $cacheProvider = null)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        protected Widget $widget,
+        private readonly ?CacheProviderTagAwareInterface $cacheProvider = null,
+    ) {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
     }
@@ -123,7 +127,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget type.
      *
-     * @return string $type
+     * @return string
      */
     public function getType()
     {
@@ -184,7 +188,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template.
      *
-     * @return string $template
+     * @return string
      */
     public function getTemplate()
     {
@@ -249,7 +253,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get an error message.
      *
-     * @return string $errorMessage
+     * @return string
      */
     public function getErrorMessage()
     {
@@ -347,7 +351,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     private function usesLegacyCache(): bool
     {
-        return is_null($this->cacheProvider);
+        return null === $this->cacheProvider;
     }
 
     /**

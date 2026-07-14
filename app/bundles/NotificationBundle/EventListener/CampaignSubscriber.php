@@ -142,7 +142,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $playerIds = $this->getLeadPlayerIds($event, $log);
 
-            if (!$playerIds) {
+            if ([] === $playerIds) {
                 continue;
             }
 
@@ -207,7 +207,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $playerIds[] = $pushID->getPushID();
         }
 
-        if (!$playerIds) {
+        if ([] === $playerIds) {
             $event->passWithError($log, $this->translator->trans('mautic.notification.campaign.failed.not_subscribed'));
         }
 
@@ -293,7 +293,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $playerIds = $this->getLeadPlayerIds($event, $log);
 
-            if (!$playerIds) {
+            if ([] === $playerIds) {
                 continue;
             }
 

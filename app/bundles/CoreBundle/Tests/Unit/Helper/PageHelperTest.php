@@ -21,8 +21,7 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->session              = $this->createMock(SessionInterface::class);
         $requestStack               = $this->createMock(RequestStack::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $this->pageHelper           = new PageHelper($requestStack, $coreParametersHelper, 'mautic.test', 0);
+        $this->pageHelper           = new PageHelper($requestStack, $this->createStub(CoreParametersHelper::class), 'mautic.test', 0);
 
         $requestStack->method('getSession')->willReturn($this->session);
     }
@@ -38,7 +37,9 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    /**
+     * @return array<int, array{0: int, 1: int, 2: int}>
+     */
     public static function pageProvider(): array
     {
         return [
@@ -65,7 +66,9 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    /**
+     * @return array<int, array{0: int, 1: int, 2: int}>
+     */
     public static function startProvider(): array
     {
         return [

@@ -199,7 +199,8 @@ class DynamicContentController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -257,7 +258,8 @@ class DynamicContentController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
+        }
+        if (!$this->security->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -363,7 +365,8 @@ class DynamicContentController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess(
+        }
+        if (!$security->hasEntityAccess(
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()
@@ -372,8 +375,8 @@ class DynamicContentController extends FormController
             $this->throwAccessDenied();
         }
 
-        /* @var DynamicContent $parent */
-        /* @var DynamicContent[] $children */
+        /** @var DynamicContent $translationParent */
+        /** @var DynamicContent[] $translationChildren */
         [$translationParent, $translationChildren] = $entity->getTranslations();
 
         // Audit Log
@@ -481,7 +484,8 @@ class DynamicContentController extends FormController
                 ];
 
                 return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
-            } elseif (!$this->security->hasEntityAccess(
+            }
+            if (!$this->security->hasEntityAccess(
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
                 $entity->getCreatedBy()

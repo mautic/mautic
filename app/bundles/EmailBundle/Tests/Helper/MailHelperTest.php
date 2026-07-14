@@ -415,12 +415,12 @@ final class MailHelperTest extends TestCase
         $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
 
         foreach ($metadatas as $key => $metadata) {
-            $this->assertTrue(isset($metadata[$this->contacts[$key]['email']]));
+            $this->assertArrayHasKey($this->contacts[$key]['email'], $metadata);
 
             if (0 === $key) {
                 // Should have two contacts
                 $this->assertCount(2, $metadata);
-                $this->assertTrue(isset($metadata['contact4@somewhere.com']));
+                $this->assertArrayHasKey('contact4@somewhere.com', $metadata);
             } else {
                 $this->assertCount(1, $metadata);
             }
@@ -1202,7 +1202,7 @@ final class MailHelperTest extends TestCase
 
         $callCount = 0;
         $this->router->method('generate')
-            ->willReturnCallback(function ($route, $params = []) use (&$callCount, $unsubscribeUrl, $trackingPixelUrl, $emailSecret): string {
+            ->willReturnCallback(function (string $route, array $params = []) use (&$callCount, $unsubscribeUrl, $trackingPixelUrl, $emailSecret): string {
                 if (0 === $callCount++) {
                     $this->assertSame('mautic_email_unsubscribe', $route);
                     $this->assertSame(['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret], $params);
@@ -1277,7 +1277,7 @@ final class MailHelperTest extends TestCase
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $this->router->method('generate')
-            ->willReturnCallback(fn ($route): string => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+            ->willReturnCallback(fn (string $route): string => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1608,7 +1608,7 @@ final class MailHelperTest extends TestCase
 
         $body = $transport->getMessage()->getHtmlBody();
 
-        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', (string) $body);
         $this->assertSame(2, substr_count($body, 'cid:'));
 
         $metadata = $transport->getMessage()->getMetadata();
@@ -2011,7 +2011,7 @@ final class MailHelperTest extends TestCase
             });
 
         $this->router->method('generate')
-            ->willReturnCallback(fn ($route) => match ($route) {
+            ->willReturnCallback(fn (string $route): string => match ($route) {
                 'mautic_email_unsubscribe' => '/unsubscribe',
                 'mautic_email_tracker'     => '/tracking.gif',
                 default                    => $route,

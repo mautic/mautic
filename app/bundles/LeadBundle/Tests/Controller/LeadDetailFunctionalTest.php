@@ -58,7 +58,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ]);
-        $leadFields = array_filter($lead->getFields(true), fn ($value): bool => isset($value['value']));
+        $leadFields = array_filter($lead->getFields(true), fn (array $value): bool => isset($value['value']));
         $leadFields = array_keys($leadFields);
 
         // get expected core labels
@@ -110,7 +110,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(sprintf('Campaigns for %s', $firstName), $dataHeader);
         $response = $this->client->getResponse();
         // Make sure the data-target-url is not an absolute URL
-        Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), $response->getContent());
+        Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), (string) $response->getContent());
     }
 
     public function testLeadDetailPageForSocialTabInDetailsCollapsibleForNoData(): void

@@ -549,7 +549,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function noMoreRequestAssertion(): callable
     {
-        return function (): void {
+        return function (): never {
             $this->fail('No other request was expected');
         };
     }

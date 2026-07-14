@@ -10,10 +10,14 @@ trait DataGeneratorTrait
 
     protected int $id = 0;
 
-    /** @var array<int, array{id: int}> */
+    /**
+     * @var array<int, array{id: int}>
+     */
     protected array $generatedRecords = [];
 
-    /** @return array<int, array{id: int}> */
+    /**
+     * @return array<int, array{id: int}>
+     */
     protected function generateData(int $maxPages): array
     {
         $pageSize = ($this->page === $maxPages) ? ConnectwiseIntegration::PAGESIZE / 2 : ConnectwiseIntegration::PAGESIZE;

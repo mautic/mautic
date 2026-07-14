@@ -10,7 +10,7 @@ use Twig\TwigTest;
 
 class ObjectExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('method_exists', fn ($obj, $method): bool => method_exists($obj, $method)),

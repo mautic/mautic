@@ -38,13 +38,19 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $message;
 
-    /** @var MockObject&LeadModel */
+    /**
+     * @var MockObject&LeadModel
+     */
     protected MockObject $leadModel;
 
-    /** @var MockObject&EntityManagerInterface */
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
     protected MockObject $entityManager;
 
-    /** @var MockObject&MessageQueueRepository */
+    /**
+     * @var MockObject&MessageQueueRepository
+     */
     protected MockObject $messageQueueRepository;
 
     protected function setUp(): void
@@ -52,12 +58,11 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel              = $this->createMock(LeadModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
-        $coreHelper                   = $this->createMock(CoreParametersHelper::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->leadModel,
             $this->createStub(CompanyModel::class),
-            $coreHelper,
+            $this->createStub(CoreParametersHelper::class),
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),

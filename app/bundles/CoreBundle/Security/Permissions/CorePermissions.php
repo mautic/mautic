@@ -158,7 +158,7 @@ class CorePermissions implements ResetInterface
                 foreach ($perms as $perm) {
                     // get the bit for the perm
                     if (!$object->isSupported($name, $perm)) {
-                        throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
+                        throw new \InvalidArgumentException("{$perm} does not exist for {$bundle}:{$name}");
                     }
 
                     $bit += $object->getValue($name, $perm);
@@ -252,10 +252,12 @@ class CorePermissions implements ResetInterface
         if ('MATCH_ALL' == $mode) {
             // deny if any of the permissions are denied
             return !in_array(0, $permissions);
-        } elseif ('MATCH_ONE' == $mode) {
+        }
+        if ('MATCH_ONE' == $mode) {
             // grant if any of the permissions were granted
             return in_array(1, $permissions);
-        } elseif ('RETURN_ARRAY' == $mode) {
+        }
+        if ('RETURN_ARRAY' == $mode) {
             return $permissions;
         }
         throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
@@ -368,13 +370,12 @@ class CorePermissions implements ResetInterface
 
         if (0 === $ownerId) {
             return (bool) $other;
-        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
-            return true;
-        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
+        }
+        if ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
         }
 
-        return false;
+        return $other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId;
     }
 
     /**
@@ -478,9 +479,6 @@ class CorePermissions implements ResetInterface
         throw new \UnexpectedValueException("There is no permission object for {$bundle}");
     }
 
-    /**
-     * Register permission classes.
-     */
     private function registerPermissionClasses(): void
     {
         foreach ($this->getBundles() as $bundle) {

@@ -113,7 +113,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * @return array{0: bool, 1:string}
      */
-    public static function validateProperties($type, &$properties): array
+    public static function validateProperties($type, array &$properties): array
     {
         if (!array_key_exists($type, self::$types)) {
             // ensure the field type is supported
@@ -198,8 +198,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Get locale choices.
-     *
      * @return array<string, string>
      */
     public static function getLocaleChoices(): array

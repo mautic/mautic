@@ -321,7 +321,7 @@ class FormSubscriber implements EventSubscriberInterface
             $body = $json;
         } else {
             parse_str($body, $output);
-            if ($output) {
+            if ([] !== $output) {
                 $body = $output;
             }
         }
@@ -366,7 +366,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
-            $output .= "<tr><td style='vertical-align: top'><strong>$key</strong></td><td>";
+            $output .= "<tr><td style='vertical-align: top'><strong>{$key}</strong></td><td>";
             if (is_array($row)) {
                 $output .= $this->postToHtml($row);
             } else {

@@ -37,8 +37,12 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
     /**
      * @param array<mixed> $options
      */
-    public function __construct(private FormLoginAuthenticator $authenticator, private UserProviderInterface $userProvider, private PasswordHasherFactoryInterface $passwordHasherFactory, array $options)
-    {
+    public function __construct(
+        private FormLoginAuthenticator $authenticator,
+        private UserProviderInterface $userProvider,
+        private PasswordHasherFactoryInterface $passwordHasherFactory,
+        array $options,
+    ) {
         $this->authenticator         = $authenticator;
         $this->userProvider          = $userProvider;
         $this->passwordHasherFactory = $passwordHasherFactory;

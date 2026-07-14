@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -15,6 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
+/**
+ * @extends CrmAbstractIntegration<DynamicsApi>
+ */
 class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
@@ -177,7 +181,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param mixed[]|Lead         $lead
+     * @param array<string, mixed> $config
+     *
+     * @return mixed[]
      */
     public function populateLeadData($lead, $config = [], $object = 'Contacts')
     {
@@ -251,7 +258,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                 'UniqueidentifierType',
                             ], true)) {
                                 continue;
-                            } elseif (in_array($fieldType, [
+                            }
+                            if (in_array($fieldType, [
                                 'DoubleType',
                                 'IntegerType',
                                 'MoneyType',
@@ -420,10 +428,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    /**
-     * @param array $params
-     */
-    public function getCompanies($params = []): int
+    public function getCompanies(array $params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000
@@ -680,11 +685,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -726,7 +729,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');
                 $progress = new ProgressBar($output, $totalCount);
             }

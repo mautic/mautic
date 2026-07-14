@@ -177,7 +177,7 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
+     */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $category;
 
@@ -344,8 +344,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -369,8 +367,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get file.
-     *
      * @return File|null
      */
     public function getFile()
@@ -388,8 +384,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set title.
-     *
      * @param string $title
      */
     public function setTitle($title): static
@@ -441,8 +435,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set originalFileName.
-     *
      * @param string $originalFileName
      */
     public function setOriginalFileName($originalFileName): static
@@ -454,8 +446,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get originalFileName.
-     *
      * @return string|null
      */
     public function getOriginalFileName()
@@ -464,8 +454,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set storage location.
-     *
      * @param string $storageLocation
      */
     public function setStorageLocation($storageLocation): static
@@ -477,8 +465,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get storage location.
-     *
      * @return string|null
      */
     public function getStorageLocation()
@@ -502,8 +488,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get path.
-     *
      * @return ?string
      */
     public function getPath()
@@ -530,9 +514,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this->remotePath;
     }
 
-    /**
-     * Set alias.
-     */
     public function setAlias(?string $alias): self
     {
         $this->isChanged('alias', $alias);
@@ -541,17 +522,12 @@ class Asset extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * Get alias.
-     */
     public function getAlias(): ?string
     {
         return $this->alias;
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      */
     public function setPublishUp($publishUp): static
@@ -563,8 +539,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -573,8 +547,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTimeInterface $publishDown
      */
     public function setPublishDown($publishDown): static
@@ -586,8 +558,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()
@@ -596,8 +566,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set downloadCount.
-     *
      * @param int $downloadCount
      */
     public function setDownloadCount($downloadCount): static
@@ -608,8 +576,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get downloadCount.
-     *
      * @return int
      */
     public function getDownloadCount()
@@ -618,8 +584,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set revision.
-     *
      * @param int $revision
      */
     public function setRevision($revision): static
@@ -630,8 +594,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get revision.
-     *
      * @return int
      */
     public function getRevision()
@@ -640,8 +602,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set language.
-     *
      * @param string $language
      */
     public function setLanguage($language): static
@@ -653,8 +613,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get language.
-     *
      * @return string
      */
     public function getLanguage()
@@ -662,9 +620,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this->language;
     }
 
-    /**
-     * Set category.
-     */
     public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null): static
     {
         $this->isChanged('category', $category);
@@ -674,8 +629,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get category.
-     *
      * @return \Mautic\CategoryBundle\Entity\Category|null
      */
     public function getCategory()
@@ -684,8 +637,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set uniqueDownloadCount.
-     *
      * @param int $uniqueDownloadCount
      */
     public function setUniqueDownloadCount($uniqueDownloadCount): static
@@ -696,8 +647,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get uniqueDownloadCount.
-     *
      * @return int
      */
     public function getUniqueDownloadCount()
@@ -811,10 +760,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to the file.
-     *
-     * @return string
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): ?string
     {
         return null === $this->path
             ? null
@@ -823,10 +770,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempPath()
+    public function getAbsoluteTempPath(): ?string
     {
         return null === $this->tempId || null === $this->tempName
             ? null
@@ -835,10 +780,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempDir()
+    public function getAbsoluteTempDir(): ?string
     {
         return null === $this->tempId
             ? null
@@ -860,8 +803,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set uploadDir.
-     *
      * @param string $uploadDir
      */
     public function setUploadDir($uploadDir): static
@@ -887,8 +828,6 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set max size.
-     *
      * @param float $maxSize
      */
     public function setMaxSize($maxSize): static

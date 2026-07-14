@@ -90,7 +90,7 @@ class Stage extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['stage:read', 'stage:write'])]
     private $category;
 

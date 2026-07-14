@@ -107,7 +107,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert
         $this->em->refresh($childSms);
-        $this->assertNull($childSms->getTranslationParent());
+        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\TranslationEntityInterface::class, $childSms->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void

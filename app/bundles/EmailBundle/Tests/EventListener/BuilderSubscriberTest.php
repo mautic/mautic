@@ -36,16 +36,14 @@ final class BuilderSubscriberTest extends TestCase
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $trackableModel             = $this->createMock(TrackableModel::class);
-        $redirectModel              = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
         $fromEmailHelper            = new FromEmailHelper($this->coreParametersHelper, $this->leadRepository);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
-            $trackableModel,
-            $redirectModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
             $fromEmailHelper
@@ -280,7 +278,7 @@ final class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(fn ($route) => match ($route) {
+            ->willReturnCallback(fn (string $route): ?string => match ($route) {
                 'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
                 'mautic_email_webview'     => '/email/webview/'.$emailHash,
                 'mautic_email_preview'     => '/email/preview/111',

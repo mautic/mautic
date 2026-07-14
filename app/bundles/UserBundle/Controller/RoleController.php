@@ -30,10 +30,8 @@ class RoleController extends FormController
 
     /**
      * Generate's default role list view.
-     *
-     * @param int $page
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted('user:roles:view')) {
             $this->throwAccessDenied();
@@ -167,7 +165,8 @@ class RoleController extends FormController
                         'mauticContent' => 'role',
                     ],
                 ]);
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -234,7 +233,8 @@ class RoleController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($entity)) {
+        }
+        if ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'user.role');
         }

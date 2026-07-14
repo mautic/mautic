@@ -75,10 +75,7 @@ class TrackableModel extends AbstractCommonModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
     {
         return $this->em->getRepository(Trackable::class);
     }
@@ -89,15 +86,14 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array      $clickthrough
-     * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param bool|false $shortenUrl If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
      *
      * @return string
      */
     public function generateTrackableUrl(
         Trackable $trackable,
-        $clickthrough = [],
+        array $clickthrough = [],
         $shortenUrl = false,
         $utmTags = [],
     ) {
@@ -478,7 +474,11 @@ class TrackableModel extends AbstractCommonModel
             }
         } else {
             // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
+            try {
+                $trackableUrl = $this->httpBuildUrl($urlParts);
+            } catch (\InvalidArgumentException) {
+                return false;
+            }
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;
@@ -560,11 +560,11 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
-     * @param $urlParts Array from parse_url
+     * @param array<string, mixed> $urlParts from parse_url
      *
      * @return array|false
      */
-    protected function extractTokensFromQuery(&$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts)
     {
         $tokenizedParams = false;
 

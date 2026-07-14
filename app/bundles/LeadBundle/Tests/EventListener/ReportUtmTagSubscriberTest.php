@@ -81,7 +81,6 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($leadColumns);
 
         $fieldsBuilderMock
-            ->expects($this->any())
             ->method('getLeadFilter')
             ->willReturn([
                 'tag' => [
@@ -211,14 +210,11 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportUtmTagSubscriber(): ReportUtmTagSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportUtmTagSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
@@ -233,7 +229,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {

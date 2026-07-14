@@ -82,12 +82,10 @@ final class WebhookModelTest extends TestCase
 
         $this->webhookRepository->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Webhook $entity): true {
+            ->willReturnCallback(function (Webhook $entity): void {
                 // The secret hash is not empty on save.
                 $this->assertNotEmpty($entity->getSecret());
-
-                return true;
-            }));
+            });
 
         $this->model->saveEntity($entity);
     }
@@ -202,7 +200,7 @@ final class WebhookModelTest extends TestCase
 
     public function testProcessWebhook(): void
     {
-        $webhook = new class extends Webhook {
+        $webhook = new class() extends Webhook {
             public function getId(): int
             {
                 return 1;
@@ -213,7 +211,7 @@ final class WebhookModelTest extends TestCase
         $event = new Event();
         $event->setEventType('mautic.email_on_send');
 
-        $queue = new class extends WebhookQueue {
+        $queue = new class() extends WebhookQueue {
             public function getId(): string
             {
                 return '1';
@@ -256,7 +254,7 @@ final class WebhookModelTest extends TestCase
 
     public function testMinAndMaxQueueIdWhenNoneIsSet(): void
     {
-        $webhook = new class extends Webhook {
+        $webhook = new class() extends Webhook {
             public function getId(): int
             {
                 return 1;
@@ -331,7 +329,7 @@ final class WebhookModelTest extends TestCase
 
     public function testMinAndMaxQueueIdWhenBothSet(): void
     {
-        $webhook = new class extends Webhook {
+        $webhook = new class() extends Webhook {
             public function getId(): int
             {
                 return 1;
@@ -416,8 +414,6 @@ final class WebhookModelTest extends TestCase
 
     private function initModel(): WebhookModel
     {
-        $webhookServiceMock = $this->createMock(WebhookService::class);
-
         // create anew webhook model instance using mocks
         $model              = new WebhookModel(
             $this->parametersHelperMock,
@@ -430,7 +426,7 @@ final class WebhookModelTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(Logger::class),
-            $webhookServiceMock
+            $this->createStub(WebhookService::class)
         );
 
         return $model;

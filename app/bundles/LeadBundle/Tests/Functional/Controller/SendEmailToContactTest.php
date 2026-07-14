@@ -85,6 +85,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
     public function testSMimeWithEncryptedPrivateKey(): void
     {
+        /** @var EncryptionHelper $encryptionHelper */
         $encryptionHelper = self::getContainer()->get('mautic.helper.encryption');
         $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
 
@@ -255,8 +256,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($subjectErrorMessage, $responseContent, 'The missing subject line should show an error');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error about the email body');
+        $this->assertStringContainsString($subjectErrorMessage, (string) $responseContent, 'The missing subject line should show an error');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error about the email body');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -266,8 +267,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($bodyErrorMessage, $responseContent, 'The missing body should show an error');
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error about the subject line');
+        $this->assertStringContainsString($bodyErrorMessage, (string) $responseContent, 'The missing body should show an error');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error about the subject line');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -277,7 +278,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error after adding the subject line');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error after adding the body');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error after adding the subject line');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error after adding the body');
     }
 }
