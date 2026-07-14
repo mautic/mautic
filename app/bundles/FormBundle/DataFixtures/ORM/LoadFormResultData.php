@@ -61,7 +61,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $importResults($results2);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 9;
     }

@@ -259,7 +259,7 @@ class ContactMerger
             $this->logger->debug('CONTACT: Associating '.$winner->getId().' with company '.$loserCompanyLead->getCompany()->getId());
         }
 
-        if ($newCompanyLeads) {
+        if ([] !== $newCompanyLeads) {
             // Pass $new = false so the repository does not reset the winner's existing primary company
             $this->companyLeadRepository->saveEntities($newCompanyLeads, false);
             $this->companyLeadRepository->detachEntities($newCompanyLeads);

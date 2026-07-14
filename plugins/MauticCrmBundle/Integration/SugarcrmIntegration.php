@@ -32,6 +32,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends CrmAbstractIntegration<SugarcrmApi>
+ */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
     /**
@@ -1245,7 +1248,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $checkEmailsInSugar = array_merge($checkEmailsUpdatedInSugar, $checkEmailsInSugar);
         }
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
-        if ($deletedSugarLeads) {
+        if ([] !== $deletedSugarLeads) {
             $integrationEntityRepo->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
         }
 
@@ -1604,7 +1607,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
 
-            if ($persistEntities) {
+            if ([] !== $persistEntities) {
                 $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 unset($persistEntities);

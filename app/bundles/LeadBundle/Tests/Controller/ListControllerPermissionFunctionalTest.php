@@ -721,7 +721,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment->setAlias(str_shuffle('abcdefghijklmnopqrstuvwxyz'));
         $segment->setCreatedBy($user);
 
-        if ($filters) {
+        if ([] !== $filters) {
             $segment->setFilters($filters);
         }
 

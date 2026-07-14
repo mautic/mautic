@@ -76,7 +76,7 @@ final class ClientTest extends TestCase
 
         $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload): true {
+            ->willReturnCallback(function (Request $request) use ($method, $url, $headers, $payload, $response): Response {
                 $this->assertSame($method, $request->getMethod());
                 $this->assertSame($url, (string) $request->getUri());
 
@@ -87,9 +87,8 @@ final class ClientTest extends TestCase
 
                 $this->assertSame(json_encode($payload), (string) $request->getBody());
 
-                return true;
-            }))
-            ->willReturn($response);
+                return $response;
+            });
 
         $this->assertEquals($response, $this->client->post($url, $payload, $secret));
     }
