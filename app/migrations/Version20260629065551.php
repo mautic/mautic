@@ -6,15 +6,17 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-final class Version20251029065551 extends PreUpAssertionMigration
+final class Version20260629065551 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        // Idempotency: if the index already exists, skip running the async ALTER.
         $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIndexName());
-        }, sprintf('Index %s already exists', $this->getIndexName()));
+            $table = $schema->getTable($this->getTableName());
+
+            return count($table->getIndexes()) >= IndexHelper::MAX_COUNT_ALLOWED || $table->hasIndex($this->getIndexName());
+        }, sprintf('Index %s cannot be created because the %s table has hit the index limit or the index already exists', $this->getIndexName(), $this->getTableName()));
     }
 
     public function up(Schema $schema): void
