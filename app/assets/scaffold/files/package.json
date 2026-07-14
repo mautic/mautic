@@ -4,6 +4,7 @@
   "description": "Mautic Open Source Distribution",
   "overrides": {
     "ajv": ">=8.18.0",
+    "yaml": ">=2.8.3",
     "raw-loader": {
       "schema-utils": "^4.0.0"
     }
