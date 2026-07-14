@@ -38,17 +38,11 @@ final class FieldTypeTest extends TypeTestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&AlreadyMappedFieldCollectorInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $mappedFieldCollector;
-
     protected function setUp(): void
     {
         $this->translator           = $this->createStub(TranslatorInterface::class);
         $this->objectCollector      = $this->createMock(ObjectCollectorInterface::class);
         $this->fieldCollector       = $this->createMock(FieldCollectorInterface::class);
-        $this->mappedFieldCollector = $this->createStub(AlreadyMappedFieldCollectorInterface::class);
 
         // Set up expected behavior for objectCollector
         $objectCollection = new ObjectCollection();
@@ -82,7 +76,7 @@ final class FieldTypeTest extends TypeTestCase
                     $this->translator,
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->mappedFieldCollector
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class)
                 ),
                 FormFieldBooleanType::class => new FormFieldBooleanType(),
                 FormFieldRatingType::class  => new FormFieldRatingType($this->translator),
