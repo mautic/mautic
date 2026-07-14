@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20251204081531 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = 'monitoring';
+
     private string $uuidColumn = 'uuid';
 
     public function preUp(Schema $schema): void

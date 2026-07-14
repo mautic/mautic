@@ -9,7 +9,9 @@ use Symfony\Component\Process\Process;
 class DbHelper extends Module
 {
     private bool $databasePrepared = false;
+
     private array $dbConfig;
+
     private string $dumpFilePath = 'tests/_data/dump.sql';
 
     public function _beforeSuite($settings = [])

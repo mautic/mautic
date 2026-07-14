@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class LeadListRepository extends CommonRepository
 {
     use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
-
     use ExpressionHelperTrait;
     use RegexTrait;
     use ProjectRepositoryTrait;

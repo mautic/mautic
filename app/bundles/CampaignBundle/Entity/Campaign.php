@@ -55,9 +55,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
-
     use OptimisticLockTrait;
-
     use ProjectTrait;
 
     public const TABLE_NAME  = 'campaigns';

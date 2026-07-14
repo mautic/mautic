@@ -9,7 +9,9 @@ use Step\Acceptance\SegmentStep;
 class EmailManagementCest
 {
     public const ADMIN_PASSWORD = 'Maut1cR0cks!';
+
     public const ADMIN_USER     = 'admin';
+
     public const DATE_FORMAT    = 'Y:m:d H:i:s';
 
     public function _before(AcceptanceTester $I): void

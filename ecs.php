@@ -30,6 +30,7 @@ return ECSConfig::configure()
     ])
     ->withRules([
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+        \PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
@@ -37,4 +38,5 @@ return ECSConfig::configure()
         namespaces: true,
         cleanup: true,
         controlStructures: true,
+        // spaces: true,
     );

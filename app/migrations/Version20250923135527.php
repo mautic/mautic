@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20250923135527 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME  = 'push_notifications';
+
     private const COLUMN_NAME   = 'translation_parent_id';
 
     protected function preUpAssertions(): void

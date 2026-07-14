@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 final class Version20260616135523 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = Email::TABLE_NAME;
+
     private const COLUMN_NAME  = 'settings';
 
     protected function preUpAssertions(): void

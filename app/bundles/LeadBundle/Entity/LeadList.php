@@ -49,7 +49,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
-
     use ProjectTrait;
 
     public const TABLE_NAME  = 'lead_lists';
