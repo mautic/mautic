@@ -10,7 +10,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 class SubmissionResultLoader implements MauticModelInterface
 {
     public function __construct(
-        private EntityManager $entityManager,
+        private readonly EntityManager $entityManager,
     ) {
     }
 
@@ -24,10 +24,7 @@ class SubmissionResultLoader implements MauticModelInterface
         return $repository->getEntity($id);
     }
 
-    /**
-     * @return SubmissionRepository
-     */
-    private function getRepository()
+    private function getRepository(): SubmissionRepository
     {
         return $this->entityManager->getRepository(Submission::class);
     }

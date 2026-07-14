@@ -13,13 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
+final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&ListModel $mockListModel;
 
     private MockObject&ExecutionContext $context;
-
-    private MockObject&RequestStack $requestStack;
 
     private Request $request;
 
@@ -31,14 +29,14 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel = $this->createMock(ListModel::class);
         $this->context       = $this->createMock(ExecutionContext::class);
-        $this->requestStack  = $this->createMock(RequestStack::class);
+        $requestStack        = $this->createMock(RequestStack::class);
         $this->request       = new Request();
 
-        $this->requestStack->expects($this->once())
+        $requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->validator = new CircularDependencyValidator($this->mockListModel, $this->requestStack);
+        $this->validator = new CircularDependencyValidator($this->mockListModel, $requestStack);
         $this->validator->initialize($this->context);
     }
 
@@ -100,26 +98,26 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $mockEntity1 = $this->createMock(LeadList::class);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getId')
             ->willReturn(1);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getFilters')
             ->willReturn($filters);
 
         $mockEntity2 = $this->createMock(LeadList::class);
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getId')
             ->willReturn(2);
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getFilters')
             ->willReturn($filters2);
 
         $mockEntity3 = $this->createMock(LeadList::class);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getId')
             ->willReturn(3);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getFilters')
             ->willReturn($filters3);
 
@@ -129,14 +127,14 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             3 => $mockEntity3,
         ];
 
-        $this->mockListModel->expects($this->any())
+        $this->mockListModel
             ->method('getEntity')
-            ->willReturnCallback(fn ($id) => $entities[$id]);
+            ->willReturnCallback(fn ($id): LeadList&\PHPUnit\Framework\MockObject\MockObject => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
                 ->method('addViolation')
-                ->with($this->equalTo($expectedMessage));
+                ->with($expectedMessage);
         } else {
             $this->context->expects($this->never())
                 ->method('addViolation');
@@ -149,15 +147,20 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Verify a constraint message.
+     *
+     * @param array<int, array<string, mixed>> $filters
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
+    public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public static function validateDataProvider()
+    /**
+     * @return array<int, array{0: ?string, 1: int, 2: array<int, array<string, mixed>>}>
+     */
+    public static function validateDataProvider(): array
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 

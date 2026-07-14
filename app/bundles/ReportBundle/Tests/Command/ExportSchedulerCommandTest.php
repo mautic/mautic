@@ -7,7 +7,7 @@ namespace Mautic\ReportBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class ExportSchedulerCommandTest extends MauticMysqlTestCase
+final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
     public function testCommand(): void
     {

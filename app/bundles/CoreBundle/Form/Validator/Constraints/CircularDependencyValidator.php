@@ -15,8 +15,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $model,
-        private RequestStack $requestStack,
+        private readonly ListModel $model,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -25,7 +25,7 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint): void
     {
-        $dependentSegmentIds = $this->flatten(array_map(fn ($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
+        $dependentSegmentIds = $this->flatten(array_map(fn ($id): array => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
 
         try {
             $segmentId = $this->getSegmentIdFromRequest();
@@ -68,6 +68,6 @@ class CircularDependencyValidator extends ConstraintValidator
 
     private function flatten(array $array): array
     {
-        return array_unique(array_reduce($array, 'array_merge', []));
+        return array_unique(array_reduce($array, array_merge(...), []));
     }
 }

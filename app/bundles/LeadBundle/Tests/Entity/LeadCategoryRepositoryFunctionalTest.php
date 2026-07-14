@@ -13,14 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,
@@ -57,9 +57,8 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testCategoriesOnContactPreferences(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$this->lead->getId());
-        $response   = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
 
@@ -73,9 +72,8 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // Request the preference on Lead detail page.
         $crawler  = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$this->lead->getId());
-        $response = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
 
@@ -199,10 +197,9 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     private function getContactFrequencyCrawler(Lead $lead): Crawler
     {
         // Request the preference on Lead detail page.
-        $crawler  = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$lead->getId());
-        $response = $this->client->getResponse();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$lead->getId());
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         return $crawler;
     }

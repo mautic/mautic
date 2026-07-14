@@ -7,10 +7,13 @@ namespace Mautic\PageBundle\Tests\Entity;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 
-class PageTest extends \PHPUnit\Framework\TestCase
+final class PageTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
-    public function testSetIsPreferenceCenter($value, $expected, array $changes): void
+    public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
         $page->setIsPreferenceCenter($value);
@@ -19,6 +22,9 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
@@ -29,8 +35,11 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, ['isPreferenceCenter' => [null, true]]];
     }
 
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
-    public function testSetNoIndex($value, $expected, array $changes): void
+    public function testSetNoIndex(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
         $page->setNoIndex($value);
@@ -39,6 +48,9 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];

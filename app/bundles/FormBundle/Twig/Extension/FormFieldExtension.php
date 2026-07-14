@@ -18,13 +18,13 @@ final class FormFieldExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('formFieldParseBooleanList', [FormFieldHelper::class, 'parseBooleanList']),
             new TwigFunction('formFieldParseList', [FormFieldHelper::class, 'parseList']),
             new TwigFunction('formFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
-            new TwigFunction('formFieldCleanInputAttributes', [$this, 'cleanInputAttributes']),
+            new TwigFunction('formFieldCleanInputAttributes', $this->cleanInputAttributes(...)),
         ];
     }
 

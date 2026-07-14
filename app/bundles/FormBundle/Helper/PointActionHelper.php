@@ -4,17 +4,13 @@ namespace Mautic\FormBundle\Helper;
 
 class PointActionHelper
 {
-    public static function validateFormSubmit($eventDetails, $action): bool
+    public static function validateFormSubmit($eventDetails, array $action): bool
     {
         $form         = $eventDetails->getForm();
         $formId       = $form->getId();
         $limitToForms = $action['properties']['forms'];
 
-        if (!empty($limitToForms) && !in_array($formId, $limitToForms)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToForms) || in_array($formId, $limitToForms);
     }
 }

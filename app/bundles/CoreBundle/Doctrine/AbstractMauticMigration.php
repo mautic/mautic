@@ -54,7 +54,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $function = $platform.'Up';
 
         if (method_exists($this, $function)) {
-            $this->$function($schema);
+            $this->{$function}($schema);
         }
     }
 

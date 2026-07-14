@@ -41,7 +41,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getPending()
     {
@@ -212,17 +212,17 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
-    public function getFailures()
+    public function getFailures(): ArrayCollection
     {
         return $this->failures;
     }
 
     /**
-     * @return LeadEventLog[]|ArrayCollection
+     * @return ArrayCollection<int, LeadEventLog>
      */
-    public function getSuccessful()
+    public function getSuccessful(): ArrayCollection
     {
         return $this->successful;
     }
@@ -241,8 +241,8 @@ class PendingEvent extends AbstractLogCollectionEvent
     {
         if ($failedLog = $log->getFailedLog()) {
             // Delete existing entries
-            $failedLog->setLog(null);
-            $log->setFailedLog(null);
+            $failedLog->setLog();
+            $log->setFailedLog();
         }
         $this->logChannel($log);
         $log->setIsScheduled(false)

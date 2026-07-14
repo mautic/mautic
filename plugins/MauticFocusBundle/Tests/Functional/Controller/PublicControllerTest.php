@@ -11,7 +11,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PublicControllerTest extends MauticMysqlTestCase
+final class PublicControllerTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
@@ -62,6 +62,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             $twig->addExtension(new \Twig\Extension\EscaperExtension());
         }
         $url = $twig->getRuntime(\Twig\Runtime\EscaperRuntime::class)->escape($url, 'js');
-        Assert::assertStringContainsString($url, $content);
+        Assert::assertStringContainsString($url, (string) $content);
     }
 }

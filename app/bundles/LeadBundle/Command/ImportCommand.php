@@ -30,12 +30,12 @@ class ImportCommand extends Command
     public const COMMAND_NAME = 'mautic:import';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ImportModel $importModel,
-        private ProcessSignalService $processSignalService,
-        private UserTokenSetter $userTokenSetter,
-        private LoggerInterface $logger,
-        private NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly ImportModel $importModel,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly UserTokenSetter $userTokenSetter,
+        private readonly LoggerInterface $logger,
+        private readonly NotificationModel $notificationModel,
     ) {
         parent::__construct();
     }

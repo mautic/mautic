@@ -53,9 +53,9 @@ trait LeadBatchLimiterTrait
             return;
         }
 
-        $ids = array_unique(array_filter(array_map(fn ($id) => (string) (int) $id, (array) $batchLimiters['ids'])));
+        $ids = array_unique(array_filter(array_map(fn ($id): string => (string) (int) $id, (array) $batchLimiters['ids'])));
 
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

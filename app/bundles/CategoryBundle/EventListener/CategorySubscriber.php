@@ -16,11 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CategorySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private CategoryModel $categoryModel,
-        private TranslatorInterface $translator,
+        private readonly BundleHelper $bundleHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly CategoryModel $categoryModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -93,7 +93,7 @@ class CategorySubscriber implements EventSubscriberInterface
             $message = $this->translator->trans(
                 'mautic.category.is_in_use.delete',
                 [
-                    '%entities%'     => implode(', ', array_map(fn ($entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
+                    '%entities%'     => implode(', ', array_map(fn (array $entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
                     '%categoryName%' => $event->getCategory()->getTitle(),
                 ],
                 'validators');

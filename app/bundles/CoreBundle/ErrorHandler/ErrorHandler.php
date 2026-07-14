@@ -37,10 +37,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         private $mainLogger;
 
-        /**
-         * @var string
-         */
-        private static $root;
+        private static string|false $root;
 
         public function __construct()
         {
@@ -118,11 +115,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param string $file
          * @param int    $line
-         * @param array  $context
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
+        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -144,26 +140,20 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $logLevel = LogLevel::ERROR;
                 }
 
-                $message = 'PHP '.$this->getErrorName($level)." - $message";
+                $message = 'PHP '.$this->getErrorName($level)." - {$message}";
                 if (LogLevel::DEBUG === $logLevel) {
-                    $this->log($logLevel, "$message - in file $file - at line $line", $context);
+                    $this->log($logLevel, "{$message} - in file {$file} - at line {$line}", $context);
                 } elseif ($this->displayErrors) {
                     throw new \ErrorException($message, 0, $level, $file, $line);
                 } else {
-                    $this->log($logLevel, "$message - in file $file - at line $line", $context);
+                    $this->log($logLevel, "{$message} - in file {$file} - at line {$line}", $context);
                 }
             }
 
             return false;
         }
 
-        /**
-         * @param bool $returnContent
-         * @param bool $inTemplate
-         *
-         * @return bool|string|void
-         */
-        public function handleException($exception, $returnContent = false, $inTemplate = false)
+        public function handleException($exception, bool $returnContent = false, bool $inTemplate = false): false|string
         {
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
@@ -172,7 +162,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $content = $this->generateResponse($error, $inTemplate);
 
             $message = $error['logMessage'] ?? $error['message'];
-            $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
+            $this->log(LogLevel::ERROR, "{$message} - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
                 return $content;
@@ -206,7 +196,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     if (!$handlingFatal) {
                         // Prevent fatal loop
                         $handlingFatal = true;
-                        $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
+                        $this->log(LogLevel::ERROR, "PHP {$name}: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
                         if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
                             $exception = new OutOfMemoryError(
@@ -235,9 +225,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @return array
+         * @return false|mixed[]
          */
-        public static function prepareExceptionForOutput($exception)
+        public static function prepareExceptionForOutput($exception): false|array
         {
             $inline             = null;
             $logMessage         = null;
@@ -302,10 +292,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param string $environment
-         *
-         * @return ErrorHandler
          */
-        public static function register($environment = 'prod')
+        public static function register($environment = 'prod'): self
         {
             if ('dev' === $environment) {
                 Debug::enable();
@@ -323,8 +311,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 register_shutdown_function([self::$handler, 'handleFatal']);
 
                 // Log general PHP errors
-                set_exception_handler([self::$handler, 'handleException']);
-                set_error_handler([self::$handler, 'handleError']);
+                set_exception_handler(self::$handler->handleException(...));
+                set_error_handler(self::$handler->handleError(...));
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));
@@ -336,10 +324,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed $displayErrors
-         *
-         * @return ErrorHandler
          */
-        public function setDisplayErrors($displayErrors)
+        public function setDisplayErrors($displayErrors): static
         {
             $this->displayErrors = $displayErrors;
 
@@ -348,10 +334,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param string $environment
-         *
-         * @return ErrorHandler
          */
-        public function setEnvironment($environment)
+        public function setEnvironment($environment): static
         {
             self::$environment = $environment;
 
@@ -360,10 +344,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param LoggerInterface $logger
-         *
-         * @return ErrorHandler
          */
-        public function setLogger($logger)
+        public function setLogger($logger): static
         {
             $this->logger = $logger;
 
@@ -372,10 +354,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed $mainLogger
-         *
-         * @return ErrorHandler
          */
-        public function setMainLogger($mainLogger)
+        public function setMainLogger($mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 
@@ -383,9 +363,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param array $context
+         * @param mixed[] $context
          */
-        protected function log($logLevel, $message, $context = [], $debugTrace = null)
+        protected function log($logLevel, $message, array $context = [], $debugTrace = null)
         {
             $message = strip_tags($message);
             if ($this->logger) {
@@ -409,11 +389,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed[] $error
-         * @param bool    $inTemplate
-         *
-         * @return mixed|string
          */
-        private function generateResponse($error, $inTemplate = false)
+        private function generateResponse(array $error, bool $inTemplate = false): string|false
         {
             // Get a trace
             if ('dev' == self::$environment) {
@@ -473,7 +450,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             if ('dev' == self::$environment || $this->displayErrors) {
                 $error['file']          = str_replace(self::$root, '', $error['file']);
                 $errorMessage           = $error['logMessage'] ?? $error['message'];
-                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['message']       = "{$errorMessage} - in file {$error['file']} - at line {$error['line']}";
             } else {
                 if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
@@ -514,10 +491,13 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $loader             = new \Twig\Loader\FilesystemLoader([
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Offline',
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Exception',
+                ]);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
-                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn (): string|false => realpath(__DIR__.'/../../../../')));
 
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);

@@ -14,12 +14,12 @@ use Mautic\ReportBundle\Model\ReportModel;
 class EmailDependencies
 {
     public function __construct(
-        private CampaignModel $campaignModel,
-        private ListModel $listModel,
-        private ActionModel $actionModel,
-        private PointModel $pointModel,
-        private TriggerEventModel $triggerEventModel,
-        private ReportModel $reportModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly ListModel $listModel,
+        private readonly ActionModel $actionModel,
+        private readonly PointModel $pointModel,
+        private readonly TriggerEventModel $triggerEventModel,
+        private readonly ReportModel $reportModel,
     ) {
     }
 

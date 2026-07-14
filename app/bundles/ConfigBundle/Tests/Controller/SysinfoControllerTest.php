@@ -9,17 +9,17 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class SysinfoControllerTest extends MauticMysqlTestCase
+final class SysinfoControllerTest extends MauticMysqlTestCase
 {
     public function testDbInfoIsShown(): void
     {
         $sysinfoModel = static::getContainer()->get(SysinfoModel::class);
-        \assert($sysinfoModel instanceof SysinfoModel);
+        $this->assertInstanceOf(SysinfoModel::class, $sysinfoModel);
         $dbInfo = $sysinfoModel->getDbInfo();
 
         // Request sysinfo page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sysinfo');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $dbVersion       = $crawler->filterXPath("//td[@id='dbinfo-version']")->text();
         $dbDriver        = $crawler->filterXPath("//td[@id='dbinfo-driver']")->text();

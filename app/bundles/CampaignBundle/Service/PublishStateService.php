@@ -20,8 +20,9 @@ class PublishStateService
      */
     private array $cachedRangesByCampaign = [];
 
-    public function __construct(private AuditLogRepository $auditLogRepository)
-    {
+    public function __construct(
+        private readonly AuditLogRepository $auditLogRepository,
+    ) {
     }
 
     public function getUnublishedSecondsSince(Campaign $campaign, \DateTimeInterface $eventLogCreatedDate): int
@@ -89,7 +90,7 @@ class PublishStateService
         return array_values(
             array_filter(
                 $ranges,
-                static fn (PublishStateDateRange $range) => $range->getPublished() === $published
+                static fn (PublishStateDateRange $range): bool => $range->getPublished() === $published
             )
         );
     }
@@ -223,7 +224,7 @@ class PublishStateService
      */
     private function buildManualPublishDateRanges(array $publishStates): array
     {
-        /** @var PublishStateDateRange[] */
+        /** @var PublishStateDateRange[] $manualPublishRanges */
         $manualPublishRanges = [];
         $currentRange        = null;
         $currentState        = null;

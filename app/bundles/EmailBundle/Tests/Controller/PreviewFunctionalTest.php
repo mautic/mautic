@@ -14,9 +14,10 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PreviewFunctionalTest extends MauticMysqlTestCase
+final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
@@ -41,6 +42,16 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         // Anonymous visitor
         $this->assertPageContent($url, $contentNoContactInfo, self::PREHEADER_TEXT);
         $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
+    }
+
+    public function testPreviewPageWithTemplateAndNoSavedHtml(): void
+    {
+        $email = $this->createEmail();
+        $email->setCustomHtml('');
+        $email->setContent([]);
+        $this->em->flush();
+
+        $this->assertPageContent("/email/preview/{$email->getId()}", 'Hello World!');
     }
 
     private function assertPageContent(string $url, string ...$expectedContents): void
@@ -282,6 +293,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";

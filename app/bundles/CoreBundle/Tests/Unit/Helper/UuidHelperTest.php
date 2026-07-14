@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use PHPUnit\Framework\TestCase;
 
-class UuidHelperTest extends TestCase
+final class UuidHelperTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideValidUuids')]
     public function testIsValidUuidWithValidUuids(string $uuid): void

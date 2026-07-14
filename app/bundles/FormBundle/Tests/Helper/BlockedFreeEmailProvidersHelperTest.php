@@ -23,11 +23,9 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
     {
         $providers = BlockedFreeEmailProvidersHelper::load();
 
-        if (!empty($providers)) {
-            foreach ($providers as $provider) {
-                self::assertIsString($provider);
-                self::assertNotEmpty($provider);
-            }
+        foreach ($providers as $provider) {
+            self::assertIsString($provider);
+            self::assertNotEmpty($provider);
         }
     }
 

@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Twig\Extension;
 use Mautic\CoreBundle\Twig\Extension\PurifyExtension;
 use PHPUnit\Framework\TestCase;
 
-class PurifyExtensionTest extends TestCase
+final class PurifyExtensionTest extends TestCase
 {
     private PurifyExtension $extension;
 
@@ -20,7 +20,7 @@ class PurifyExtensionTest extends TestCase
     public function testPurifyAllowTargetBlank(?string $input, string $expected): void
     {
         $result = $this->extension->purifyAllowTargetBlank($input);
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**

@@ -43,7 +43,7 @@ class PRedisConnectionHelper
         }
 
         // this will return an array of associative arrays which is supported by Predis
-        return array_map(function ($i) use ($parsed) {
+        return array_map(function ($i) use ($parsed): array {
             $parsed['host'] = $i;
 
             return $parsed;

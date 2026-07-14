@@ -10,7 +10,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use PHPUnit\Framework\Assert;
 
-class WebhookQueueFunctionalTest extends MauticMysqlTestCase
+final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
     public function testPayloadCompressed(): void
     {
@@ -29,6 +29,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $webhookQueue = $this->em->getRepository(WebhookQueue::class)
             ->find($webhookQueue->getId());
+        $this->assertInstanceOf(WebhookQueue::class, $webhookQueue);
 
         Assert::assertSame($payload, $webhookQueue->getPayload());
     }

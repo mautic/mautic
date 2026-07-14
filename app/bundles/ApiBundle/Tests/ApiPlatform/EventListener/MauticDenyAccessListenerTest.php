@@ -58,7 +58,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $this->corePermissionsMock            = $this->createMock(CorePermissions::class);
         $this->resourceMetadataFactoryMock    = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $this->requestEvent                   = new RequestEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             $requestMock,
             HttpKernelInterface::MAIN_REQUEST
         );

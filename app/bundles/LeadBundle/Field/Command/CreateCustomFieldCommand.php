@@ -31,9 +31,9 @@ class CreateCustomFieldCommand extends ModeratedCommand
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 
     public function __construct(
-        private BackgroundService $backgroundService,
-        private TranslatorInterface $translator,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly BackgroundService $backgroundService,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {

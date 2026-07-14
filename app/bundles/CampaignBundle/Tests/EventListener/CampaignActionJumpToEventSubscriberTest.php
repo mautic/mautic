@@ -27,13 +27,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     {
         $event    = new Event();
         $campaign = new Campaign();
-        $leadLog  = new class extends LeadEventLog {
+        $leadLog  = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 789;
@@ -43,7 +43,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign,
+                private readonly Campaign $campaign,
             ) {
             }
 
@@ -77,12 +77,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventExecutioner = new class extends EventExecutioner {
+        $eventExecutioner = new class() extends EventExecutioner {
             public function __construct()
             {
             }
         };
-        $translator = new class extends Translator {
+        $translator = new class() extends Translator {
             public function __construct()
             {
             }
@@ -97,13 +97,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 return $id;
             }
         };
-        $leadRepository = new class extends LeadRepository {
+        $leadRepository = new class() extends LeadRepository {
             public function __construct()
             {
             }
         };
 
-        $eventScheduler = new class extends EventScheduler {
+        $eventScheduler = new class() extends EventScheduler {
             public function __construct()
             {
             }
@@ -139,19 +139,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     public function testOnJumpToEventWhenEventExists(): void
     {
         $event    = new Event();
-        $campaign = new class extends Campaign {
+        $campaign = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
-        $leadLog = new class extends LeadEventLog {
+        $leadLog = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 789;
@@ -161,7 +161,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign,
+                private readonly Campaign $campaign,
             ) {
             }
 
@@ -192,8 +192,8 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 );
 
                 return [
-                    new class extends Event {
-                        public function getId()
+                    new class() extends Event {
+                        public function getId(): int
                         {
                             return 222;
                         }
@@ -202,7 +202,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventExecutioner = new class extends EventExecutioner {
+        $eventExecutioner = new class() extends EventExecutioner {
             public function __construct()
             {
             }
@@ -214,12 +214,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 Assert::assertSame(789, $contacts->first()->getId());
             }
         };
-        $translator = new class extends Translator {
+        $translator = new class() extends Translator {
             public function __construct()
             {
             }
         };
-        $leadRepository = new class extends LeadRepository {
+        $leadRepository = new class() extends LeadRepository {
             public function __construct()
             {
             }
@@ -231,7 +231,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
 
-        $eventScheduler = new class extends EventScheduler {
+        $eventScheduler = new class() extends EventScheduler {
             public function __construct()
             {
             }

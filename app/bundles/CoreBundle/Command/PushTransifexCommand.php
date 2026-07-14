@@ -32,9 +32,9 @@ class PushTransifexCommand extends Command
     public const NAME = 'mautic:transifex:push';
 
     public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper,
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }
@@ -42,7 +42,7 @@ class PushTransifexCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 

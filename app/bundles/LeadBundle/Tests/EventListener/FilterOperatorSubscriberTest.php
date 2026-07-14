@@ -22,25 +22,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    private OperatorOptions $operatorOptions;
-
     /**
-     * @var MockObject|LeadFieldRepository
+     * @var MockObject&LeadFieldRepository
      */
     private MockObject $leadFieldRepository;
 
     /**
-     * @var MockObject|TypeOperatorProviderInterface
+     * @var MockObject&TypeOperatorProviderInterface
      */
     private MockObject $typeOperatorProvider;
 
     /**
-     * @var MockObject|FieldChoicesProviderInterface
+     * @var MockObject&FieldChoicesProviderInterface
      */
     private MockObject $fieldChoicesProvider;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -50,14 +48,14 @@ final class FilterOperatorSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $this->operatorOptions      = new OperatorOptions();
+        $operatorOptions            = new OperatorOptions();
         $this->leadFieldRepository  = $this->createMock(LeadFieldRepository::class);
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
-            $this->operatorOptions,
+            $operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,
@@ -335,7 +333,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -344,7 +342,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -353,7 +351,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -362,7 +360,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -432,7 +430,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -441,7 +439,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -450,7 +448,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -459,7 +457,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -527,7 +525,7 @@ final class FilterOperatorSubscriberTest extends TestCase
             ->method('getListablePublishedFields')
             ->willReturn(new ArrayCollection([$field]));
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -536,7 +534,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -545,7 +543,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -554,7 +552,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -639,7 +637,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -648,7 +646,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -657,7 +655,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -666,7 +664,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -736,7 +734,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -745,7 +743,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -754,7 +752,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -763,7 +761,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 

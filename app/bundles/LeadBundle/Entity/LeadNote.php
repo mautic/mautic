@@ -79,8 +79,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -89,13 +87,9 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set text.
-     *
      * @param string $text
-     *
-     * @return LeadNote
      */
-    public function setText($text)
+    public function setText($text): static
     {
         $this->isChanged('text', $text);
         $this->text = $text;
@@ -104,8 +98,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get text.
-     *
      * @return string
      */
     public function getText()
@@ -114,13 +106,9 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return LeadNote
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -129,9 +117,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get type.
-     *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -167,7 +153,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateTime()
     {

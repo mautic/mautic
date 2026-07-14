@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
@@ -8,7 +10,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
-class CampaignBuilderEventTest extends CampaignTestAbstract
+final class CampaignBuilderEventTest extends CampaignTestAbstract
 {
     public function testAddGetDecision(): void
     {
@@ -127,13 +129,13 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    protected function initEvent()
+    protected function initEvent(): CampaignBuilderEvent
     {
         $translator = $this->createMock(Translator::class);
 
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): string {
                 $args = func_get_args();
 
                 return $args[0];

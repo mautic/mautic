@@ -56,14 +56,14 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
             'REMOTE_ADDR'     => $ipAddress,
         ];
         $this->client->request(Request::METHOD_GET, '/email/'.$stat->getTrackingHash().'.gif', [], [], $server);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $updatedStat = $this->em->getRepository(Stat::class)->findOneBy(['id'=>$statId]);
         $this->assertSame($isRead, $updatedStat->getIsRead());
         if ($isRead) {
-            $this->assertNotNull($updatedStat->getLastOpened());
+            $this->assertInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
         } else {
-            $this->assertNull($updatedStat->getLastOpened());
+            $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
         }
     }
 

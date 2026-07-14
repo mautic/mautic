@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\JobExtendTimeEvent;
@@ -21,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporterTest extends \PHPUnit\Framework\TestCase
+final class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessExport(): void
     {
@@ -118,13 +120,13 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->atLeast(3);
 
         $eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow): JobExtendTimeEvent|\Mautic\ReportBundle\Event\ReportScheduleSendEvent {
                 if ($event instanceof JobExtendTimeEvent) {
                     return $event;
                 }
 
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
-                Assert::assertSame($event->getFile(), 'my-path');
+                Assert::assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $scheduler1);
                 }

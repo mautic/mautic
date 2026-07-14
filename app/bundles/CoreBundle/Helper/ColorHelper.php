@@ -34,10 +34,8 @@ class ColorHelper
 
     /**
      * Sets random values to RGB properties. It will avoid too black or too wight colors.
-     *
-     * @return ColorHelper
      */
-    public function buildRandomColor()
+    public function buildRandomColor(): static
     {
         $this->red   = random_int(20, 236);
         $this->green = random_int(20, 236);
@@ -56,9 +54,9 @@ class ColorHelper
         if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
             [$r, $g, $b]     = sscanf($hex, $format);
-            $this->red       = hexdec("$r$r");
-            $this->green     = hexdec("$g$g");
-            $this->blue      = hexdec("$b$b");
+            $this->red       = hexdec("{$r}{$r}");
+            $this->green     = hexdec("{$g}{$g}");
+            $this->blue      = hexdec("{$b}{$b}");
         } else {
             $format                                     = '#%2x%2x%2x';
             [$this->red, $this->green, $this->blue]     = sscanf($hex, $format);

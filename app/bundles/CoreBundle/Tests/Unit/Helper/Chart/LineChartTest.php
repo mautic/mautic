@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(LineChart::class)]
-class LineChartTest extends \PHPUnit\Framework\TestCase
+final class LineChartTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The getUnitInterval returns the correct interval objects')]
     public function testGetUnitInterval(): void

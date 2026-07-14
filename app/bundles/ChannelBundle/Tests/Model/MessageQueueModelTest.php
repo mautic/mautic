@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
+final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string
@@ -36,37 +38,38 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $message;
 
-    /** @var MockObject|LeadModel */
-    protected $leadModel;
+    /**
+     * @var MockObject&LeadModel
+     */
+    protected MockObject $leadModel;
 
-    /** @var MockObject|CompanyModel */
-    protected $companyModel;
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
+    protected MockObject $entityManager;
 
-    /** @var MockObject|EntityManagerInterface */
-    protected $entityManager;
-
-    /** @var MockObject|MessageQueueRepository */
-    protected $messageQueueRepository;
+    /**
+     * @var MockObject&MessageQueueRepository
+     */
+    protected MockObject $messageQueueRepository;
 
     protected function setUp(): void
     {
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->companyModel           = $this->createMock(CompanyModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
-        $coreHelper                   = $this->createMock(CoreParametersHelper::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->leadModel,
-            $this->companyModel,
-            $coreHelper,
+            $this->createStub(CompanyModel::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class)
         );
 
         $this->entityManager->method('getRepository')->willReturn($this->messageQueueRepository);
@@ -102,7 +105,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    protected function prepareRescheduleMessageIntervalTest(\DateInterval $interval)
+    protected function prepareRescheduleMessageIntervalTest(\DateInterval $interval): void
     {
         $oldScheduleDate = $this->message->getScheduledDate();
         $this->messageQueue->reschedule($this->message, $interval);

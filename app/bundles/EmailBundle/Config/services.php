@@ -19,6 +19,7 @@ return function (ContainerConfigurator $configurator): void {
         'MonitoredEmail/Processor',
         'Stat/Reference.php',
         'Helper/DTO',
+        'Model/AbTest/EmailStatus.php',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')
@@ -28,8 +29,7 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
-    $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
-        ->decorate('mailer.transport_factory');
+    $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)->decorate('mailer.transport_factory');
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
