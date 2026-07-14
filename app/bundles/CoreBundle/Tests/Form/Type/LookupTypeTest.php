@@ -19,7 +19,7 @@ final class LookupTypeTest extends TypeTestCase
         $form = $this->factory->create(LookupType::class, null, ['attr' => $attributes]);
         $view = $form->createView();
 
-        self::assertSame($expected, $view->vars['attr']);
+        $this->assertSame($expected, $view->vars['attr']);
     }
 
     public static function provideLookupAttributes(): \Generator

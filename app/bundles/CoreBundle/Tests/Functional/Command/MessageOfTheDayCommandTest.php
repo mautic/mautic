@@ -183,7 +183,7 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
         touch($this->cachePath, time() - 7200);
 
         $httpClient = static::getContainer()->get(HttpClientInterface::class);
-        self::assertInstanceOf(MockHttpClient::class, $httpClient);
+        $this->assertInstanceOf(MockHttpClient::class, $httpClient);
         $httpClient->setResponseFactory([
             new MockResponse('', ['http_code' => 500]),
         ]);

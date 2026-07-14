@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -13,6 +15,8 @@ abstract class AbstractFormController extends CommonController
     protected ?string $permissionBase = null;
 
     /**
+     * @param string $objectModel
+     *
      * @return mixed
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
@@ -22,7 +26,8 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            if (null !== $entity && null !== $entity->getCheckedOutBy()) {
+            if ($entity instanceof FormEntity && null !== $entity->getCheckedOutBy()) {
+                /** @var FormModel $model */
                 $model->unlockEntity($entity);
             }
 

@@ -65,10 +65,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
-        self::assertCount(0, $pendingEvent->getFailures());
-        self::assertCount(1, $pendingEvent->getSuccessful());
-        self::assertSame(1, $leadLog->getMetadata()['failed']);
-        self::assertSame('mautic.sms.campaign.failed.missing_entity', $leadLog->getMetadata()['reason']);
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame(1, $leadLog->getMetadata()['failed']);
+        $this->assertSame('mautic.sms.campaign.failed.missing_entity', $leadLog->getMetadata()['reason']);
     }
 
     public function testSendUnpublishedSms(): void
@@ -103,10 +103,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
 
-        self::assertCount(0, $pendingEvent->getFailures());
-        self::assertCount(1, $pendingEvent->getSuccessful());
-        self::assertSame(1, $leadLog->getMetadata()['failed']);
-        self::assertSame('mautic.sms.campaign.failed.unpublished', $leadLog->getMetadata()['reason']);
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame(1, $leadLog->getMetadata()['failed']);
+        $this->assertSame('mautic.sms.campaign.failed.unpublished', $leadLog->getMetadata()['reason']);
     }
 
     public function testOnCampaignTriggerBatchAction(): void

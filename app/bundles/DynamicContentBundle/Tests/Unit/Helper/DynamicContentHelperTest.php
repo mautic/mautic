@@ -126,7 +126,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->method('hasListeners')->willReturn(true);
         $matcher = $this->exactly(2);
         $this->mockDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $contact, $slot) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $contact, $slot): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): void {
                         $this->assertSame($contact, $event->getContact());
@@ -184,7 +184,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $contact, $slot) {
+                function (...$parameters) use ($matcher, $contact, $slot): object {
                     if (1 === $matcher->numberOfInvocations()) {
                         $callback = function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): void {
                             $this->assertSame($contact, $event->getContact());
@@ -233,7 +233,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $contact, $slot) {
+                function (...$parameters) use ($matcher, $contact, $slot): object {
                     if (1 === $matcher->numberOfInvocations()) {
                         $callback = function (TokenReplacementEvent $event) use ($contact, $slot): void {
                             $this->assertSame($contact, $event->getLead());

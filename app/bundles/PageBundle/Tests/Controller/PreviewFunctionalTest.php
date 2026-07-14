@@ -64,7 +64,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check for correct preview URL.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$pageId);
-        self::assertStringContainsString('/page/preview/'.$pageId, (string) $crawler->filter('#content_preview_url')->attr('value'));
+        $this->assertStringContainsString('/page/preview/'.$pageId, (string) $crawler->filter('#content_preview_url')->attr('value'));
     }
 
     public function testPreviewPagePublicToggle(): void
@@ -79,7 +79,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         // Check for public preview ON.
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$pageId);
         $toggleElem = $crawler->filter('i.ri-toggle-fill');
-        self::assertCount(1, $toggleElem);
+        $this->assertCount(1, $toggleElem);
 
         // Toggle public preview.
         $parameters = [
@@ -93,7 +93,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         // Check for public preview OFF.
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$pageId);
         $toggleElem = $crawler->filter('i.ri-toggle-line');
-        self::assertCount(1, $toggleElem);
+        $this->assertCount(1, $toggleElem);
 
         // Create landing page with public preview OFF.
         $page = $this->createPage(null, '', true, false);
@@ -105,7 +105,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check for public preview OFF.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$pageId);
-        self::assertCount(1, $crawler->filter('i.ri-toggle-line'));
+        $this->assertCount(1, $crawler->filter('i.ri-toggle-line'));
 
         // Toggle public preview.
         $parameters['id'] = $pageId;
@@ -114,7 +114,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         // Check for public preview ON.
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$pageId);
         $toggleElem = $crawler->filter('i.ri-toggle-fill');
-        self::assertCount(1, $toggleElem);
+        $this->assertCount(1, $toggleElem);
     }
 
     public function testPreviewPageWithPublishAndPublicOptions(): void
@@ -129,8 +129,8 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         // Check for public preview ON.
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        self::assertSame('Hello', $crawler->filter('body')->text());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertSame('Hello', $crawler->filter('body')->text());
 
         // Create landing page with public preview OFF.
         $page = $this->createPage(null, '', true, false);
@@ -143,11 +143,8 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         // Check public preview without login.
 
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString(
-            'Unauthorized access to requested URL: /page/preview/'.$pageId,
-            $crawler->text()
-        );
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
 
         // Create page with publish OFF.
         $page = $this->createPage(null, '', false);
@@ -159,11 +156,8 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check for public preview ON.
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString(
-            'Unauthorized access to requested URL: /page/preview/'.$pageId,
-            $crawler->text()
-        );
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
 
         // Create landing page with publish and public preview OFF.
         $page = $this->createPage(null, '', false, false);
@@ -175,19 +169,16 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check for public preview ON.
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString(
-            'Unauthorized access to requested URL: /page/preview/'.$pageId,
-            $crawler->text()
-        );
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
     }
 
     public function testPreviewPageNotFound(): void
     {
         // Check for non existing landing page preview.
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/20000');
-        self::assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString('404 Not Found', $crawler->text());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('404 Not Found', $crawler->text());
     }
 
     public function testPreviewPageAccess(): void
@@ -205,17 +196,14 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        self::assertSame('Hello', $crawler->filter('body')->text());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertSame('Hello', $crawler->filter('body')->text());
 
         // Check public preview without login.
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
-        self::assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString(
-            'Unauthorized access to requested URL: /page/preview/'.$pageId,
-            $crawler->text()
-        );
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
 
         // Check public preview access without permissions
         $this->loginUser($user);
@@ -227,18 +215,15 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
             $page->getCreatedBy()
         )->willReturn(false);
         $this->getContainer()->set('mautic.security', $security);
-        self::assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString(
-            'Unauthorized access to requested URL: /page/preview/'.$pageId,
-            $crawler->text()
-        );
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Unauthorized access to requested URL: /page/preview/'.$pageId, $crawler->text());
     }
 
     private function assertPageContent(string $url, string $expectedContent): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertResponseIsSuccessful();
-        self::assertSame($expectedContent, $crawler->filter('body')->text());
+        $this->assertSame($expectedContent, $crawler->filter('body')->text());
     }
 
     private function createPage(

@@ -48,7 +48,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }

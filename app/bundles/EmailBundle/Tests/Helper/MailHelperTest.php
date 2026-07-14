@@ -625,17 +625,14 @@ final class MailHelperTest extends TestCase
 
         $mailer->flushQueue([]);
 
-        self::assertEmpty($mailer->getErrors()['failures']);
+        $this->assertEmpty($mailer->getErrors()['failures']);
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
 
         $this->assertCount(3, $fromAddresses);
         $this->assertCount(3, $metadatas);
-        self::assertSame(
-            ['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'],
-            $fromAddresses
-        );
+        $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
     }
 
     public function testGlobalFromThatAllFromAddressesAreTheSame(): void
@@ -943,25 +940,23 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function provideEmails(): array
+    public static function provideEmails(): \Iterator
     {
-        return [
-            ['john@doe.com', true],
-            ['john@doe.email', true],
-            ['john@doe.whatevertldtheycomewithinthefuture', true],
-            ['john.doe@email.com', true],
-            ['john+doe@email.com', true],
-            ['john@doe', false],
-            ['jo hn@doe.email', false],
-            ['jo^hn@doe.email', false],
-            ['jo\'hn@doe.email', false],
-            ['jo;hn@doe.email', false],
-            ['jo&hn@doe.email', false],
-            ['jo*hn@doe.email', false],
-            ['jo%hn@doe.email', false],
-        ];
+        yield ['john@doe.com', true];
+        yield ['john@doe.email', true];
+        yield ['john@doe.whatevertldtheycomewithinthefuture', true];
+        yield ['john.doe@email.com', true];
+        yield ['john+doe@email.com', true];
+        yield ['john@doe', false];
+        yield ['jo hn@doe.email', false];
+        yield ['jo^hn@doe.email', false];
+        yield ['jo\'hn@doe.email', false];
+        yield ['jo;hn@doe.email', false];
+        yield ['jo&hn@doe.email', false];
+        yield ['jo*hn@doe.email', false];
+        yield ['jo%hn@doe.email', false];
     }
 
     public function testValidateEmailWithoutTld(): void
@@ -1202,7 +1197,7 @@ final class MailHelperTest extends TestCase
 
         $callCount = 0;
         $this->router->method('generate')
-            ->willReturnCallback(function ($route, $params = []) use (&$callCount, $unsubscribeUrl, $trackingPixelUrl, $emailSecret): string {
+            ->willReturnCallback(function (string $route, array $params = []) use (&$callCount, $unsubscribeUrl, $trackingPixelUrl, $emailSecret): string {
                 if (0 === $callCount++) {
                     $this->assertSame('mautic_email_unsubscribe', $route);
                     $this->assertSame(['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret], $params);
@@ -1277,7 +1272,7 @@ final class MailHelperTest extends TestCase
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $this->router->method('generate')
-            ->willReturnCallback(fn ($route): string => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+            ->willReturnCallback(fn (string $route): string => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1475,14 +1470,12 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return array<array<bool|int|string>>
+     * @return \Iterator<(int|string), array<(bool|int|string)>>
      */
-    public static function minifyHtmlDataProvider(): array
+    public static function minifyHtmlDataProvider(): \Iterator
     {
-        return [
-            [false, self::MINIFY_HTML, self::MINIFY_HTML],
-            [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)],
-        ];
+        yield [false, self::MINIFY_HTML, self::MINIFY_HTML];
+        yield [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)];
     }
 
     public function testHeadersAreTokenized(): void
@@ -1536,20 +1529,17 @@ final class MailHelperTest extends TestCase
             $realHeaders[$header->getName()] = $header->getBodyAsString();
         }
 
-        self::assertSame(
-            $realHeaders,
-            [
-                'To'                    => 'contact1@somewhere.com',
-                'From'                  => 'No Body <nobody@nowhere.com>',
-                'Sender'                => 'No Body <nobody@nowhere.com>',
-                'Reply-To'              => 'nobody@nowhere.com',
-                'Subject'               => 'Test',
-                'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
-                'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
-                'List-Unsubscribe'      => '<{unsubscribe_url}>',
-                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
-            ]
-        );
+        $this->assertSame($realHeaders, [
+            'To'                    => 'contact1@somewhere.com',
+            'From'                  => 'No Body <nobody@nowhere.com>',
+            'Sender'                => 'No Body <nobody@nowhere.com>',
+            'Reply-To'              => 'nobody@nowhere.com',
+            'Subject'               => 'Test',
+            'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
+            'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
+            'List-Unsubscribe'      => '<{unsubscribe_url}>',
+            'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+        ]);
     }
 
     public function testThatHtmlIsCorrectlyProcessedWhenTheAreEmbeddedImages(): void
@@ -2011,7 +2001,7 @@ final class MailHelperTest extends TestCase
             });
 
         $this->router->method('generate')
-            ->willReturnCallback(fn ($route) => match ($route) {
+            ->willReturnCallback(fn (string $route): string => match ($route) {
                 'mautic_email_unsubscribe' => '/unsubscribe',
                 'mautic_email_tracker'     => '/tracking.gif',
                 default                    => $route,
@@ -2079,7 +2069,7 @@ final class MailHelperTest extends TestCase
         $mailer->addTo($this->contacts[0]['email']);
 
         $onSendDispatchCount = 0;
-        $eventDispatcher->expects(self::atLeastOnce())
+        $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->willReturnCallback(function (object $event, ?string $eventName = null) use (&$onSendDispatchCount): object {
                 if ($event instanceof EmailSendEvent && EmailEvents::EMAIL_ON_SEND === $eventName) {

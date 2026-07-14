@@ -73,7 +73,7 @@ class EventModel extends FormModel
             ];
         }
 
-        if ($deletedKeys) {
+        if ([] !== $deletedKeys) {
             $this->getRepository()->nullEventRelationships($deletedKeys);
             $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);

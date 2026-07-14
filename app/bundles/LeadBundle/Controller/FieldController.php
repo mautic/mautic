@@ -499,7 +499,7 @@ class FieldController extends FormController
             }
 
             // Delete everything we are able to
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $model->deleteEntities($deleteIds);
                     if ($entities) {
@@ -569,7 +569,7 @@ class FieldController extends FormController
         $deletedEntities        = $e->getDeletedEntities();
         $unableToDeleteEntities = $e->getUnableToDeleteEntities();
 
-        if ($deletedEntities) {
+        if ([] !== $deletedEntities) {
             $flashes[] = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.lead.field.notice.batch_deleted',
@@ -577,7 +577,7 @@ class FieldController extends FormController
             ];
         }
 
-        if ($unableToDeleteEntities) {
+        if ([] !== $unableToDeleteEntities) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.core.notice.used.fields',

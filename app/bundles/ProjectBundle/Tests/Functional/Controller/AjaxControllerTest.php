@@ -198,23 +198,21 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return \Iterator<string, array<string>>
      */
-    public static function xssPayloadsProvider(): array
+    public static function xssPayloadsProvider(): \Iterator
     {
-        return [
-            'option break with img onerror' => [
-                '</option><img src=x onerror="alert(1)">',
-                '<img src=x onerror="alert(1)">',
-            ],
-            'script tag'                    => [
-                '<script>alert(1)</script>',
-                '<script>alert(1)</script>',
-            ],
-            'quote escape with img onerror' => [
-                '"><img src=x onerror=alert(1)>',
-                '<img src=x onerror=alert(1)>',
-            ],
+        yield 'option break with img onerror' => [
+            '</option><img src=x onerror="alert(1)">',
+            '<img src=x onerror="alert(1)">',
+        ];
+        yield 'script tag' => [
+            '<script>alert(1)</script>',
+            '<script>alert(1)</script>',
+        ];
+        yield 'quote escape with img onerror' => [
+            '"><img src=x onerror=alert(1)>',
+            '<img src=x onerror=alert(1)>',
         ];
     }
 
@@ -306,14 +304,12 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return \Iterator<string, array<string>>
      */
-    public static function specialCharacterProjectNamesProvider(): array
+    public static function specialCharacterProjectNamesProvider(): \Iterator
     {
-        return [
-            'ampersand'      => ['Project & Company'],
-            'double quotes'  => ['Client "ABC" Ltd'],
-            'single quotes'  => ["Q1 '26 Results"],
-        ];
+        yield 'ampersand' => ['Project & Company'];
+        yield 'double quotes' => ['Client "ABC" Ltd'];
+        yield 'single quotes' => ["Q1 '26 Results"];
     }
 }
