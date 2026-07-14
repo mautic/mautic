@@ -721,10 +721,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param Redirect|Page|null $page
-     */
-    public function getHitQuery(Request $request, $page = null): array
+    public function getHitQuery(Request $request, Redirect|Page|null $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();

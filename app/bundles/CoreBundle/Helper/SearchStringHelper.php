@@ -64,7 +64,7 @@ class SearchStringHelper
         return $self->parseString($input);
     }
 
-    public function parseString($input)
+    public function parseString($input): \stdClass
     {
         return $this->splitUpSearchString($input);
     }
@@ -108,12 +108,8 @@ class SearchStringHelper
 
     /**
      * @param string $input
-     * @param string $baseName
-     * @param string $overrideCommand
-     *
-     * @return \stdClass
      */
-    protected function splitUpSearchString($input, $baseName = 'root', $overrideCommand = '')
+    protected function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
     {
         $keyCount                                 = 0;
         $command                                  = $overrideCommand;

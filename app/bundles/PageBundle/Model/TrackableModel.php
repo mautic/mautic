@@ -236,15 +236,13 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[] $content
      * @param string[]        $contentTokens
-     * @param ?string         $channel
-     * @param ?int            $channelId
      * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, ?int $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 

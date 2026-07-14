@@ -80,7 +80,7 @@ class ConfigMetadata
                 );
 
                 $filtered->transform(
-                    fn ($serviceDefinition) => $this->encodeParameters($serviceDefinition)
+                    fn ($serviceDefinition): mixed => $this->encodeParameters($serviceDefinition)
                 );
 
                 return $filtered->toArray();
@@ -93,7 +93,7 @@ class ConfigMetadata
     private function prepareParameters(Collection $parameters): array
     {
         $parameters->transform(
-            fn ($parameterValue) => $this->encodeParameters($parameterValue)
+            fn ($parameterValue): mixed => $this->encodeParameters($parameterValue)
         );
 
         return $parameters->toArray();

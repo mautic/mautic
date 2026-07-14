@@ -46,7 +46,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param string      $type
      * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
@@ -56,7 +55,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?Responses
+    public function execute(string $type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

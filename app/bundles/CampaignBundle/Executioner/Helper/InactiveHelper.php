@@ -43,14 +43,12 @@ class InactiveHelper
     }
 
     /**
-     * @param int $lastActiveEventId
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(
         \DateTime $now,
         ArrayCollection $contacts,
-        $lastActiveEventId,
+        ?int $lastActiveEventId,
         ArrayCollection $negativeChildren,
         Event $event,
     ): void {
