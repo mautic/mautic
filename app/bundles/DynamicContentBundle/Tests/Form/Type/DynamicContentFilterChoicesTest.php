@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * Test case to verify that filter choice transformations are working correctly.
  * This tests the fix for the locale/timezone filter validation issue.
  */
-class DynamicContentFilterChoicesTest extends TestCase
+final class DynamicContentFilterChoicesTest extends TestCase
 {
     private const AMERICA_NEW_YORK = 'America/New_York';
 
@@ -29,7 +29,7 @@ class DynamicContentFilterChoicesTest extends TestCase
 
         if (isset($transformedChoices['en_US'])) {
             $this->assertIsString($transformedChoices['en_US']);
-            $this->assertNotEquals('en_US', $transformedChoices['en_US'], 'Value should be different from key');
+            $this->assertNotSame('en_US', $transformedChoices['en_US'], 'Value should be different from key');
         }
     }
 
@@ -51,7 +51,7 @@ class DynamicContentFilterChoicesTest extends TestCase
 
         if (isset($transformedChoices[self::AMERICA_NEW_YORK])) {
             $this->assertIsString($transformedChoices[self::AMERICA_NEW_YORK]);
-            $this->assertNotEquals(
+            $this->assertNotSame(
                 self::AMERICA_NEW_YORK,
                 $transformedChoices[self::AMERICA_NEW_YORK],
                 'Value should be different from key'
