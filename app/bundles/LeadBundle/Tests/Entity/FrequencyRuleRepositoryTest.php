@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
@@ -85,7 +84,7 @@ final class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
                 'frequency_time'   => 'DAY',
             ],
         ];
-        Assert::assertSame($expectedViolations, $violations);
+        $this->assertSame($expectedViolations, $violations);
     }
 
     public function testValidateDefaultParameters(): void

@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
@@ -56,7 +55,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
             }
         }
 
-        Assert::assertSame($shouldClearCookies, $deviceIdCookieCleared);
-        Assert::assertSame($shouldClearCookies, $mtcIdCookieCleared);
+        $this->assertSame($shouldClearCookies, $deviceIdCookieCleared);
+        $this->assertSame($shouldClearCookies, $mtcIdCookieCleared);
     }
 }
