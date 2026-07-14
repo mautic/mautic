@@ -509,7 +509,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
 
         $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
-        $this->assertFalse(in_array($tag, $updatedCompany->getTags()->toArray(), true));
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $this->assertNotContains($tag, $updatedCompany->getTags()->toArray());
     }
 
     public function testContactListActionSuggestionsByAdminUser(): void

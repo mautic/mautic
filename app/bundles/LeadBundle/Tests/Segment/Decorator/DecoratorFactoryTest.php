@@ -29,7 +29,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $dateOptionFactory;
 
-    private CompanyDecorator&MockObject $companyDecorator;
+    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
 
     private DecoratorFactory $decoratorFactory;
 
@@ -39,7 +39,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
-        $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
+        $this->companyDecorator               = $this->createStub(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $contactSegmentFilterDictionary,

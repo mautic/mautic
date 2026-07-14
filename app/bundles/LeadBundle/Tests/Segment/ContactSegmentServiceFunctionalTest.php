@@ -94,7 +94,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         /** @var Lead $lead */
         $lead = $this->getReference($reference);
         $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
-        \assert($lead instanceof Lead);
+        $this->assertInstanceOf(Lead::class, $lead);
 
         return $lead;
     }
@@ -102,7 +102,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function clearLoggedInUser(): void
     {
         $tokenStorage = static::getContainer()->get('security.token_storage');
-        \assert($tokenStorage instanceof TokenStorageInterface);
+        $this->assertInstanceOf(TokenStorageInterface::class, $tokenStorage);
 
         $tokenStorage->setToken(null);
         $this->client->getCookieJar()->clear();
@@ -112,7 +112,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function loginAdminUser(): void
     {
         $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        \assert($admin instanceof User);
+        $this->assertInstanceOf(User::class, $admin);
 
         $this->loginUser($admin);
     }
@@ -122,7 +122,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         /** @var Company $company */
         $company = $this->getReference($reference);
         $company = $this->em->getRepository(Company::class)->find($company->getId());
-        \assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         return $company;
     }
@@ -150,7 +150,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
 
-        return array_map('intval', array_column($results[$segment->getId()], 'id'));
+        return array_map(intval(...), array_column($results[$segment->getId()], 'id'));
     }
 
     public function testSegmentCountIsCorrect(): void

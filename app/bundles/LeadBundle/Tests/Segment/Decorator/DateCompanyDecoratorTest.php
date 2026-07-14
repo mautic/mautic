@@ -59,8 +59,6 @@ final class DateCompanyDecoratorTest extends TestCase
 
     private function createDateCompanyDecorator(): DateCompanyDecorator
     {
-        $dateDecorator = $this->createMock(FilterDecoratorInterface::class);
-
-        return new DateCompanyDecorator($dateDecorator);
+        return new DateCompanyDecorator($this->createStub(FilterDecoratorInterface::class));
     }
 }

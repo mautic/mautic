@@ -295,7 +295,7 @@ class TagRepository extends CommonRepository
      */
     private function getExistingEntityIds(array $entityIds, string $entityClass): array
     {
-        $entityIds = array_values(array_unique(array_map('intval', $entityIds)));
+        $entityIds = array_values(array_unique(array_map(intval(...), $entityIds)));
         if (empty($entityIds)) {
             return [];
         }
@@ -310,7 +310,7 @@ class TagRepository extends CommonRepository
             ->executeQuery()
             ->fetchFirstColumn();
 
-        return array_map('intval', $ids);
+        return array_map(intval(...), $ids);
     }
 
     private function getTaggableEntityTableName(string $entityClass): string

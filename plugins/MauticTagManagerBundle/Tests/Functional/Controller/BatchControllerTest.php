@@ -120,7 +120,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('2 companies affected', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('2 companies affected', (string) $this->client->getResponse()->getContent());
 
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $company1     = $companyModel->getEntity($this->companies[0]->getId());

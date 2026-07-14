@@ -44,18 +44,18 @@ final class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationV
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l', $debugOutput);
+        Assert::assertStringContainsString('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l', (string) $debugOutput);
         Assert::assertStringContainsString(
             'LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies_leads rel ON rel.lead_id = l.id',
-            $debugOutput
+            (string) $debugOutput
         );
         Assert::assertStringContainsString(
             'LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp ON cmp.id = rel.company_id',
-            $debugOutput
+            (string) $debugOutput
         );
         Assert::assertStringContainsString(
             '(cmp.company_name IS NULL) OR (cmp.company_name = )',
-            $debugOutput
+            (string) $debugOutput
         );
     }
 
