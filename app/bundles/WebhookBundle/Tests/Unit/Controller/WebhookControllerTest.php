@@ -54,17 +54,17 @@ final class WebhookControllerTest extends TestCase
     public function testIndexViewArgumentsIncludeListFilters(): void
     {
         $controller = new TestableWebhookController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(FlashBag::class),
-            $this->createMock(RequestStack::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(FormFieldHelper::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            new RequestStack(),
+            $this->createStub(CorePermissions::class),
         );
 
         $listFilters = [
