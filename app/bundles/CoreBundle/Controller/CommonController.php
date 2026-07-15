@@ -151,10 +151,8 @@ class CommonController extends AbstractController implements MauticController
      * @param array  $request    An array of request parameters
      * @param array  $path       An array of path parameters
      * @param array  $query      An array of query parameters
-     *
-     * @return Response A Response instance
      */
-    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = [])
+    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
@@ -442,10 +440,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Get's the content of error page.
-     *
-     * @return Response
      */
-    public function renderException(\Exception $e)
+    public function renderException(\Exception $e): Response
     {
         $request = $this->getCurrentRequest();
 
@@ -490,7 +486,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @throws AccessDeniedHttpException
      */
-    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
     {
         throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
     }
@@ -531,10 +527,8 @@ class CommonController extends AbstractController implements MauticController
      * Generate 404 not found message.
      *
      * @param string $msg
-     *
-     * @return Response
      */
-    public function notFound($msg = 'mautic.core.url.error.404')
+    public function notFound($msg = 'mautic.core.url.error.404'): Response
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');

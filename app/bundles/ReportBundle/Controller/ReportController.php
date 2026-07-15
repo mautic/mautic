@@ -730,10 +730,8 @@ class ReportController extends FormController
      *
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
-     *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, ReportModel $model, string $modelName)
+    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, ReportModel $model, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
     {
         if (null === $entity) {
             return $this->postActionRedirect(

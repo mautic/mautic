@@ -64,7 +64,7 @@ abstract class AbstractFormController extends CommonController
      * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|array
+     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
