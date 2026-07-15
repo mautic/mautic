@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
-use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
@@ -37,7 +36,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertSame(0, $result->getStatusCode());
     }
 
     public function testRemoveCommandWithInvalidPackageType(): void
@@ -56,7 +55,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
+        $this->assertSame(1, $result->getStatusCode());
     }
 
     public function testRemoveCommandWithComposerError(): void
@@ -75,6 +74,6 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
+        $this->assertSame(1, $result->getStatusCode());
     }
 }

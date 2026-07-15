@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
@@ -55,29 +54,27 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
     }
 
     /**
-     * @return array<mixed,mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): \Iterator
     {
-        return [
-            [
-                'pageUrl'          => ['page_url', 'https://example.com'],
-                'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'          => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
-                'accumulativeTime' => ['accumulative_time', 5],
-                'page'             => ['page', null],
-            ],
-            [
-                'pageUrl'          => ['page_url', 'https://example.com'],
-                'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'          => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
-                'accumulativeTime' => ['accumulative_time', null],
-                'page'             => ['page', ''],
-            ],
+        yield [
+            'pageUrl'          => ['page_url', 'https://example.com'],
+            'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+            'endDate'          => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
+            'accumulativeTime' => ['accumulative_time', 5],
+            'page'             => ['page', null],
+        ];
+        yield [
+            'pageUrl'          => ['page_url', 'https://example.com'],
+            'startDate'        => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+            'endDate'          => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
+            'accumulativeTime' => ['accumulative_time', null],
+            'page'             => ['page', ''],
         ];
     }
 }
