@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -36,13 +35,13 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
         $deviceOne  = $this->createDevice($contactOne, 'track-me-one');
         $this->em->flush();
 
-        Assert::assertSame($contactOne, $this->trackContactByDevice($deviceOne));
+        $this->assertSame($contactOne, $this->trackContactByDevice($deviceOne));
 
         $contactTwo = $this->createContact('test-two@domain.tld');
         $deviceTwo  = $this->createDevice($contactTwo, 'track-me-two');
         $this->em->flush();
 
-        Assert::assertSame($contactTwo, $this->trackContactByDevice($deviceTwo));
+        $this->assertSame($contactTwo, $this->trackContactByDevice($deviceTwo));
     }
 
     private function createContact(string $email): Lead
