@@ -77,7 +77,7 @@ final class OwnerFieldTokenEmailFunctionalTest extends MauticMysqlTestCase
                 'lead'  => $lead->getId(),
             ]
         );
-        $this->assertNotNull($emailStat);
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/view/'.$emailStat->getTrackingHash());
         $body    = $crawler->filter('body');
