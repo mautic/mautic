@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     private UserModel $userModel;
@@ -26,10 +27,12 @@ class PublicController extends FormController
         \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
         UserModel $userModel,
         LeadModel $leadModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
         $this->leadModel = $leadModel;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -179,8 +182,6 @@ class PublicController extends FormController
                 /*  COMPANY STUFF */
 
                 if ('company' === $request->request->get('type')) {
-                    /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-                    $model = $this->getModel('lead.company');
                     /** @var Company $company */
                     $company    = $validatedRequest['entity'];
                     $currFields = $company->getFields(true);
@@ -250,8 +251,8 @@ class PublicController extends FormController
                     unset($socialCache['clearbit']['nonce']);
                     $company->setSocialCache($socialCache);
 
-                    $model->setFieldValues($company, $data);
-                    $model->saveEntity($company);
+                    $this->companyModel->setFieldValues($company, $data);
+                    $this->companyModel->saveEntity($company);
 
                     if ($notify) {
                         if ($user = $this->userModel->getEntity($notify)) {

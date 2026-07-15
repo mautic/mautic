@@ -121,7 +121,6 @@ class ResultController extends CommonFormController
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
-        $model      = $this->getModel('form.submission');
 
         if ($request->query->has('result')) {
             // Force ID
@@ -130,7 +129,7 @@ class ResultController extends CommonFormController
         }
 
         // get the results
-        $entities = $model->getEntities(
+        $entities = $this->submissionModel->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,
@@ -333,10 +332,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var SubmissionModel $model */
-        $model = $this->getModel('form.submission');
-
-        return $model->exportResults($format, $form, $args);
+        return $this->submissionModel->exportResults($format, $form, $args);
     }
 
     /**

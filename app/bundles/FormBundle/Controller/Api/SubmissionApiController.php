@@ -26,6 +26,14 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class SubmissionApiController extends CommonApiController
 {
+    private \Mautic\FormBundle\Model\FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireSubmissionApiController(\Mautic\FormBundle\Model\FormModel $formModel): void
+    {
+        $this->formModel = $formModel;
+    }
+
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
     {
         $this->model            = $formSubmissionModel;
@@ -115,8 +123,7 @@ class SubmissionApiController extends CommonApiController
      */
     protected function getFormOrResponseWithError($formId)
     {
-        $formModel = $this->getModel('form');
-        $form      = $formModel->getEntity($formId);
+        $form      = $this->formModel->getEntity($formId);
 
         if (!$form) {
             return $this->notFound();
