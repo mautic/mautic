@@ -14,13 +14,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private readonly bool $canViewOther;
 
     public function __construct(
-        private PageModel $model,
+        private readonly PageModel $model,
         CorePermissions $corePermissions,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');

@@ -9,23 +9,15 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class BuilderIntegrationsHelperTest extends TestCase
+final class BuilderIntegrationsHelperTest extends TestCase
 {
-    /**
-     * @var IntegrationsHelper|MockObject
-     */
-    private MockObject $integrationsHelper;
-
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     protected function setUp(): void
     {
-        $this->integrationsHelper        = $this->createMock(IntegrationsHelper::class);
-        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($this->integrationsHelper);
+        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($this->createStub(IntegrationsHelper::class));
     }
 
     public function testBuilderNotFoundIfFeatureSupportedButNotEnabled(): void
@@ -87,7 +79,7 @@ class BuilderIntegrationsHelperTest extends TestCase
 
         $foundBuilder = $this->builderIntegrationsHelper->getBuilder('page');
 
-        Assert::assertSame($builder, $foundBuilder);
+        $this->assertSame($builder, $foundBuilder);
     }
 
     public function testBuilderNamesAreReturned(): void
@@ -110,12 +102,9 @@ class BuilderIntegrationsHelperTest extends TestCase
             ->willReturn('Builder Two');
         $this->builderIntegrationsHelper->addIntegration($builder2);
 
-        Assert::assertSame(
-            [
-                'builder1' => 'Builder One',
-                'builder2' => 'Builder Two',
-            ],
-            $this->builderIntegrationsHelper->getBuilderNames()
-        );
+        $this->assertSame([
+            'builder1' => 'Builder One',
+            'builder2' => 'Builder Two',
+        ], $this->builderIntegrationsHelper->getBuilderNames());
     }
 }

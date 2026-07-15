@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\DBAL\Connection;
@@ -9,13 +11,12 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @template T of AbstractPlatform
  */
-class InstallSchemaTest extends TestCase
+final class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 
@@ -31,7 +32,7 @@ class InstallSchemaTest extends TestCase
      */
     private AbstractSchemaManager $schemaManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         EnvLoader::load();
@@ -65,7 +66,7 @@ class InstallSchemaTest extends TestCase
         $this->schemaManager->createTable($t);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -84,11 +85,9 @@ class InstallSchemaTest extends TestCase
         // Make the backupExistingSchema method public so we can test that functionality without mocking all the SchemaHelper's functionality.
         $controllerReflection = new \ReflectionClass(SchemaHelper::class);
         $method               = $controllerReflection->getMethod('backupExistingSchema');
-        $method->setAccessible(true);
 
         // Set the platform property, as that one is only set in the installSchema method, which we want to avoid.
-        $property = $controllerReflection->getProperty('platform');
-        $property->setAccessible(true);
+        $property   = $controllerReflection->getProperty('platform');
         $connection = DriverManager::getConnection($this->dbParams);
         $property->setValue($schemaHelper, $connection->getDatabasePlatform());
 
@@ -109,6 +108,6 @@ class InstallSchemaTest extends TestCase
         }
         $this->connection->close();
 
-        Assert::assertSame([], $exceptions);
+        $this->assertSame([], $exceptions);
     }
 }

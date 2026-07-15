@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SegmentDateValidator extends ConstraintValidator
 {
     public function __construct(
-        private ContactSegmentFilterFactory $contactSegmentFilterFactory,
-        private TranslatorInterface $translator,
+        private readonly ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

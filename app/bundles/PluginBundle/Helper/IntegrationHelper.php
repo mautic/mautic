@@ -40,7 +40,7 @@ class IntegrationHelper
     private array $byPlugin = [];
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
         protected EntityManager $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,
@@ -235,7 +235,7 @@ class IntegrationHelper
             $integrationsWithFeatures = [];
             foreach ($withFeatures as $feature) {
                 if (isset($this->byFeatureList[$feature])) {
-                    $integrationsWithFeatures = $integrationsWithFeatures + $this->byFeatureList[$feature];
+                    $integrationsWithFeatures += $this->byFeatureList[$feature];
                 }
             }
 
@@ -336,11 +336,9 @@ class IntegrationHelper
      * @param bool $find If true, array of regexes to find a handle will be returned;
      *                   If false, array of URLs with a placeholder of %handle% will be returned
      *
-     * @return array
-     *
      * @todo Extend this method to allow plugins to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex($find = true)
+    public function getSocialProfileUrlRegex($find = true): array
     {
         if ($find) {
             // regex to find a match
@@ -361,20 +359,20 @@ class IntegrationHelper
                 'flickr' => "/flickr.com\/photos\/(.*?)($|\/)/",
                 'skype'  => "/skype:(.*?)($|\?)/",
             ];
-        } else {
-            // populate placeholder
-            return [
-                'twitter'    => 'https://twitter.com/%handle%',
-                'facebook'   => 'https://facebook.com/%handle%',
-                'linkedin'   => 'https://linkedin.com/in/%handle%',
-                'instagram'  => 'https://instagram.com/%handle%',
-                'pinterest'  => 'https://pinterest.com/%handle%',
-                'klout'      => 'https://klout.com/%handle%',
-                'youtube'    => 'https://youtube.com/user/%handle%',
-                'flickr'     => 'https://flickr.com/photos/%handle%',
-                'skype'      => 'skype:%handle%?call',
-            ];
         }
+
+        // populate placeholder
+        return [
+            'twitter'    => 'https://twitter.com/%handle%',
+            'facebook'   => 'https://facebook.com/%handle%',
+            'linkedin'   => 'https://linkedin.com/in/%handle%',
+            'instagram'  => 'https://instagram.com/%handle%',
+            'pinterest'  => 'https://pinterest.com/%handle%',
+            'klout'      => 'https://klout.com/%handle%',
+            'youtube'    => 'https://youtube.com/user/%handle%',
+            'flickr'     => 'https://flickr.com/photos/%handle%',
+            'skype'      => 'skype:%handle%?call',
+        ];
     }
 
     /**
@@ -415,7 +413,7 @@ class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -518,7 +516,7 @@ class IntegrationHelper
 
                 // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/{$integration}:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }
@@ -538,7 +536,7 @@ class IntegrationHelper
         $identifier      = (is_array($identifierField)) ? [] : false;
         $matchFound      = false;
 
-        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound): void {
+        $findMatch = function ($f, array $fields) use (&$identifierField, &$identifier, &$matchFound): void {
             if (is_array($identifier)) {
                 // there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {

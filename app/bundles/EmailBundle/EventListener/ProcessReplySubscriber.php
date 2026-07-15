@@ -28,8 +28,8 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     }
 
     public function __construct(
-        private Reply $replier,
-        private CacheStorageHelper $cache,
+        private readonly Reply $replier,
+        private readonly CacheStorageHelper $cache,
     ) {
     }
 
@@ -49,7 +49,7 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         // Using * will return the last UID even if the starting UID doesn't exist so let's just use a highball number
         $endingUID = $startingUID + 1_000_000_000;
 
-        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." $startingUID:$endingUID");
+        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." {$startingUID}:{$endingUID}");
     }
 
     public function onEmailParse(ParseEmailEvent $event): void

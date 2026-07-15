@@ -8,23 +8,17 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 class ExecutedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     public function __construct(
-        private AbstractEventAccessor $config,
-        private LeadEventLog $log,
+        private readonly AbstractEventAccessor $config,
+        private readonly LeadEventLog $log,
     ) {
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getConfig()
+    public function getConfig(): AbstractEventAccessor
     {
         return $this->config;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    public function getLog(): LeadEventLog
     {
         return $this->log;
     }

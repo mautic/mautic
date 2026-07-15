@@ -14,9 +14,9 @@ class DateRelativeInterval implements FilterDecoratorInterface
      * @param string $originalValue
      */
     public function __construct(
-        private DateDecorator $dateDecorator,
+        private readonly DateDecorator $dateDecorator,
         private $originalValue,
-        private DateOptionParameters $dateOptionParameters,
+        private readonly DateOptionParameters $dateOptionParameters,
     ) {
     }
 
@@ -50,10 +50,8 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): string|array
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
@@ -68,11 +66,19 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
-        if ('like' === $operator || 'notLike' === $operator) {
+
+        $isLikeOperator = 'like' === $operator || 'notLike' === $operator;
+        if (!$isLikeOperator && $contactSegmentFilterCrate->hasTimeParts()) {
+            $format .= ' H:i:s';
+        }
+        if ($isLikeOperator) {
             $format .= '%';
         }
+        if (!$contactSegmentFilterCrate->hasTimeParts() && 'gt' === $operator) {
+            $format .= ' 23:59:59';
+        }
 
-        return $date->toLocalString($format);
+        return $date->toUtcString($format);
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string

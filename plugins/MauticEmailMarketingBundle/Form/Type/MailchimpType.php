@@ -23,8 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class MailchimpType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private PluginModel $pluginModel,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PluginModel $pluginModel,
         protected RequestStack $requestStack,
         protected CoreParametersHelper $coreParametersHelper,
     ) {
@@ -81,9 +81,7 @@ class MailchimpType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
                 $form = $event->getForm();
 
-                if ($error) {
-                    $form['list']->addError(new FormError($error));
-                }
+                $form['list']->addError(new FormError($error));
             });
         }
 
@@ -103,7 +101,7 @@ class MailchimpType extends AbstractType
                     'feature_settings'   => [
                         'list_settings' => $data,
                     ],
-                    'ignore_field_cache' => (1 == $page && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
+                    'ignore_field_cache' => 1 == $page && 'POST' !== $_SERVER['REQUEST_METHOD'],
                 ];
                 try {
                     $fields = $mailchimp->getFormLeadFields($settings);

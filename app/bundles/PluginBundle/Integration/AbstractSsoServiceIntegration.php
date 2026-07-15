@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Integration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -16,7 +17,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      * Called after the user is authenticated with the 3rd party service to obtain the users
      * details.
      *
-     * @param $response mixed Typically the response from request to authenticating service
+     * @param mixed $response Typically the response from request to authenticating service
      *
      * @return mixed
      */

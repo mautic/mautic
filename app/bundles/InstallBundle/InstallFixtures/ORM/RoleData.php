@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -37,7 +37,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
         $this->addReference('admin-role', $role);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

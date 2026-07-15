@@ -17,9 +17,9 @@ class IcontactApi extends EmailMarketingApi
 
         if (is_array($response) && !empty($response['errors'])) {
             throw new ApiErrorException(implode(' ', $response['errors']));
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**
@@ -43,13 +43,11 @@ class IcontactApi extends EmailMarketingApi
     }
 
     /**
-     * @param array $fields
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($listId, $fields)
+    public function subscribeLead($listId, array $fields)
     {
         $fields['status'] = 'normal';
 

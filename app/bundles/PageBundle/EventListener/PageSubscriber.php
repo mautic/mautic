@@ -19,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private LanguageHelper $languageHelper,
-        private PageModel $pageModel,
-        private PageDraftModel $pageDraftModel,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly LanguageHelper $languageHelper,
+        private readonly PageModel $pageModel,
+        private readonly PageDraftModel $pageDraftModel,
     ) {
     }
 
@@ -190,15 +190,13 @@ class PageSubscriber implements EventSubscriberInterface
         $livePageReflection   = new \ReflectionObject($livePage);
         $editedPageReflection = new \ReflectionObject($editedPage);
         foreach ($livePageReflection->getProperties() as $property) {
-            if ('id' == $property->getName()) {
+            if ('id' === $property->getName()) {
                 continue;
             }
 
-            $property->setAccessible(true);
             $name                = $property->getName();
             $value               = $property->getValue($livePage);
             $editedPageProperty  = $editedPageReflection->getProperty($name);
-            $editedPageProperty->setAccessible(true);
             $editedPageProperty->setValue($editedPage, $value);
         }
     }

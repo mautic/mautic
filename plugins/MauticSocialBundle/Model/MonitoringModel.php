@@ -85,16 +85,16 @@ class MonitoringModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -118,10 +118,7 @@ class MonitoringModel extends FormModel
         parent::saveEntity($monitoringEntity, $unlock);
     }
 
-    /**
-     * @return \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
-     */
-    public function getRepository()
+    public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
     {
         return $this->em->getRepository(Monitoring::class);
     }

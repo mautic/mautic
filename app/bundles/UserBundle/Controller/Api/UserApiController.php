@@ -14,6 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +40,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private UserPasswordHasherInterface $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -120,19 +121,18 @@ class UserApiController extends CommonApiController
             ) {
                 // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
-            } else {
-                $entity = $this->model->getEntity();
-                if (isset($parameters['plainPassword']['password'])) {
-                    $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
-                }
+            }
+            $entity = $this->model->getEntity();
+            if (isset($parameters['plainPassword']['password'])) {
+                $submittedPassword = $parameters['plainPassword']['password'];
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
             }
         } else {
             // Changing passwords via API is forbidden
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ('PATCH' == $method) {
+            if ('PATCH' === $method) {
                 // PATCH will accept a diff so just remove the entities
 
                 // Changing username via API is forbidden
@@ -149,6 +149,12 @@ class UserApiController extends CommonApiController
         return $this->processForm($request, $entity, $parameters, $method);
     }
 
+    /**
+     * @param User                 $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         switch ($action) {
@@ -188,7 +194,8 @@ class UserApiController extends CommonApiController
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 
@@ -213,8 +220,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $request->query->get('filter', null);
-        $limit  = (int) $request->query->get('limit', null);
+        $filter = $request->query->get('filter');
+        $limit  = (int) $request->query->get('limit');
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

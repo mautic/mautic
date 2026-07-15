@@ -16,8 +16,12 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      */
     public function transform(mixed $array): mixed
     {
-        if (null === $array) {
+        if (null === $array || '' === $array) {
             return '';
+        }
+
+        if (is_string($array)) {
+            return $array;
         }
 
         return implode("\n", $array);
@@ -34,6 +38,6 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
             return [];
         }
 
-        return array_map('trim', explode("\n", $string));
+        return array_map(trim(...), explode("\n", $string));
     }
 }

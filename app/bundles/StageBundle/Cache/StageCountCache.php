@@ -5,45 +5,50 @@ declare(strict_types=1);
 namespace Mautic\StageBundle\Cache;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\StageBundle\Model\StageModel;
-use Symfony\Contracts\Cache\ItemInterface;
 
 class StageCountCache
 {
     private const EXPIRATION = 3600;
 
-    public function __construct(private CacheProvider $cacheProvider, private StageModel $stageModel)
-    {
+    public function __construct(
+        private readonly CacheProviderInterface $cacheProvider,
+        private readonly StageModel $stageModel,
+    ) {
     }
 
     public function getStageContactCount(int $stageId): int
     {
-        return (int) $this->cacheProvider->getCacheAdapter()->get($this->generateCacheKey($stageId), function (ItemInterface $item) use ($stageId): int {
-            $item->expiresAfter(self::EXPIRATION);
+        $item = $this->cacheProvider->getItem($this->generateCacheKey($stageId));
 
-            return $this->stageModel->getRepository()->getContactCount($stageId);
-        });
+        if (!$item->isHit()) {
+            $item->set($this->stageModel->getRepository()->getContactCount($stageId));
+            $item->expiresAfter(self::EXPIRATION);
+            $this->cacheProvider->save($item);
+        }
+
+        return (int) $item->get();
     }
 
     public function incrementStageContactCount(int $stageId): void
     {
-        $item  = $this->cacheProvider->getCacheAdapter()->getItem($this->generateCacheKey($stageId));
+        $item  = $this->cacheProvider->getItem($this->generateCacheKey($stageId));
         $count = $item->get() ?? ($this->getStageContactCount($stageId) - 1);
         if ($count > -1) {
             $item->set($count + 1);
-            $this->cacheProvider->getCacheAdapter()->save($item);
+            $this->cacheProvider->save($item);
         }
     }
 
     public function decrementStageContactCount(int $stageId): void
     {
-        $item  = $this->cacheProvider->getCacheAdapter()->getItem($this->generateCacheKey($stageId));
+        $item  = $this->cacheProvider->getItem($this->generateCacheKey($stageId));
         $count = $item->get() ?? ($this->getStageContactCount($stageId) + 1);
         if ($count > 0) {
             $value = $count - 1;
             $item->set($value);
-            $this->cacheProvider->getCacheAdapter()->save($item);
+            $this->cacheProvider->save($item);
         }
     }
 
@@ -59,7 +64,7 @@ class StageCountCache
         $counts = [];
         foreach ($stages as $stage) {
             $stageId          = $stage->getId();
-            $items            = $this->cacheProvider->getCacheAdapter()->getItem($this->generateCacheKey($stageId));
+            $items            = $this->cacheProvider->getItem($this->generateCacheKey($stageId));
             $counts[$stageId] = $items->get() ?? 0;
         }
 

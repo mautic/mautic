@@ -10,10 +10,10 @@ use Twig\TwigFunction;
 
 class SerializerExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('serializerDecode', [Serializer::class, 'decode']),
+            new TwigFunction('serializerDecode', Serializer::decode(...)),
         ];
     }
 }

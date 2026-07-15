@@ -15,15 +15,15 @@ use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
     private MockObject $em;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -41,7 +41,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnDetermineOpenRateWinner(): void
     {
         $parentMock = $this->createMock(Email::class);
-        $children   = [2 => $this->createMock(Email::class)];
+        $children   = [2 => $this->createStub(Email::class)];
         $repoMock   = $this->createMock(StatRepository::class);
         $ids        = [1, 2];
         $parameters = ['parent' => $parentMock, 'children' => $children];
@@ -60,7 +60,8 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'readRate'   => 50,
             ],
         ];
-        $this->translator->method('trans')->willReturnMap([
+
+        $this->translator->expects($this->atLeast(3))->method('trans')->willReturnMap([
             ['mautic.email.abtest.label.opened', [], null, null, 'opened'],
             ['mautic.email.abtest.label.sent', [], null, null, 'sent'],
         ]);
@@ -73,7 +74,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
@@ -102,7 +103,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnDetermineOClickthroughRateWinner(): void
     {
         $parentMock    = $this->createMock(Email::class);
-        $children      = [2 => $this->createMock(Email::class)];
+        $children      = [2 => $this->createStub(Email::class)];
         $pageRepoMock  = $this->createMock(HitRepository::class);
         $emailRepoMock = $this->createMock(StatRepository::class);
         $ids           = [1, 2];
@@ -120,7 +121,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             2 => 153,
         ];
 
-        $this->translator->method('trans')->willReturnMap(
+        $this->translator->expects($this->atLeast(3))->method('trans')->willReturnMap(
             [
                 ['mautic.email.abtest.label.clickthrough', [], null, null, 'clickthrough'],
                 ['mautic.email.abtest.label.opened', [], null, null, 'opened'],
@@ -146,7 +147,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 

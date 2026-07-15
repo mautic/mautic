@@ -122,12 +122,13 @@ class WebhookModel extends FormModel
     private ?float $startTime = null;
 
     private bool $disableAutoUnpublish;
+
     private int $webhookRetryDelay;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         protected SerializerInterface $serializer,
-        private Client $httpClient,
+        private readonly Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -135,7 +136,7 @@ class WebhookModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private WebhookService $webhookService,
+        private readonly WebhookService $webhookService,
     ) {
         $this->setConfigProps($coreParametersHelper);
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -183,10 +184,7 @@ class WebhookModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return WebhookRepository
-     */
-    public function getRepository()
+    public function getRepository(): WebhookRepository
     {
         return $this->em->getRepository(Webhook::class);
     }
@@ -440,7 +438,7 @@ class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null): void
+    public function addLog(Webhook $webhook, $statusCode, $runtime, ?string $note = null): void
     {
         if (!$webhook->getId()) {
             return;
@@ -460,26 +458,17 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
     }
 
-    /**
-     * @return WebhookQueueRepository
-     */
-    public function getQueueRepository()
+    public function getQueueRepository(): WebhookQueueRepository
     {
         return $this->em->getRepository(WebhookQueue::class);
     }
 
-    /**
-     * @return EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
         return $this->em->getRepository(Event::class);
     }
 
-    /**
-     * @return LogRepository
-     */
-    public function getLogRepository()
+    public function getLogRepository(): LogRepository
     {
         return $this->em->getRepository(Log::class);
     }
@@ -503,7 +492,7 @@ class WebhookModel extends FormModel
             $queuesArray = null !== $queue ? [$queue] : [];
         }
         $this->webhookQueueIdList = [];
-        /* @var WebhookQueue $queueItem */
+        /** @var WebhookQueue $queueItem */
         foreach ($queuesArray as $queueItem) {
             /** @var Event $event */
             $event = $queueItem->getEvent();
@@ -540,7 +529,6 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
         $webhookRetryTime = (new \DateTimeImmutable())
@@ -658,16 +646,16 @@ class WebhookModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof SymfonyEvent) {
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

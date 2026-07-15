@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Helper;
 
 use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class FulltextKeywordTest extends TestCase
+final class FulltextKeywordTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('dataDefault')]
     public function testDefault(string $value, string $expected): void
     {
         $fulltextKeyword = new FulltextKeyword($value);
 
-        Assert::assertSame($expected, $fulltextKeyword->format());
-        Assert::assertSame($expected, (string) $fulltextKeyword);
+        $this->assertSame($expected, $fulltextKeyword->format());
+        $this->assertSame($expected, (string) $fulltextKeyword);
     }
 
     /**
@@ -35,8 +34,8 @@ class FulltextKeywordTest extends TestCase
     {
         $fulltextKeyword = new FulltextKeyword($value, true, true, true);
 
-        Assert::assertSame($expected, $fulltextKeyword->format());
-        Assert::assertSame($expected, (string) $fulltextKeyword);
+        $this->assertSame($expected, $fulltextKeyword->format());
+        $this->assertSame($expected, (string) $fulltextKeyword);
     }
 
     /**
@@ -55,8 +54,8 @@ class FulltextKeywordTest extends TestCase
     {
         $fulltextKeyword = new FulltextKeyword($value, true, false);
 
-        Assert::assertSame($expected, $fulltextKeyword->format());
-        Assert::assertSame($expected, (string) $fulltextKeyword);
+        $this->assertSame($expected, $fulltextKeyword->format());
+        $this->assertSame($expected, (string) $fulltextKeyword);
     }
 
     /**
@@ -75,8 +74,8 @@ class FulltextKeywordTest extends TestCase
     {
         $fulltextKeyword = new FulltextKeyword($value, false);
 
-        Assert::assertSame($expected, $fulltextKeyword->format());
-        Assert::assertSame($expected, (string) $fulltextKeyword);
+        $this->assertSame($expected, $fulltextKeyword->format());
+        $this->assertSame($expected, (string) $fulltextKeyword);
     }
 
     /**

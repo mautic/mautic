@@ -30,7 +30,8 @@ class DoctrineEventsSubscriber
         // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
-        } elseif (empty($this->tablePrefix)) {
+        }
+        if (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 
@@ -125,7 +126,7 @@ class DoctrineEventsSubscriber
             foreach ($table->getIndexes() as $id => $index) {
                 $index_first_column = $this->trimQuotes(strtolower($index->getColumns()[0]));
 
-                if (!$index->isPrimary() && 1 == count($index->getColumns()) && $index_first_column === $pk_first_column) {
+                if (!$index->isPrimary() && 1 === count($index->getColumns()) && $index_first_column === $pk_first_column) {
                     $table->dropIndex($id);
                 }
             }

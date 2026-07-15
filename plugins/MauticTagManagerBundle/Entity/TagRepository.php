@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
 class TagRepository extends BaseTagRepository
@@ -54,8 +55,9 @@ class TagRepository extends BaseTagRepository
         }
 
         $q->where(
-            $q->expr()->in('ltx.tag_id', $tagIds)
+            $q->expr()->in('ltx.tag_id', ':tagIds')
         )
+            ->setParameter('tagIds', $tagIds, ArrayParameterType::INTEGER)
             ->groupBy('ltx.tag_id');
 
         $result = $q->executeQuery()->fetchAllAssociative();
@@ -73,15 +75,5 @@ class TagRepository extends BaseTagRepository
         }
 
         return ($returnArray) ? $return : $return[$tagIds[0]];
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    protected function addCatchAllWhereClause($qb, $filter): array
-    {
-        return $this->addStandardCatchAllWhereClause($qb, $filter, [
-            'lt.tag',
-        ]);
     }
 }

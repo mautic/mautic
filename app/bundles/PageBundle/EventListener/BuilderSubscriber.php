@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -57,8 +58,16 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private array $renderedContentCache = [];
 
-    public function __construct(private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly TokenHelper $tokenHelper,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PageModel $pageModel,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly Environment $twig,
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -76,7 +85,17 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested([static::pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+            $tokenFilter = $event->getTokenFilter();
+            $tokens      = $tokenHelper->getFormattedTokens(
+                self::pageTokenRegex,
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
+                'title',
+                'id'
+            );
+            if ([] !== $tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 
@@ -115,35 +134,49 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         if ($event->tokensRequested([static::pageTokenRegex, static::dwcTokenRegex])) {
-            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+            $tokenFilter = $event->getTokenFilter();
+            $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
+            $tokens      = $tokenHelper->getFormattedTokens(
+                self::pageTokenRegex,
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
+                $labelFilter,
+                'title'
+            );
+            if ([] !== $tokens) {
+                $event->addTokens($tokens);
+            }
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
             $expr           = $this->connection->createExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
-            $tokens         = $dwcTokenHelper->getTokens(
+            $dwcTokens      = $dwcTokenHelper->getFormattedTokens(
                 static::dwcTokenRegex,
-                '',
+                TokenFormatOptions::simplePrefix('mautic.page.token.dwc'),
+                $labelFilter,
                 'name',
                 'slot_name',
                 $expr
             );
-            $event->addTokens(is_array($tokens) ? $tokens : []);
+            if ([] !== $dwcTokens) {
+                $event->addTokens($dwcTokens);
+            }
 
+            $thisPagePrefix = $this->translator->trans('mautic.page.token.thispage').': ';
             $event->addTokens(
                 $event->filterTokens(
                     [
-                        static::langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
-                        static::shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
-                        static::titleRegex        => $this->translator->trans('mautic.core.title'),
-                        static::brandName         => $this->translator->trans('mautic.core.token.brand_name'),
-                        static::descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
-                        static::segmentListRegex  => $this->translator->trans('mautic.page.form.segmentlist'),
-                        static::categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
-                        static::preferredchannel  => $this->translator->trans('mautic.page.form.preferredchannel'),
-                        static::channelfrequency  => $this->translator->trans('mautic.page.form.channelfrequency'),
-                        static::saveprefsRegex    => $this->translator->trans('mautic.page.form.saveprefs'),
-                        static::successmessage    => $this->translator->trans('mautic.page.form.successmessage'),
-                        static::identifierToken   => $this->translator->trans('mautic.page.form.leadidentifier'),
+                        static::langBarRegex      => $thisPagePrefix.$this->translator->trans('mautic.page.token.lang'),
+                        static::shareButtonsRegex => $thisPagePrefix.$this->translator->trans('mautic.page.token.share'),
+                        static::titleRegex        => $thisPagePrefix.$this->translator->trans('mautic.core.title'),
+                        static::brandName         => $thisPagePrefix.$this->translator->trans('mautic.core.token.brand_name'),
+                        static::descriptionRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.metadescription'),
+                        static::segmentListRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.segmentlist'),
+                        static::categoryListRegex => $thisPagePrefix.$this->translator->trans('mautic.page.form.categorylist'),
+                        static::preferredchannel  => $thisPagePrefix.$this->translator->trans('mautic.page.form.preferredchannel'),
+                        static::channelfrequency  => $thisPagePrefix.$this->translator->trans('mautic.page.form.channelfrequency'),
+                        static::saveprefsRegex    => $thisPagePrefix.$this->translator->trans('mautic.page.form.saveprefs'),
+                        static::successmessage    => $thisPagePrefix.$this->translator->trans('mautic.page.form.successmessage'),
+                        static::identifierToken   => $thisPagePrefix.$this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
             );
@@ -299,7 +332,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             '@MauticCore/Slots/channelfrequency.html.twig',
             $params,
-            '<div class="pref-channelfrequency">{templateContent}</div>'
+            '<div class="pref-channelfrequency"%s>{templateContent}</div>',
+            static::firstSlotAttribute
         );
     }
 
@@ -342,19 +376,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $parent   = $page->getTranslationParent();
         $children = $page->getTranslationChildren();
 
-        if (empty($parent) && empty($children)) {
+        if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 
         // If this page has a parent, then fetch the children from the parent
-        if (!empty($parent)) {
+        if ($parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
             $children = $parent->getTranslationChildren();
         } else {
             // Otherwise this is the parent page.
             $parent = $page;
         }
 
-        if (empty($children)) {
+        if (!$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 
@@ -379,7 +413,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $language   = $page->getLanguage();
         $translated = $this->translator->trans('mautic.page.lang.'.$language);
 
-        if ($translated == 'mautic.page.lang.'.$language) {
+        if ($translated === 'mautic.page.lang.'.$language) {
             $translated = $language;
         }
 

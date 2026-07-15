@@ -19,12 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConvertConfigCommand extends Command
 {
     public function __construct(
-        private PathsHelper $pathsHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -62,7 +62,7 @@ EOT
         $themePath = realpath($this->pathsHelper->getSystemPath('themes', true).'/'.$theme);
 
         if (empty($themePath)) {
-            $output->writeln("\n\n<error>The specified theme ($theme) does not exist.</error>");
+            $output->writeln("\n\n<error>The specified theme ({$theme}) does not exist.</error>");
 
             return Command::FAILURE;
         }
@@ -70,7 +70,7 @@ EOT
         $jsonConfigPath = $themePath.'/config.json';
 
         if (file_exists($jsonConfigPath)) {
-            $output->writeln("\n\n<error>The specified theme ($theme) already has a JSON config file.");
+            $output->writeln("\n\n<error>The specified theme ({$theme}) already has a JSON config file.");
 
             return Command::FAILURE;
         }
@@ -78,7 +78,7 @@ EOT
         $configPath = $themePath.'/config.php';
 
         if (!file_exists($configPath)) {
-            $output->writeln("\n\n<error>The php config file for the specified theme ($theme) could not be found.</error>");
+            $output->writeln("\n\n<error>The php config file for the specified theme ({$theme}) could not be found.</error>");
 
             return Command::FAILURE;
         }
@@ -86,7 +86,7 @@ EOT
         $config = include $configPath;
 
         if (!is_array($config) || !array_key_exists('name', $config)) {
-            $output->writeln("\n\n<error>The php config file for the specified theme ($theme) is not a valid config file.</error>");
+            $output->writeln("\n\n<error>The php config file for the specified theme ({$theme}) is not a valid config file.</error>");
 
             return Command::FAILURE;
         }
@@ -94,21 +94,20 @@ EOT
         $jsonConfig = json_encode($config, JSON_PRETTY_PRINT);
 
         if (!file_put_contents($jsonConfigPath, $jsonConfig)) {
-            $output->writeln("\n\n<error>Error writing json config file for the specified theme ($theme).</error>");
+            $output->writeln("\n\n<error>Error writing json config file for the specified theme ({$theme}).</error>");
 
             return Command::FAILURE;
-        } else {
-            $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ($theme).</info>");
         }
+        $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ({$theme}).</info>");
 
         if (!$savePhpConfig) {
             if (!unlink($configPath)) {
-                $output->writeln("\n\n<error>Error deleting php config file for the specified theme ($theme).</error>");
+                $output->writeln("\n\n<error>Error deleting php config file for the specified theme ({$theme}).</error>");
             } else {
-                $output->writeln("\n\n<info>PHP config file for theme ($theme) has been deleted.</info>");
+                $output->writeln("\n\n<info>PHP config file for theme ({$theme}) has been deleted.</info>");
             }
         } else {
-            $output->writeln("\n\n<info>PHP config file for theme ($theme) was preserved.</info>");
+            $output->writeln("\n\n<info>PHP config file for theme ({$theme}) was preserved.</info>");
         }
 
         return Command::SUCCESS;

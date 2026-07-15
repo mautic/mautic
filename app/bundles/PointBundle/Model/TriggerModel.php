@@ -40,13 +40,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @var array<string, mixed[]>
      */
-    private $cachedEvents = [];
+    private array $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -59,20 +59,15 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PointBundle\Entity\TriggerRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PointBundle\Entity\TriggerRepository
     {
         return $this->em->getRepository(Trigger::class);
     }
 
     /**
      * Retrieves an instance of the TriggerEventRepository.
-     *
-     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
      */
-    public function getEventRepository()
+    public function getEventRepository(): \Mautic\PointBundle\Entity\TriggerEventRepository
     {
         return $this->em->getRepository(TriggerEvent::class);
     }
@@ -104,7 +99,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         parent::saveEntity($entity, $unlock);
 
@@ -224,7 +219,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
@@ -255,7 +250,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    $event->$func($v);
+                    $event->{$func}($v);
                 }
             }
             $event->setTrigger($entity);
@@ -275,7 +270,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if (empty($this->cachedEvents)) {
             $event = new TriggerBuilderEvent($this->translator);
@@ -310,7 +305,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, ?Lead $lead = null, $force = false)
+    public function triggerEvent(array $event, ?Lead $lead = null, $force = false)
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -343,19 +338,18 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        } else {
-            /** @var TriggerEvent $triggerEvent */
-            $triggerEvent = $this->getEventRepository()->find($event['id']);
-
-            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-
-            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
-
-            return $triggerExecutedEvent->getResult();
         }
+        /** @var TriggerEvent $triggerEvent */
+        $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+        $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+
+        $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
+
+        return $triggerExecutedEvent->getResult();
     }
 
-    private function invokeCallback($event, Lead $lead, array $settings): mixed
+    private function invokeCallback(array $event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'  => $event,
@@ -392,7 +386,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
-        /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo         = $this->getEventRepository();
         $events       = $repo->getPublishedByPointTotal($points);
         $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());

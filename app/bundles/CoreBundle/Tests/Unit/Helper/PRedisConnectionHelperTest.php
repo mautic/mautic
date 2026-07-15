@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\PRedisConnectionHelper;
 use Mautic\CoreBundle\Predis\Command\Unlink;
 use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Predis\Cluster\ClusterStrategy;
 use Predis\Command\Processor\KeyPrefixProcessor;
@@ -15,29 +14,29 @@ use Predis\Connection\Cluster\PredisCluster;
 use Predis\Connection\Cluster\RedisCluster;
 use Predis\Connection\Replication\SentinelReplication;
 
-class PRedisConnectionHelperTest extends TestCase
+final class PRedisConnectionHelperTest extends TestCase
 {
     public function testEndpointsArrayInput(): void
     {
         $a = ['tcp://1.1.1.1', 'unix://var/socket'];
         // assume arrays are already in correct format
-        Assert::assertSame($a, PRedisConnectionHelper::getRedisEndpoints($a));
+        $this->assertSame($a, PRedisConnectionHelper::getRedisEndpoints($a));
     }
 
     public function testEndpointsStringInput(): void
     {
         // non domain string should be encapsulated into an array
-        Assert::assertSame([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
+        $this->assertSame([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
 
         // domain should be resolved and an array of ip addresses returned
         $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://bing.com:8888?test=car');
-        Assert::assertIsArray($connInfo);
-        Assert::assertGreaterThan(1, count($connInfo));
+        $this->assertIsArray($connInfo);
+        $this->assertGreaterThan(1, count($connInfo));
         foreach ($connInfo as $c) {
-            Assert::assertMatchesRegularExpression('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
-            Assert::assertSame('tcp', $c['scheme']);
-            Assert::assertSame(8888, $c['port']);
-            Assert::assertSame('test=car', $c['query']);
+            $this->assertMatchesRegularExpression('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
+            $this->assertSame('tcp', $c['scheme']);
+            $this->assertSame(8888, $c['port']);
+            $this->assertSame('test=car', $c['query']);
         }
     }
 
@@ -53,10 +52,11 @@ class PRedisConnectionHelperTest extends TestCase
             'service'     => 'secondmaster',
             'parameters'  => ['password' => 'secretpass'],
         ];
-        Assert::assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration));
+        $this->assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration));
 
-        $result['prefix'] = 'prf:';
-        Assert::assertEquals($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'prf:'));
+        // use as first item in array
+        $result = ['prefix' => 'prf:'] + $result;
+        $this->assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'prf:'));
 
         $redisConfiguration = [
             'password' => 'secretpass',
@@ -64,7 +64,7 @@ class PRedisConnectionHelperTest extends TestCase
         $result = [
             'parameters' => ['password' => 'secretpass'],
         ];
-        Assert::assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration));
+        $this->assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration));
     }
 
     public function testCreateClientWithoutSentinel(): void
@@ -73,20 +73,20 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix]);
         $options = $client->getOptions();
 
-        \assert($options->prefix instanceof KeyPrefixProcessor);
-        Assert::assertSame($prefix, $options->prefix->getPrefix());
-        Assert::assertNull($options->aggregate);
+        $this->assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
+        $this->assertSame($prefix, $options->prefix->getPrefix());
+        $this->assertNull($options->aggregate);
 
         $commandFactory = $client->getCommandFactory();
-        Assert::assertTrue($commandFactory->supports(Unlink::ID));
+        $this->assertTrue($commandFactory->supports(Unlink::ID));
 
         $connection = $client->getConnection();
 
         if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
             $clusterStrategy = $connection->getClusterStrategy();
-            \assert($clusterStrategy instanceof ClusterStrategy);
+            $this->assertInstanceOf(ClusterStrategy::class, $clusterStrategy);
 
-            Assert::assertContains(Unlink::ID, $clusterStrategy->getSupportedCommands());
+            $this->assertContains(Unlink::ID, $clusterStrategy->getSupportedCommands());
         }
     }
 
@@ -96,12 +96,12 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix, 'replication' => 'sentinel']);
         $options = $client->getOptions();
 
-        \assert($options->prefix instanceof KeyPrefixProcessor);
-        Assert::assertSame($prefix, $options->prefix->getPrefix());
-        Assert::assertIsCallable($options->aggregate);
+        $this->assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
+        $this->assertSame($prefix, $options->prefix->getPrefix());
+        $this->assertIsCallable($options->aggregate);
 
         $sentinelReplication = ($options->aggregate)(['tcp://1.1.1.1'], $options);
-        Assert::assertInstanceOf(SentinelReplication::class, $sentinelReplication);
-        Assert::assertInstanceOf(MasterOnlyStrategy::class, $sentinelReplication->getReplicationStrategy());
+        $this->assertInstanceOf(SentinelReplication::class, $sentinelReplication);
+        $this->assertInstanceOf(MasterOnlyStrategy::class, $sentinelReplication->getReplicationStrategy());
     }
 }

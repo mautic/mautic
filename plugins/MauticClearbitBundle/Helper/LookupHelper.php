@@ -41,9 +41,8 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
@@ -80,15 +79,13 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
-                        /* @var Router $router */
                         $clearbit->setWebhookId($webhookId);
                         $res = $clearbit->lookupByDomain($parse['host']);
                         // Prevent from filling up the cache
@@ -110,11 +107,16 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid, $type)
+    /**
+     * @return array{notify: mixed, entity: mixed}|false
+     */
+    public function validateRequest($oid, $type): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -144,10 +146,8 @@ class LookupHelper
 
     /**
      * @param bool $person
-     *
-     * @return bool|Clearbit_Company|Clearbit_Person
      */
-    protected function getClearbit($person = true)
+    protected function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;
@@ -161,7 +161,6 @@ class LookupHelper
 
     protected function getCache($entity, $notify): array
     {
-        /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
         $cacheId   = sprintf('clearbit%s#', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');

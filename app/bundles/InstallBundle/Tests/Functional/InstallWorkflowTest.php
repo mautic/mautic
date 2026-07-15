@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class InstallWorkflowTest extends MauticMysqlTestCase
+final class InstallWorkflowTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
 
@@ -93,17 +93,17 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $heading = $crawler->filter('.panel-body.text-center h5');
-        Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
+        $this->assertCount(1, $heading, $this->client->getResponse()->getContent());
 
         $successText = $heading->text();
-        Assert::assertStringContainsString('Mautic is installed', $successText);
+        $this->assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
-        \assert($emailField instanceof LeadField);
-        Assert::assertSame('Email', $emailField->getLabel());
+        $this->assertInstanceOf(LeadField::class, $emailField);
+        $this->assertSame('Email', $emailField->getLabel());
     }
 
     public function testInstallRequirementsAndRecommendations(): void
@@ -117,7 +117,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
-        Assert::assertStringContainsString($expectedMemoryMessage, $details);
+        $this->assertStringContainsString($expectedMemoryMessage, $details);
 
         // set the memory limit higher than the recommended value.
         ini_set('memory_limit', (string) ($limit + 1));
@@ -125,6 +125,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
-        Assert::assertStringNotContainsString($expectedMemoryMessage, $details);
+        $this->assertStringNotContainsString($expectedMemoryMessage, $details);
     }
 }

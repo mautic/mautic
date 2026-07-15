@@ -10,12 +10,11 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -63,7 +62,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
 
@@ -75,7 +74,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $form['mauticform[email]']->setValue('testing@ampersand.select');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         // Create some necessary entities.
         $campaignEvent = new Event();
@@ -104,6 +103,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        // @phpstan-ignore new.deprecated
         $event   = new CampaignExecutionEvent(
             [
                 'lead'            => $contact,
@@ -120,8 +120,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
-        Assert::assertSame('form', $event->getChannel());
-        Assert::assertSame($result, $event->getResult());
+        $this->assertSame('form', $event->getChannel());
+        $this->assertSame($result, $event->getResult());
     }
 
     public static function valueProvider(): \Generator

@@ -46,10 +46,7 @@ class MessageQueueModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageQueueRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ChannelBundle\Entity\MessageQueueRepository
     {
         return $this->em->getRepository(MessageQueue::class);
     }
@@ -166,7 +163,7 @@ class MessageQueueModel extends FormModel
             $messageQueues[] = $messageQueue;
         }
 
-        if ($messageQueues) {
+        if ([] !== $messageQueues) {
             $this->saveEntities($messageQueues);
             $messageQueueRepository = $this->getRepository();
             $messageQueueRepository->detachEntities($messageQueues);
@@ -230,7 +227,7 @@ class MessageQueueModel extends FormModel
                 continue;
             }
 
-            $messageChannel   = $message->getChannel();
+            $messageChannel   = $message->getChannel() ?? '';
             $messageChannelId = $message->getChannelId();
             if (!$messageChannelId) {
                 $messageChannelId = 0;
@@ -312,10 +309,7 @@ class MessageQueueModel extends FormModel
         $message->setProcessed();
     }
 
-    /**
-     * @param array $channelIds
-     */
-    public function getQueuedChannelCount($channel, $channelIds = []): int
+    public function getQueuedChannelCount($channel, ?array $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }
@@ -342,15 +336,15 @@ class MessageQueueModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

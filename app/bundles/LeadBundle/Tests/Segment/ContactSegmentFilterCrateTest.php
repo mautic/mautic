@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
-class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyFilter(): void
     {
@@ -99,7 +101,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertSame(2.0, $contactSegmentFilterCrate->getFilter());
+        $this->assertEqualsWithDelta(2.0, $contactSegmentFilterCrate->getFilter(), PHP_FLOAT_EPSILON);
         $this->assertTrue($contactSegmentFilterCrate->isNumberType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
@@ -194,7 +196,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToNotEmpty($field): void
+    public function testSpecialFieldsToConvertToNotEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -220,7 +222,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToEmpty($field): void
+    public function testSpecialFieldsToConvertToEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -245,14 +247,15 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    public static function specialFieldsToConvertToEmptyProvider()
+    /**
+     * @return \Iterator<int, array{string}>
+     */
+    public static function specialFieldsToConvertToEmptyProvider(): \Iterator
     {
-        return [
-            ['page_id'],
-            ['email_id'],
-            ['redirect_id'],
-            ['notification'],
-        ];
+        yield ['page_id'];
+        yield ['email_id'];
+        yield ['redirect_id'];
+        yield ['notification'];
     }
 
     public function testBehaviorsTypeFilter(): void

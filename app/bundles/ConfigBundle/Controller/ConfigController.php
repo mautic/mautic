@@ -24,14 +24,12 @@ class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
@@ -61,7 +59,7 @@ class ConfigController extends FormController
         $openTab    = null;
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
@@ -155,9 +153,9 @@ class ConfigController extends FormController
                     }
 
                     return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
-                } else {
-                    return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }
+
+                return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
             }
         }
 
@@ -190,7 +188,7 @@ class ConfigController extends FormController
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
@@ -201,7 +199,7 @@ class ConfigController extends FormController
         $fileFields = $event->getFileFields();
 
         if (!in_array($objectId, $fileFields)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content  = $this->coreParametersHelper->get($objectId);
@@ -229,7 +227,7 @@ class ConfigController extends FormController
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $success    = 0;

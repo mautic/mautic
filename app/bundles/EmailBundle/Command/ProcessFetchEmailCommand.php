@@ -23,13 +23,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
-        private CoreParametersHelper $parametersHelper,
-        private Fetcher $fetcher,
+        private readonly CoreParametersHelper $parametersHelper,
+        private readonly Fetcher $fetcher,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')

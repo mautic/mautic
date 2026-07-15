@@ -10,19 +10,16 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportHelperTest extends TestCase
+final class ImportHelperTest extends TestCase
 {
     private ExportHelper $exportHelper;
 
     private ImportHelper $importHelper;
-
-    private PathsHelper&MockObject $pathsHelper;
 
     /**
      * @var array<string>
@@ -32,28 +29,28 @@ class ImportHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->exportHelper = new ExportHelper(
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(FilePathResolver::class),
-            $this->createMock(ProcessSignalService::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(FilePathResolver::class),
+            $this->createStub(ProcessSignalService::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
 
         $filesystem = new Filesystem();
 
         $systemTempDirBase = sys_get_temp_dir().'/import_helper_test';
         $this->paths[]     = $systemTempDirBase;
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper       = $this->createMock(PathsHelper::class);
 
         $testTempDir = $systemTempDirBase.'/tmp';
-        $this->pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
+        $pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
         $filesystem->mkdir($testTempDir);
 
         $mediaDir = $systemTempDirBase.'/media';
-        $this->pathsHelper->method('getMediaPath')->willReturn($mediaDir);
+        $pathsHelper->method('getMediaPath')->willReturn($mediaDir);
         $filesystem->mkdir($mediaDir);
 
-        $this->importHelper = new ImportHelper($this->pathsHelper);
+        $this->importHelper = new ImportHelper($pathsHelper);
     }
 
     protected function tearDown(): void
@@ -62,6 +59,52 @@ class ImportHelperTest extends TestCase
         $filesystem->remove($this->paths);
 
         parent::tearDown();
+    }
+
+    /**
+     * A ZIP entry named `../escape.php` starts with `../`.
+     * normalizePath() silently drops the leading `../` (returns `escape.php`),
+     * so the validation check sees no `..` and passes.
+     * Extraction then uses the raw filename, writing the file outside var/tmp.
+     */
+    public function testReadZipFileWithLeadingPathTraversalThrowsRuntimeException(): void
+    {
+        $zipPath       = sys_get_temp_dir().'/traversal_leading_'.uniqid().'.zip';
+        $this->paths[] = $zipPath;
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('campaign.json', json_encode(['key' => 'value']));
+        $zip->addFromString('../escape.php', '<?php system($_GET["cmd"]);');
+        $zip->close();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Uu]nsafe/');
+
+        $this->importHelper->readZipFile($zipPath);
+    }
+
+    /**
+     * A ZIP entry `assets/../../escape.php` has two `..` segments. normalizePath() correctly pops `assets` for the first `..`,
+     * but then the second `..` finds an empty stack and is silently dropped,
+     * turning the path into `escape.php` (no `..` remains, passes validation).
+     * The assets copy stage uses the raw filename as the destination, escaping media/files/.
+     */
+    public function testReadZipFileWithDoublePathTraversalInAssetsThrowsRuntimeException(): void
+    {
+        $zipPath       = sys_get_temp_dir().'/traversal_assets_'.uniqid().'.zip';
+        $this->paths[] = $zipPath;
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('campaign.json', json_encode(['key' => 'value']));
+        $zip->addFromString('assets/../../escape.php', '<?php echo "pwned";');
+        $zip->close();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/[Uu]nsafe/');
+
+        $this->importHelper->readZipFile($zipPath);
     }
 
     public function testReadFromZipWithAssets(): void
@@ -85,8 +128,8 @@ class ImportHelperTest extends TestCase
         $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
         $this->paths[] = $zipFilePath;
 
-        self::assertFileExists($zipFilePath);
+        $this->assertFileExists($zipFilePath);
 
-        self::assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
+        $this->assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
     }
 }

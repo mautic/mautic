@@ -70,10 +70,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param string $source
      * @param int    $sourceId
-     *
-     * @return $this
      */
-    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null)
+    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
         $statRepo = $this->getStatRepository();
 
@@ -180,16 +178,16 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function getRepository(): TweetRepository

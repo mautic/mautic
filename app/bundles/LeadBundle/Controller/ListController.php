@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -63,7 +67,7 @@ class ListController extends FormController
 
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
-            $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -163,13 +167,11 @@ class ListController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel)
+    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -193,18 +195,16 @@ class ListController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return Response
      */
-    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false)
+    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
+            $segment = $this->getSegment((int) $objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
 
             return $this->createSegmentNewResponse(
                 $request,
@@ -215,10 +215,8 @@ class ListController extends FormController
                 $auditLogModel,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
+                (bool) $ignorePost
             );
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -247,7 +245,7 @@ class ListController extends FormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
-            $segment = $this->getSegment($objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
+            $segment = $this->getSegment((int) $objectId, LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER);
 
             if ($isNew) {
                 $segment->setNew();
@@ -264,8 +262,6 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -321,7 +317,7 @@ class ListController extends FormController
         $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
         // Check for a submitted form and process it
-        if (!$ignorePost && Request::METHOD_POST == $request->getMethod()) {
+        if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -349,7 +345,8 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]));
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
@@ -370,12 +367,11 @@ class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
-     * @param string $action
-     * @param bool   $ignorePost
+     * @param bool $ignorePost
      *
      * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');
@@ -399,7 +395,7 @@ class ListController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
@@ -417,9 +413,9 @@ class ListController extends FormController
                         ];
 
                         return $this->postActionRedirect($postActionVars);
-                    } else {
-                        return $this->viewAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId());
                     }
+
+                    return $this->viewAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId());
                 }
             } else {
                 // unlock the entity
@@ -486,8 +482,6 @@ class ListController extends FormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        /** @var ListModel $model */
-        $model     = $this->getModel('lead.list');
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
@@ -502,22 +496,6 @@ class ListController extends FormController
                 'mauticContent' => 'lead',
             ],
         ];
-
-        $dependents = $model->getSegmentsWithDependenciesOnSegment($objectId);
-
-        if (!empty($dependents)) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.lead.list.error.cannot.delete',
-                'msgVars' => ['%segments%' => implode(', ', $dependents)],
-            ];
-
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => $flashes,
-                ])
-            );
-        }
 
         if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
@@ -534,20 +512,28 @@ class ListController extends FormController
                 LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
-                $model->deleteEntity($list);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.core.notice.deleted',
-                    'msgVars' => [
-                        '%name%' => $list->getName(),
-                        '%id%'   => $objectId,
-                    ],
-                ];
+                try {
+                    $model->deleteEntity($list);
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.core.notice.deleted',
+                        'msgVars' => [
+                            '%name%' => $list->getName(),
+                            '%id%'   => $objectId,
+                        ],
+                    ];
+                } catch (DeleteEntityDependencyException $deletedException) {
+                    foreach ($deletedException->getErrors() as $error) {
+                        $flashes[] = [
+                            'type' => 'error',
+                            'msg'  => $error,
+                        ];
+                    }
+                }
             }
         } // else don't do anything
 
@@ -561,7 +547,7 @@ class ListController extends FormController
     /**
      * Deletes a group of entities.
      */
-    public function batchDeleteAction(Request $request): Response
+    public function batchDeleteAction(Request $request, ListModel $model): Response
     {
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -578,24 +564,11 @@ class ListController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model           = $this->getModel('lead.list');
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $canNotBeDeleted = $model->canNotBeDeleted($ids);
-
-            if (!empty($canNotBeDeleted)) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
-                    'msgVars' => ['%segments%' => implode(', ', $canNotBeDeleted)],
-                ];
-            }
-
-            $toBeDeleted = array_diff($ids, array_keys($canNotBeDeleted));
-            $deleteIds   = [];
+            $ids       = json_decode($request->query->get('ids', '{}'));
+            $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
-            foreach ($toBeDeleted as $objectId) {
+            foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -607,7 +580,7 @@ class ListController extends FormController
                 } elseif (!$this->security->hasEntityAccess(
                     LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
                 )) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.list', true);
                 } else {
@@ -615,19 +588,34 @@ class ListController extends FormController
                 }
             }
 
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+            if ([] !== $deleteIds) {
+                try {
+                    $deletedEntities = $model->deleteEntities($deleteIds);
+                } catch (DeleteEntitiesDependencyException $e) {
+                    $deletedEntities = $e->getDeletedEntities();
 
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.lead.list.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
+                    if ($e->getUnableToDeleteEntities()) {
+                        $flashes[] = [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
+                            'msgVars' => [
+                                '%segments%' => implode(', ', array_map(fn (LeadList $entity) => $entity->getName(), $e->getUnableToDeleteEntities())),
+                            ],
+                        ];
+                    }
+                }
+
+                if ([] !== $deletedEntities) {
+                    $flashes[] = [
+                        'type'    => 'notice',
+                        'msg'     => 'mautic.lead.list.notice.batch_deleted',
+                        'msgVars' => [
+                            '%count%' => count($deletedEntities),
+                        ],
+                    ];
+                }
             }
-        } // else don't do anything
+        }
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -690,7 +678,7 @@ class ListController extends FormController
             } elseif (!$this->security->hasEntityAccess(
                 LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
             )) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif (null === $list) {
                 $flashes[] = [
                     'type'    => 'error',
@@ -700,12 +688,12 @@ class ListController extends FormController
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list, true);
+                $model->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -734,10 +722,8 @@ class ListController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId)
+    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId): Response
     {
         /** @var LeadList $list */
         $list = $listModel->getEntity($objectId);
@@ -773,13 +759,14 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $dateRangeValues              = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
@@ -842,9 +829,6 @@ class ListController extends FormController
         return $this->getModel('lead.list')->getPermissionBase();
     }
 
-    /**
-     * Get List Model.
-     */
     protected function getListModel(): ListModel
     {
         /** @var ListModel $model */
@@ -969,13 +953,13 @@ class ListController extends FormController
         }
 
         if (!empty($filters)) {
-            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+            if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+            if (in_array('manually_removed', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+            if (in_array('filter_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 0]);
             }
         }

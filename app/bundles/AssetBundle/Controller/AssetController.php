@@ -16,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1)
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -35,12 +32,17 @@ class AssetController extends FormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['asset:assets:viewown'] && !$permissions['asset:assets:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
 
-        $limit = $request->getSession()->get('mautic.asset.limit', $parametersHelper->get('default_assetlimit'));
+        // Remove the "default_assetlimit" in Mautic 8.
+        $limit = $request->getSession()->get(
+            'mautic.asset.limit',
+            $parametersHelper->get('default_assetlimit', $parametersHelper->get('default_pagelimit'))
+        );
+
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -124,10 +126,8 @@ class AssetController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, AssetModel $model, $objectId)
+    public function viewAction(Request $request, AssetModel $model, $objectId): Response
     {
         $activeAsset = $model->getEntity($objectId);
 
@@ -161,8 +161,9 @@ class AssetController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
-            return $this->accessDenied();
+        }
+        if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+            $this->throwAccessDenied();
         }
 
         // Audit Log
@@ -281,7 +282,7 @@ class AssetController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('asset:assets:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $maxSize    = $model->getMaxUploadSize();
@@ -311,7 +312,7 @@ class AssetController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -372,7 +373,6 @@ class AssetController extends FormController
             'viewParameters' => [
                 'form'             => $form->createView(),
                 'activeAsset'      => $entity,
-                'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
                 'startOnLocal'     => $entity->isLocal(),
                 'uploadEndpoint'   => $uploadEndpoint,
@@ -405,7 +405,7 @@ class AssetController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess('asset:assets:editown', 'asset:assets:editother', $entity->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->coreParametersHelper->get('max_size')));
@@ -453,11 +453,12 @@ class AssetController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'asset.asset');
@@ -473,7 +474,7 @@ class AssetController extends FormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -574,7 +575,7 @@ class AssetController extends FormController
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $clone = clone $entity;
@@ -625,7 +626,7 @@ class AssetController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'asset.asset');
             }
@@ -687,7 +688,7 @@ class AssetController extends FormController
                     'asset:assets:deleteown', 'asset:assets:deleteother', $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'asset', true);
                 } else {

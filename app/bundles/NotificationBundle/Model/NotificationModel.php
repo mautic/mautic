@@ -53,18 +53,12 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\NotificationBundle\Entity\NotificationRepository
     {
         return $this->em->getRepository(Notification::class);
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\NotificationBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }
@@ -80,7 +74,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
-            $isNew = ($entity->getId()) ? false : true;
+            $isNew = !(bool) $entity->getId();
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
@@ -188,7 +182,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new NotificationEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -214,12 +208,11 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 

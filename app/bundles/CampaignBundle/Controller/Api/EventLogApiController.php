@@ -174,9 +174,8 @@ class EventLogApiController extends FetchCommonApiController
 
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
-        } else {
-            [$log, $created] = $result;
         }
+        [$log, $created] = $result;
 
         $event->addContactLog($log);
         $view = $this->view(
@@ -203,6 +202,8 @@ class EventLogApiController extends FetchCommonApiController
         if ($valid instanceof Response) {
             return $valid;
         }
+
+        $errors= [];
 
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->getModel('lead'), false);

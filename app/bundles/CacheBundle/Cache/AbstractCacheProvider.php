@@ -7,11 +7,9 @@ namespace Mautic\CacheBundle\Cache;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * Class CacheProvider provides a caching mechanism using adapters, it provides both PSR-6 and PSR-16.
@@ -19,19 +17,20 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 abstract class AbstractCacheProvider implements CacheProviderInterface
 {
     private ?AdapterInterface $adapter = null;
+
     private ?Psr16Cache $psr16         = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private ContainerInterface $container,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ContainerInterface $container,
     ) {
     }
 
-    abstract public function getCacheAdapter(): TagAwareAdapterInterface|TagAwareCacheInterface;
+    abstract public function getCacheAdapter(): AdapterInterface;
 
     public function getSimpleCache(): Psr16Cache
     {
-        if (is_null($this->psr16)) {
+        if (null === $this->psr16) {
             $this->psr16 = new Psr16Cache($this->getCacheAdapter());
         }
 
@@ -83,7 +82,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
         return $this->getCacheAdapter()->commit();
     }
 
-    protected function cacheAdapterFactory(string $parameter): TagAwareAdapterInterface|TagAwareCacheInterface
+    protected function cacheAdapterFactory(string $parameter): AdapterInterface
     {
         if (null === $this->adapter) {
             $service       = $this->coreParametersHelper->get($parameter);

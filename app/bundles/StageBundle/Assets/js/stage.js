@@ -1,3 +1,39 @@
+//StageBundle
+Mautic.stageOnLoad = function (container, response) {
+    const segmentCountElem = mQuery('a.col-count');
+
+    if (segmentCountElem.length) {
+        segmentCountElem.each(function() {
+            const elem = mQuery(this);
+            const id = elem.attr('data-id');
+
+            Mautic.ajaxActionRequest(
+                'stage:getLeadCount',
+                {id: id},
+                function (response) {
+                    elem.html(response.html);
+                },
+                false,
+                true
+            );
+        });
+    }
+
+    const sequence = mQuery('#stage-weight-sequence');
+
+    if (!sequence.length) {
+        return;
+    }
+
+    const stageWeights = sequence.data('weights');
+    const weightFieldId = sequence.data('weight-field-id');
+
+    if (stageWeights && weightFieldId) {
+        const entityId = sequence.data('entity-id');
+        Mautic.initStageWeightConflictCheck(stageWeights, weightFieldId, entityId);
+    }
+};
+
 Mautic.getStageActionPropertiesForm = function(actionType) {
     Mautic.activateLabelLoadingIndicator('stage_type');
 
@@ -22,23 +58,28 @@ Mautic.getStageActionPropertiesForm = function(actionType) {
     });
 };
 
-Mautic.stageOnLoad = function(container, response) {
-    const segmentCountElem = mQuery('a.col-count');
+Mautic.initStageWeightConflictCheck = function(weights, weightFieldId, entityId) {
+    mQuery(document).ready(function() {
+        const weightField = mQuery('#' + weightFieldId);
+        const group = weightField.closest('.form-group');
+        const message = mQuery('<span class="help-block text-danger"></span>').insertAfter(weightField);
 
-    if (segmentCountElem.length) {
-        segmentCountElem.each(function() {
-            const elem = mQuery(this);
-            const id = elem.attr('data-id');
+        function check() {
+            const val = parseInt(weightField.val(), 10);
+            const conflict = weights.some(function(w) {
+                return w.weight == val && (!entityId || w.id != entityId);
+            });
 
-            Mautic.ajaxActionRequest(
-                'stage:getLeadCount',
-                {id: id},
-                function (response) {
-                    elem.html(response.html);
-                },
-                false,
-                true
-            );
-        });
-    }
+            if (conflict) {
+                group.addClass('has-error');
+                message.text(Mautic.translate('mautic.stage.weight.conflict'));
+            } else {
+                group.removeClass('has-error');
+                message.text('');
+            }
+        }
+
+        weightField.on('input', check);
+        check();
+    });
 };

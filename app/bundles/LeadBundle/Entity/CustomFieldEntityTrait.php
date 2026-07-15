@@ -69,6 +69,9 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
+    /**
+     * @param mixed[] $fields
+     */
     public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
@@ -123,7 +126,7 @@ trait CustomFieldEntityTrait
             if ('' === $value) {
                 $value = null;
             }
-            $this->$setter($value);
+            $this->{$setter}($value);
         }
 
         if (is_string($value)) {
@@ -145,7 +148,7 @@ trait CustomFieldEntityTrait
             $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
-        if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
+        if ($oldValue !== $value && (('' !== $oldValue || null !== $value) && (null !== $oldValue || '' !== $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }
@@ -236,11 +239,10 @@ trait CustomFieldEntityTrait
             }
 
             return array_merge($fieldValues, $this->updatedFields);
-        } else {
-            // The fields are already flattened
-
-            return $this->fields;
         }
+        // The fields are already flattened
+
+        return $this->fields;
     }
 
     public function hasFields(): bool

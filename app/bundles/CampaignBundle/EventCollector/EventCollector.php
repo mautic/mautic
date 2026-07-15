@@ -18,21 +18,18 @@ class EventCollector
     private ?EventAccessor $events = null;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
-    /**
-     * @return EventAccessor
-     */
-    public function getEvents()
+    public function getEvents(): EventAccessor
     {
         if (empty($this->eventsArray)) {
             $this->buildEventList();
         }
 
-        if (empty($this->events)) {
+        if (!$this->events instanceof EventAccessor) {
             $this->events = new EventAccessor($this->eventsArray);
         }
 
@@ -64,7 +61,7 @@ class EventCollector
 
         if (null !== $type) {
             if (!isset($this->events[$type])) {
-                throw new \InvalidArgumentException("$type not found as array key");
+                throw new \InvalidArgumentException("{$type} not found as array key");
             }
 
             return $this->eventsArray[$type];

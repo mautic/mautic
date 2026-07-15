@@ -28,10 +28,7 @@ class RouteEvent extends Event
         $this->collection->addCollection($this->loader->import($path));
     }
 
-    /**
-     * @return RouteCollection
-     */
-    public function getCollection()
+    public function getCollection(): RouteCollection
     {
         return $this->collection;
     }

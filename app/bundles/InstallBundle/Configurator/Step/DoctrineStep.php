@@ -82,7 +82,7 @@ class DoctrineStep implements StepInterface
             if (str_starts_with($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
                 $key                         = substr($key, 3);
-                $this->$key                  = $value;
+                $this->{$key}                  = $value;
             }
         }
     }
@@ -135,7 +135,7 @@ class DoctrineStep implements StepInterface
      * Return the key values of the available driver array.
      * Required in step.
      *
-     * @see \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::buildForm()
+     * @see DoctrineStepType::buildForm()
      */
     public static function getDriverKeys(): array
     {

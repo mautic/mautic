@@ -65,26 +65,17 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->negate;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }
 
-    /**
-     * @param bool $status
-     */
-    public function setSearchStatus($status): void
+    public function setSearchStatus(bool $status): void
     {
         $this->isSearchDone = $status;
     }
 
-    /**
-     * @param string $query
-     */
-    public function setSubQuery($query): void
+    public function setSubQuery(string $query): void
     {
         $this->subQuery = $query;
 
@@ -114,10 +105,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->strict;
     }
 
-    /**
-     * @param bool $val
-     */
-    public function setStrict($val): void
+    public function setStrict(bool $val): void
     {
         $this->strict = $val;
     }
@@ -127,26 +115,17 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->returnParameters;
     }
 
-    /**
-     * @param bool $val
-     */
-    public function setReturnParameters($val): void
+    public function setReturnParameters(bool $val): void
     {
         $this->returnParameters = $val;
     }
 
-    /**
-     * @return array
-     */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    /**
-     * @param array $val
-     */
-    public function setParameters($val): void
+    public function setParameters(array $val): void
     {
         $this->parameters = $val;
     }

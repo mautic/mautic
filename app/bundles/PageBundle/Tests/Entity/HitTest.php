@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Hit;
-use PHPUnit\Framework\Assert;
 
-class HitTest extends \PHPUnit\Framework\TestCase
+final class HitTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('setUrlTitle')]
     public function testSetUrlTitle(string $urlTitle, int $expected): void
@@ -15,7 +14,7 @@ class HitTest extends \PHPUnit\Framework\TestCase
         $hit = new Hit();
         $hit->setUrlTitle($urlTitle);
 
-        Assert::assertEquals($expected, mb_strlen($hit->getUrlTitle()));
+        $this->assertSame($expected, mb_strlen($hit->getUrlTitle()));
     }
 
     /**

@@ -6,25 +6,19 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
 trait DataGeneratorTrait
 {
-    /**
-     * @var int
-     */
-    protected $page = 1;
+    protected int $page = 1;
+
+    protected int $id = 0;
 
     /**
-     * @var int
+     * @var array<int, array{id: int}>
      */
-    protected $id = 0;
+    protected array $generatedRecords = [];
 
     /**
-     * @var array
+     * @return array<int, array{id: int}>
      */
-    protected $generatedRecords = [];
-
-    /**
-     * @return array
-     */
-    protected function generateData($maxPages)
+    protected function generateData(int $maxPages): array
     {
         $pageSize = ($this->page === $maxPages) ? ConnectwiseIntegration::PAGESIZE / 2 : ConnectwiseIntegration::PAGESIZE;
         $fakeData = [];
@@ -44,7 +38,7 @@ trait DataGeneratorTrait
         return $fakeData;
     }
 
-    protected function reset()
+    protected function reset(): void
     {
         $this->id               = 0;
         $this->page             = 1;
