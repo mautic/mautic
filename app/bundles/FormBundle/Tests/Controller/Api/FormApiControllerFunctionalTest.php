@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -269,7 +268,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
+        $this->assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
 
         $formId = $response['form']['id'];
 
@@ -400,11 +399,11 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'email'       => 'john@doe.test',
             'state'       => 'Plzeňský kraj',
             'number'      => 123.0,
@@ -418,21 +417,21 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('john@doe.test', $contact->getEmail());
-        Assert::assertSame('Czech Republic', $contact->getCountry());
-        Assert::assertSame('Plzeňský kraj', $contact->getState());
-        Assert::assertSame(123, $contact->getPoints());
-        Assert::assertSame('Doe Corp', $contact->getCompany());
+        $this->assertSame('john@doe.test', $contact->getEmail());
+        $this->assertSame('Czech Republic', $contact->getCountry());
+        $this->assertSame('Plzeňský kraj', $contact->getState());
+        $this->assertSame(123, $contact->getPoints());
+        $this->assertSame('Doe Corp', $contact->getCompany());
 
         $companies = $this->em->getRepository(Company::class)->findAll();
 
-        Assert::assertCount(1, $companies);
+        $this->assertCount(1, $companies);
 
         // A company should be created by the submission.
         /** @var Company $company */
         $company = $companies[0];
-        Assert::assertSame('Doe Corp', $company->getName());
-        Assert::assertSame('+420444555666', $company->getPhone());
+        $this->assertSame('Doe Corp', $company->getName());
+        $this->assertSame('+420444555666', $company->getPhone());
 
         // The previous request changes user to anonymous.
         $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
@@ -669,8 +668,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         $formId = $response['form']['id'];
-        Assert::assertGreaterThan(0, $formId);
-        Assert::assertTrue($response['form']['isPublished']);
+        $this->assertGreaterThan(0, $formId);
+        $this->assertTrue($response['form']['isPublished']);
 
         $newFormName = 'Updated Form Name';
 
@@ -698,7 +697,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         }
         self::assertResponseStatusCodeSame(Response::HTTP_OK, 'Return code must be 200.');
 
-        Assert::assertSame($newFormName, $response['form']['name']);
-        Assert::assertTrue($response['form']['isPublished']);
+        $this->assertSame($newFormName, $response['form']['name']);
+        $this->assertTrue($response['form']['isPublished']);
     }
 }

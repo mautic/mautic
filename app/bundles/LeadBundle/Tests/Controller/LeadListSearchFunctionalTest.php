@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
@@ -120,7 +119,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
         foreach ($expectedQueries as $expectedQuery) {
             $matchedQueries = array_filter($queries, fn (string $query): bool => $expectedQuery === $query);
-            Assert::assertCount(1, $matchedQueries, sprintf('The query "%s" was expected to be executed once.', $expectedQuery));
+            $this->assertCount(1, $matchedQueries, sprintf('The query "%s" was expected to be executed once.', $expectedQuery));
         }
     }
 
@@ -135,11 +134,11 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $responseText = $crawler->text();
 
         foreach ($expectedLeads as $expectedLead) {
-            Assert::assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
+            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
         }
 
         foreach ($notExpectedLeads as $notExpectedLead) {
-            Assert::assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
+            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
         }
     }
 

@@ -9,7 +9,6 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class BuilderIntegrationsHelperTest extends TestCase
@@ -80,7 +79,7 @@ final class BuilderIntegrationsHelperTest extends TestCase
 
         $foundBuilder = $this->builderIntegrationsHelper->getBuilder('page');
 
-        Assert::assertSame($builder, $foundBuilder);
+        $this->assertSame($builder, $foundBuilder);
     }
 
     public function testBuilderNamesAreReturned(): void
@@ -103,12 +102,9 @@ final class BuilderIntegrationsHelperTest extends TestCase
             ->willReturn('Builder Two');
         $this->builderIntegrationsHelper->addIntegration($builder2);
 
-        Assert::assertSame(
-            [
-                'builder1' => 'Builder One',
-                'builder2' => 'Builder Two',
-            ],
-            $this->builderIntegrationsHelper->getBuilderNames()
-        );
+        $this->assertSame([
+            'builder1' => 'Builder One',
+            'builder2' => 'Builder Two',
+        ], $this->builderIntegrationsHelper->getBuilderNames());
     }
 }
