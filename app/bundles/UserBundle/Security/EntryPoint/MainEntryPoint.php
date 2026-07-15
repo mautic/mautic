@@ -13,8 +13,10 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 
 class MainEntryPoint implements AuthenticationEntryPointInterface
 {
-    public function __construct(private UrlGeneratorInterface $urlGenerator, private bool $samlEnabled)
-    {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly bool $samlEnabled,
+    ) {
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response

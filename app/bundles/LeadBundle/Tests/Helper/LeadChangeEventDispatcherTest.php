@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -12,7 +14,7 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that date identified change dispatches correct event')]
     public function testDateIdentifiedEventIsDispatched(): void

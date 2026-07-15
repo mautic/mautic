@@ -6,20 +6,25 @@ namespace Mautic\FormBundle\Tests\Entity;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use PHPUnit\Framework\Assert;
 
 final class FormTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
-    public function testSetNoIndex($value, $expected, array $changes): void
+    public function testSetNoIndex(mixed $value, mixed $expected, array $changes): void
     {
         $form = new Form();
         $form->setNoIndex($value);
 
-        Assert::assertSame($expected, $form->getNoIndex());
-        Assert::assertSame($changes, $form->getChanges());
+        $this->assertSame($expected, $form->getNoIndex());
+        $this->assertSame($changes, $form->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, ['noIndex' => [true, null]]];
@@ -51,14 +56,14 @@ final class FormTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        Assert::assertSame($result, $form->getMappedFieldValues());
+        $this->assertSame($result, $form->getMappedFieldValues());
     }
 
     public function testGetMappedFieldObjects(): void
     {
         $form = $this->createForm();
 
-        Assert::assertSame(['contact', 'company'], $form->getMappedFieldObjects());
+        $this->assertSame(['contact', 'company'], $form->getMappedFieldObjects());
     }
 
     private function createForm(): Form

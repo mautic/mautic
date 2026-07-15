@@ -20,8 +20,8 @@ use Symfony\Component\Routing\RouterInterface;
 class CompanyObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CompanyObjectHelper $companyObjectHelper,
-        private RouterInterface $router,
+        private readonly CompanyObjectHelper $companyObjectHelper,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -84,7 +84,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Company::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
             return;
         }
 

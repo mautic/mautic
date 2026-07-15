@@ -11,14 +11,13 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 
 /**
  * This test ensures that the pending query will work even if a contact was deleted between batches.
  * After the refactoring from NOT EXISTS to NOT IN the single deleted contact could cause the
  * pending query to find no contacts due to null value in the lead_id column.
  */
-class PendingQueryFunctionalTest extends MauticMysqlTestCase
+final class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void
     {
@@ -32,17 +31,17 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
         $email         = $this->createEmail($segment);
         $this->addContactsToSegment($contacts, $segment);
 
-        Assert::assertSame($contactCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
+        $this->assertSame($contactCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
 
         $this->emulateEmailSend($email, $batch1);
 
-        Assert::assertSame($oneBatchCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
+        $this->assertSame($oneBatchCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
 
         $this->em->remove($batch1[0]);
         $this->em->flush();
 
         // The pending count must be the same even if one of the email_stat records has lead_id = null.
-        Assert::assertSame($oneBatchCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
+        $this->assertSame($oneBatchCount, (int) $emailRepository->getEmailPendingLeads($email->getId(), null, null, true));
     }
 
     /**
@@ -58,8 +57,9 @@ class PendingQueryFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;

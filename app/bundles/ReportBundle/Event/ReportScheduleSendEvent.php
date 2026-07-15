@@ -11,15 +11,12 @@ class ReportScheduleSendEvent extends Event
      * @param string $file
      */
     public function __construct(
-        private Scheduler $scheduler,
+        private readonly Scheduler $scheduler,
         private $file,
     ) {
     }
 
-    /**
-     * @return Scheduler
-     */
-    public function getScheduler()
+    public function getScheduler(): Scheduler
     {
         return $this->scheduler;
     }

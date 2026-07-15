@@ -116,7 +116,7 @@ class LeadNoteRepository extends CommonRepository
                         $returnParameter = true;
                         break;
                 }
-                $expr           = $q->expr()->eq('n.type', ":$unique");
+                $expr           = $q->expr()->eq('n.type', ":{$unique}");
                 $filter->strict = true;
                 break;
         }
@@ -127,7 +127,7 @@ class LeadNoteRepository extends CommonRepository
 
         if ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [

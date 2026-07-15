@@ -9,7 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class FileExtensionConstraintValidator extends ConstraintValidator
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -29,7 +29,7 @@ class FileExtensionConstraintValidator extends ConstraintValidator
 
         $blacklistedExtensions = $this->coreParametersHelper->get('blacklisted_extensions');
         $intersect             = array_intersect($value, $blacklistedExtensions);
-        if ($intersect) {
+        if ([] !== $intersect) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ forbidden }}', implode(', ', $intersect))
                 ->addViolation();

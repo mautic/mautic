@@ -32,7 +32,6 @@ use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -273,7 +272,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $list) {
                 $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
-                $leadModel->$class($lead, $list);
+                $leadModel->{$class}($lead, $list);
                 $dataArray['success'] = 1;
             }
         }
@@ -310,7 +309,7 @@ class AjaxController extends CommonAjaxController
     {
         if (!$this->security->isGranted('campaign:campaigns:editown')
             && !$this->security->isGranted('campaign:campaigns:editother')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $dataArray  = ['success' => 0];
@@ -354,7 +353,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $company) {
                 $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
-                $companyModel->$class($company, $lead);
+                $companyModel->{$class}($company, $lead);
                 $dataArray['success'] = 1;
             }
         }
@@ -407,10 +406,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @return array|JsonResponse|RedirectResponse
      */
-    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model)
+    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model): array|JsonResponse
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');
@@ -431,7 +428,7 @@ class AjaxController extends CommonAjaxController
             );
 
             if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-                return $this->accessDenied(true);
+                return $this->getAccessDeniedFlash();
             }
 
             $session    = $request->getSession();
@@ -447,7 +444,7 @@ class AjaxController extends CommonAjaxController
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
             if ('list' != $indexMode) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'][] = "!$anonymous";
+                $filter['force'][] = "!{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
@@ -590,6 +587,9 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
+    /**
+     * @deprecated since Mautic 7.2, will be removed in 8.0 with no replacement.
+     */
     public function addLeadUtmTagsAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $utmTags = $request->request->get('utmtags');
@@ -601,7 +601,7 @@ class AjaxController extends CommonAjaxController
                 if (!is_numeric($utmTag)) {
                     // New tag
                     $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmTag(InputHelper::clean($utmTag));
+                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
                     $newUtmTags[] = $utmTagEntity;
                 }
             }

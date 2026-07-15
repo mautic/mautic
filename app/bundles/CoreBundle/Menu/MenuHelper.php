@@ -17,7 +17,7 @@ class MenuHelper
     public function __construct(
         protected CorePermissions $security,
         protected RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
         protected IntegrationHelper $integrationHelper,
     ) {
     }
@@ -29,7 +29,7 @@ class MenuHelper
      * @param int    $defaultPriority
      * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
+    public function createMenuStructure(array &$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -185,7 +185,7 @@ class MenuHelper
 
         uasort(
             $menuItems,
-            function ($a, $b) use ($defaultPriority): int {
+            function (array $a, array $b) use ($defaultPriority): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
@@ -287,7 +287,7 @@ class MenuHelper
                 }
 
                 foreach ($checkConfig as $name => $value) {
-                    if (false === $this->$checkMethod($name, $value)) {
+                    if (false === $this->{$checkMethod}($name, $value)) {
                         return false;
                     }
                 }

@@ -24,11 +24,11 @@ class UserSummaryNotificationHelper
     private ?string $listTranslationKey = null;
 
     public function __construct(
-        private Writer $writer,
-        private UserHelper $userHelper,
-        private OwnerProvider $ownerProvider,
-        private RouteHelper $routeHelper,
-        private TranslatorInterface $translator,
+        private readonly Writer $writer,
+        private readonly UserHelper $userHelper,
+        private readonly OwnerProvider $ownerProvider,
+        private readonly RouteHelper $routeHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

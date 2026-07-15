@@ -13,7 +13,7 @@ class ApiEntityEvent extends CommonEvent
     public function __construct(
         protected $entity,
         protected array $entityRequestParameters,
-        private Request $request,
+        private readonly Request $request,
     ) {
     }
 
@@ -25,18 +25,12 @@ class ApiEntityEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return array
-     */
-    public function getEntityRequestParameters()
+    public function getEntityRequestParameters(): array
     {
         return $this->entityRequestParameters;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

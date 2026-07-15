@@ -7,9 +7,10 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
 use PHPUnit\Framework\TestCase;
 
-class PrivateAddressCheckerTest extends TestCase
+final class PrivateAddressCheckerTest extends TestCase
 {
     private PrivateAddressChecker $checker;
+
     private PrivateAddressChecker $checkerWithMockedDns;
 
     protected function setUp(): void
@@ -19,14 +20,12 @@ class PrivateAddressCheckerTest extends TestCase
 
         // Checker with mocked DNS resolver for URL tests
         $this->checkerWithMockedDns = new PrivateAddressChecker(
-            function (string $host) {
-                return match ($host) {
-                    'private.example.com' => ['192.168.1.1'],
-                    'public.example.com'  => ['203.0.113.1'],
-                    'api.example.com'     => ['8.8.8.8'],
-                    'localhost'           => ['127.0.0.1'],
-                    default               => false,
-                };
+            fn (string $host): array|false => match ($host) {
+                'private.example.com' => ['192.168.1.1'],
+                'public.example.com'  => ['203.0.113.1'],
+                'api.example.com'     => ['8.8.8.8'],
+                'localhost'           => ['127.0.0.1'],
+                default               => false,
             }
         );
     }
@@ -56,74 +55,64 @@ class PrivateAddressCheckerTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function privateIpProvider(): array
+    public static function privateIpProvider(): \Iterator
     {
-        return [
-            'IPv4 Local'           => ['127.0.0.1'],
-            'IPv4 Private Class A' => ['10.0.0.1'],
-            'IPv4 Private Class B' => ['172.16.0.1'],
-            'IPv4 Private Class C' => ['192.168.0.1'],
-            'IPv4 Link Local'      => ['169.254.0.1'],
-            'IPv6 Localhost'       => ['::1'],
-            'IPv6 Unique Local'    => ['fc00::1'],
-            'IPv6 Link Local'      => ['fe80::1'],
-        ];
+        yield 'IPv4 Local' => ['127.0.0.1'];
+        yield 'IPv4 Private Class A' => ['10.0.0.1'];
+        yield 'IPv4 Private Class B' => ['172.16.0.1'];
+        yield 'IPv4 Private Class C' => ['192.168.0.1'];
+        yield 'IPv4 Link Local' => ['169.254.0.1'];
+        yield 'IPv6 Localhost' => ['::1'];
+        yield 'IPv6 Unique Local' => ['fc00::1'];
+        yield 'IPv6 Link Local' => ['fe80::1'];
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function publicIpProvider(): array
+    public static function publicIpProvider(): \Iterator
     {
-        return [
-            'IPv4 Public'             => ['8.8.8.8'],
-            'IPv4 Public Alternative' => ['203.0.113.1'],
-            'IPv6 Public'             => ['2001:4860:4860::8888'],
-        ];
+        yield 'IPv4 Public' => ['8.8.8.8'];
+        yield 'IPv4 Public Alternative' => ['203.0.113.1'];
+        yield 'IPv6 Public' => ['2001:4860:4860::8888'];
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function privateUrlProvider(): array
+    public static function privateUrlProvider(): \Iterator
     {
-        return [
-            'Localhost'                      => ['http://localhost'],
-            'Localhost with port'            => ['http://localhost:8080'],
-            'IPv4 Private'                   => ['http://192.168.1.1'],
-            'IPv4 Private with path'         => ['https://10.0.0.1/path'],
-            'IPv6 Localhost'                 => ['http://[::1]'],
-            'IPv6 Private'                   => ['http://[fc00::1]'],
-            'Domain resolving to private IP' => ['http://private.example.com'],
-        ];
+        yield 'Localhost' => ['http://localhost'];
+        yield 'Localhost with port' => ['http://localhost:8080'];
+        yield 'IPv4 Private' => ['http://192.168.1.1'];
+        yield 'IPv4 Private with path' => ['https://10.0.0.1/path'];
+        yield 'IPv6 Localhost' => ['http://[::1]'];
+        yield 'IPv6 Private' => ['http://[fc00::1]'];
+        yield 'Domain resolving to private IP' => ['http://private.example.com'];
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function publicUrlProvider(): array
+    public static function publicUrlProvider(): \Iterator
     {
-        return [
-            'Public Domain' => ['http://public.example.com'],
-            'IPv4 Public'   => ['http://8.8.8.8'],
-            'IPv6 Public'   => ['http://[2001:4860:4860::8888]'],
-            'HTTPS URL'     => ['https://api.example.com/v1'],
-        ];
+        yield 'Public Domain' => ['http://public.example.com'];
+        yield 'IPv4 Public' => ['http://8.8.8.8'];
+        yield 'IPv6 Public' => ['http://[2001:4860:4860::8888]'];
+        yield 'HTTPS URL' => ['https://api.example.com/v1'];
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function invalidUrlProvider(): array
+    public static function invalidUrlProvider(): \Iterator
     {
-        return [
-            'Empty URL'          => [''],
-            'Invalid Format'     => ['not-a-url'],
-            'Missing Protocol'   => ['example.com'],
-            'Invalid Characters' => ['http://example.com\\invalid'],
-        ];
+        yield 'Empty URL' => [''];
+        yield 'Invalid Format' => ['not-a-url'];
+        yield 'Missing Protocol' => ['example.com'];
+        yield 'Invalid Characters' => ['http://example.com\\invalid'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('invalidUrlProvider')]
@@ -148,19 +137,17 @@ class PrivateAddressCheckerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('edgeCaseUrlProvider')]
     public function testEdgeCaseUrls(string $url, bool $expectedResult): void
     {
-        $this->assertEquals($expectedResult, $this->checkerWithMockedDns->isPrivateUrl($url));
+        $this->assertSame($expectedResult, $this->checkerWithMockedDns->isPrivateUrl($url));
     }
 
     /**
-     * @return array<string, array{string, bool}>
+     * @return \Iterator<string, array{string, bool}>
      */
-    public static function edgeCaseUrlProvider(): array
+    public static function edgeCaseUrlProvider(): \Iterator
     {
-        return [
-            'URL with Port'        => ['http://[::1]:8080', true],
-            'IPv6 with Zone Index' => ['http://[fe80::1%eth0]', true],
-            'IPv6 Full Format'     => ['http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]', false],
-        ];
+        yield 'URL with Port' => ['http://[::1]:8080', true];
+        yield 'IPv6 with Zone Index' => ['http://[fe80::1%eth0]', true];
+        yield 'IPv6 Full Format' => ['http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]', false];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('allowedUrlProvider')]
@@ -185,30 +172,26 @@ class PrivateAddressCheckerTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function allowedUrlProvider(): array
+    public static function allowedUrlProvider(): \Iterator
     {
-        return [
-            'Public Domain'                => ['http://public.example.com'],
-            'Allowed Private IP'           => ['http://192.168.1.1'],
-            'Allowed Localhost'            => ['http://localhost'],
-            'Allowed IPv6 Localhost'       => ['http://[::1]'],
-            'Domain to Allowed Private IP' => ['http://private.example.com'], // Resolves to 192.168.1.1
-        ];
+        yield 'Public Domain' => ['http://public.example.com'];
+        yield 'Allowed Private IP' => ['http://192.168.1.1'];
+        yield 'Allowed Localhost' => ['http://localhost'];
+        yield 'Allowed IPv6 Localhost' => ['http://[::1]'];
+        yield 'Domain to Allowed Private IP' => ['http://private.example.com'];
     }
 
     /**
-     * @return array<string, array{string}>
+     * @return \Iterator<string, array{string}>
      */
-    public static function disallowedUrlProvider(): array
+    public static function disallowedUrlProvider(): \Iterator
     {
-        return [
-            'Disallowed Private IP'           => ['http://192.168.1.1'],
-            'Different Private IP'            => ['http://192.168.1.3'],
-            'Domain to Disallowed Private IP' => ['http://private.example.com'],
-            'Localhost when not allowed'      => ['http://localhost'],
-        ];
+        yield 'Disallowed Private IP' => ['http://192.168.1.1'];
+        yield 'Different Private IP' => ['http://192.168.1.3'];
+        yield 'Domain to Disallowed Private IP' => ['http://private.example.com'];
+        yield 'Localhost when not allowed' => ['http://localhost'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('invalidUrlProvider')]

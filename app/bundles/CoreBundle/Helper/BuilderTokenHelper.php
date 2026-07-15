@@ -28,11 +28,11 @@ class BuilderTokenHelper
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        private CorePermissions $security,
-        private ModelFactory $modelFactory,
-        private Connection $connection,
-        private UserHelper $userHelper,
-        private TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly ModelFactory $modelFactory,
+        private readonly Connection $connection,
+        private readonly UserHelper $userHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -46,7 +46,7 @@ class BuilderTokenHelper
         ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
-        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
+        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "{$modelName}:{$modelName}s";
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
         $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
@@ -87,7 +87,7 @@ class BuilderTokenHelper
             'RETURN_ARRAY'
         );
 
-        if (1 == count(array_unique($permissions)) && false == end($permissions)) {
+        if (1 === count(array_unique($permissions)) && false == end($permissions)) {
             return;
         }
 

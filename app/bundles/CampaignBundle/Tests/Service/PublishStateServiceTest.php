@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 final class PublishStateServiceTest extends MauticMysqlTestCase
 {
@@ -45,28 +44,22 @@ final class PublishStateServiceTest extends MauticMysqlTestCase
         $this->saveAuditLogs($this->em, $auditLogs, $campaign);
 
         $unpublishStateService = $this->getContainer()->get(PublishStateService::class);
-        \assert($unpublishStateService instanceof PublishStateService);
+        $this->assertInstanceOf(PublishStateService::class, $unpublishStateService);
 
-        Assert::assertSame($expectedunpublishedranges, array_map(
-            fn (PublishStateDateRange $range) => [
+        $this->assertSame($expectedunpublishedranges, array_map(
+            fn (PublishStateDateRange $range): array => [
                 'fromDate' => $range->getFromDate()->format(DateTimeHelper::FORMAT_DB),
                 'toDate'   => $range->getToDate()?->format(DateTimeHelper::FORMAT_DB),
             ], $unpublishStateService->generateUnpublishDateRanges($campaign)
         ));
 
-        Assert::assertSame(
-            $expectedLastPublishedDate,
-            $unpublishStateService->getLastPublishDate($campaign)?->format(DateTimeHelper::FORMAT_DB)
-        );
+        $this->assertSame($expectedLastPublishedDate, $unpublishStateService->getLastPublishDate($campaign)?->format(DateTimeHelper::FORMAT_DB));
 
         if (null === $expectedUnpublishedSecondsSinceCampaignCreated) {
             return;
         }
 
-        Assert::assertSame(
-            $expectedUnpublishedSecondsSinceCampaignCreated,
-            $unpublishStateService->getUnublishedSecondsSince($campaign, new \DateTimeImmutable($auditLogs[0]['dateAdded']))
-        );
+        $this->assertSame($expectedUnpublishedSecondsSinceCampaignCreated, $unpublishStateService->getUnublishedSecondsSince($campaign, new \DateTimeImmutable($auditLogs[0]['dateAdded'])));
     }
 
     public static function unpublishStateDataProvider(): \Generator

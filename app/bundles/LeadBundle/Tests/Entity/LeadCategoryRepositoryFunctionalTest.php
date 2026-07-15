@@ -13,14 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,

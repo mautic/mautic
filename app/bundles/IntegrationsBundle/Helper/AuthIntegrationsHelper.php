@@ -16,7 +16,7 @@ class AuthIntegrationsHelper
     private array $integrations = [];
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
+        private readonly IntegrationsHelper $integrationsHelper,
     ) {
     }
 
@@ -31,7 +31,7 @@ class AuthIntegrationsHelper
     public function getIntegration(string $integration): AuthenticationInterface
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.authentication_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.authentication_integration");
         }
 
         // Ensure the configuration is hydrated

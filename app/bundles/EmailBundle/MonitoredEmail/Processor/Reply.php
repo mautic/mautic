@@ -21,13 +21,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Reply implements ProcessorInterface
 {
     public function __construct(
-        private EmailStatModel $emailStatModel,
-        private ContactFinder $contactFinder,
-        private LeadModel $leadModel,
-        private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
-        private ContactTracker $contactTracker,
-        private EmailAddressHelper $addressHelper,
+        private readonly EmailStatModel $emailStatModel,
+        private readonly ContactFinder $contactFinder,
+        private readonly LeadModel $leadModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly ContactTracker $contactTracker,
+        private readonly EmailAddressHelper $addressHelper,
     ) {
     }
 

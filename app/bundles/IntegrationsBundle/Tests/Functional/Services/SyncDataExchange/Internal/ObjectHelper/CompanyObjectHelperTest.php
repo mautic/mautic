@@ -14,16 +14,15 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
-use PHPUnit\Framework\Assert;
 
-class CompanyObjectHelperTest extends MauticMysqlTestCase
+final class CompanyObjectHelperTest extends MauticMysqlTestCase
 {
     public function testUpdateEmpty(): void
     {
         /** @var CompanyObjectHelper $companyObjectHelper */
         $companyObjectHelper  = static::getContainer()->get('mautic.integrations.helper.company_object');
         $updatedMappedObjects = $companyObjectHelper->update([], []);
-        Assert::assertSame([], $updatedMappedObjects);
+        $this->assertSame([], $updatedMappedObjects);
     }
 
     public function testUpdate(): void
@@ -60,8 +59,8 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
             $company2->getId() => $this->buildObjectChangeDAO($company2, 'companycity', $city),
         ]);
 
-        Assert::assertSame($phone, $company1->getPhone());
-        Assert::assertSame($city, $company2->getCity());
+        $this->assertSame($phone, $company1->getPhone());
+        $this->assertSame($city, $company2->getCity());
     }
 
     private function buildObjectChangeDAO(Company $company, string $name, string $value): ObjectChangeDAO

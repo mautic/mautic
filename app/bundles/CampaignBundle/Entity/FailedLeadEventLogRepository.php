@@ -15,7 +15,7 @@ class FailedLeadEventLogRepository extends CommonRepository
      */
     public function deleteByIds(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

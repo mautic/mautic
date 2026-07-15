@@ -63,7 +63,7 @@ class TokenParser
         return $tokens;
     }
 
-    public function buildTokenWithDefaultOptions($integrationObjectName, $integration, $default, $linkText, $baseURL): string
+    public function buildTokenWithDefaultOptions(string $integrationObjectName, $integration, $default, $linkText, $baseURL): string
     {
         return sprintf(
             '{mapped-integration-object=%s | integration=%s | default=%s | link-text=%s | base-url=%s}',
@@ -90,6 +90,6 @@ class TokenParser
      */
     private function trimArrayElements(array $array): array
     {
-        return array_map('trim', $array);
+        return array_map(trim(...), $array);
     }
 }

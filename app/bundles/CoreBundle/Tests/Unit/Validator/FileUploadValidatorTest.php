@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
+final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Check that extension is valid')]
     public function testValidExtension(): void
@@ -62,7 +62,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 6;
+        $maxUploadSizeMB = '6';
         $sizeErrorMsg    = 'My message';
 
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
@@ -79,7 +79,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 4;
+        $maxUploadSizeMB = '4';
         $sizeErrorMsg    = 'My message';
 
         $this->expectException(FileInvalidException::class);

@@ -9,19 +9,18 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 class SegmentCampaignShare
 {
     public function __construct(
-        private CampaignModel $campaignModel,
-        private CacheStorageHelper $cacheStorageHelper,
-        private EntityManager $entityManager,
+        private readonly CampaignModel $campaignModel,
+        private readonly CacheStorageHelper $cacheStorageHelper,
+        private readonly EntityManager $entityManager,
     ) {
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param mixed[] $campaignIds
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {

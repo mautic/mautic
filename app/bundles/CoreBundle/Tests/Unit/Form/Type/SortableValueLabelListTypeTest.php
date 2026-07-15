@@ -23,17 +23,15 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function ($name) {
+            ->with($this->callback(function (string $name): bool {
                 $expected = [
                     ['label', 'value'],
                 ];
 
                 return in_array($name, $expected[0], true);
             }),
-                $this->callback(function ($type) {
-                    return TextType::class === $type;
-                }),
-                $this->callback(function ($options) use (&$call) {
+                TextType::class,
+                $this->callback(function (array $options) use (&$call): bool {
                     $expectedOptions = [
                         [
                             'label'          => 'mautic.core.label',
@@ -64,8 +62,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewSetsViewVariables(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options = [
             'attr' => [
@@ -89,8 +87,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewWithEmptyOptions(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options    = ['attr' => []];
         $view->vars = [];
@@ -112,7 +110,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         // @phpstan-ignore-next-line
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->callback(function ($callback) use (&$eventListener) {
+            ->with(FormEvents::PRE_SUBMIT, $this->callback(function ($callback) use (&$eventListener): true {
                 $eventListener = $callback;
 
                 return true;
@@ -127,7 +125,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
@@ -136,9 +134,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expectedValue) {
-                    return $newData['label'] === $data['label'] && $newData['value'] === $expectedValue;
-                }));
+                ->willReturnCallback(function (array $newData) use ($data, $expectedValue): void {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expectedValue, $newData['value']);
+                });
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -147,31 +146,29 @@ final class SortableValueLabelListTypeTest extends TestCase
     }
 
     /**
-     * @return array<string, array{mixed, bool, string|null}>
+     * @return \Iterator<string, array{mixed, bool, (string|null)}>
      */
-    public static function eventListenerDataProvider(): array
+    public static function eventListenerDataProvider(): \Iterator
     {
-        return [
-            'auto generates value' => [
-                ['label' => 'Test Label', 'value' => ''],
-                true,
-                'test_label',
-            ],
-            'does not modify when value exists' => [
-                ['label' => 'Test Label', 'value' => 'existing_value'],
-                false,
-                null,
-            ],
-            'does not modify when label empty' => [
-                ['label' => '', 'value' => ''],
-                false,
-                null,
-            ],
-            'handles non-array data' => [
-                'not_an_array',
-                false,
-                null,
-            ],
+        yield 'auto generates value' => [
+            ['label' => 'Test Label', 'value' => ''],
+            true,
+            'test_label',
+        ];
+        yield 'does not modify when value exists' => [
+            ['label' => 'Test Label', 'value' => 'existing_value'],
+            false,
+            null,
+        ];
+        yield 'does not modify when label empty' => [
+            ['label' => '', 'value' => ''],
+            false,
+            null,
+        ];
+        yield 'handles non-array data' => [
+            'not_an_array',
+            false,
+            null,
         ];
     }
 
@@ -179,7 +176,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
 
@@ -191,9 +188,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expected) {
-                    return $newData['label'] === $data['label'] && $newData['value'] === $expected;
-                }));
+                ->willReturnCallback(function (array $newData) use ($data, $expected): void {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expected, $newData['value']);
+                });
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -203,51 +201,49 @@ final class SortableValueLabelListTypeTest extends TestCase
     }
 
     /**
-     * @return array<int, array{string, string}>
+     * @return \Iterator<int, array{string, string}>
      */
-    public static function slugifyDataProvider(): array
+    public static function slugifyDataProvider(): \Iterator
     {
-        return [
-            ['My Option', 'my_option'],
-            ['First Choice!', 'first_choice'],
-            ['Test-Value_123', 'testvalue_123'],
-            ['Special@#$%Characters', 'specialcharacters'],
-            ['  Trimmed  Spaces  ', 'trimmed_spaces'],
-            ['Multiple___Underscores', 'multiple_underscores'],
-            ['Àccénted Chàracters', 'accented_characters'],
-            ['Привет мир', 'privet_mir'],
-            ['', ''],
-            ['123Numbers', '123numbers'],
-            ['Numéro', 'numero'],
-            ['Âge', 'age'],
-            ['Straße', 'strasse'],
-            ['Über', 'uber'],
-            ['Teléfono', 'telefono'],
-            ['Dirección', 'direccion'],
-            ['Coração', 'coracao'],
-            ['Ação', 'acao'],
-            ['Födelsedag', 'fodelsedag'],
-            ['Äktenskap', 'aktenskap'],
-            ['Номер', 'nomer'],
-            ['Адрес', 'adres'],
-            ['电话', 'dian_hua'],
-            ['地址', 'de_zhi'],
-            ['電話番号', 'dian_hua_fan_hao'],
-            ['住所', 'zhu_suo'],
-            ['رقم', 'rqm'],
-            ['عنوان', 'nwan'],
-            ['Adres', 'adres'],
-            ['Yaş', 'yas'],
-            ['Adresa', 'adresa'],
-            ['Číslo', 'cislo'],
-            ['Ulica', 'ulica'],
-            ['Wiek', 'wiek'],
-            ['Cím', 'cim'],
-            ['Születésnap', 'szuletesnap'],
-            ['Διεύθυνση', 'dieuthynse'],
-            ['Ηλικία', 'elikia'],
-            ['주소', 'juso'],
-            ['전화번호', 'jeonhwabeonho'],
-        ];
+        yield ['My Option', 'my_option'];
+        yield ['First Choice!', 'first_choice'];
+        yield ['Test-Value_123', 'testvalue_123'];
+        yield ['Special@#$%Characters', 'specialcharacters'];
+        yield ['  Trimmed  Spaces  ', 'trimmed_spaces'];
+        yield ['Multiple___Underscores', 'multiple_underscores'];
+        yield ['Àccénted Chàracters', 'accented_characters'];
+        yield ['Привет мир', 'privet_mir'];
+        yield ['', ''];
+        yield ['123Numbers', '123numbers'];
+        yield ['Numéro', 'numero'];
+        yield ['Âge', 'age'];
+        yield ['Straße', 'strasse'];
+        yield ['Über', 'uber'];
+        yield ['Teléfono', 'telefono'];
+        yield ['Dirección', 'direccion'];
+        yield ['Coração', 'coracao'];
+        yield ['Ação', 'acao'];
+        yield ['Födelsedag', 'fodelsedag'];
+        yield ['Äktenskap', 'aktenskap'];
+        yield ['Номер', 'nomer'];
+        yield ['Адрес', 'adres'];
+        yield ['电话', 'dian_hua'];
+        yield ['地址', 'de_zhi'];
+        yield ['電話番号', 'dian_hua_fan_hao'];
+        yield ['住所', 'zhu_suo'];
+        yield ['رقم', 'rqm'];
+        yield ['عنوان', 'nwan'];
+        yield ['Adres', 'adres'];
+        yield ['Yaş', 'yas'];
+        yield ['Adresa', 'adresa'];
+        yield ['Číslo', 'cislo'];
+        yield ['Ulica', 'ulica'];
+        yield ['Wiek', 'wiek'];
+        yield ['Cím', 'cim'];
+        yield ['Születésnap', 'szuletesnap'];
+        yield ['Διεύθυνση', 'dieuthynse'];
+        yield ['Ηλικία', 'elikia'];
+        yield ['주소', 'juso'];
+        yield ['전화번호', 'jeonhwabeonho'];
     }
 }

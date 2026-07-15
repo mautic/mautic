@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\HtmlExtension;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class HtmlExtensionTest extends TestCase
@@ -20,7 +19,7 @@ final class HtmlExtensionTest extends TestCase
 
         $actual = $extension->convertHtmlAttributesToArray($input);
 
-        Assert::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**

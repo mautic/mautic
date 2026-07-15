@@ -11,7 +11,7 @@ class CompanyLead
 
     /**
      * @var Company
-     **/
+     */
     private $company;
 
     /**
@@ -68,7 +68,7 @@ class CompanyLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -116,7 +116,7 @@ class CompanyLead
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getPrimary()
     {

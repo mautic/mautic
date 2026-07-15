@@ -36,7 +36,7 @@ class NoteModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -107,7 +107,7 @@ class NoteModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadNoteEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

@@ -17,24 +17,18 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ChannelClickQueryBuilderTest extends TestCase
+final class ChannelClickQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
 
     /**
-     * @var MockObject|RandomParameterName
+     * @var MockObject&RandomParameterName
      */
     private MockObject $randomParameterMock;
-
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
@@ -43,14 +37,13 @@ class ChannelClickQueryBuilderTest extends TestCase
 
     private ChannelClickQueryBuilder $queryBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $this->dispatcherMock
+            $this->createStub(EventDispatcherInterface::class)
         );
 
         $this->connectionMock->method('quote')
@@ -59,7 +52,7 @@ class ChannelClickQueryBuilderTest extends TestCase
 
     public function testGetServiceId(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'mautic.lead.query.builder.channel_click.value',
             $this->queryBuilder::getServiceId()
         );
@@ -91,7 +84,7 @@ class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -138,7 +131,7 @@ class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -160,10 +153,10 @@ class ChannelClickQueryBuilderTest extends TestCase
                 ]
             ),
             new BaseDecorator(new ContactSegmentFilterOperator(
-                $this->createMock(FilterOperatorProviderInterface::class)
+                $this->createStub(FilterOperatorProviderInterface::class)
             )),
-            new TableSchemaColumnsCache($this->createMock(EntityManager::class)),
-            $this->createMock(FilterQueryBuilderInterface::class),
+            new TableSchemaColumnsCache($this->createStub(EntityManager::class)),
+            $this->createStub(FilterQueryBuilderInterface::class),
             $batchLimiters
         );
     }

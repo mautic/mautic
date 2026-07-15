@@ -14,12 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
 {
-    /**
-     * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -31,7 +26,7 @@ class TriggerController extends FormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['point:triggers:view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -97,10 +92,8 @@ class TriggerController extends FormController
      * View a specific trigger.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         $entity = $this->getModel('point.trigger')->getEntity($objectId);
 
@@ -135,8 +128,9 @@ class TriggerController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$permissions['point:triggers:view']) {
-            return $this->accessDenied();
+        }
+        if (!$permissions['point:triggers:view']) {
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView([
@@ -176,7 +170,7 @@ class TriggerController extends FormController
         $sessionId = $this->getSessionBase();
 
         if (!$this->security->isGranted('point:triggers:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -195,7 +189,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($sessionId);
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -328,8 +322,9 @@ class TriggerController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:triggers:edit')) {
-            return $this->accessDenied();
+        }
+        if (!$this->security->isGranted('point:triggers:edit')) {
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'point.trigger');
@@ -340,7 +335,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($objectId);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // set added/updated events
@@ -402,7 +397,9 @@ class TriggerController extends FormController
                         'contentTemplate' => $template,
                     ])
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($this->isButtonClicked($form, 'apply')) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }
@@ -457,10 +454,8 @@ class TriggerController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         /** @var TriggerModel $model */
         $model  = $this->getModel('point.trigger');
@@ -471,7 +466,7 @@ class TriggerController extends FormController
 
         if (null != $entity) {
             if (!$this->security->isGranted('point:triggers:create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $existingActions = $entity->getEvents()->toArray();
@@ -524,7 +519,7 @@ class TriggerController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->isGranted('point:triggers:delete')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'point.trigger');
             }
@@ -585,7 +580,7 @@ class TriggerController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->isGranted('point:triggers:delete')) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'point.trigger', true);
                 } else {
