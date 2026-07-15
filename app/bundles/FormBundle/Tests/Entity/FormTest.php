@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Tests\Entity;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use PHPUnit\Framework\Assert;
 
 final class FormTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,8 +18,8 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         $form = new Form();
         $form->setNoIndex($value);
 
-        Assert::assertSame($expected, $form->getNoIndex());
-        Assert::assertSame($changes, $form->getChanges());
+        $this->assertSame($expected, $form->getNoIndex());
+        $this->assertSame($changes, $form->getChanges());
     }
 
     /**
@@ -57,14 +56,14 @@ final class FormTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        Assert::assertSame($result, $form->getMappedFieldValues());
+        $this->assertSame($result, $form->getMappedFieldValues());
     }
 
     public function testGetMappedFieldObjects(): void
     {
         $form = $this->createForm();
 
-        Assert::assertSame(['contact', 'company'], $form->getMappedFieldObjects());
+        $this->assertSame(['contact', 'company'], $form->getMappedFieldObjects());
     }
 
     private function createForm(): Form

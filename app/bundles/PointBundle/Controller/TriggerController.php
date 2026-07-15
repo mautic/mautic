@@ -398,7 +398,8 @@ class TriggerController extends FormController
                     ])
                 );
             }
-            if ($form->get('buttons')->get('apply')->isClicked()) {
+
+            if ($this->isButtonClicked($form, 'apply')) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }

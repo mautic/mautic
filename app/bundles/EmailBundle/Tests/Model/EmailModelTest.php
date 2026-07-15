@@ -999,8 +999,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->getEmailListStats($lists);
 
-        self::assertCount(1, $result['datasets']);
-        self::assertEquals(self::SEGMENT_A, $result['datasets'][0]['label']);
+        $this->assertCount(1, $result['datasets']);
+        $this->assertEquals(self::SEGMENT_A, $result['datasets'][0]['label']);
     }
 
     public function testGetEmailListStatsTwoSegments(): void
@@ -1015,9 +1015,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->getEmailListStats($lists);
 
-        self::assertCount(3, $result['datasets']);
-        self::assertEquals(self::SEGMENT_A, $result['datasets'][1]['label']);
-        self::assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
+        $this->assertCount(3, $result['datasets']);
+        $this->assertEquals(self::SEGMENT_A, $result['datasets'][1]['label']);
+        $this->assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
     }
 
     /**

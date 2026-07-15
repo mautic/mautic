@@ -30,8 +30,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     {
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => 999999]);
 
-        Assert::assertSame(1, $output->getStatusCode());
-        Assert::assertStringContainsString('Segment #999999 does not exist', $output->getDisplay());
+        $this->assertSame(1, $output->getStatusCode());
+        $this->assertStringContainsString('Segment #999999 does not exist', $output->getDisplay());
     }
 
     #[DataProvider('provider')]
@@ -67,7 +67,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, $getCommandParams($segment));
 
@@ -78,10 +78,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            1,
-            $leadListRepository->getLeadCount([$segment->getId()])
-        );
+        $this->assertSame(1, $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     /**
@@ -197,19 +194,16 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            $expected,
-            $leadListRepository->getLeadCount([$segment->getId()])
-        );
+        $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     public static function provideIncludeExclude(): \Generator
@@ -237,7 +231,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+        $this->assertEmpty($fields, 'There are no Custom Fields.');
 
         // Add field.
         $leadField = new LeadField();
@@ -321,19 +315,16 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            $expected,
-            $leadListRepository->getLeadCount([$segment->getId()])
-        );
+        $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     /**
@@ -348,7 +339,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+        $this->assertEmpty($fields, 'There are no Custom Fields.');
 
         // Add field.
         $leadField = new LeadField();
@@ -432,19 +423,16 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            $expected,
-            $leadListRepository->getLeadCount([$segment->getId()])
-        );
+        $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     public static function provideSingleIncludeExclude(): \Generator
@@ -540,16 +528,16 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
+        $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     /**
@@ -636,15 +624,12 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            (int) $expected,
-            (int) $leadListRepository->getLeadCount([$segment->getId()])
-        );
+        $this->assertSame((int) $expected, (int) $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     /**
@@ -710,18 +695,15 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        Assert::assertEquals($longTimeAgo, $segmentD->getLastBuiltDate());
+        $this->assertEquals($longTimeAgo, $segmentD->getLastBuiltDate());
 
         $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
 
-        Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
+        $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        Assert::assertSame(
-            $expected,
-            $leadListRepository->getLeadCount([$segmentD->getId()])
-        );
+        $this->assertSame($expected, $leadListRepository->getLeadCount([$segmentD->getId()]));
     }
 }

@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
@@ -89,7 +88,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
 
-        self::assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 
         $form = $crawler->filter(static::FORM_SELECTOR);
         $html = $form->html();
@@ -102,20 +101,16 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 $html
             );
 
-            Assert::assertCount(
-                $expectedCount,
-                $form->filter($selector),
-                $message
-            );
+            $this->assertCount($expectedCount, $form->filter($selector), $message);
         }
 
         // Ensure the token and save button are always included within the <form> tag
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
+        $this->assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
 
         if ($hasPreferenceCenter) {
-            Assert::assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         } else {
-            Assert::assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         }
     }
 
