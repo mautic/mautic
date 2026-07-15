@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -106,7 +105,7 @@ final class EmailTokenTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertNotNull($emailStat);
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 
@@ -119,8 +118,7 @@ final class EmailTokenTest extends MauticMysqlTestCase
             }
         });
 
-        Assert::assertSame(
-            $this->stripWhiteSpaces('Dear Test Lead,
+        $this->assertSame($this->stripWhiteSpaces('Dear Test Lead,
             
             Check these fields:
             Mobile: 012
@@ -144,9 +142,7 @@ final class EmailTokenTest extends MauticMysqlTestCase
             Textarea: This is a paragraph
             Time: 20:00
             Timezone: Kolkata
-            URL: www.example.com'),
-            $this->stripWhiteSpaces($body->html())
-        );
+            URL: www.example.com'), $this->stripWhiteSpaces($body->html()));
     }
 
     /**

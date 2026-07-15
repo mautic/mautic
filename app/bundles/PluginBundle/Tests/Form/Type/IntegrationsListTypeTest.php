@@ -256,7 +256,7 @@ final class IntegrationsListTypeTest extends TestCase
 
         $callsBuilder = 0;
         $builder      = $this->createMock(FormBuilderInterface::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(FormBuilderInterface::class, $builder);
+        $this->assertInstanceOf(FormBuilderInterface::class, $builder);
         $builder->method('add')
             ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($pluginName, &$callsBuilder, $builder): FormBuilderInterface {
                 if ('integration' === $key) {

@@ -79,7 +79,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         // Verify all contacts received signed emails
         foreach ($contacts as $contactEmail) {
             $message = $this->getMailerMessagesByToAddress($contactEmail)[0];
-            Assert::assertStringContainsString('Hey '.$contactEmail, $message->toString());
+            $this->assertStringContainsString('Hey '.$contactEmail, $message->toString());
             $this->assertMessageIsSigned($message, 'Test Subject');
         }
     }
@@ -99,12 +99,12 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // Assert that emails were sent successfully
-        Assert::assertEquals(1, $response['success']);
-        Assert::assertEquals([$expectedCount, $expectedCount], $response['progress']);
-        Assert::assertEquals(100, $response['percent']);
-        Assert::assertEquals($expectedCount, $response['stats']['sent']);
-        Assert::assertEquals(0, $response['stats']['failed']);
-        Assert::assertEmpty($response['stats']['failedRecipients']);
+        $this->assertEquals(1, $response['success']);
+        $this->assertEquals([$expectedCount, $expectedCount], $response['progress']);
+        $this->assertEquals(100, $response['percent']);
+        $this->assertEquals($expectedCount, $response['stats']['sent']);
+        $this->assertEquals(0, $response['stats']['failed']);
+        $this->assertEmpty($response['stats']['failedRecipients']);
 
         // With sync messenger, emails are sent immediately
         $this->assertEmailCount($expectedCount);
@@ -190,9 +190,9 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
     private function assertMessageIsSigned(RawMessage $message, string $expectedSubject): void
     {
         $email = $message->toString();
-        Assert::assertStringContainsString('Subject: '.$expectedSubject, $email);
-        Assert::assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
-        Assert::assertSame(1, substr_count($email, 'Content-Disposition: attachment; filename="smime.p7s"'), $email);
-        Assert::assertSame(1, substr_count($email, 'Content-Type: application/x-pkcs7-signature; name="smime.p7s'), $email);
+        $this->assertStringContainsString('Subject: '.$expectedSubject, $email);
+        $this->assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
+        $this->assertSame(1, substr_count($email, 'Content-Disposition: attachment; filename="smime.p7s"'), $email);
+        $this->assertSame(1, substr_count($email, 'Content-Type: application/x-pkcs7-signature; name="smime.p7s'), $email);
     }
 }
