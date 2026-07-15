@@ -83,7 +83,7 @@ final class WebhookControllerTest extends TestCase
             ],
         ];
 
-        Assert::assertSame(
+        $this->assertSame(
             [
                 'viewParameters' => [
                     'items'   => [],
@@ -92,7 +92,7 @@ final class WebhookControllerTest extends TestCase
             ],
             $controller->getViewArguments($args, 'index')
         );
-        Assert::assertSame($args, $controller->getViewArguments($args, 'edit'));
+        $this->assertSame($args, $controller->getViewArguments($args, 'edit'));
     }
 
     #[DataProvider('provideNewOrUpdate')]

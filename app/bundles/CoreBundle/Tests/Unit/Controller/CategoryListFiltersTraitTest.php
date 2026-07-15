@@ -38,28 +38,19 @@ final class CategoryListFiltersTraitTest extends TestCase
             $filter
         );
 
-        Assert::assertSame(
+        $this->assertSame([
+            'category' => ['first-category', '22', 'first-category'],
+        ], $request->getSession()->get('mautic.test.list_filters'));
+        $this->assertSame([
             [
-                'category' => ['first-category', '22', 'first-category'],
+                'column' => 'cat.id',
+                'expr'   => 'in',
+                'value'  => [11, 22],
             ],
-            $request->getSession()->get('mautic.test.list_filters')
-        );
-        Assert::assertSame(
-            [
-                [
-                    'column' => 'cat.id',
-                    'expr'   => 'in',
-                    'value'  => [11, 22],
-                ],
-            ],
-            $filter['force']
-        );
-        Assert::assertSame(self::CATEGORIES, $result['categories']);
-        Assert::assertSame('Filter by category', $result['filters']['filters']['placeholder']);
-        Assert::assertSame(
-            ['first-category', '22', 'first-category'],
-            $result['filters']['filters']['groups']['mautic.core.filter.categories']['values']
-        );
+        ], $filter['force']);
+        $this->assertSame(self::CATEGORIES, $result['categories']);
+        $this->assertSame('Filter by category', $result['filters']['filters']['placeholder']);
+        $this->assertSame(['first-category', '22', 'first-category'], $result['filters']['filters']['groups']['mautic.core.filter.categories']['values']);
     }
 
     public function testUsesTranslatedCategoryPrefixFromStoredSessionFilters(): void
@@ -78,16 +69,13 @@ final class CategoryListFiltersTraitTest extends TestCase
             $filter
         );
 
-        Assert::assertSame(
+        $this->assertSame([
             [
-                [
-                    'column' => 'c.id',
-                    'expr'   => 'in',
-                    'value'  => [22],
-                ],
+                'column' => 'c.id',
+                'expr'   => 'in',
+                'value'  => [22],
             ],
-            $filter['force']
-        );
+        ], $filter['force']);
     }
 
     public function testClearsCategoryFiltersWhenRequestFilterPayloadIsEmpty(): void
@@ -108,12 +96,9 @@ final class CategoryListFiltersTraitTest extends TestCase
             $filter
         );
 
-        Assert::assertSame([], $request->getSession()->get('mautic.test.list_filters'));
-        Assert::assertSame([], $filter['force']);
-        Assert::assertArrayNotHasKey(
-            'values',
-            $result['filters']['filters']['groups']['mautic.core.filter.categories']
-        );
+        $this->assertSame([], $request->getSession()->get('mautic.test.list_filters'));
+        $this->assertSame([], $filter['force']);
+        $this->assertArrayNotHasKey('values', $result['filters']['filters']['groups']['mautic.core.filter.categories']);
     }
 
     public function testIgnoresMalformedCategoryFilterPayload(): void
@@ -131,22 +116,16 @@ final class CategoryListFiltersTraitTest extends TestCase
             $filter
         );
 
-        Assert::assertSame(
+        $this->assertSame([
+            'category' => ['first-category'],
+        ], $request->getSession()->get('mautic.test.list_filters'));
+        $this->assertSame([
             [
-                'category' => ['first-category'],
+                'column' => 'cat.id',
+                'expr'   => 'in',
+                'value'  => [11],
             ],
-            $request->getSession()->get('mautic.test.list_filters')
-        );
-        Assert::assertSame(
-            [
-                [
-                    'column' => 'cat.id',
-                    'expr'   => 'in',
-                    'value'  => [11],
-                ],
-            ],
-            $filter['force']
-        );
+        ], $filter['force']);
     }
 
     public function testAppliesCustomFilterGroupAndPlaceholder(): void
@@ -166,15 +145,9 @@ final class CategoryListFiltersTraitTest extends TestCase
             'mautic.lead.list.filter.placeholder'
         );
 
-        Assert::assertSame('Filter by segment category', $result['filters']['filters']['placeholder']);
-        Assert::assertSame(
-            ['first-category'],
-            $result['filters']['filters']['groups']['mautic.lead.list.source.segment.category']['values']
-        );
-        Assert::assertArrayNotHasKey(
-            'mautic.core.filter.categories',
-            $result['filters']['filters']['groups']
-        );
+        $this->assertSame('Filter by segment category', $result['filters']['filters']['placeholder']);
+        $this->assertSame(['first-category'], $result['filters']['filters']['groups']['mautic.lead.list.source.segment.category']['values']);
+        $this->assertArrayNotHasKey('mautic.core.filter.categories', $result['filters']['filters']['groups']);
     }
 
     /**

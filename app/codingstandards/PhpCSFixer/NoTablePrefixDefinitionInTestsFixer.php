@@ -16,6 +16,9 @@ class NoTablePrefixDefinitionInTestsFixer extends AbstractFixer
         return sprintf('Mautic/%s', parent::getName());
     }
 
+    /**
+     * @param Tokens<\PhpCsFixer\Tokenizer\Token> $tokens
+     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $matches = $tokens->findSequence([[T_STRING, 'define'], '(', [T_CONSTANT_ENCAPSED_STRING, "'MAUTIC_TABLE_PREFIX'"]]);
@@ -42,6 +45,9 @@ class NoTablePrefixDefinitionInTestsFixer extends AbstractFixer
         }
     }
 
+    /**
+     * @param Tokens<\PhpCsFixer\Tokenizer\Token> $tokens
+     */
     public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound(T_CONSTANT_ENCAPSED_STRING);
