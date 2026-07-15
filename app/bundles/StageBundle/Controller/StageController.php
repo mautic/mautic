@@ -432,7 +432,8 @@ class StageController extends AbstractFormController
             );
         }
 
-        if (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
+        if (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)
+            || !$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
             $this->throwAccessDenied();
         }
 
