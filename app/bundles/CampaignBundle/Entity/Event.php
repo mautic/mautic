@@ -728,7 +728,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Add children.
      */
-    public function addChild(Event $children): static
+    public function addChild(self $children): static
     {
         $this->children[] = $children;
 
@@ -738,7 +738,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Remove children.
      */
-    public function removeChild(Event $children): void
+    public function removeChild(self $children): void
     {
         $this->children->removeElement($children);
     }
@@ -797,7 +797,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->getChildren()->matching($criteria);
     }
 
-    public function setParent(?Event $parent = null): static
+    public function setParent(?self $parent = null): static
     {
         $isChanged = $this->isChanged('parent', $parent);
         if ($isChanged) {
@@ -918,7 +918,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerWindow;
     }
 
-    public function setTriggerWindow(?int $triggerWindow): Event
+    public function setTriggerWindow(?int $triggerWindow): self
     {
         $this->triggerWindow = $triggerWindow;
 
@@ -1122,7 +1122,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function setDeleted(mixed $deleted = 'now'): Event
+    public function setDeleted(mixed $deleted = 'now'): self
     {
         if (is_array($deleted) && array_key_exists('date', $deleted)) {
             $deleted = new \DateTime($deleted['date']);
@@ -1175,7 +1175,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->dateLinked = $dateLinked;
     }
 
-    public function setRedirectEvent(?Event $redirectEvent = null): Event
+    public function setRedirectEvent(?self $redirectEvent = null): self
     {
         $this->isChanged('redirectEvent', $redirectEvent);
         $this->redirectEvent = $redirectEvent;
@@ -1183,7 +1183,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    public function getRedirectEvent(): ?Event
+    public function getRedirectEvent(): ?self
     {
         return $this->redirectEvent;
     }

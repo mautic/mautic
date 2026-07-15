@@ -38,7 +38,7 @@ class EmailActionModel
             $affected[] = $email;
         }
 
-        if ($affected) {
+        if ([] !== $affected) {
             $this->saveEntities($emails);
         }
 

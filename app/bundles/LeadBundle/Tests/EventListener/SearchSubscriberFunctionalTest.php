@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
-use PHPUnit\Framework\Assert;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -47,9 +46,9 @@ final class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $text = $crawler->text();
-        Assert::assertStringContainsString('Lead-test-1', $text);
-        Assert::assertStringContainsString('Lead-test-2', $text);
-        Assert::assertStringNotContainsString('Lead-test-3', $text);
+        $this->assertStringContainsString('Lead-test-1', $text);
+        $this->assertStringContainsString('Lead-test-2', $text);
+        $this->assertStringNotContainsString('Lead-test-3', $text);
     }
 
     private function prepareTestData(): void

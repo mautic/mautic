@@ -121,7 +121,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             fn (array $query): bool => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE dnc.channel = :channel" === $query['sql']
         );
 
-        Assert::assertCount(0, $dncQueries);
+        $this->assertCount(0, $dncQueries);
     }
 
     /**
@@ -162,7 +162,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             fn (array $query): bool => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN (?))" === $query['sql']
         );
 
-        Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
+        $this->assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
     }
 
     public function testEmailDetailPageForDisabledSendButton(): void
@@ -229,29 +229,23 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $this->assertResponseIsSuccessful();
-        Assert::assertGreaterThan(0, $crawler->filter('.click-list thead th[scope="col"]')->count());
+        $this->assertGreaterThan(0, $crawler->filter('.click-list thead th[scope="col"]')->count());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}?name=email.clicks&orderby=t.hits");
         $this->assertResponseIsSuccessful();
-        Assert::assertSame(
-            [
-                self::CLICK_URL_HIGH,
-                self::CLICK_URL_MID,
-                self::CLICK_URL_LOW,
-            ],
-            $this->getClickCountUrls($crawler)
-        );
+        $this->assertSame([
+            self::CLICK_URL_HIGH,
+            self::CLICK_URL_MID,
+            self::CLICK_URL_LOW,
+        ], $this->getClickCountUrls($crawler));
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}?tmpl=click_counts&name=email.clicks&orderby=t.hits");
         $this->assertResponseIsSuccessful();
-        Assert::assertSame(
-            [
-                self::CLICK_URL_LOW,
-                self::CLICK_URL_MID,
-                self::CLICK_URL_HIGH,
-            ],
-            $this->getClickCountUrls($crawler)
-        );
+        $this->assertSame([
+            self::CLICK_URL_LOW,
+            self::CLICK_URL_MID,
+            self::CLICK_URL_HIGH,
+        ], $this->getClickCountUrls($crawler));
     }
 
     /**
@@ -266,7 +260,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
-        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
+        $this->assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
     }
 
     public function testSegmentEmailVariationChildrenParents(): void
@@ -310,23 +304,23 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        Assert::assertNotNull($emailARow, 'Could not find Email A row');
-        Assert::assertNotNull($emailBRow, 'Could not find Email B row');
-        Assert::assertNotNull($emailCRow, 'Could not find Email C row');
+        $this->assertNotNull($emailARow, 'Could not find Email A row');
+        $this->assertNotNull($emailBRow, 'Could not find Email B row');
+        $this->assertNotNull($emailCRow, 'Could not find Email C row');
 
         // Email C (child) - should have A/B variant icon only
-        Assert::assertStringContainsString('ri-a-b fs-14', $emailCRow);
-        Assert::assertStringContainsString('Is A/B variant', $emailCRow);
+        $this->assertStringContainsString('ri-a-b fs-14', $emailCRow);
+        $this->assertStringContainsString('Is A/B variant', $emailCRow);
 
         // Email B (parent) - should have both A/B variant icon AND organization chart icon
-        Assert::assertStringContainsString('ri-a-b fs-14', $emailBRow);
-        Assert::assertStringContainsString('Is A/B variant', $emailBRow);
-        Assert::assertStringContainsString('ri-organization-chart', $emailBRow);
-        Assert::assertStringContainsString('Has A/B tests', $emailBRow);
+        $this->assertStringContainsString('ri-a-b fs-14', $emailBRow);
+        $this->assertStringContainsString('Is A/B variant', $emailBRow);
+        $this->assertStringContainsString('ri-organization-chart', $emailBRow);
+        $this->assertStringContainsString('Has A/B tests', $emailBRow);
 
         // Email A (grandparent) - should have organization chart icon only
-        Assert::assertStringContainsString('Has A/B tests', $emailARow);
-        Assert::assertStringContainsString('ri-organization-chart', $emailARow);
+        $this->assertStringContainsString('Has A/B tests', $emailARow);
+        $this->assertStringContainsString('ri-organization-chart', $emailARow);
     }
 
     #[DataProvider('provideHtmlForEmailTracking')]
@@ -345,19 +339,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $quote = $singleOrDoubleQuotes ? '\'' : '"';
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
-        Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+        $this->assertSame('Subject A', $email->getSubject());
+        $this->assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
+        $this->assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
+        $this->assertCount(1, $email->getFrom());
+        $this->assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
+        $this->assertSame($this->configParams['mailer_from_email'], $email->getFrom()[0]->getAddress());
+        $this->assertCount(1, $email->getTo());
+        $this->assertSame('', $email->getTo()[0]->getName());
+        $this->assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
+        $this->assertCount(1, $email->getReplyTo());
+        $this->assertSame('', $email->getReplyTo()[0]->getName());
+        $this->assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+        $this->assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
     public function testSegmentEmailTranslationChildrenParents(): void
@@ -382,10 +376,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
         $iconNodes1   = $crawler->filter('.email-list .ri-translate.fs-14');
-        Assert::assertGreaterThanOrEqual(2, $iconNodes1->count(), 'Translate icon not found in the email list rows.');
+        $this->assertGreaterThanOrEqual(2, $iconNodes1->count(), 'Translate icon not found in the email list rows.');
 
         $iconNodes2 = $crawler->filter('.email-list .ri-translate-2');
-        Assert::assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
+        $this->assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
     }
 
     public static function provideHtmlForEmailTracking(): \Generator
@@ -440,19 +434,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(MauticMessage::class, $email);
 
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
-        Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame('Custom From Name', $email->getFrom()[0]->getName());
-        Assert::assertSame('custom@from.address', $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+        $this->assertSame('Subject A', $email->getSubject());
+        $this->assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
+        $this->assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
+        $this->assertCount(1, $email->getFrom());
+        $this->assertSame('Custom From Name', $email->getFrom()[0]->getName());
+        $this->assertSame('custom@from.address', $email->getFrom()[0]->getAddress());
+        $this->assertCount(1, $email->getTo());
+        $this->assertSame('', $email->getTo()[0]->getName());
+        $this->assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
+        $this->assertCount(1, $email->getReplyTo());
+        $this->assertSame('', $email->getReplyTo()[0]->getName());
+        $this->assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
+        $this->assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
     public function testSegmentEmailSendWithTokenInFromAddress(): void
@@ -484,33 +478,33 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $messageOne = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
         $messageTwo = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
 
-        Assert::assertSame('Subject A', $messageOne->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageOne->getHtmlBody());
-        Assert::assertSame('Dear contact@one.email', $messageOne->getTextBody());
-        Assert::assertCount(1, $messageOne->getFrom());
-        Assert::assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
-        Assert::assertSame('address2+contact@one.email', $messageOne->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $messageOne->getTo());
-        Assert::assertSame('', $messageOne->getTo()[0]->getName());
-        Assert::assertSame('contact@one.email', $messageOne->getTo()[0]->getAddress());
-        Assert::assertCount(1, $messageOne->getReplyTo());
-        Assert::assertSame('', $messageOne->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
+        $this->assertSame('Subject A', $messageOne->getSubject());
+        $this->assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageOne->getHtmlBody());
+        $this->assertSame('Dear contact@one.email', $messageOne->getTextBody());
+        $this->assertCount(1, $messageOne->getFrom());
+        $this->assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
+        $this->assertSame('address2+contact@one.email', $messageOne->getFrom()[0]->getAddress());
+        $this->assertCount(1, $messageOne->getTo());
+        $this->assertSame('', $messageOne->getTo()[0]->getName());
+        $this->assertSame('contact@one.email', $messageOne->getTo()[0]->getAddress());
+        $this->assertCount(1, $messageOne->getReplyTo());
+        $this->assertSame('', $messageOne->getReplyTo()[0]->getName());
+        $this->assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
+        $this->assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
 
-        Assert::assertSame('Subject A', $messageTwo->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageTwo->getHtmlBody());
-        Assert::assertSame('Dear contact@two.email', $messageTwo->getTextBody());
-        Assert::assertCount(1, $messageTwo->getFrom());
-        Assert::assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
-        Assert::assertSame('address2+contact@two.email', $messageTwo->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $messageTwo->getTo());
-        Assert::assertSame('', $messageTwo->getTo()[0]->getName());
-        Assert::assertSame('contact@two.email', $messageTwo->getTo()[0]->getAddress());
-        Assert::assertCount(1, $messageTwo->getReplyTo());
-        Assert::assertSame('', $messageTwo->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
+        $this->assertSame('Subject A', $messageTwo->getSubject());
+        $this->assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageTwo->getHtmlBody());
+        $this->assertSame('Dear contact@two.email', $messageTwo->getTextBody());
+        $this->assertCount(1, $messageTwo->getFrom());
+        $this->assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
+        $this->assertSame('address2+contact@two.email', $messageTwo->getFrom()[0]->getAddress());
+        $this->assertCount(1, $messageTwo->getTo());
+        $this->assertSame('', $messageTwo->getTo()[0]->getName());
+        $this->assertSame('contact@two.email', $messageTwo->getTo()[0]->getAddress());
+        $this->assertCount(1, $messageTwo->getReplyTo());
+        $this->assertSame('', $messageTwo->getReplyTo()[0]->getName());
+        $this->assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
+        $this->assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
     public function testCloneAction(): void
@@ -532,19 +526,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
-        Assert::assertCount(2, $emails);
+        $this->assertCount(2, $emails);
 
         $firstEmail  = $emails[0];
         $secondEmail = $emails[1];
 
-        Assert::assertSame($email->getId(), $firstEmail->getId());
-        Assert::assertNotSame($email->getId(), $secondEmail->getId());
-        Assert::assertEquals('list', $secondEmail->getEmailType());
-        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
-        Assert::assertEquals('Email B', $firstEmail->getName());
-        Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
-        Assert::assertEquals('Email B clone', $secondEmail->getName());
-        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+        $this->assertSame($email->getId(), $firstEmail->getId());
+        $this->assertNotSame($email->getId(), $secondEmail->getId());
+        $this->assertEquals('list', $secondEmail->getEmailType());
+        $this->assertEquals('Email B Subject', $firstEmail->getSubject());
+        $this->assertEquals('Email B', $firstEmail->getName());
+        $this->assertEquals('Email B Subject clone', $secondEmail->getSubject());
+        $this->assertEquals('Email B clone', $secondEmail->getName());
+        $this->assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
     public function testCloneWithTranslationsAndVariantsAction(): void
@@ -606,35 +600,35 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $emailRepository = $this->em->getRepository(Email::class);
         $emails          = $emailRepository->findBy([], ['id' => 'ASC']);
 
-        Assert::assertCount(8, $emails);
+        $this->assertCount(8, $emails);
 
         $clonedParent             = $emailRepository->findOneBy(['name' => 'Parent email (copy)']);
         $clonedTranslation        = $emailRepository->findOneBy(['name' => 'Parent French (copy)']);
         $clonedVariant            = $emailRepository->findOneBy(['name' => 'Variant email (copy)']);
         $clonedVariantTranslation = $emailRepository->findOneBy(['name' => 'Variant French (copy)']);
 
-        Assert::assertInstanceOf(Email::class, $clonedParent);
-        Assert::assertInstanceOf(Email::class, $clonedTranslation);
-        Assert::assertInstanceOf(Email::class, $clonedVariant);
-        Assert::assertInstanceOf(Email::class, $clonedVariantTranslation);
+        $this->assertInstanceOf(Email::class, $clonedParent);
+        $this->assertInstanceOf(Email::class, $clonedTranslation);
+        $this->assertInstanceOf(Email::class, $clonedVariant);
+        $this->assertInstanceOf(Email::class, $clonedVariantTranslation);
 
-        Assert::assertSame('list', $clonedParent->getEmailType());
-        Assert::assertFalse($clonedParent->isPublished(false));
-        Assert::assertSame(0, $clonedParent->getSentCount());
-        Assert::assertSame('Parent html', $clonedParent->getCustomHtml());
-        Assert::assertCount(1, $clonedParent->getLists());
+        $this->assertSame('list', $clonedParent->getEmailType());
+        $this->assertFalse($clonedParent->isPublished(false));
+        $this->assertSame(0, $clonedParent->getSentCount());
+        $this->assertSame('Parent html', $clonedParent->getCustomHtml());
+        $this->assertCount(1, $clonedParent->getLists());
 
-        Assert::assertSame($clonedParent->getId(), $clonedTranslation->getTranslationParent()->getId());
-        Assert::assertSame('fr_FR', $clonedTranslation->getLanguage());
-        Assert::assertSame('French html', $clonedTranslation->getCustomHtml());
+        $this->assertSame($clonedParent->getId(), $clonedTranslation->getTranslationParent()->getId());
+        $this->assertSame('fr_FR', $clonedTranslation->getLanguage());
+        $this->assertSame('French html', $clonedTranslation->getCustomHtml());
 
-        Assert::assertSame($clonedParent->getId(), $clonedVariant->getVariantParent()->getId());
-        Assert::assertSame($variantSettings, $clonedVariant->getVariantSettings());
-        Assert::assertSame('Variant html', $clonedVariant->getCustomHtml());
+        $this->assertSame($clonedParent->getId(), $clonedVariant->getVariantParent()->getId());
+        $this->assertSame($variantSettings, $clonedVariant->getVariantSettings());
+        $this->assertSame('Variant html', $clonedVariant->getCustomHtml());
 
-        Assert::assertSame($clonedVariant->getId(), $clonedVariantTranslation->getTranslationParent()->getId());
-        Assert::assertSame('fr_FR', $clonedVariantTranslation->getLanguage());
-        Assert::assertSame('Variant French html', $clonedVariantTranslation->getCustomHtml());
+        $this->assertSame($clonedVariant->getId(), $clonedVariantTranslation->getTranslationParent()->getId());
+        $this->assertSame('fr_FR', $clonedVariantTranslation->getLanguage());
+        $this->assertSame('Variant French html', $clonedVariantTranslation->getCustomHtml());
     }
 
     public function testEmailDetailsPageShouldNotHavePendingCount(): void
@@ -684,13 +678,13 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         // Verify the parent email was updated with AB test settings
         $this->em->clear();
         $updatedEmail = $this->em->getRepository(Email::class)->find($email->getId());
-        Assert::assertNotNull($updatedEmail);
+        $this->assertInstanceOf(Email::class, $updatedEmail);
 
         $settings = $updatedEmail->getVariantSettings();
-        Assert::assertEquals('email.openrate', $settings['winnerCriteria']);
-        Assert::assertEquals(24, $settings['sendWinnerDelay']);
-        Assert::assertEquals(10, $settings['totalWeight']);
-        Assert::assertEquals(1, $settings['enableAbTest']);
+        $this->assertEquals('email.openrate', $settings['winnerCriteria']);
+        $this->assertEquals(24, $settings['sendWinnerDelay']);
+        $this->assertEquals(10, $settings['totalWeight']);
+        $this->assertEquals(1, $settings['enableAbTest']);
     }
 
     #[DataProvider('dwcTokenTypeDataProvider')]
@@ -748,7 +742,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedEmail = $this->em->find(Email::class, $email->getId());
         $this->assertInstanceOf(Email::class, $savedEmail);
-        Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
     public function testOptimisticLock(): void
@@ -768,10 +762,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
-        Assert::assertStringContainsString(
-            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
-            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
-        );
+        $this->assertStringContainsString('The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.', $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.');
     }
 
     /**
@@ -827,10 +818,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
         $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
         $publishDownInput   = $crawler->filter('input[name="emailform[publishDown]"]:not([disabled="disabled"])');
-        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
-        Assert::assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
-        Assert::assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
-        Assert::assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
+        $this->assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
+        $this->assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
+        $this->assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
+        $this->assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -843,7 +834,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
-        Assert::assertTrue($email->getIsPublished());
+        $this->assertTrue($email->getIsPublished());
     }
 
     /**
@@ -863,19 +854,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
-        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
-        Assert::assertSame($publishedByDefault, null === $isUnpublishedInput->attr('checked'));
+        $this->assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
+        $this->assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        $this->assertSame($publishedByDefault, null === $isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
-        Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
-        Assert::assertSame($publishedByDefault, null !== $isPublishedInput->attr('checked'));
+        $this->assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
+        $this->assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        $this->assertSame($publishedByDefault, null !== $isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
-        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
+        $this->assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        $this->assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -888,7 +879,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
-        Assert::assertSame($publishAfterSave, $email->getIsPublished());
+        $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
 
     /**
@@ -928,10 +919,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
         $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
         $publishDownInput   = $crawler->filter('input[name="emailform[publishDown]"]:not([disabled="disabled"])');
-        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
-        Assert::assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
-        Assert::assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
-        Assert::assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
+        $this->assertCount(1, $isUnpublishedInput, 'The unpublished field should be found, unchecked and enabled.');
+        $this->assertCount(1, $isPublishedInput, 'The published field should be found, checked and enabled.');
+        $this->assertCount(1, $publishUpInput, 'The publish up field should be found and enabled.');
+        $this->assertCount(1, $publishDownInput, 'The publish down field should be found and enabled.');
     }
 
     /**
@@ -960,19 +951,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
-        Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
-        Assert::assertTrue(null === $isUnpublishedInput->attr('checked'));
+        $this->assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
+        $this->assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        $this->assertNull($isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
-        Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
-        Assert::assertTrue(null !== $isPublishedInput->attr('checked'));
+        $this->assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
+        $this->assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        $this->assertNotNull($isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
-        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
+        $this->assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        $this->assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -986,7 +977,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
-        Assert::assertSame($publishAfterSave, $email->getIsPublished());
+        $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
 
     /**
@@ -1520,6 +1511,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $email = $this->em->find(Email::class, $id);
         $this->assertInstanceOf(Email::class, $email);
-        Assert::assertSame($expectedVersion, $email->getVersion(), $message);
+        $this->assertSame($expectedVersion, $email->getVersion(), $message);
     }
 }

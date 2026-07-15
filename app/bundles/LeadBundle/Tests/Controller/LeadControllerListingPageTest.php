@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class LeadControllerListingPageTest extends MauticMysqlTestCase
 {
@@ -31,7 +30,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
         $crawler    = $this->client->request('GET', 's/contacts');
         $rowContent = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
-        Assert::assertStringEndsWith($expected, $rowContent->text());
+        $this->assertStringEndsWith($expected, $rowContent->text());
     }
 
     /**

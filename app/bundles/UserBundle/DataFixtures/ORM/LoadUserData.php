@@ -48,7 +48,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-user', $user);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 2;
     }

@@ -286,7 +286,7 @@ class SalesforceApi extends CrmApi
                 $results              = [];
                 foreach ($chunked as $chunk) {
                     // We can only submit 25 at a time
-                    if ($chunk) {
+                    if ([] !== $chunk) {
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;
@@ -638,7 +638,7 @@ class SalesforceApi extends CrmApi
         return $this->optOutFieldAccessible;
     }
 
-    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): self
     {
         $this->optOutFieldAccessible = $optOutFieldAccessible;
 
@@ -662,7 +662,7 @@ class SalesforceApi extends CrmApi
             ));
         }
         try {
-            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $leadsQuery = sprintf($baseQuery, implode(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
         } catch (ApiErrorException $e) {
             [$missingField, $entityType] = $this->parseMissingField($e->getMessage());

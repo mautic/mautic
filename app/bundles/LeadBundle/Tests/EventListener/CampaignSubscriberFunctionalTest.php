@@ -25,7 +25,6 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
@@ -149,7 +148,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         foreach ($listLeads as $contactId) {
             $points = $this->connection->fetchOne("SELECT points FROM {$prefix}leads WHERE id = :id", ['id' => $contactId]);
-            Assert::assertEquals($expectedPoints, $points);
+            $this->assertEquals($expectedPoints, $points);
         }
     }
 
@@ -209,7 +208,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         foreach ($contacts as $contact) {
             $points = $this->connection->fetchOne("SELECT points FROM {$prefix}leads WHERE id = :id", ['id' => $contact->getId()]);
-            Assert::assertEquals($expectedPoints, $points);
+            $this->assertEquals($expectedPoints, $points);
         }
     }
 
@@ -235,7 +234,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
     }
 
     public function testIsContactInOneOfStages(): void
@@ -267,7 +266,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
             );
 
-            Assert::assertTrue($event->getResult());
+            $this->assertTrue($event->getResult());
         }
     }
 
@@ -291,7 +290,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
         /** @var Lead $contactA */
         $contactA = $this->contactRepository->getEntity($contacts[0]->getId());
@@ -340,7 +339,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
         /** @var Lead $contactA */
         $contactA = $this->contactRepository->getEntity($contacts[0]->getId());
@@ -385,7 +384,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $exitCode = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertSame(0, $exitCode->getStatusCode());
+        $this->assertSame(0, $exitCode->getStatusCode());
 
         $this->em->clear();
 
@@ -1062,9 +1061,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 
         $leadManipulator = $lead->getManipulator();
-        Assert::assertInstanceOf(LeadManipulator::class, $leadManipulator);
-        Assert::assertSame('campaign', $leadManipulator->getBundleName());
-        Assert::assertSame('trigger-action', $leadManipulator->getObjectName());
+        $this->assertInstanceOf(LeadManipulator::class, $leadManipulator);
+        $this->assertSame('campaign', $leadManipulator->getBundleName());
+        $this->assertSame('trigger-action', $leadManipulator->getObjectName());
     }
 
     private function addContactToCampaign(Campaign $campaign, Lead $lead): void
@@ -1138,20 +1137,18 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array{string, string, string, bool}>
+     * @return \Iterator<int, array{string, string, string, bool}>
      */
-    public static function regexOperatorProvider(): array
+    public static function regexOperatorProvider(): \Iterator
     {
-        return [
-            // [operator, regex, fieldValue, expectedResult]
-            [OperatorOptions::REGEXP, "^\d{4}-03-24$", '2026-03-24', true],
-            [OperatorOptions::REGEXP, "^\d{4}-12-31$", '2026-03-24', false],
-            [OperatorOptions::REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', true],
-            [OperatorOptions::REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', false],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-31$", '2026-03-24', true],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-24$", '2026-03-24', false],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', true],
-            [OperatorOptions::NOT_REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', false],
-        ];
+        // [operator, regex, fieldValue, expectedResult]
+        yield [OperatorOptions::REGEXP, "^\d{4}-03-24$", '2026-03-24', true];
+        yield [OperatorOptions::REGEXP, "^\d{4}-12-31$", '2026-03-24', false];
+        yield [OperatorOptions::REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', true];
+        yield [OperatorOptions::REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', false];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-12-31$", '2026-03-24', true];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-03-24$", '2026-03-24', false];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-12-\d{2}$", '2026-03-24', true];
+        yield [OperatorOptions::NOT_REGEXP, "^\d{4}-03-\d{2}$", '2026-03-24', false];
     }
 }

@@ -37,7 +37,7 @@ class FileUploadValidator
             $errors[] = $e->getMessage();
         }
 
-        if ($errors) {
+        if ([] !== $errors) {
             $message = implode('<br />', $errors);
             throw new FileInvalidException($message);
         }

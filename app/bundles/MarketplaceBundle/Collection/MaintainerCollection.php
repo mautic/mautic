@@ -24,7 +24,7 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
-    public static function fromArray(array $array): MaintainerCollection
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(
