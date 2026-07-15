@@ -9,8 +9,11 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 class ExpressionBuilder extends BaseExpressionBuilder
 {
     public const REGEXP   = 'REGEXP';
+
     public const BETWEEN  = 'BETWEEN';
+
     private const IN_LAST = 'inLast';
+
     private const IN_NEXT = 'inNext';
 
     /**
