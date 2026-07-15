@@ -18,7 +18,6 @@ use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -56,8 +55,8 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->installPackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
-        Assert::assertSame(200, $response->getStatusCode());
+        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testRemovePackageAction(): void
@@ -74,8 +73,8 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $response = $controller->removePackageAction($request);
 
-        Assert::assertSame('{"success":true}', $response->getContent());
-        Assert::assertSame(200, $response->getStatusCode());
+        $this->assertSame('{"success":true}', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     private function generateController(bool $isPackageInstalled): AjaxController

@@ -343,7 +343,7 @@ final class ContactObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn($contactObj);
         $this->subscriber->findContactById($event);
-        self::assertSame($contactObj, $event->getEntity());
+        $this->assertSame($contactObj, $event->getEntity());
     }
 
     /**
@@ -355,7 +355,7 @@ final class ContactObjectSubscriberTest extends TestCase
         $this->contactObjectHelper->expects($this->never())
             ->method('findObjectById');
         $this->subscriber->findContactById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 
     /**
@@ -370,6 +370,6 @@ final class ContactObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn(null);
         $this->subscriber->findContactById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 }

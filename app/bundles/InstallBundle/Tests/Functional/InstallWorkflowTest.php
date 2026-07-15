@@ -93,17 +93,17 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $heading = $crawler->filter('.panel-body.text-center h5');
-        Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
+        $this->assertCount(1, $heading, $this->client->getResponse()->getContent());
 
         $successText = $heading->text();
-        Assert::assertStringContainsString('Mautic is installed', $successText);
+        $this->assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         $this->assertInstanceOf(LeadField::class, $emailField);
-        Assert::assertSame('Email', $emailField->getLabel());
+        $this->assertSame('Email', $emailField->getLabel());
     }
 
     public function testInstallRequirementsAndRecommendations(): void
@@ -117,7 +117,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
-        Assert::assertStringContainsString($expectedMemoryMessage, $details);
+        $this->assertStringContainsString($expectedMemoryMessage, $details);
 
         // set the memory limit higher than the recommended value.
         ini_set('memory_limit', (string) ($limit + 1));
@@ -125,6 +125,6 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $details = $crawler->filter('#minorDetails ul')->html();
-        Assert::assertStringNotContainsString($expectedMemoryMessage, $details);
+        $this->assertStringNotContainsString($expectedMemoryMessage, $details);
     }
 }

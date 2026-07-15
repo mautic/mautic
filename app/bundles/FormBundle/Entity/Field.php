@@ -909,7 +909,7 @@ class Field implements UuidInterface
         $properties = $this->getProperties();
 
         return 'checkboxgrp' === $this->getType()
-            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+            || (array_key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**
@@ -966,7 +966,7 @@ class Field implements UuidInterface
         return $this->parent;
     }
 
-    private function findParentFieldInForm(): ?Field
+    private function findParentFieldInForm(): ?self
     {
         if (!$this->parent) {
             return null;
@@ -1029,7 +1029,7 @@ class Field implements UuidInterface
         return empty($this->fieldWidth) ? '100%' : $this->fieldWidth;
     }
 
-    public function setFieldWidth(?string $fieldWidth): Field
+    public function setFieldWidth(?string $fieldWidth): self
     {
         $this->isChanged('fieldWidth', $fieldWidth);
         $this->fieldWidth = $fieldWidth;

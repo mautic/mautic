@@ -279,7 +279,7 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @param \DateTime $publishDown
      */
-    public function setPublishDown($publishDown): Stage
+    public function setPublishDown($publishDown): self
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
