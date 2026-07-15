@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticRector\Tests\GetModelToRequiredPropertyRector\Fixture;
+namespace Utils\Rector\Tests\GetModelToRequiredPropertyRector\Fixture;
 
 use Mautic\CoreBundle\Controller\CommonController;
 

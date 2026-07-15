@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticRector\Tests\GetModelToRequiredPropertyRector;
+namespace Utils\Rector\Tests\GetModelToRequiredPropertyRector;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Tests\Rule;
+namespace Utils\PHPStan\Tests\Rule;
 
-use MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule;
+use Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 

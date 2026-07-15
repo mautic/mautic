@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\SmsBundle\Model\SmsModel;
-use MauticRector\GetModelToRequiredPropertyRector;
+use Utils\Rector\GetModelToRequiredPropertyRector;
 use Rector\Config\RectorConfig;
 
 return static function (RectorConfig $rectorConfig): void {

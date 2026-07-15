@@ -180,6 +180,6 @@ parameters:
 
 services:
 	-
-		class: MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule
+		class: Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
 		tags:
 			- phpstan.rules.rule

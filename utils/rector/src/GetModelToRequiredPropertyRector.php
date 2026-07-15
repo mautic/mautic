@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticRector;
+namespace Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -156,22 +156,83 @@ CODE_SAMPLE
 
         /** @var array<string, class-string> $propertyNameToModelClass */
         $propertyNameToModelClass = [];
+        $hasChanged               = false;
 
         foreach ($node->getMethods() as $classMethod) {
+            // a constructor already there can take the model as a param, keeping the original assign order
+            if ($this->isName($classMethod, '__construct')) {
+                $hasChanged = $this->refactorConstructor($classMethod) || $hasChanged;
+                continue;
+            }
+
             foreach ($this->refactorClassMethod($node, $classMethod) as $propertyName => $modelClass) {
                 $propertyNameToModelClass[$propertyName] = $modelClass;
             }
         }
 
-        if ([] === $propertyNameToModelClass) {
-            return null;
-        }
-
         foreach ($propertyNameToModelClass as $propertyName => $modelClass) {
             $this->addAutowiredProperty($node, $propertyName, $modelClass);
+            $hasChanged = true;
         }
 
-        return $node;
+        return $hasChanged ? $node : null;
+    }
+
+    /**
+     * The lookup result is already assigned somewhere in the constructor body, so swapping it for a param of
+     * the same name keeps every existing read working, and keeps it happening before parent::__construct().
+     */
+    private function refactorConstructor(ClassMethod $constructClassMethod): bool
+    {
+        if (null === $constructClassMethod->stmts) {
+            return false;
+        }
+
+        $hasChanged = false;
+
+        foreach ($this->resolveStmtsHolders($constructClassMethod) as $stmtsHolder) {
+            foreach ($stmtsHolder->stmts as $key => $stmt) {
+                $modelAssign = $this->matchModelAssign($stmt);
+                if (null === $modelAssign) {
+                    continue;
+                }
+
+                [$variableName, $modelClass] = $modelAssign;
+
+                // the variable turns into a param, so nothing else may write to it
+                if (!$this->isCollapsibleVariable($constructClassMethod, $variableName)) {
+                    continue;
+                }
+
+                unset($stmtsHolder->stmts[$key]);
+                $this->removeInstanceOfAsserts($stmtsHolder, $variableName, $modelClass);
+                $stmtsHolder->stmts = array_values($stmtsHolder->stmts);
+
+                $this->addParam($constructClassMethod, new Param(new Variable($variableName), null, new FullyQualified($modelClass)));
+
+                $hasChanged = true;
+
+                break;
+            }
+        }
+
+        return $hasChanged;
+    }
+
+    /**
+     * A required param may not sit behind an optional or variadic one.
+     */
+    private function addParam(ClassMethod $classMethod, Param $param): void
+    {
+        foreach ($classMethod->params as $key => $existingParam) {
+            if (null !== $existingParam->default || $existingParam->variadic) {
+                array_splice($classMethod->params, $key, 0, [$param]);
+
+                return;
+            }
+        }
+
+        $classMethod->params[] = $param;
     }
 
     /**
@@ -180,11 +241,6 @@ CODE_SAMPLE
     private function refactorClassMethod(Class_ $class, ClassMethod $classMethod): array
     {
         if (null === $classMethod->stmts) {
-            return [];
-        }
-
-        // a #[Required] setter only runs after the constructor, so the property is still uninitialized there
-        if ($this->isName($classMethod, '__construct')) {
             return [];
         }
 

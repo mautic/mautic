@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Rule;
+namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;

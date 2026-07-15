@@ -13,27 +13,21 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Service\Attribute\Required;
 
 class SmsController extends FormController
 {
     use EntityContactsTrait;
-    private SmsModel $smsModel;
-
-    #[Required]
-    public function autowire(SmsModel $smsModel): void
-    {
-        $this->smsModel = $smsModel;
-    }
 
     /**
      * @param int $page
      */
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
     {
+        /** @var SmsModel $model */
+        $model = $this->getModel('sms');
+
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -85,7 +79,7 @@ class SmsController extends FormController
         $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
         $orderByDir = $session->get('mautic.sms.orderbydir', $this->getDefaultOrderDirection());
 
-        $smss = $this->smsModel->getEntities([
+        $smss = $model->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -126,7 +120,7 @@ class SmsController extends FormController
                 'limit'       => $limit,
                 'tmpl'        => $request->get('tmpl', 'index'),
                 'permissions' => $permissions,
-                'model'       => $this->smsModel,
+                'model'       => $model,
                 'security'    => $this->security,
                 'configured'  => count($transportChain->getEnabledTransports()) > 0,
             ],
@@ -144,10 +138,12 @@ class SmsController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
+        /** @var SmsModel $model */
+        $model    = $this->getModel('sms');
         $security = $this->security;
 
         /** @var Sms $sms */
-        $sms = $this->smsModel->getEntity($objectId);
+        $sms = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
 
@@ -190,7 +186,7 @@ class SmsController extends FormController
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        $entityViews     = $this->smsModel->getHitsLineChartData(
+        $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -199,7 +195,7 @@ class SmsController extends FormController
         );
 
         // Get click through stats
-        $trackableLinks = $this->smsModel->getSmsClickStats($sms->getId());
+        $trackableLinks = $model->getSmsClickStats($sms->getId());
 
         $translations = $sms->getTranslations();
         if ($translations instanceof Collection) {
@@ -255,13 +251,16 @@ class SmsController extends FormController
      *
      * @param Sms $entity
      *
-     * @return RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, $entity = null)
     {
+        /** @var SmsModel $model */
+        $model = $this->getModel('sms');
+
         if (!$entity instanceof Sms) {
             /** @var Sms $entity */
-            $entity = $this->smsModel->getEntity();
+            $entity = $model->getEntity();
         }
 
         $method  = $request->getMethod();
@@ -284,7 +283,7 @@ class SmsController extends FormController
         }
 
         // create the form
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -295,7 +294,7 @@ class SmsController extends FormController
                         $entity->setMedia([]);
                     }
                     // form is valid so process the data
-                    $this->smsModel->saveEntity($entity);
+                    $model->saveEntity($entity);
 
                     $this->addFlashMessage(
                         'mautic.core.notice.created',
@@ -389,12 +388,14 @@ class SmsController extends FormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
+        /** @var SmsModel $model */
+        $model   = $this->getModel('sms');
         $method  = $request->getMethod();
-        $entity  = $this->smsModel->getEntity($objectId);
+        $entity  = $model->getEntity($objectId);
         $session = $request->getSession();
         $page    = $session->get('mautic.sms.page', 1);
 
@@ -435,7 +436,7 @@ class SmsController extends FormController
         )
         ) {
             $this->throwAccessDenied();
-        } elseif ($this->smsModel->isLocked($entity)) {
+        } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'sms');
         }
@@ -447,7 +448,7 @@ class SmsController extends FormController
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
@@ -458,7 +459,7 @@ class SmsController extends FormController
                     if (!$entity->getIsMms()) {
                         $entity->setMedia([]);
                     }
-                    $this->smsModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -480,7 +481,7 @@ class SmsController extends FormController
                 // clear any modified content
                 $session->remove('mautic.sms.'.$objectId.'.content');
                 // unlock the entity
-                $this->smsModel->unlockEntity($entity);
+                $model->unlockEntity($entity);
             }
 
             $passthrough = [
@@ -524,7 +525,7 @@ class SmsController extends FormController
             }
         } else {
             // lock the entity
-            $this->smsModel->lockEntity($entity);
+            $model->lockEntity($entity);
         }
 
         return $this->delegateView(
@@ -554,11 +555,12 @@ class SmsController extends FormController
     /**
      * Clone an entity.
      *
-     * @return JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction(Request $request, $objectId)
     {
-        $entity = $this->smsModel->getEntity($objectId);
+        $model  = $this->getModel('sms');
+        $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('sms:smses:create')
@@ -599,7 +601,9 @@ class SmsController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $entity = $this->smsModel->getEntity($objectId);
+            $model = $this->getModel('sms');
+            \assert($model instanceof SmsModel);
+            $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -614,11 +618,11 @@ class SmsController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($this->smsModel->isLocked($entity)) {
+            } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'sms');
             }
 
-            $this->smsModel->deleteEntity($entity);
+            $model->deleteEntity($entity);
 
             $flashes[] = [
                 'type'    => 'notice',
@@ -658,13 +662,15 @@ class SmsController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('sms');
+            \assert($model instanceof SmsModel);
             $ids = json_decode($request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $this->smsModel->getEntity($objectId);
+                $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -679,7 +685,7 @@ class SmsController extends FormController
                 )
                 ) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($this->smsModel->isLocked($entity)) {
+                } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'sms', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -688,7 +694,7 @@ class SmsController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $this->smsModel->deleteEntities($deleteIds);
+                $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -713,7 +719,9 @@ class SmsController extends FormController
      */
     public function previewAction($objectId)
     {
-        $sms      = $this->smsModel->getEntity($objectId);
+        /** @var SmsModel $model */
+        $model    = $this->getModel('sms');
+        $sms      = $model->getEntity($objectId);
         $security = $this->security;
 
         if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
@@ -731,7 +739,7 @@ class SmsController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
