@@ -22,7 +22,6 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -162,7 +161,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $this->subscriber->onReportBuilder($reportBuilderEvent);
 
-        Assert::assertCount(0, $reportBuilderEvent->getTables());
+        $this->assertCount(0, $reportBuilderEvent->getTables());
     }
 
     public function testOnReportBuilderAddsFormAndFormResultReports(): void
@@ -207,9 +206,9 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $tables = $reportBuilderEvent->getTables();
 
-        Assert::assertCount(2, $tables);
-        Assert::assertArrayHasKey('form.results.test', $tables);
-        Assert::assertCount(3, $tables['form.results.test']['columns']);
+        $this->assertCount(2, $tables);
+        $this->assertArrayHasKey('form.results.test', $tables);
+        $this->assertCount(3, $tables['form.results.test']['columns']);
     }
 
     public function testOnReportGenerateFormsContext(): void

@@ -121,7 +121,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
     public function testCampaignMultipleProjectAdditionsShowInAuditLog(): void
     {
-        $campaignModel = CampaignAuditLogTest::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get('mautic.campaign.model.campaign');
 
         // Create projects first
         $project1 = $this->createProject('First Project');

@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
-use PHPUnit\Framework\Assert;
 
 final class JumpToActionTest extends MauticMysqlTestCase
 {
@@ -150,8 +149,8 @@ final class JumpToActionTest extends MauticMysqlTestCase
 
         $eventLogs = $this->getEventLogsForContact($contact);
 
-        Assert::assertCount(3, $eventLogs, '3 event logs should be scheduled to be executed in 1 minute');
-        Assert::assertSame(['URL is hit', 'Jump to', 'Add tag'], $this->getEventNames($eventLogs));
+        $this->assertCount(3, $eventLogs, '3 event logs should be scheduled to be executed in 1 minute');
+        $this->assertSame(['URL is hit', 'Jump to', 'Add tag'], $this->getEventNames($eventLogs));
 
         // Time travel 2 minutes into the future:
         foreach ($eventLogs as $eventLog) {
@@ -174,8 +173,8 @@ final class JumpToActionTest extends MauticMysqlTestCase
 
         $eventLogs = $this->getEventLogsForContact($contact);
 
-        Assert::assertCount(3, $eventLogs); // This was 6 before the fix.
-        Assert::assertSame(['URL is hit', 'Jump to', 'Add tag'], $this->getEventNames($eventLogs));
+        $this->assertCount(3, $eventLogs); // This was 6 before the fix.
+        $this->assertSame(['URL is hit', 'Jump to', 'Add tag'], $this->getEventNames($eventLogs));
     }
 
     /**

@@ -638,7 +638,7 @@ class SalesforceApi extends CrmApi
         return $this->optOutFieldAccessible;
     }
 
-    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): self
     {
         $this->optOutFieldAccessible = $optOutFieldAccessible;
 

@@ -425,7 +425,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function createQueryBuilder(?Connection $connection = null): QueryBuilder
+    public function createQueryBuilder(?Connection $connection = null): self
     {
         return new self($connection ?: $this->connection);
     }
