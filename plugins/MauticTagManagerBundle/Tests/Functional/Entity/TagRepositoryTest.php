@@ -7,7 +7,6 @@ namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
-use PHPUnit\Framework\Assert;
 
 final class TagRepositoryTest extends MauticMysqlTestCase
 {
@@ -36,6 +35,6 @@ final class TagRepositoryTest extends MauticMysqlTestCase
     public function testCountOccurencesReturnsCorrectQuantityOfTags(): void
     {
         $count = $this->tagRepository->countOccurrences('tag2');
-        Assert::assertSame(1, $count);
+        $this->assertSame(1, $count);
     }
 }

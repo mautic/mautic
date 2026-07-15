@@ -12,7 +12,6 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 
 final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
@@ -46,7 +45,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertSame($expectedIsPublished, $webhook->getIsPublished());
+        $this->assertSame($expectedIsPublished, $webhook->getIsPublished());
         $this->assertNumberOfLogs($expectedNumberOfLogs);
     }
 
@@ -71,7 +70,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertFalse($webhook->getIsPublished());
+        $this->assertFalse($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -84,7 +83,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertTrue($webhook->getIsPublished());
+        $this->assertTrue($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -97,7 +96,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertFalse($webhook->getIsPublished());
+        $this->assertFalse($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -109,7 +108,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertTrue($webhook->getIsPublished());
+        $this->assertTrue($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -157,6 +156,6 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function assertNumberOfLogs(int $expectedNumberOfLogs): void
     {
-        Assert::assertSame($expectedNumberOfLogs, $this->em->getRepository(Log::class)->count([]));
+        $this->assertSame($expectedNumberOfLogs, $this->em->getRepository(Log::class)->count([]));
     }
 }

@@ -18,7 +18,6 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,9 +43,9 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
-            Assert::assertNotNull($hit['id']);
-            Assert::assertNotNull($hit['title']);
-            Assert::assertNotNull($hit['hits']);
+            $this->assertNotNull($hit['id']);
+            $this->assertNotNull($hit['title']);
+            $this->assertNotNull($hit['hits']);
         }
     }
 
@@ -130,7 +129,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
-        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+        $this->assertSame($report->getId() + 1, $reportClone->getId());
     }
 
     public function testContactReportSqlInjectionDontWork(): void
@@ -287,7 +286,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Load view content as HTML and convert the report table to result array
         $result  = $this->parseReportTable($response->getContent());
 
-        Assert::assertSame($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testContactReportNotLikeExpression(): void
@@ -668,7 +667,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -713,6 +712,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

@@ -10,7 +10,6 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -56,7 +55,7 @@ final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
             $this->assertInstanceOf(MauticMessage::class, $message);
             $clickThrough = $this->parseClickThrough($message->getHtmlBody());
             $email        = $message->getTo()[0]->getAddress();
-            Assert::assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');
+            $this->assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');
         }
     }
 
@@ -126,10 +125,7 @@ final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertSame(
-            '{"success":1,"percent":100,"progress":['.$pending.','.$pending.'],"stats":{"sent":'.$pending.',"failed":0,"failedRecipients":[]}}',
-            $response->getContent()
-        );
+        $this->assertSame('{"success":1,"percent":100,"progress":['.$pending.','.$pending.'],"stats":{"sent":'.$pending.',"failed":0,"failedRecipients":[]}}', $response->getContent());
     }
 
     /**

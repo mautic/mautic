@@ -171,12 +171,12 @@ final class PluginAuthenticatorTest extends TestCase
         $this->assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
         $this->assertSame($userIdentifier, $userBadge->getUserIdentifier());
         $this->assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(PluginBadge::class, $pluginBadge);
+        $this->assertInstanceOf(PluginBadge::class, $pluginBadge);
         $this->assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
         $this->assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }

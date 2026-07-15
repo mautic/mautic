@@ -26,7 +26,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $stage = $this->client->request(Request::METHOD_GET, '/s/stages');
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $stageMenuString = $stage->filterXPath('//a[@id="mautic_stage_index"]');
-        Assert::assertStringContainsString('Stages', $stageMenuString->text());
+        $this->assertStringContainsString('Stages', $stageMenuString->text());
     }
 
     public function testStageWithProject(): void
@@ -52,7 +52,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedStage = $this->em->find(Stage::class, $stage->getId());
         $this->assertInstanceOf(Stage::class, $savedStage);
-        Assert::assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
     }
 
     public function testStageMergeMovesContactsAndStageLogs(): void
