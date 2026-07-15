@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class DateCompanyDecoratorTest extends TestCase
@@ -23,10 +22,7 @@ final class DateCompanyDecoratorTest extends TestCase
             'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
         ]);
 
-        Assert::assertSame(
-            AnyCompanyRelationValueFilterQueryBuilder::getServiceId(),
-            $dateCompanyDecorator->getQueryType($crate)
-        );
+        $this->assertSame(AnyCompanyRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
     }
 
     public function testGetQueryTypeReturnsPrimaryCompanyServiceForPrimaryObject(): void
@@ -37,10 +33,7 @@ final class DateCompanyDecoratorTest extends TestCase
             'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
         ]);
 
-        Assert::assertSame(
-            PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(),
-            $dateCompanyDecorator->getQueryType($crate)
-        );
+        $this->assertSame(PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
     }
 
     public function testGetQueryTypeReturnsComplexServiceForLeadObject(): void
@@ -51,10 +44,7 @@ final class DateCompanyDecoratorTest extends TestCase
             'object' => ContactSegmentFilterCrate::CONTACT_OBJECT,
         ]);
 
-        Assert::assertSame(
-            ComplexRelationValueFilterQueryBuilder::getServiceId(),
-            $dateCompanyDecorator->getQueryType($crate)
-        );
+        $this->assertSame(ComplexRelationValueFilterQueryBuilder::getServiceId(), $dateCompanyDecorator->getQueryType($crate));
     }
 
     private function createDateCompanyDecorator(): DateCompanyDecorator

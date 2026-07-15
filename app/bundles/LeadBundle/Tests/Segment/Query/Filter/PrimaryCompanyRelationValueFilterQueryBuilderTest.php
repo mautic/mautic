@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
-use PHPUnit\Framework\Assert;
 
 final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
 {
@@ -25,10 +24,7 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
     public function testGetServiceId(): void
     {
-        Assert::assertSame(
-            'mautic.lead.query.builder.complex_relation.primary_company',
-            $this->queryBuilder::getServiceId()
-        );
+        $this->assertSame('mautic.lead.query.builder.complex_relation.primary_company', $this->queryBuilder::getServiceId());
     }
 
     public function testApplyQueryAllowsMissingCompanyForEmptyOperator(): void
@@ -47,23 +43,11 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString(
-            'EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel1 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp1',
-            (string) $debugOutput
-        );
-        Assert::assertStringContainsString('(rel1.lead_id = l.id) AND (rel1.is_primary = 1)', (string) $debugOutput);
-        Assert::assertStringContainsString(
-            '((cmp1.company_name IS NULL) OR (cmp1.company_name',
-            (string) $debugOutput
-        );
-        Assert::assertStringContainsString(
-            '(EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel1 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp1 ON cmp1.id = rel1.company_id WHERE',
-            (string) $debugOutput
-        );
-        Assert::assertStringContainsString(
-            'OR (NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel2 WHERE (rel2.lead_id = l.id) AND (rel2.is_primary = 1))',
-            (string) $debugOutput
-        );
+        $this->assertStringContainsString('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel1 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp1', (string) $debugOutput);
+        $this->assertStringContainsString('(rel1.lead_id = l.id) AND (rel1.is_primary = 1)', (string) $debugOutput);
+        $this->assertStringContainsString('((cmp1.company_name IS NULL) OR (cmp1.company_name', (string) $debugOutput);
+        $this->assertStringContainsString('(EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel1 LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp1 ON cmp1.id = rel1.company_id WHERE', (string) $debugOutput);
+        $this->assertStringContainsString('OR (NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel2 WHERE (rel2.lead_id = l.id) AND (rel2.is_primary = 1))', (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesNotEmptyOperatorCondition(): void
@@ -82,10 +66,7 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString(
-            'WHERE (rel1.lead_id = l.id) AND (rel1.is_primary = 1) AND ((cmp1.company_name IS NOT NULL) AND (cmp1.company_name',
-            (string) $debugOutput
-        );
+        $this->assertStringContainsString('WHERE (rel1.lead_id = l.id) AND (rel1.is_primary = 1) AND ((cmp1.company_name IS NOT NULL) AND (cmp1.company_name', (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesNotEqualOperatorWithNullCondition(): void
@@ -104,8 +85,8 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString('((cmp1.company_name IS NULL) OR (cmp1.company_name', (string) $debugOutput);
-        Assert::assertStringContainsString(')', (string) $debugOutput);
+        $this->assertStringContainsString('((cmp1.company_name IS NULL) OR (cmp1.company_name', (string) $debugOutput);
+        $this->assertStringContainsString(')', (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesStartsWithOperator(): void
@@ -123,7 +104,7 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString("(cmp1.company_name LIKE 'Acme')", (string) $debugOutput);
+        $this->assertStringContainsString("(cmp1.company_name LIKE 'Acme')", (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesGtOperator(): void
@@ -141,7 +122,7 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString('(cmp1.company_name > 5)', (string) $debugOutput);
+        $this->assertStringContainsString('(cmp1.company_name > 5)', (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesNotInOperatorAndMissingRelationHandling(): void
@@ -161,12 +142,9 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString('(cmp1.company_name NOT IN (1, 2)', (string) $debugOutput);
-        Assert::assertStringContainsString('cmp1.company_name IS NULL', (string) $debugOutput);
-        Assert::assertStringContainsString(
-            'OR (NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel2 WHERE (rel2.lead_id = l.id) AND (rel2.is_primary = 1))',
-            (string) $debugOutput
-        );
+        $this->assertStringContainsString('(cmp1.company_name NOT IN (1, 2)', (string) $debugOutput);
+        $this->assertStringContainsString('cmp1.company_name IS NULL', (string) $debugOutput);
+        $this->assertStringContainsString('OR (NOT EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_leads rel2 WHERE (rel2.lead_id = l.id) AND (rel2.is_primary = 1))', (string) $debugOutput);
     }
 
     public function testApplyQueryAppliesNegatedMultiselectOperator(): void
@@ -192,8 +170,8 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString("NOT cmp1.company_name REGEXP 'alpha'", (string) $debugOutput);
-        Assert::assertStringContainsString("NOT cmp1.company_name REGEXP 'beta'", (string) $debugOutput);
+        $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'alpha'", (string) $debugOutput);
+        $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'beta'", (string) $debugOutput);
     }
 
     public function testApplyQuerySupportsEqualOperator(): void
@@ -211,8 +189,8 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString("cmp1.company_name = 'Acme'", (string) $debugOutput);
-        Assert::assertStringNotContainsString('OR NOT EXISTS', (string) $debugOutput);
+        $this->assertStringContainsString("cmp1.company_name = 'Acme'", (string) $debugOutput);
+        $this->assertStringNotContainsString('OR NOT EXISTS', (string) $debugOutput);
     }
 
     public function testApplyQueryThrowsOnUnsupportedOperator(): void
