@@ -47,6 +47,9 @@
     <testsuite name="Middleware tests">
       <directory>middlewares/Tests</directory>
     </testsuite>
+    <testsuite name="Static analysis rule tests">
+      <directory>./../utils/rector/tests</directory>
+      <directory>./../utils/phpstan/tests</directory>
   </testsuites>
   <php>
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>

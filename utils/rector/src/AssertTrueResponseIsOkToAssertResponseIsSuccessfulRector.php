@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticRector;
+namespace Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Arg;

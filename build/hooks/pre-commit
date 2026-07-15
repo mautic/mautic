@@ -13,8 +13,9 @@ fi
 
 if $HAS_PHP_CS_FIXER; then
 
-    # Fix changed (indexed) files
-    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --verbose --using-cache=no $(git diff --cached --name-only)
+    # Fix changed (indexed) files. Passing paths makes php-cs-fixer ignore the config finder, so
+    # intersection is needed to keep honouring it, e.g. to leave rector rule fixtures alone.
+    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --verbose --using-cache=no --path-mode=intersection $(git diff --cached --name-only)
 
     # Add the changes from CS Fixer back to the git index:
     git add $(git diff --cached --name-only)
