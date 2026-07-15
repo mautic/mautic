@@ -23,7 +23,6 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -131,7 +130,7 @@ final class LeadSubscriberTest extends CommonMocks
 
         $subscriber->onLeadPostSave(new LeadEvent($lead));
 
-        Assert::assertEmpty($lead->getChanges()); // changes were reset after they were processed.
+        $this->assertEmpty($lead->getChanges()); // changes were reset after they were processed.
     }
 
     /**

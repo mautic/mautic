@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +30,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        Assert::assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -76,7 +75,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        Assert::assertSame($url, $response->getTargetUrl());
+        $this->assertSame($url, $response->getTargetUrl());
     }
 
     /**
@@ -123,10 +122,10 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
+        $this->assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
-        Assert::assertNotNull($hit);
+        $this->assertInstanceOf(Hit::class, $hit);
     }
 
     private function getEncodedClickThroughValue(string $trackingHash, int $leadId): string

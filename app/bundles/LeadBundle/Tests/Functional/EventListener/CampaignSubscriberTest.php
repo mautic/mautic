@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignSubscriberTest extends MauticMysqlTestCase
@@ -86,7 +85,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore new.deprecated
 
         $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        Assert::assertTrue($campaignExecutionEvent->getResult());
+        $this->assertTrue($campaignExecutionEvent->getResult());
     }
 
     /**

@@ -9,7 +9,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class EventLogApiControllerTest extends MauticMysqlTestCase
 {
@@ -121,17 +120,17 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertCount(1, $response['events'][$event1->getId()]['contactLog']);
-        Assert::assertCount(2, $response['events'][$event2->getId()]['contactLog']);
-        Assert::assertCount(0, $response['events'][$event3->getId()]['contactLog']);
+        $this->assertCount(1, $response['events'][$event1->getId()]['contactLog']);
+        $this->assertCount(2, $response['events'][$event2->getId()]['contactLog']);
+        $this->assertCount(0, $response['events'][$event3->getId()]['contactLog']);
 
         $errorMessages = array_map(
             fn (array $error) => $error['message'],
             $response['errors']
         );
 
-        Assert::assertContains("The event {$event1->getId()} in the campaign {$campaign->getId()} has already been executed at 2016-01-10T00:00:00+00:00 for the contact {$contact2->getId()}.", $errorMessages);
-        Assert::assertContains("The contact {$contact3->getId()} is not in the campaign {$campaign->getId()}.", $errorMessages);
-        Assert::assertContains("A decision type event cannot be scheduled. Event: {$event3->getId()}, campaign: {$campaign->getId()}, contact: {$contact1->getId()}.", $errorMessages);
+        $this->assertContains("The event {$event1->getId()} in the campaign {$campaign->getId()} has already been executed at 2016-01-10T00:00:00+00:00 for the contact {$contact2->getId()}.", $errorMessages);
+        $this->assertContains("The contact {$contact3->getId()} is not in the campaign {$campaign->getId()}.", $errorMessages);
+        $this->assertContains("A decision type event cannot be scheduled. Event: {$event3->getId()}, campaign: {$campaign->getId()}, contact: {$contact1->getId()}.", $errorMessages);
     }
 }
