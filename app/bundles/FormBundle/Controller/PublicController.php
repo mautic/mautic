@@ -131,7 +131,7 @@ final class PublicController extends CommonFormController
             return null;
         }
 
-        // Allow relative URLs (starting with /)
+        // Allow relative URLs (starting with / but not //)
         if (str_starts_with($return, '/') && !str_starts_with($return, '//')) {
             return $return;
         }
@@ -151,14 +151,17 @@ final class PublicController extends CommonFormController
             $returnScheme = parse_url($return, PHP_URL_SCHEME);
             $returnPort   = parse_url($return, PHP_URL_PORT);
 
-            // Normalize ports: null means default port for the scheme
-            $sitePort ??= 'https' === $siteScheme ? 443 : 80;
-            $returnPort ??= 'https' === $returnScheme ? 443 : 80;
+            // Only proceed with same-origin check if both URLs have schemes
+            if ($siteScheme && $returnScheme) {
+                // Normalize ports: null means default port for the scheme
+                $sitePort ??= 'https' === $siteScheme ? 443 : 80;
+                $returnPort ??= 'https' === $returnScheme ? 443 : 80;
 
-            if ($siteHost && strtolower($siteScheme) === strtolower($returnScheme)
-                && strtolower($siteHost) === strtolower($returnHost)
-                && $sitePort === $returnPort) {
-                return $return;
+                if ($siteHost && strtolower($siteScheme) === strtolower($returnScheme)
+                    && strtolower($siteHost) === strtolower($returnHost)
+                    && $sitePort === $returnPort) {
+                    return $return;
+                }
             }
         }
 
@@ -280,8 +283,8 @@ final class PublicController extends CommonFormController
         if (null !== $trustedReturn) {
             $post['return'] = $trustedReturn;
         } else {
-            // If the provided return URL is untrusted, remove it so SubmissionModel falls back
-            // to HTTP_REFERER which is a trusted browser header.
+            // If the provided return URL is untrusted, remove it to prevent
+            // submission redirection to user-controlled URLs.
             unset($post['return']);
         }
 
