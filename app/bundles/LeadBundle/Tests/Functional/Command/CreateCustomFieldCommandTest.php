@@ -46,7 +46,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = $userCreator->getId();
-        $customFieldNotification = self::createMock(CustomFieldNotification::class);
+        $customFieldNotification = $this->createMock(CustomFieldNotification::class);
         $customFieldNotification
             ->expects($this->once())
             ->method('customFieldWasCreated')
@@ -62,7 +62,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             '--id'   => $leadField->getId(),
         ]);
 
-        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
@@ -71,7 +71,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             $columnsSchema
         );
 
-        self::assertContains('custom_field_1', $columnNames);
+        $this->assertContains('custom_field_1', $columnNames);
     }
 
     public function testWithNoArgs(): void
@@ -102,9 +102,9 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = $userCreator->getId();
-        $customFieldNotification = self::createMock(CustomFieldNotification::class);
+        $customFieldNotification = $this->createMock(CustomFieldNotification::class);
         $customFieldNotification
-            ->expects(self::exactly(2))
+            ->expects($this->exactly(2))
             ->method('customFieldWasCreated')
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
@@ -115,7 +115,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
@@ -124,8 +124,8 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             $columnsSchema
         );
 
-        self::assertContains('custom_field_1', $columnNames);
-        self::assertContains('custom_field_2', $columnNames);
+        $this->assertContains('custom_field_1', $columnNames);
+        $this->assertContains('custom_field_2', $columnNames);
     }
 
     private function getUser(string $username): User

@@ -45,11 +45,11 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
 
         if ($errorMessage) {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-            self::assertStringContainsString('error', (string) $response->getContent());
-            self::assertStringContainsString($errorMessage, (string) $response->getContent());
+            $this->assertStringContainsString('error', (string) $response->getContent());
+            $this->assertStringContainsString($errorMessage, (string) $response->getContent());
         } else {
             self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-            self::assertStringNotContainsString('error', (string) $response->getContent());
+            $this->assertStringNotContainsString('error', (string) $response->getContent());
         }
     }
 
@@ -105,7 +105,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $response = $this->client->getResponse()->getContent();
-        self::assertStringContainsString($errorMessage, (string) $response);
+        $this->assertStringContainsString($errorMessage, (string) $response);
 
         // Try to fetch the entity, but gracefully handle DB range errors
         try {
@@ -122,10 +122,6 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
             }
         }
 
-        if ('' === $errorMessage) {
-            self::assertNotNull($pointDetail, "Point with delta $delta should have been created");
-        } else {
-            self::assertNull($pointDetail, "Point with invalid delta $delta should NOT have been created");
-        }
+        '' === $errorMessage ? $this->assertInstanceOf(Point::class, $pointDetail) : $this->assertNotInstanceOf(Point::class, $pointDetail);
     }
 }

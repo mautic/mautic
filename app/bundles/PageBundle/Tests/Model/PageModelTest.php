@@ -170,7 +170,7 @@ final class PageModelTest extends PageTestAbstract
             ->willReturn(null);
 
         $result = $pageModel->hitPage($redirect, new Request());
-        self::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     /**

@@ -551,13 +551,13 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -576,11 +576,11 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
     }
 
     public function testCampaignActionChangeMembershipRestartRotation(): void
@@ -608,12 +608,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
-        Assert::assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
     }
 
     public function testCampaignActionAfterChangeMembership(): void
@@ -632,14 +632,14 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
-        Assert::assertCount(1, $campaignLeads);
-        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertCount(1, $campaignLeads);
+        $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
-        Assert::assertCount(1, $campaignEventLogs);
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
-        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+        $this->assertCount(1, $campaignEventLogs);
+        $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
     }
 
     public function testCampaignActionBeforeChangeMembership(): void
@@ -658,16 +658,16 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
-        Assert::assertCount(1, $campaignLeads);
-        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertCount(1, $campaignLeads);
+        $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
-        Assert::assertCount(2, $campaignEventLogs);
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
-        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[1]->getCampaign()->getId());
-        Assert::assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
+        $this->assertCount(2, $campaignEventLogs);
+        $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+        $this->assertSame($campaign->getId(), $campaignEventLogs[1]->getCampaign()->getId());
+        $this->assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
     }
 
     public function testCampaignExclusion(): void
@@ -687,12 +687,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[0]->getManuallyRemoved(), 'Test not executed campaign does not have Contact removed.');
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
-        Assert::assertFalse($campaignLeads[1]->getManuallyAdded());
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[0]->getManuallyRemoved(), 'Test not executed campaign does not have Contact removed.');
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertFalse($campaignLeads[1]->getManuallyAdded());
     }
 
     /**
@@ -772,7 +772,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     /**
@@ -880,23 +880,23 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $eventLog = $this->em->find(LeadEventLog::class, $logId);
         $this->assertInstanceOf(LeadEventLog::class, $eventLog);
 
-        Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
-        Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
+        $this->assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
 
         // Assert that trigger date logging is working
         $metadata = $eventLog->getMetadata();
-        Assert::assertIsArray($metadata, 'Metadata should be an array');
-        Assert::assertArrayHasKey('triggerDateLog', $metadata, 'Metadata should contain triggerDateLog');
+        $this->assertIsArray($metadata, 'Metadata should be an array');
+        $this->assertArrayHasKey('triggerDateLog', $metadata, 'Metadata should contain triggerDateLog');
 
         $triggerDateLog = $metadata['triggerDateLog'];
-        Assert::assertNotEmpty($triggerDateLog, 'Trigger date log should contain entries');
+        $this->assertNotEmpty($triggerDateLog, 'Trigger date log should contain entries');
 
-        Assert::assertCount(count($expectedTriggerDateLog), $triggerDateLog);
+        $this->assertCount(count($expectedTriggerDateLog), $triggerDateLog);
 
         // Assert that the expected metadata is present
         foreach ($triggerDateLog as $key => $log) {
-            Assert::assertSame($log['changedTo'], $expectedTriggerDateLog[$key]['changedTo']);
-            Assert::assertSame($log['note'], $expectedTriggerDateLog[$key]['note']);
+            $this->assertSame($log['changedTo'], $expectedTriggerDateLog[$key]['changedTo']);
+            $this->assertSame($log['note'], $expectedTriggerDateLog[$key]['note']);
         }
     }
 

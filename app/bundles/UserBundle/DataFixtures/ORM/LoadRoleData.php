@@ -51,7 +51,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-role', $role);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

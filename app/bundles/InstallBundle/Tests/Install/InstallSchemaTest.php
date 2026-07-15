@@ -11,7 +11,6 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -112,6 +111,6 @@ final class InstallSchemaTest extends TestCase
         }
         $this->connection->close();
 
-        Assert::assertSame([], $exceptions);
+        $this->assertSame([], $exceptions);
     }
 }

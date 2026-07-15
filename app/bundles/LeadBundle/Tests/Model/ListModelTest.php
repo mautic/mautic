@@ -228,7 +228,7 @@ final class ListModelTest extends TestCase
             ->with($leadList)
             ->willReturn($orphanLeadsCount);
 
-        self::assertSame(0, $this->model->rebuildListLeads($leadList));
+        $this->assertSame(0, $this->model->rebuildListLeads($leadList));
 
         $this->segmentCountCacheHelper
             ->expects($this->once())
@@ -238,7 +238,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testRemoveLeadWillDecrementCacheCounter(): void
@@ -258,7 +258,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $currentLeadCount - 1], $leadCounts);
+        $this->assertSame([$segmentId => $currentLeadCount - 1], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromCache(): void
@@ -275,7 +275,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testAddLeadWillIncrementCacheCounter(): void
@@ -295,7 +295,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $currentLeadCount + 1], $leadCounts);
+        $this->assertSame([$segmentId => $currentLeadCount + 1], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromDatabaseHavingCache(): void
@@ -318,7 +318,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromDatabase(): void
@@ -341,7 +341,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testGetActiveSegmentContactCount(): void
@@ -368,7 +368,7 @@ final class ListModelTest extends TestCase
         $property->setValue($this->model, $doNotContactRepository);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);
-        self::assertSame($total - $dnc, $active);
+        $this->assertSame($total - $dnc, $active);
     }
 
     public function testLeadListExists(): void
@@ -380,7 +380,7 @@ final class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn(true);
 
-        self::assertTrue($this->model->leadListExists($segmentId));
+        $this->assertTrue($this->model->leadListExists($segmentId));
     }
 
     private function mockLeadList(int $id): LeadList

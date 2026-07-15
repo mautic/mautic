@@ -696,11 +696,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf = $this->getSalesforceIntegration();
         $sf->amendLeadDataBeforePush($input);
 
-        self::assertSame($input, $output);
-        self::assertSame('string', gettype($output[0]));
-        self::assertSame('boolean', gettype($output[1]));
-        self::assertSame('string', gettype($output[2]));
-        self::assertSame('integer', gettype($output[3]));
+        $this->assertSame($input, $output);
+        $this->assertSame('string', gettype($output[0]));
+        $this->assertSame('boolean', gettype($output[1]));
+        $this->assertSame('string', gettype($output[2]));
+        $this->assertSame('integer', gettype($output[3]));
     }
 
     protected function setMaxInvocations(string $name, int $max): self

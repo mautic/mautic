@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 
 final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
@@ -30,7 +29,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
         $user    = $this->getUser(self::ADMIN_USER);
         $userIds = $this->notificationBuilder->getUserIds('lead', 253);
 
-        Assert::assertSame([$user->getId()], $userIds);
+        $this->assertSame([$user->getId()], $userIds);
     }
 
     public function testGetUserIdsWithExistentObject(): void
@@ -45,28 +44,28 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
         $userIds = $this->notificationBuilder->getUserIds('lead', (int) $lead->getId());
         $this->assertInstanceOf(User::class, $user);
 
-        Assert::assertSame([$user->getId()], $userIds);
+        $this->assertSame([$user->getId()], $userIds);
     }
 
     public function testBuildLink(): void
     {
         $link = $this->notificationBuilder->buildLink('lead', 253, 'Some text');
 
-        Assert::assertSame('<a href="/s/contacts/view/253">Some text</a>', $link);
+        $this->assertSame('<a href="/s/contacts/view/253">Some text</a>', $link);
     }
 
     public function testFormatHeader(): void
     {
         $header = $this->notificationBuilder->formatHeader('Integration name', 'Lead');
 
-        Assert::assertSame('Issue encountered while syncing with the Integration name Lead object', $header);
+        $this->assertSame('Issue encountered while syncing with the Integration name Lead object', $header);
     }
 
     public function testFormatMessage(): void
     {
         $header = $this->notificationBuilder->formatMessage('Some message', 'Some link');
 
-        Assert::assertSame('Some link failed to sync with message, &quot;Some message&quot;', $header);
+        $this->assertSame('Some link failed to sync with message, &quot;Some message&quot;', $header);
     }
 
     private function getUser(string $username): User

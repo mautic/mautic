@@ -19,7 +19,6 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,17 +75,17 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();
         // Ensure we have a clean slate. There should be no rows waiting to be processed at this point.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->createContacts();
 
         // At this point there should be 3 events waiting to be processed.
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookWorkflowWithCommandProcessInQueueRange(): void
@@ -104,7 +103,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         ]);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookWorkflowWithCommandProcessWithoutPassingWebhookID(): void
@@ -116,7 +115,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     /**
@@ -145,7 +144,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $webhookQueues = $this->getWebhookQueue($webhook->getId());
         foreach ($webhookQueues as $webhookQueue) {
@@ -164,15 +163,15 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
-        Assert::assertCount(1, $this->notificationRepository->getNotifications($expectedUser->getId()));
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertCount(1, $this->notificationRepository->getNotifications($expectedUser->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
-        Assert::assertNotNull($webhook->getMarkedUnhealthyAt());
-        Assert::assertNotNull($webhook->getUnHealthySince());
-        Assert::assertNotNull($webhook->getLastNotificationSentAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
     }
 
     public function testWebhookQueueNotProcessedIfMarkedUnhealthy(): void
@@ -187,7 +186,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         // The queue should not be processed.
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookQueueProcessedWhenUnhealthyTimePassed(): void
@@ -203,13 +202,13 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
         $this->assertInstanceOf(Webhook::class, $webhook);
-        Assert::assertNull($webhook->getMarkedUnhealthyAt());
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
         $this->assertInstanceOf(Webhook::class, $webhook);
-        Assert::assertNull($webhook->getUnHealthySince());
-        Assert::assertNull($webhook->getLastNotificationSentAt());
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
 
         // The queue should be processed.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     private function createWebhook(): Webhook
@@ -273,10 +272,10 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
 
         return [
             $response['contacts'][0]['id'],
@@ -291,9 +290,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
                 function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
-                    Assert::assertSame('/post', $request->getUri()->getPath());
+                    $this->assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
-                    Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
+                    $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;
 
@@ -309,9 +308,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
                 function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
-                    Assert::assertSame('/post', $request->getUri()->getPath());
+                    $this->assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
-                    Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
+                    $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;
 

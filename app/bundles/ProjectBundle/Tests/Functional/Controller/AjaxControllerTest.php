@@ -45,10 +45,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $payload = json_decode($this->client->getResponse()->getContent(), true);
 
-        Assert::assertArrayHasKey('projects', $payload);
+        $this->assertArrayHasKey('projects', $payload);
 
         // The options are orderec alphabetically by name.
-        Assert::assertSame(
+        $this->assertSame(
             // The Blue Project is selected as it was sent as part of the existingProjectIds.
             '<option selected="selected" value="'.$projects[1]->getId().'">'.$projects[1]->getName().'</option>'.
             // The Green Project is selected as it was sent as part of the newProjectNames and should have next ID as it was created as 4th.
@@ -151,7 +151,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $payload = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertArrayHasKey('projects', $payload);
+        $this->assertArrayHasKey('projects', $payload);
 
         $projectOptions = $payload['projects'];
 
@@ -159,17 +159,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $escapedPayload = htmlspecialchars($xssPayload, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // Assert the malicious payload is properly escaped
-        Assert::assertStringContainsString($escapedPayload, (string) $projectOptions, 'Project name should be HTML-escaped in the response');
+        $this->assertStringContainsString($escapedPayload, (string) $projectOptions, 'Project name should be HTML-escaped in the response');
 
         // Assert the dangerous substring is NOT present in the response
-        Assert::assertStringNotContainsString($dangerousSubstring, (string) $projectOptions, 'Raw XSS payload should not be present in the response');
+        $this->assertStringNotContainsString($dangerousSubstring, (string) $projectOptions, 'Raw XSS payload should not be present in the response');
 
         // Assert proper option structure with escaped content
-        Assert::assertStringContainsString(
-            '<option value="'.$project->getId().'">'.$escapedPayload.'</option>',
-            (string) $projectOptions,
-            'Option should contain properly escaped label'
-        );
+        $this->assertStringContainsString('<option value="'.$project->getId().'">'.$escapedPayload.'</option>', (string) $projectOptions, 'Option should contain properly escaped label');
 
         // Verify the malicious project can still be selected and associated normally
         $this->client->request(
@@ -187,14 +183,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectOptions2 = $payload2['projects'];
 
         // Verify the malicious project can be selected
-        Assert::assertStringContainsString(
-            '<option selected="selected" value="'.$project->getId().'">'.$escapedPayload.'</option>',
-            (string) $projectOptions2,
-            'Malicious project should be selectable with escaped content'
-        );
+        $this->assertStringContainsString('<option selected="selected" value="'.$project->getId().'">'.$escapedPayload.'</option>', (string) $projectOptions2, 'Malicious project should be selectable with escaped content');
 
         // Verify dangerous content is still not present when selected
-        Assert::assertStringNotContainsString($dangerousSubstring, (string) $projectOptions2, 'Raw XSS payload should not be present even when selected');
+        $this->assertStringNotContainsString($dangerousSubstring, (string) $projectOptions2, 'Raw XSS payload should not be present even when selected');
     }
 
     /**
@@ -252,27 +244,19 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $payload = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertArrayHasKey('projects', $payload);
+        $this->assertArrayHasKey('projects', $payload);
 
         $projectOptions = $payload['projects'];
         $escapedName    = htmlspecialchars($projectName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         // Verify the project appears correctly with escaped name
-        Assert::assertStringContainsString($escapedName, (string) $projectOptions, 'Project name with special characters should be HTML-escaped');
+        $this->assertStringContainsString($escapedName, (string) $projectOptions, 'Project name with special characters should be HTML-escaped');
 
         // Verify the selected project has the selected attribute
-        Assert::assertStringContainsString(
-            '<option selected="selected" value="'.$project->getId().'">'.$escapedName.'</option>',
-            (string) $projectOptions,
-            'Selected project should have selected attribute and escaped name'
-        );
+        $this->assertStringContainsString('<option selected="selected" value="'.$project->getId().'">'.$escapedName.'</option>', (string) $projectOptions, 'Selected project should have selected attribute and escaped name');
 
         // Verify the unselected project appears without selected attribute
-        Assert::assertStringContainsString(
-            '<option value="'.$unselectedProject->getId().'">Unselected Project</option>',
-            (string) $projectOptions,
-            'Unselected project should not have selected attribute'
-        );
+        $this->assertStringContainsString('<option value="'.$unselectedProject->getId().'">Unselected Project</option>', (string) $projectOptions, 'Unselected project should not have selected attribute');
 
         // Test that we can change selection (deselect the special char project, select the other)
         $this->client->request(
@@ -290,17 +274,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectOptions2 = $payload2['projects'];
 
         // Verify selections are preserved correctly
-        Assert::assertStringContainsString(
-            '<option selected="selected" value="'.$unselectedProject->getId().'">Unselected Project</option>',
-            (string) $projectOptions2,
-            'Selection changes should be preserved'
-        );
+        $this->assertStringContainsString('<option selected="selected" value="'.$unselectedProject->getId().'">Unselected Project</option>', (string) $projectOptions2, 'Selection changes should be preserved');
 
-        Assert::assertStringContainsString(
-            '<option value="'.$project->getId().'">'.$escapedName.'</option>',
-            (string) $projectOptions2,
-            'Previously selected project should now be unselected'
-        );
+        $this->assertStringContainsString('<option value="'.$project->getId().'">'.$escapedName.'</option>', (string) $projectOptions2, 'Previously selected project should now be unselected');
     }
 
     /**

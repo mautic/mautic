@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -60,10 +59,10 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
         if (!$this->isPostgresqlPlatform()) {
             // Relaxed, platform-agnostic checks – we only verify that the expected steps were executed
-            Assert::assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_first", $output);
-            Assert::assertStringContainsString("adding indices for table {$this->tablePrefix}test_first", $output);
-            Assert::assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_second", $output);
-            Assert::assertStringContainsString("adding indices for table {$this->tablePrefix}test_second", $output);
+            $this->assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_first", $output);
+            $this->assertStringContainsString("adding indices for table {$this->tablePrefix}test_first", $output);
+            $this->assertStringContainsString("adding generated columns for table {$this->tablePrefix}test_second", $output);
+            $this->assertStringContainsString("adding indices for table {$this->tablePrefix}test_second", $output);
 
             // Platform-agnostic verification of columns and indexes via schema introspection
             $this->assertGeneratedColumnsAndIndexesExist();
@@ -80,49 +79,18 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         // test_first
         $tableFirst = $schemaManager->introspectTable($this->tablePrefix.'test_first');
 
-        Assert::assertTrue($tableFirst->hasColumn('generated_name_one'), 'generated_name_one column missing');
-        Assert::assertTrue($tableFirst->hasColumn('generated_name_three'), 'generated_name_three column missing');
-
-        $hasIndexOne   = $this->hasSingleColumnIndex($tableFirst, 'generated_name_one');
-        $hasIndexThree = $this->hasSingleColumnIndex($tableFirst, 'generated_name_three');
-
-        Assert::assertTrue($hasIndexOne, 'Index on generated_name_one missing');
-        Assert::assertTrue($hasIndexThree, 'Index on generated_name_three missing');
-
-        // test_second
-        $tableSecond = $schemaManager->introspectTable($this->tablePrefix.'test_second');
-
-        Assert::assertTrue($tableSecond->hasColumn('generated_date_year'), 'generated_date_year column missing');
-
-        $hasCompositeIndex = $this->hasCompositeIndex($tableSecond, ['campaign_id', 'generated_date_year', 'id']);
-
-        Assert::assertTrue($hasCompositeIndex, 'Composite index on (campaign_id, generated_date_year, id) missing');
+        $this->assertTableHasColumnAndIndex('test_first', 'generated_name_one', 'generated_name_one');
+        $this->assertTableHasColumnAndIndex('test_first', 'generated_name_three', 'generated_name_three');
+        $this->assertTableHasColumnAndIndex('test_second', 'generated_date_year', 'campaign_id_generated_date_year_id');
     }
 
-    private function hasSingleColumnIndex(\Doctrine\DBAL\Schema\Table $table, string $column): bool
+    private function assertTableHasColumnAndIndex(string $table, string $column, string $index): void
     {
-        foreach ($table->getIndexes() as $index) {
-            $columns = $index->getColumns();
-            if (1 === count($columns) && $columns[0] === $column) {
-                return true;
-            }
-        }
+        $result = $this->connection->fetchAssociative("SHOW COLUMNS FROM {$this->tablePrefix}{$table} WHERE Field = '{$column}'");
+        $this->assertNotEmpty($result, sprintf('Table "%s" is expected to have column "%s".', $table, $column));
 
-        return false;
-    }
-
-    /**
-     * @param array<string> $expectedColumns
-     */
-    private function hasCompositeIndex(\Doctrine\DBAL\Schema\Table $table, array $expectedColumns): bool
-    {
-        foreach ($table->getIndexes() as $index) {
-            if ($index->getColumns() === $expectedColumns) {
-                return true;
-            }
-        }
-
-        return false;
+        $result = $this->connection->fetchAssociative("SHOW INDEX FROM {$this->tablePrefix}{$table} WHERE Key_name = '{$this->tablePrefix}{$index}'");
+        $this->assertNotEmpty($result, sprintf('Table "%s" is expected to have index "%s".', $table, $index));
     }
 
     private function createTables(): void
@@ -141,28 +109,24 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         $dateType = $isPostgreSQL ? 'timestamp' : 'datetime';
 
         // test_first (pre-creates one generated column to test skipping duplicates)
-        $sqlFirst = <<<SQL
-CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first (
-    id $idType NOT NULL,
-    name varchar(100) NOT NULL,
-    $generatedColumnSql,
-    PRIMARY KEY (id)
-)
-SQL;
+        $this->connection->executeStatement("
+            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_first (
+                id $idType NOT NULL,
+                name varchar(100) NOT NULL,
+                $generatedColumnSql,
+                PRIMARY KEY (id)
+            )
+        ");
 
-        $this->connection->executeStatement($sqlFirst);
-
-        // test_second (no pre-existing generated column)
-        $sqlSecond = <<<SQL
-CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_second (
-    id $idType NOT NULL,
-    campaign_id integer NOT NULL,
-    date_added $dateType NOT NULL,
-    PRIMARY KEY (id)
-)
-SQL;
-
-        $this->connection->executeStatement($sqlSecond);
+        $this->connection->executeStatement("
+            CREATE TABLE IF NOT EXISTS {$this->tablePrefix}test_second
+            (
+                id $idType NOT NULL,
+                campaign_id integer NOT NULL,
+                date_added $dateType NOT NULL,
+                PRIMARY KEY (id)
+            )
+        ");
     }
 
     private function dropTable(string $table): void
@@ -188,7 +152,7 @@ SQL;
         $statusCode = $application->run(new ArrayInput($params), $output);
         $message    = $output->fetch();
 
-        Assert::assertSame(ExitCode::SUCCESS, $statusCode, $message);
+        $this->assertSame(ExitCode::SUCCESS, $statusCode, $message);
 
         return $message;
     }

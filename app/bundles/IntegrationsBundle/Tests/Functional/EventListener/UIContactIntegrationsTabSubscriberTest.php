@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class UIContactIntegrationsTabSubscriberTest extends MauticMysqlTestCase
 {
@@ -31,8 +30,8 @@ final class UIContactIntegrationsTabSubscriberTest extends MauticMysqlTestCase
 
         $this->client->request('GET', "/s/contacts/view/{$contact->getId()}");
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('<dt>Object</dt><dd>testobject</dd>', (string) $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('<dt>Object ID</dt><dd>testid</dd>', (string) $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('testintegration', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('<dt>Object</dt><dd>testobject</dd>', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('<dt>Object ID</dt><dd>testid</dd>', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('testintegration', (string) $this->client->getResponse()->getContent());
     }
 }

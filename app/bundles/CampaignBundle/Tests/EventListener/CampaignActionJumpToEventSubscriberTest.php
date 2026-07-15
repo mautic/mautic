@@ -124,16 +124,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $subscriber->onJumpToEvent($pendingEvent);
 
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
 
-        Assert::AssertSame(
-            [
-                'failed' => 1,
-                'reason' => 'mautic.campaign.campaign.jump_to_event.target_not_exist',
-            ],
-            $leadLog->getMetadata()
-        );
+        $this->AssertSame([
+            'failed' => 1,
+            'reason' => 'mautic.campaign.campaign.jump_to_event.target_not_exist',
+        ], $leadLog->getMetadata());
     }
 
     public function testOnJumpToEventWhenEventExists(): void
@@ -265,8 +262,8 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $subscriber->onJumpToEvent($pendingEvent);
 
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::AssertSame([], $leadLog->getMetadata());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->AssertSame([], $leadLog->getMetadata());
     }
 }

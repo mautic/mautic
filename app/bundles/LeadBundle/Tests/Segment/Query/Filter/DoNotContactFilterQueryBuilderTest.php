@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -21,7 +20,7 @@ final class DoNotContactFilterQueryBuilderTest extends TestCase
 
     public function testGetServiceId(): void
     {
-        Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
+        $this->assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
@@ -36,8 +35,8 @@ final class DoNotContactFilterQueryBuilderTest extends TestCase
         $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher(), $connectionMock);
 
         $expectedQuery = str_replace('__MAUTIC_TABLE_PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
-        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
