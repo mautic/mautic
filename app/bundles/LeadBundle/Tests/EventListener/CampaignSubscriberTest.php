@@ -49,47 +49,45 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @return array<int, array<string, array<int, string>|bool|int|null>>
+     * @return \Iterator<int, array<string, (array<int, string>|bool|int|null)>>
      */
-    public static function provideFormDNC(): array
+    public static function provideFormDNC(): \Iterator
     {
-        return [
-            [
-                'reason'   => 1,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 3,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 0,
-            ],
+        yield [
+            'reason'   => 1,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 3,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 0,
         ];
     }
 

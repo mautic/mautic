@@ -62,29 +62,26 @@ final class PointActionHelperTest extends TestCase
     }
 
     /**
-     * @return array<string, array<int, mixed>>
+     * @return \Iterator<string, array<int, mixed>>
      */
-    public static function urlHitsActionDataProvider(): array
+    public static function urlHitsActionDataProvider(): \Iterator
     {
-        return [
-            'url_matches_first_hit' => [
-                [
-                    'id'         => 2,
-                    'type'       => 'url.hit',
-                    'name'       => 'Hit page',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/ppk',
-                        'page_hits'              => 1,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 0,
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 5,
+        yield 'url_matches_first_hit' => [
+            [
+                'id'         => 2,
+                'type'       => 'url.hit',
+                'name'       => 'Hit page',
+                'properties' => [
+                    'page_url'               => 'https://example.com/ppk',
+                    'page_hits'              => 1,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 0,
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                true,
+                'points' => 5,
             ],
             'plain_text_matches_substring' => [
                 [
@@ -141,8 +138,9 @@ final class PointActionHelperTest extends TestCase
                     ],
                     'points' => 5,
                 ],
-                false,
+                'points' => 5,
             ],
+            false,
         ];
     }
 
@@ -174,49 +172,47 @@ final class PointActionHelperTest extends TestCase
     }
 
     /**
-     * @return array<string, array<int, mixed>>
+     * @return \Iterator<string, array<int, mixed>>
      */
-    public static function returnWithinActionDataProvider(): array
+    public static function returnWithinActionDataProvider(): \Iterator
     {
-        return [
-            'valid_return_within' => [
-                [
-                    'id'         => 1,
-                    'type'       => 'url.hit',
-                    'name'       => 'Test return within',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/test/',
-                        'page_hits'              => null,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 14400, // 4 hours in seconds
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 3,
+        yield 'valid_return_within' => [
+            [
+                'id'         => 1,
+                'type'       => 'url.hit',
+                'name'       => 'Test return within',
+                'properties' => [
+                    'page_url'               => 'https://example.com/test/',
+                    'page_hits'              => null,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 14400, // 4 hours in seconds
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                true,
+                'points' => 3,
             ],
-            'invalid_return_within' => [
-                [
-                    'id'         => 4,
-                    'type'       => 'url.hit',
-                    'name'       => 'Invalid Return Within',
-                    'properties' => [
-                        'page_url'               => 'https://example.com/test/',
-                        'page_hits'              => null,
-                        'accumulative_time_unit' => 'H',
-                        'accumulative_time'      => 0,
-                        'returns_within_unit'    => 'H',
-                        'returns_within'         => 3600, // 1 hour in seconds
-                        'returns_after_unit'     => 'H',
-                        'returns_after'          => 0,
-                    ],
-                    'points' => 3,
+            true,
+        ];
+        yield 'invalid_return_within' => [
+            [
+                'id'         => 4,
+                'type'       => 'url.hit',
+                'name'       => 'Invalid Return Within',
+                'properties' => [
+                    'page_url'               => 'https://example.com/test/',
+                    'page_hits'              => null,
+                    'accumulative_time_unit' => 'H',
+                    'accumulative_time'      => 0,
+                    'returns_within_unit'    => 'H',
+                    'returns_within'         => 3600, // 1 hour in seconds
+                    'returns_after_unit'     => 'H',
+                    'returns_after'          => 0,
                 ],
-                false,
+                'points' => 3,
             ],
+            false,
         ];
     }
 }

@@ -208,7 +208,7 @@ final class PublicControllerTest extends TestCase
 
         $this->request->attributes->set('ignore_mismatch', true);
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $controller = new PublicController(
@@ -277,7 +277,7 @@ final class PublicControllerTest extends TestCase
             throw new InvalidDecodedStringException($clickTrough);
         };
 
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects($this->exactly(2))
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
@@ -317,7 +317,7 @@ final class PublicControllerTest extends TestCase
             $redirectId
         );
 
-        self::assertSame('https://someurl.test/', $response->getTargetUrl());
+        $this->assertSame('https://someurl.test/', $response->getTargetUrl());
     }
 
     #[DataProvider('provideRedirectUrls')]
@@ -356,7 +356,7 @@ final class PublicControllerTest extends TestCase
             throw new InvalidDecodedStringException($clickThrough);
         };
 
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects($this->exactly(2))
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
@@ -396,8 +396,8 @@ final class PublicControllerTest extends TestCase
             $this->pageModel,
             $redirectId
         );
-        self::assertSame($targetUrl, $response->getTargetUrl());
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame($targetUrl, $response->getTargetUrl());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     public static function provideRedirectUrls(): \Generator

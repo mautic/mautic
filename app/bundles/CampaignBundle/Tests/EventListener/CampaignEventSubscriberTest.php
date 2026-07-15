@@ -120,8 +120,8 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
 
-        self::assertNotNull($campaign->getPublishUp());
-        self::assertSame('00', $campaign->getPublishUp()->format('s'));
+        $this->assertInstanceOf(\DateTimeInterface::class, $campaign->getPublishUp());
+        $this->assertSame('00', $campaign->getPublishUp()->format('s'));
     }
 
     public function testFailedEventGeneratesANotification(): void

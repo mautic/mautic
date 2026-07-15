@@ -42,8 +42,8 @@ final class PageRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertSame($expected, (string) $expr);
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     /**
@@ -59,7 +59,7 @@ final class PageRepositoryTest extends TestCase
     {
         $repository = $this->getRepository();
         $commands   = $repository->getSearchCommands();
-        self::assertContains('mautic.page.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.page.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.page.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.page.searchcommand.ispending', $commands);
     }
 }
