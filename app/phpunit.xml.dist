@@ -48,8 +48,8 @@
       <directory>middlewares/Tests</directory>
     </testsuite>
     <testsuite name="Static analysis rule tests">
-      <directory>./../rector/Tests</directory>
-      <directory>./../phpstan/Tests</directory>
+      <directory>./../utils/rector/tests</directory>
+      <directory>./../utils/phpstan/tests</directory>
     </testsuite>
   </testsuites>
   <php>

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use PhpParser\Modifiers;
 use PhpParser\Node;
-use PhpParser\Node\Arg;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\MethodCall;
@@ -20,8 +20,6 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
-use PhpParser\Node\Stmt\Return_;
-use PhpParser\Modifiers;
 use PhpParser\NodeVisitor;
 use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
@@ -82,8 +80,7 @@ class SmsController extends FormController
         return $this->render($model->getEntity(1));
     }
 }
-CODE_SAMPLE
-                    ,
+CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
 class SmsController extends FormController
 {
@@ -100,8 +97,7 @@ class SmsController extends FormController
         return $this->render($this->smsModel->getEntity(1));
     }
 }
-CODE_SAMPLE
-                    ,
+CODE_SAMPLE,
                     [
                         'sms' => 'Mautic\SmsBundle\Model\SmsModel',
                     ]

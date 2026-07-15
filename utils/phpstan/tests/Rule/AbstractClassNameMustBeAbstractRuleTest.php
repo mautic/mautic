@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Tests\Rule;
 
-use Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
+use Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule;
 
 /**
  * @extends RuleTestCase<AbstractClassNameMustBeAbstractRule>
