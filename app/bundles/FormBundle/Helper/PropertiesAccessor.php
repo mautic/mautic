@@ -9,7 +9,7 @@ use Mautic\FormBundle\Model\FormModel;
 class PropertiesAccessor
 {
     public function __construct(
-        private FormModel $formModel,
+        private readonly FormModel $formModel,
     ) {
     }
 
@@ -23,7 +23,8 @@ class PropertiesAccessor
         $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'contact' === $field['mappedObject'];
         if ('country' === $field['type'] || ($hasContactFieldMapped && !empty($field['properties']['syncList']))) {
             return $this->formModel->getContactFieldPropertiesList((string) $field['mappedField']);
-        } elseif (!empty($field['properties'])) {
+        }
+        if (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
         }
 
@@ -75,7 +76,8 @@ class PropertiesAccessor
     {
         if (!empty($properties['list']['list'])) {
             return $properties['list']['list'];
-        } elseif (!empty($properties['optionlist']['list'])) {
+        }
+        if (!empty($properties['optionlist']['list'])) {
             return $properties['optionlist']['list'];
         }
 

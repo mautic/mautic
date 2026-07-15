@@ -7,13 +7,14 @@ namespace Mautic\PointBundle\Tests\Functional;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
+final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -163,6 +164,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
     private function createTestContactWithGroupPoints(): void
     {
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         $groupA = $this->createGroup('Group A');
@@ -229,6 +231,6 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 }

@@ -38,6 +38,7 @@ final class ResumeStuckCampaignCommand extends Command
     use WriteCountTrait;
 
     public const COMMAND_NAME                      = 'mautic:campaigns:resume-stuck';
+
     private const MAX_ALLOWED_RECORDS_EACH_PROCESS = 500;
 
     public function __construct(
@@ -53,9 +54,6 @@ final class ResumeStuckCampaignCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->addArgument(
@@ -73,15 +71,13 @@ final class ResumeStuckCampaignCommand extends Command
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Fix contacts starting at a specific contact ID.',
-                null
+                'Fix contacts starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Fix contacts up to a specific contact ID.',
-                null
+                'Fix contacts up to a specific contact ID.'
             )
             ->addOption(
                 '--batch-limit',
@@ -94,9 +90,6 @@ final class ResumeStuckCampaignCommand extends Command
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $campaignId     = (int) $input->getArgument('campaign-id');

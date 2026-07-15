@@ -12,19 +12,17 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FilePathResolverTest extends \PHPUnit\Framework\TestCase
+final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Filesystem
+     * @var MockObject&Filesystem
      */
     private MockObject $filesystemMock;
 
     /**
-     * @var MockObject|UploadedFile
+     * @var MockObject&UploadedFile
      */
     private MockObject $fileMock;
-
-    private InputHelper $inputHelper;
 
     private FilePathResolver $filePathResolver;
 
@@ -33,8 +31,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->filesystemMock   = $this->createMock(Filesystem::class);
         $this->fileMock         = $this->createMock(UploadedFile::class);
-        $this->inputHelper      = new InputHelper();
-        $this->filePathResolver = new FilePathResolver($this->filesystemMock, $this->inputHelper);
+        $inputHelper            = new InputHelper();
+        $this->filePathResolver = new FilePathResolver($this->filesystemMock, $inputHelper);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Get correct name if few previous names are taken')]
@@ -46,7 +44,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $matcher       = $this->exactly(3);
 
         $this->filesystemMock->expects($matcher)
-            ->method('exists')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('exists')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('my/upload/dir/filename_x.jpg', $parameters[0]);
 
@@ -62,6 +60,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->fileMock->expects($this->once())

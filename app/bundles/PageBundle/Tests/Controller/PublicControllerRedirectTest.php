@@ -11,12 +11,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerRedirectTest extends MauticMysqlTestCase
+final class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
@@ -31,7 +30,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        Assert::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -74,9 +73,9 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        Assert::assertSame($url, $response->getTargetUrl());
+        $this->assertSame($url, $response->getTargetUrl());
     }
 
     /**
@@ -121,12 +120,12 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
+        $this->assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
-        Assert::assertNotNull($hit);
+        $this->assertInstanceOf(Hit::class, $hit);
     }
 
     private function getEncodedClickThroughValue(string $trackingHash, int $leadId): string

@@ -36,8 +36,8 @@ class FormController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
-        private MappedObjectCollector $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -48,15 +48,11 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -75,7 +71,7 @@ class FormController extends CommonFormController
         );
 
         if (!$permissions['form:forms:viewown'] && !$permissions['form:forms:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -154,10 +150,8 @@ class FormController extends CommonFormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         /** @var FormModel $model */
         $model      = $this->getModel('form');
@@ -188,13 +182,14 @@ class FormController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $activeForm->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $permissions = $this->security->isGranted(
@@ -299,7 +294,7 @@ class FormController extends CommonFormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('form:forms:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -319,7 +314,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -520,7 +515,6 @@ class FormController extends CommonFormController
         }
 
         $session    = $request->getSession();
-        $cleanSlate = true;
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.form.page', 1);
@@ -554,13 +548,14 @@ class FormController extends CommonFormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:editown',
             'form:forms:editother',
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'form.form');
@@ -570,7 +565,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // set added/updated fields
@@ -689,20 +684,17 @@ class FormController extends CommonFormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($valid && $this->isButtonClicked($form, 'apply')) {
                 // Rebuild everything to include new ids
-                $cleanSlate = true;
                 $reorder    = true;
 
-                if ($valid) {
-                    // Rebuild the form with new action so that apply doesn't keep creating a clone
-                    $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
-                    $form   = $model->createForm($entity, $this->formFactory, $action);
-                }
+                // Rebuild the form with new action so that apply doesn't keep creating a clone
+                $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
+                $form   = $model->createForm($entity, $this->formFactory, $action);
             }
         } else {
-            $cleanSlate = true;
-
             // lock the entity
             $model->lockEntity($entity);
         }
@@ -714,112 +706,110 @@ class FormController extends CommonFormController
         // Get field and action settings
         $availableFields = $this->fieldHelper->getChoiceList($customComponents['fields']);
 
-        if ($cleanSlate) {
-            // clean slate
-            $this->clearSessionComponents($request, $objectId);
-            $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
+        // clean slate
+        $this->clearSessionComponents($request, $objectId);
+        $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
 
-            // load existing fields into session
-            $modifiedFields   = [];
-            $existingFields   = $entity->getFields()->toArray();
-            $fieldMap         = [];
-            $submitButton     = false;
+        // load existing fields into session
+        $modifiedFields   = [];
+        $existingFields   = $entity->getFields()->toArray();
+        $fieldMap         = [];
+        $submitButton     = false;
 
-            foreach ($existingFields as $fieldId => $formField) {
-                // Check to see if the field still exists
+        foreach ($existingFields as $fieldId => $formField) {
+            // Check to see if the field still exists
 
-                if ('button' == $formField->getType()) {
-                    // submit button found
-                    $submitButton = true;
-                }
-                if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
-                    continue;
-                }
+            if ('button' == $formField->getType()) {
+                // submit button found
+                $submitButton = true;
+            }
+            if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
+                continue;
+            }
 
-                $id    = $formField->getId();
-                $field = $formField->convertToArray();
+            $id    = $formField->getId();
+            $field = $formField->convertToArray();
 
-                if (!$id) {
-                    // Cloned entity
-                    $id = $field['id'] = $field['sessionId'] = $fieldMap[$fieldId] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    if (isset($field['parent'])) {
-                        $field['parent'] = $fieldMap[$field['parent']];
-                    }
-                }
-
-                unset($field['form']);
-
-                if (isset($customComponents['fields'][$field['type']])) {
-                    // Set the custom parameters
-                    $field['customParameters'] = $customComponents['fields'][$field['type']];
-                }
-
-                $field['formId']     = $objectId;
-                $modifiedFields[$id] = $field;
-
-                if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
-                    $this->alreadyMappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
+            if (!$id) {
+                // Cloned entity
+                $id = $field['id'] = $field['sessionId'] = $fieldMap[$fieldId] = 'new'.hash('sha1', uniqid(mt_rand()));
+                if (isset($field['parent'])) {
+                    $field['parent'] = $fieldMap[$field['parent']];
                 }
             }
 
-            if (!$submitButton) { // means something deleted the submit button from the form
-                // add a submit button
-                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
-                $field = new Field();
+            unset($field['form']);
 
-                $modifiedFields[$keyId]                    = $field->convertToArray();
-                $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
-                $modifiedFields[$keyId]['alias']           = 'submit';
-                $modifiedFields[$keyId]['showLabel']       = 1;
-                $modifiedFields[$keyId]['type']            = 'button';
-                $modifiedFields[$keyId]['id']              = $keyId;
-                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
-                $modifiedFields[$keyId]['formId']          = $objectId;
-                unset($modifiedFields[$keyId]['form']);
+            if (isset($customComponents['fields'][$field['type']])) {
+                // Set the custom parameters
+                $field['customParameters'] = $customComponents['fields'][$field['type']];
             }
 
-            if (!empty($reorder)) {
-                uasort(
-                    $modifiedFields,
-                    fn ($a, $b): int => $a['order'] <=> $b['order']
-                );
+            $field['formId']     = $objectId;
+            $modifiedFields[$id] = $field;
+
+            if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
+                $this->alreadyMappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
             }
-
-            $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
-            $deletedFields = [];
-
-            // Load existing actions into session
-            $modifiedActions = [];
-            $existingActions = $entity->getActions()->toArray();
-
-            foreach ($existingActions as $formAction) {
-                // Check to see if the action still exists
-                if (!isset($customComponents['actions'][$formAction->getType()])) {
-                    continue;
-                }
-
-                $id     = $formAction->getId();
-                $action = $formAction->convertToArray();
-
-                if (!$id) {
-                    // Cloned entity so use a random Id instead
-                    $action['id'] = $id = 'new'.hash('sha1', uniqid(mt_rand()));
-                }
-                unset($action['form']);
-
-                $modifiedActions[$id] = $action;
-            }
-
-            if (!empty($reorder)) {
-                uasort(
-                    $modifiedActions,
-                    fn ($a, $b): int => $a['order'] <=> $b['order']
-                );
-            }
-
-            $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
-            $deletedActions = [];
         }
+
+        if (!$submitButton) { // means something deleted the submit button from the form
+            // add a submit button
+            $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+            $field = new Field();
+
+            $modifiedFields[$keyId]                    = $field->convertToArray();
+            $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['alias']           = 'submit';
+            $modifiedFields[$keyId]['showLabel']       = 1;
+            $modifiedFields[$keyId]['type']            = 'button';
+            $modifiedFields[$keyId]['id']              = $keyId;
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-ghost"';
+            $modifiedFields[$keyId]['formId']          = $objectId;
+            unset($modifiedFields[$keyId]['form']);
+        }
+
+        if (!empty($reorder)) {
+            uasort(
+                $modifiedFields,
+                fn ($a, $b): int => $a['order'] <=> $b['order'] ?: $a['id'] <=> $b['id']
+            );
+        }
+
+        $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
+        $deletedFields = [];
+
+        // Load existing actions into session
+        $modifiedActions = [];
+        $existingActions = $entity->getActions()->toArray();
+
+        foreach ($existingActions as $formAction) {
+            // Check to see if the action still exists
+            if (!isset($customComponents['actions'][$formAction->getType()])) {
+                continue;
+            }
+
+            $id     = $formAction->getId();
+            $action = $formAction->convertToArray();
+
+            if (!$id) {
+                // Cloned entity so use a random Id instead
+                $action['id'] = $id = 'new'.hash('sha1', uniqid(mt_rand()));
+            }
+            unset($action['form']);
+
+            $modifiedActions[$id] = $action;
+        }
+
+        if (!empty($reorder)) {
+            uasort(
+                $modifiedActions,
+                fn ($a, $b): int => $a['order'] <=> $b['order']
+            );
+        }
+
+        $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
+        $deletedActions = [];
 
         return $this->delegateView(
             [
@@ -878,7 +868,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -1021,7 +1011,7 @@ class FormController extends CommonFormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'form.form');
             }
@@ -1091,7 +1081,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {
@@ -1153,7 +1143,7 @@ class FormController extends CommonFormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var FormModel $model */
             $model = $this->getModel('form');
             $ids   = json_decode($request->query->get('ids', ''));
@@ -1174,7 +1164,7 @@ class FormController extends CommonFormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {

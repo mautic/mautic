@@ -267,7 +267,7 @@ class ContactSegmentService
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($leadsTableAlias.'.date_identified'));
     }
 
-    /***** DEBUG *****/
+    /* DEBUG */
 
     /**
      * Formatting helper.

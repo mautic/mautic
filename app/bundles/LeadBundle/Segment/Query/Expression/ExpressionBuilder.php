@@ -18,7 +18,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function between($x, $arr): string
     {
-        if (!is_array($arr) || 2 != count($arr)) {
+        if (!is_array($arr) || 2 !== count($arr)) {
             throw new SegmentQueryException('Between expression expects second argument to be an array with exactly two elements');
         }
 
@@ -112,6 +112,6 @@ class ExpressionBuilder extends BaseExpressionBuilder
             $additionArguments[$k] = is_numeric($v) && intval($v) === $v ? $v : $this->literal($v);
         }
 
-        return $func.'('.$x.(count($additionArguments) ? ', ' : '').join(',', $additionArguments).')';
+        return $func.'('.$x.(count($additionArguments) ? ', ' : '').implode(',', $additionArguments).')';
     }
 }

@@ -6,18 +6,17 @@ namespace Mautic\CoreBundle\Tests\Unit\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\InvalidStateException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalState;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class ProcessSignalTest extends TestCase
+final class ProcessSignalTest extends TestCase
 {
     public function testGetData(): void
     {
         $data  = ['key' => 'value'];
         $state = new ProcessSignalState($data);
 
-        Assert::assertSame($data, $state->getData());
+        $this->assertSame($data, $state->getData());
     }
 
     public function testToString(): void
@@ -25,7 +24,7 @@ class ProcessSignalTest extends TestCase
         $data  = ['key' => 'value'];
         $state = new ProcessSignalState($data);
 
-        Assert::assertSame('<<<StartOfState>>>{"key":"value"}<<<EndOfState>>>', (string) $state);
+        $this->assertSame('<<<StartOfState>>>{"key":"value"}<<<EndOfState>>>', (string) $state);
     }
 
     /**

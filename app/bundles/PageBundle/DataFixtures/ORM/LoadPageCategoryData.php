@@ -11,7 +11,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private CategoryModel $categoryModel,
+        private readonly CategoryModel $categoryModel,
     ) {
     }
 
@@ -30,7 +30,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $this->setReference('page-cat-1', $cat);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

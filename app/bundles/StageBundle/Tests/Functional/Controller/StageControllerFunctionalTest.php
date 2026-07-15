@@ -7,17 +7,16 @@ namespace Mautic\StageBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\Stage;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class StageControllerFunctionalTest extends MauticMysqlTestCase
+final class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testStageMenuString(): void
     {
         $stage = $this->client->request(Request::METHOD_GET, '/s/stages');
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $stageMenuString = $stage->filterXPath('//a[@id="mautic_stage_index"]');
-        Assert::assertStringContainsString('Stages', $stageMenuString->text());
+        $this->assertStringContainsString('Stages', $stageMenuString->text());
     }
 
     public function testStageWithProject(): void
@@ -42,6 +41,7 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedStage = $this->em->find(Stage::class, $stage->getId());
-        Assert::assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
+        $this->assertInstanceOf(Stage::class, $savedStage);
+        $this->assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
     }
 }

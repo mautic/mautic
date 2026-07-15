@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use LightSaml\Credential\X509Credential;
@@ -8,12 +10,12 @@ use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CredentialsStoreTest extends TestCase
+final class CredentialsStoreTest extends TestCase
 {
     private string $cacheDir;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -27,7 +29,7 @@ class CredentialsStoreTest extends TestCase
     {
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
-        $this->assertEquals([], $store->getByEntityId('barfoo'));
+        $this->assertSame([], $store->getByEntityId('barfoo'));
     }
 
     public function testDefaultCredentialsAreUsedIfSamlIsDisabled(): void

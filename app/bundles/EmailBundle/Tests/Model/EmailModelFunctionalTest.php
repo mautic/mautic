@@ -20,18 +20,22 @@ use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use PHPUnit\Framework\Assert;
 
-class EmailModelFunctionalTest extends MauticMysqlTestCase
+final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     private const EMAILS_A_MONTH = 2;
+
     private bool $useDefaultFrequencyRules;
+
     private EmailModel $emailModel;
 
     protected function setUp(): void
@@ -42,8 +46,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->configParams['email_frequency_time']   = 'MONTH';
         parent::setUp();
 
+        /** @var EmailModel $emailModel */
         $emailModel = static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
+        $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
 
@@ -60,11 +65,11 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail($segment);
 
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
-        $this->assertEquals($sentCount, 7);
+        $this->assertEquals(7, $sentCount);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
-        $this->assertEquals($sentCount, 8);
+        $this->assertEquals(8, $sentCount);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
-        $this->assertEquals($sentCount, 8);
+        $this->assertEquals(8, $sentCount);
     }
 
     public function testGetEmailGeneralStats(): void
@@ -136,8 +141,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;
@@ -196,21 +202,21 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail($segment);
 
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4, 2);
-        $this->assertEquals($sentCount, 4);
+        $this->assertEquals(4, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 3, 2);
-        $this->assertEquals($sentCount, 3);
+        $this->assertEquals(3, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 2);
-        $this->assertEquals($sentCount, 2);
+        $this->assertEquals(2, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4);
-        $this->assertEquals($sentCount, 1);
+        $this->assertEquals(1, $sentCount);
 
         $email                                              = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment]);
-        $this->assertEquals($sentCount, 10);
+        $this->assertEquals(10, $sentCount);
 
         $email                                              = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], null, 2);
-        $this->assertEquals($sentCount, 10);
+        $this->assertEquals(10, $sentCount);
     }
 
     public function testSendEmailToListsWithContinueSendingFalse(): void
@@ -263,15 +269,15 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $parentEmail->setName('Test change');
         $this->emailModel->saveEntity($parentEmail);
 
-        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
-        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
+        $this->assertSame($customHtmlParent, $parentEmail->getCustomHtml());
+        $this->assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
     }
 
     /**
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    private function emulateEmailStat(Lead $lead, Email $email, bool $isRead): void
+    private function emulateEmailStat(Lead $lead, Email $email, bool $isRead): Stat
     {
         $stat = new Stat();
         $stat->setEmailAddress('test@test.com');
@@ -280,6 +286,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $stat->setEmail($email);
         $stat->setIsRead($isRead);
         $this->em->persist($stat);
+
+        return $stat;
     }
 
     /**
@@ -328,6 +336,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $emailStat->setDateRead(new \DateTime());
         $emailStat->setOpenCount(1);
         $email = $emailStat->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
         $email->setReadCount($email->getReadCount() + 1);
         $this->em->persist($emailStat);
         $this->em->persist($email);
@@ -415,8 +424,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $this->emulateEmailStat($lead, $email, $l['read']);
 
             if ($l['read'] && $l['click']) {
-                $hits       = rand(1, 5);
-                $uniqueHits = rand(1, $hits);
+                $hits       = random_int(1, 5);
+                $uniqueHits = random_int(1, $hits);
                 $this->emulateClick($lead, $email, $hits, $uniqueHits);
             }
         }
@@ -529,6 +538,100 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEmpty($result['companies']);
     }
 
+    public function testGetEntityReturnsFreshPendingCountAfterPendingCacheInvalidation(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
+        $this->emailModel->invalidatePendingCountCacheForList($segment->getId());
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntityReturnsFreshPendingCountAfterSegmentListChangeEvent(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
+
+        static::getContainer()->get('event_dispatcher')->dispatch(
+            new ListChangeEvent($contacts[2], $segment, true),
+            LeadEvents::LEAD_LIST_CHANGE
+        );
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntityReturnsFreshPendingCountForSegmentEmail(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->assertInstanceOf(ListModel::class, $listModel);
+
+        foreach (array_slice($contacts, 2, 3) as $contact) {
+            $listModel->addLead($contact, $segment, true);
+        }
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntitiesReturnsFreshPendingCountForSegmentEmail(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->assertInstanceOf(ListModel::class, $listModel);
+
+        foreach (array_slice($contacts, 2, 3) as $contact) {
+            $listModel->addLead($contact, $segment, true);
+        }
+
+        $entities = $this->emailModel->getEntities([
+            'ids'              => [$email->getId()],
+            'ignore_paginator' => true,
+        ]);
+
+        $loadedEmail = null;
+        foreach ($entities as $entity) {
+            $loadedEmail = $entity;
+            break;
+        }
+
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
     /**
      * @return iterable<string, null[]>
      */
@@ -582,6 +685,108 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailIsNotPostponed();
     }
 
+    public function testGetEmailListStatsDateToIncludesTheWholeDay(): void
+    {
+        $contact  = $this->createContact();
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment([$contact], $segment);
+        $email   = $this->createEmail($segment);
+        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat->setDateSent(new \DateTime('2026-05-02 06:31:32'));
+        $this->em->flush();
+
+        $stats = $this->emailModel->getEmailListStats($email, false, new \DateTime('2026-05-01'), new \DateTime('2026-05-02'));
+        $data  = array_filter($stats['datasets'][0]['data'] ?? []);
+        $this->assertNotEmpty($data, 'The stats should not be empty');
+    }
+
+    public function testGetEmailGeneralStatsDateToIncludesTheWholeDay(): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTemplateEmail();
+        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat->setDateSent(new \DateTime('2026-03-13 19:01:54'));
+        $this->em->flush();
+
+        $stats = $this->emailModel->getEmailGeneralStats($email, false, null, new \DateTime('2026-03-12'), new \DateTime('2026-03-13'));
+        $data  = array_filter($stats['datasets'][0]['data'] ?? []);
+        $this->assertNotEmpty($data, 'The stats should not be empty');
+    }
+
+    public function testGetEmailsToSendWinnerVariantReturnsOnlyEligibleEmails(): void
+    {
+        [$eligibleParent]       = $this->createVariantPair('eligible', 90, 2);
+        [$defaultWeightParent]  = $this->createVariantPair('default-weight', 100, 2);
+        [$noDelayParent]        = $this->createVariantPair('no-delay', 90, 0);
+
+        $this->em->flush();
+
+        $ids = array_map(
+            static fn (Email $email): int => (int) $email->getId(),
+            $this->emailModel->getEmailsToSendWinnerVariant()
+        );
+
+        sort($ids);
+
+        $this->assertSame([(int) $eligibleParent->getId()], $ids);
+        $this->assertNotContains((int) $defaultWeightParent->getId(), $ids);
+        $this->assertNotContains((int) $noDelayParent->getId(), $ids);
+    }
+
+    public function testTimeLeftToDetermineWinnerReturnsFullDelayWithoutStatsAndVariantStartDate(): void
+    {
+        [$parent] = $this->createVariantPair('no-start-date', 90, 3);
+        $parent->setVariantStartDate(null);
+        $this->em->persist($parent);
+        $this->em->flush();
+
+        $this->assertSame(['hours' => 3, 'minutes' => 0], $this->emailModel->timeLeftToDetermineWinner((int) $parent->getId(), 3));
+    }
+
+    public function testIsReadyToSendWinnerDependsOnLastSentDate(): void
+    {
+        [$parent, $winner] = $this->createVariantPair('ready-check', 90, 1);
+        $contact           = $this->createContact();
+
+        $stat = new Stat();
+        $stat->setEmail($winner);
+        $stat->setLead($contact);
+        $stat->setEmailAddress($contact->getEmail());
+        $stat->setDateSent(new \DateTime('-3 hours', new \DateTimeZone('UTC')));
+        $this->em->persist($stat);
+        $this->em->flush();
+
+        $this->assertTrue($this->emailModel->isReadyToSendWinner((int) $parent->getId(), 1));
+
+        [$freshParent] = $this->createVariantPair('not-ready', 90, 1);
+        $this->em->flush();
+
+        $this->assertFalse($this->emailModel->isReadyToSendWinner((int) $freshParent->getId(), 1));
+    }
+
+    public function testConvertWinnerVariantCopiesPublishSettingsFromOldParent(): void
+    {
+        [$parent, $winner] = $this->createVariantPair('conversion', 90, 1);
+        $parent->setPublishUp(new \DateTime('2026-01-01 00:00:00', new \DateTimeZone('UTC')));
+        $parent->setPublishDown(new \DateTime('2026-01-31 23:59:59', new \DateTimeZone('UTC')));
+        $parent->setContinueSending(true);
+        $this->em->persist($parent);
+        $this->em->flush();
+
+        $this->emailModel->convertWinnerVariant($winner);
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var Email $winnerReloaded */
+        $winnerReloaded = $this->em->getRepository(Email::class)->find($winner->getId());
+
+        $this->assertInstanceOf(Email::class, $winnerReloaded);
+        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $winnerReloaded->getVariantParent());
+        $this->assertSame('2026-01-01 00:00:00', $winnerReloaded->getPublishUp()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-01-31 23:59:59', $winnerReloaded->getPublishDown()?->format('Y-m-d H:i:s'));
+        $this->assertTrue($winnerReloaded->getContinueSending());
+    }
+
     private function createContact(): Lead
     {
         $contact = new Lead();
@@ -591,6 +796,46 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
 
         return $contact;
+    }
+
+    /**
+     * @return array{0: Email, 1: Email}
+     */
+    private function createVariantPair(string $suffix, int $totalWeight, int $sendWinnerDelay): array
+    {
+        $parent = new Email();
+        $parent->setName('Parent '.$suffix);
+        $parent->setSubject('Parent '.$suffix);
+        $parent->setCustomHTML('parent-'.$suffix);
+        $parent->setEmailType('template');
+        $parent->setLanguage('en');
+        $parent->setIsPublished(true);
+        $parent->setContinueSending(true);
+        $parent->setVariantSettings([
+            'enableAbTest'    => true,
+            'totalWeight'     => $totalWeight,
+            'sendWinnerDelay' => $sendWinnerDelay,
+            'winnerCriteria'  => 'email.openrate',
+        ]);
+        $this->em->persist($parent);
+
+        $winner = new Email();
+        $winner->setName('Winner '.$suffix);
+        $winner->setSubject('Winner '.$suffix);
+        $winner->setCustomHTML('winner-'.$suffix);
+        $winner->setEmailType('template');
+        $winner->setLanguage('en');
+        $winner->setIsPublished(true);
+        $winner->setVariantParent($parent);
+        $winner->setVariantSettings([
+            'weight'         => 90,
+            'winnerCriteria' => 'email.openrate',
+        ]);
+        $parent->addVariantChild($winner);
+
+        $this->em->persist($winner);
+
+        return [$parent, $winner];
     }
 
     private function createTemplateEmail(): Email
@@ -653,24 +898,24 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsNotPostponed(): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
-        Assert::assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
+        $this->assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
     }
 
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $queuedMessages = $messageQueueRepository->findBy([]);
-        Assert::assertCount(1, $queuedMessages, 'Email should be postponed.');
+        $this->assertCount(1, $queuedMessages, 'Email should be postponed.');
 
         $queuedMessage = reset($queuedMessages);
-        Assert::assertInstanceOf(MessageQueue::class, $queuedMessage);
-        Assert::assertSame('email', $queuedMessage->getChannel());
-        Assert::assertSame($email->getId(), $queuedMessage->getChannelId());
-        Assert::assertSame($contact, $queuedMessage->getLead());
-        Assert::assertSame($queuedMessage::STATUS_PENDING, $queuedMessage->getStatus());
+        $this->assertInstanceOf(MessageQueue::class, $queuedMessage);
+        $this->assertSame('email', $queuedMessage->getChannel());
+        $this->assertSame($email->getId(), $queuedMessage->getChannelId());
+        $this->assertSame($contact, $queuedMessage->getLead());
+        $this->assertSame($queuedMessage::STATUS_PENDING, $queuedMessage->getStatus());
     }
 }

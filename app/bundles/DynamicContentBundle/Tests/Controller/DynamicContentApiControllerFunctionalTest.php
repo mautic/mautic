@@ -11,13 +11,12 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
+final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
 
@@ -63,7 +62,7 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $responseArray = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertSame('<some>content</some>', $responseArray['content']);
+        $this->assertSame('<some>content</some>', $responseArray['content']);
     }
 
     public function testCreateDwc(): void

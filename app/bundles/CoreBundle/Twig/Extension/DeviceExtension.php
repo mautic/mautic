@@ -10,10 +10,10 @@ use Twig\TwigFunction;
 
 class DeviceExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('deviceGetFullName', [AbstractDeviceParser::class, 'getFullName']),
+            new TwigFunction('deviceGetFullName', AbstractDeviceParser::getFullName(...)),
         ];
     }
 }

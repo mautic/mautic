@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Tests\Validator\Constraints;
 
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -9,12 +11,12 @@ use Mautic\DynamicContentBundle\Validator\Constraints\SlotNameTypeValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
+final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * @var DynamicContentModel|MockObject
      */
-    private $dynamicContentModel;
+    private ?MockObject $dynamicContentModel = null;
 
     protected function createValidator(): SlotNameTypeValidator
     {

@@ -9,7 +9,7 @@ class WakeupCall
         throw new \Exception('this should not have been executed');
     }
 
-    public function hello()
+    public function hello(): string
     {
         return 'test';
     }

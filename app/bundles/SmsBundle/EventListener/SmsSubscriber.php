@@ -6,7 +6,6 @@ use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -19,12 +18,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SmsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AuditLogModel $auditLogModel,
-        private TrackableModel $trackableModel,
-        private PageTokenHelper $pageTokenHelper,
-        private AssetTokenHelper $assetTokenHelper,
-        private SmsHelper $smsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
+        private readonly SmsHelper $smsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -73,7 +72,6 @@ class SmsSubscriber implements EventSubscriberInterface
 
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
-        /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();

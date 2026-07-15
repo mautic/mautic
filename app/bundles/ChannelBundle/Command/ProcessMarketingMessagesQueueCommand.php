@@ -23,23 +23,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private MessageQueueModel $messageQueueModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MessageQueueModel $messageQueueModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
                 '--channel',
                 '-c',
                 InputOption::VALUE_OPTIONAL,
-                'Channel to use for sending messages i.e. email, sms.',
-                null
+                'Channel to use for sending messages i.e. email, sms.'
             )
             ->addOption('--channel-id', '-i', InputOption::VALUE_REQUIRED, 'The ID of the message i.e. email ID, sms ID.')
             ->addOption('--message-id', '-m', InputOption::VALUE_REQUIRED, 'ID of a specific queued message')
@@ -47,8 +46,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                 '--limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
-                'Maximum number of messages to process',
-                null
+                'Maximum number of messages to process'
             )
             ->addOption(
                 '--batch',

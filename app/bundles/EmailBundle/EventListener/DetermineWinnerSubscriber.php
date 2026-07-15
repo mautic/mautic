@@ -14,8 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -44,7 +44,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $counts = $repo->getOpenedRates($ids, $startDate);
+            $counts = $repo->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
             $translator = $this->translator;
 
@@ -140,8 +140,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate);
-            $sentCounts         = $emailRepo->getSentCounts($ids, $startDate);
+            $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
+            $sentCounts         = $emailRepo->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
             $translator = $this->translator;
             if ($clickthroughCounts) {

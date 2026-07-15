@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 /**
  * This test is breaking other tests, so running it in a separate process.
@@ -26,15 +25,15 @@ final class JsControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/mtc.js');
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\')', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\')', (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexActionRendersSuccessfullyWithAnonymizeIp(): void
     {
         $this->client->request('GET', '/mtc.js');
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', (string) $this->client->getResponse()->getContent());
     }
 }

@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Appends contact segment IDs to tracking URLs for third-party integrations like VWO.
  */
-final class SegmentTrackingSubscriber implements EventSubscriberInterface
+final readonly class SegmentTrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -46,7 +46,7 @@ final class SegmentTrackingSubscriber implements EventSubscriberInterface
         }
 
         $segmentIds = $this->leadListRepository->getContactSegmentIds((string) $contactId);
-        if ($segmentIds) {
+        if ([] !== $segmentIds) {
             $this->appendSegmentIdsToUrl($event, $segmentIds);
         }
     }

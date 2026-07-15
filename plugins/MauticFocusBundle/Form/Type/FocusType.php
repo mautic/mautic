@@ -50,37 +50,37 @@ class FocusType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     /**
      * @var mixed[]
      */
-    private array $timezoneChoices;
+    private readonly array $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceTypesChoices;
+    private readonly array $deviceTypesChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceBrandsChoices;
+    private readonly array $deviceBrandsChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceOsChoices;
+    private readonly array $deviceOsChoices;
 
     /**
      * @var array<string, string>
@@ -88,11 +88,11 @@ class FocusType extends AbstractType
     private array $tagChoices = [];
 
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
         ListModel $listModel,
         LeadModel $leadModel,
-        private TranslatorInterface $translator,
-        private RelativeDate $relativeDate,
+        private readonly TranslatorInterface $translator,
+        private readonly RelativeDate $relativeDate,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();

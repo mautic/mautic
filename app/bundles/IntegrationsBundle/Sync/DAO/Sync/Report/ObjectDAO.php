@@ -36,10 +36,7 @@ class ObjectDAO
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addField(FieldDAO $fieldDAO)
+    public function addField(FieldDAO $fieldDAO): static
     {
         $this->fields[$fieldDAO->getName()] = $fieldDAO;
 

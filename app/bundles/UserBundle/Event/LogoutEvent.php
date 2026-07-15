@@ -11,15 +11,12 @@ class LogoutEvent extends Event
     private array $session = [];
 
     public function __construct(
-        private User $user,
-        private Request $request,
+        private readonly User $user,
+        private readonly Request $request,
     ) {
     }
 
-    /**
-     * @return User
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -34,18 +31,13 @@ class LogoutEvent extends Event
 
     /**
      * Get session items to be added after session has been cleared.
-     *
-     * @return array
      */
-    public function getPostSessionItems()
+    public function getPostSessionItems(): array
     {
         return $this->session;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

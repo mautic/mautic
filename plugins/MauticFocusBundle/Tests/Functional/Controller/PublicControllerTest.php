@@ -11,14 +11,13 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class PublicControllerTest extends MauticMysqlTestCase
+final class PublicControllerTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
 
@@ -30,7 +29,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/focus/check');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
-        Assert::assertSame('', $this->client->getResponse()->getContent());
+        $this->assertSame('', $this->client->getResponse()->getContent());
     }
 
     public function testCheckActionReturnsMatchingItemsForTrackedContactOnly(): void
@@ -60,10 +59,10 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $payload = json_decode((string) $response->getContent(), true);
-        Assert::assertSame($focus->getId(), $payload['focus_items'][0]['id']);
-        Assert::assertStringContainsString(sprintf('/focus/%d.js', $focus->getId()), $payload['focus_items'][0]['js_url']);
-        Assert::assertSame($matchingLead->getId(), $payload['id']);
-        Assert::assertArrayHasKey('device_id', $payload);
+        $this->assertSame($focus->getId(), $payload['focus_items'][0]['id']);
+        $this->assertStringContainsString(sprintf('/focus/%d.js', $focus->getId()), (string) $payload['focus_items'][0]['js_url']);
+        $this->assertSame($matchingLead->getId(), $payload['id']);
+        $this->assertArrayHasKey('device_id', $payload);
 
         // Non-matching contact gets nothing
         $ct = ClickthroughHelper::encodeArrayForUrl(['stat' => 'focus-tracking-hash-2']);
@@ -71,8 +70,8 @@ class PublicControllerTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
         // The endpoint is non-trackable: it must not have created leads or devices
-        Assert::assertSame($leadCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads'));
-        Assert::assertSame($deviceCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices'));
+        $this->assertSame($leadCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads'));
+        $this->assertSame($deviceCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices'));
     }
 
     /**
@@ -147,11 +146,11 @@ class PublicControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
 
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
-        Assert::assertCount(1, $redirects);
+        $this->assertCount(1, $redirects);
 
         /** @var Redirect $redirect */
         $redirect = reset($redirects);
-        Assert::assertSame($linkUrl, $redirect->getUrl());
+        $this->assertSame($linkUrl, $redirect->getUrl());
 
         $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $twig = $this->getContainer()->get('twig');
@@ -159,6 +158,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             $twig->addExtension(new \Twig\Extension\EscaperExtension());
         }
         $url = $twig->getRuntime(\Twig\Runtime\EscaperRuntime::class)->escape($url, 'js');
-        Assert::assertStringContainsString($url, $content);
+        $this->assertStringContainsString($url, (string) $content);
     }
 }

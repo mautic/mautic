@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\ListModel;
 class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private ListModel $segmentModel,
+        private readonly ListModel $segmentModel,
     ) {
     }
 
@@ -43,10 +43,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $this->segmentModel->rebuildListLeads($list);
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 5;
     }
