@@ -19,6 +19,7 @@ parameters:
 		- app/bundles
 		- app/migrations
 		- plugins
+		- utils
 	excludePaths:
 		- *.js.php
 		- *.less.php
@@ -192,6 +193,6 @@ services:
 		tags:
 			- phpstan.rules.rule
 	-
-		class: MauticPhpStan\Rule\AutowireMethodNameMustMatchClassRule
+		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
 		tags:
 			- phpstan.rules.rule

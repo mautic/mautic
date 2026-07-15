@@ -30,15 +30,8 @@ final class NoTablePrefixDefinitionInTestsRuleTest extends RuleTestCase
                 18,
             ],
         ]);
-    }
 
-    public function testSkipOtherConstant(): void
-    {
         $this->analyse([__DIR__.'/Fixture/DefineOtherConstantTest.php'], []);
-    }
-
-    public function testSkipNonTestFile(): void
-    {
         $this->analyse([__DIR__.'/Fixture/TablePrefixDefiner.php'], []);
     }
 }

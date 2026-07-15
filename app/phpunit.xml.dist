@@ -50,6 +50,8 @@
     <testsuite name="Static analysis rule tests">
       <directory>./../utils/rector/tests</directory>
       <directory>./../utils/phpstan/tests</directory>
+      <exclude>./../utils/rector/tests/*/Fixture</exclude>
+      <exclude>./../utils/phpstan/tests/Rule/Fixture</exclude>
     </testsuite>
   </testsuites>
   <php>
