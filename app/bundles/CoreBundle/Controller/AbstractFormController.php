@@ -16,6 +16,7 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * @param string $objectModel
+     *
      * @return RedirectResponse
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
