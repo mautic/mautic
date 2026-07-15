@@ -20,9 +20,9 @@ final class CampaignSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->subscriber = new CampaignSubscriber(
-            $this->createMock(LeadModel::class),
-            $this->createMock(TrackingHelper::class),
-            $this->createMock(RealTimeExecutioner::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(TrackingHelper::class),
+            $this->createStub(RealTimeExecutioner::class),
         );
     }
 
@@ -35,7 +35,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        self::assertTrue($event->getResult());
+        $this->assertTrue($event->getResult());
     }
 
     public function testOnCampaignTriggerDecisionMatchesLegacyWildcardRefererFilter(): void
@@ -47,7 +47,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        self::assertTrue($event->getResult());
+        $this->assertTrue($event->getResult());
     }
 
     public function testOnCampaignTriggerDecisionReturnsFalseWhenUrlDoesNotMatch(): void
@@ -59,7 +59,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        self::assertFalse($event->getResult());
+        $this->assertFalse($event->getResult());
     }
 
     public function testOnCampaignTriggerDecisionMatchesCommaSeparatedUrlFilters(): void
@@ -71,7 +71,7 @@ final class CampaignSubscriberTest extends TestCase
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
-        self::assertTrue($event->getResult());
+        $this->assertTrue($event->getResult());
     }
 
     private function createHitMock(string $url, ?string $referer): Hit&MockObject
@@ -87,7 +87,7 @@ final class CampaignSubscriberTest extends TestCase
     /**
      * @param array<string, string> $properties
      */
-    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): object
+    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): CampaignExecutionEvent
     {
         // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         return new CampaignExecutionEvent([
