@@ -11,7 +11,6 @@ use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -173,7 +172,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $form->setValues(['project_entity[name]' => '']);
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A name is required.', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('A name is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditProjectWithNoPermission(): void

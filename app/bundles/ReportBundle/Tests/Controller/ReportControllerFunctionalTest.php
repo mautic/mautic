@@ -18,7 +18,6 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,9 +43,9 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
-            Assert::assertNotNull($hit['id']);
-            Assert::assertNotNull($hit['title']);
-            Assert::assertNotNull($hit['hits']);
+            $this->assertNotNull($hit['id']);
+            $this->assertNotNull($hit['title']);
+            $this->assertNotNull($hit['hits']);
         }
     }
 
@@ -130,7 +129,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
-        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+        $this->assertSame($report->getId() + 1, $reportClone->getId());
     }
 
     public function testContactReportSqlInjectionDontWork(): void
@@ -287,7 +286,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Load view content as HTML and convert the report table to result array
         $result  = $this->parseReportTable($response->getContent());
 
-        Assert::assertSame($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testContactReportNotLikeExpression(): void
@@ -423,27 +422,22 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<mixed>[]
+     * @return \Iterator<(int|string), array<mixed>>
      */
-    public static function scheduleProvider(): array
+    public static function scheduleProvider(): \Iterator
     {
-        return [
-            'null_to_now'      => [null, null, null, SchedulerEnum::UNIT_NOW, null, null],
-            'null_to_daily'    => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'null_to_weekly'   => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'null_to_monthly'  => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST],
-
-            'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
-            'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
-
-            'weekly_to_daily'   => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null],
-            'weekly_to_weekly'  => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null],
-            'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'],
-
-            'monthly_to_daily'   => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null],
-            'monthly_to_weekly'  => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null],
-            'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
-        ];
+        yield 'null_to_now' => [null, null, null, SchedulerEnum::UNIT_NOW, null, null];
+        yield 'null_to_daily' => [null, null, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'null_to_weekly' => [null, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'null_to_monthly' => [null, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, SchedulerEnum::MONTH_FREQUENCY_FIRST];
+        yield 'daily_to_weekly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null];
+        yield 'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'];
+        yield 'weekly_to_daily' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'weekly_to_weekly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null];
+        yield 'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'];
+        yield 'monthly_to_daily' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null];
+        yield 'monthly_to_weekly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null];
+        yield 'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'];
     }
 
     public function testDescriptionIsNotEscaped(): void
@@ -549,19 +543,19 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
-        self::assertFileExists($csvPath);
+        $this->assertFileExists($csvPath);
 
         // Pretend Mautic has created a ZIP file as in \Mautic\ReportBundle\Scheduler\Model\FileHandler::zipIt
         $zipPath      = str_replace('.csv', '.zip', $csvPath);
         $bytesWritten = file_put_contents($zipPath, 'ZIP');
-        self::assertNotFalse($bytesWritten);
-        self::assertFileExists($zipPath);
+        $this->assertNotFalse($bytesWritten);
+        $this->assertFileExists($zipPath);
 
         $queuedMessage = self::getMailerMessagesByToAddress($toAddress);
 
-        self::assertCount(1, $queuedMessage);
-        self::assertFileExists($csvPath);
-        self::assertFileExists($zipPath);
+        $this->assertCount(1, $queuedMessage);
+        $this->assertFileExists($csvPath);
+        $this->assertFileExists($zipPath);
     }
 
     /**
@@ -673,7 +667,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -718,6 +712,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

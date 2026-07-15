@@ -65,7 +65,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
                 $leadsIds = array_column($qb->executeQuery()->fetchAllAssociative(), 'id');
-                if (0 === sizeof($leadsIds)) {
+                if (0 === count($leadsIds)) {
                     break;
                 }
                 foreach ($leadsIds as $leadId) {

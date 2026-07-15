@@ -63,14 +63,14 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/api/contacts/activity');
         self::assertResponseIsSuccessful();
-        Assert::assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('order', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('types', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('total', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('page', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('limit', json_decode($this->client->getResponse()->getContent(), true));
-        Assert::assertArrayHasKey('maxPages', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('order', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('types', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('total', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('page', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('limit', json_decode($this->client->getResponse()->getContent(), true));
+        $this->assertArrayHasKey('maxPages', json_decode($this->client->getResponse()->getContent(), true));
     }
 
     public function testSingleEndpointCanHandleMergedContactsPost(): void
@@ -577,10 +577,10 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $payload = json_decode($clientResponse->getContent(), true);
-        Assert::assertEquals(1, $payload['total']);
+        $this->assertEquals(1, $payload['total']);
         $contactFromApi = $payload['contacts'][$contact->getId()];
-        Assert::assertEquals($contact->getId(), $contactFromApi['id']);
-        Assert::assertEquals($contact->getFirstname(), $contactFromApi['fields']['all']['firstname']);
+        $this->assertEquals($contact->getId(), $contactFromApi['id']);
+        $this->assertEquals($contact->getFirstname(), $contactFromApi['fields']['all']['firstname']);
     }
 
     public function testSingleNewEndpointCreateAndUpdate(): void
@@ -1119,7 +1119,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($clientResponse->getContent(), true);
 
-        self::assertCount(3, $response['contacts']);
+        $this->assertCount(3, $response['contacts']);
 
         $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertSame($contact1->getId(), $response['contacts'][0]['id']);
@@ -1172,11 +1172,11 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful($clientResponse->getContent());
         $activityResponse = json_decode($clientResponse->getContent(), true);
-        Assert::assertCount(2, $activityResponse['events']); // identified and dnc added events
+        $this->assertCount(2, $activityResponse['events']); // identified and dnc added events
         $dncEvents = array_values(array_filter($activityResponse['events'], fn (array $event): bool => 'lead.donotcontact' === $event['event']));
-        Assert::assertCount(1, $dncEvents);
-        Assert::assertSame('Email', $dncEvents[0]['eventLabel']);
-        Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
+        $this->assertCount(1, $dncEvents);
+        $this->assertSame('Email', $dncEvents[0]['eventLabel']);
+        $this->assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
 
         // Remove DNC from the contact.
         $this->client->request(Request::METHOD_POST, "/api/contacts/{$contactId}/dnc/{$dncChannel}/remove");
