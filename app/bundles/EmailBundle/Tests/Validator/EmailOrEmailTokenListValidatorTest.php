@@ -71,7 +71,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $validator->initialize($context);
         $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(['allowMultiple' => false]));
 
-        Assert::assertSame(1, $context->violationCount);
+        $this->assertSame(1, $context->violationCount);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
@@ -143,7 +143,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $emaiOrEmailTokenListValidator->initialize($context);
         $emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList());
 
-        Assert::assertSame($expectedViolationCount, $context->violationCount);
+        $this->assertSame($expectedViolationCount, $context->violationCount);
     }
 
     /**

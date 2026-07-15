@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(InputHelper::class)]
@@ -137,7 +136,7 @@ final class InputHelperTest extends TestCase
     {
         $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
 
-        Assert::assertEquals($cleanedUrl, $outputUrl);
+        $this->assertEquals($cleanedUrl, $outputUrl);
     }
 
     /**
@@ -259,7 +258,7 @@ final class InputHelperTest extends TestCase
     {
         $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
 
-        Assert::assertSame($cleanedUrl, $outputFilename);
+        $this->assertSame($cleanedUrl, $outputFilename);
     }
 
     /**
