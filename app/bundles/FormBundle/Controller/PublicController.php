@@ -152,8 +152,8 @@ final class PublicController extends CommonFormController
             $returnPort   = parse_url($return, PHP_URL_PORT);
 
             // Normalize ports: null means default port for the scheme
-            $sitePort   = $sitePort ?? ('https' === $siteScheme ? 443 : 80);
-            $returnPort = $returnPort ?? ('https' === $returnScheme ? 443 : 80);
+            $sitePort ??= 'https' === $siteScheme ? 443 : 80;
+            $returnPort ??= 'https' === $returnScheme ? 443 : 80;
 
             if ($siteHost && strtolower($siteScheme) === strtolower($returnScheme)
                 && strtolower($siteHost) === strtolower($returnHost)
