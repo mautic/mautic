@@ -72,6 +72,7 @@ return RectorConfig::configure()
         ResponseReturnTypeControllerActionRector::class => [
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
             __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,

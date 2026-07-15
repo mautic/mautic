@@ -16,8 +16,9 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * @param string $objectModel
+     * @return RedirectResponse
      */
-    public function unlockAction(Request $request, $objectId, $objectModel): RedirectResponse
+    public function unlockAction(Request $request, $objectId, $objectModel)
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
