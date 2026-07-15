@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
-use PHPUnit\Framework\Assert;
 
 final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
 {
@@ -26,6 +25,6 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
 
         $integrationConfig = $integrationRepository->findOneBy(['name' => $integration->getName()]);
         $this->assertInstanceOf(Integration::class, $integrationConfig);
-        Assert::assertSame('messaging_sid', $integrationConfig->getFeatureSettings()['messaging_service_sid']);
+        $this->assertSame('messaging_sid', $integrationConfig->getFeatureSettings()['messaging_service_sid']);
     }
 }

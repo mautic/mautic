@@ -10,7 +10,6 @@ use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -37,8 +36,8 @@ final class PasswordSubscriberTest extends TestCase
     public function testThatItIsSubscribedToEvents(): void
     {
         $subscribedEvents = PasswordSubscriber::getSubscribedEvents();
-        Assert::assertCount(1, $subscribedEvents);
-        Assert::assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
+        $this->assertCount(1, $subscribedEvents);
+        $this->assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
     }
 
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void

@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Type;
 use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeImmutableType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class UTCDateTimeImmutableTypeTest extends TestCase
@@ -32,7 +31,7 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
     public function testConvertToDatabaseValueWithNull(): void
     {
-        Assert::assertNull($this->type->convertToDatabaseValue(null, $this->platform));
+        $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
@@ -42,13 +41,13 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
         $databaseValue = $this->type->convertToDatabaseValue(new \DateTimeImmutable($date), $this->platform);
 
-        Assert::assertIsString($databaseValue);
-        Assert::assertSame($this->convertDateTimezone($date, $timezone, 'UTC'), $databaseValue, 'Database value should be converted to UTC.');
+        $this->assertIsString($databaseValue);
+        $this->assertSame($this->convertDateTimezone($date, $timezone, 'UTC'), $databaseValue, 'Database value should be converted to UTC.');
     }
 
     public function testConvertToPHPValueWithNull(): void
     {
-        Assert::assertNull($this->type->convertToPHPValue(null, $this->platform));
+        $this->assertNull($this->type->convertToPHPValue(null, $this->platform));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
@@ -58,8 +57,8 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
         $phpValue = $this->type->convertToPHPValue($date, $this->platform);
 
-        Assert::assertInstanceOf(\DateTimeImmutable::class, $phpValue);
-        Assert::assertSame($this->convertDateTimezone($date, 'UTC', $timezone), $phpValue->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $phpValue);
+        $this->assertSame($this->convertDateTimezone($date, 'UTC', $timezone), $phpValue->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
     }
 
     /**

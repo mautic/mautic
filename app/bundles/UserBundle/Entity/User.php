@@ -308,7 +308,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
-        if ($data instanceof User) {
+        if ($data instanceof self) {
             $isNewUser        = !$data->getId();
             $hasPlainPassword = !empty($data->getPlainPassword());
 
