@@ -204,7 +204,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
                         $formModifier(new FormEvent($form, $data));
 
-                        Assert::assertSame(2, $form->addMethodCallCounter);
+                        $this->assertSame(2, $form->addMethodCallCounter);
                     };
                     $callback($parameters[1]);
                 }

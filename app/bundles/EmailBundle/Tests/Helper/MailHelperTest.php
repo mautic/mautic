@@ -29,7 +29,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -525,17 +524,14 @@ final class MailHelperTest extends TestCase
 
         $mailer->flushQueue([]);
 
-        self::assertEmpty($mailer->getErrors()['failures']);
+        $this->assertEmpty($mailer->getErrors()['failures']);
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
 
         $this->assertCount(3, $fromAddresses);
         $this->assertCount(3, $metadatas);
-        self::assertSame(
-            ['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'],
-            $fromAddresses
-        );
+        $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
     }
 
     public function testGlobalFromThatAllFromAddressesAreTheSame(): void
@@ -717,25 +713,23 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function provideEmails(): array
+    public static function provideEmails(): \Iterator
     {
-        return [
-            ['john@doe.com', true],
-            ['john@doe.email', true],
-            ['john@doe.whatevertldtheycomewithinthefuture', true],
-            ['john.doe@email.com', true],
-            ['john+doe@email.com', true],
-            ['john@doe', false],
-            ['jo hn@doe.email', false],
-            ['jo^hn@doe.email', false],
-            ['jo\'hn@doe.email', false],
-            ['jo;hn@doe.email', false],
-            ['jo&hn@doe.email', false],
-            ['jo*hn@doe.email', false],
-            ['jo%hn@doe.email', false],
-        ];
+        yield ['john@doe.com', true];
+        yield ['john@doe.email', true];
+        yield ['john@doe.whatevertldtheycomewithinthefuture', true];
+        yield ['john.doe@email.com', true];
+        yield ['john+doe@email.com', true];
+        yield ['john@doe', false];
+        yield ['jo hn@doe.email', false];
+        yield ['jo^hn@doe.email', false];
+        yield ['jo\'hn@doe.email', false];
+        yield ['jo;hn@doe.email', false];
+        yield ['jo&hn@doe.email', false];
+        yield ['jo*hn@doe.email', false];
+        yield ['jo%hn@doe.email', false];
     }
 
     public function testValidateEmailWithoutTld(): void
@@ -1103,14 +1097,12 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return array<array<bool|int|string>>
+     * @return \Iterator<(int|string), array<(bool|int|string)>>
      */
-    public static function minifyHtmlDataProvider(): array
+    public static function minifyHtmlDataProvider(): \Iterator
     {
-        return [
-            [false, self::MINIFY_HTML, self::MINIFY_HTML],
-            [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)],
-        ];
+        yield [false, self::MINIFY_HTML, self::MINIFY_HTML];
+        yield [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)];
     }
 
     public function testHeadersAreTokenized(): void
@@ -1145,20 +1137,17 @@ final class MailHelperTest extends TestCase
             $realHeaders[$header->getName()] = $header->getBodyAsString();
         }
 
-        self::assertSame(
-            $realHeaders,
-            [
-                'To'                    => 'contact1@somewhere.com',
-                'From'                  => 'No Body <nobody@nowhere.com>',
-                'Sender'                => 'No Body <nobody@nowhere.com>',
-                'Reply-To'              => 'nobody@nowhere.com',
-                'Subject'               => 'Test',
-                'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
-                'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
-                'List-Unsubscribe'      => '<{unsubscribe_url}>',
-                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
-            ]
-        );
+        $this->assertSame($realHeaders, [
+            'To'                    => 'contact1@somewhere.com',
+            'From'                  => 'No Body <nobody@nowhere.com>',
+            'Sender'                => 'No Body <nobody@nowhere.com>',
+            'Reply-To'              => 'nobody@nowhere.com',
+            'Subject'               => 'Test',
+            'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
+            'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
+            'List-Unsubscribe'      => '<{unsubscribe_url}>',
+            'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+        ]);
     }
 
     public function testThatHtmlIsCorrectlyProcessedWhenTheAreEmbeddedImages(): void
@@ -1203,7 +1192,7 @@ final class MailHelperTest extends TestCase
 
         $metadata = $transport->getMessage()->getMetadata();
         foreach ($this->contacts as $contact) {
-            Assert::assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
+            $this->assertMatchesRegularExpression('#^http:\/\/tracking\.url\?ct=[A-Za-z0-9%]+$#', $metadata[$contact['email']]['tokens']['{tracking_pixel}']);
         }
     }
 
@@ -1504,17 +1493,14 @@ final class MailHelperTest extends TestCase
             $mailer->message->getBody();
             $this->fail('The body should be empty before send');
         } catch (LogicException $e) {
-            Assert::assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
+            $this->assertSame('A message must have a text or an HTML part or attachments.', $e->getMessage());
         }
 
-        Assert::assertSame($trackedHtml, $mailer->getBody());
+        $this->assertSame($trackedHtml, $mailer->getBody());
         $mailer->send(true);
 
-        Assert::assertMatchesRegularExpression(
-            '#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#',
-            $mailer->message->getHtmlBody()
-        );
-        Assert::assertSame($trackedHtml, $mailer->getBody());
+        $this->assertMatchesRegularExpression('#^Text <a href="https://mautic\.com">Mautic</a> <img src="cid:abc" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79" /> <img src="cid:2cb7cfd2ffccfbbbaf0e4d8891df2d79"/> <img src="https://mautic\.com/fake\.jpg">\{unsubscribe_url\}<img height="1" width="1" src="/tracking\.gif\?ct=[A-Za-z0-9%]+" alt="" />$#', $mailer->message->getHtmlBody());
+        $this->assertSame($trackedHtml, $mailer->getBody());
     }
 
     public function testEmailWithDefaultSignature(): void
@@ -1557,7 +1543,7 @@ final class MailHelperTest extends TestCase
         $mailer->addTo($this->contacts[0]['email']);
 
         $onSendDispatchCount = 0;
-        $eventDispatcher->expects(self::atLeastOnce())
+        $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->willReturnCallback(function (object $event, ?string $eventName = null) use (&$onSendDispatchCount): object {
                 if ($event instanceof EmailSendEvent && EmailEvents::EMAIL_ON_SEND === $eventName) {
@@ -1573,9 +1559,9 @@ final class MailHelperTest extends TestCase
         $email->setCustomHtml('{signature}');
         $mailer->setEmail($email);
 
-        Assert::assertNull($mailer->message->getHtmlBody());
+        $this->assertNull($mailer->message->getHtmlBody());
         $mailer->send(true);
-        Assert::assertSame(1, $onSendDispatchCount);
-        Assert::assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
+        $this->assertSame(1, $onSendDispatchCount);
+        $this->assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
     }
 }

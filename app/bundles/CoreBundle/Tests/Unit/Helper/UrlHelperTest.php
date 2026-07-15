@@ -111,7 +111,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('provideUrlsForSanitizeQueryParameters')]
     public function testSanitizeQueryParameters(string $url, string $expected): void
     {
-        self::assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
+        $this->assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
     }
 
     public static function provideUrlsForSanitizeQueryParameters(): \Generator

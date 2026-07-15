@@ -81,7 +81,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->method('has')
             ->with('parameter_bag')
             ->willReturn(true);
-        $containerMock->expects(self::once())
+        $containerMock->expects($this->once())
             ->method('get')
             ->with('parameter_bag')
             ->willReturn($parameterBag);

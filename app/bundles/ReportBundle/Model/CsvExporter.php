@@ -76,7 +76,7 @@ class CsvExporter
     private function putRow($handle, array $row): void
     {
         if ($this->coreParametersHelper->get('csv_always_enclose')) {
-            fputs($handle, '"'.implode('","', $row).'"'."\n");
+            fwrite($handle, '"'.implode('","', $row).'"'."\n");
         } else {
             CsvHelper::putCsv($handle, $row);
         }

@@ -249,7 +249,7 @@ final class WebhookModelTest extends TestCase
             ->with('test-webhook.com', $responsePayload)
             ->willReturn(new Response(200, [], 'Success'));
 
-        self::assertTrue($this->model->processWebhook($webhook, $queue));
+        $this->assertTrue($this->model->processWebhook($webhook, $queue));
     }
 
     public function testMinAndMaxQueueIdWhenNoneIsSet(): void
