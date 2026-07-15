@@ -17,7 +17,6 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -170,8 +169,8 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->callback(
                     function (TokenReplacementEvent $event) use ($lead): true {
-                        Assert::assertSame('{contactfield=active-field}', $event->getContent());
-                        Assert::assertSame($lead, $event->getLead());
+                        $this->assertSame('{contactfield=active-field}', $event->getContent());
+                        $this->assertSame($lead, $event->getLead());
 
                         // Emulate a subscriber.
                         $event->setContent('replaced.token@email.address');
@@ -239,6 +238,6 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
 
-        Assert::assertSame(1, $emailSendEvent->getTokenMethodCallCounter);
+        $this->assertSame(1, $emailSendEvent->getTokenMethodCallCounter);
     }
 }

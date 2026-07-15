@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -60,7 +59,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
-        Assert::assertFileExists($filePath);
+        $this->assertFileExists($filePath);
 
         $link = $this->router->generate(
             'mautic_contact_export_download',
@@ -76,7 +75,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             UrlGeneratorInterface::ABSOLUTE_URL
         );
         $this->client->request(Request::METHOD_GET, $notFoundLink);
-        Assert::assertTrue($this->client->getResponse()->isNotFound());
+        $this->assertTrue($this->client->getResponse()->isNotFound());
     }
 
     private function createContacts(): void
@@ -104,7 +103,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     {
         $repo    = $this->em->getRepository(ContactExportScheduler::class);
         $allRows = $repo->findAll();
-        Assert::assertCount($count, $allRows);
+        $this->assertCount($count, $allRows);
 
         return $allRows;
     }

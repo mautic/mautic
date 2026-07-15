@@ -28,7 +28,6 @@ use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -161,11 +160,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         foreach ($this->provideSegments() as $segmentAlias => $expectedCount) {
             $reference       = $this->getReference($segmentAlias);
             $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($reference);
-            Assert::assertEquals(
-                $expectedCount,
-                $segmentContacts[$reference->getId()]['count'],
-                sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias)
-            );
+            $this->assertEquals($expectedCount, $segmentContacts[$reference->getId()]['count'], sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias));
         }
     }
 
@@ -242,7 +237,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Secondary Company', 'segment-secondary-company');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertContains($lead->getId(), $leadIds);
+        $this->assertContains($lead->getId(), $leadIds);
 
         $primarySegment = $this->createSegment([
             [
@@ -257,7 +252,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Primary Company', 'segment-primary-company');
         $primaryLeadIds = $this->getSegmentLeadIds($primarySegment);
 
-        Assert::assertNotContains($lead->getId(), $primaryLeadIds);
+        $this->assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
     public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
@@ -279,9 +274,9 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Company All Not Like', 'segment-company-all-not-like');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertContains($leadWithCompany->getId(), $leadIds);
-        Assert::assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
-        Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
+        $this->assertContains($leadWithCompany->getId(), $leadIds);
+        $this->assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
     }
 
     public function testSegmentCanCombineContactAndCompanyTags(): void
@@ -325,9 +320,9 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Contact and Company Tags', 'segment-contact-company-tags');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertContains($leadWithBothTags->getId(), $leadIds);
-        Assert::assertNotContains($leadWithoutCompanyTag->getId(), $leadIds);
-        Assert::assertNotContains($leadWithoutAnyCompany->getId(), $leadIds);
+        $this->assertContains($leadWithBothTags->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompanyTag->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutAnyCompany->getId(), $leadIds);
     }
 
     public function testCompanyTagsEmptyFilterExcludesContactsWithoutCompanies(): void
@@ -355,10 +350,10 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Company Tags Empty', 'segment-company-tags-empty');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertNotContains($leadWithTaggedCompany->getId(), $leadIds);
-        Assert::assertContains($leadWithUntaggedCompany->getId(), $leadIds);
-        Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
-        Assert::assertGreaterThan(1, count($leadIds));
+        $this->assertNotContains($leadWithTaggedCompany->getId(), $leadIds);
+        $this->assertContains($leadWithUntaggedCompany->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
+        $this->assertGreaterThan(1, count($leadIds));
     }
 
     public function testSegmentRebuildCommand(): void
@@ -490,12 +485,12 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);
 
         $leads = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertCount(50, $leads[$segment->getId()]);
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertCount(50, $leads[$segment->getId()]);
 
         $leadsSubset = array_column(array_slice($leads[$segment->getId()], 0, 15), 'id');
         $leads       = $this->contactSegmentService->getNewLeadListLeads($segment, ['ids' => $leadsSubset]);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
     }
 }

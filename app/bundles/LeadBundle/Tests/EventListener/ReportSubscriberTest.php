@@ -28,7 +28,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -1041,7 +1040,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 
     public function testOnReportColumnCollectForContact(): void
@@ -1086,6 +1085,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 }

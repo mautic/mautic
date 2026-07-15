@@ -33,7 +33,7 @@ class WebhookQueue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(WebhookQueue::TABLE_NAME)
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addBigIntIdField();
         $builder->createManyToOne('webhook', 'Webhook')
@@ -133,7 +133,7 @@ class WebhookQueue
         return $this->retries;
     }
 
-    public function setRetries(int $retries): WebhookQueue
+    public function setRetries(int $retries): self
     {
         $this->retries = $retries;
 
@@ -145,7 +145,7 @@ class WebhookQueue
         return $this->dateModified;
     }
 
-    public function setDateModified(?\DateTimeImmutable $dateModified): WebhookQueue
+    public function setDateModified(?\DateTimeImmutable $dateModified): self
     {
         $this->dateModified = $dateModified;
 
