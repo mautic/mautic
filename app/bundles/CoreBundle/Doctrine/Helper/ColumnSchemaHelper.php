@@ -155,7 +155,7 @@ class ColumnSchemaHelper
      * @throws SchemaException
      * @throws \OutOfRangeException
      */
-    public function updateColumnLength(string $column, ?int $length): ColumnSchemaHelper
+    public function updateColumnLength(string $column, ?int $length): self
     {
         if (empty($column)) {
             throw new SchemaException('The column name is should not be empty/missing.');

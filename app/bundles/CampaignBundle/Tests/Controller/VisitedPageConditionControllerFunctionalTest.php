@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
@@ -55,7 +54,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
     }
 
     /**
