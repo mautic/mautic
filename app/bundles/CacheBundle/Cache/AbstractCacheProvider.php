@@ -17,11 +17,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractCacheProvider implements CacheProviderInterface
 {
     private ?AdapterInterface $adapter = null;
+
     private ?Psr16Cache $psr16         = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private ContainerInterface $container,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ContainerInterface $container,
     ) {
     }
 
@@ -29,7 +30,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
 
     public function getSimpleCache(): Psr16Cache
     {
-        if (is_null($this->psr16)) {
+        if (null === $this->psr16) {
             $this->psr16 = new Psr16Cache($this->getCacheAdapter());
         }
 

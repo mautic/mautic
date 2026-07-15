@@ -10,10 +10,7 @@ use Mautic\UserBundle\Entity\User;
  */
 class AuditLogModel extends AbstractCommonModel
 {
-    /**
-     * @return \Mautic\CoreBundle\Entity\AuditLogRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\CoreBundle\Entity\AuditLogRepository
     {
         return $this->em->getRepository(AuditLog::class);
     }

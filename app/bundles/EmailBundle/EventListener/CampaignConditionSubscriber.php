@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailValidator $validator,
+        private readonly EmailValidator $validator,
     ) {
     }
 
@@ -38,14 +38,16 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {
         try {
             $this->validator->validate($event->getLead()->getEmail(), true);
         } catch (UnexpectedValueException|InvalidEmailException) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
-        return $event->setResult(true);
+        $event->setResult(true);
     }
 }

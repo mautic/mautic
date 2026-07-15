@@ -9,8 +9,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotifyOfFailureSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private NotificationHelper $notificationHelper)
-    {
+    public function __construct(
+        private readonly NotificationHelper $notificationHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -33,10 +33,10 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
 
     public function __construct(
-        private RequestStack $requestStack,
-        private LeadModel $leadModel,
-        private ExportHelper $exportHelper,
-        private MailHelper $mailHelper,
+        private readonly RequestStack $requestStack,
+        private readonly LeadModel $leadModel,
+        private readonly ExportHelper $exportHelper,
+        private readonly MailHelper $mailHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -42,30 +44,28 @@ final class FieldAliasToFqcnMapTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function aliasFqcnProvider(): array
+    public static function aliasFqcnProvider(): \Iterator
     {
-        return [
-            ['boolean', BooleanType::class],
-            ['country', CountryType::class],
-            ['date', DateType::class],
-            ['datetime', DateTimeType::class],
-            ['email', EmailType::class],
-            ['hidden', HiddenType::class],
-            ['locale', LocaleType::class],
-            ['lookup', LookupType::class],
-            ['multiselect', MultiselectType::class],
-            ['number', NumberType::class],
-            ['region', RegionType::class],
-            ['select', SelectType::class],
-            ['tel', TelType::class],
-            ['text', TextType::class],
-            ['textarea', TextareaType::class],
-            ['time', TimeType::class],
-            ['timezone', TimezoneType::class],
-            ['url', UrlType::class],
-            ['html', HtmlType::class],
-        ];
+        yield ['boolean', BooleanType::class];
+        yield ['country', CountryType::class];
+        yield ['date', DateType::class];
+        yield ['datetime', DateTimeType::class];
+        yield ['email', EmailType::class];
+        yield ['hidden', HiddenType::class];
+        yield ['locale', LocaleType::class];
+        yield ['lookup', LookupType::class];
+        yield ['multiselect', MultiselectType::class];
+        yield ['number', NumberType::class];
+        yield ['region', RegionType::class];
+        yield ['select', SelectType::class];
+        yield ['tel', TelType::class];
+        yield ['text', TextType::class];
+        yield ['textarea', TextareaType::class];
+        yield ['time', TimeType::class];
+        yield ['timezone', TimezoneType::class];
+        yield ['url', UrlType::class];
+        yield ['html', HtmlType::class];
     }
 }

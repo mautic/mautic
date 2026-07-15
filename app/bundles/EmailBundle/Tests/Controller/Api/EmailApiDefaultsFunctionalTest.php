@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,6 +47,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 
         // Re-authenticate: setUpSymfony() destroys the previous client and its security token.
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $payload = [
@@ -59,21 +59,21 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 
-        Assert::assertSame('config-source', $response['utmTags']['utmSource']);
-        Assert::assertSame('config-medium', $response['utmTags']['utmMedium']);
-        Assert::assertSame('config-campaign', $response['utmTags']['utmCampaign']);
-        Assert::assertSame('config-content', $response['utmTags']['utmContent']);
+        $this->assertSame('config-source', $response['utmTags']['utmSource']);
+        $this->assertSame('config-medium', $response['utmTags']['utmMedium']);
+        $this->assertSame('config-campaign', $response['utmTags']['utmCampaign']);
+        $this->assertSame('config-content', $response['utmTags']['utmContent']);
 
         // Verify preference center from database since API serialization may return it differently.
         $emailId    = $response['id'];
         $savedEmail = $this->em->find(Email::class, $emailId);
-        Assert::assertNotNull($savedEmail, 'Email must be persisted');
-        Assert::assertNotNull($savedEmail->getPreferenceCenter(), 'Preference center must be set by defaults');
-        Assert::assertSame($pageId, $savedEmail->getPreferenceCenter()->getId());
+        $this->assertInstanceOf(Email::class, $savedEmail, 'Email must be persisted');
+        $this->assertInstanceOf(Page::class, $savedEmail->getPreferenceCenter(), 'Preference center must be set by defaults');
+        $this->assertSame($pageId, $savedEmail->getPreferenceCenter()->getId());
     }
 
     public function testNewEmailViaApiDoesNotOverwriteExplicitValues(): void
@@ -94,14 +94,14 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 
-        Assert::assertSame('explicit-source', $response['utmTags']['utmSource']);
-        Assert::assertSame('explicit-medium', $response['utmTags']['utmMedium']);
-        Assert::assertSame('explicit-campaign', $response['utmTags']['utmCampaign']);
-        Assert::assertSame('explicit-content', $response['utmTags']['utmContent']);
+        $this->assertSame('explicit-source', $response['utmTags']['utmSource']);
+        $this->assertSame('explicit-medium', $response['utmTags']['utmMedium']);
+        $this->assertSame('explicit-campaign', $response['utmTags']['utmCampaign']);
+        $this->assertSame('explicit-content', $response['utmTags']['utmContent']);
     }
 
     private function createPreferenceCenterPage(string $name): Page

@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -51,6 +50,7 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->setUpSymfony(array_merge($this->configParams, ['email_default_preference_center_id' => $pageId]));
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
@@ -58,11 +58,11 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
-        Assert::assertSame((string) $pageId, $form['emailform[preferenceCenter]']->getValue());
-        Assert::assertSame('config-source', $form['emailform[utmTags][utmSource]']->getValue());
-        Assert::assertSame('config-medium', $form['emailform[utmTags][utmMedium]']->getValue());
-        Assert::assertSame('config-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
-        Assert::assertSame('config-content', $form['emailform[utmTags][utmContent]']->getValue());
+        $this->assertSame((string) $pageId, $form['emailform[preferenceCenter]']->getValue());
+        $this->assertSame('config-source', $form['emailform[utmTags][utmSource]']->getValue());
+        $this->assertSame('config-medium', $form['emailform[utmTags][utmMedium]']->getValue());
+        $this->assertSame('config-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
+        $this->assertSame('config-content', $form['emailform[utmTags][utmContent]']->getValue());
     }
 
     public function testEditFormDoesNotOverwriteExistingPreferenceCenterAndUtmValues(): void
@@ -86,11 +86,11 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
-        Assert::assertSame((string) $existingPage->getId(), $form['emailform[preferenceCenter]']->getValue());
-        Assert::assertSame('existing-source', $form['emailform[utmTags][utmSource]']->getValue());
-        Assert::assertSame('existing-medium', $form['emailform[utmTags][utmMedium]']->getValue());
-        Assert::assertSame('existing-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
-        Assert::assertSame('existing-content', $form['emailform[utmTags][utmContent]']->getValue());
+        $this->assertSame((string) $existingPage->getId(), $form['emailform[preferenceCenter]']->getValue());
+        $this->assertSame('existing-source', $form['emailform[utmTags][utmSource]']->getValue());
+        $this->assertSame('existing-medium', $form['emailform[utmTags][utmMedium]']->getValue());
+        $this->assertSame('existing-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
+        $this->assertSame('existing-content', $form['emailform[utmTags][utmContent]']->getValue());
     }
 
     public function testCloneFormKeepsExplicitCloneValuesInsteadOfConfigDefaults(): void
@@ -113,11 +113,11 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
-        Assert::assertSame((string) $clonedPage->getId(), $form['emailform[preferenceCenter]']->getValue());
-        Assert::assertSame('clone-source', $form['emailform[utmTags][utmSource]']->getValue());
-        Assert::assertSame('clone-medium', $form['emailform[utmTags][utmMedium]']->getValue());
-        Assert::assertSame('clone-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
-        Assert::assertSame('clone-content', $form['emailform[utmTags][utmContent]']->getValue());
+        $this->assertSame((string) $clonedPage->getId(), $form['emailform[preferenceCenter]']->getValue());
+        $this->assertSame('clone-source', $form['emailform[utmTags][utmSource]']->getValue());
+        $this->assertSame('clone-medium', $form['emailform[utmTags][utmMedium]']->getValue());
+        $this->assertSame('clone-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());
+        $this->assertSame('clone-content', $form['emailform[utmTags][utmContent]']->getValue());
     }
 
     public function testCloneOfEmailWithBlankFieldsDoesNotInheritConfigDefaults(): void
@@ -132,11 +132,11 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
-        Assert::assertSame('', $form['emailform[preferenceCenter]']->getValue());
-        Assert::assertSame('', $form['emailform[utmTags][utmSource]']->getValue());
-        Assert::assertSame('', $form['emailform[utmTags][utmMedium]']->getValue());
-        Assert::assertSame('', $form['emailform[utmTags][utmCampaign]']->getValue());
-        Assert::assertSame('', $form['emailform[utmTags][utmContent]']->getValue());
+        $this->assertSame('', $form['emailform[preferenceCenter]']->getValue());
+        $this->assertSame('', $form['emailform[utmTags][utmSource]']->getValue());
+        $this->assertSame('', $form['emailform[utmTags][utmMedium]']->getValue());
+        $this->assertSame('', $form['emailform[utmTags][utmCampaign]']->getValue());
+        $this->assertSame('', $form['emailform[utmTags][utmContent]']->getValue());
     }
 
     private function createEmail(): Email

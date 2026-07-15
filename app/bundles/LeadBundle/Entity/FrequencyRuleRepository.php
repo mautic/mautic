@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Stat;
 
@@ -68,8 +69,9 @@ class FrequencyRuleRepository extends CommonRepository
         if ($leadIds) {
             if ($groupByLeads) {
                 $q->andWhere(
-                    $q->expr()->in('fr.lead_id', $leadIds)
-                );
+                    $q->expr()->in('fr.lead_id', ':leadIds')
+                )
+                ->setParameter('leadIds', $leadIds, ArrayParameterType::INTEGER);
             } else {
                 $q->andWhere('fr.lead_id = :leadId')
                     ->setParameter('leadId', (int) $leadIds);
@@ -121,7 +123,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select("ch.$statContactColumn, fr.frequency_number, fr.frequency_time")
+        $q->select("ch.{$statContactColumn}, fr.frequency_number, fr.frequency_time")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
             ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
 
@@ -148,12 +150,13 @@ class FrequencyRuleRepository extends CommonRepository
         );
 
         $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", $leadIds)
-        );
+            $q->expr()->in("ch.{$statContactColumn}", ':ids')
+        )
+        ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
-        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
+        $q->groupBy("ch.{$statContactColumn}, fr.frequency_time, fr.frequency_number");
 
-        $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
+        $q->having("count(ch.{$statContactColumn}) >= fr.frequency_number");
 
         return $q->executeQuery()->fetchAllAssociative();
     }
@@ -164,8 +167,6 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
     private function getDefaultFrequencyRuleViolations(
         array $leadIds,
@@ -174,10 +175,10 @@ class FrequencyRuleRepository extends CommonRepository
         $statTable,
         $statContactColumn,
         $statSentColumn,
-    ) {
+    ): array {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select("ch.$statContactColumn")
+        $query->select("ch.{$statContactColumn}")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
 
         if (Stat::TABLE_NAME === $statTable) {
@@ -203,8 +204,9 @@ class FrequencyRuleRepository extends CommonRepository
             ->setParameter('frequencyTime', $since->format('Y-m-d H:i:s'));
 
         $query->andWhere(
-            $query->expr()->in("ch.$statContactColumn", $leadIds)
-        );
+            $query->expr()->in("ch.{$statContactColumn}", ':ids')
+        )
+            ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
         $hasCustomRules = $this->tableHasRows(MAUTIC_TABLE_PREFIX.'lead_frequencyrules');
         // We don't need to check if users have custom rules if there are no records inside that table
@@ -220,9 +222,9 @@ class FrequencyRuleRepository extends CommonRepository
             );
         }
 
-        $query->groupBy("ch.$statContactColumn");
+        $query->groupBy("ch.{$statContactColumn}");
 
-        $query->having("count(ch.$statContactColumn) >= :defaultNumber")
+        $query->having("count(ch.{$statContactColumn}) >= :defaultNumber")
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
         $results = $query->executeQuery()->fetchAllAssociative();

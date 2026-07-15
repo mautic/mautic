@@ -29,8 +29,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MobileNotificationType extends AbstractType
 {
-    public function __construct(private readonly EntityManager $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManager $entityManager,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -166,7 +167,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 if (isset($data['translationParentSelector'])) {
                     $data['translationParent'] = $data['translationParentSelector'];

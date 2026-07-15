@@ -12,9 +12,9 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 class EmailActionModel
 {
     public function __construct(
-        private EmailModel $emailModel,
-        private EmailRepository $emailRepository,
-        private CorePermissions $corePermissions,
+        private readonly EmailModel $emailModel,
+        private readonly EmailRepository $emailRepository,
+        private readonly CorePermissions $corePermissions,
     ) {
     }
 
@@ -38,7 +38,7 @@ class EmailActionModel
             $affected[] = $email;
         }
 
-        if ($affected) {
+        if ([] !== $affected) {
             $this->saveEntities($emails);
         }
 

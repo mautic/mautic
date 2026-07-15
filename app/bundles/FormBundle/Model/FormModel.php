@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -54,13 +55,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -73,10 +74,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return FormRepository
-     */
-    public function getRepository()
+    public function getRepository(): FormRepository
     {
         return $this->em->getRepository(Form::class);
     }
@@ -151,7 +149,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -194,21 +192,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($field, $func)) {
-                    $field->$func($v);
+                    $field->{$func}($v);
                 }
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            if (!$field->getParent()) {
-                $field->setOrder($order);
-                ++$order;
-            } else {
-                if (isset($sessionFields[$field->getParent()]['order'])) {
-                    $field->setOrder($sessionFields[$field->getParent()]['order']);
-                } else {
-                    $field->setOrder($order);
-                }
-            }
+            $field->setOrder($order);
+            ++$order;
             $entity->addField($properties['id'], $field);
         }
 
@@ -284,7 +274,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 }
 
                 if (method_exists($action, $func)) {
-                    $action->$func($v);
+                    $action->{$func}($v);
                 }
             }
             $action->setForm($entity);
@@ -326,7 +316,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
@@ -354,6 +344,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
+        if ($form->isSubmissionLimitReached()) {
+            $message = $form->getSubmissionLimitMessage() ?? $this->translator->trans('mautic.form.submission.limit_reached');
+
+            return sprintf('<div class="mautic-form-message">%s</div>', InputHelper::strict_html($message));
+        }
+
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
@@ -445,7 +441,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
+        uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
@@ -556,9 +552,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param object $entity
+     */
     public function deleteEntity($entity): void
     {
-        /* @var Form $entity */
+        /** @var Form $entity */
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -578,7 +577,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
-            /* @var Form $entity */
+            /** @var Form $entity */
             // delete the associated results table
             $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
@@ -858,9 +857,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -882,7 +880,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -896,7 +894,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML($dom, $html)
+    private function saveHTML(\DOMDocument $dom, ?\DOMNode $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
@@ -955,7 +953,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Generate dom manipulation javascript to include all script.
      */
-    private function generateJsScript($html): string
+    private function generateJsScript(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -966,18 +964,18 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         foreach ($items as $key => $script) {
             if ($script->hasAttribute('src')) {
                 $javascript .= "
-                var script$key = document.createElement('script');
-                script$key.src = '".$script->getAttribute('src')."';
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var script{$key} = document.createElement('script');
+                script{$key}.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             } else {
                 $scriptContent = $script->nodeValue;
                 $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
 
                 $javascript .= "
-                var inlineScript$key = document.createTextNode(\"$scriptContent\");
-                var script$key       = document.createElement('script');
-                script$key.appendChild(inlineScript$key);
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var inlineScript{$key} = document.createTextNode(\"{$scriptContent}\");
+                var script{$key}       = document.createElement('script');
+                script{$key}.appendChild(inlineScript{$key});
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             }
         }
 
@@ -1095,5 +1093,16 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+    }
+
+    private function compareFieldOrder(Field $a, Field $b): int
+    {
+        $order = $a->getOrder() <=> $b->getOrder();
+
+        if (0 !== $order) {
+            return $order;
+        }
+
+        return ($a->getId() ?? 0) <=> ($b->getId() ?? 0);
     }
 }

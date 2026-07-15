@@ -6,14 +6,10 @@ namespace Mautic\CoreBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
-class CommandHelperTest extends MauticMysqlTestCase
+final class CommandHelperTest extends MauticMysqlTestCase
 {
-    /**
-     * @var CommandHelper
-     */
-    private $commandHelper;
+    private CommandHelper $commandHelper;
 
     protected function setUp(): void
     {
@@ -24,14 +20,14 @@ class CommandHelperTest extends MauticMysqlTestCase
     public function testRunCommandWithParam(): void
     {
         $response = $this->commandHelper->runCommand('help', ['--version']);
-        Assert::assertSame(0, $response->getStatusCode());
-        Assert::assertStringContainsString('(env: test, debug: false)', $response->getMessage());
+        $this->assertSame(0, $response->getStatusCode());
+        $this->assertStringContainsString('(env: test, debug: false)', $response->getMessage());
     }
 
     public function testRunCommandWithoutParam(): void
     {
         $response = $this->commandHelper->runCommand('list');
-        Assert::assertSame(0, $response->getStatusCode());
-        Assert::assertStringContainsString('doctrine:database:create', $response->getMessage());
+        $this->assertSame(0, $response->getStatusCode());
+        $this->assertStringContainsString('doctrine:database:create', $response->getMessage());
     }
 }

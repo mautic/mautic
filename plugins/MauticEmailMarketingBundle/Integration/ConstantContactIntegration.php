@@ -40,7 +40,6 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string false if no error; otherwise the error string
@@ -86,7 +85,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
             $leadFields[$f] = [
                 'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
-                'required' => ('email' == $f) ? true : false,
+                'required' => 'email' === $f,
             ];
         }
 
@@ -111,9 +110,11 @@ class ConstantContactIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['email'])) {
+        }
+        if (empty($mappedData['email'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 

@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\Assert;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,19 +28,18 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ->willReturn($result);
 
         $modelFake = $this->createMock(FieldModel::class);
-        $modelFake->expects(self::once())
+        $modelFake->expects($this->once())
             ->method('getEntities')
             ->willReturn($paginator);
 
         $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
 
-            private object $model;
             private string $entityNameOne = 'lead';
 
-            public function __construct(object $modelFake)
-            {
-                $this->model = $modelFake;
+            public function __construct(
+                private object $model,
+            ) {
             }
 
             /**
@@ -58,7 +56,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        Assert::assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
-        Assert::assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
+        $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
+        $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
     }
 }

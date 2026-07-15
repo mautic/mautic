@@ -16,7 +16,7 @@ class ConfigIntegrationsHelper
     private array $integrations = [];
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
+        private readonly IntegrationsHelper $integrationsHelper,
     ) {
     }
 
@@ -33,7 +33,7 @@ class ConfigIntegrationsHelper
     public function getIntegration(string $integration)
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.config_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.config_integration");
         }
 
         // Ensure the configuration is hydrated

@@ -76,10 +76,7 @@ final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
             }
         }
 
-        self::assertEmpty(
-            $violations,
-            "The following ownership-scoped item operations are missing ', object)' in their security expression:\n"
-            .implode("\n", $violations)
-        );
+        $this->assertEmpty($violations, "The following ownership-scoped item operations are missing ', object)' in their security expression:\n"
+        .implode("\n", $violations));
     }
 }

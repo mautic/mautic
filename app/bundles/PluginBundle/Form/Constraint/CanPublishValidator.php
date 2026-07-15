@@ -12,8 +12,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class CanPublishValidator extends ConstraintValidator
 {
-    public function __construct(private EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void

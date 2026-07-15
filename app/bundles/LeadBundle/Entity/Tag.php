@@ -92,7 +92,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -107,10 +107,7 @@ class Tag implements UuidInterface
         return $this->tag;
     }
 
-    /**
-     * @return Tag
-     */
-    public function setTag(string $tag)
+    public function setTag(string $tag): static
     {
         $this->tag = $this->validateTag($tag);
 
@@ -118,7 +115,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -127,10 +124,8 @@ class Tag implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Tag
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 

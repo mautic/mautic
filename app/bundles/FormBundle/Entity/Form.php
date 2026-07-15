@@ -53,6 +53,8 @@ class Form extends FormEntity implements UuidInterface
 
     public const ENTITY_NAME = 'forms';
 
+    public const TABLE_NAME  = 'forms';
+
     /**
      * @var int
      */
@@ -88,7 +90,7 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
@@ -180,6 +182,14 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $progressiveProfilingLimit;
+
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?int $submissionLimit = null;
+
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?string $submissionLimitMessage = null;
+
+    private int $submissionCount = 0;
 
     /**
      * This var is used to cache the result once gained from the loop.
@@ -275,6 +285,15 @@ class Form extends FormEntity implements UuidInterface
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->addNullableField('submissionLimit', Types::INTEGER, 'submission_limit');
+        $builder->createField('submissionLimitMessage', Types::TEXT)
+            ->columnName('submission_limit_message')
+            ->nullable()
+            ->build();
+        $builder->createField('submissionCount', Types::INTEGER)
+            ->columnName('submission_count')
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
@@ -381,7 +400,7 @@ class Form extends FormEntity implements UuidInterface
         self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
@@ -392,7 +411,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -401,10 +420,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return Form
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -413,7 +430,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -422,10 +439,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Form
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -434,7 +449,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription($truncate = false, $length = 45)
     {
@@ -449,10 +464,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $cachedHtml
-     *
-     * @return Form
      */
-    public function setCachedHtml($cachedHtml)
+    public function setCachedHtml($cachedHtml): static
     {
         $this->cachedHtml = $cachedHtml;
 
@@ -460,7 +473,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCachedHtml()
     {
@@ -477,10 +490,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $postAction
-     *
-     * @return Form
      */
-    public function setPostAction($postAction)
+    public function setPostAction($postAction): static
     {
         $this->isChanged('postAction', $postAction);
         $this->postAction = $postAction;
@@ -498,10 +509,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $postActionProperty
-     *
-     * @return Form
      */
-    public function setPostActionProperty($postActionProperty)
+    public function setPostActionProperty($postActionProperty): static
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -525,10 +534,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return Form
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -537,7 +544,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -546,10 +553,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return Form
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -558,7 +563,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -567,10 +572,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addField($key, Field $field)
+    public function addField($key, Field $field): static
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -629,7 +632,7 @@ class Form extends FormEntity implements UuidInterface
                 ],
                 $this->getFields()->getValues(),
             ),
-            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField']),
+            fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
     }
 
@@ -644,7 +647,7 @@ class Form extends FormEntity implements UuidInterface
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        fn (Field $field) => $field->getMappedObject(),
+                        fn (Field $field): ?string => $field->getMappedObject(),
                     )->toArray(),
                 ),
             ),
@@ -653,10 +656,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $alias
-     *
-     * @return Form
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -665,17 +666,14 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
         return $this->alias;
     }
 
-    /**
-     * @return Form
-     */
-    public function addSubmission(Submission $submissions)
+    public function addSubmission(Submission $submissions): static
     {
         $this->submissions[] = $submissions;
 
@@ -688,19 +686,17 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return Collection<int, Submission>
      */
-    public function getSubmissions()
+    public function getSubmissions(): Collection
     {
         return $this->submissions;
     }
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addAction($key, Action $action)
+    public function addAction($key, Action $action): static
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', [$key, $changes]);
@@ -732,7 +728,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -748,7 +744,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -764,7 +760,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getInKioskMode()
     {
@@ -788,7 +784,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isInKioskMode()
     {
@@ -798,7 +794,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getFormType()
     {
@@ -811,10 +807,8 @@ class Form extends FormEntity implements UuidInterface
      * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
      * @param mixed $formType
-     *
-     * @return Form
      */
-    public function setFormType($formType)
+    public function setFormType($formType): static
     {
         trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
         $this->formType = $formType;
@@ -842,10 +836,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $formAttributes
-     *
-     * @return Form
      */
-    public function setFormAttributes($formAttributes)
+    public function setFormAttributes($formAttributes): static
     {
         $this->isChanged('formAttributes', $formAttributes);
         $this->formAttributes = $formAttributes;
@@ -854,7 +846,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFormAttributes()
     {
@@ -941,10 +933,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param int $progressiveProfilingLimit
-     *
-     * @return Form
      */
-    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit): static
     {
         $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
         $this->progressiveProfilingLimit = $progressiveProfilingLimit;
@@ -953,10 +943,53 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getProgressiveProfilingLimit()
     {
         return $this->progressiveProfilingLimit;
+    }
+
+    public function setSubmissionLimit(?int $submissionLimit): self
+    {
+        $this->isChanged('submissionLimit', $submissionLimit);
+        $this->submissionLimit = $submissionLimit;
+
+        return $this;
+    }
+
+    public function getSubmissionLimit(): ?int
+    {
+        return $this->submissionLimit;
+    }
+
+    public function setSubmissionLimitMessage(?string $message): self
+    {
+        $this->isChanged('submissionLimitMessage', $message);
+        $this->submissionLimitMessage = $message;
+
+        return $this;
+    }
+
+    public function getSubmissionLimitMessage(): ?string
+    {
+        return $this->submissionLimitMessage;
+    }
+
+    public function getSubmissionCount(): int
+    {
+        return $this->submissionCount;
+    }
+
+    public function setSubmissionCount(int $count): self
+    {
+        $this->submissionCount = $count;
+
+        return $this;
+    }
+
+    public function isSubmissionLimitReached(): bool
+    {
+        return null !== $this->submissionLimit && $this->submissionLimit > 0 && $this->submissionCount >= $this->submissionLimit;
     }
 }

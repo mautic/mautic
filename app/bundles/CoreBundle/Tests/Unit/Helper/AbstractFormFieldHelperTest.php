@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use PHPUnit\Framework\Assert;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(AbstractFormFieldHelper::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\BarListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
-class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void
@@ -153,29 +152,26 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testparseChoiceListWithNullValue(): void
     {
-        Assert::assertEquals(
-            [0 => 'label4'],
-            AbstractFormFieldHelper::parseList(
+        $this->assertEquals([0 => 'label4'], AbstractFormFieldHelper::parseList(
+            [
                 [
-                    [
-                        'label' => 'label1',
-                        'value' => '',
-                    ],
-                    [
-                        'label' => 'label2',
-                        'value' => null,
-                    ],
-                    [
-                        'label' => 'label3',
-                        'value' => 0,
-                    ],
-                    [
-                        'label' => 'label4',
-                        'value' => '0',
-                    ],
-                ]
-            )
-        );
+                    'label' => 'label1',
+                    'value' => '',
+                ],
+                [
+                    'label' => 'label2',
+                    'value' => null,
+                ],
+                [
+                    'label' => 'label3',
+                    'value' => 0,
+                ],
+                [
+                    'label' => 'label4',
+                    'value' => '0',
+                ],
+            ]
+        ));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
@@ -258,7 +254,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($array);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanBarStringList(): void
@@ -271,7 +267,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanJsonStringList(): void
@@ -284,7 +280,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testNumericalJsonStringList(): void

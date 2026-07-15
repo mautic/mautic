@@ -22,8 +22,8 @@ class ObjectMappingDAO
     private array $fieldMappings = [];
 
     public function __construct(
-        private string $internalObjectName,
-        private string $integrationObjectName,
+        private readonly string $internalObjectName,
+        private readonly string $integrationObjectName,
     ) {
     }
 

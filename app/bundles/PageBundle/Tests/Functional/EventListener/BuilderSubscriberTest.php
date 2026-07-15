@@ -12,32 +12,41 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class BuilderSubscriberTest extends MauticMysqlTestCase
+final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     // Custom preference center page
     public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist input';
+
     public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist input';
+
     public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel select';
+
     public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency div[data-contact-frequency="1"]';
+
     public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs button.btn-save';
 
     // Default preference center page
     public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
+
     public const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
+
     public const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
+
     public const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
+
     public const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
+
     public const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
 
     // Common to both custom and default
     public const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
+
     public const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
 
     protected function setUp(): void
@@ -69,7 +78,7 @@ class BuilderSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $mailHashHelper = static::getContainer()->get(MailHashHelper::class);
-        \assert($mailHashHelper instanceof MailHashHelper);
+        $this->assertInstanceOf(MailHashHelper::class, $mailHashHelper);
 
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
             'idHash'     => $emailStat->getTrackingHash(),
@@ -79,7 +88,7 @@ class BuilderSubscriberTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
 
-        self::assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+        $this->assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
 
         $form = $crawler->filter(static::FORM_SELECTOR);
         $html = $form->html();
@@ -92,20 +101,16 @@ class BuilderSubscriberTest extends MauticMysqlTestCase
                 $html
             );
 
-            Assert::assertCount(
-                $expectedCount,
-                $form->filter($selector),
-                $message
-            );
+            $this->assertCount($expectedCount, $form->filter($selector), $message);
         }
 
         // Ensure the token and save button are always included within the <form> tag
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
+        $this->assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
 
         if ($hasPreferenceCenter) {
-            Assert::assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         } else {
-            Assert::assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         }
     }
 

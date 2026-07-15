@@ -15,7 +15,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
-class MobileNotificationDetailsTypeTest extends TypeTestCase
+final class MobileNotificationDetailsTypeTest extends TypeTestCase
 {
     /**
      * @var MockObject&Integration
@@ -59,8 +59,8 @@ class MobileNotificationDetailsTypeTest extends TypeTestCase
 
         $view = $form->createView();
         // test only field is "additional_data"
-        self::assertCount(1, $view->children);
-        self::assertArrayHasKey('additional_data', $view->children);
+        $this->assertCount(1, $view->children);
+        $this->assertArrayHasKey('additional_data', $view->children);
     }
 
     /**
@@ -76,11 +76,11 @@ class MobileNotificationDetailsTypeTest extends TypeTestCase
         $form = $this->factory->create(MobileNotificationDetailsType::class);
 
         $view = $form->createView();
-        self::assertCount(1 + count($settings), $view->children);
-        self::assertArrayHasKey('additional_data', $view->children);
+        $this->assertCount(1 + count($settings), $view->children);
+        $this->assertArrayHasKey('additional_data', $view->children);
 
         foreach ($settings as $settingField) {
-            self::assertArrayHasKey($settingField, $view->children);
+            $this->assertArrayHasKey($settingField, $view->children);
         }
     }
 

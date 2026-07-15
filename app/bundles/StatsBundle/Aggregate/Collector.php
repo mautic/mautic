@@ -11,16 +11,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Collector
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
     /**
      * @param string $statName
-     *
-     * @return StatCollection
      */
-    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null)
+    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null): StatCollection
     {
         if (null === $fetchOptions) {
             $fetchOptions = new FetchOptions();

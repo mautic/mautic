@@ -17,12 +17,11 @@ use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailTypeTest extends MauticMysqlTestCase
+final class EmailTypeTest extends MauticMysqlTestCase
 {
     /**
      * @var array<mixed>
@@ -60,26 +59,26 @@ class EmailTypeTest extends MauticMysqlTestCase
         $this->removeContactFromCategory((int) $contactIds[3], $category);
         $segment       = $this->createSegment();
         $commandTester = $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
-        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
-        Assert::assertStringContainsString(($contactIdsCount = count($contactIds)).' total contact(s) to be added', $commandTester->getDisplay());
+        $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
+        $this->assertStringContainsString(($contactIdsCount = count($contactIds)).' total contact(s) to be added', $commandTester->getDisplay());
         $segmentLeadCount = $this->em->getRepository(ListLead::class)->count(['list' => $segment]);
-        Assert::assertSame($contactIdsCount, $segmentLeadCount);
+        $this->assertSame($contactIdsCount, $segmentLeadCount);
 
         $campaign      = $this->createCampaign($segment, $emailId = (int) $email->getId());
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:update', ['-i' => ($campaignId = $campaign->getId())]);
-        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
-        Assert::assertStringContainsString($contactIdsCount.' total contact(s) to be added', $commandTester->getDisplay());
+        $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
+        $this->assertStringContainsString($contactIdsCount.' total contact(s) to be added', $commandTester->getDisplay());
         $campaignLeadCount = $this->em->getRepository(CampaignLead::class)->count(['campaign' => $campaign]);
-        Assert::assertSame($contactIdsCount, $campaignLeadCount);
+        $this->assertSame($contactIdsCount, $campaignLeadCount);
 
         $this->em->clear();
 
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
-        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
-        Assert::assertStringContainsString($contactIdsCount.' total events(s) to be processed', $commandTester->getDisplay());
+        $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode());
+        $this->assertStringContainsString($contactIdsCount.' total events(s) to be processed', $commandTester->getDisplay());
 
         $stats = $this->em->getRepository(Stat::class)->count(['email' => $emailId]);
-        Assert::assertSame($expectedEmailCopiesCount, $stats);
+        $this->assertSame($expectedEmailCopiesCount, $stats);
     }
 
     /**
@@ -150,11 +149,11 @@ class EmailTypeTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
-        Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
-        Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
-        Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][3], $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $response['statusCodes'][3], $clientResponse->getContent());
 
         return [
             $response['contacts'][0]['id'],

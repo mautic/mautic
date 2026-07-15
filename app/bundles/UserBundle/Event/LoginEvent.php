@@ -8,14 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 class LoginEvent extends Event
 {
     public function __construct(
-        private User $user,
+        private readonly User $user,
     ) {
     }
 
-    /**
-     * @return User|null
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }

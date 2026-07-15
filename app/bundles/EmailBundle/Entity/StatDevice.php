@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
+
     /**
      * @var string
      */
@@ -23,10 +24,7 @@ class StatDevice
      */
     private $device;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -80,18 +78,12 @@ class StatDevice
         return (int) $this->id;
     }
 
-    /**
-     * @return IpAddress
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
-    public function setIpAddress(IpAddress $ip): void
+    public function setIpAddress(?IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -107,7 +99,7 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getDateOpened()
     {
@@ -123,16 +115,13 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return LeadDevice|null
      */
     public function getDevice()
     {
         return $this->device;
     }
 
-    /**
-     * @param mixed $device
-     */
     public function setDevice(LeadDevice $device): void
     {
         $this->device = $device;

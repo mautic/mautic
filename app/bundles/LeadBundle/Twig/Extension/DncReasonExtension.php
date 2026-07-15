@@ -19,10 +19,10 @@ class DncReasonExtension extends AbstractExtension
     /**
      * @see Twig_Extension::getFunctions()
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('dncReasonToText', [$this, 'toText']),
+            new TwigFunction('dncReasonToText', $this->toText(...)),
         ];
     }
 
