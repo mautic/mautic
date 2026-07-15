@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -84,23 +83,23 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($log);
         $this->em->flush();
 
-        Assert::assertSame([], $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType()));
+        $this->assertSame([], $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType()));
 
         $log->setNonActionPathTaken(false);
         $this->em->persist($log);
         $this->em->flush();
 
         $pendingEvents = $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType());
-        Assert::assertCount(1, $pendingEvents);
-        Assert::assertSame($yesDecision->getId(), array_values($pendingEvents)[0]->getId());
+        $this->assertCount(1, $pendingEvents);
+        $this->assertSame($yesDecision->getId(), array_values($pendingEvents)[0]->getId());
 
         $log->setNonActionPathTaken(true);
         $this->em->persist($log);
         $this->em->flush();
 
         $pendingEvents = $repository->getContactPendingEvents($lead->getId(), $yesDecision->getType());
-        Assert::assertCount(1, $pendingEvents);
-        Assert::assertSame($noDecision->getId(), array_values($pendingEvents)[0]->getId());
+        $this->assertCount(1, $pendingEvents);
+        $this->assertSame($noDecision->getId(), array_values($pendingEvents)[0]->getId());
     }
 
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
