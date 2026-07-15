@@ -71,6 +71,7 @@ return RectorConfig::configure()
         // skip as might be overriden by 3rd party controllers
         ResponseReturnTypeControllerActionRector::class => [
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
+            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,

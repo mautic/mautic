@@ -72,8 +72,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Delete a batch of entities.
+     *
+     * @return array|Response
      */
-    public function deleteEntitiesAction(Request $request): Response
+    public function deleteEntitiesAction(Request $request)
     {
         $parameters = $request->query->all();
 
@@ -161,8 +163,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Edit a batch of entities.
+     *
+     * @return array|Response
      */
-    public function editEntitiesAction(Request $request): Response
+    public function editEntitiesAction(Request $request)
     {
         $parameters = $request->request->all();
 
@@ -264,8 +268,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Create a batch of new entities.
+     *
+     * @return array|Response
      */
-    public function newEntitiesAction(Request $request): Response
+    public function newEntitiesAction(Request $request)
     {
         $entity = $this->model->getEntity();
 
