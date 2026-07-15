@@ -30,7 +30,7 @@ class MapHelper
             $result[] = [
                 'data'       => $mappedData['data'] ?? [],
                 'label'      => $value['label'],
-                'legendText' => MapHelper::getOptionLegendText(
+                'legendText' => self::getOptionLegendText(
                     $legendText,
                     [
                         '%total'       => (string) ($mappedData['total'] ?? 0),

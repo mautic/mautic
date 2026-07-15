@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageModelValidationTest extends MauticMysqlTestCase
@@ -47,7 +46,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        Assert::assertNotEmpty($pageHit, 'page hit should not be empty');
+        $this->assertInstanceOf(\Mautic\PageBundle\Entity\Hit::class, $pageHit, 'page hit should not be empty');
     }
 
     public function testPageHitWhenRequiredValuesValidationFails(): void
@@ -70,7 +69,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
 
         // Verify no Hit was persisted due to validation failure
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        Assert::assertNull($pageHit, 'page hit should not be persisted when validation fails');
+        $this->assertNotInstanceOf(\Mautic\PageBundle\Entity\Hit::class, $pageHit, 'page hit should not be persisted when validation fails');
     }
 
     /**

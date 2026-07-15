@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Form\FormInterface;
 
 final class ContactChannelsTypeTest extends AbstractMauticTestCase
@@ -34,8 +33,8 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
     private function assertOptions(FormInterface $form, string $name, bool $hasHtml5): void
     {
         $config = $form->get($name)->getConfig();
-        Assert::assertSame($hasHtml5, $config->getOption('html5'));
-        Assert::assertSame('yyyy-MM-dd', $config->getOption('format'));
+        $this->assertSame($hasHtml5, $config->getOption('html5'));
+        $this->assertSame('yyyy-MM-dd', $config->getOption('format'));
     }
 
     /**

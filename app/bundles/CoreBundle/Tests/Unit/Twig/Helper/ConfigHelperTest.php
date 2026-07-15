@@ -27,7 +27,7 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertEquals('value A', $helper->get('param_a'));
+        $this->assertEquals('value A', $helper->get('param_a'));
     }
 
     public function testGetName(): void
@@ -40,6 +40,6 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertSame('config', $helper->getName());
+        $this->assertSame('config', $helper->getName());
     }
 }
