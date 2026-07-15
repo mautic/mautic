@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -34,12 +36,12 @@ class StageController extends MauticMysqlTestCase
         $stage->setWeight(1);
         $this->stageModel->saveEntity($stage);
 
-        $this->assertEquals(0, $this->getStageContactCountViaAjax($stage->getId()));
+        $this->assertSame(0, $this->getStageContactCountViaAjax($stage->getId()));
 
         $this->leadModel->addToStages($contact, $stage);
         $this->leadModel->saveEntity($contact);
 
-        $this->assertEquals(1, $this->getStageContactCountViaAjax($stage->getId()));
+        $this->assertSame(1, $this->getStageContactCountViaAjax($stage->getId()));
 
         // create stage 2
         $stage2 = new Stage();
@@ -47,13 +49,13 @@ class StageController extends MauticMysqlTestCase
         $stage2->setWeight(2);
         $this->stageModel->saveEntity($stage2);
 
-        $this->assertEquals(0, $this->getStageContactCountViaAjax($stage2->getId()));
+        $this->assertSame(0, $this->getStageContactCountViaAjax($stage2->getId()));
 
         $this->leadModel->addToStages($contact, $stage2);
         $this->leadModel->saveEntity($contact);
 
-        $this->assertEquals(1, $this->getStageContactCountViaAjax($stage2->getId()));
-        $this->assertEquals(0, $this->getStageContactCountViaAjax($stage->getId()));
+        $this->assertSame(1, $this->getStageContactCountViaAjax($stage2->getId()));
+        $this->assertSame(0, $this->getStageContactCountViaAjax($stage->getId()));
     }
 
     private function getStageContactCountViaAjax(int $stageId): int
