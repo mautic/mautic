@@ -182,12 +182,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        Assert::assertArrayHasKey('message', $content);
-        Assert::assertSame(
-            $translator->trans('mautic.asset.asset.batch_download.error.no_selection', [], 'flashes'),
-            $content['message']
-        );
-        Assert::assertArrayHasKey('flashes', $content);
+        $this->assertArrayHasKey('message', $content);
+        $this->assertSame($translator->trans('mautic.asset.asset.batch_download.error.no_selection', [], 'flashes'), $content['message']);
+        $this->assertArrayHasKey('flashes', $content);
     }
 
     public function testBatchDownloadRejectsObjectShapedIds(): void
@@ -210,11 +207,11 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        Assert::assertSame('application/zip', $response->headers->get('Content-Type'));
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
 
         $contentDisposition = $response->headers->get('Content-Disposition');
-        Assert::assertStringContainsString('assets-batch-', (string) $contentDisposition);
-        Assert::assertStringEndsWith('.zip', $contentDisposition);
+        $this->assertStringContainsString('assets-batch-', (string) $contentDisposition);
+        $this->assertStringEndsWith('.zip', $contentDisposition);
 
         $zipContent = $this->client->getInternalResponse()->getContent();
 
@@ -223,17 +220,17 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         file_put_contents($zipPath, $zipContent);
 
         $zipArchive = new \ZipArchive();
-        Assert::assertTrue($zipArchive->open($zipPath));
-        Assert::assertSame(1, $zipArchive->numFiles);
+        $this->assertTrue($zipArchive->open($zipPath));
+        $this->assertSame(1, $zipArchive->numFiles);
 
         $entryName     = $zipArchive->getNameIndex(0);
         $entryContents = $zipArchive->getFromName($entryName);
 
-        Assert::assertStringContainsString('asset', mb_strtolower($entryName));
-        Assert::assertStringContainsString('controller', mb_strtolower($entryName));
-        Assert::assertStringContainsString('test', mb_strtolower($entryName));
-        Assert::assertStringEndsWith('.png', $entryName);
-        Assert::assertSame($this->expectedPngContent, $entryContents);
+        $this->assertStringContainsString('asset', mb_strtolower($entryName));
+        $this->assertStringContainsString('controller', mb_strtolower($entryName));
+        $this->assertStringContainsString('test', mb_strtolower($entryName));
+        $this->assertStringEndsWith('.png', $entryName);
+        $this->assertSame($this->expectedPngContent, $entryContents);
 
         $zipArchive->close();
         unlink($zipPath);
