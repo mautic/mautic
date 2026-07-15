@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -94,7 +93,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -130,7 +129,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -205,7 +204,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -244,7 +243,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**

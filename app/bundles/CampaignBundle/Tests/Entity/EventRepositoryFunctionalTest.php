@@ -48,7 +48,7 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        Assert::assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
+        $this->assertCount($expectedCount, $repository->getContactPendingEvents($lead->getId(), $event->getType()));
     }
 
     public function testGetContactPendingEventsWaitsForConditionPathResult(): void
@@ -152,12 +152,12 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $reloadedEventC = $this->em->find(Event::class, $eventCId);
         $this->assertInstanceOf(Event::class, $reloadedEventC);
 
-        Assert::assertNotNull($reloadedEventC->getDeleted());
+        $this->assertInstanceOf(\DateTimeInterface::class, $reloadedEventC->getDeleted());
         $this->assertInstanceOf(Event::class, $reloadedEventA);
-        Assert::assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
+        $this->assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
         $this->assertInstanceOf(Event::class, $reloadedEventB);
-        Assert::assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
-        Assert::assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
+        $this->assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
+        $this->assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
     }
 
     public function testGetCampaignEmailEvents(): void

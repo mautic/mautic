@@ -42,25 +42,25 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         if ($expectedSanitized) {
             // Assert that a tag was created
-            Assert::assertCount(1, $tags);
+            $this->assertCount(1, $tags);
 
             // Get the created tag
             $tag = $tags[0];
 
             // Assert that the tag name does not contain the malicious script
-            Assert::assertStringNotContainsString('<script>', $tag->getTag());
-            Assert::assertStringNotContainsString('</script>', $tag->getTag());
+            $this->assertStringNotContainsString('<script>', $tag->getTag());
+            $this->assertStringNotContainsString('</script>', $tag->getTag());
 
             // Assert that the tag name has been properly sanitized
-            Assert::assertEquals($expectedSanitized, $tag->getTag());
+            $this->assertEquals($expectedSanitized, $tag->getTag());
         } else {
             // Assert that a tag was NOT created
-            Assert::assertCount(0, $tags);
+            $this->assertCount(0, $tags);
         }
 
         // Check the response content to ensure no script is present
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringNotContainsString($payload, (string) $content);
+        $this->assertStringNotContainsString($payload, (string) $content);
     }
 
     /**
@@ -127,20 +127,20 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
+        $this->assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
 
         $crawler = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
+        $this->assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
 
         $buttonCrawlerNode = $crawler->selectButton('Save & Close');
-        Assert::assertCount(1, $buttonCrawlerNode, $crawler->html());
+        $this->assertCount(1, $buttonCrawlerNode, $crawler->html());
         $form = $buttonCrawlerNode->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
+        $this->assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
     }
 }
