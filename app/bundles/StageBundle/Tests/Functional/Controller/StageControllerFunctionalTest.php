@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class StageControllerFunctionalTest extends MauticMysqlTestCase
@@ -107,28 +106,28 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $savedContact = $this->em->find(Lead::class, $contactId);
-        Assert::assertNotNull($savedContact);
+        $this->assertInstanceOf(Lead::class, $savedContact);
         $savedContactStage = $savedContact->getStage();
-        Assert::assertNotNull($savedContactStage);
-        Assert::assertSame($primaryStageId, $savedContactStage->getId());
-        Assert::assertNull($this->em->find(Stage::class, $mergedStageId));
-        Assert::assertSame(1, (int) $connection->fetchOne(
+        $this->assertInstanceOf(Stage::class, $savedContactStage);
+        $this->assertSame($primaryStageId, $savedContactStage->getId());
+        $this->assertNotInstanceOf(Stage::class, $this->em->find(Stage::class, $mergedStageId));
+        $this->assertSame(1, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $contactId]
         ));
-        Assert::assertSame(1, (int) $connection->fetchOne(
+        $this->assertSame(1, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $duplicateLogContactId]
         ));
-        Assert::assertSame(1, (int) $connection->fetchOne(
+        $this->assertSame(1, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $contactId]
         ));
-        Assert::assertSame(0, (int) $connection->fetchOne(
+        $this->assertSame(0, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ?',
             [$mergedStageId]
         ));
-        Assert::assertSame(0, (int) $connection->fetchOne(
+        $this->assertSame(0, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ?',
             [$mergedStageId]
         ));
@@ -152,8 +151,8 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/merge/'.$mergedStageId);
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Primary stage from form', (string) $this->client->getResponse()->getContent());
-        Assert::assertStringNotContainsString('Merged stage from form', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Primary stage from form', (string) $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Merged stage from form', (string) $this->client->getResponse()->getContent());
 
         $form = $crawler->selectButton('stage_merge[buttons][save]')->form();
         $form['stage_merge[stage_to_merge]']->setValue((string) $primaryStageId);
@@ -164,11 +163,11 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $savedContact = $this->em->find(Lead::class, $contactId);
-        Assert::assertNotNull($savedContact);
+        $this->assertInstanceOf(Lead::class, $savedContact);
         $savedContactStage = $savedContact->getStage();
-        Assert::assertNotNull($savedContactStage);
-        Assert::assertSame($primaryStageId, $savedContactStage->getId());
-        Assert::assertNull($this->em->find(Stage::class, $mergedStageId));
+        $this->assertInstanceOf(Stage::class, $savedContactStage);
+        $this->assertSame($primaryStageId, $savedContactStage->getId());
+        $this->assertNotInstanceOf(Stage::class, $this->em->find(Stage::class, $mergedStageId));
     }
 
     private function createStage(string $name): Stage
