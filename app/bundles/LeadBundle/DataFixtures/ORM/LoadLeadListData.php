@@ -43,10 +43,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $this->segmentModel->rebuildListLeads($list);
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 5;
     }

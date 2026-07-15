@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 
 final class PageTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,8 +17,8 @@ final class PageTest extends \PHPUnit\Framework\TestCase
         $page = new Page();
         $page->setIsPreferenceCenter($value);
 
-        Assert::assertSame($expected, $page->getIsPreferenceCenter());
-        Assert::assertSame($changes, $page->getChanges());
+        $this->assertSame($expected, $page->getIsPreferenceCenter());
+        $this->assertSame($changes, $page->getChanges());
     }
 
     /**
@@ -44,8 +43,8 @@ final class PageTest extends \PHPUnit\Framework\TestCase
         $page = new Page();
         $page->setNoIndex($value);
 
-        Assert::assertSame($expected, $page->getNoIndex());
-        Assert::assertSame($changes, $page->getChanges());
+        $this->assertSame($expected, $page->getNoIndex());
+        $this->assertSame($changes, $page->getChanges());
     }
 
     /**
@@ -90,7 +89,7 @@ final class PageTest extends \PHPUnit\Framework\TestCase
     {
         $page = new Page();
         $page->setIsDuplicate($isDuplicate);
-        Assert::assertIsBool($page->isDuplicate());
+        $this->assertIsBool($page->isDuplicate());
     }
 
     /**

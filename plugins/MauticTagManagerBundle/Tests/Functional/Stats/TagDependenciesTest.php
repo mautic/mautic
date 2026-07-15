@@ -29,7 +29,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$campaign->getId(), $campaign2->getId()]);
+        $searchIds      = implode(',', [$campaign->getId(), $campaign2->getId()]);
         $this->assertStringContainsString("href=\"/s/campaigns?search=ids:{$searchIds}\"", (string) $content);
     }
 
@@ -57,7 +57,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$segmentWithTag->getId()]);
+        $searchIds      = implode(',', [$segmentWithTag->getId()]);
         $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", (string) $content);
     }
 
@@ -71,7 +71,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$form->getId()]);
+        $searchIds      = implode(',', [$form->getId()]);
         $this->assertStringContainsString("href=\"/s/forms?search=ids:{$searchIds}\"", (string) $content);
     }
 
@@ -84,7 +84,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$pointActionIsSent->getId()]);
+        $searchIds      = implode(',', [$pointActionIsSent->getId()]);
         $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", (string) $content);
     }
 
@@ -95,7 +95,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$report->getId()]);
+        $searchIds      = implode(',', [$report->getId()]);
         $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", (string) $content);
     }
 

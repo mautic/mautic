@@ -128,8 +128,8 @@ final class ImportHelperTest extends TestCase
         $zipFilePath   = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
         $this->paths[] = $zipFilePath;
 
-        self::assertFileExists($zipFilePath);
+        $this->assertFileExists($zipFilePath);
 
-        self::assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
+        $this->assertSame($jsonData, $this->importHelper->readZipFile($zipFilePath));
     }
 }

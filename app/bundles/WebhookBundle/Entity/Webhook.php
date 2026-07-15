@@ -555,7 +555,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->markedUnhealthyAt;
     }
 
-    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): Webhook
+    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): self
     {
         $this->isChanged('markedUnhealthyAt', $markedUnhealthyAt);
         $this->markedUnhealthyAt = $markedUnhealthyAt;

@@ -15,7 +15,6 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -62,7 +61,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $reportSubscriber->onReportBuilder($event);
 
-        Assert::assertSame([], $event->getTables());
+        $this->assertSame([], $event->getTables());
     }
 
     public function testOnReportBuilderWithAssetDownloadContext(): void
@@ -93,43 +92,31 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $reportSubscriber->onReportBuilder($event);
 
-        Assert::assertSame(
-            [
-                'alias' => 'download_count',
-                'label' => '[trans]mautic.asset.report.download_count[/trans]',
-                'type'  => 'int',
-            ],
-            $event->getTables()['assets']['columns']['a.download_count']
-        );
+        $this->assertSame([
+            'alias' => 'download_count',
+            'label' => '[trans]mautic.asset.report.download_count[/trans]',
+            'type'  => 'int',
+        ], $event->getTables()['assets']['columns']['a.download_count']);
 
-        Assert::assertSame(
-            [
-                'alias' => 'unique_download_count',
-                'label' => '[trans]mautic.asset.report.unique_download_count[/trans]',
-                'type'  => 'int',
-            ],
-            $event->getTables()['assets']['columns']['a.unique_download_count']
-        );
+        $this->assertSame([
+            'alias' => 'unique_download_count',
+            'label' => '[trans]mautic.asset.report.unique_download_count[/trans]',
+            'type'  => 'int',
+        ], $event->getTables()['assets']['columns']['a.unique_download_count']);
 
-        Assert::assertSame(
-            [
-                'alias'   => 'download_count',
-                'label'   => '[trans]mautic.asset.report.download_count[/trans]',
-                'type'    => 'int',
-                'formula' => 'COUNT(ad.id)',
-            ],
-            $event->getTables()['asset.downloads']['columns']['a.download_count']
-        );
+        $this->assertSame([
+            'alias'   => 'download_count',
+            'label'   => '[trans]mautic.asset.report.download_count[/trans]',
+            'type'    => 'int',
+            'formula' => 'COUNT(ad.id)',
+        ], $event->getTables()['asset.downloads']['columns']['a.download_count']);
 
-        Assert::assertSame(
-            [
-                'alias'   => 'unique_download_count',
-                'label'   => '[trans]mautic.asset.report.unique_download_count[/trans]',
-                'type'    => 'int',
-                'formula' => 'COUNT(DISTINCT ad.lead_id)',
-            ],
-            $event->getTables()['asset.downloads']['columns']['a.unique_download_count']
-        );
+        $this->assertSame([
+            'alias'   => 'unique_download_count',
+            'label'   => '[trans]mautic.asset.report.unique_download_count[/trans]',
+            'type'    => 'int',
+            'formula' => 'COUNT(DISTINCT ad.lead_id)',
+        ], $event->getTables()['asset.downloads']['columns']['a.unique_download_count']);
     }
 
     private function createTranslatorMock(): TranslatorInterface

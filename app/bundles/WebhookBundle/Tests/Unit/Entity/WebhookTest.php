@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;
-use PHPUnit\Framework\Assert;
 
 final class WebhookTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,11 +41,11 @@ final class WebhookTest extends \PHPUnit\Framework\TestCase
         $webhook->setTriggers($triggers);
 
         $events = $webhook->getEvents();
-        Assert::assertCount(3, $events);
+        $this->assertCount(3, $events);
 
         foreach ($events as $key => $event) {
-            Assert::assertEquals($event->getEventType(), $triggers[$key]);
-            Assert::assertSame($webhook, $event->getWebhook());
+            $this->assertEquals($event->getEventType(), $triggers[$key]);
+            $this->assertSame($webhook, $event->getWebhook());
         }
     }
 }

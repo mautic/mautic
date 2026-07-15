@@ -10,7 +10,6 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,8 +69,8 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringNotContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
-        Assert::assertStringContainsString('Edit Dynamic Content', $crawler->text());
+        $this->assertStringNotContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
+        $this->assertStringContainsString('Edit Dynamic Content', $crawler->text());
 
         $this->submitFormAndAssertNoNestingValidation($crawler);
     }
@@ -115,7 +114,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedAsset = $this->em->find(DynamicContent::class, $dynamicContent->getId());
         $this->assertInstanceOf(DynamicContent::class, $savedAsset);
-        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 
     private function createAndLoginUser(?string $permission = null): User
@@ -232,7 +231,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
+        $this->assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
     }
 
     public function testLocaleAndTimezoneFilterValidation(): void
