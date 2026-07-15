@@ -77,7 +77,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         $schemaManager = $this->connection->createSchemaManager();
 
         // test_first
-        $tableFirst = $schemaManager->introspectTable($this->tablePrefix.'test_first');
+        $schemaManager->introspectTable($this->tablePrefix.'test_first');
 
         $this->assertTableHasColumnAndIndex('test_first', 'generated_name_one', 'generated_name_one');
         $this->assertTableHasColumnAndIndex('test_first', 'generated_name_three', 'generated_name_three');

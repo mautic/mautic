@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -370,7 +369,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ],
     ): Import {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        Assert::assertInstanceOf(User::class, $user, 'Admin user not found in test database');
+        $this->assertInstanceOf(User::class, $user, 'Admin user not found in test database');
 
         $now    = new \DateTime();
         $import = new Import();
