@@ -479,7 +479,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * @param ?string $path
      */
-    public function setPath($path): Asset
+    public function setPath($path): self
     {
         $this->isChanged('path', $path);
         $this->path = $path;
@@ -498,7 +498,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * @param ?string $remotePath
      */
-    public function setRemotePath($remotePath): Asset
+    public function setRemotePath($remotePath): self
     {
         $this->isChanged('remotePath', $remotePath);
         $this->remotePath = $remotePath;

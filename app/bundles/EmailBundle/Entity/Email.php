@@ -678,7 +678,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function setId(int $id): Email
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -833,7 +833,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->sendToDnc;
     }
 
-    public function setSendToDnc(bool $sendToDnc): Email
+    public function setSendToDnc(bool $sendToDnc): self
     {
         $this->isChanged('sendToDnc', $sendToDnc);
         $this->sendToDnc = $sendToDnc;
@@ -903,7 +903,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->preheaderText;
     }
 
-    public function setPreheaderText(?string $preheaderText): Email
+    public function setPreheaderText(?string $preheaderText): self
     {
         $this->isChanged('preheaderText', $preheaderText);
         $this->preheaderText = $preheaderText;
@@ -1496,7 +1496,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param array<mixed> $settings
      */
-    public function setSettings(array $settings): Email
+    public function setSettings(array $settings): self
     {
         $this->isChanged('settings', $settings);
         $this->settings = $settings;

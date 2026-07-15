@@ -66,7 +66,7 @@ class EmailDefaultsHelper
         ];
 
         $filtered = array_filter($utmTags, static fn ($tag): bool => null !== $tag && '' !== $tag);
-        if ($filtered) {
+        if ([] !== $filtered) {
             $email->setUtmTags($filtered);
         }
     }

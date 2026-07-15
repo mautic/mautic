@@ -331,8 +331,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 $modifiedBy
             );
 
-        $modifiedBy->expects(self::atLeastOnce())->method('getEmail')->willReturn($modifiedByEmail);
-        $owner->expects(self::atLeastOnce())->method('getEmail')->willReturn($ownerEmail);
+        $modifiedBy->expects($this->atLeastOnce())->method('getEmail')->willReturn($modifiedByEmail);
+        $owner->expects($this->atLeastOnce())->method('getEmail')->willReturn($ownerEmail);
 
         $this->mailHelperMock
             ->expects($this->once())
@@ -351,7 +351,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $this->coreParamHelperMock->expects(self::atLeastOnce())
+        $this->coreParamHelperMock->expects($this->atLeastOnce())
             ->method('get')
             ->willReturnMap([
                 ['webhook_send_notification_to_author', 1, true],
@@ -440,7 +440,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('setBody')
             ->with($details);
 
-        $this->coreParamHelperMock->expects(self::atLeastOnce())
+        $this->coreParamHelperMock->expects($this->atLeastOnce())
             ->method('get')
             ->willReturnMap([
                 ['webhook_send_notification_to_author', 1, false],

@@ -24,7 +24,7 @@ final class ImportCommandTest extends TestCase
     public function testExecuteFailsIfModifiedByIsNotSet(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
         $importMock       = $this->createStub(Import::class);
         $importModelMock  = $this->createMock(ImportModel::class);
         $loggerMock       = $this->createStub(Logger::class);
@@ -55,7 +55,7 @@ final class ImportCommandTest extends TestCase
     {
         // Translator
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
         // Import entity
         $importMock = $this->createMock(Import::class);
@@ -124,7 +124,7 @@ final class ImportCommandTest extends TestCase
     public function testExecuteAddsNotificationOnFailure(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
+        $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
         $importMock = $this->createMock(Import::class);
         $importMock->expects($this->once())

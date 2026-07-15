@@ -93,7 +93,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 'title',
                 'id'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }
@@ -142,7 +142,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 $labelFilter,
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
 
@@ -157,7 +157,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 'slot_name',
                 $expr
             );
-            if ($dwcTokens) {
+            if ([] !== $dwcTokens) {
                 $event->addTokens($dwcTokens);
             }
 

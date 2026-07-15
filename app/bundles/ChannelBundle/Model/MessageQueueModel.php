@@ -163,7 +163,7 @@ class MessageQueueModel extends FormModel
             $messageQueues[] = $messageQueue;
         }
 
-        if ($messageQueues) {
+        if ([] !== $messageQueues) {
             $this->saveEntities($messageQueues);
             $messageQueueRepository = $this->getRepository();
             $messageQueueRepository->detachEntities($messageQueues);

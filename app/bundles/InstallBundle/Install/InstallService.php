@@ -347,7 +347,7 @@ class InstallService
     {
         $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
-        if (!$fixtures) {
+        if ([] === $fixtures) {
             throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 

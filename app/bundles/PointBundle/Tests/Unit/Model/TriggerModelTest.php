@@ -90,7 +90,7 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function ($event, $eventName) use ($dispatchCalls, $contact, $triggerEvent) {
+            ->willReturnCallback(function (object $event, ?string $eventName) use ($dispatchCalls, $contact, $triggerEvent): object {
                 $dispatchCalls->append($eventName);
 
                 if (PointEvents::TRIGGER_ON_BUILD === $eventName) {
@@ -110,8 +110,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     return $event;
                 }
                 if (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
-                    Assert::assertSame($contact, $event->getLead());
-                    Assert::assertSame($triggerEvent, $event->getTriggerEvent());
+                    $this->assertSame($contact, $event->getLead());
+                    $this->assertSame($triggerEvent, $event->getTriggerEvent());
 
                     return $event;
                 }
@@ -121,8 +121,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);
 
         // Assert both expected events were dispatched
-        Assert::assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
-        Assert::assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
-        Assert::assertCount(2, $dispatchCalls);
+        $this->assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
+        $this->assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
+        $this->assertCount(2, $dispatchCalls);
     }
 }

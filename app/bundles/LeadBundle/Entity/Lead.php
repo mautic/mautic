@@ -1915,7 +1915,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->groupScores = $groupScores;
     }
 
-    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    public function addGroupScore(GroupContactScore $groupContactScore): self
     {
         $this->groupScores[] = $groupContactScore;
 

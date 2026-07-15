@@ -76,7 +76,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
                 $leadsIds = array_column($subQb->executeQuery()->fetchAllAssociative(), 'id');
 
-                if (0 === sizeof($leadsIds)) {
+                if (0 === count($leadsIds)) {
                     break;
                 }
 
