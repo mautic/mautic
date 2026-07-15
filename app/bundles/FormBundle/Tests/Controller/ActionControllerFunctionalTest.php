@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -49,7 +48,7 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content    = $this->client->getResponse()->getContent();
         $actionHtml = json_decode($content, true)['actionHtml'] ?? null;
-        Assert::assertNotNull($actionHtml, $content);
+        $this->assertNotNull($actionHtml, $content);
         $crawler  = new Crawler($actionHtml);
         $editPage = $crawler->filter('.btn-edit')->attr('href');
 

@@ -31,7 +31,6 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -484,13 +483,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $mockHandler = $this->getClientMockHandler();
         $mockHandler->append(
             function (RequestInterface $request): Response {
-                Assert::assertSame('GET', $request->getMethod());
+                $this->assertSame('GET', $request->getMethod());
 
                 // Later check the logged/displayed URL has no auth details.
-                Assert::assertSame(
-                    'https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz',
-                    (string) $request->getUri()
-                );
+                $this->assertSame('https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', (string) $request->getUri());
 
                 return new Response(SymfonyResponse::HTTP_FORBIDDEN);
             }
@@ -507,7 +503,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse();
         // Be aware the exception could be in mock handler expectations.
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -535,7 +531,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=getIpLookupForm&service=maxmind_download');
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
