@@ -83,6 +83,7 @@ final class NoRequiredMethodWithConstructorInControllerRule implements Rule
             ))
                 ->identifier('mautic.noRequiredMethodWithConstructorInController')
                 ->line($classMethod->getStartLine())
+                ->nonIgnorable()
                 ->build();
         }
 
