@@ -765,11 +765,9 @@ class ReportController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function exportAction(Request $request, $objectId, $format = 'csv')
+    public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         /** @var ReportModel $model */
         $model    = $this->getModel('report');
@@ -873,7 +871,7 @@ class ReportController extends FormController
      *
      * @throws \Exception
      */
-    public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv')
+    public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
     {
         if ('csv' !== $format) {
             throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));

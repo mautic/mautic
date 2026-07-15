@@ -82,7 +82,7 @@ class CampaignApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         $response = parent::getEntitiesAction($request, $userHelper);
 
@@ -118,11 +118,9 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadAction($id, $leadId)
+    public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -152,11 +150,9 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeLeadAction($id, $leadId)
+    public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -326,10 +322,8 @@ class CampaignApiController extends CommonApiController
 
     /**
      * Obtains a list of campaign contacts.
-     *
-     * @return Response
      */
-    public function getContactsAction(Request $request, $id)
+    public function getContactsAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -371,7 +365,7 @@ class CampaignApiController extends CommonApiController
         );
     }
 
-    public function cloneCampaignAction($campaignId)
+    public function cloneCampaignAction($campaignId): Response
     {
         if (empty($campaignId) || false == intval($campaignId)) {
             return $this->notFound();

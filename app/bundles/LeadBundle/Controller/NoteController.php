@@ -16,10 +16,8 @@ class NoteController extends FormController
 
     /**
      * Generate's default list view.
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, $leadId = 0, $page = 1)
+    public function indexAction(Request $request, $leadId = 0, $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -294,10 +292,8 @@ class NoteController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $leadId, $objectId)
+    public function deleteAction(Request $request, $leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {

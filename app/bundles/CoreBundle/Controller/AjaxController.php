@@ -49,13 +49,11 @@ class AjaxController extends CommonController
 
     /**
      * Executes an action requested via ajax.
-     *
-     * @return Response
      */
     public function delegateAjaxAction(
         Request $request,
         AuthorizationCheckerInterface $authorizationChecker,
-    ) {
+    ): Response|JsonResponse {
         // process ajax actions
         $action     = $request->get('action');
         $bundleName = null;
@@ -106,14 +104,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 0]);
     }
 
-    /**
-     * @return Response
-     */
     public function executeAjaxAction(
         Request $request,
         $action,
         $bundle = null,
-    ) {
+    ): Response|JsonResponse {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
                 static::class.'::'.$action.'Action',
