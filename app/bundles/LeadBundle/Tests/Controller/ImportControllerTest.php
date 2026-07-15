@@ -601,7 +601,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
             }
         }));
 
-        Assert::assertNotEmpty($values, 'Company Name mapping option must be available in the import form.');
+        $this->assertNotEmpty($values, 'Company Name mapping option must be available in the import form.');
 
         $mappingForm['lead_field_import[company]']->setValue(end($values));
     }
