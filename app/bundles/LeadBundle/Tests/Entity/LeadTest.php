@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class LeadTest extends TestCase
@@ -313,9 +312,9 @@ final class LeadTest extends TestCase
         $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
         $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
 
-        Assert::assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
-        Assert::assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
-        Assert::assertNull($lead->getLastEventLogByAction('third'));
+        $this->assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
+        $this->assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
+        $this->assertNotInstanceOf(LeadEventLog::class, $lead->getLastEventLogByAction('third'));
     }
 
     /**

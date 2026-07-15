@@ -10,7 +10,6 @@ use Mautic\MarketplaceBundle\Command\ListCommand;
 use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
-use PHPUnit\Framework\Assert;
 
 final class ListCommandTest extends AbstractMauticTestCase
 {
@@ -58,8 +57,8 @@ final class ListCommandTest extends AbstractMauticTestCase
         Execution time:
         EOF;
 
-        Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString($expected, $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
     }
 
     public function testCommmandWithAllowlist(): void
@@ -151,7 +150,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         Execution time:
         EOF;
 
-        Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString($expected, $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
     }
 }

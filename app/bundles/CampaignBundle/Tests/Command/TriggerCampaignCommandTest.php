@@ -551,13 +551,13 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(0, $count);
+        $this->assertSame(0, $count);
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -576,11 +576,11 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
     }
 
     public function testCampaignActionChangeMembershipRestartRotation(): void
@@ -608,12 +608,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
-        Assert::assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertSame(2, $campaignLeads[1]->getRotation()); // assert it's the second rotation
     }
 
     public function testCampaignActionAfterChangeMembership(): void
@@ -632,14 +632,14 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
-        Assert::assertCount(1, $campaignLeads);
-        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertCount(1, $campaignLeads);
+        $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
-        Assert::assertCount(1, $campaignEventLogs);
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
-        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+        $this->assertCount(1, $campaignEventLogs);
+        $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
     }
 
     public function testCampaignActionBeforeChangeMembership(): void
@@ -658,16 +658,16 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
-        Assert::assertCount(1, $campaignLeads);
-        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+        $this->assertCount(1, $campaignLeads);
+        $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
-        Assert::assertCount(2, $campaignEventLogs);
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
-        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
-        Assert::assertSame($campaign->getId(), $campaignEventLogs[1]->getCampaign()->getId());
-        Assert::assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
+        $this->assertCount(2, $campaignEventLogs);
+        $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+        $this->assertSame($campaign->getId(), $campaignEventLogs[1]->getCampaign()->getId());
+        $this->assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
     }
 
     public function testCampaignExclusion(): void
@@ -687,12 +687,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
-        Assert::assertCount(2, $campaignLeads);
-        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[0]->getManuallyRemoved(), 'Test not executed campaign does not have Contact removed.');
-        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
-        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
-        Assert::assertFalse($campaignLeads[1]->getManuallyAdded());
+        $this->assertCount(2, $campaignLeads);
+        $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[0]->getManuallyRemoved(), 'Test not executed campaign does not have Contact removed.');
+        $this->assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        $this->assertFalse($campaignLeads[1]->getManuallyRemoved());
+        $this->assertFalse($campaignLeads[1]->getManuallyAdded());
     }
 
     /**
@@ -772,7 +772,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertSame(50, $count);
+        $this->assertSame(50, $count);
     }
 
     /**
@@ -880,30 +880,30 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $eventLog = $this->em->find(LeadEventLog::class, $logId);
         $this->assertInstanceOf(LeadEventLog::class, $eventLog);
 
-        Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
-        Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
+        $this->assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
 
         // Assert that trigger date logging is working
         $metadata = $eventLog->getMetadata();
-        Assert::assertIsArray($metadata, 'Metadata should be an array');
-        Assert::assertArrayHasKey('triggerDateLog', $metadata, 'Metadata should contain triggerDateLog');
+        $this->assertIsArray($metadata, 'Metadata should be an array');
+        $this->assertArrayHasKey('triggerDateLog', $metadata, 'Metadata should contain triggerDateLog');
 
         $triggerDateLog = $metadata['triggerDateLog'];
-        Assert::assertNotEmpty($triggerDateLog, 'Trigger date log should contain entries');
+        $this->assertNotEmpty($triggerDateLog, 'Trigger date log should contain entries');
 
-        Assert::assertCount(count($expectedTriggerDateLog), $triggerDateLog);
+        $this->assertCount(count($expectedTriggerDateLog), $triggerDateLog);
 
         // Assert that the expected metadata is present
         foreach ($triggerDateLog as $key => $log) {
-            Assert::assertSame($log['changedTo'], $expectedTriggerDateLog[$key]['changedTo']);
-            Assert::assertSame($log['note'], $expectedTriggerDateLog[$key]['note']);
+            $this->assertSame($log['changedTo'], $expectedTriggerDateLog[$key]['changedTo']);
+            $this->assertSame($log['note'], $expectedTriggerDateLog[$key]['note']);
         }
     }
 
     /**
-     * @return array<string, array{republishBehavior: string, triggerMode: string, intervalDays: int, auditLogs: array<array{dateAdded: string, details: array<string, array<int, mixed>>}>, expectedTriggerDate: string, expectedIsScheduled: bool}>
+     * @return \Iterator<string, array{republishBehavior: string, triggerMode: string, intervalDays: int, auditLogs: array<array{dateAdded: string, details: array<string, array<int, mixed>>}>, expectedTriggerDate: string, expectedIsScheduled: bool}>
      */
-    public static function republishBehaviorProvider(): array
+    public static function republishBehaviorProvider(): \Iterator
     {
         $unpublishedAfter5days = 'published, unpublished and published';
         $auditLogs             = [
@@ -928,98 +928,95 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 ],
             ],
         ];
-
-        return [
-            'Same the original trigger date as it should not change' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ALL_TIME->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        yield 'Same the original trigger date as it should not change' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ALL_TIME->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            '10 days after last publish which is 2024-10-10 00:00:00' => [
-                'republishBehavior'      => RepublishBehavior::RESTART_ON_PUBLISH->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-20 00:00:00', // 10 days after last publish
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
-                    [
-                        'changedTo' => '2024-10-20 00:00:00',
-                        'note'      => 'Campaign republish behavior: restart_on_publish',
-                    ],
+        ];
+        yield '10 days after last publish which is 2024-10-10 00:00:00' => [
+            'republishBehavior'      => RepublishBehavior::RESTART_ON_PUBLISH->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-20 00:00:00', // 10 days after last publish
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
+                ],
+                [
+                    'changedTo' => '2024-10-20 00:00:00',
+                    'note'      => 'Campaign republish behavior: restart_on_publish',
                 ],
             ],
-            'Scheduled at 2024-10-02 00:00:00 for 10 days (2024-10-12 00:00:00), unpublished at 2024-10-05 00:00:00 after 3 days, published 2024-10-10 00:00:00 (5 days)' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-17 00:00:00', // 3 days were already published, 7 remaining to go after publish of 2024-10-10 00:00:00.
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
-                    [
-                        'changedTo' => '2024-10-17 00:00:00',
-                        'note'      => 'Campaign republish behavior: count_only_while_published',
-                    ],
+        ];
+        yield 'Scheduled at 2024-10-02 00:00:00 for 10 days (2024-10-12 00:00:00), unpublished at 2024-10-05 00:00:00 after 3 days, published 2024-10-10 00:00:00 (5 days)' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-17 00:00:00', // 3 days were already published, 7 remaining to go after publish of 2024-10-10 00:00:00.
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
+                ],
+                [
+                    'changedTo' => '2024-10-17 00:00:00',
+                    'note'      => 'Campaign republish behavior: count_only_while_published',
                 ],
             ],
-            'Absolute date trigger mode should not do anything' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_DATE,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'Absolute date trigger mode should not do anything' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_DATE,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            'Immediate trigger mode should not extend anything' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_IMMEDIATE,
-                'intervalDays'           => 10,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'Immediate trigger mode should not extend anything' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_IMMEDIATE,
+            'intervalDays'           => 10,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
-            'If the interval is empty then there will be no extension' => [
-                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
-                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
-                'intervalDays'           => 0,
-                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
-                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
-                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
-                'expectedTriggerDateLog' => [
-                    [
-                        'changedTo' => '2024-10-12 00:00:00',
-                        'note'      => 'Test setup',
-                    ],
+        ];
+        yield 'If the interval is empty then there will be no extension' => [
+            'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+            'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+            'intervalDays'           => 0,
+            'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+            'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+            'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+            'expectedTriggerDateLog' => [
+                [
+                    'changedTo' => '2024-10-12 00:00:00',
+                    'note'      => 'Test setup',
                 ],
             ],
         ];

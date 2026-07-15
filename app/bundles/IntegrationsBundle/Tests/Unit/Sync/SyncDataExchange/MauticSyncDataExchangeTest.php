@@ -19,7 +19,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullO
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -152,8 +151,8 @@ final class MauticSyncDataExchangeTest extends TestCase
 
         $internalObjectDao = $this->mauticSyncDataExchange->getConflictedInternalObject($mappingManualDao, 'lead', $integrationObjectDao);
 
-        Assert::assertSame('lead', $internalObjectDao->getObject());
-        Assert::assertNull($internalObjectDao->getObjectId());
+        $this->assertSame('lead', $internalObjectDao->getObject());
+        $this->assertNull($internalObjectDao->getObjectId());
     }
 
     public function testGetConflictedInternalObjectWithObjectId(): void
@@ -187,8 +186,8 @@ final class MauticSyncDataExchangeTest extends TestCase
 
         $internalObjectDao = $this->mauticSyncDataExchange->getConflictedInternalObject($mappingManualDao, 'lead', $integrationObjectDao);
 
-        Assert::assertSame('lead', $internalObjectDao->getObject());
-        Assert::assertSame(123, $internalObjectDao->getObjectId());
-        Assert::assertCount(1, $internalObjectDao->getFields());
+        $this->assertSame('lead', $internalObjectDao->getObject());
+        $this->assertSame(123, $internalObjectDao->getObjectId());
+        $this->assertCount(1, $internalObjectDao->getFields());
     }
 }
