@@ -73,6 +73,7 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
             __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
+            __DIR__ . '/app/bundles/CoreBundle/Controller/CommonController.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,

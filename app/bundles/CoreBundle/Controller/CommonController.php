@@ -151,8 +151,10 @@ class CommonController extends AbstractController implements MauticController
      * @param array  $request    An array of request parameters
      * @param array  $path       An array of path parameters
      * @param array  $query      An array of query parameters
+     *
+     * @return Response A Response instance
      */
-    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
+    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = [])
     {
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
@@ -440,8 +442,10 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Get's the content of error page.
+     *
+     * @return Response
      */
-    public function renderException(\Exception $e): Response
+    public function renderException(\Exception $e)
     {
         $request = $this->getCurrentRequest();
 
@@ -463,8 +467,10 @@ class CommonController extends AbstractController implements MauticController
      * @param int    $objectId
      * @param int    $objectSubId
      * @param string $objectModel
+     *
+     * @return Response
      */
-    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
@@ -486,7 +492,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @throws AccessDeniedHttpException
      */
-    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
     {
         throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
     }
@@ -527,8 +533,10 @@ class CommonController extends AbstractController implements MauticController
      * Generate 404 not found message.
      *
      * @param string $msg
+     *
+     * @return Response
      */
-    public function notFound($msg = 'mautic.core.url.error.404'): Response
+    public function notFound($msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
