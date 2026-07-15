@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\SmsBundle\Model\SmsModel;
-use MauticRector\GetModelToConstructorInjectionRector;
+use MauticRector\GetModelToRequiredPropertyRector;
 use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
@@ -55,7 +55,7 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
     ])
-    ->withConfiguredRule(GetModelToConstructorInjectionRector::class, [
+    ->withConfiguredRule(GetModelToRequiredPropertyRector::class, [
         'sms' => SmsModel::class,
     ])
     ->reportUnusedSkips()
