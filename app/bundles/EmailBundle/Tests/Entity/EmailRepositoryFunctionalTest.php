@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 
 final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -34,7 +33,7 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $result = $this->emailRepository->getDoNotEmailList();
 
-        Assert::assertSame([], $result);
+        $this->assertSame([], $result);
     }
 
     public function testGetDoNotEmailListNotEmpty(): void
@@ -53,22 +52,22 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // no $leadIds
         $result = $this->emailRepository->getDoNotEmailList();
-        Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
+        $this->assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // matching $leadIds
         $result = $this->emailRepository->getDoNotEmailList([$lead->getId()]);
-        Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
+        $this->assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // mismatching $leadIds
         $result = $this->emailRepository->getDoNotEmailList([-1]);
-        Assert::assertSame([], $result);
+        $this->assertSame([], $result);
     }
 
     public function testCheckDoNotEmailNonExistent(): void
     {
         $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
 
-        Assert::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     public function testCheckDoNotEmailExistent(): void
@@ -88,9 +87,9 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
-        Assert::assertNotFalse($result);
+        $this->assertNotFalse($result);
 
-        Assert::assertSame([
+        $this->assertSame([
             'id'           => (string) $doNotContact->getId(),
             'unsubscribed' => true,
             'bounced'      => false,
@@ -200,7 +199,7 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $expectedLeadIds = array_map(fn (int $id): string => (string) $id, $expectedLeadIds);
         sort($expectedLeadIds);
 
-        Assert::assertSame($expectedLeadIds, $actualLeadIds);
+        $this->assertSame($expectedLeadIds, $actualLeadIds);
     }
 
     /**

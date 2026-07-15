@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -255,7 +254,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaignId = $campaign->getId();
 
         $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     private function campaignContactCountOnCanvas(): void
@@ -263,7 +262,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign      = $this->saveSomeCampaignLeadEventLogs();
         $campaignId    = $campaign->getId();
         $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     /**
@@ -287,9 +286,9 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         }
 
         $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
-        Assert::assertSame($expectedCompleted, $actionCounts['completed']);
-        Assert::assertSame($expectedPending, $actionCounts['pending']);
+        $this->assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
+        $this->assertSame($expectedCompleted, $actionCounts['completed']);
+        $this->assertSame($expectedPending, $actionCounts['pending']);
     }
 
     public function testDeleteCampaign(): void
@@ -305,7 +304,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         self::assertResponseIsSuccessful($response->getContent());
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $this->assertCount(0, $eventLogs);
     }
 
     private function createLead(): Lead

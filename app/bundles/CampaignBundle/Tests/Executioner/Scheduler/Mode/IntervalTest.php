@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableExceptio
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Psr\Log\NullLogger;
 
 final class IntervalTest extends \PHPUnit\Framework\TestCase
@@ -62,7 +61,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        Assert::assertSame($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
+        $this->assertSame($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
     }
 
     /**
@@ -136,7 +135,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval         = $this->getInterval();
         $scheduledForDate = $interval->getExecutionDateTime($event, $scheduledOnDate, $scheduledOnDate);
 
-        Assert::assertSame($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
+        $this->assertSame($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
     }
 
     /**
@@ -319,8 +318,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertSame($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertSame($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
@@ -356,8 +355,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
@@ -375,8 +374,8 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectIntervalUnit(): void
@@ -407,9 +406,9 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event3));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event3));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithValidTriggerHour(): void
@@ -426,7 +425,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithDayOfWeekRestrictions(): void
@@ -445,7 +444,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithStartAndStopHours(): void
@@ -468,7 +467,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     private function getInterval(): Interval
@@ -557,7 +556,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredShouldReturnFalseForNegativePathAction(): void
@@ -587,6 +586,6 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
     }
 }

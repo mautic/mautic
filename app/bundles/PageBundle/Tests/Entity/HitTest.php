@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Hit;
-use PHPUnit\Framework\Assert;
 
 final class HitTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +14,7 @@ final class HitTest extends \PHPUnit\Framework\TestCase
         $hit = new Hit();
         $hit->setUrlTitle($urlTitle);
 
-        Assert::assertSame($expected, mb_strlen($hit->getUrlTitle()));
+        $this->assertSame($expected, mb_strlen($hit->getUrlTitle()));
     }
 
     /**

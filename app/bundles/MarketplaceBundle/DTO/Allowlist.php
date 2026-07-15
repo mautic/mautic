@@ -19,7 +19,7 @@ final class Allowlist
     /**
      * @param array<string,mixed> $array
      */
-    public static function fromArray(array $array): Allowlist
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(AllowlistEntry::fromArray(...), $array['allowlist'] ?? []),
