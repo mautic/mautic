@@ -12,8 +12,8 @@ use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 class FocusFilterHelper
 {
     public function __construct(
-        private FocusRepository $focusRepository,
-        private DynamicContentHelper $dynamicContentHelper,
+        private readonly FocusRepository $focusRepository,
+        private readonly DynamicContentHelper $dynamicContentHelper,
     ) {
     }
 

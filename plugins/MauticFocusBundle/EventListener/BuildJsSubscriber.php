@@ -14,8 +14,8 @@ use Symfony\Component\Routing\RouterInterface;
 class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private RouterInterface $router,
-        private FocusRepository $focusRepository,
+        private readonly RouterInterface $router,
+        private readonly FocusRepository $focusRepository,
     ) {
     }
 

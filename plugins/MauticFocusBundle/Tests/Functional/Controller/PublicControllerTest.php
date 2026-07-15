@@ -49,8 +49,10 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $matchingLead = $this->createLeadWithTrackingStat('focus-match@example.com', 'focus-tracking-hash-1');
         $this->createLeadWithTrackingStat('focus-other@example.com', 'focus-tracking-hash-2');
 
-        $leadCount   = $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads');
-        $deviceCount = $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices');
+        $leadCountQuery   = sprintf('SELECT COUNT(*) FROM %sleads', MAUTIC_TABLE_PREFIX);
+        $deviceCountQuery = sprintf('SELECT COUNT(*) FROM %slead_devices', MAUTIC_TABLE_PREFIX);
+        $leadCount        = $this->connection->fetchOne($leadCountQuery);
+        $deviceCount      = $this->connection->fetchOne($deviceCountQuery);
 
         // Matching contact gets the focus item
         $ct = ClickthroughHelper::encodeArrayForUrl(['stat' => 'focus-tracking-hash-1']);
@@ -70,8 +72,8 @@ final class PublicControllerTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
         // The endpoint is non-trackable: it must not have created leads or devices
-        $this->assertSame($leadCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads'));
-        $this->assertSame($deviceCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices'));
+        $this->assertSame($leadCount, $this->connection->fetchOne($leadCountQuery));
+        $this->assertSame($deviceCount, $this->connection->fetchOne($deviceCountQuery));
     }
 
     /**

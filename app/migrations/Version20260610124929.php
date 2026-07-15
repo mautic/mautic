@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20260610124929 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'focus';
+
     private const COLUMN_NAME  = 'filters';
 
     protected function preUpAssertions(): void

@@ -7,9 +7,8 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
-use PHPUnit\Framework\Assert;
 
-class FocusRepositoryTest extends MauticMysqlTestCase
+final class FocusRepositoryTest extends MauticMysqlTestCase
 {
     /**
      * @var array<int, array<string, mixed>>
@@ -51,15 +50,15 @@ class FocusRepositoryTest extends MauticMysqlTestCase
 
         // Pin how the array column type serializes an empty filters collection
         $rawEmpty = $this->connection->fetchOne('SELECT filters FROM '.MAUTIC_TABLE_PREFIX.'focus WHERE id = '.$emptyFilters->getId());
-        Assert::assertSame('a:0:{}', $rawEmpty);
+        $this->assertSame('a:0:{}', $rawEmpty);
 
         $repository = $this->getRepository();
         $rows       = $repository->getPublishedWithFilters();
 
-        Assert::assertCount(1, $rows);
-        Assert::assertSame((string) $published->getId(), (string) $rows[0]['id']);
-        Assert::assertSame(self::FILTERS, \Mautic\CoreBundle\Helper\Serializer::decode($rows[0]['filters']));
-        Assert::assertTrue($repository->hasPublishedWithFilters());
+        $this->assertCount(1, $rows);
+        $this->assertSame((string) $published->getId(), (string) $rows[0]['id']);
+        $this->assertSame(self::FILTERS, \Mautic\CoreBundle\Helper\Serializer::decode($rows[0]['filters']));
+        $this->assertTrue($repository->hasPublishedWithFilters());
     }
 
     public function testHasPublishedWithFiltersIsFalseWithoutFilterBasedItems(): void
@@ -67,15 +66,15 @@ class FocusRepositoryTest extends MauticMysqlTestCase
         $focus = $this->createFocus('No filters', true);
         $this->em->flush();
 
-        Assert::assertFalse($this->getRepository()->hasPublishedWithFilters());
-        Assert::assertSame([], $this->getRepository()->getPublishedWithFilters());
+        $this->assertFalse($this->getRepository()->hasPublishedWithFilters());
+        $this->assertSame([], $this->getRepository()->getPublishedWithFilters());
 
         $focus->setFilters(self::FILTERS);
         // Mautic entities use deferred-explicit change tracking
         $this->em->persist($focus);
         $this->em->flush();
 
-        Assert::assertTrue($this->getRepository()->hasPublishedWithFilters());
+        $this->assertTrue($this->getRepository()->hasPublishedWithFilters());
     }
 
     private function createFocus(string $name, bool $isPublished): Focus
