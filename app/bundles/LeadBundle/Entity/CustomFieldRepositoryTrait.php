@@ -267,7 +267,7 @@ trait CustomFieldRepositoryTrait
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
-            $this->getEntityManager()->flush($entity);
+            $this->getEntityManager()->flush();
         }
 
         // Includes prefix
