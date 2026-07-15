@@ -16,7 +16,6 @@ use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -67,13 +66,13 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         $model->addOrEditEntity($email);
 
-        Assert::assertSame('<html/>', $email->getCustomHtml());
+        $this->assertSame('<html/>', $email->getCustomHtml());
         $content = $email->getContent();
-        Assert::assertIsArray($content);
-        Assert::assertArrayHasKey('grapesjsbuilder', $content);
-        Assert::assertIsArray($content['grapesjsbuilder']);
-        Assert::assertSame(['pages' => [['id' => 'main']]], $content['grapesjsbuilder']['editorState']);
-        Assert::assertArrayHasKey('updatedAt', $content['grapesjsbuilder']);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('grapesjsbuilder', $content);
+        $this->assertIsArray($content['grapesjsbuilder']);
+        $this->assertSame(['pages' => [['id' => 'main']]], $content['grapesjsbuilder']['editorState']);
+        $this->assertArrayHasKey('updatedAt', $content['grapesjsbuilder']);
     }
 
     public function testAddOrEditEntitySkipsWhenTranslationChildrenAreUpdating(): void
@@ -129,10 +128,10 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $model->addOrEditPageEntity($page);
 
         $content = $page->getContent();
-        Assert::assertIsArray($content);
-        Assert::assertArrayHasKey('grapesjsbuilder', $content);
-        Assert::assertIsArray($content['grapesjsbuilder']);
-        Assert::assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('grapesjsbuilder', $content);
+        $this->assertIsArray($content['grapesjsbuilder']);
+        $this->assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
 
         $requestStackNoEditor = new RequestStack();
         $requestStackNoEditor->push(new Request([], [

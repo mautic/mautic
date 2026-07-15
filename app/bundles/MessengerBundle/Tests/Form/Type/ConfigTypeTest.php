@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MessengerBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,11 +31,7 @@ final class ConfigTypeTest extends MauticMysqlTestCase
     #[DataProvider('belowOneMultiplierProvider')]
     public function testMultiplierBelowOneIsRejected(string $value): void
     {
-        Assert::assertStringContainsString(
-            self::MIN_MULTIPLIER_ERROR,
-            $this->submitMultiplier($value),
-            'A multiplier below 1 must be rejected with a validation error.'
-        );
+        $this->assertStringContainsString(self::MIN_MULTIPLIER_ERROR, $this->submitMultiplier($value), 'A multiplier below 1 must be rejected with a validation error.');
     }
 
     /**
@@ -50,11 +45,7 @@ final class ConfigTypeTest extends MauticMysqlTestCase
 
     public function testValidMultiplierIsAccepted(): void
     {
-        Assert::assertStringNotContainsString(
-            self::MIN_MULTIPLIER_ERROR,
-            $this->submitMultiplier('3'),
-            'A multiplier >= 1 must not trigger the minimum-multiplier validation error.'
-        );
+        $this->assertStringNotContainsString(self::MIN_MULTIPLIER_ERROR, $this->submitMultiplier('3'), 'A multiplier >= 1 must not trigger the minimum-multiplier validation error.');
     }
 
     /**

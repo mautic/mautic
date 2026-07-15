@@ -202,7 +202,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        Assert::assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
     }
 
     private function getCrawler(Campaign $campaign): Crawler

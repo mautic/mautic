@@ -19,7 +19,6 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -126,15 +125,15 @@ final class ReportExporterTest extends \PHPUnit\Framework\TestCase
                 }
 
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
-                Assert::assertSame('my-path', $event->getFile());
+                $this->assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $scheduler1);
+                    $this->assertSame($event->getScheduler(), $scheduler1);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $scheduler2);
+                    $this->assertSame($event->getScheduler(), $scheduler2);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $schedulerNow);
+                    $this->assertSame($event->getScheduler(), $schedulerNow);
                 }
 
                 return $event;
