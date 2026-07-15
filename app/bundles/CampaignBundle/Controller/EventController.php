@@ -26,6 +26,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EventController extends CommonFormController
 {
+    private \Mautic\CampaignBundle\Model\EventModel $eventModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireEventController(\Mautic\CampaignBundle\Model\EventModel $eventModel): void
+    {
+        $this->eventModel = $eventModel;
+    }
     /**
      * @var string[]
      */
@@ -217,7 +224,7 @@ class EventController extends CommonFormController
         $this->setCampaignElements($request->request);
         $event = $this->modifiedEvents[$objectId] ?? [];
         if (empty($event)) {
-            $eventEntity = $this->getModel('campaign.event')->getEntity($objectId);
+            $eventEntity = $this->eventModel->getEntity($objectId);
             if (null === $eventEntity) {
                 return $this->modalAccessDenied();
             }

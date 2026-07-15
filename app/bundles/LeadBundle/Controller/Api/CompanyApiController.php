@@ -30,6 +30,13 @@ class CompanyApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
+    private CompanyModel $companyModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireCompanyApiController(CompanyModel $companyModel): void
+    {
+        $this->companyModel = $companyModel;
+    }
 
     /**
      * @var CompanyModel|null
@@ -62,9 +69,7 @@ class CompanyApiController extends CommonApiController
 
     public function getNewEntity(array $params)
     {
-        $leadCompanyModel = $this->getModel('lead.company');
-        \assert($leadCompanyModel instanceof CompanyModel);
-        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $this->companyModel);
         if (count($companyEntities)) {
             return $this->model->getEntity($company['id']);
         }

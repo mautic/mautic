@@ -33,6 +33,13 @@ use Symfony\Component\HttpFoundation\Response;
 class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
+    private EventModel $eventModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireEventLogApiController(EventModel $eventModel): void
+    {
+        $this->eventModel = $eventModel;
+    }
 
     private const LOG_SERIALIZATION = 30;
 
@@ -155,11 +162,8 @@ class EventLogApiController extends FetchCommonApiController
         if ($contact instanceof Response) {
             return $contact;
         }
-
-        /** @var EventModel $eventModel */
-        $eventModel = $this->getModel('campaign.event');
         /** @var Event $event */
-        $event = $eventModel->getEntity($eventId);
+        $event = $this->eventModel->getEntity($eventId);
         if (null === $event || !$event->getId()) {
             return $this->notFound();
         }
@@ -202,7 +206,7 @@ class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
-        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
+        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
         $this->inBatchMode = true;

@@ -29,6 +29,13 @@ use Symfony\Component\Routing\RouterInterface;
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
+    private ListModel $listModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireListApiController(ListModel $listModel): void
+    {
+        $this->listModel = $listModel;
+    }
 
     /**
      * @var ListModel|null
@@ -132,9 +139,7 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction(): Response
     {
-        $listModel = $this->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-        $lists   = $listModel->getUserLists();
+        $lists   = $this->listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);

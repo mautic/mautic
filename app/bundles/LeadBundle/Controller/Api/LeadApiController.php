@@ -43,8 +43,23 @@ class LeadApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
+    private \Mautic\LeadBundle\Model\DeviceModel $deviceModel;
+    private \Mautic\LeadBundle\Model\NoteModel $noteModel;
 
-    public const MODEL_ID = 'lead.lead';
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireLeadApiController(
+        \Mautic\LeadBundle\Model\NoteModel $noteModel,
+        \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
+        \Mautic\UserBundle\Model\UserModel $userModel,
+        \Mautic\StageBundle\Model\StageModel $stageModel,
+    ): void {
+        $this->noteModel = $noteModel;
+        $this->deviceModel = $deviceModel;
+        $this->userModel = $userModel;
+        $this->stageModel = $stageModel;
+    }
 
     /**
      * @var LeadModel|null
@@ -71,11 +86,10 @@ class LeadApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
+        LeadModel $leadModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
-        $leadModel = $modelFactory->getModel(self::MODEL_ID);
-        \assert($leadModel instanceof LeadModel);
         $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
@@ -162,7 +176,7 @@ class LeadApiController extends CommonApiController
 
         $defaultPageLimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
-        $results = $this->getModel('lead.note')->getEntities(
+        $results = $this->noteModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->getInt('limit', $defaultPageLimit),
@@ -214,7 +228,7 @@ class LeadApiController extends CommonApiController
 
         $defaultPagelimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
-        $results = $this->getModel('lead.device')->getEntities(
+        $results = $this->deviceModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
                 'limit'  => $request->query->getInt('limit', $defaultPagelimit),
@@ -607,13 +621,13 @@ class LeadApiController extends CommonApiController
         }
 
         if (isset($parameters['owner'])) {
-            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $owner = $this->userModel->getEntity((int) $parameters['owner']);
             $entity->setOwner($owner);
             unset($parameters['owner']);
         }
 
         if (isset($parameters['stage'])) {
-            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $stage = $this->stageModel->getEntity((int) $parameters['stage']);
             $entity->setStage($stage);
             unset($parameters['stage']);
         }
