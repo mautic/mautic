@@ -14,8 +14,9 @@ use Ramsey\Uuid\Uuid;
 #[AsDoctrineListener(Events::prePersist)]
 class UUIDListener
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {
     }
 
     /**

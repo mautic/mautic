@@ -19,17 +19,17 @@ use PHPUnit\Framework\TestCase;
 final class SegmentOperatorQuerySubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilder;
 
     /**
-     * @var MockObject|ExpressionBuilder
+     * @var MockObject&ExpressionBuilder
      */
     private MockObject $expressionBuilder;
 
     /**
-     * @var MockObject|ContactSegmentFilter
+     * @var MockObject&ContactSegmentFilter
      */
     private MockObject $contactSegmentFilter;
 
@@ -91,23 +91,19 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
-                    $this->assertSame($expectedExpression, (string) $expression);
-
-                    return true;
-                }),
+                $expectedExpression,
                 CompositeExpression::TYPE_AND
             );
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNull')
             ->with('l.email')
-            ->willReturnCallback(fn ($x) => $x.' IS NULL');
+            ->willReturnCallback(fn ($x): string => $x.' IS NULL');
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('eq')
             ->with('l.email')
-            ->willReturnCallback(fn ($x, $y) => $x.' = '.$y);
+            ->willReturnCallback(fn ($x, $y): string => $x.' = '.$y);
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('literal')
@@ -170,24 +166,20 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
-            ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
-                    $this->assertSame($expectedExpression, (string) $expression);
-
-                    return true;
-                }),
-                CompositeExpression::TYPE_AND
-            );
+            ->willReturnCallback(function (CompositeExpression $expression, $glue) use ($expectedExpression): void {
+                $this->assertSame($expectedExpression, (string) $expression);
+                $this->assertSame(CompositeExpression::TYPE_AND, $glue);
+            });
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNotNull')
             ->with('l.email')
-            ->willReturnCallback(fn ($x) => $x.' IS NOT NULL');
+            ->willReturnCallback(fn ($x): string => $x.' IS NOT NULL');
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('neq')
             ->with('l.email')
-            ->willReturnCallback(fn ($x, $y) => $x.' <> '.$y);
+            ->willReturnCallback(fn ($x, $y): string => $x.' <> '.$y);
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('literal')
@@ -206,6 +198,69 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     {
         yield [false, 'l.email IS NOT NULL'];
         yield [true, "(l.email IS NOT NULL) AND (l.email <> '')"];
+    }
+
+    public function testOnNegativeOperatorsExcludingAllWithMultipleValuesAddsAlwaysTrueExpression(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a', 'value_b']
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::EXCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with('1 = 1', CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->never())
+            ->method('isNull');
+
+        $this->subscriber->onNegativeOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnNegativeOperatorsExcludingAllWithSingleValueTreatsAsNotIn(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('country');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::EXCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with($this->anything(), CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('isNull')
+            ->with('l.country');
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('notIn')
+            ->with('l.country', ['value_a']);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('or');
+
+        $this->subscriber->onNegativeOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
     }
 
     public function testOnNegativeOperatorsIfNotNegativeOperator(): void
@@ -287,7 +342,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAll(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -339,8 +394,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);
@@ -403,7 +458,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAny(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -455,8 +510,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);
@@ -512,6 +567,62 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->contactSegmentFilter->contactSegmentFilterCrate = $contactSegmentFilterCrate;
 
         $this->subscriber->onMultiselectOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnDefaultOperatorsIncludingAllWithMultipleValuesAddsAlwaysFalseExpression(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a', 'value_b']
+        );
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::INCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with('1 = 0', CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->never())
+            ->method('in');
+
+        $this->subscriber->onDefaultOperators($event);
+
+        $this->assertTrue($event->wasOperatorHandled());
+    }
+
+    public function testOnDefaultOperatorsIncludingAllWithSingleValueTreatsAsIn(): void
+    {
+        $event = new SegmentOperatorQueryBuilderEvent(
+            $this->queryBuilder,
+            $this->contactSegmentFilter,
+            ['value_a']
+        );
+
+        $this->contactSegmentFilter->method('getField')
+            ->willReturn('country');
+
+        $this->contactSegmentFilter->method('getOperator')
+            ->willReturn(OperatorOptions::INCLUDING_ALL);
+
+        $this->contactSegmentFilter->method('getGlue')
+            ->willReturn(CompositeExpression::TYPE_AND);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('addLogic')
+            ->with($this->anything(), CompositeExpression::TYPE_AND);
+
+        $this->expressionBuilder->expects($this->once())
+            ->method('in')
+            ->with('l.country', ['value_a']);
+
+        $this->subscriber->onDefaultOperators($event);
 
         $this->assertTrue($event->wasOperatorHandled());
     }

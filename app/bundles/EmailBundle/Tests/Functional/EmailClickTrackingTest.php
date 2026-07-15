@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailClickTrackingTest extends MauticMysqlTestCase
@@ -47,12 +46,13 @@ final class EmailClickTrackingTest extends MauticMysqlTestCase
         $this->logoutUser();
 
         $this->client->request(Request::METHOD_GET, '/test-page?&ct=YToxOntzOjQ6InN0YXQiO3M6MjI6IjY3MTY3ZjU3YTRjMDUyNjU5MzYwOTEiO30%3D');
-        Assert::assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $pageHitRepository = $this->em->getRepository(Hit::class);
-        \assert($pageHitRepository instanceof HitRepository);
+        $this->assertInstanceOf(HitRepository::class, $pageHitRepository);
 
         $hit = $pageHitRepository->findOneBy(['page' => $page]);
-        Assert::assertSame($contact->getId(), $hit->getLead()->getId());
+        $this->assertInstanceOf(Hit::class, $hit);
+        $this->assertSame($contact->getId(), $hit->getLead()->getId());
     }
 }

@@ -26,11 +26,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener extends ErrorListener
 {
     /**
-     * @param mixed $controller
+     * @param string|object|mixed[]|null $controller
      */
     public function __construct(
         protected Router $router,
-        $controller,
+        string|object|array|null $controller,
         ?LoggerInterface $logger = null,
     ) {
         parent::__construct($controller, $logger);
@@ -122,7 +122,6 @@ class ExceptionListener extends ErrorListener
             }
 
             $prev = new \ReflectionProperty('Exception', 'previous');
-            $prev->setAccessible(true);
             $prev->setValue($wrapper, $exception);
 
             throw $e;

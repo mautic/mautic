@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -16,6 +17,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\SMimeHelper;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,9 +37,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class OwnerSubscriberTest extends TestCase
+final class OwnerSubscriberTest extends TestCase
 {
-    protected $contacts = [
+    /**
+     * @var array<int, array<string, int|string|null>>
+     */
+    protected array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -75,15 +80,11 @@ class OwnerSubscriberTest extends TestCase
         ],
     ];
 
-    /** @var MockObject&CoreParametersHelper */
-    private $coreParametersHelper;
-
     private MailHashHelper $mailHashHelper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
+        $this->mailHashHelper       = new MailHashHelper($this->createStub(CoreParametersHelper::class));
     }
 
     public function testOnEmailBuild(): void
@@ -205,7 +206,7 @@ class OwnerSubscriberTest extends TestCase
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 
-        $mockLeadRepository->method('getLeadOwner')
+        $mockLeadRepository->expects($this->atLeast(0))->method('getLeadOwner')
             ->willReturnMap(
                 [
                     [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],
@@ -249,31 +250,26 @@ class OwnerSubscriberTest extends TestCase
         return $coreParametersHelper;
     }
 
+    /**
+     * @param array<string, mixed> $lead
+     */
     protected function getMockMailer(array $lead): MailHelper
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
 
-        /** @var FromEmailHelper|MockObject $fromEmaiHelper */
-        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-
         $coreParametersHelper = $this->getMockParametersHelper(true, $parameterMap);
 
-        /** @var Mailbox|MockObject $mailbox */
-        $mailbox = $this->createMock(Mailbox::class);
-
-        /** @var LoggerInterface|MockObject $logger */
-        $logger = $this->createMock(LoggerInterface::class);
-
-        /** @var MockObject&RouterInterface $router */
-        $router = $this->createMock(RouterInterface::class);
-
-        /** @var MockObject&Environment $twig */
-        $twig = $this->createMock(Environment::class);
+        $coreParametersHelper->expects($this->atLeast(1))->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+                ]
+            );
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -285,23 +281,23 @@ class OwnerSubscriberTest extends TestCase
         $requestStack = new RequestStack();
         $mailerHelper = new MailHelper(
             $mailer,
-            $fromEmaiHelper,
+            $this->createStub(FromEmailHelper::class),
             $coreParametersHelper,
-            $mailbox,
-            $logger,
+            $this->createStub(Mailbox::class),
+            $this->createStub(LoggerInterface::class),
             $this->mailHashHelper,
-            $router,
-            $twig,
+            $this->createStub(RouterInterface::class),
+            $this->createStub(Environment::class),
             $themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class),
-            $this->createMock(SMimeHelper::class),
+            $this->createStub(AssetModel::class),
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
+            $this->createStub(SMimeHelper::class),
+            $this->createStub(EmailStatModel::class),
         );
         $mailerHelper->setLead($lead);
 
@@ -315,7 +311,7 @@ class OwnerSubscriberTest extends TestCase
     {
         /** @var Translator&MockObject $translator */
         $translator = $this->createMock(Translator::class);
-        $translator->expects($this->any())
+        $translator
             ->method('hasId')
             ->willReturn(false);
 
@@ -331,8 +327,7 @@ class OwnerSubscriberTest extends TestCase
             $leadRepository = $this->createMock(LeadRepository::class);
             $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
             $leadModel->method('getRepository')->willReturn($leadRepository);
-            $translator = $this->createMock(TranslatorInterface::class);
-            $subscriber = new OwnerSubscriber($leadModel, $translator);
+            $subscriber = new OwnerSubscriber($leadModel, $this->createStub(TranslatorInterface::class));
 
             $event = new TokenReplacementEvent($content, $lead);
             $subscriber->onSmsTokenReplacement($event);
@@ -342,7 +337,7 @@ class OwnerSubscriberTest extends TestCase
 
     protected function getUser(): User
     {
-        $user = new class extends User {
+        $user = new class() extends User {
             public function setId(int $id): void
             {
                 $this->id = $id;
@@ -361,17 +356,17 @@ class OwnerSubscriberTest extends TestCase
     private function onSmsTokenReplacementProvider(): array
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getId')
             ->willReturn(1);
-        $lead->expects($this->any())
+        $lead
             ->method('getProfileFields')
             ->willReturn(
                 [
                     'id'     => 1,
                 ]
             );
-        $lead->expects($this->any())
+        $lead
             ->method('getowner')
             ->willReturn(
                 $this->getUser()

@@ -32,7 +32,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @method SalesforceApi getApiHelper()
+ * @extends CrmAbstractIntegration<SalesforceApi>
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
@@ -167,11 +167,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
-        if (isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0]) {
-            return true;
-        }
 
-        return false;
+        return isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0];
     }
 
     /**
@@ -202,13 +199,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
      * @return mixed[]
      *
      * @throws InvalidArgumentException
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $silenceExceptions = $settings['silence_exceptions'] ?? true;
         $salesForceObjects = [];
@@ -220,7 +215,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate']))
-        || ('Lead' == $object && in_array($field['name'], ['Company']))
+        || ('Lead' == $object && 'Company' == $field['name'])
         || (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
 
         $salesFields = [];
@@ -254,10 +249,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && !in_array($fieldInfo['name'], ['Id', 'IsDeleted', 'CreatedDate'])))
                                         || !isset($fieldInfo['name'])
-                                        || (in_array(
-                                            $fieldInfo['type'],
-                                            ['reference']
-                                        ) && 'AccountId' != $fieldInfo['name'])
+                                        || ('reference' == $fieldInfo['type'] && 'AccountId' != $fieldInfo['name'])
                                     ) {
                                         continue;
                                     }
@@ -280,7 +272,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         ];
 
                                         // CreateDate can be updatable just in Mautic
-                                        if (in_array($fieldInfo['name'], ['CreatedDate'])) {
+                                        if ('CreatedDate' == $fieldInfo['name']) {
                                             $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject]['update_mautic'] = 1;
                                         }
                                     } else {
@@ -372,7 +364,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if ($dataObject) {
+                if ([] !== $dataObject) {
                     $entity = null;
                     switch ($object) {
                         case 'Contact':
@@ -462,7 +454,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         // Persist integration entities
                         $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
                         $counter = 0;
-                        $this->em->detach($entity);
+                        foreach ($integrationMapping as $mapping) {
+                            $this->em->detach($mapping['entity']);
+                        }
                         $integrationMapping = [];
                     }
                 }
@@ -471,7 +465,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (count($integrationMapping)) {
                 // Persist integration entities
                 $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
-                $this->em->detach($entity);
+                foreach ($integrationMapping as $mapping) {
+                    $this->em->detach($mapping['entity']);
+                }
             }
 
             foreach ($DNCUpdates as $objectName => $sfEntity) {
@@ -662,10 +658,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -764,10 +758,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Company $company
      * @param array   $config
-     *
-     * @return array|bool
      */
-    public function pushCompany($company, $config = [])
+    public function pushCompany($company, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -827,7 +819,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Return success if any company was updated or created
-                return ($companyFound) ? $companies : false;
+                return $companies;
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -842,6 +834,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $object
      *
      * @return array|null
+     *
+     * @phpstan-impure
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
@@ -914,7 +908,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($this->getAdminUsers() as $adminUser) {
             if ($preventUnreadDuplicates) {
-                /* @var Notification|null $exists */
+                /** @var Notification|null $exists */
                 $notificationTemplate->setUser($adminUser);
 
                 $searchArray = $transformer->transform($notificationTemplate);
@@ -972,11 +966,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 
@@ -1102,11 +1094,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         $limit                   = $params['limit'] ?? 100;
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
@@ -1153,7 +1143,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $progress = new ProgressBar($output, $totalCount);
             }
         }
@@ -1303,7 +1293,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($config['objects'])) {
             // try searching for lead as this has been changed before in updated done to the plugin
-            if (false !== array_search('Contact', $config['objects'])) {
+            if (in_array('Contact', $config['objects'])) {
                 $resultContact = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
 
                 if ($resultContact) {
@@ -1427,17 +1417,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (20 === $counter) {
                         // Batch to control RAM use
-                        $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
-                        $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
+                        $integrationEntityRepo->saveEntities($persistEntities);
+                        $integrationEntityRepo->detachEntities($persistEntities);
                         $persistEntities = [];
                         $counter         = 0;
                     }
                 }
 
                 // Catch left overs
-                if ($persistEntities) {
-                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
-                    $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
+                if ([] !== $persistEntities) {
+                    $integrationEntityRepo->saveEntities($persistEntities);
+                    $integrationEntityRepo->detachEntities($persistEntities);
                 }
 
                 unset($unknownMembers, $fetcher, $organizer, $persistEntities);
@@ -1459,7 +1449,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function getMixedLeadFields($fields, $object): array
+    /**
+     * @param array<string, mixed> $fields
+     */
+    public function getMixedLeadFields(array $fields, $object): array
     {
         $mixedFields = array_filter($fields['leadFields'] ?? []);
         $fields      = [];
@@ -1514,20 +1507,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!empty($lead->getEmail())) {
             $pushPeople = [];
             $pushObject = null;
-            if (!empty($personIds)) {
-                // Give precendence to Contact CampaignMembers
-                if (!empty($personIds['Contact'])) {
-                    $pushObject      = 'Contact';
-                    $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
-                    $pushPeople      = $personIds[$pushObject];
-                }
 
-                if (empty($campaignMembers) && !empty($personIds['Lead'])) {
-                    $pushObject      = 'Lead';
-                    $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
-                    $pushPeople      = $personIds[$pushObject];
-                }
-            } // pushLead should have handled this
+            // Give precendence to Contact CampaignMembers
+            if (!empty($personIds['Contact'])) {
+                $pushObject      = 'Contact';
+                $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
+                $pushPeople      = $personIds[$pushObject];
+            }
+
+            if (empty($campaignMembers) && !empty($personIds['Lead'])) {
+                $pushObject      = 'Lead';
+                $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
+                $pushPeople      = $personIds[$pushObject];
+            }
 
             foreach ($pushPeople as $memberId) {
                 $campaignMappingId = '-'.$campaignId;
@@ -1603,7 +1595,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
-        &$trackedContacts,
+        array &$trackedContacts,
         $limit,
         $fromDate,
         $toDate,
@@ -1655,7 +1647,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getMauticContactsToCreate(
         &$checkEmailsInSF,
-        $fieldMapping,
+        array $fieldMapping,
         $mauticLeadFieldString,
         $limit,
         $fromDate,
@@ -1728,10 +1720,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     protected function buildCompositeBody(
-        &$mauticData,
-        $objectFields,
+        array &$mauticData,
+        array $objectFields,
         $object,
-        &$entity,
+        array &$entity,
         $objectId = null,
         $sfRecord = null,
     ): array {
@@ -1760,7 +1752,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 }
                                 if ($company) {
                                     $sfCompany = $this->pushCompany($company);
-                                    if (!empty($sfCompany)) {
+                                    if ($sfCompany) {
                                         $entity['company'] = key($sfCompany);
                                     }
                                 }
@@ -1805,7 +1797,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $this->amendLeadDataBeforePush($body);
 
-            if (!empty($body)) {
+            if ($body) {
                 $url = '/services/data/v38.0/sobjects/'.$object;
                 if ($objectId) {
                     $url .= '/'.$objectId;
@@ -1853,7 +1845,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objectFields       = [];
 
         // Important to have contacts first!!
-        if (false !== array_search('Contact', $config['objects'])) {
+        if (in_array('Contact', $config['objects'])) {
             $supportedObjects['Contact'] = 'Contact';
             $fieldsToCreate              = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Contact');
             $objectFields['Contact']     = [
@@ -1861,7 +1853,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'create' => $fieldsToCreate,
             ];
         }
-        if (false !== array_search('Lead', $config['objects'])) {
+        if (in_array('Lead', $config['objects'])) {
             $supportedObjects['Lead'] = 'Lead';
             $fieldsToCreate           = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Lead');
             $objectFields['Lead']     = [
@@ -1949,12 +1941,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (strstr($object, 'CampaignMember')) {
                     $object = 'CampaignMember';
                 }
-                if ('Account' == $object) {
+                if ('Account' === $object) {
                     $internalObject = 'company';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
                     $exception = new ApiErrorException($item['body'][0]['message']);
-                    if ('Contact' == $object || $object = 'Lead') {
+                    if ('Contact' === $object || 'Lead' === $object) {
                         $exception->setContactId($contactId);
                     }
                     $this->logIntegrationError($exception);
@@ -2035,7 +2027,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $exception = new ApiErrorException($error);
-                    if (!empty($item['referenceId']) && ('Contact' == $object || $object = 'Lead')) {
+                    if (!empty($item['referenceId']) && ('Contact' === $object || 'Lead' === $object)) {
                         $exception->setContactId($item['referenceId']);
                     }
                     $this->logIntegrationError($exception);
@@ -2077,7 +2069,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
-            fn ($lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
+            fn (array $lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
             $checkEmailsInSF
         );
 
@@ -2094,13 +2086,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareMauticContactsToUpdate(
         &$mauticData,
-        &$checkEmailsInSF,
-        &$processedLeads,
-        &$trackedContacts,
+        array &$checkEmailsInSF,
+        array &$processedLeads,
+        array &$trackedContacts,
         &$leadsToSync,
-        $objectFields,
+        array $objectFields,
         $mauticLeadFieldString,
-        $sfEntityRecords,
+        array $sfEntityRecords,
         $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
@@ -2206,8 +2198,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 )
                 ) {
                     // Get the lead entity
-                    /* @var Lead $leadEntity */
                     foreach ($updateLead as $mauticField => $sfValue) {
+                        /** @var Lead $leadEntity */
                         $leadEntity->addUpdatedField($mauticField, $sfValue);
                     }
 
@@ -2245,9 +2237,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareMauticContactsToCreate(
         &$mauticData,
-        &$checkEmailsInSF,
-        &$processedLeads,
-        $objectFields,
+        array &$checkEmailsInSF,
+        array &$processedLeads,
+        array $objectFields,
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
@@ -2296,7 +2288,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($chunked as $chunk) {
             // We can only submit 25 at a time
-            if ($chunk) {
+            if ([] !== $chunk) {
                 $request['compositeRequest'] = $chunk;
                 $result                      = $apiHelper->syncMauticToSalesforce($request);
                 $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, true));
@@ -2305,10 +2297,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return bool|mixed|string
-     */
-    protected function setContactToSync(&$checkEmailsInSF, $lead)
+    protected function setContactToSync(array &$checkEmailsInSF, array $lead): false|string
     {
         $key = $this->getSyncKey($lead['email']);
         if (isset($checkEmailsInSF[$key])) {
@@ -2326,7 +2315,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return int
      */
-    protected function getSalesforceSyncLimit($currentContactList, $limit)
+    protected function getSalesforceSyncLimit($currentContactList, $limit): float|int
     {
         return $limit - count($currentContactList);
     }
@@ -2334,7 +2323,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array|bool
      */
-    protected function checkLeadIsContact(&$trackedContacts, $email, $contactId, $leadFields)
+    protected function checkLeadIsContact(array &$trackedContacts, $email, $contactId, $leadFields)
     {
         if (empty($trackedContacts[$email])) {
             // Check if there's an existing entry
@@ -2371,7 +2360,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
-    protected function mapContactDataForPush(Lead $lead, $config): array
+    protected function mapContactDataForPush(Lead $lead, array $config): array
     {
         $fields             = array_keys($config['leadFields'] ?? []);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
@@ -2385,7 +2374,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         ];
 
         foreach (['Lead', 'Contact'] as $object) {
-            if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
+            if (isset($config['objects']) && in_array($object, $config['objects'])) {
                 $fieldMapping[$object]['create'] = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fields, $object);
                 $fieldMapping[$object]['update'] = isset($fieldsToUpdateInSf[$object]) ? array_intersect_key(
                     $fieldMapping[$object]['create'],
@@ -2418,7 +2407,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    protected function mapCompanyDataForPush(Company $company, $config): array
+    protected function mapCompanyDataForPush(Company $company, array $config): array
     {
         $object     = 'company';
         $entity     = [];
@@ -2426,7 +2415,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $object => [],
         ];
 
-        if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
+        if (isset($config['objects']) && in_array($object, $config['objects'])) {
             $fieldKeys          = array_keys($config['companyFields']);
             $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, 'Account');
             $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, 'Account', 'mautic_company');
@@ -2507,12 +2496,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param string $sfObject
-     * @param string $sfFieldString
-     *
      * @throws ApiErrorException
      */
-    public function getDncHistory($sfObject, $sfFieldString): mixed
+    public function getDncHistory(string $sfObject, string $sfFieldString): mixed
     {
         return $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
     }
@@ -2546,7 +2532,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = []): void
+    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, array $params = []): void
     {
         $filters            = [];
         $leadIds            = [];
@@ -2636,11 +2622,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushCompanies($params = []): array
+    public function pushCompanies(array $params = []): array
     {
         $limit                   = $params['limit'] ?? 100;
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
@@ -2660,8 +2644,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$sfObject]]]);
 
         // get company fields from Mautic that have been mapped
-        $mauticCompanyFieldString = implode(', l.', $config['companyFields']);
-        $mauticCompanyFieldString = 'l.'.$mauticCompanyFieldString;
+        $mauticCompanyFieldString = 'l.'.implode(', l.', $config['companyFields']);
 
         $fieldKeys          = array_keys($config['companyFields']);
         $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, $sfObject);
@@ -2682,10 +2665,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'fields' => $fields,
             'string' => $string,
         ];
-
-        if (empty($objectFields)) {
-            return [0, 0, 0, 0];
-        }
 
         $originalLimit = $limit;
         $progress      = false;
@@ -2719,7 +2698,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $progress = new ProgressBar($output, $totalCount);
             }
         }
@@ -2754,7 +2733,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic companies to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if (($limit > 0) && !empty($mauticCompanyFieldString)) {
+            if ($limit > 0) {
                 $this->getMauticEntitesToCreate(
                     $checkCompaniesInSF,
                     $mauticCompanyFieldString,
@@ -2766,7 +2745,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 );
             }
 
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $sfEntityRecords = $this->getSalesforceAccountsByName($checkCompaniesInSF, implode(',', array_keys($config['companyFields'])));
 
                 if (!isset($sfEntityRecords['records'])) {
@@ -2779,7 +2758,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // We're done
-            if (!$checkCompaniesInSF) {
+            if ([] === $checkCompaniesInSF) {
                 break;
             }
 
@@ -2796,7 +2775,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // Only create left over if Lead object is enabled in integration settings
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $this->prepareMauticCompaniesToCreate(
                     $mauticData,
                     $checkCompaniesInSF,
@@ -2827,7 +2806,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalIgnored = $totalToProcess - ($totalUpdated + $totalCreated + $totalErrors);
 
         if ($totalIgnored < 0) { // this could have been marked as deleted so it was not pushed
-            $totalIgnored = $totalIgnored * -1;
+            $totalIgnored *= -1;
         }
 
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
@@ -2835,11 +2814,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareMauticCompaniesToUpdate(
         &$mauticData,
-        &$checkCompaniesInSF,
-        &$processedCompanies,
+        array &$checkCompaniesInSF,
+        array &$processedCompanies,
         &$companiesToSync,
-        $objectFields,
-        $sfEntityRecords,
+        array $objectFields,
+        array $sfEntityRecords,
         $progress = null,
     ) {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
@@ -2908,8 +2887,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             )
             ) {
                 // Get the company entity
-                /* @var Lead $leadEntity */
                 foreach ($updateCompany as $mauticField => $sfValue) {
+                    /** @var Company $companyEntity */
                     $companyEntity->addUpdatedField($mauticField, $sfValue);
                 }
 
@@ -2927,9 +2906,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function prepareMauticCompaniesToCreate(
         &$mauticData,
-        &$checkCompaniesInSF,
-        &$processedCompanies,
-        $objectFields,
+        array &$checkCompaniesInSF,
+        array &$processedCompanies,
+        array $objectFields,
     ) {
         foreach ($checkCompaniesInSF as $key => $company) {
             if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
@@ -2958,7 +2937,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     protected function getMauticRecordsToUpdate(
-        &$checkIdsInSF,
+        array &$checkIdsInSF,
         $mauticEntityFieldString,
         &$sfObject,
         $limit,
@@ -2991,7 +2970,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     protected function getMauticEntitesToCreate(
-        &$checkIdsInSF,
+        array &$checkIdsInSF,
         $mauticCompanyFieldString,
         $limit,
         $fromDate,
@@ -3024,7 +3003,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @throws ORMException
      * @throws \Exception
      */
-    protected function getSalesforceAccountsByName(&$checkIdsInSF, $requiredFieldString): array
+    protected function getSalesforceAccountsByName(array &$checkIdsInSF, $requiredFieldString): array
     {
         $searchForIds   = [];
         $searchForNames = [];
@@ -3087,7 +3066,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
     {
-        if (isset($matchedFields['mauticContactIsContactableByEmail']) and true === $this->updateDncByDate()) {
+        if (isset($matchedFields['mauticContactIsContactableByEmail']) and $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();
             $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
             $record[$lead->getEmail()]              = $matchedFields;
@@ -3099,10 +3078,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager()
+    public function getEntityManager(): \Doctrine\ORM\EntityManager
     {
         return $this->em;
     }

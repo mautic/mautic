@@ -21,7 +21,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -81,31 +81,30 @@ class FullContactController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $request->getMethod()) {
-                try {
-                    $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
-                    $this->addFlashMessage(
-                        'mautic.lead.batch_leads_affected',
-                        [
-                            '%count%'     => 1,
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlashMessage(
-                        $ex->getMessage(),
-                        [],
-                        'error'
-                    );
-                }
-
-                return new JsonResponse(
+        }
+        if ('POST' === $request->getMethod()) {
+            try {
+                $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
+                $this->addFlashMessage(
+                    'mautic.lead.batch_leads_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        '%count%'     => 1,
                     ]
                 );
+            } catch (\Exception $ex) {
+                $this->addFlashMessage(
+                    $ex->getMessage(),
+                    [],
+                    'error'
+                );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
@@ -116,7 +115,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -183,22 +182,22 @@ class FullContactController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            if ($count > 20) {
-                $this->addFlashMessage(
-                    $this->translator->trans('mautic.plugin.fullcontact.toomany'),
-                    [],
-                    'error'
-                );
-
-                return new JsonResponse(
-                    [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
-                    ]
-                );
-            }
         }
+        if ($count > 20) {
+            $this->addFlashMessage(
+                $this->translator->trans('mautic.plugin.fullcontact.toomany'),
+                [],
+                'error'
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
+        }
+
         if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
@@ -227,46 +226,45 @@ class FullContactController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $request->getMethod()) {
-                $notify = array_key_exists('notify', $data);
-                foreach ($lookupEmails as $id => $lookupEmail) {
-                    if ($lead = $model->getEntity($id)) {
-                        try {
-                            $lookupHelper->lookupContact($lead, $notify);
-                        } catch (\Exception $ex) {
-                            $this->addFlashMessage(
-                                $ex->getMessage(),
-                                [],
-                                'error'
-                            );
-                            --$count;
-                        }
+        }
+        if ('POST' === $request->getMethod()) {
+            $notify = array_key_exists('notify', $data);
+            foreach ($lookupEmails as $id => $lookupEmail) {
+                if ($lead = $model->getEntity($id)) {
+                    try {
+                        $lookupHelper->lookupContact($lead, $notify);
+                    } catch (\Exception $ex) {
+                        $this->addFlashMessage(
+                            $ex->getMessage(),
+                            [],
+                            'error'
+                        );
+                        --$count;
                     }
                 }
+            }
 
-                if ($count) {
-                    $this->addFlashMessage(
-                        'mautic.lead.batch_leads_affected',
-                        [
-                            '%count%'     => $count,
-                        ]
-                    );
-                }
-
-                return new JsonResponse(
+            if ($count) {
+                $this->addFlashMessage(
+                    'mautic.lead.batch_leads_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        '%count%'     => $count,
                     ]
                 );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
     }
 
-    /***************** COMPANY ***********************/
+    /* COMPANY */
 
     /**
      * @param string $objectId
@@ -275,7 +273,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -334,31 +332,30 @@ class FullContactController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $request->getMethod()) {
-                try {
-                    $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
-                    $this->addFlashMessage(
-                        'mautic.company.batch_companies_affected',
-                        [
-                            '%count%'     => 1,
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlashMessage(
-                        $ex->getMessage(),
-                        [],
-                        'error'
-                    );
-                }
-
-                return new JsonResponse(
+        }
+        if ('POST' === $request->getMethod()) {
+            try {
+                $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
+                $this->addFlashMessage(
+                    'mautic.company.batch_companies_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        '%count%'     => 1,
                     ]
                 );
+            } catch (\Exception $ex) {
+                $this->addFlashMessage(
+                    $ex->getMessage(),
+                    [],
+                    'error'
+                );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
@@ -369,7 +366,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
@@ -435,22 +432,22 @@ class FullContactController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            if ($count > 20) {
-                $this->addFlashMessage(
-                    $this->translator->trans('mautic.plugin.fullcontact.comptoomany'),
-                    [],
-                    'error'
-                );
-
-                return new JsonResponse(
-                    [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
-                    ]
-                );
-            }
         }
+        if ($count > 20) {
+            $this->addFlashMessage(
+                $this->translator->trans('mautic.plugin.fullcontact.comptoomany'),
+                [],
+                'error'
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
+        }
+
         if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
@@ -479,40 +476,39 @@ class FullContactController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $request->getMethod()) {
-                $notify = array_key_exists('notify', $data);
-                foreach ($lookupWebsites as $id => $lookupWebsite) {
-                    if ($company = $model->getEntity($id)) {
-                        try {
-                            $lookupHelper->lookupCompany($company, $notify);
-                        } catch (\Exception $ex) {
-                            $this->addFlashMessage(
-                                $ex->getMessage(),
-                                [],
-                                'error'
-                            );
-                            --$count;
-                        }
+        }
+        if ('POST' === $request->getMethod()) {
+            $notify = array_key_exists('notify', $data);
+            foreach ($lookupWebsites as $id => $lookupWebsite) {
+                if ($company = $model->getEntity($id)) {
+                    try {
+                        $lookupHelper->lookupCompany($company, $notify);
+                    } catch (\Exception $ex) {
+                        $this->addFlashMessage(
+                            $ex->getMessage(),
+                            [],
+                            'error'
+                        );
+                        --$count;
                     }
                 }
+            }
 
-                if ($count) {
-                    $this->addFlashMessage(
-                        'mautic.company.batch_companies_affected',
-                        [
-                            '%count%'     => $count,
-                        ]
-                    );
-                }
-
-                return new JsonResponse(
+            if ($count) {
+                $this->addFlashMessage(
+                    'mautic.company.batch_companies_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        '%count%'     => $count,
                     ]
                 );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);

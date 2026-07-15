@@ -1,25 +1,61 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
-class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function __construct($name = null)
-    {
-        parent::__construct($name);
-    }
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetectorFactoryInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
     {
+        $this->deviceDetectorFactory = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $this->deviceDetector        = $this->createMock(DeviceDetector::class);
+
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
+    public function testDeviceDetectorBotsDetectionTrue(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(true);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertFalse($ip->getIpAddress()->isTrackable());
+    }
+
+    public function testDeviceDetectorBotsDetectionFalse(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(false);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertTrue($ip->getIpAddress()->isTrackable());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Check if IP outside a request that local IP is returned')]
@@ -62,7 +98,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->expects($this->any())
+        $mockCoreParametersHelper
             ->method('get')
             ->willReturnCallback(
                 fn ($param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
@@ -140,16 +176,13 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Check that requests without request context fall back to IP trackability')]
     public function testIsRequestTrackableWithoutRequest(): void
     {
-        $result = $this->getIpHelper(null)->isRequestTrackable();
+        $result = $this->getIpHelper()->isRequestTrackable();
 
         // Returns true since there's no request to check and the IP (127.0.0.1) is trackable
         $this->assertTrue($result);
     }
 
-    /**
-     * @return IpLookupHelper
-     */
-    private function getIpHelper($request = null, $mockCoreParametersHelper = null)
+    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
     {
         $requestStack = new RequestStack();
 
@@ -158,23 +191,32 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         }
 
         $mockRepository = $this->createMock(IpAddressRepository::class);
-        $mockRepository->expects($this->any())
+        $mockRepository
             ->method('__call')
-            ->with($this->equalTo('findOneByIpAddress'))
+            ->with('findOneByIpAddress')
             ->willReturn(null);
 
         $mockEm = $this->createMock(EntityManager::class);
-        $mockEm->expects($this->any())
+        $mockEm
             ->method('getRepository')
             ->willReturn($mockRepository);
 
-        if (is_null($mockCoreParametersHelper)) {
+        if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-            $mockCoreParametersHelper->expects($this->any())
+            $mockCoreParametersHelper
                 ->method('get')
                 ->willReturn(null);
         }
 
-        return new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper);
+        $this->deviceDetectorFactory
+            ->method('create')
+            ->willReturnCallback(
+                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
+            );
+
+        $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory);
+        $helper->reset();
+
+        return $helper;
     }
 }

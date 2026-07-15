@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
+final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized(): void
     {
@@ -64,11 +66,11 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $preferences = $builder->getChannelPreferences();
 
         $this->assertCount(3, $preferences);
-        $this->assertTrue(isset($preferences['email']));
-        $this->assertTrue(isset($preferences['sms']));
-        $this->assertTrue(isset($preferences['push']));
+        $this->assertArrayHasKey('email', $preferences);
+        $this->assertArrayHasKey('sms', $preferences);
+        $this->assertArrayHasKey('push', $preferences);
 
-        /** @var ChannelPreferences $emailLogs */
+        /** @var ChannelPreferences $email */
         $email = $preferences['email'];
 
         // First priority
@@ -82,7 +84,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $emailLogs->first()->getId());
 
         // First priority for SMS which should just be one
-        /** @var ChannelPreferences $smsLogs */
+        /** @var ChannelPreferences $sms */
         $sms     = $preferences['sms'];
         $smsLogs = $sms->getLogsByPriority(1);
         $this->assertCount(1, $smsLogs);

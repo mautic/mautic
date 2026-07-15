@@ -116,7 +116,6 @@ system('find . -type f -name .hgtags -exec rm -f {} \\;');
 system('find . -type f -name .coveralls.yml -exec rm -f {} \\;');
 system('find . -type f -name build.properties -exec rm -f {} \\;');
 system('find . -type f -name build.xml -exec rm -f {} \\;');
-system('find . -type f -name Gruntfile.js -exec rm -f {} \\;');
 
 // Delete MD files
 system('find vendor/ -type f -name "*.md" -exec rm -f {} \\;');

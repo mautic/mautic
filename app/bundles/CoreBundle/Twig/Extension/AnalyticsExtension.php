@@ -15,10 +15,10 @@ class AnalyticsExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('analyticsGetCode', [$this, 'getCode'], ['is_safe' => ['all']]),
+            new TwigFunction('analyticsGetCode', $this->getCode(...), ['is_safe' => ['all']]),
         ];
     }
 

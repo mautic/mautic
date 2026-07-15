@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Tests\Functional\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
@@ -40,10 +39,10 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame($success, $responseData['success'], $response->getContent());
+        $this->assertSame($success, $responseData['success'], $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, $responseData['newContent']);
+            $this->assertStringContainsString($expectedString, (string) $responseData['newContent']);
         }
     }
 
@@ -203,7 +202,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, $response->getContent());
+            $this->assertStringContainsString($expectedString, (string) $response->getContent());
         }
     }
 }

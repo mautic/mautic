@@ -176,7 +176,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if (count($duplicates)) {
                 foreach ($duplicates as $value => $label) {
-                    $prepped[$value] = "$label ($value)";
+                    $prepped[$value] = "{$label} ({$value})";
                 }
             }
 
@@ -195,7 +195,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $idColumn    = $this->options['entity_id_column'];
 
         if (!$this->modelFactory->hasModel($modelName)) {
-            throw new \InvalidArgumentException("$modelName not found as a registered model service.");
+            throw new \InvalidArgumentException("{$modelName} not found as a registered model service.");
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
@@ -214,6 +214,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $args['limit'] = max($args['limit'], count($data));
         }
 
+        $parameters = [];
         // Check if the method exists in the model
         $methodName = $this->options['model_lookup_method'] ?? null;
         if ($methodName && method_exists($model, $methodName)) {
@@ -224,9 +225,20 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
-            $limit     = max(100, count($data));
-            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = null;
+
+            $limit = 100;
+            if ($data) {
+                $composite = CompositeExpression::and(
+                    $expr->in($alias.'.id', ':dataIds')
+                );
+                $parameters['dataIds'] = $data;
+                if (count($data) > $limit) {
+                    $limit = count($data);
+                }
+            }
+
+            $choices = $model->getRepository()->getSimpleList($composite, $parameters, $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;
@@ -276,7 +288,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     private function sanitizeIds(int|string|array|object|null $data): array
     {
-        if (is_null($data)) {
+        if (null === $data) {
             return [];
         }
 
@@ -292,7 +304,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $id = null;
 
             if (is_object($value) && method_exists($value, $getter)) {
-                $id = $value->$getter();
+                $id = $value->{$getter}();
             } elseif (is_scalar($value)) {
                 $id = $value;
             }

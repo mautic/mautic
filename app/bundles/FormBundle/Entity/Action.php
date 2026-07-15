@@ -22,10 +22,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['action:read'],
@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Action implements UuidInterface
 {
     use UuidTrait;
+
     public const ENTITY_NAME = 'form_action';
 
     /**
@@ -117,6 +118,7 @@ class Action implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         static::addUuidField($builder);
@@ -149,10 +151,10 @@ class Action implements UuidInterface
         ]));
     }
 
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -165,9 +167,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -175,13 +175,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
-     *
-     * @return Action
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
 
@@ -191,8 +187,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get order.
-     *
      * @return int
      */
     public function getOrder()
@@ -201,13 +195,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
-     *
-     * @return Action
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -217,8 +207,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -226,12 +214,7 @@ class Action implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * Set form.
-     *
-     * @return Action
-     */
-    public function setForm(Form $form)
+    public function setForm(Form $form): static
     {
         $this->form = $form;
 
@@ -239,8 +222,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()
@@ -249,13 +230,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return Action
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -264,9 +241,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get type.
-     *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -279,13 +254,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Action
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -294,9 +265,7 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -304,13 +273,9 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Action
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -319,12 +284,15 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getForm()?->getCreatedBy();
     }
 }

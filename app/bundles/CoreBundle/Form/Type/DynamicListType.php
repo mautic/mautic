@@ -55,11 +55,11 @@ class DynamicListType extends AbstractType
                     'required' => false,
                     'attr'     => [
                         'class'         => 'form-control',
-                        'preaddon'      => fn (Options $options) => $options['remove_icon'],
+                        'preaddon'      => fn (Options $options): mixed => $options['remove_icon'],
                         'preaddon_attr' => fn (Options $options): array => [
                             'onclick' => $options['remove_onclick'],
                         ],
-                        'postaddon'     => fn (Options $options) => $options['sortable'],
+                        'postaddon'     => fn (Options $options): mixed => $options['sortable'],
                     ],
 
                     'constraints'    => fn (Options $options): array => ($options['option_notblank']) ? [

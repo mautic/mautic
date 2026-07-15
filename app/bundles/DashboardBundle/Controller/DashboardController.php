@@ -123,10 +123,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Generate new dashboard widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory)
+    public function newAction(Request $request, FormFactoryInterface $formFactory): JsonResponse|Response
     {
         // retrieve the entity
         $widget = new Widget();
@@ -177,22 +175,20 @@ class DashboardController extends AbstractFormController
             $passthroughVars['flashes'] = $this->getFlashContent();
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
+        ]);
     }
 
     /**
      * edit widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId): JsonResponse|Response
     {
         $model  = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -238,14 +234,14 @@ class DashboardController extends AbstractFormController
             }
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => '@MauticDashboard/Widget/form.html.twig',
+        ]);
     }
 
     /**
@@ -296,14 +292,12 @@ class DashboardController extends AbstractFormController
 
     /**
      * Saves the widgets of current user into a json and stores it for later as a file.
-     *
-     * @return Response
      */
-    public function saveAction(Request $request)
+    public function saveAction(Request $request): Response
     {
         // Accept only AJAX POST requests because those are check for CSRF tokens
         if (!$request->isMethod(Request::METHOD_POST) || !$request->isXmlHttpRequest()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $name = $this->getNameFromRequest($request);
@@ -372,7 +366,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (file_exists($path) && is_writable($path)) {
@@ -397,7 +391,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (!file_exists($path) || !is_readable($path)) {

@@ -33,10 +33,10 @@ class PullTransifexCommand extends Command
     public const NAME = 'mautic:transifex:pull';
 
     public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private PathsHelper $pathsHelper,
-        private LanguageHelper $languageHelper,
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }
@@ -44,9 +44,9 @@ class PullTransifexCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
-            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.', null)
+            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull')
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
+            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
 

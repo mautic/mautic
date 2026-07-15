@@ -9,7 +9,7 @@ use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 /**
  * We need to store mapped fields in the form field builder so we could remove the used ones from the select box.
  */
-final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorInterface
+final readonly class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorInterface
 {
     private const EXPIRATION_IN_SECONDS = 18000;
 
@@ -38,7 +38,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 
     public function removeField(string $formId, string $object, string $fieldKey): void
     {
-        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey) {
+        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
             $cacheKey = array_search($fieldKey, $fields, true);
 
             if (false !== $cacheKey) {

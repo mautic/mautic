@@ -34,10 +34,10 @@ class DashboardModel extends FormModel
 {
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        private PathsHelper $pathsHelper,
-        private WidgetDetailEventFactory $widgetEventFactory,
-        private Filesystem $filesystem,
-        private RequestStack $requestStack,
+        private readonly PathsHelper $pathsHelper,
+        private readonly WidgetDetailEventFactory $widgetEventFactory,
+        private readonly Filesystem $filesystem,
+        private readonly RequestStack $requestStack,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -45,7 +45,7 @@ class DashboardModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private CacheProviderTagAwareInterface $cacheProvider,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -167,7 +167,7 @@ class DashboardModel extends FormModel
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
-                if (!($widget instanceof Widget)) {
+                if (!$widget instanceof Widget) {
                     $widget = $this->populateWidgetEntity($widget);
                 }
                 $this->populateWidgetContent($widget, $filter);
@@ -185,7 +185,7 @@ class DashboardModel extends FormModel
         foreach ($data as $property => $value) {
             $method = 'set'.ucfirst($property);
             if (method_exists($entity, $method)) {
-                $entity->$method($value);
+                $entity->{$method}($value);
             }
             unset($data[$property]);
         }
@@ -193,9 +193,6 @@ class DashboardModel extends FormModel
         return $entity;
     }
 
-    /**
-     * Populate widget preview.
-     */
     public function populateWidgetPreview(Widget $widget): void
     {
         $event = $this->widgetEventFactory->create($widget);
@@ -239,10 +236,18 @@ class DashboardModel extends FormModel
 
         $widget->setParams($resultParams);
 
-        $this->dispatcher->dispatch(
-            $this->widgetEventFactory->create($widget),
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
-        );
+        try {
+            $this->dispatcher->dispatch(
+                $this->widgetEventFactory->create($widget),
+                DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Dashboard widget "{type}" failed to load: {message}',
+                ['type' => $widget->getType(), 'message' => $e->getMessage(), 'exception' => $e]
+            );
+            $widget->setErrorMessage('mautic.dashboard.widget.load.failed');
+        }
     }
 
     /**

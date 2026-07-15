@@ -5,6 +5,7 @@ namespace Mautic\SmsBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\TokenSorter;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
@@ -66,24 +67,24 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    public function getBuilderTokensAction(Request $request, ?EventDispatcherInterface $eventDispatcher = null): JsonResponse
+    public function getBuilderTokensAction(Request $request, TokenSorter $tokenSorter, ?EventDispatcherInterface $eventDispatcher = null): JsonResponse
     {
-        $query  = $request->get('query', '');
+        $query = $request->query->get('query', '');
+
         $tokens = $this->getBuilderTokens($query);
         $event  = new TokensBuildEvent($tokens);
         $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
+        $sortedTokens = $tokenSorter->sortTokens($event->getTokens());
 
-        return $this->sendJsonResponse(['tokens'=>$event->getTokens()]);
+        return $this->sendJsonResponse(['tokens' => $sortedTokens]);
     }
 
     /**
-     * Just selected get tokens from email  builder.
+     * Just selected get tokens from email builder.
      *
-     * @param string|null $query
-     *
-     * @return array<string,array<int|string>>
+     * @return array<string, string>
      */
-    protected function getBuilderTokens($query): array
+    protected function getBuilderTokens(string $query): array
     {
         /** @var EmailModel $model */
         $model        = $this->getModel('email');
@@ -93,7 +94,7 @@ class AjaxController extends CommonAjaxController
         $tokens       = $components['tokens'];
 
         array_map(
-            function ($token, $value) use ($findTokens, &$returnTokens): void {
+            function (string $token, string $value) use ($findTokens, &$returnTokens): void {
                 foreach ($findTokens as $findToken) {
                     if (str_starts_with($token, $findToken)) {
                         $returnTokens[$token] = $value;

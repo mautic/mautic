@@ -18,11 +18,11 @@ use Twig\Environment;
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Config $config,
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
-        private Environment $twig,
-        private RequestStack $requestStack,
-        private RouterInterface $router,
+        private readonly Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly Environment $twig,
+        private readonly RequestStack $requestStack,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -48,11 +48,13 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $passParams = ['customMjml' => ''];
+            $passParams = [
+                'customMjml' => '',
+            ];
             if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
-                $data = $this->requestStack->getCurrentRequest()->get('grapesjsbuilder', '');
+                $data = $this->requestStack->getCurrentRequest()->request->all('grapesjsbuilder');
 
-                if (isset($data['customMjml'])) {
+                if (is_array($data) && isset($data['customMjml'])) {
                     $passParams['customMjml'] = $data['customMjml'];
                 }
             }
@@ -69,6 +71,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                     $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
                 }
             }
+
             $content = $this->twig->render(
                 '@GrapesJsBuilder/Setting/fields.html.twig',
                 $passParams

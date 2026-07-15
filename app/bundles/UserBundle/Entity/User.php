@@ -29,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
         new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown')"),
-        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown')"),
+        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown', object)"),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['user:read'],
@@ -136,10 +136,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $activePermissions;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     #[Groups(['user:read', 'user:write'])]
-    private $preferences = [];
+    private array $preferences = [];
 
     /**
      * @var string|null
@@ -264,6 +264,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
                 'fields'           => ['email'],
                 'message'          => 'mautic.user.user.email.unique',
                 'repositoryMethod' => 'checkUniqueUsernameEmail',
+                'groups'           => ['User', 'SecondPass'],
             ]
         ));
 
@@ -307,7 +308,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
-        if ($data instanceof User) {
+        if ($data instanceof self) {
             $isNewUser        = !$data->getId();
             $hasPlainPassword = !empty($data->getPlainPassword());
 
@@ -350,10 +351,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('role' == $prop) {
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
@@ -392,8 +393,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get plain password.
-     *
      * @return ?string
      */
     public function getPlainPassword()
@@ -471,14 +470,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->id;
     }
 
-    /**
-     * Set username.
-     *
-     * @param string $username
-     *
-     * @return User
-     */
-    public function setUsername($username)
+    public function setUsername(?string $username): static
     {
         $this->isChanged('username', $username);
         $this->username = $username;
@@ -487,37 +479,23 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set password.
-     *
      * @param string $password
-     *
-     * @return User
      */
-    public function setPassword($password)
+    public function setPassword($password): static
     {
         $this->password = $password;
 
         return $this;
     }
 
-    /**
-     * Set plain password.
-     *
-     * @return User
-     */
-    public function setPlainPassword($plainPassword)
+    public function setPlainPassword($plainPassword): static
     {
         $this->plainPassword = $plainPassword;
 
         return $this;
     }
 
-    /**
-     * Set current password.
-     *
-     * @return User
-     */
-    public function setCurrentPassword($currentPassword)
+    public function setCurrentPassword($currentPassword): static
     {
         $this->currentPassword = $currentPassword;
 
@@ -525,13 +503,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set firstName.
-     *
      * @param string $firstName
-     *
-     * @return User
      */
-    public function setFirstName($firstName)
+    public function setFirstName($firstName): static
     {
         $this->isChanged('firstName', $firstName);
         $this->firstName = $firstName;
@@ -540,9 +514,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get firstName.
-     *
-     * @return string
+     * @return string|null
      */
     public function getFirstName()
     {
@@ -550,13 +522,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set lastName.
-     *
      * @param string $lastName
-     *
-     * @return User
      */
-    public function setLastName($lastName)
+    public function setLastName($lastName): static
     {
         $this->isChanged('lastName', $lastName);
         $this->lastName = $lastName;
@@ -565,9 +533,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get lastName.
-     *
-     * @return string
+     * @return string|null
      */
     public function getLastName()
     {
@@ -585,13 +551,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set email.
-     *
      * @param string $email
-     *
-     * @return User
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->isChanged('email', $email);
         $this->email = $email;
@@ -600,21 +562,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get email.
-     *
-     * @return string
+     * @return string|null
      */
     public function getEmail()
     {
         return $this->email;
     }
 
-    /**
-     * Set role.
-     *
-     * @return User
-     */
-    public function setRole(?Role $role = null)
+    public function setRole(?Role $role = null): static
     {
         $this->isChanged('role', $role);
         $this->role = $role;
@@ -623,21 +578,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get role.
-     *
-     * @return Role
+     * @return Role|null
      */
     public function getRole()
     {
         return $this->role;
     }
 
-    /**
-     * Set active permissions.
-     *
-     * @return User
-     */
-    public function setActivePermissions(array $permissions)
+    public function setActivePermissions(array $permissions): static
     {
         $this->activePermissions = $permissions;
 
@@ -645,8 +593,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get active permissions.
-     *
      * @return mixed
      */
     public function getActivePermissions()
@@ -655,13 +601,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set position.
-     *
      * @param string $position
-     *
-     * @return User
      */
-    public function setPosition($position)
+    public function setPosition($position): static
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -670,9 +612,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get position.
-     *
-     * @return string
+     * @return string|null
      */
     public function getPosition()
     {
@@ -680,13 +620,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set timezone.
-     *
      * @param string $timezone
-     *
-     * @return User
      */
-    public function setTimezone($timezone)
+    public function setTimezone($timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
@@ -695,19 +631,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get timezone.
-     *
-     * @return string
+     * @return string|null
      */
     public function getTimezone()
     {
         return $this->timezone;
     }
 
-    /**
-     * @return User
-     */
-    public function setLocale(?string $locale)
+    public function setLocale(?string $locale): static
     {
         $this->isChanged('locale', $locale);
         $this->locale = $locale;
@@ -716,9 +647,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get locale.
-     *
-     * @return string
+     * @return string|null
      */
     public function getLocale()
     {
@@ -734,13 +663,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         if (null !== $this->role) {
             return $this->role->isAdmin();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastLogin()
     {
@@ -759,7 +688,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastActive()
     {
@@ -778,15 +707,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getPreferences()
+    public function getPreferences(): array
     {
         return $this->preferences;
     }
 
     /**
-     * @param mixed $preferences
+     * @param mixed[] $preferences
      */
     public function setPreferences(array $preferences): void
     {
@@ -794,13 +723,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set signature.
-     *
      * @param string $signature
-     *
-     * @return User
      */
-    public function setSignature($signature)
+    public function setSignature($signature): static
     {
         $this->isChanged('signature', $signature);
         $this->signature = $signature;
@@ -809,9 +734,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get signature.
-     *
-     * @return string
+     * @return string|null
      */
     public function getSignature()
     {
@@ -844,5 +767,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public static function createFromInvite(UserInvite $invite): self
+    {
+        $user = new self();
+        $user->setEmail($invite->getEmail());
+        $user->setRole($invite->getRole());
+
+        return $user;
     }
 }

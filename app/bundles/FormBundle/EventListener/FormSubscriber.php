@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -24,15 +25,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private LanguageHelper $languageHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -67,7 +68,7 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
-        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+        if (!array_key_exists($form->getLanguage() ?? '', $this->languageHelper->getSupportedLanguages())) {
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
@@ -180,7 +181,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
+        if (!empty($config['email_to_owner']) && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
@@ -271,7 +272,7 @@ class FormSubscriber implements EventSubscriberInterface
                     if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
                         unset($post[$key]);
                     }
-                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                    if (isset($fieldTypes[$key]) && 'password' == $fieldTypes[$key]) {
                         $post[$key] = '*********';
                     }
                 }
@@ -320,7 +321,7 @@ class FormSubscriber implements EventSubscriberInterface
             $body = $json;
         } else {
             parse_str($body, $output);
-            if ($output) {
+            if ([] !== $output) {
                 $body = $output;
             }
         }
@@ -365,7 +366,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
-            $output .= "<tr><td style='vertical-align: top'><strong>$key</strong></td><td>";
+            $output .= "<tr><td style='vertical-align: top'><strong>{$key}</strong></td><td>";
             if (is_array($row)) {
                 $output .= $this->postToHtml($row);
             } else {
@@ -382,7 +383,7 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private function getEmailsFromString($emailString): array
     {
-        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
+        return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
 
     /**

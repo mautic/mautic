@@ -29,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('report:reports:viewown')"),
         new Post(security: "is_granted('report:reports:create')"),
-        new Get(security: "is_granted('report:reports:viewown')"),
-        new Put(security: "is_granted('report:reports:editown')"),
-        new Patch(security: "is_granted('report:reports:editother')"),
-        new Delete(security: "is_granted('report:reports:deleteown')"),
+        new Get(security: "is_granted('report:reports:viewown', object)"),
+        new Put(security: "is_granted('report:reports:editown', object)"),
+        new Patch(security: "is_granted('report:reports:editother', object)"),
+        new Delete(security: "is_granted('report:reports:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['report:read'],
@@ -150,6 +150,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     #[Groups(['report:read', 'report:write'])]
     private $scheduleMonthFrequency;
+
     private bool $hasScheduleChanged = false;
 
     public function __clone()
@@ -262,7 +263,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -276,10 +277,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return Report
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -288,9 +287,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -299,10 +296,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param string $system
-     *
-     * @return Report
      */
-    public function setSystem($system)
+    public function setSystem($system): static
     {
         $this->isChanged('system', $system);
         $this->system = $system;
@@ -311,7 +306,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getSystem()
     {
@@ -319,13 +314,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Set source.
-     *
      * @param string $source
-     *
-     * @return Report
      */
-    public function setSource($source)
+    public function setSource($source): static
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -334,7 +325,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -343,10 +334,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param mixed[] $columns
-     *
-     * @return Report
      */
-    public function setColumns($columns)
+    public function setColumns($columns): static
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -355,7 +344,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getColumns()
     {
@@ -364,10 +353,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param mixed[] $filters
-     *
-     * @return Report
      */
-    public function setFilters($filters)
+    public function setFilters($filters): static
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -376,7 +363,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getFilters()
     {
@@ -427,7 +414,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDescription()
     {
@@ -443,7 +430,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getTableOrder()
     {
@@ -458,7 +445,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getGraphs()
     {
@@ -473,7 +460,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getGroupBy()
     {
@@ -488,7 +475,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getAggregators()
     {
@@ -497,12 +484,12 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public function getAggregatorColumns(): array
     {
-        return array_map(fn ($aggregator) => $aggregator['column'], $this->getAggregators());
+        return array_map(fn (array $aggregator): mixed => $aggregator['column'], $this->getAggregators());
     }
 
     public function getOrderColumns(): array
     {
-        return array_map(fn ($order) => $order['column'], $this->getTableOrder());
+        return array_map(fn (array $order): mixed => $order['column'], $this->getTableOrder());
     }
 
     public function getSelectAndAggregatorAndOrderAndGroupByColumns(): array
@@ -530,7 +517,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>|null
      */
     public function getSettings()
     {
@@ -713,7 +700,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<string>
+     * @return array<string, string|null>
      */
     public function getSchedule(): array
     {

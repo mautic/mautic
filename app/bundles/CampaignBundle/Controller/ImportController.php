@@ -49,15 +49,15 @@ final class ImportController extends AbstractFormController
         ManagerRegistry $doctrine,
         CoreParametersHelper $coreParametersHelper,
         ModelFactory $modelFactory,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         CorePermissions $security,
-        private LoggerInterface $logger,
-        private PathsHelper $pathsHelper,
-        private FormFactoryInterface $formFactory,
+        private readonly LoggerInterface $logger,
+        private readonly PathsHelper $pathsHelper,
+        private readonly FormFactoryInterface $formFactory,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -65,7 +65,7 @@ final class ImportController extends AbstractFormController
     public function newAction(): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session  = $this->requestStack->getSession();
@@ -94,7 +94,7 @@ final class ImportController extends AbstractFormController
     public function uploadAction(Request $request): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fullPath = $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
@@ -177,10 +177,10 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): Response
+    public function cancelAction(): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
@@ -271,109 +271,108 @@ final class ImportController extends AbstractFormController
                 ],
                 'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
             ]);
-        } else {
-            try {
-                $fileData      = $importHelper->readZipFile($fullPath);
-                $userId        = $this->userHelper->getUser()->getId();
-                $importSummary = [];
+        }
+        try {
+            $fileData      = $importHelper->readZipFile($fullPath);
+            $userId        = $this->userHelper->getUser()->getId();
+            $importSummary = [];
 
-                $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
+            $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
 
-                $importHelper->recursiveRemoveEmailaddress($fileData);
+            $importHelper->recursiveRemoveEmailaddress($fileData);
 
-                // Loop through importActions and clean UUIDs for 'create' actions
-                foreach ($fileData as &$group) {
-                    foreach ($importActions as $entityType => $entities) {
-                        if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
+            // Loop through importActions and clean UUIDs for 'create' actions
+            foreach ($fileData as &$group) {
+                foreach ($importActions as $entityType => $entities) {
+                    if (in_array($entityType, [Event::ENTITY_NAME, Field::ENTITY_NAME, Action::ENTITY_NAME], true)) {
+                        continue;
+                    }
+                    if (!isset($group[$entityType])) {
+                        continue;
+                    }
+
+                    foreach ($entities as $entityUuid => $action) {
+                        if ('create' !== $action) {
                             continue;
                         }
-                        if (!isset($group[$entityType])) {
-                            continue;
-                        }
 
-                        foreach ($entities as $entityUuid => $action) {
-                            if ('create' !== $action) {
-                                continue;
-                            }
-
-                            foreach ($group[$entityType] as &$item) {
-                                if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
-                                    if (Campaign::ENTITY_NAME == $entityType) {
-                                        foreach ($group[Event::ENTITY_NAME] as &$eventItem) {
-                                            $eventItem['uuid'] = '';
-                                        }
+                        foreach ($group[$entityType] as &$item) {
+                            if (isset($item['uuid']) && (int) $item['uuid'] === (int) $entityUuid) {
+                                if (Campaign::ENTITY_NAME == $entityType) {
+                                    foreach ($group[Event::ENTITY_NAME] as &$eventItem) {
+                                        $eventItem['uuid'] = '';
                                     }
-                                    if (Form::ENTITY_NAME == $entityType) {
-                                        if (isset($group[Field::ENTITY_NAME])) {
-                                            foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
-                                                $fieldItem['uuid'] = '';
-                                            }
-                                        }
-                                        if (isset($group[Action::ENTITY_NAME])) {
-                                            foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
-                                                $actionItem['uuid'] = '';
-                                            }
-                                        }
-                                    }
-                                    $item['uuid'] = '';
-                                    break;
                                 }
+                                if (Form::ENTITY_NAME == $entityType) {
+                                    if (isset($group[Field::ENTITY_NAME])) {
+                                        foreach ($group[Field::ENTITY_NAME] as &$fieldItem) {
+                                            $fieldItem['uuid'] = '';
+                                        }
+                                    }
+                                    if (isset($group[Action::ENTITY_NAME])) {
+                                        foreach ($group[Action::ENTITY_NAME] as &$actionItem) {
+                                            $actionItem['uuid'] = '';
+                                        }
+                                    }
+                                }
+                                $item['uuid'] = '';
+                                break;
                             }
                         }
                     }
                 }
-
-                foreach ($fileData as $entity) {
-                    $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
-                    $this->dispatcher->dispatch($event);
-                    $summary = $event->getStatus();
-                    if (!empty($summary)) {
-                        $importSummary[] = $summary;
-                    }
-                }
-
-                foreach ($importSummary as $summary) {
-                    foreach ([EntityImportEvent::NEW, EntityImportEvent::UPDATE] as $status) {
-                        if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
-                            continue;
-                        }
-
-                        $campaignData    = $summary[$status][Campaign::ENTITY_NAME];
-                        $campaignName    = $campaignData['names'][0] ?? 'Unknown';
-                        $campaignId      = $campaignData['ids'][0] ?? 0;
-
-                        $this->addFlashMessage(
-                            'mautic.campaign.notice.import.finished',
-                            [
-                                '%id%'   => $campaignId,
-                                '%name%' => htmlspecialchars($campaignName, ENT_QUOTES, 'UTF-8'),
-                            ]
-                        );
-                    }
-                }
-
-                $this->removeImportFile($fullPath);
-                $session->set('mautic.campaign.import.summary', $importSummary);
-                $this->resetImport();
-            } catch (\RuntimeException $e) {
-                $this->logger->error($e->getMessage());
-                $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
-
-                $this->removeImportFile($fullPath);
-                $importSummary = [
-                    EntityImportEvent::ERRORS => [$e->getMessage()],
-                ];
             }
 
-            return $this->delegateView([
-                'viewParameters' => [
-                    'importProgress'  => 100,
-                    'importSummary'   => $importSummary,
-                    'mauticContent'   => 'campaignImport',
-                ],
-                'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
-            ]);
+            foreach ($fileData as $entity) {
+                $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+                $this->dispatcher->dispatch($event);
+                $summary = $event->getStatus();
+                if (!empty($summary)) {
+                    $importSummary[] = $summary;
+                }
+            }
+
+            foreach ($importSummary as $summary) {
+                foreach ([EntityImportEvent::NEW, EntityImportEvent::UPDATE] as $status) {
+                    if (!isset($summary[$status][Campaign::ENTITY_NAME])) {
+                        continue;
+                    }
+
+                    $campaignData    = $summary[$status][Campaign::ENTITY_NAME];
+                    $campaignName    = $campaignData['names'][0] ?? 'Unknown';
+                    $campaignId      = $campaignData['ids'][0] ?? 0;
+
+                    $this->addFlashMessage(
+                        'mautic.campaign.notice.import.finished',
+                        [
+                            '%id%'   => $campaignId,
+                            '%name%' => htmlspecialchars($campaignName, ENT_QUOTES, 'UTF-8'),
+                        ]
+                    );
+                }
+            }
+
+            $this->removeImportFile($fullPath);
+            $session->set('mautic.campaign.import.summary', $importSummary);
+            $this->resetImport();
+        } catch (\RuntimeException $e) {
+            $this->logger->error($e->getMessage());
+            $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
+
+            $this->removeImportFile($fullPath);
+            $importSummary = [
+                EntityImportEvent::ERRORS => [$e->getMessage()],
+            ];
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'importProgress'  => 100,
+                'importSummary'   => $importSummary,
+                'mauticContent'   => 'campaignImport',
+            ],
+            'contentTemplate' => '@MauticCampaign/Import/progress.html.twig',
+        ]);
     }
 
     /**
@@ -447,7 +446,7 @@ final class ImportController extends AbstractFormController
     public function undoAction(): JsonResponse
     {
         if (!$this->security->isGranted('campaign:imports:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session         = $this->requestStack->getSession();

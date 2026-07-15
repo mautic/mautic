@@ -18,18 +18,16 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetModel $assetModel,
+        private readonly AssetModel $assetModel,
         protected TranslatorInterface $translator,
-        private AnalyticsHelper $analyticsHelper,
-        private AssetsHelper $assetsHelper,
-        private ThemeHelperInterface $themeHelper,
-        private Environment $twig,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly AnalyticsHelper $analyticsHelper,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -138,7 +136,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->twig->render(
+            $this->themeHelper->renderThemeTemplate(
                 $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,

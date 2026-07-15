@@ -41,27 +41,25 @@ class InactiveExecutioner implements ExecutionerInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private InactiveContactFinder $inactiveContactFinder,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventScheduler $scheduler,
-        private InactiveHelper $helper,
-        private EventExecutioner $executioner,
-        private ProcessSignalService $processSignalService,
-        private EventRedirectionHelper $redirectionHelper,
-        private LeadRepository $leadRepository,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveHelper $helper,
+        private readonly EventExecutioner $executioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -89,14 +87,12 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();
@@ -155,7 +151,7 @@ class InactiveExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
         $totalContacts = 0;
-        if (!($this->output instanceof NullOutput)) {
+        if (!$this->output instanceof NullOutput) {
             $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
             $this->output->writeln(
@@ -320,24 +316,56 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function handleRedirectedEvent(Event $redirectEvent, Event $originalDecisionEvent): void
     {
-        $contacts = $this->inactiveContactFinder->getContacts(
-            $this->campaign->getId(), $originalDecisionEvent, $this->limiter, true);
+        try {
+            $contacts = $this->inactiveContactFinder->getContacts(
+                $this->campaign->getId(),
+                $originalDecisionEvent,
+                $this->limiter,
+                true
+            );
 
-        if (!$contacts->count()) {
-            return;
+            while ($contacts->count()) {
+                $batchMinContactId = max($contacts->getKeys()) + 1;
+
+                $this->progressBar->advance($contacts->count());
+                $this->counter->advanceEvaluated($contacts->count());
+
+                $contactIds = $contacts->getKeys();
+                $this->leadRepository->incrementCampaignRotationForContacts(
+                    $contactIds,
+                    $redirectEvent->getCampaign()->getId()
+                );
+
+                $this->executioner->recordLogsAsExecutedForEvent($originalDecisionEvent, $contacts, true);
+
+                $eventCollection = new ArrayCollection([$redirectEvent]);
+                $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter, true);
+
+                $this->inactiveContactFinder->clear($contacts);
+
+                if ($this->limiter->getContactId()) {
+                    break;
+                }
+
+                $this->processSignalService->throwExceptionIfSignalIsCaught();
+
+                $this->logger->debug(
+                    'CAMPAIGN: Fetching the next batch of inactive contacts for redirected decision ID #'
+                    .$originalDecisionEvent->getId().' starting with contact ID '.$batchMinContactId
+                );
+                $this->limiter->setBatchMinContactId($batchMinContactId);
+
+                $contacts = $this->inactiveContactFinder->getContacts(
+                    $this->campaign->getId(),
+                    $originalDecisionEvent,
+                    $this->limiter,
+                    true
+                );
+            }
+        } catch (NoContactsFoundException) {
+            $this->logger->debug(
+                'CAMPAIGN: No more contacts to process for redirected decision ID #'.$originalDecisionEvent->getId()
+            );
         }
-
-        $this->progressBar->advance($contacts->count());
-        $this->counter->advanceEvaluated($contacts->count());
-
-        $contactIds = $contacts->getKeys();
-
-        $this->leadRepository->incrementCampaignRotationForContacts(
-            $contactIds,
-            $redirectEvent->getCampaign()->getId()
-        );
-
-        $eventCollection = new ArrayCollection([$redirectEvent]);
-        $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter);
     }
 }

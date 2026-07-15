@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private DateTimeToken $dateTokenHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly DateTimeToken $dateTokenHelper,
     ) {
     }
 
@@ -28,7 +28,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
+        $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
 
     public function onEmailDisplay(EmailSendEvent $event): void

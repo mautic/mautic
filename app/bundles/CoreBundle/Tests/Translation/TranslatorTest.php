@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-class TranslatorTest extends AbstractMauticTestCase
+final class TranslatorTest extends AbstractMauticTestCase
 {
     public function testMissingPluralOptions(): void
     {
@@ -17,9 +17,8 @@ class TranslatorTest extends AbstractMauticTestCase
         $fallback   = 'en_US';
         $locale     = 'ru';
 
-        $reflection = new \ReflectionClass($translator);
-        $property   = $reflection->getProperty('translator');
-        $property->setAccessible(true);
+        $reflection         = new \ReflectionClass($translator);
+        $property           = $reflection->getProperty('translator');
         $internalTranslator = $property->getValue($translator);
 
         $internalTranslator->addLoader('array', new ArrayLoader());

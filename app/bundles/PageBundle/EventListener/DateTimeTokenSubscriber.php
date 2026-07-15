@@ -14,10 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private DateTimeToken $dateTokenHelper,
-        private CorePermissions $security,
-        private ContactTracker $contactTracker,
+        private readonly TranslatorInterface $translator,
+        private readonly DateTimeToken $dateTokenHelper,
+        private readonly CorePermissions $security,
+        private readonly ContactTracker $contactTracker,
     ) {
     }
 
@@ -31,7 +31,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
 
     public function onPageBuild(PageBuilderEvent $event): void
     {
-        $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
+        $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
 
     public function onPageDisplay(PageDisplayEvent $event): void

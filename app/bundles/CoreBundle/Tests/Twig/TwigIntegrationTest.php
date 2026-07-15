@@ -33,7 +33,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         $pathHelperMock = $this->createMock(PathsHelper::class);
 
         $packagesMock->method('getUrl')
-            ->willReturnCallback(function (string $path) {
+            ->willReturnCallback(function (string $path): string {
                 $packageName = $version = null;
                 $absolute    = $ignorePrefix = false;
 

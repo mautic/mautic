@@ -478,14 +478,14 @@ class FieldModel extends FormModel
     ];
 
     public function __construct(
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private ListModel $leadListModel,
-        private CustomFieldColumn $customFieldColumn,
-        private FieldSaveDispatcher $fieldSaveDispatcher,
-        private LeadFieldRepository $leadFieldRepository,
-        private FieldList $fieldList,
-        private LeadFieldSaver $leadFieldSaver,
-        private LeadFieldDeleter $leadFieldDeleter,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly ListModel $leadListModel,
+        private readonly CustomFieldColumn $customFieldColumn,
+        private readonly FieldSaveDispatcher $fieldSaveDispatcher,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FieldList $fieldList,
+        private readonly LeadFieldSaver $leadFieldSaver,
+        private readonly LeadFieldDeleter $leadFieldDeleter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -628,7 +628,7 @@ class FieldModel extends FormModel
                 $this->customFieldColumn->createLeadColumn($entity);
             } catch (CustomFieldLimitException $e) {
                 // Convert to original Exception not to cause BC
-                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
             }
         } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
@@ -698,14 +698,7 @@ class FieldModel extends FormModel
 
         /** @var LeadField $entity */
         foreach ($entities as $entity) {
-            switch ($entity->getObject()) {
-                case 'lead':
-                    $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-                case 'company':
-                    $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-            }
+            $this->customFieldColumn->deleteLeadColumn($entity);
         }
 
         return $entities;
@@ -729,9 +722,6 @@ class FieldModel extends FormModel
         return $this->leadListModel->getFieldSegments($field);
     }
 
-    /**
-     * Filter used field ids.
-     */
     public function filterUsedFieldIds(array $ids): array
     {
         return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
@@ -900,13 +890,9 @@ class FieldModel extends FormModel
     /**
      * @deprecated Use FieldList::getFieldList method instead
      *
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
-     * @param array     $filters
-     *
      * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }

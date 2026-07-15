@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,15 +30,15 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     public function testListOfRemoteDomainsVisibility(bool $enabled): void
     {
         $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
         $label   = 'List of allowed remote domains (one per line)';
 
         if ($enabled) {
-            Assert::assertStringContainsString($label, $content);
+            $this->assertStringContainsString($label, (string) $content);
         } else {
-            Assert::assertStringNotContainsString($label, $content);
+            $this->assertStringNotContainsString($label, (string) $content);
         }
     }
 }

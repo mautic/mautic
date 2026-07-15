@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,37 +22,30 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     private FormSubscriber $subscriber;
 
     /**
-     * @var MailHelper&MockObject
+     * @var MockObject&MailHelper
      */
-    private MailHelper $mailer;
+    private MockObject $mailer;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $auditLogModel        = $this->createMock(AuditLogModel::class);
-        $this->mailer         = $this->createMock(MailHelper::class);
-        $translator           = $this->createMock(TranslatorInterface::class);
-        $router               = $this->createMock(RouterInterface::class);
-        $languageHelper       = $this->createMock(LanguageHelper::class);
-
+        $this->mailer      = $this->createMock(MailHelper::class);
         $this->mailer->expects($this->once())
             ->method('getMailer')
             ->willReturnSelf();
 
         $this->subscriber = new FormSubscriber(
-            $ipLookupHelper,
-            $auditLogModel,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(AuditLogModel::class),
             $this->mailer,
-            $translator,
-            $router,
-            $languageHelper
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(RouterInterface::class),
+            $this->createStub(LanguageHelper::class)
         );
     }
 
@@ -108,7 +103,7 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::never())
+        $this->mailer->expects($this->never())
             ->method('send');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -145,43 +140,43 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('reset');
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('send');
 
         if (null !== $to) {
-            $this->mailer->expects(self::once())
+            $this->mailer->expects($this->once())
                 ->method('setTo')
-                ->with(array_fill_keys(array_map('trim', explode(',', $to)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $to)), null));
         }
 
         if (null !== $cc) {
-            $this->mailer->expects(self::once())
+            $this->mailer->expects($this->once())
                 ->method('setCc')
-                ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
         }
 
         if (null !== $bcc) {
-            $this->mailer->expects(self::once())
+            $this->mailer->expects($this->once())
                 ->method('setBcc')
-                ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
+                ->with(array_fill_keys(array_map(trim(...), explode(',', $bcc)), null));
         }
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -227,33 +222,33 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('reset');
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('send');
 
-        $this->mailer->expects(self::never())
+        $this->mailer->expects($this->never())
             ->method('setTo');
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setCc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
-        $this->mailer->expects(self::once())
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
+        $this->mailer->expects($this->once())
             ->method('setBcc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $bcc)), null));
-        $this->mailer->expects(self::once())
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $bcc)), null));
+        $this->mailer->expects($this->once())
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -291,28 +286,28 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('reset');
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('send');
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setTo')
             ->with([$leadEmail => null]);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -353,28 +348,28 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('reset');
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('send');
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setTo')
             ->with([$ownerEmail => null]);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
@@ -420,14 +415,14 @@ New line',
             ->setFields($this->getFormFields())
             ->setAction($action);
 
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('reset');
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('send');
-        $matcher = self::exactly(3);
+        $matcher = $this->exactly(3);
 
         $this->mailer->expects($matcher)
-            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail) {
+            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([$to => null], $parameters[0]);
                 }
@@ -440,26 +435,26 @@ New line',
 
                 return true;
             });
-        $this->mailer->expects(self::once())
+        $this->mailer->expects($this->once())
             ->method('setCc')
-            ->with(array_fill_keys(array_map('trim', explode(',', $cc)), null));
-        $this->mailer->expects(self::once())
+            ->with(array_fill_keys(array_map(trim(...), explode(',', $cc)), null));
+        $this->mailer->expects($this->once())
             ->method('setBcc')
             ->with([$bcc => null]);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setSubject')
             ->with($subject);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setBody')
             ->with($message);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('parsePlainText')
             ->with($message);
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('addTokens')
             ->with($emailTokens);
 
-        $this->mailer->expects(self::exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('setLead');
 
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
