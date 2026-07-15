@@ -9,7 +9,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Monolog\Logger;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +48,6 @@ final class TwilioTransportTest extends TestCase
         $payload = ['messagingServiceSid' => 'MS1234', 'body' => 'some_content'];
 
         $result = $method->invokeArgs($this->twilioTransport, [...array_values($payload), []]);
-        Assert::assertSame($payload, $result);
+        $this->assertSame($payload, $result);
     }
 }

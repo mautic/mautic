@@ -29,10 +29,7 @@ final class TimezoneResolverTest extends TestCase
         };
 
         $timezoneResolver = new TimezoneResolver($coreParametersHelper);
-        Assert::assertSame(
-            $expectedTimezone,
-            $timezoneResolver->getDefaultDate(false)->getDateTime()->getTimezone()->getName()
-        );
+        $this->assertSame($expectedTimezone, $timezoneResolver->getDefaultDate(false)->getDateTime()->getTimezone()->getName());
     }
 
     /**
