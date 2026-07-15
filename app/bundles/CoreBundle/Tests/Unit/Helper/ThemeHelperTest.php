@@ -417,13 +417,13 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('email');
-        Assert::assertCount(2, $themes);
-        Assert::assertArrayHasKey('theme-legacy-email', $themes);
-        Assert::assertArrayHasKey('theme-legacy-all', $themes);
+        $this->assertCount(2, $themes);
+        $this->assertArrayHasKey('theme-legacy-email', $themes);
+        $this->assertArrayHasKey('theme-legacy-all', $themes);
 
         $themes = $this->themeHelper->getInstalledThemes('page');
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('theme-legacy-all', $themes);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('theme-legacy-all', $themes);
     }
 
     public function testCustomThemesAreReturnedForFeatureIfCustomBuilderIsEnabled(): void
@@ -444,13 +444,13 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('page');
-        Assert::assertCount(2, $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-all', $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-page', $themes);
+        $this->assertCount(2, $themes);
+        $this->assertArrayHasKey('theme-custom-builder-all', $themes);
+        $this->assertArrayHasKey('theme-custom-builder-page', $themes);
 
         $themes = $this->themeHelper->getInstalledThemes('email');
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-all', $themes);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('theme-custom-builder-all', $themes);
     }
 
     public function testAllThemesAreReturned(): void
@@ -459,12 +459,12 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes();
-        Assert::assertCount(4, $themes);
+        $this->assertCount(4, $themes);
 
         // Test that a list of themes are returned by default
         $themeKeys   = array_keys($themes);
         $themeValues = array_values($themes);
-        Assert::assertSame($themeKeys, $themeValues);
+        $this->assertSame($themeKeys, $themeValues);
     }
 
     public function testExtendedThemeDetailsAreReturned(): void
@@ -473,9 +473,9 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayHasKey('dir', $themes['theme-legacy-email']);
     }
 
     public function testExtendedThemeDetailsWithoutDirectoriesAreReturned(): void
@@ -484,9 +484,9 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
     }
 
     public function testCachedThemesReturnAsExpected(): void
@@ -511,25 +511,25 @@ final class ThemeHelperTest extends TestCase
             });
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
 
         // this should return cached results
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
 
         $themes = $this->themeHelper->getInstalledThemes('page', true, false, false);
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-all']);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-all']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-all']);
 
         $themes = $this->themeHelper->getInstalledThemes('page', true, false, true);
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
-        Assert::assertArrayHasKey('dir', $themes['theme-legacy-all']);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-all']);
+        $this->assertArrayHasKey('dir', $themes['theme-legacy-all']);
     }
 
     public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
@@ -537,7 +537,7 @@ final class ThemeHelperTest extends TestCase
         $this->pathsHelper->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
-        Assert::assertTrue($this->themeHelper->exists('theme-legacy-email'));
+        $this->assertTrue($this->themeHelper->exists('theme-legacy-email'));
     }
 
     public function testExistsReturnsFalseIfThemeDoesNotExist(): void
@@ -545,7 +545,7 @@ final class ThemeHelperTest extends TestCase
         $this->pathsHelper->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
-        Assert::assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
+        $this->assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
     }
 
     public function testDefaultThemeNotShouldNotGetRemoved(): void
@@ -571,7 +571,7 @@ final class ThemeHelperTest extends TestCase
 
         // custom theme name - theme-legacy-email
         $themeHelper->delete('theme-legacy-email');
-        Assert::assertTrue($themeHelper->exists('theme-legacy-email'));
+        $this->assertTrue($themeHelper->exists('theme-legacy-email'));
     }
 
     public function testDeleteThemeThrowsExceptionIfThemeDoesNotExist(): void
@@ -605,7 +605,7 @@ final class ThemeHelperTest extends TestCase
 
         $rendered = $themeHelper->renderThemeTemplate('@themes/test/html/page.html.twig', ['value' => 'runtime ok']);
 
-        Assert::assertSame('runtime ok [runtime]', $rendered);
+        $this->assertSame('runtime ok [runtime]', $rendered);
     }
 }
 

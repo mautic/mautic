@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -78,7 +77,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
         self::assertResponseIsSuccessful();
-        Assert::assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
+        $this->assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
     }
 
     public function testSegmentWithProject(): void
@@ -116,7 +115,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedSegment = $this->listRepo->find($segment->getId());
         $this->assertInstanceOf(LeadList::class, $savedSegment);
-        Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
     /**
@@ -804,7 +803,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $segmentExistCheck = $this->listRepo->find($segmentId);
-        Assert::assertNull($segmentExistCheck);
+        $this->assertNotInstanceOf(LeadList::class, $segmentExistCheck);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
@@ -830,7 +829,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
 
-        Assert::assertStringContainsString('leadlist_buttons_apply', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('leadlist_buttons_apply', (string) $this->client->getResponse()->getContent());
 
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);

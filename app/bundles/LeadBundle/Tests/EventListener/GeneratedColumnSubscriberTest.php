@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\EventListener\GeneratedColumnSubscriber;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,9 +50,9 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
         $generatedColumn = $event->getGeneratedColumns()->current();
 
-        Assert::assertSame(MAUTIC_TABLE_PREFIX.'leads', $generatedColumn->getTableName());
-        Assert::assertSame('generated_email_domain', $generatedColumn->getColumnName());
-        Assert::assertSame('VARCHAR(255) AS (SUBSTRING(email, LOCATE("@", email) + 1)) COMMENT \'(DC2Type:generated)\'', $generatedColumn->getColumnDefinition());
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $generatedColumn->getTableName());
+        $this->assertSame('generated_email_domain', $generatedColumn->getColumnName());
+        $this->assertSame('VARCHAR(255) AS (SUBSTRING(email, LOCATE("@", email) + 1)) COMMENT \'(DC2Type:generated)\'', $generatedColumn->getColumnDefinition());
     }
 
     public function testOnGenerateSegmentFilters(): void
@@ -71,27 +70,24 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
         $this->generatedColumnSubscriber->onGenerateSegmentFilters($event);
 
-        Assert::assertSame(
-            [
-                'label'      => 'translated string',
-                'properties' => ['type' => 'text'],
-                'operators'  => [
-                    'mautic.lead.list.form.operator.equals'     => '=',
-                    'mautic.lead.list.form.operator.notequals'  => '!=',
-                    'mautic.lead.list.form.operator.isempty'    => 'empty',
-                    'mautic.lead.list.form.operator.isnotempty' => '!empty',
-                    'mautic.lead.list.form.operator.islike'     => 'like',
-                    'mautic.lead.list.form.operator.isnotlike'  => '!like',
-                    'mautic.lead.list.form.operator.regexp'     => 'regexp',
-                    'mautic.lead.list.form.operator.notregexp'  => '!regexp',
-                    'mautic.core.operator.starts.with'          => 'startsWith',
-                    'mautic.core.operator.ends.with'            => 'endsWith',
-                    'mautic.core.operator.contains'             => 'contains',
-                ],
-                'object'    => 'lead',
-                'iconClass' => 'ri-at-line',
+        $this->assertSame([
+            'label'      => 'translated string',
+            'properties' => ['type' => 'text'],
+            'operators'  => [
+                'mautic.lead.list.form.operator.equals'     => '=',
+                'mautic.lead.list.form.operator.notequals'  => '!=',
+                'mautic.lead.list.form.operator.isempty'    => 'empty',
+                'mautic.lead.list.form.operator.isnotempty' => '!empty',
+                'mautic.lead.list.form.operator.islike'     => 'like',
+                'mautic.lead.list.form.operator.isnotlike'  => '!like',
+                'mautic.lead.list.form.operator.regexp'     => 'regexp',
+                'mautic.lead.list.form.operator.notregexp'  => '!regexp',
+                'mautic.core.operator.starts.with'          => 'startsWith',
+                'mautic.core.operator.ends.with'            => 'endsWith',
+                'mautic.core.operator.contains'             => 'contains',
             ],
-            $event->getChoices()['lead']['generated_email_domain']
-        );
+            'object'    => 'lead',
+            'iconClass' => 'ri-at-line',
+        ], $event->getChoices()['lead']['generated_email_domain']);
     }
 }

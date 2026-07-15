@@ -281,13 +281,21 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            $handlingException = true;
-            $line              = $exception->getLine();
-            $file              = $exception->getFile();
-            $trace             = $exception->getTrace();
-            $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
+            $context = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'showExceptionDetails', 'previous']);
+            return [
+                'inline' => $inline,
+                'type' => $type,
+                'message' => $message,
+                'logMessage' => $logMessage,
+                'line' => $exception->getLine(),
+                'file' => $exception->getFile(),
+                'trace' => $exception->getTrace(),
+                'context' => $context,
+                'showExceptionMessage' => $showExceptionMessage,
+                'showExceptionDetails' => $showExceptionDetails,
+                'previous' => $previous,
+            ];
         }
 
         /**

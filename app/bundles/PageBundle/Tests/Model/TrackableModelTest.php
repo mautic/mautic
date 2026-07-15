@@ -150,17 +150,17 @@ final class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey($match[0], $trackables);
+        $this->assertArrayHasKey($match[0], $trackables);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        Assert::assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
+        $this->assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -187,17 +187,17 @@ final class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey($match[0], $trackables);
+        $this->assertArrayHasKey($match[0], $trackables);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        Assert::assertEquals($url, $redirect->getUrl());
+        $this->assertEquals($url, $redirect->getUrl());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -226,13 +226,13 @@ final class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
+        $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a token used in place of a URL is parsed properly')]
@@ -450,11 +450,11 @@ final class TrackableModelTest extends TestCase
             1
         );
         $token = array_key_first($trackables);
-        Assert::assertNotEmpty($trackables, $content);
-        Assert::assertStringContainsString($token, (string) $content);
+        $this->assertNotEmpty($trackables, $content);
+        $this->assertStringContainsString($token, (string) $content);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -484,11 +484,11 @@ final class TrackableModelTest extends TestCase
         );
 
         // Assert that both trackables found
-        Assert::assertCount(3, $trackables);
+        $this->assertCount(3, $trackables);
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertStringContainsString((string) $redirectId, (string) $content, $content);
+            $this->assertStringContainsString((string) $redirectId, (string) $content, $content);
         }
     }
 
