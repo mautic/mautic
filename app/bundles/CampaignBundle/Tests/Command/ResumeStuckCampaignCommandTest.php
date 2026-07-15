@@ -13,6 +13,8 @@ use Symfony\Component\Console\Exception\RuntimeException;
 
 final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 {
+    private const TAG_GREATER_THAN_FOUR = 'greater than 4';
+
     protected function setUp(): void
     {
         $this->configParams['campaigns_resume_stuck_records_after'] = '2025-08-01 00:00:00';
@@ -89,7 +91,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         $yesPathAction = $this->createEvent('Incomplete Condition Child', $campaign, 'lead.changetags', 'action', [
             'add_tags' => [
-                'greater than 4',
+                self::TAG_GREATER_THAN_FOUR,
             ],
         ]);
         $yesPathAction->setParent($condition);
@@ -144,7 +146,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Third level events - YES path from decision
         $yesPathAction = $this->createEvent('Yes Path - Add Tag', $campaign, 'lead.changetags', 'action', [
             'add_tags' => [
-                'greater than 4',
+                self::TAG_GREATER_THAN_FOUR,
             ],
         ]);
         $yesPathAction->setParent($conditionEvent);
@@ -483,7 +485,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // Third level events - YES path from decision
         $yesPathAction = $this->createEvent('Yes Path - Add Tag', $campaign, 'lead.changetags', 'action', [
             'add_tags' => [
-                'greater than 4',
+                self::TAG_GREATER_THAN_FOUR,
             ],
         ]);
         $yesPathAction->setParent($decisionEvent);
