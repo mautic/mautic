@@ -188,7 +188,7 @@ services:
 		tags:
 			- phpstan.rules.rule
 	-
-		class: MauticPhpStan\Rule\NoTablePrefixDefinitionInTestsRule
+		class: Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
 		tags:
 			- phpstan.rules.rule
 	-

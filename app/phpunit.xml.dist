@@ -50,6 +50,7 @@
     <testsuite name="Static analysis rule tests">
       <directory>./../utils/rector/tests</directory>
       <directory>./../utils/phpstan/tests</directory>
+    </testsuite>
   </testsuites>
   <php>
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>

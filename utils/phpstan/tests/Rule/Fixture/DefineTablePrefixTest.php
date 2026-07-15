@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Tests\Rule\Fixture;
+namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // the test bootstrap defines the const already - must be reported
 class DefineTablePrefixTest
