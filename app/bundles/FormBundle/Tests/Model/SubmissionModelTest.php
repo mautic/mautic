@@ -125,6 +125,8 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     private SubmissionModel $submissionModel;
 
+    private EntityManager&MockObject $entityManager;
+
     /**
      * @var \ReflectionClass<SubmissionModel>
      */
@@ -152,9 +154,9 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         );
         $this->userHelper                 = $this->createMock(UserHelper::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
-        $entityManager              = $this->createMock(EntityManager::class);
+        $this->entityManager              = $this->createMock(EntityManager::class);
         $connection                       = $this->createMock(Connection::class);
-        $entityManager->method('getConnection')->willReturn($connection);
+        $this->entityManager->method('getConnection')->willReturn($connection);
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
         $schemaManager->method('tablesExist')->willReturn(true);
         $connection->method('createSchemaManager')->willReturn($schemaManager);
@@ -164,7 +166,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $connection->method('executeStatement')->willReturn(1);
         $classMetadata = $this->createMock(\Doctrine\ORM\Mapping\ClassMetadata::class);
         $classMetadata->method('getTableName')->willReturn('forms');
-        $entityManager->method('getClassMetadata')->willReturn($classMetadata);
+        $this->entityManager->method('getClassMetadata')->willReturn($classMetadata);
         $this->submissioRepository        = $this->createMock(SubmissionRepository::class);
         $this->leadRepository             = $this->createMock(LeadRepository::class);
         $this->uploadFieldValidatorMock   = $this->createMock(UploadFieldValidator::class);
@@ -174,7 +176,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker             = $this->createMock(ContactTracker::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
-        $entityManager->method('getRepository')
+        $this->entityManager->method('getRepository')
             ->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
                 Submission::class => $this->submissioRepository,
                 Lead::class       => $this->leadRepository,
@@ -213,7 +215,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->createStub(ContactMerger::class),
             $this->fieldsWithUniqueIdentifier,
-            $entityManager,
+            $this->entityManager,
             $this->createStub(CorePermissions::class),
             $dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
