@@ -7,8 +7,8 @@ namespace Mautic\StageBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
-use Mautic\StageBundle\Entity\StageLeadActionLog;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -78,32 +78,32 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $duplicateLogContactId = $duplicateLogContact->getId();
 
         $connection = $this->em->getConnection();
-        $actionLog1 = new StageLeadActionLog(); // adjust namespace
-        $actionLog1->setStage($mergedStage);  // or setStageId if no relation
+        $actionLog1 = new LeadStageLog(); 
+        $actionLog1->setStage($mergedStage); 
         $actionLog1->setLead($contact);
         $actionLog1->setDateFired(new \DateTime(self::MERGE_TEST_LOG_DATE));
         $this->em->persist($actionLog1);
-    
-        $changeLog = new LeadStagesChangeLog(); // adjust
+
+        $changeLog = new LeadStageLog(); 
         $changeLog->setLead($contact);
         $changeLog->setStage($mergedStage);
         $changeLog->setEventName('Stage changed');
         $changeLog->setActionName('Merged stage');
         $changeLog->setDateAdded(new \DateTime(self::MERGE_TEST_LOG_DATE));
         $this->em->persist($changeLog);
-    
-        $actionLog2 = new StageLeadActionLog();
+
+        $actionLog2 = new LeadStageLog();
         $actionLog2->setStage($primaryStage);
         $actionLog2->setLead($duplicateLogContact);
         $actionLog2->setDateFired(new \DateTime(self::MERGE_TEST_LOG_DATE));
         $this->em->persist($actionLog2);
-    
-        $actionLog3 = new StageLeadActionLog();
+
+        $actionLog3 = new LeadStageLog();
         $actionLog3->setStage($mergedStage);
         $actionLog3->setLead($duplicateLogContact);
         $actionLog3->setDateFired(new \DateTime('2026-01-02 00:00:00'));
         $this->em->persist($actionLog3);
-    
+
         $this->em->flush();
 
         /** @var StageModel $stageModel */
