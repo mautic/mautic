@@ -78,8 +78,6 @@ trait OperatorListTrait
             'include' => [
                 OperatorOptions::EQUAL_TO,
                 OperatorOptions::NOT_EQUAL_TO,
-                OperatorOptions::IN_LAST,
-                OperatorOptions::IN_NEXT,
                 OperatorOptions::GREATER_THAN,
                 OperatorOptions::GREATER_THAN_OR_EQUAL,
                 OperatorOptions::LESS_THAN,

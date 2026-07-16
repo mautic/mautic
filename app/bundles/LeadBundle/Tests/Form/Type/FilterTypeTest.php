@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\LeadBundle\Form\Type\FilterType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
@@ -37,7 +38,8 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
         $this->listModel               = $this->createMock(ListModel::class);
         $this->form                    = new FilterType(
             $this->formAdjustmentsProvider,
-            $this->listModel
+            $this->listModel,
+            $this->createStub(TypeOperatorProviderInterface::class),
         );
     }
 

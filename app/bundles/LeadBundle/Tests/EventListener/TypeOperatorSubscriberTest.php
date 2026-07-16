@@ -100,7 +100,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnTypeOperatorsCollect(): void
     {
-        $event = new TypeOperatorsEvent();
+        $event = new TypeOperatorsEvent('segment');
 
         $this->subscriber->onTypeOperatorsCollect($event);
 

@@ -22,7 +22,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 
-    private const BEHAVIOR_OPERATORS = [
+    private array $behaviorOperators = [
         'datetime' => [
             OperatorOptions::EQUAL_TO,
             OperatorOptions::NOT_EQUAL_TO,
@@ -30,8 +30,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             OperatorOptions::LESS_THAN,
             OperatorOptions::GREATER_THAN_OR_EQUAL,
             OperatorOptions::LESS_THAN_OR_EQUAL,
-            OperatorOptions::IN_LAST,
-            OperatorOptions::IN_NEXT,
         ],
         'number' => [
             OperatorOptions::EQUAL_TO,
@@ -562,7 +560,12 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
      */
     private function getBehaviorOperators(string $fieldType): array
     {
-        return $this->typeOperatorProvider->getOperatorsIncluding(self::BEHAVIOR_OPERATORS[$fieldType]);
+        if ('segment' === $this->typeOperatorProvider->getContext()) {
+            $this->behaviorOperators['datetime'][] = OperatorOptions::IN_LAST;
+            $this->behaviorOperators['datetime'][] = OperatorOptions::IN_NEXT;
+        }
+
+        return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);
     }
 
     public function onGenerateSegmentFiltersNormalizeOperatorLabels(LeadListFiltersChoicesEvent $event): void
