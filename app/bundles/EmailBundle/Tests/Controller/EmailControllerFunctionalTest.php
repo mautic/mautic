@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
@@ -657,6 +658,53 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertCount(0, $pendingCountQuery);
+    }
+
+    #[DataProvider('segmentViewPermissionProvider')]
+    public function testSegmentEmailDetailsShowSegmentsBasedOnViewPermission(bool $canViewSegments): void
+    {
+        $firstSegment  = $this->createSegment('Segment A', 'segment-a');
+        $secondSegment = $this->createSegment('Segment B', 'segment-b');
+        $email         = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Test html', $firstSegment);
+        $email->addList($secondSegment);
+        $this->em->flush();
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $user);
+
+        foreach ($user->getRole()->getPermissions() as $permission) {
+            $user->getRole()->removePermission($permission);
+            $this->em->remove($permission);
+        }
+
+        $this->addPermission($user->getRole(), 'email', 'emails', 6);
+        if ($canViewSegments) {
+            $this->addPermission($user->getRole(), 'lead', 'lists', 6);
+        }
+        $this->em->flush();
+        $this->loginUser($user);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $segmentsUsed = $crawler->filter('#email-segments-used');
+        $this->assertCount(1, $segmentsUsed);
+        $this->assertStringContainsString('Segments used', $segmentsUsed->text());
+        $this->assertStringContainsString('Segment A', $segmentsUsed->text());
+        $this->assertStringContainsString('Segment B', $segmentsUsed->text());
+        $this->assertCount(1, $segmentsUsed->filter('.label-gray'));
+        $this->assertCount(1, $segmentsUsed->filter('.label-red'));
+        $this->assertCount(0, $segmentsUsed->filter('.label i'));
+        $this->assertCount($canViewSegments ? 2 : 0, $segmentsUsed->filter('a'));
+    }
+
+    /**
+     * @return iterable<string, array{canViewSegments: bool}>
+     */
+    public static function segmentViewPermissionProvider(): iterable
+    {
+        yield 'segment links are shown with view permission' => ['canViewSegments' => true];
+        yield 'segment names are shown without view permission' => ['canViewSegments' => false];
     }
 
     public function testAbTestAction(): void
@@ -1504,6 +1552,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    private function addPermission(Role $role, string $bundle, string $name, int $bitwise): void
+    {
+        $permission = new Permission();
+        $permission->setBundle($bundle);
+        $permission->setName($name);
+        $permission->setBitwise($bitwise);
+        $role->addPermission($permission);
+        $this->em->persist($permission);
     }
 
     private function assertEmailVersion(int $id, int $expectedVersion, string $message = ''): void
