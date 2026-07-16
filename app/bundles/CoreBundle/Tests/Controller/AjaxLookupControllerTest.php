@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxLookupControllerTest extends MauticMysqlTestCase
+final class AjaxLookupControllerTest extends MauticMysqlTestCase
 {
     public function testCompanyLookupWithOptions(): void
     {
