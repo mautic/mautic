@@ -24,7 +24,7 @@ class MonitoringController extends FormController
     private MonitoringModel $monitoringModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(MonitoringModel $monitoringModel): void
+    public function autowireMonitoringController(MonitoringModel $monitoringModel): void
     {
         $this->monitoringModel = $monitoringModel;
     }

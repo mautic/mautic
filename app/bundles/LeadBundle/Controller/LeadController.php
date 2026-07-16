@@ -68,7 +68,7 @@ class LeadController extends FormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(LeadModel $leadModel): void
+    public function autowireLeadController(LeadModel $leadModel): void
     {
         $this->leadModel = $leadModel;
     }
