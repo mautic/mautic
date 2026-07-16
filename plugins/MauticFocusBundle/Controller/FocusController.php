@@ -26,6 +26,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
+    private FocusModel $focusModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(FocusModel $focusModel): void
+    {
+        $this->focusModel = $focusModel;
+    }
+
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
@@ -163,10 +171,7 @@ class FocusController extends AbstractStandardFormController
             } else {
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
-
-                /** @var FocusModel $model */
-                $model = $this->getModel('focus');
-                $stats = $model->getStats(
+                $stats = $this->focusModel->getStats(
                     $item,
                     null,
                     $statsDateFrom,

@@ -26,11 +26,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class SubmissionApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
     {
-        $formSubmissionModel = $modelFactory->getModel('form.submission');
-        \assert($formSubmissionModel instanceof SubmissionModel);
-
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
