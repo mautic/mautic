@@ -42,10 +42,7 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    /**
-     * @return Response
-     */
-    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash)
+    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
@@ -113,12 +110,10 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -418,8 +413,6 @@ class PublicController extends CommonFormController
 
     /**
      * Preview email.
-     *
-     * @return Response
      */
     public function previewAction(
         AnalyticsHelper $analyticsHelper,
@@ -432,7 +425,7 @@ class PublicController extends CommonFormController
         FakeContactHelper $fakeLeadHelper,
         string $objectId,
         ?string $objectType = null,
-    ) {
+    ): Response {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 

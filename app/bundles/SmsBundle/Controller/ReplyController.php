@@ -19,11 +19,9 @@ class ReplyController extends AbstractController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function callbackAction(Request $request, $transport)
+    public function callbackAction(Request $request, $transport): Response
     {
         define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
