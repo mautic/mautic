@@ -107,10 +107,8 @@ trait CustomFieldsApiControllerTrait
                 }
                 $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
-                $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
-                    : (float) $fields[$group][$field]['value'];
-                $fields[$group][$field]['normalizedValue'] = empty($properties['scale']) ? (int) $fields[$group][$field]['normalizedValue']
-                    : (float) $fields[$group][$field]['normalizedValue'];
+                $fields[$group][$field]['value']           = (float) $fields[$group][$field]['value'];
+                $fields[$group][$field]['normalizedValue'] = (float) $fields[$group][$field]['normalizedValue'];
 
                 $numberFields[$field] = $fields[$group][$field]['value'];
             }
@@ -191,7 +189,7 @@ trait CustomFieldsApiControllerTrait
                 $parameters,
                 function ($value): bool {
                     if (is_numeric($value)) {
-                        return 0 !== (int) $value;
+                        return 0.0 !== (float) $value;
                     }
 
                     return true;
