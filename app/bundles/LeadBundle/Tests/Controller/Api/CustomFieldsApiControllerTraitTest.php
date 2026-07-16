@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
@@ -58,5 +59,63 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
 
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
+    }
+
+    /**
+     * @param array<string, mixed> $expectedParameters
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('numericValueProvider')]
+    public function testSetCustomFieldValuesFiltersOnlyNumericZero(mixed $value, array $expectedParameters): void
+    {
+        $model = new class {
+            /**
+             * @var array<string, mixed>
+             */
+            public array $parameters = [];
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
+            {
+                $this->parameters = $parameters;
+            }
+        };
+
+        $controller = new class($model) {
+            use CustomFieldsApiControllerTrait;
+
+            public function __construct(private object $model)
+            {
+            }
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setCustomFieldValuesPublic(Lead $lead, array $parameters): void
+            {
+                $this->setCustomFieldValues($lead, new \ArrayIterator(), $parameters, true);
+            }
+        };
+
+        $controller->setCustomFieldValuesPublic(new Lead(), ['number_field' => $value]);
+
+        self::assertSame($expectedParameters, $model->parameters);
+    }
+
+    /**
+     * @return \Generator<string, array{mixed, array<string, mixed>}>
+     */
+    public static function numericValueProvider(): \Generator
+    {
+        yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
+        yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
+        yield 'negative fraction' => [-0.5, ['number_field' => -0.5]];
+        yield 'integer' => [5, ['number_field' => 5]];
+        yield 'integer string' => ['5', ['number_field' => '5']];
+        yield 'integer zero' => [0, []];
+        yield 'float zero' => [0.0, []];
+        yield 'zero string' => ['0', []];
+        yield 'decimal zero string' => ['0.00', []];
     }
 }
