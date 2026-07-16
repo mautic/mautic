@@ -28,6 +28,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
+    private UserModel $userModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(UserModel $userModel): void
+    {
+        $this->userModel = $userModel;
+    }
+
     /**
      * Generate's default user list.
      */
@@ -183,20 +191,17 @@ class UserController extends FormController
             $this->throwAccessDenied();
         }
 
-        /** @var UserModel $model */
-        $model = $this->getModel('user.user');
-
         // retrieve the user entity
-        $user = $model->getEntity();
+        $user = $this->userModel->getEntity();
 
         // get the user form factory
         $action   = $this->generateUrl('mautic_user_action', ['objectAction' => 'new']);
-        $form     = $model->createForm($user, $this->formFactory, $action);
+        $form     = $this->userModel->createForm($user, $this->formFactory, $action);
         $response = null;
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $model, $user, $form);
+            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $this->userModel, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
@@ -298,9 +303,7 @@ class UserController extends FormController
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
         }
-        $model = $this->getModel('user.user');
-        \assert($model instanceof UserModel);
-        $user = $model->getEntity($objectId);
+        $user = $this->userModel->getEntity($objectId);
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_user_index'),
@@ -319,7 +322,7 @@ class UserController extends FormController
         $auditLogModel      = $this->getModel('core.auditlog');
         $auditLogRepository = $auditLogModel->getRepository();
         $userActivity       = $auditLogRepository->getLogsForUser($user);
-        $users              = $model->getEntities();
+        $users              = $this->userModel->getEntities();
 
         $roleModel = $this->getModel('user.role');
         \assert($roleModel instanceof RoleModel);
@@ -342,13 +345,13 @@ class UserController extends FormController
             ],
         ];
 
-        if ($model->isLocked($user)) {
+        if ($this->userModel->isLocked($user)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }
 
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($user, $this->formFactory, $action);
+        $form   = $this->userModel->createForm($user, $this->formFactory, $action);
 
         $isSamlUser    = $samlHelper->isSamlSession();
         if ($isSamlUser) {
@@ -363,19 +366,19 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+                $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     $user->setPassword($password);
-                    $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->userModel->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     if (!empty($submittedPassword)) {
-                        $model->sendChangePasswordInfo($user);
+                        $this->userModel->sendChangePasswordInfo($user);
                     }
 
                     if ($newEmail !== $oldEmail) {
-                        $model->sendChangeEmailInfo($oldEmail, $user);
+                        $this->userModel->sendChangeEmailInfo($oldEmail, $user);
                     }
 
                     // check if the user's locale has been downloaded already, fetch it if not
@@ -387,7 +390,7 @@ class UserController extends FormController
                         // If there is an error, we need to reset the user's locale to the default
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
-                            $model->saveEntity($user);
+                            $this->userModel->saveEntity($user);
                             $message     = 'mautic.core.could.not.set.language';
                             $messageVars = [];
 
@@ -414,7 +417,7 @@ class UserController extends FormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($user);
+                $this->userModel->unlockEntity($user);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -422,7 +425,7 @@ class UserController extends FormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($user);
+            $this->userModel->lockEntity($user);
         }
 
         return $this->delegateView([
@@ -475,9 +478,7 @@ class UserController extends FormController
         if ('POST' === $request->getMethod()) {
             // ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model = $this->getModel('user.user');
-                \assert($model instanceof UserModel);
-                $entity = $model->getEntity($objectId);
+                $entity = $this->userModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -485,10 +486,10 @@ class UserController extends FormController
                         'msg'     => 'mautic.user.user.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->userModel->isLocked($entity)) {
                     return $this->isLocked($postActionVars, $entity, 'user.user');
                 } else {
-                    $model->deleteEntity($entity);
+                    $this->userModel->deleteEntity($entity);
                     $name      = $entity->getName();
                     $flashes[] = [
                         'type'    => 'notice',
@@ -653,15 +654,13 @@ class UserController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('user');
-            \assert($model instanceof UserModel);
             $ids         = json_decode($request->query->get('ids', ''));
             $deleteIds   = [];
             $currentUser = $this->user;
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->userModel->getEntity($objectId);
 
                 if ((int) $currentUser->getId() === (int) $objectId) {
                     $flashes[] = [
@@ -676,7 +675,7 @@ class UserController extends FormController
                     ];
                 } elseif (!$this->security->isGranted('user:users:delete')) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->userModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'user', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -685,7 +684,7 @@ class UserController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->userModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
