@@ -371,10 +371,8 @@ class PageController extends FormController
      * Generates new form and processes post data.
      *
      * @param Page|null $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
+    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();
@@ -685,10 +683,8 @@ class PageController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -848,10 +844,8 @@ class PageController extends FormController
      * Activate the builder.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         // permission check
         if (str_contains((string) $objectId, 'new')) {
@@ -893,10 +887,8 @@ class PageController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 

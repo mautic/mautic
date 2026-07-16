@@ -114,10 +114,8 @@ class StageController extends AbstractFormController
      * Generates new form and processes post data.
      *
      * @param Stage $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null)
+    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
     {
         $model = $this->getModel('stage');
         \assert($model instanceof StageModel);
@@ -392,10 +390,8 @@ class StageController extends AbstractFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);

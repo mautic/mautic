@@ -557,10 +557,8 @@ class MobileNotificationController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
+    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
     {
         $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);

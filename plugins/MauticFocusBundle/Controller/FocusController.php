@@ -106,10 +106,8 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }

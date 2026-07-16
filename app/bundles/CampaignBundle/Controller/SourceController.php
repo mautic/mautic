@@ -234,10 +234,8 @@ class SourceController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;

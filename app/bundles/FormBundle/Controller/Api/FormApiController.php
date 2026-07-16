@@ -67,10 +67,8 @@ class FormApiController extends CommonApiController
 
     /**
      * Delete fields from a form.
-     *
-     * @return Response
      */
-    public function deleteFieldsAction(Request $request, $formId)
+    public function deleteFieldsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -97,10 +95,8 @@ class FormApiController extends CommonApiController
 
     /**
      * Delete fields from a form.
-     *
-     * @return Response
      */
-    public function deleteActionsAction(Request $request, $formId)
+    public function deleteActionsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
