@@ -33,6 +33,7 @@ final class FormSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('form%3Anewsletter-form', [$submittedContact], [$otherSubmittedContact, $notSubmittedContact]);
         $this->assertSearchResult('!form%3Anewsletter-form', [$otherSubmittedContact, $notSubmittedContact], [$submittedContact]);
         $this->assertSearchResult('form%3Amissing-form', [], [$submittedContact, $otherSubmittedContact, $notSubmittedContact]);
+        $this->assertSearchResult('form%3A', [], [$submittedContact, $otherSubmittedContact, $notSubmittedContact]);
     }
 
     private function createContact(string $email): Lead

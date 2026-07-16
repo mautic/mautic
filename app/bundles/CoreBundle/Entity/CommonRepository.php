@@ -1749,7 +1749,10 @@ class CommonRepository extends ServiceEntityRepository
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
-            if (isset($f->children)) {
+            if ($f->missingValue ?? false) {
+                $expr   = $qb->expr()->eq(1, 0);
+                $params = [];
+            } elseif (isset($f->children)) {
                 [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
                 if (!empty($f->command)) {

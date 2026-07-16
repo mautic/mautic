@@ -150,7 +150,9 @@ class SearchStringHelper
 
                 if (empty($chars)) {
                     // Command hasn't been defined so don't allow empty or could end up searching entire table
-                    unset($filters->{$baseName}[$keyCount]);
+                    $filters->{$baseName}[$keyCount]->command      = $command;
+                    $filters->{$baseName}[$keyCount]->missingValue = true;
+                    $this->addFilterCommand($filters, $filters->{$baseName}[$keyCount]);
                 } else {
                     $filters->{$baseName}[$keyCount]->command = $command;
                     $string                                   = '';
