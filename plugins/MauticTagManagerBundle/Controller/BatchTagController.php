@@ -14,7 +14,7 @@ class BatchTagController extends AbstractFormController
     private TagModel $tagModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(TagModel $tagModel): void
+    public function autowireBatchTagController(TagModel $tagModel): void
     {
         $this->tagModel = $tagModel;
     }

@@ -38,7 +38,7 @@ class ResultController extends CommonFormController
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(FormModel $formModel, SubmissionResultLoader $submissionResultLoader, SubmissionModel $submissionModel): void
+    public function autowireResultController(FormModel $formModel, SubmissionResultLoader $submissionResultLoader, SubmissionModel $submissionModel): void
     {
         $this->formModel = $formModel;
         $this->submissionResultLoader = $submissionResultLoader;
