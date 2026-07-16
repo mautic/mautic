@@ -14,7 +14,7 @@ class AuditlogController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, int $page = 1)
+    public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

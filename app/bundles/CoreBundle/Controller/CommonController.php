@@ -492,7 +492,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @throws AccessDeniedHttpException
      */
-    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
     {
         throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
     }

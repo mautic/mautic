@@ -47,11 +47,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addContactAction($id, $contactId)
+    public function addContactAction($id, $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 
@@ -82,11 +80,9 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeContactAction($id, $contactId)
+    public function removeContactAction($id, $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 

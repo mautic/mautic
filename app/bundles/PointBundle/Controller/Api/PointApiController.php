@@ -58,7 +58,7 @@ class PointApiController extends CommonApiController
     /**
      * Return array of available point action types.
      */
-    public function getPointActionTypesAction()
+    public function getPointActionTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
             return $this->accessDenied();

@@ -49,10 +49,8 @@ class WidgetApiController extends CommonApiController
 
     /**
      * Obtains a list of available widget types.
-     *
-     * @return Response
      */
-    public function getTypesAction()
+    public function getTypesAction(): Response
     {
         $dispatcher = $this->dispatcher;
         $event      = new WidgetTypeListEvent();
