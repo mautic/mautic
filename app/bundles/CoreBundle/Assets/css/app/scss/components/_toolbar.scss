@@ -23,9 +23,9 @@
     }
 
     .search-scope-select {
-      flex: 0 0 280px;
-      inline-size: 280px;
-      max-inline-size: 280px;
+      flex: 0 0 210px;
+      inline-size: 210px;
+      max-inline-size: 210px;
       border-inline-end: none;
       padding-inline: var(--spacing-04);
       background-color: var(--field);
@@ -33,10 +33,10 @@
     }
 
     .search-scope-chosen {
-      flex: 0 0 280px;
-      inline-size: 280px;
-      max-inline-size: 280px;
-      min-inline-size: 280px;
+      flex: 0 0 210px;
+      inline-size: 210px;
+      max-inline-size: 210px;
+      min-inline-size: 210px;
       position: relative;
       z-index: 2;
 
@@ -100,8 +100,8 @@
           border: var(--border-no-width);
           border-color: var(--border-strong);
           box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
-          inline-size: 280px;
-          min-inline-size: 280px;
+          inline-size: 210px;
+          min-inline-size: 210px;
           overflow: hidden;
           padding: 0;
 
@@ -178,6 +178,13 @@
           }
         }
       }
+    }
+
+    @media (max-width: 1100px) {
+        .search-scope-select,
+        .search-scope-chosen {
+            display: none;
+        }
     }
 
     > .btn {
