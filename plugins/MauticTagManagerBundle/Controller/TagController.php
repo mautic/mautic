@@ -14,8 +14,6 @@ use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -151,10 +149,8 @@ class TagController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, TagDependencies $tagDependencies)
+    public function newAction(Request $request, TagDependencies $tagDependencies): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             $this->throwAccessDenied();

@@ -119,10 +119,8 @@ class ListApiController extends CommonApiController
 
     /**
      * Obtains a list of smart lists for the user.
-     *
-     * @return Response
      */
-    public function getListsAction()
+    public function getListsAction(): Response
     {
         $listModel = $this->getModel('lead.list');
         \assert($listModel instanceof ListModel);
@@ -140,11 +138,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadAction($id, $leadId)
+    public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -225,11 +221,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeLeadAction($id, $leadId)
+    public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 

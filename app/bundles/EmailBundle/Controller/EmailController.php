@@ -1226,12 +1226,10 @@ class EmailController extends FormController
     /**
      * Activate the builder.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId): Response
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
@@ -1286,10 +1284,8 @@ class EmailController extends FormController
 
     /**
      * Create an AB test.
-     *
-     * @return array<string, mixed>|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId)
+    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 

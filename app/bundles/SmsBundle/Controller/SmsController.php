@@ -554,10 +554,8 @@ class SmsController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->smsModel->getEntity($objectId);
 
@@ -709,10 +707,7 @@ class SmsController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function previewAction($objectId)
+    public function previewAction($objectId): Response
     {
         $sms      = $this->smsModel->getEntity($objectId);
         $security = $this->security;
