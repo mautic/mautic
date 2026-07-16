@@ -46,10 +46,8 @@ class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserModel $userModel,
     ) {
-        $userModel     = $modelFactory->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-
         $this->model            = $userModel;
         $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
