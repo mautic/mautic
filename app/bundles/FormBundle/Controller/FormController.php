@@ -282,11 +282,9 @@ class FormController extends CommonFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     *
      * @throws \Exception
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         /** @var FormModel $model */
         $model   = $this->getModel('form');
@@ -850,10 +848,8 @@ class FormController extends CommonFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         $model = $this->getModel('form.form');
 

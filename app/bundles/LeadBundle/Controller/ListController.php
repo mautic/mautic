@@ -237,10 +237,8 @@ class ListController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return Response
      */
-    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false)
+    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
     {
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
@@ -624,18 +622,12 @@ class ListController extends FormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function removeLeadAction(Request $request, $objectId)
+    public function removeLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'remove');
     }
 
-    /**
-     * @return Response
-     */
-    public function addLeadAction(Request $request, $objectId)
+    public function addLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'add');
     }
