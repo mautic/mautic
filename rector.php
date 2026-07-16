@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+use MauticRector\UnserializeToSerializerDecodeRector;
+=======
+>>>>>>> 646cc5dd2c ([model] flip c* getModels() to typed property inject)
+>>>>>>> 92c408aa84 ([model] flip c* getModels() to typed property inject)
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
@@ -54,6 +61,18 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
     ])
+<<<<<<< HEAD
+=======
+    ->withConfiguredRule(GetModelToRequiredPropertyRector::class, [
+        'focus' => MauticPlugin\MauticFocusBundle\Model\FocusModel::class,
+        'form' => Mautic\FormBundle\Model\FormModel::class,
+        'form.action' => Mautic\FormBundle\Model\ActionModel::class,
+        'form.field' => Mautic\FormBundle\Model\FieldModel::class,
+        'form.form' => Mautic\FormBundle\Model\FormModel::class,
+        'form.submission' => Mautic\FormBundle\Model\SubmissionModel::class,
+        'form.submission_result_loader' => Mautic\FormBundle\Model\SubmissionResultLoader::class,
+    ])
+>>>>>>> 646cc5dd2c ([model] flip c* getModels() to typed property inject)
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
     ->withSkip([

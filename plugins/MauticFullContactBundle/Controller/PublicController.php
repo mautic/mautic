@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+<<<<<<< HEAD
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
@@ -23,6 +24,20 @@ class PublicController extends FormController
     {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+=======
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+<<<<<<< HEAD
+    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
+=======
+    public function autowire(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+>>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
+    {
+        $this->leadModel = $leadModel;
+        $this->notificationModel = $notificationModel;
+>>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     /**
@@ -35,9 +50,7 @@ class PublicController extends FormController
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+        $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }
 
     /**

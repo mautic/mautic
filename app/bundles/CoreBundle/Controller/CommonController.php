@@ -34,6 +34,14 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     protected ?\Mautic\UserBundle\Entity\User $user;
 
     /**
@@ -655,10 +663,7 @@ class CommonController extends AbstractController implements MauticController
 
         $afterId = $request->get('mauticLastNotificationId');
 
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 

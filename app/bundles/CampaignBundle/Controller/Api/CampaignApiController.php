@@ -61,10 +61,8 @@ class CampaignApiController extends CommonApiController
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
+        CampaignModel $campaignModel,
     ) {
-        $campaignModel = $modelFactory->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';

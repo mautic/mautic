@@ -4,7 +4,6 @@ namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -16,6 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+    }
+
     protected function getPermissions(): array
     {
         return (array) $this->security->isGranted(
@@ -378,11 +385,7 @@ class DynamicContentController extends FormController
         /** @var DynamicContent $translationParent */
         /** @var DynamicContent[] $translationChildren */
         [$translationParent, $translationChildren] = $entity->getTranslations();
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
+        $logs          = $this->auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];

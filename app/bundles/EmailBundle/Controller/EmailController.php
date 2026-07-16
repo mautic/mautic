@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -39,12 +38,21 @@ class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+<<<<<<< HEAD
     private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireEmailController(\Mautic\LeadBundle\Model\ListModel $listModel): void
     {
         $this->listModel = $listModel;
+=======
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+>>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -332,11 +340,7 @@ class EmailController extends FormController
 
         // get related translations
         [$translationParent, $translationChildren] = $email->getTranslations();
-
-        // Audit Log
-        $auditLog = $this->getModel('core.auditlog');
-        \assert($auditLog instanceof AuditLogModel);
-        $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
+        $logs = $this->auditLogModel->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         if (!$session->has('mautic.email.clicks.orderby')) {
             $session->set('mautic.email.clicks.orderby', 'r.url');

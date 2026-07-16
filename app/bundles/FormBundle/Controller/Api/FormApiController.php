@@ -47,7 +47,15 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+<<<<<<< HEAD
+<<<<<<< HEAD
         FormModel $formModel,
+=======
+        \Mautic\FormBundle\Model\FormModel $formModel,
+>>>>>>> e85f77de49 (fixup! [model] flip c* getModels() to typed property inject)
+=======
+        FormModel $formModel,
+>>>>>>> f7115c6478 (fixup! fixup! fixup! [model] flip c* getModels() to typed property inject)
     ) {
         $this->model            = $formModel;
         $this->entityClass      = Form::class;

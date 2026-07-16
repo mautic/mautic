@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -33,12 +32,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+<<<<<<< HEAD
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireFormController(FormModel $formModel): void
     {
         $this->formModel = $formModel;
+=======
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+>>>>>>> 5d9b4961d3 ([model] flip c* getModels() to typed property inject)
     }
 
     public function __construct(
@@ -212,11 +220,7 @@ class FormController extends CommonFormController
             ],
             'RETURN_ARRAY'
         );
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+        $logs = $this->auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];

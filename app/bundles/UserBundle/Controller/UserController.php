@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
@@ -28,12 +27,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
+<<<<<<< HEAD
     private UserModel $userModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireUserController(UserModel $userModel): void
     {
         $this->userModel = $userModel;
+=======
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+>>>>>>> 5d9b4961d3 ([model] flip c* getModels() to typed property inject)
     }
 
     /**
@@ -317,10 +325,7 @@ class UserController extends FormController
             ]);
         }
         $oldEmail = $user->getEmail();
-
-        /** @var AuditLogModel $auditLogModel */
-        $auditLogModel      = $this->getModel('core.auditlog');
-        $auditLogRepository = $auditLogModel->getRepository();
+        $auditLogRepository = $this->auditLogModel->getRepository();
         $userActivity       = $auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
 
@@ -589,9 +594,7 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
                     ];
-                    $auditLogModel = $this->getModel('core.auditlog');
-                    \assert($auditLogModel instanceof AuditLogModel);
-                    $auditLogModel->writeToLog($log);
+                    $this->auditLogModel->writeToLog($log);
 
                     $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }

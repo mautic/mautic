@@ -61,6 +61,7 @@ class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
 
@@ -75,6 +76,7 @@ class LeadController extends FormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
+<<<<<<< HEAD
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $listModel,
@@ -89,6 +91,23 @@ class LeadController extends FormController
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
+=======
+<<<<<<< HEAD
+    public function autowireLeadController(LeadModel $leadModel, \Mautic\StageBundle\Model\StageModel $stageModel): void
+    {
+        $this->leadModel = $leadModel;
+        $this->stageModel = $stageModel;
+=======
+<<<<<<< HEAD
+    public function autowireLeadController(LeadModel $leadModel): void
+=======
+    public function autowire(LeadModel $leadModel, \Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+>>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
+    {
+        $this->leadModel = $leadModel;
+        $this->campaignModel = $campaignModel;
+>>>>>>> 92c408aa84 ([model] flip c* getModels() to typed property inject)
+>>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     /**
@@ -1351,10 +1370,8 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel  = $this->getModel('campaign');
-            $campaigns      = $campaignModel->getPublishedCampaigns(true);
-            $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
+            $campaigns      = $this->campaignModel->getPublishedCampaigns(true);
+            $leadsCampaigns = $this->campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
                 $campaigns[$c['id']]['inCampaign'] = isset($leadsCampaigns[$c['id']]);
@@ -1570,9 +1587,6 @@ class LeadController extends FormController
      */
     public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $this->getModel('campaign');
-
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1605,7 +1619,7 @@ class LeadController extends FormController
             $remove = (!empty($data['remove'])) ? $data['remove'] : [];
 
             if ($count = count($entities)) {
-                $campaigns = $campaignModel->getEntities(
+                $campaigns = $this->campaignModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1648,7 +1662,7 @@ class LeadController extends FormController
             );
         }
         // Get a list of campaigns
-        $campaigns = $campaignModel->getPublishedCampaigns(true);
+        $campaigns = $this->campaignModel->getPublishedCampaigns(true);
         $items     = [];
         foreach ($campaigns as $campaign) {
             $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];

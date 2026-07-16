@@ -59,9 +59,8 @@ class EventLogApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        EventLogModel $campaignEventLogModel,
     ) {
-        $campaignEventLogModel = $modelFactory->getModel('campaign.event_log');
-        \assert($campaignEventLogModel instanceof EventLogModel);
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
         $this->entityNameOne            = 'event';

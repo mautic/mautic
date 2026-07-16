@@ -11,6 +11,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultController extends CommonController
 {
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $root = $this->coreParametersHelper->get('webroot');
@@ -56,10 +64,7 @@ class DefaultController extends CommonController
 
     public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent(null, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent(null, false, 200);
 
         return $this->delegateView(
             [
