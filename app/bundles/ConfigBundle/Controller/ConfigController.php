@@ -181,10 +181,7 @@ class ConfigController extends FormController
         );
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
+    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId): Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -220,10 +217,7 @@ class ConfigController extends FormController
         return $this->notFound();
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
+    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId): JsonResponse
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {

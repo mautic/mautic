@@ -95,10 +95,8 @@ class PointController extends AbstractFormController
      * Generates new form and processes post data.
      *
      * @param Point $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null)
+    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
     {
         $model = $this->getModel('point');
         \assert($model instanceof PointModel);
@@ -334,10 +332,8 @@ class PointController extends AbstractFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
         $model  = $this->getModel('point');
         $entity = $model->getEntity($objectId);
