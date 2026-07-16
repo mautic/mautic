@@ -217,10 +217,8 @@ class AssetController extends FormController
      * Show a preview of the file.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function previewAction(Request $request, AssetModel $model, $objectId)
+    public function previewAction(Request $request, AssetModel $model, $objectId): JsonResponse|Response
     {
         $activeAsset = $model->getEntity($objectId);
 
@@ -267,10 +265,8 @@ class AssetController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null)
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -561,10 +557,8 @@ class AssetController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId)
+    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
         $clone  = null;
