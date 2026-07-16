@@ -20,6 +20,14 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class TagController extends FormController
 {
+    private TagManagerModel $tagModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(TagManagerModel $tagModel): void
+    {
+        $this->tagModel = $tagModel;
+    }
+
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
 
     private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
@@ -43,10 +51,6 @@ class TagController extends FormController
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        // Use overwritten tag model so overwritten repository can be fetched,
-        // we need it to define table alias so we can define sort order.
-        $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof TagManagerModel);
         $session = $request->getSession();
 
         // set some permissions
@@ -81,7 +85,7 @@ class TagController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        $items = $model->getEntities(
+        $items = $this->tagModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -122,7 +126,7 @@ class TagController extends FormController
         $session->set('mautic.tagmanager.page', $page);
 
         $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
-        $tagsCount = (!empty($tagIds)) ? $model->getRepository()->countByLeads($tagIds) : [];
+        $tagsCount = (!empty($tagIds)) ? $this->tagModel->getRepository()->countByLeads($tagIds) : [];
 
         $parameters = [
             'items'       => $items,
@@ -158,8 +162,6 @@ class TagController extends FormController
 
         // retrieve the entity
         $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
-        $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof TagManagerModel);
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         // set the return URL for post actions
@@ -167,9 +169,9 @@ class TagController extends FormController
         $action    = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']);
 
         // get the user form factory
-        $form = $model->createForm($tag, $this->formFactory, $action);
+        $form = $this->tagModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $model, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $this->tagModel, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -286,15 +288,12 @@ class TagController extends FormController
      */
     private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
     {
-        /** @var TagModel $tagModel */
-        $tagModel = $this->getModel('tagmanager.tag');
-
         /** @var FormInterface<FormInterface<Tag>> $form */
-        $form = $tagModel->createForm($tag, $this->formFactory, $action);
+        $form = $this->tagModel->createForm($tag, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
-            $response = $this->handleEditFormPost($request, $tag, $tagDependencies, $tagModel, $form, $postActionVars);
+            $response = $this->handleEditFormPost($request, $tag, $tagDependencies, $this->tagModel, $form, $postActionVars);
             if (null !== $response) {
                 return $response;
             }
