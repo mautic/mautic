@@ -259,10 +259,8 @@ class TriggerEventController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');
@@ -320,10 +318,8 @@ class TriggerEventController extends CommonFormController
      * Undeletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function undeleteAction(Request $request, $objectId)
+    public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');
