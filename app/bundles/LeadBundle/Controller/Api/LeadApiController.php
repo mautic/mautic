@@ -83,10 +83,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of users for lead owner edits.
-     *
-     * @return Response
      */
-    public function getOwnersAction(Request $request)
+    public function getOwnersAction(Request $request): Response
     {
         if (!$this->security->isGranted(
             ['lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'],
@@ -114,10 +112,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of custom fields.
-     *
-     * @return Response
      */
-    public function getFieldsAction()
+    public function getFieldsAction(): Response
     {
         if (!$this->security->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -147,10 +143,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of notes on a specific lead.
-     *
-     * @return Response
      */
-    public function getNotesAction(Request $request, $id)
+    public function getNotesAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -199,10 +193,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of devices on a specific lead.
-     *
-     * @return Response
      */
-    public function getDevicesAction(Request $request, $id)
+    public function getDevicesAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -251,10 +243,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of contact segments the contact is in.
-     *
-     * @return Response
      */
-    public function getListsAction($id)
+    public function getListsAction($id): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -289,10 +279,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of contact companies the contact is in.
-     *
-     * @return Response
      */
-    public function getCompaniesAction($id)
+    public function getCompaniesAction($id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -319,10 +307,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of campaigns the lead is part of.
-     *
-     * @return Response
      */
-    public function getCampaignsAction($id)
+    public function getCampaignsAction($id): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -364,10 +350,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of contact events.
-     *
-     * @return Response
      */
-    public function getActivityAction(Request $request, $id)
+    public function getActivityAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -384,10 +368,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of contact events.
-     *
-     * @return Response
      */
-    public function getAllActivityAction(Request $request, $lead = null)
+    public function getAllActivityAction(Request $request, $lead = null): Response
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers = $this->security->isGranted('lead:leads:viewother');
@@ -455,10 +437,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Removes a DNC from the contact.
-     *
-     * @return Response
      */
-    public function removeDncAction($id, $channel)
+    public function removeDncAction($id, $channel): Response
     {
         $doNotContact = $this->doNotContactModel;
 
@@ -529,10 +509,8 @@ class LeadApiController extends CommonApiController
      * Adds a UTM Tagset to the contact.
      *
      * @param int $id
-     *
-     * @return Response
      */
-    public function addUtmTagsAction(Request $request, $id)
+    public function addUtmTagsAction(Request $request, $id): Response
     {
         return $this->applyUtmTagsAction($id, 'addUTMTags', $request->request->all());
     }
@@ -542,10 +520,8 @@ class LeadApiController extends CommonApiController
      *
      * @param int $id
      * @param int $utmid
-     *
-     * @return Response
      */
-    public function removeUtmTagsAction($id, $utmid)
+    public function removeUtmTagsAction($id, $utmid): Response
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
     }
