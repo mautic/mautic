@@ -14,6 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     /**
      * Write a notification.
      *
@@ -53,8 +61,6 @@ class PublicController extends FormController
         $notify = $validatedRequest['notify'];
 
         try {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
             /** @var Lead $lead */
             $lead       = $validatedRequest['entity'];
             $currFields = $lead->getFields(true);
@@ -185,8 +191,8 @@ class PublicController extends FormController
             unset($socialCache['fullcontact']['nonce']);
             $lead->setSocialCache($socialCache);
 
-            $model->setFieldValues($lead, $data);
-            $model->getRepository()->saveEntity($lead);
+            $this->leadModel->setFieldValues($lead, $data);
+            $this->leadModel->getRepository()->saveEntity($lead);
 
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */

@@ -29,6 +29,14 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
+    private LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
@@ -657,9 +665,7 @@ class ListController extends FormController
             $model = $this->getModel('lead.list');
             /** @var LeadList $list */
             $list = $model->getEntity($listId);
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $lead      = $this->leadModel->getEntity($leadId);
 
             if (null === $lead) {
                 $flashes[] = [

@@ -40,12 +40,18 @@ class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;
 
+    private LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     public function userListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadModel = $this->getModel('lead.lead');
-        \assert($leadModel instanceof LeadModel);
-        $results   = $leadModel->getLookupResults('user', $filter);
+        $results   = $this->leadModel->getLookupResults('user', $filter);
         $dataArray = [];
         foreach ($results as $r) {
             $name        = $r['firstName'].' '.$r['lastName'];
@@ -176,9 +182,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
+            $lead  = $this->leadModel->getEntity($leadId);
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields        = $lead->getFields();
@@ -232,9 +236,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
+            $lead  = $this->leadModel->getEntity($leadId);
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
