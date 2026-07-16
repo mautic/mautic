@@ -14,7 +14,7 @@ class DefaultController extends CommonController
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    public function autowireDefaultController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
     {
         $this->notificationModel = $notificationModel;
     }

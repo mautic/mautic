@@ -18,7 +18,7 @@ class DynamicContentController extends FormController
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    public function autowireDynamicContentController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
         $this->auditLogModel = $auditLogModel;
     }

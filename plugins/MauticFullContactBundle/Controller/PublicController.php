@@ -26,14 +26,11 @@ class PublicController extends FormController
         $this->companyModel = $companyModel;
 =======
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
-=======
-    public function autowire(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
->>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
+    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
     {
         $this->leadModel = $leadModel;
         $this->notificationModel = $notificationModel;

@@ -49,7 +49,7 @@ class EmailController extends FormController
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    public function autowireEmailController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
         $this->auditLogModel = $auditLogModel;
 >>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)

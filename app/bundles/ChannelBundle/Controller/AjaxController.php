@@ -14,7 +14,7 @@ class AjaxController extends CommonAjaxController
     private \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel): void
+    public function autowireChannelAjaxController(\Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel): void
     {
         $this->messageQueueModel = $messageQueueModel;
     }

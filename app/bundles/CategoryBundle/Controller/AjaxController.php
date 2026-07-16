@@ -11,7 +11,7 @@ class AjaxController extends CommonAjaxController
     private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
+    public function autowireCategoryAjaxController(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
     {
         $this->categoryModel = $categoryModel;
     }

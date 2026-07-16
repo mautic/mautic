@@ -32,23 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-<<<<<<< HEAD
-    private FormModel $formModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFormController(FormModel $formModel): void
-    {
-        $this->formModel = $formModel;
-=======
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
-        $this->auditLogModel = $auditLogModel;
->>>>>>> 5d9b4961d3 ([model] flip c* getModels() to typed property inject)
-    }
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -63,6 +46,8 @@ class FormController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly FormModel $formModel,
+        private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
     ) {
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);

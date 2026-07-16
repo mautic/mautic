@@ -22,7 +22,7 @@ class AjaxController extends CommonAjaxController
     private \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CampaignBundle\Model\EventLogModel $eventLogModel): void
+    public function autowireCampaignAjaxController(\Mautic\CampaignBundle\Model\EventLogModel $eventLogModel): void
     {
         $this->eventLogModel = $eventLogModel;
     }

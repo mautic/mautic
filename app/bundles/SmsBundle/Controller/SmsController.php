@@ -20,16 +20,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 class SmsController extends FormController
 {
     use EntityContactsTrait;
+
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
 
     #[Required]
-<<<<<<< HEAD
-    public function autowireSmsController(SmsModel $smsModel): void
-=======
-    public function autowire(SmsModel $smsModel, \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
->>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
+    public function autowireSmsController(SmsModel $smsModel, \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;

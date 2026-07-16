@@ -29,20 +29,22 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
+    protected ?\Mautic\UserBundle\Entity\User $user;
+
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
-    {
+    #[Required]
+    public function autowireCommonController(
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+    ): void {
         $this->notificationModel = $notificationModel;
     }
-
-    protected ?\Mautic\UserBundle\Entity\User $user;
 
     /**
      * @param ModelFactory<object> $modelFactory

@@ -61,6 +61,7 @@ class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
+
     private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
@@ -77,6 +78,7 @@ class LeadController extends FormController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $listModel,
@@ -92,6 +94,8 @@ class LeadController extends FormController
         $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
 =======
+=======
+>>>>>>> aa3d162ded (corrections)
 <<<<<<< HEAD
     public function autowireLeadController(LeadModel $leadModel, \Mautic\StageBundle\Model\StageModel $stageModel): void
     {
@@ -103,6 +107,9 @@ class LeadController extends FormController
 =======
     public function autowire(LeadModel $leadModel, \Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
 >>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
+=======
+    public function autowireLeadController(LeadModel $leadModel, \Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+>>>>>>> 480cfd4a3a (corrections)
     {
         $this->leadModel = $leadModel;
         $this->campaignModel = $campaignModel;

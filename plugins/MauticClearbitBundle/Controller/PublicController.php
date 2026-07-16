@@ -17,7 +17,7 @@ class PublicController extends FormController
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    public function autowirePublicController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
     {
         $this->notificationModel = $notificationModel;
     }

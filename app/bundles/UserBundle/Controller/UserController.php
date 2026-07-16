@@ -27,21 +27,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
-<<<<<<< HEAD
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireUserController(UserModel $userModel): void
-    {
-        $this->userModel = $userModel;
-=======
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
+    public function autowireUserController(
+        UserModel $userModel,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+    ): void {
+        $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
->>>>>>> 5d9b4961d3 ([model] flip c* getModels() to typed property inject)
     }
 
     /**

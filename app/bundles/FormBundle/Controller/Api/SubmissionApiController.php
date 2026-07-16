@@ -26,15 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class SubmissionApiController extends CommonApiController
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
-=======
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, \Mautic\FormBundle\Model\SubmissionModel $formSubmissionModel)
->>>>>>> e85f77de49 (fixup! [model] flip c* getModels() to typed property inject)
-=======
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
->>>>>>> f7115c6478 (fixup! fixup! fixup! [model] flip c* getModels() to typed property inject)
     {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;

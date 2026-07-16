@@ -17,10 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
 class NotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
+
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    public function autowireNotificationController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
         $this->auditLogModel = $auditLogModel;
     }

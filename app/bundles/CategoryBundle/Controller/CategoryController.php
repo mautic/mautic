@@ -25,7 +25,7 @@ class CategoryController extends AbstractFormController
     private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
+    public function autowireCategoryController(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
     {
         $this->categoryModel = $categoryModel;
     }

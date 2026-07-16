@@ -54,7 +54,7 @@ class CampaignController extends AbstractStandardFormController
     private CampaignModel $campaignModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(CampaignModel $campaignModel, ?\Mautic\CampaignBundle\Model\EventModel $eventModel = null): void
+    public function autowireCampaignController(CampaignModel $campaignModel, \Mautic\CampaignBundle\Model\EventModel $eventModel): void
     {
         $this->campaignModel = $campaignModel;
         $this->eventModel = $eventModel;

@@ -14,7 +14,7 @@ class SourceController extends CommonFormController
     private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+    public function autowireSourceController(\Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
     {
         $this->campaignModel = $campaignModel;
     }

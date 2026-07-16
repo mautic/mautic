@@ -19,19 +19,15 @@ use Symfony\Component\HttpFoundation\Response;
 class MonitoringController extends FormController
 {
     use EntityContactsTrait;
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
-        $this->auditLogModel = $auditLogModel;
-    }
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireMonitoringController(MonitoringModel $monitoringModel): void
+    public function autowireMonitoringController(MonitoringModel $monitoringModel, \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
+        $this->auditLogModel = $auditLogModel;
         $this->monitoringModel = $monitoringModel;
     }
 
