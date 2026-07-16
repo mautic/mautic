@@ -56,7 +56,7 @@ class ApiErrorException extends \Exception
         return $this->shortMessage;
     }
 
-    public function setShortMessage(string $shortMessage): ApiErrorException
+    public function setShortMessage(string $shortMessage): self
     {
         $this->shortMessage = $shortMessage;
 

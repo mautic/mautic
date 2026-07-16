@@ -274,7 +274,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(?Category $category = null): LeadList
+    public function setCategory(?Category $category = null): self
     {
         $this->isChanged('category', $category);
         $this->category = $category;
