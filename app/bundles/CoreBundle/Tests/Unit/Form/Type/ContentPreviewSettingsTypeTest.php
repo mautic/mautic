@@ -407,7 +407,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
-        $this->routerMock->expects(self::once())
+        $this->routerMock->expects($this->once())
             ->method('generate')
             ->with('mautic_email_action', ['objectAction' => 'view', 'objectId' => '__ID__'])
             ->willReturn('/s/email/view/__ID__');
@@ -431,7 +431,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('variant', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
-                    self::assertSame([
+                    $this->assertSame([
                         'choices' => $expectedVariantChoices,
                         'attr'    => [
                             'onChange' => "if(this.value){window.location='/s/email/view/__ID__'.replace('__ID__', this.value);}",
