@@ -45,10 +45,8 @@ class SubmissionApiController extends CommonApiController
      * Obtains a list of entities as defined by the API URL.
      *
      * @param int $formId
-     *
-     * @return Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -73,10 +71,8 @@ class SubmissionApiController extends CommonApiController
      *
      * @param int $formId
      * @param int $contactId
-     *
-     * @return Response
      */
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId)
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -97,10 +93,8 @@ class SubmissionApiController extends CommonApiController
 
     /**
      * Obtains a specific entity as defined by the API URL.
-     *
-     * @return Response
      */
-    public function getEntityAction(Request $request, $formId = null, $submissionId = null)
+    public function getEntityAction(Request $request, $formId = null, $submissionId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
