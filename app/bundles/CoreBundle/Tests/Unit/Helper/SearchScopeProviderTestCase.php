@@ -37,9 +37,9 @@ abstract class SearchScopeProviderTestCase extends TestCase
     {
         $scopes = $this->getScopes();
 
-        self::assertSame('', $scopes[0]['command']);
-        self::assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        self::assertTrue($scopes[0]['default'] ?? false);
+        $this->assertSame('', $scopes[0]['command']);
+        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
+        $this->assertTrue($scopes[0]['default'] ?? false);
     }
 
     public function testGetScopesDoesNotDuplicatePinnedCommands(): void
@@ -47,10 +47,10 @@ abstract class SearchScopeProviderTestCase extends TestCase
         $commands = array_column($this->getScopes(), 'command');
 
         foreach ($this->expectedDynamicCommands() as $expectedCommand) {
-            self::assertContains($expectedCommand, $commands);
+            $this->assertContains($expectedCommand, $commands);
         }
 
-        self::assertCount(count(array_unique($commands)), $commands);
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 
     /**

@@ -39,11 +39,11 @@ final class AbstractSearchScopeProviderTest extends TestCase
         $scopes   = $provider->getScopes();
         $commands = array_column($scopes, 'command');
 
-        self::assertSame('', $scopes[0]['command']);
-        self::assertTrue($scopes[0]['default'] ?? false);
-        self::assertContains('is:mine', $commands);
-        self::assertContains('custom_field', $commands);
-        self::assertCount(count(array_unique($commands)), $commands);
+        $this->assertSame('', $scopes[0]['command']);
+        $this->assertTrue($scopes[0]['default'] ?? false);
+        $this->assertContains('is:mine', $commands);
+        $this->assertContains('custom_field', $commands);
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 
     public function testGetScopesSortsIndentedCommandsAfterRegularOnes(): void
@@ -76,7 +76,7 @@ final class AbstractSearchScopeProviderTest extends TestCase
 
         $commands = array_column($provider->getScopes(), 'command');
 
-        self::assertSame(['', 'aaa_regular', 'aaa_custom', 'zzz_custom'], $commands);
+        $this->assertSame(['', 'aaa_regular', 'aaa_custom', 'zzz_custom'], $commands);
     }
 
     public function testGetScopesDoesNotInsertCustomFieldsHeaderWhenIndentedCommandsExist(): void
@@ -109,8 +109,8 @@ final class AbstractSearchScopeProviderTest extends TestCase
 
         $commands = array_column($provider->getScopes(), 'command');
 
-        self::assertNotContains('__custom_fields__', $commands);
-        self::assertContains('aaa_custom', $commands);
+        $this->assertNotContains('__custom_fields__', $commands);
+        $this->assertContains('aaa_custom', $commands);
     }
 
     public function testGetScopesDoesNotInsertCustomFieldsHeaderWhenNoIndentedCommands(): void
@@ -136,6 +136,6 @@ final class AbstractSearchScopeProviderTest extends TestCase
 
         $commands = array_column($provider->getScopes(), 'command');
 
-        self::assertNotContains('__custom_fields__', $commands);
+        $this->assertNotContains('__custom_fields__', $commands);
     }
 }

@@ -39,10 +39,10 @@ final class WebhookRepositoryTest extends TestCase
     {
         $commands = $this->getRepository()->getSearchCommands();
 
-        self::assertContains('mautic.core.searchcommand.name', $commands);
-        self::assertContains('mautic.core.searchcommand.ispublished', $commands);
-        self::assertContains('mautic.core.searchcommand.ismine', $commands);
-        self::assertContains('mautic.core.searchcommand.ids', $commands);
+        $this->assertContains('mautic.core.searchcommand.name', $commands);
+        $this->assertContains('mautic.core.searchcommand.ispublished', $commands);
+        $this->assertContains('mautic.core.searchcommand.ismine', $commands);
+        $this->assertContains('mautic.core.searchcommand.ids', $commands);
     }
 
     public function testAddSearchCommandWhereClauseHandlesNameFilter(): void
@@ -55,8 +55,8 @@ final class WebhookRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertStringContainsString('e.name', (string) $expr);
-        self::assertCount(1, $params);
+        $this->assertStringContainsString('e.name', (string) $expr);
+        $this->assertCount(1, $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesPublishedFilter(): void
@@ -69,7 +69,7 @@ final class WebhookRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertStringContainsString('e.is_published', (string) $expr);
-        self::assertSame(['par0' => true], $params);
+        $this->assertStringContainsString('e.is_published', (string) $expr);
+        $this->assertSame(['par0' => true], $params);
     }
 }

@@ -54,7 +54,7 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
     {
         $commands = array_column($this->getScopes(), 'command');
 
-        self::assertCount(1, array_filter($commands, static fn (string $command): bool => 'segment' === $command));
+        $this->assertCount(1, array_filter($commands, static fn (string $command): bool => 'segment' === $command));
     }
 
     public function testCustomFieldIsIndentedAndSortedAfterKnownFields(): void
@@ -63,11 +63,11 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
 
         $byCommand = array_column($scopes, null, 'command');
 
-        self::assertFalse($byCommand['instagram']['indent'] ?? false);
-        self::assertTrue($byCommand['custom_field']['indent'] ?? false);
+        $this->assertFalse($byCommand['instagram']['indent'] ?? false);
+        $this->assertTrue($byCommand['custom_field']['indent'] ?? false);
 
         $commands = array_column($scopes, 'command');
-        self::assertGreaterThan(array_search('instagram', $commands, true), array_search('custom_field', $commands, true));
-        self::assertGreaterThan(array_search('segment', $commands, true), array_search('custom_field', $commands, true));
+        $this->assertGreaterThan(array_search('instagram', $commands, true), array_search('custom_field', $commands, true));
+        $this->assertGreaterThan(array_search('segment', $commands, true), array_search('custom_field', $commands, true));
     }
 }

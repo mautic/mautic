@@ -329,10 +329,10 @@ final class EmailRepositoryTest extends TestCase
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repo->getSearchCommands();
-        self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
-        self::assertContains('mautic.core.searchcommand.name', $commands);
-        self::assertContains('mautic.email.email.searchcommand.subject', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.core.searchcommand.name', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.subject', $commands);
     }
 
     public function testAddSearchCommandWhereClauseHandlesNameFilter(): void
@@ -344,8 +344,8 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertStringContainsString('e.name', (string) $expr);
-        self::assertCount(1, $params);
+        $this->assertStringContainsString('e.name', (string) $expr);
+        $this->assertCount(1, $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesSubjectFilter(): void
@@ -357,7 +357,7 @@ final class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertStringContainsString('e.subject', (string) $expr);
-        self::assertCount(1, $params);
+        $this->assertStringContainsString('e.subject', (string) $expr);
+        $this->assertCount(1, $params);
     }
 }

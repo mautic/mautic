@@ -13,7 +13,7 @@ final class SearchScopeHelperTest extends TestCase
 
     public function testParseReturnsStandardForUnscopedSearch(): void
     {
-        self::assertSame(
+        $this->assertSame(
             ['command' => '', 'value' => 'john@example.com'],
             SearchScopeHelper::parse('john@example.com', self::CONTACT_SCOPES)
         );
@@ -21,7 +21,7 @@ final class SearchScopeHelperTest extends TestCase
 
     public function testParseSplitsScopedSearch(): void
     {
-        self::assertSame(
+        $this->assertSame(
             ['command' => 'firstname', 'value' => 'John'],
             SearchScopeHelper::parse('firstname:John', self::CONTACT_SCOPES)
         );
@@ -29,7 +29,7 @@ final class SearchScopeHelperTest extends TestCase
 
     public function testParseMatchesLongestCommandFirst(): void
     {
-        self::assertSame(
+        $this->assertSame(
             ['command' => 'is:published', 'value' => ''],
             SearchScopeHelper::parse('is:published', ['', 'is', 'is:published'])
         );
@@ -37,17 +37,17 @@ final class SearchScopeHelperTest extends TestCase
 
     public function testComposeStandardPreservesFreeText(): void
     {
-        self::assertSame('tag:vip', SearchScopeHelper::compose('', 'tag:vip'));
+        $this->assertSame('tag:vip', SearchScopeHelper::compose('', 'tag:vip'));
     }
 
     public function testComposeScopedSearch(): void
     {
-        self::assertSame('firstname:John', SearchScopeHelper::compose('firstname', 'John'));
+        $this->assertSame('firstname:John', SearchScopeHelper::compose('firstname', 'John'));
     }
 
     public function testComposeCommandWithoutValue(): void
     {
-        self::assertSame('is:published', SearchScopeHelper::compose('is:published', ''));
+        $this->assertSame('is:published', SearchScopeHelper::compose('is:published', ''));
     }
 
     public function testRoundTrip(): void
@@ -55,33 +55,33 @@ final class SearchScopeHelperTest extends TestCase
         $composed = SearchScopeHelper::compose('email', 'test@example.com');
         $parsed   = SearchScopeHelper::parse($composed, self::CONTACT_SCOPES);
 
-        self::assertSame('email', $parsed['command']);
-        self::assertSame('test@example.com', $parsed['value']);
+        $this->assertSame('email', $parsed['command']);
+        $this->assertSame('test@example.com', $parsed['value']);
     }
 
     public function testFormatLabelCapitalizesSimpleCommand(): void
     {
-        self::assertSame('Name', SearchScopeHelper::formatLabel('name'));
+        $this->assertSame('Name', SearchScopeHelper::formatLabel('name'));
     }
 
     public function testFormatLabelCapitalizesColonSeparatedCommand(): void
     {
-        self::assertSame('Is:Published', SearchScopeHelper::formatLabel('is:published'));
-        self::assertSame('Is:Mine', SearchScopeHelper::formatLabel('is:mine'));
+        $this->assertSame('Is:Published', SearchScopeHelper::formatLabel('is:published'));
+        $this->assertSame('Is:Mine', SearchScopeHelper::formatLabel('is:mine'));
     }
 
     public function testFormatLabelPreservesAlreadyCapitalizedLabel(): void
     {
-        self::assertSame('Standard', SearchScopeHelper::formatLabel('Standard'));
+        $this->assertSame('Standard', SearchScopeHelper::formatLabel('Standard'));
     }
 
     public function testFormatLabelIndentsCustomFieldLabel(): void
     {
-        self::assertSame("\u{00A0}\u{00A0}\u{00A0}\u{00A0}My Custom Field", SearchScopeHelper::formatLabel('My Custom Field', true));
+        $this->assertSame("\u{00A0}\u{00A0}\u{00A0}\u{00A0}My Custom Field", SearchScopeHelper::formatLabel('My Custom Field', true));
     }
 
     public function testFormatLabelDoesNotIndentByDefault(): void
     {
-        self::assertStringStartsNotWith("\u{00A0}", SearchScopeHelper::formatLabel('My Custom Field'));
+        $this->assertStringStartsNotWith("\u{00A0}", SearchScopeHelper::formatLabel('My Custom Field'));
     }
 }

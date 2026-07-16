@@ -36,10 +36,10 @@ final class ClientRepositoryTest extends TestCase
     {
         $commands = $this->getRepository()->getSearchCommands();
 
-        self::assertContains('mautic.core.searchcommand.name', $commands);
-        self::assertContains('mautic.api.client.searchcommand.callback', $commands);
-        self::assertContains('mautic.api.client.searchcommand.redirecturi', $commands);
-        self::assertContains('mautic.core.searchcommand.ids', $commands);
+        $this->assertContains('mautic.core.searchcommand.name', $commands);
+        $this->assertContains('mautic.api.client.searchcommand.callback', $commands);
+        $this->assertContains('mautic.api.client.searchcommand.redirecturi', $commands);
+        $this->assertContains('mautic.core.searchcommand.ids', $commands);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataSearchCommandFilters')]
@@ -53,8 +53,8 @@ final class ClientRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertStringContainsString($expectedColumn, (string) $expr);
-        self::assertCount(1, $params);
+        $this->assertStringContainsString($expectedColumn, (string) $expr);
+        $this->assertCount(1, $params);
     }
 
     /**

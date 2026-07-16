@@ -46,13 +46,13 @@ final class EmailSearchScopeProviderTest extends SearchScopeProviderTestCase
         $scopes       = $this->getScopes();
         $subjectScope = array_values(array_filter($scopes, static fn (array $scope): bool => 'subject' === $scope['command']))[0];
 
-        self::assertSame('mautic.email.email.searchcommand.subject', $subjectScope['label']);
+        $this->assertSame('mautic.email.email.searchcommand.subject', $subjectScope['label']);
     }
 
     public function testSubjectCommandAppearsExactlyOnce(): void
     {
         $commands = array_column($this->getScopes(), 'command');
 
-        self::assertCount(1, array_filter($commands, static fn (string $command): bool => 'subject' === $command));
+        $this->assertCount(1, array_filter($commands, static fn (string $command): bool => 'subject' === $command));
     }
 }
