@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ContentPreviewSettingsTypeTest extends TestCase
@@ -35,6 +36,11 @@ final class ContentPreviewSettingsTypeTest extends TestCase
      * @var MockObject&UserHelper
      */
     private MockObject $userHelperMock;
+
+    /**
+     * @var UrlGeneratorInterface&MockObject
+     */
+    private MockObject $routerMock;
 
     /**
      * @var mixed[]
@@ -60,7 +66,8 @@ final class ContentPreviewSettingsTypeTest extends TestCase
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->security       = $this->createMock(CorePermissions::class);
         $this->userHelperMock = $this->createMock(UserHelper::class);
-        $this->form           = new ContentPreviewSettingsType($this->translator, $this->security, $this->userHelperMock);
+        $this->routerMock     = $this->createMock(UrlGeneratorInterface::class);
+        $this->form           = new ContentPreviewSettingsType($this->translator, $this->security, $this->userHelperMock, $this->routerMock);
 
         parent::setUp();
     }
@@ -76,6 +83,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     'objectId'     => null,
                     'translations' => null,
                     'variants'     => null,
+                    'actionRoute'  => null,
                 ]
             );
 
@@ -349,6 +357,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
         $formOptions = [
             'objectId'      => $parentEmailId,
+            'actionRoute'   => 'mautic_email_action',
             'translations'  => [
                 'parent'   => $parentEmail,
                 'children' => [
@@ -398,6 +407,11 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
+        $this->routerMock->expects(self::once())
+            ->method('generate')
+            ->with('mautic_email_action', ['objectAction' => 'view', 'objectId' => '__ID__'])
+            ->willReturn('/s/email/view/__ID__');
+
         $formBuilder = $this->createMock(FormBuilderInterface::class);
         $matcher     = $this->exactly(3);
         $formBuilder->expects($matcher)
@@ -417,10 +431,10 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('variant', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
-                    $this->assertSame([
+                    self::assertSame([
                         'choices' => $expectedVariantChoices,
                         'attr'    => [
-                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
+                            'onChange' => "if(this.value){window.location='/s/email/view/__ID__'.replace('__ID__', this.value);}",
                         ],
                         'placeholder'  => 'chooseone',
                         'data'         => (string) $parentEmailId,

@@ -466,6 +466,7 @@ class EmailController extends FormController
                             'objectId'     => $email->getId(),
                             'variants'     => $variants,
                             'translations' => $translations,
+                            'actionRoute'  => 'mautic_email_action',
                         ]
                     )->createView(),
                 ],
