@@ -8,8 +8,7 @@
       "Mautic\\": "bundles/",
       "MauticPlugin\\": "plugins/",
       "Mautic\\Middleware\\": "middlewares/",
-      "Mautic\\Migrations\\": "migrations/",
-      "Mautic\\CodingStandards\\": "codingstandards/"
+      "Mautic\\Migrations\\": "migrations/"
     },
     "files": [
       "AppKernel.php",

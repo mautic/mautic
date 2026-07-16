@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -20,8 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class InstallWorkflowTest extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
-
     protected $useCleanupRollback = false;
 
     private string $localConfigPath;
