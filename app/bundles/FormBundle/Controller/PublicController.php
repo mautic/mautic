@@ -501,12 +501,10 @@ class PublicController extends CommonFormController
     /**
      * Gives a preview of the form.
      *
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0)
+    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
     {
         $model = $this->getModel('form.form');
         \assert($model instanceof FormModel);
@@ -601,10 +599,7 @@ class PublicController extends CommonFormController
         return $response;
     }
 
-    /**
-     * @return Response
-     */
-    public function embedAction(Request $request)
+    public function embedAction(Request $request): Response
     {
         $formId = (int) $request->get('id');
         /** @var FormModel $model */

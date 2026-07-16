@@ -375,10 +375,8 @@ class FieldController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session = $request->getSession();
         $formId  = $request->query->get('formId');

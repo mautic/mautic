@@ -64,10 +64,8 @@ class MessageController extends AbstractStandardFormController
 
     /**
      * @param bool $ignorePost
-     *
-     * @return Response|JsonResponse
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }

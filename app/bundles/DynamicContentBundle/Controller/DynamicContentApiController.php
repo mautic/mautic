@@ -14,10 +14,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DynamicContentApiController extends CommonController
 {
-    /**
-     * @return mixed
-     */
-    public function processAction(Request $request, $objectAlias)
+    public function processAction(Request $request, $objectAlias): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
