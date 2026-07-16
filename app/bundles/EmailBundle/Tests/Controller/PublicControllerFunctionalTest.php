@@ -708,7 +708,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Collect only segment labels
         $labels = $crawler->filter('#contact-segments label[for]')
-            ->each(fn ($node) => trim($node->text()));
+            ->each(fn ($node): string => trim($node->text()));
 
         $this->assertSame(
             [
