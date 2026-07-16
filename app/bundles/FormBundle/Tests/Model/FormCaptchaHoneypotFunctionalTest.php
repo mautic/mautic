@@ -21,14 +21,14 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
         /** @var FormModel $formModel */
         $formModel = static::getContainer()->get('mautic.form.model.form');
         $form      = $formModel->getEntity($formId);
-        self::assertInstanceOf(Form::class, $form);
+        $this->assertInstanceOf(Form::class, $form);
 
         $html = $formModel->generateHtml($form, false);
-        self::assertStringContainsString('mauticform-honeypot', $html);
+        $this->assertStringContainsString('mauticform-honeypot', $html);
 
         $honeypotRow = [];
         if (preg_match('/<div[^>]*id="mauticform_[^"]*honeypot"[^>]*>/', $html, $honeypotRow)) {
-            self::assertStringContainsString('mauticform-honeypot', $honeypotRow[0], $html);
+            $this->assertStringContainsString('mauticform-honeypot', $honeypotRow[0], $html);
         } else {
             self::fail('Honeypot captcha row not found in generated HTML.');
         }
@@ -42,12 +42,8 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $honeypotRow = $crawler->filter('[id$="_honeypot"]');
-        self::assertGreaterThan(0, $honeypotRow->count());
-        self::assertStringContainsString(
-            'mauticform-honeypot',
-            (string) $honeypotRow->attr('class'),
-            $crawler->html()
-        );
+        $this->assertGreaterThan(0, $honeypotRow->count());
+        $this->assertStringContainsString('mauticform-honeypot', (string) $honeypotRow->attr('class'), $crawler->html());
     }
 
     public function testHoneypotCaptchaFieldMergesHoneypotClassWithExistingContainerClasses(): void
@@ -57,15 +53,15 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
         /** @var FormModel $formModel */
         $formModel = static::getContainer()->get('mautic.form.model.form');
         $form      = $formModel->getEntity($formId);
-        self::assertInstanceOf(Form::class, $form);
+        $this->assertInstanceOf(Form::class, $form);
 
         $html = $formModel->generateHtml($form, false);
 
         preg_match('/<div[^>]*\bid="mauticform_[^"]*honeypot"[^>]*>/', $html, $honeypotRow);
-        self::assertNotEmpty($honeypotRow, $html);
-        self::assertStringContainsString('custom-class', $honeypotRow[0], $html);
-        self::assertStringContainsString('mauticform-honeypot', $honeypotRow[0], $html);
-        self::assertSame(1, substr_count($honeypotRow[0], 'class="'), $html);
+        $this->assertNotEmpty($honeypotRow, $html);
+        $this->assertStringContainsString('custom-class', $honeypotRow[0], $html);
+        $this->assertStringContainsString('mauticform-honeypot', $honeypotRow[0], $html);
+        $this->assertSame(1, substr_count($honeypotRow[0], 'class="'), $html);
     }
 
     private function createFormWithHoneypotCaptcha(string $containerAttributes = ''): int
