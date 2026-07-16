@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageLeadActionLog;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -77,28 +78,33 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $duplicateLogContactId = $duplicateLogContact->getId();
 
         $connection = $this->em->getConnection();
-        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
-            'stage_id'   => $mergedStageId,
-            'lead_id'    => $contactId,
-            'date_fired' => self::MERGE_TEST_LOG_DATE,
-        ]);
-        $connection->insert(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', [
-            'lead_id'     => $contactId,
-            'stage_id'    => $mergedStageId,
-            'event_name'  => 'Stage changed',
-            'action_name' => 'Merged stage',
-            'date_added'  => self::MERGE_TEST_LOG_DATE,
-        ]);
-        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
-            'stage_id'   => $primaryStageId,
-            'lead_id'    => $duplicateLogContactId,
-            'date_fired' => self::MERGE_TEST_LOG_DATE,
-        ]);
-        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
-            'stage_id'   => $mergedStageId,
-            'lead_id'    => $duplicateLogContactId,
-            'date_fired' => '2026-01-02 00:00:00',
-        ]);
+        $actionLog1 = new StageLeadActionLog(); // adjust namespace
+        $actionLog1->setStage($mergedStage);  // or setStageId if no relation
+        $actionLog1->setLead($contact);
+        $actionLog1->setDateFired(new \DateTime(self::MERGE_TEST_LOG_DATE));
+        $this->em->persist($actionLog1);
+    
+        $changeLog = new LeadStagesChangeLog(); // adjust
+        $changeLog->setLead($contact);
+        $changeLog->setStage($mergedStage);
+        $changeLog->setEventName('Stage changed');
+        $changeLog->setActionName('Merged stage');
+        $changeLog->setDateAdded(new \DateTime(self::MERGE_TEST_LOG_DATE));
+        $this->em->persist($changeLog);
+    
+        $actionLog2 = new StageLeadActionLog();
+        $actionLog2->setStage($primaryStage);
+        $actionLog2->setLead($duplicateLogContact);
+        $actionLog2->setDateFired(new \DateTime(self::MERGE_TEST_LOG_DATE));
+        $this->em->persist($actionLog2);
+    
+        $actionLog3 = new StageLeadActionLog();
+        $actionLog3->setStage($mergedStage);
+        $actionLog3->setLead($duplicateLogContact);
+        $actionLog3->setDateFired(new \DateTime('2026-01-02 00:00:00'));
+        $this->em->persist($actionLog3);
+    
+        $this->em->flush();
 
         /** @var StageModel $stageModel */
         $stageModel = static::getContainer()->get('mautic.stage.model.stage');
