@@ -106,9 +106,9 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createMock(Form::class), ['number_field' => $value]);
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createStub(Form::class), ['number_field' => $value]);
 
-        self::assertSame($expectedParameters, $model->parameters);
+        $this->assertSame($expectedParameters, $model->parameters);
     }
 
     /**
