@@ -1,5 +1,24 @@
 //StageBundle
 Mautic.stageOnLoad = function (container, response) {
+    const segmentCountElem = mQuery('a.col-count');
+
+    if (segmentCountElem.length) {
+        segmentCountElem.each(function() {
+            const elem = mQuery(this);
+            const id = elem.attr('data-id');
+
+            Mautic.ajaxActionRequest(
+                'stage:getLeadCount',
+                {id: id},
+                function (response) {
+                    elem.html(response.html);
+                },
+                false,
+                true
+            );
+        });
+    }
+
     const sequence = mQuery('#stage-weight-sequence');
 
     if (!sequence.length) {
