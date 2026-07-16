@@ -667,7 +667,7 @@ class TrackableModel extends AbstractCommonModel
 
     private function isContactFieldToken($token): bool
     {
-        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield') || str_contains($token, '{ownerfield');
     }
 
     /**

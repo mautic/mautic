@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -37,6 +38,7 @@ class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
@@ -106,10 +108,12 @@ class EmailController extends FormController
         // retrieve a list of Lead Lists
         $leadListModel = $this->getModel('lead.list');
         \assert($leadListModel instanceof ListModel);
+        $availableLists                                               = $leadListModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $leadListModel->getUserLists(),
+            'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
         ];
+        $listAliasLookup = array_column($availableLists, 'alias', 'id');
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
@@ -130,9 +134,9 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$column, $filter] = explode(':', $updatedFilter);
+                    [$column, $filterValue] = explode(':', $updatedFilter);
 
-                    $newFilters[$column][] = $filter;
+                    $newFilters[$column][] = $filterValue;
                 }
 
                 $currentFilters = $newFilters;
@@ -143,7 +147,7 @@ class EmailController extends FormController
         $session->set('mautic.email.list_filters', $currentFilters);
 
         if (!empty($currentFilters)) {
-            $listIds = $catIds = $templates = [];
+            $listAliases = $catIds = $templates = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 switch ($type) {
                     case 'list':
@@ -162,20 +166,29 @@ class EmailController extends FormController
                 foreach ($typeFilters as $fltr) {
                     switch ($type) {
                         case 'list':
-                            $listIds[] = (int) $fltr;
+                            $resolvedAlias       = $listAliasLookup[(int) $fltr] ?? $fltr;
+                            $listAliases[]       = $resolvedAlias;
+                            $searchFilterTerms[] = 'list:'.$fltr;
+                            $searchFilterTerms[] = 'list:'.$resolvedAlias;
                             break;
                         case 'category':
-                            $catIds[] = (int) $fltr;
+                            $catIds[]            = (int) $fltr;
+                            $searchFilterTerms[] = 'category:'.$fltr;
                             break;
                         case 'theme':
-                            $templates[] = $fltr;
+                            $templates[]         = $fltr;
+                            $searchFilterTerms[] = 'theme:'.$fltr;
                             break;
                     }
                 }
             }
 
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+            $search = $this->stripQuickFilterTokensFromSearch($search, $searchFilterTerms);
+            $session->set('mautic.email.filter', $search);
+            $filter['string'] = $search;
+
+            if (!empty($listAliases)) {
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
                 $ignoreListJoin    = false;
             }
 
