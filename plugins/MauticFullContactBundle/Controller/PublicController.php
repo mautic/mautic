@@ -30,11 +30,9 @@ class PublicController extends FormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \InvalidArgumentException
      */
-    public function callbackAction(Request $request, LookupHelper $lookupHelper, LoggerInterface $mauticLogger)
+    public function callbackAction(Request $request, LookupHelper $lookupHelper, LoggerInterface $mauticLogger): Response
     {
         if (!$request->request->has('result') || !$request->request->has('webhookId')) {
             return new Response('ERROR');
