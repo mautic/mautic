@@ -30,7 +30,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -47,9 +46,6 @@ class ConfigController extends AbstractFormController
      */
     private $integrationConfiguration;
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
@@ -58,7 +54,7 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         string $integration,
-    ) {
+    ): Response {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
