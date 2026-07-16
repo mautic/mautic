@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxLookupControllerTest extends MauticMysqlTestCase
 {
+    private const AJAX_ROUTE = '/s/ajax';
+
     public function testCompanyLookupWithOptions(): void
     {
         $company = new Company();
@@ -27,7 +29,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
             'lead_company' => 'Test',
         ];
 
-        $this->client->request(Request::METHOD_GET, '/s/ajax', $params);
+        $this->client->request(Request::METHOD_GET, self::AJAX_ROUTE, $params);
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
@@ -59,7 +61,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
             'email'      => 'Test',
         ];
 
-        $this->client->request(Request::METHOD_GET, '/s/ajax', $params);
+        $this->client->request(Request::METHOD_GET, self::AJAX_ROUTE, $params);
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
@@ -95,7 +97,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
             'sms'       => 'sms',
         ];
 
-        $this->client->request(Request::METHOD_GET, '/s/ajax', $params);
+        $this->client->request(Request::METHOD_GET, self::AJAX_ROUTE, $params);
         $this->assertResponseIsSuccessful();
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
@@ -126,7 +128,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
             'channel_message' => 'message',
         ];
 
-        $this->client->request(Request::METHOD_GET, '/s/ajax', $params);
+        $this->client->request(Request::METHOD_GET, self::AJAX_ROUTE, $params);
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
