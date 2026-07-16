@@ -145,10 +145,8 @@ class TriggerApiController extends CommonApiController
 
     /**
      * Return array of available point trigger event types.
-     *
-     * @return Response
      */
-    public function getPointTriggerEventTypesAction()
+    public function getPointTriggerEventTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
             return $this->accessDenied();
@@ -170,10 +168,8 @@ class TriggerApiController extends CommonApiController
      * Delete events from a point trigger.
      *
      * @param int $triggerId
-     *
-     * @return Response
      */
-    public function deletePointTriggerEventsAction($triggerId)
+    public function deletePointTriggerEventsAction($triggerId): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

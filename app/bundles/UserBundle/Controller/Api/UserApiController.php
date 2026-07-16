@@ -63,11 +63,9 @@ class UserApiController extends CommonApiController
     /**
      * Obtains the logged in user's data.
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction(TokenStorageInterface $tokenStorage)
+    public function getSelfAction(TokenStorageInterface $tokenStorage): Response
     {
         $currentUser = $tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
@@ -178,12 +176,10 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function isGrantedAction(Request $request, $id)
+    public function isGrantedAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
@@ -207,10 +203,8 @@ class UserApiController extends CommonApiController
 
     /**
      * Obtains a list of roles for user edits.
-     *
-     * @return Response
      */
-    public function getRolesAction(Request $request)
+    public function getRolesAction(Request $request): Response
     {
         if (!$this->security->isGranted(
             ['user:users:create', 'user:users:edit'],
