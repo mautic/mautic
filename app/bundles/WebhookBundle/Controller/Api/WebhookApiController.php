@@ -88,7 +88,7 @@ class WebhookApiController extends CommonApiController
         }
     }
 
-    public function getTriggersAction()
+    public function getTriggersAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->handleView(
             $this->view(

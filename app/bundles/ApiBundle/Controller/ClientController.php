@@ -185,10 +185,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param mixed $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             $this->throwAccessDenied();
