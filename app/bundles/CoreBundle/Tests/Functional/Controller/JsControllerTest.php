@@ -54,8 +54,11 @@ final class JsControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('runtimeReady', $content);
         Assert::assertStringContainsString('appendTrackedContact', $content);
         Assert::assertStringContainsString('requestWithCredentials', $content);
+        Assert::assertStringContainsString('replaceDynamicContent', $content);
+        Assert::assertStringContainsString('enhanceDynamicContent', $content);
         Assert::assertStringNotContainsString("localStorage.getItem('mtc_id')", $content);
         Assert::assertStringNotContainsString('getTrackedContact', $content);
+        Assert::assertStringNotContainsString('setTrackedContact(response)', $content);
     }
 
     public function testTrackingEndpointContainsIdentityWithoutRuntime(): void
@@ -66,8 +69,10 @@ final class JsControllerTest extends MauticMysqlTestCase
         $content = (string) $this->client->getResponse()->getContent();
         Assert::assertStringContainsString('runtimeReady', $content);
         Assert::assertStringContainsString("localStorage.getItem('mtc_id')", $content);
+        Assert::assertStringContainsString('onDynamicContentResponse', $content);
         Assert::assertStringNotContainsString('serialize=function', $content);
         Assert::assertStringNotContainsString('setCookie=function', $content);
+        Assert::assertStringNotContainsString('replaceDynamicContent=function', $content);
     }
 
     #[DataProvider('scriptEndpointProvider')]
