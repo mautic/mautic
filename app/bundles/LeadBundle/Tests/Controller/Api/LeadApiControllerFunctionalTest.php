@@ -589,17 +589,17 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful($clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
-        self::assertSame('2', $response['total']);
+        $this->assertSame('2', $response['total']);
 
         $emails = array_map(
             static fn (array $contact): string => $contact['fields']['all']['email'],
             array_values($response['contacts'])
         );
 
-        self::assertContains('api-view-own-scope-owned@test.com', $emails);
-        self::assertContains('api-view-own-scope-created@test.com', $emails);
-        self::assertNotContains('api-view-own-scope-owned-by-other@test.com', $emails);
-        self::assertNotContains('api-view-own-scope-unrelated@test.com', $emails);
+        $this->assertContains('api-view-own-scope-owned@test.com', $emails);
+        $this->assertContains('api-view-own-scope-created@test.com', $emails);
+        $this->assertNotContains('api-view-own-scope-owned-by-other@test.com', $emails);
+        $this->assertNotContains('api-view-own-scope-unrelated@test.com', $emails);
     }
 
     public function testBatchEditEndpoint(): void
@@ -1485,7 +1485,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
         $this->em->persist($user);
 
