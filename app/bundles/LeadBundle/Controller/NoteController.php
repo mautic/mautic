@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
-use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 class NoteController extends FormController
 {
     use LeadAccessTrait;
+
+    private \Mautic\LeadBundle\Model\NoteModel $noteModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireNoteController(\Mautic\LeadBundle\Model\NoteModel $noteModel): void
+    {
+        $this->noteModel = $noteModel;
+    }
 
     /**
      * Generate's default list view.
@@ -48,7 +55,10 @@ class NoteController extends FormController
         // do some default filtering
         $orderBy    = $session->get('mautic.lead.'.$lead->getId().'.note.orderby', 'n.dateTime');
         $orderByDir = $session->get('mautic.lead.'.$lead->getId().'.note.orderbydir', 'DESC');
+<<<<<<< HEAD
 
+=======
+>>>>>>> a1647d509a ([model] flip l* getModel() to typed property inject)
         $force = [
             [
                 'column' => 'n.lead',
@@ -79,10 +89,26 @@ class NoteController extends FormController
             ];
         }
 
+<<<<<<< HEAD
         $viewPermissions = $this->security->isGranted(['lead:notes:viewown', 'lead:notes:viewother'], 'RETURN_ARRAY');
         $canViewOwn      = $viewPermissions['lead:notes:viewown'] ?? false;
         $canViewOther    = $viewPermissions['lead:notes:viewother'] ?? false;
         $canViewNotes    = $canViewOwn || $canViewOther;
+=======
+        $items = $this->noteModel->getEntities(
+            [
+                'filter' => [
+                    'force'  => $force,
+                    'string' => $search,
+                ],
+                'start'          => $start,
+                'limit'          => $limit,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'hydration_mode' => 'HYDRATE_ARRAY',
+            ]
+        );
+>>>>>>> a1647d509a ([model] flip l* getModel() to typed property inject)
 
         $items           = [];
         if ($canViewNotes) {
@@ -168,9 +194,6 @@ class NoteController extends FormController
         // retrieve the entity
         $note = new LeadNote();
         $note->setLead($lead);
-
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -179,7 +202,7 @@ class NoteController extends FormController
             ]
         );
         // get the user form factory
-        $form       = $model->createForm($note, $this->formFactory, $action);
+        $form       = $this->noteModel->createForm($note, $this->formFactory, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -189,7 +212,7 @@ class NoteController extends FormController
                     $closeModal = true;
 
                     // form is valid so process the data
-                    $model->saveEntity($note);
+                    $this->noteModel->saveEntity($note);
                 }
             } else {
                 $closeModal = true;
@@ -250,10 +273,7 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
-        $note       = $model->getEntity($objectId);
+        $note       = $this->noteModel->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
 
@@ -269,14 +289,14 @@ class NoteController extends FormController
                 'leadId'       => $leadId,
             ]
         );
-        $form = $model->createForm($note, $this->formFactory, $action);
+        $form = $this->noteModel->createForm($note, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($note);
+                    $this->noteModel->saveEntity($note);
                     $closeModal = true;
                 }
             } else {
@@ -332,22 +352,25 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
-        $note = $model->getEntity($objectId);
+        $note = $this->noteModel->getEntity($objectId);
 
         if (null === $note) {
             return $this->notFound();
         }
 
         if (
+<<<<<<< HEAD
             !$this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy())
             || $model->isLocked($note)
+=======
+            !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
+            || $this->noteModel->isLocked($note)
+>>>>>>> a1647d509a ([model] flip l* getModel() to typed property inject)
         ) {
             $this->throwAccessDenied();
         }
 
-        $model->deleteEntity($note);
+        $this->noteModel->deleteEntity($note);
 
         return new JsonResponse(
             [
