@@ -79,10 +79,7 @@ class EventLogApiController extends FetchCommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
@@ -191,10 +188,7 @@ class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @return array|Response
-     */
-    public function editEventsAction(Request $request)
+    public function editEventsAction(Request $request): Response
     {
         $parameters = $request->request->all();
 
