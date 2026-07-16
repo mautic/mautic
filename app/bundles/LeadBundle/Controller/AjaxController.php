@@ -43,7 +43,7 @@ class AjaxController extends CommonAjaxController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(LeadModel $leadModel): void
+    public function autowireAjaxController(LeadModel $leadModel): void
     {
         $this->leadModel = $leadModel;
     }

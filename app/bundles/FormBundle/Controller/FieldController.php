@@ -31,7 +31,7 @@ class FieldController extends CommonFormController
     private FieldModel $fieldModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(FieldModel $fieldModel): void
+    public function autowireFieldController(FieldModel $fieldModel): void
     {
         $this->fieldModel = $fieldModel;
     }

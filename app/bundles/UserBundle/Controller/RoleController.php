@@ -17,7 +17,7 @@ class RoleController extends FormController
     private RoleModel $roleModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(RoleModel $roleModel): void
+    public function autowireRoleController(RoleModel $roleModel): void
     {
         $this->roleModel = $roleModel;
     }

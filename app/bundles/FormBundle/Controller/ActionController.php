@@ -15,7 +15,7 @@ class ActionController extends CommonFormController
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(FormModel $formModel): void
+    public function autowireActionController(FormModel $formModel): void
     {
         $this->formModel = $formModel;
     }
