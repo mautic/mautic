@@ -108,6 +108,10 @@ parameters:
 				- app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
 				- app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
 				- app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		-
+			message: '#Anonymous class implements deprecated interface Doctrine\\DBAL\\Logging\\SQLLogger#'
+			path: app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
+
 		# false positive, reflection reference method call
 		-
 			identifier: method.impossibleType
@@ -181,5 +185,9 @@ parameters:
 services:
 	-
 		class: MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: MauticPhpStan\Rule\NoTablePrefixDefinitionInTestsRule
 		tags:
 			- phpstan.rules.rule
