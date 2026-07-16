@@ -11,6 +11,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private FocusModel $focusModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(FocusModel $focusModel): void
+    {
+        $this->focusModel = $focusModel;
+    }
+
     public function generatePreviewAction(Request $request): JsonResponse
     {
         $responseContent  = ['html' => '', 'style' => ''];
@@ -20,10 +28,8 @@ class AjaxController extends CommonAjaxController
             $focusArray = InputHelper::_($focus['focus']);
 
             if (!empty($focusArray['style']) && !empty($focusArray['type'])) {
-                /** @var FocusModel $model */
-                $model                    = $this->getModel('focus');
                 $focusArray['id']         = 'preview';
-                $responseContent['html']  = $model->getContent($focusArray, true);
+                $responseContent['html']  = $this->focusModel->getContent($focusArray, true);
                 $responseContent['style'] = $focusArray['style']; // Required by JS in response
             }
         }
@@ -50,18 +56,15 @@ class AjaxController extends CommonAjaxController
             $viewsCount       = $cacheItemValue['views'];
             $uniqueViewsCount = $cacheItemValue['uniqueViews'];
         } else {
-            /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
-
-            $focus = $model->getEntity($focusId);
+            $focus = $this->focusModel->getEntity($focusId);
             if (null === $focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $viewsCount       = $model->getViewsCount($focus);
-            $uniqueViewsCount = $model->getUniqueViewsCount($focus);
+            $viewsCount       = $this->focusModel->getViewsCount($focus);
+            $uniqueViewsCount = $this->focusModel->getUniqueViewsCount($focus);
             $cacheItem->set([
                 'views'       => $viewsCount,
                 'uniqueViews' => $uniqueViewsCount,
@@ -95,17 +98,14 @@ class AjaxController extends CommonAjaxController
         if ($cacheItem->isHit()) {
             $clickThroughCount = $cacheItem->get();
         } else {
-            /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
-
-            $focus = $model->getEntity($focusId);
+            $focus = $this->focusModel->getEntity($focusId);
             if (null === $focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $clickThroughCount = $model->getClickThroughCount($focus);
+            $clickThroughCount = $this->focusModel->getClickThroughCount($focus);
             $cacheItem->set($clickThroughCount);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
