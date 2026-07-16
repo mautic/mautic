@@ -8,12 +8,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait FiltersEntityTrait
 {
     /**
-     * @var array
+     * @var array<int, array<string, mixed>>
      */
-    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[Groups(['dynamicContent:read', 'dynamicContent:write', 'focus:read', 'focus:write'])]
     private $filters = [];
 
-    protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
+    protected static function addFiltersMetadata(ClassMetadataBuilder $builder): void
     {
         $builder->createField('filters', 'array')
             ->columnName('filters')
@@ -22,7 +22,7 @@ trait FiltersEntityTrait
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
     public function getFilters()
     {
@@ -30,7 +30,7 @@ trait FiltersEntityTrait
     }
 
     /**
-     * @param array $filters
+     * @param array<int, array<string, mixed>> $filters
      *
      * @return $this
      */

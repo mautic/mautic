@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -43,6 +44,7 @@ class Focus extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+    use FiltersEntityTrait;
 
     /**
      * @var int
@@ -216,6 +218,8 @@ class Focus extends FormEntity implements UuidInterface
 
         $builder->addNullableField('html', 'text');
 
+        self::addFiltersMetadata($builder);
+
         static::addUuidField($builder);
         self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }
@@ -248,6 +252,7 @@ class Focus extends FormEntity implements UuidInterface
                     'html',
                     'editor',
                     'cache',
+                    'filters',
                 ]
             )
             ->build();

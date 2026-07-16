@@ -18,6 +18,10 @@ return [
             ],
         ],
         'public' => [
+            'mautic_focus_check' => [
+                'path'       => '/focus/check',
+                'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::checkAction',
+            ],
             'mautic_focus_generate' => [
                 'path'       => '/focus/{id}.js',
                 'controller' => 'MauticPlugin\MauticFocusBundle\Controller\PublicController::generateAction',

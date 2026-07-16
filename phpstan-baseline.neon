@@ -3406,12 +3406,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:addFiltersMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:setSentCount\(\) has parameter \$sentCount with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
