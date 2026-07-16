@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Form\Form;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -67,7 +68,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     #[\PHPUnit\Framework\Attributes\DataProvider('numericValueProvider')]
     public function testSetCustomFieldValuesFiltersOnlyNumericZero(mixed $value, array $expectedParameters): void
     {
-        $model = new class {
+        $model = new class() {
             /**
              * @var array<string, mixed>
              */
@@ -85,20 +86,27 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
         $controller = new class($model) {
             use CustomFieldsApiControllerTrait;
 
+            private string $entityNameOne = 'lead';
+
             public function __construct(private object $model)
             {
+            }
+
+            public function getModel(?string $name): object
+            {
+                return $this->model;
             }
 
             /**
              * @param array<string, mixed> $parameters
              */
-            public function setCustomFieldValuesPublic(Lead $lead, array $parameters): void
+            public function setCustomFieldValuesPublic(Lead $lead, Form $form, array $parameters): void
             {
-                $this->setCustomFieldValues($lead, new \ArrayIterator(), $parameters, true);
+                $this->setCustomFieldValues($lead, $form, $parameters, true);
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), ['number_field' => $value]);
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createMock(Form::class), ['number_field' => $value]);
 
         self::assertSame($expectedParameters, $model->parameters);
     }
