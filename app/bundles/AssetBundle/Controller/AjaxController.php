@@ -13,13 +13,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private AssetModel $assetModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(AssetModel $assetModel): void
+    {
+        $this->assetModel = $assetModel;
+    }
+
     public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
-        $assetModel = $this->getModel('asset');
-
-        \assert($assetModel instanceof AssetModel);
         $filter     = InputHelper::clean($request->query->get('filter'));
-        $results    = $assetModel->getLookupResults('category', $filter, 10);
+        $results    = $this->assetModel->getLookupResults('category', $filter, 10);
         $dataArray  = [];
         foreach ($results as $r) {
             $dataArray[] = [
