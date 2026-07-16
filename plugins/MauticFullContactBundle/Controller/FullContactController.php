@@ -17,7 +17,7 @@ class FullContactController extends FormController
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
+    public function autowireFullContactController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
     {
         $this->leadModel = $leadModel;
     }
