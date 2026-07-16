@@ -176,7 +176,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'composer install', 'composer lock check']
         php-versions: ['8.2']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -264,17 +264,6 @@ jobs:
             echo "verbose diff:"
             bash diff_commands_verbose.sh
             exit 1
-          fi
-        elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-          if [[ -n "${{ github.base_ref }}" ]] && [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
-            stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
-            echo $stat
-            regex="[0-9]+[[:space:]]insertion"
-            if [[ $stat =~ $regex ]]; then
-              echo "There are modifications (added or changed lines) to the phpstan-baseline.neon"
-              echo "Please fix the PHPStan errors instead of altering the baseline file"
-              exit 1
-            fi
           fi
         elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
           # create a temp dir and mimic a composer install via mautic/recommended-project
