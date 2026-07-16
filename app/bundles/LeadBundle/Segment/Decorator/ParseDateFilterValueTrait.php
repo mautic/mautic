@@ -39,14 +39,4 @@ trait ParseDateFilterValueTrait
 
         return null;
     }
-
-    /**
-     * @param array<mixed> $filter
-     */
-    private function isDateFilterType(string $type, array $filter): bool
-    {
-        $dateTypeMode = $filter['dateTypeMode'] ?? '';
-
-        return $type === $dateTypeMode;
-    }
 }
