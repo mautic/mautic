@@ -121,10 +121,8 @@ class RoleController extends FormController
 
     /**
      * Generate's new role form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             $this->throwAccessDenied();

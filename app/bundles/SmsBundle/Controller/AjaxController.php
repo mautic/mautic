@@ -14,16 +14,22 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
+    private SmsModel $smsModel;
+
+    #[Required]
+    public function autowire(SmsModel $smsModel): void
+    {
+        $this->smsModel = $smsModel;
+    }
+
     public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper): JsonResponse
     {
-        /** @var SmsModel $model */
-        $model = $this->getModel('sms');
-
         $id  = $request->get('id');
         $ids = $request->query->all()['ids'] ?? [];
 
@@ -34,7 +40,7 @@ class AjaxController extends CommonAjaxController
 
         $data = [];
         foreach ($ids as $id) {
-            if ($sms = $model->getEntity($id)) {
+            if ($sms = $this->smsModel->getEntity($id)) {
                 if ('list' !== $sms->getSmsType()) {
                     continue;
                 }

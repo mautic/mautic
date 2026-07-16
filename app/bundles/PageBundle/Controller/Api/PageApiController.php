@@ -46,10 +46,8 @@ class PageApiController extends CommonApiController
 
     /**
      * Obtains a list of pages.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): \Symfony\Component\HttpFoundation\Response
     {
         // get parent level only
         $this->listFilters[] = [

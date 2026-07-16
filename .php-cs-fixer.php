@@ -43,7 +43,6 @@ return (new PhpCsFixer\Config())
         'header_comment'        => [
             'header' => '',
         ],
-        'Mautic/no_table_prefix_definition_in_tests'       => true,
         'multiline_whitespace_before_semicolons'           => true,
         'nullable_type_declaration_for_default_null_value' => true,
         'new_with_parentheses'                             => ['anonymous_class' => true],
@@ -51,5 +50,4 @@ return (new PhpCsFixer\Config())
             'allow_mixed' => true,
         ],
     ])
-    ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);
