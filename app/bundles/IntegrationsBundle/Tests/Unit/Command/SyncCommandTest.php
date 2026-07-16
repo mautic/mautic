@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
@@ -16,8 +15,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class SyncCommandTest extends TestCase
 {
-    use IsolatedTestTrait;
-
     private const INTEGRATION_NAME = 'Test';
 
     /**
