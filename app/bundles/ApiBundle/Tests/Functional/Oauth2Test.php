@@ -6,7 +6,6 @@ namespace Mautic\ApiBundle\Tests\Functional;
 
 use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class Oauth2Test extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
-
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;

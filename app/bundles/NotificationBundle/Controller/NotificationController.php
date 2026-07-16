@@ -545,10 +545,8 @@ class NotificationController extends AbstractFormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
         $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthController extends CommonController
 {
-    public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request)
+    public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $authenticationError = false;
 
