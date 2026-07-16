@@ -67,7 +67,7 @@ final class AjaxLookupControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(1, $content, 'Should return one group');
         $this->assertCount(1, $content[0]['items'], 'Should return one email');
-        $this->assertSame('Test Template Email', $content[0]['items'][(string) $templateEmail->getId()]);
+        $this->assertSame('Test Template Email ('.$templateEmail->getId().')', $content[0]['items'][(string) $templateEmail->getId()]);
     }
 
     public function testSmsLookupWithEmailTypeOption(): void
