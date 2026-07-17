@@ -23,8 +23,9 @@ class AjaxController extends CommonAjaxController
     private SmsModel $smsModel;
 
     #[Required]
-    public function autowireSmsAjaxController(SmsModel $smsModel): void
-    {
+    public function autowireSmsAjaxController(
+        SmsModel $smsModel,
+    ): void {
         $this->smsModel = $smsModel;
     }
 

@@ -187,8 +187,10 @@ trait FrequencyRuleTrait
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFrequencyRuleTrait(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel, RequestStack $requestStack): void
-    {
+    public function autowireFrequencyRuleTrait(
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        RequestStack $requestStack,
+    ): void {
         $this->doNotContactModel = $doNotContactModel;
         $this->requestStack      = $requestStack;
     }

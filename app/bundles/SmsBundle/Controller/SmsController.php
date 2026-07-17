@@ -26,8 +26,10 @@ class SmsController extends FormController
     private SmsModel $smsModel;
 
     #[Required]
-    public function autowireSmsController(SmsModel $smsModel, \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
+    public function autowireSmsController(
+        SmsModel $smsModel,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+    ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;
     }

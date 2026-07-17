@@ -45,8 +45,9 @@ class PublicController extends CommonFormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(LeadModel $leadModel): void
-    {
+    public function autowirePublicController(
+        LeadModel $leadModel,
+    ): void {
         $this->leadModel = $leadModel;
     }
 
