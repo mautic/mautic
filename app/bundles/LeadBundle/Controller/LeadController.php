@@ -877,10 +877,8 @@ final class LeadController extends FormController
 
     /**
      * Generates merge form and action.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
+    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId): Response
     {
         $mainLead = $this->leadModel->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
