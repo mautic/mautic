@@ -116,7 +116,9 @@
       "Utils\\Rector\\": "utils/rector/src/",
       "Utils\\Rector\\Tests\\": "utils/rector/tests/",
       "Utils\\PHPStan\\": "utils/phpstan/src/",
-      "Utils\\PHPStan\\Tests\\": "utils/phpstan/tests/"
+      "Utils\\PHPStan\\Tests\\": "utils/phpstan/tests/",
+      "Utils\\ECS\\": "utils/ecs/src/",
+      "Utils\\ECS\\Tests\\": "utils/ecs/tests/"
     }
   },
   "repositories": [
