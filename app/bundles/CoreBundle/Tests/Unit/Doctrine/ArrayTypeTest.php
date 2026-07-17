@@ -12,12 +12,12 @@ class ExampleClassWithPrivateProperty
 
 class ExampleClassWithProtectedProperty
 {
-    protected $test = 'value';
+    protected string $test = 'value';
 }
 
 class ExampleClassWithPublicProperty
 {
-    public $test = 'value';
+    public string $test = 'value';
 }
 
 final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
