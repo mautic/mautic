@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
@@ -13,6 +12,7 @@ use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerAc
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -74,6 +74,9 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
             __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
+        ],
+        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
