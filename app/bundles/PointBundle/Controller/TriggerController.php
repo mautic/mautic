@@ -14,6 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
 {
+    private TriggerEventModel $triggerEventModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireTriggerController(TriggerEventModel $triggerEventModel): void
+    {
+        $this->triggerEventModel = $triggerEventModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
@@ -359,9 +367,7 @@ class TriggerController extends FormController
 
                         // delete entities
                         if (count($deletedEvents)) {
-                            $triggerEventModel = $this->getModel('point.triggerevent');
-                            \assert($triggerEventModel instanceof TriggerEventModel);
-                            $triggerEventModel->deleteEntities($deletedEvents);
+                            $this->triggerEventModel->deleteEntities($deletedEvents);
                         }
 
                         $session->set('mautic.point.'.$objectId.'.triggerevents.modified', $events);
