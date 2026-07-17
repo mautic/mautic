@@ -14,14 +14,9 @@ class AjaxController extends CommonAjaxController
     private FocusModel $focusModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowireMauticFocusAjaxController(FocusModel $focusModel): void
-    {
-=======
     public function autowireAjaxController(
         FocusModel $focusModel,
     ): void {
->>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
         $this->focusModel = $focusModel;
     }
 

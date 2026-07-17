@@ -16,14 +16,9 @@ class AjaxController extends CommonAjaxController
     private AssetModel $assetModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowireAssetAjaxController(AssetModel $assetModel): void
-    {
-=======
     public function autowireAjaxController(
         AssetModel $assetModel,
     ): void {
->>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
         $this->assetModel = $assetModel;
     }
 

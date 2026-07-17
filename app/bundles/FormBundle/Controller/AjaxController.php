@@ -24,14 +24,9 @@ class AjaxController extends CommonAjaxController
     private \Mautic\FormBundle\Model\FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowireFormAjaxController(\Mautic\FormBundle\Model\FormModel $formModel): void
-    {
-=======
     public function autowireAjaxController(
         \Mautic\FormBundle\Model\FormModel $formModel,
     ): void {
->>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
         $this->formModel = $formModel;
     }
 

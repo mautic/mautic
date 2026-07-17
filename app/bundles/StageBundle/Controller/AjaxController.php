@@ -15,14 +15,9 @@ class AjaxController extends CommonAjaxController
     private \Mautic\StageBundle\Model\StageModel $stageModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowireStageAjaxController(\Mautic\StageBundle\Model\StageModel $stageModel): void
-    {
-=======
     public function autowireAjaxController(
         \Mautic\StageBundle\Model\StageModel $stageModel,
     ): void {
->>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
         $this->stageModel = $stageModel;
     }
 
