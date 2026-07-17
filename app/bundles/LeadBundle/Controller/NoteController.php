@@ -17,7 +17,7 @@ class NoteController extends FormController
     /**
      * Generate's default list view.
      */
-    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1)
+    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -155,7 +155,7 @@ class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      */
-    public function newAction(Request $request, $leadId): Response|JsonResponse
+    public function newAction(Request $request, $leadId): Response|JsonResponse|array
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -244,7 +244,7 @@ class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse|array
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
