@@ -43,16 +43,14 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private CategoryRepository $categoryRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): CategoryRepository
     {
-        $repository = $this->em->getRepository(Category::class);
-        \assert($repository instanceof CategoryRepository);
-
-        return $repository;
+        return $this->categoryRepository;
     }
 
     public function getNameGetter(): string
