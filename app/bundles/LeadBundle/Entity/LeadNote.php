@@ -132,6 +132,9 @@ class LeadNote extends FormEntity
         $metadata->addPropertyConstraint('text', new NotBlank(
             ['message' => 'mautic.lead.note.text.notblank']
         ));
+        $metadata->addPropertyConstraint('dateTime', new NotBlank(
+            ['message' => 'mautic.lead.note.date_time.notblank']
+        ));
     }
 
     /**
