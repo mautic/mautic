@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Tests\Rule;
+namespace Utils\PHPStan\Tests\Rule;
 
-use MauticPhpStan\Rule\NoTablePrefixDefinitionInTestsRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
+use Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule;
 
 /**
  * @extends RuleTestCase<NoTablePrefixDefinitionInTestsRule>
@@ -30,15 +30,8 @@ final class NoTablePrefixDefinitionInTestsRuleTest extends RuleTestCase
                 18,
             ],
         ]);
-    }
 
-    public function testSkipOtherConstant(): void
-    {
         $this->analyse([__DIR__.'/Fixture/DefineOtherConstantTest.php'], []);
-    }
-
-    public function testSkipNonTestFile(): void
-    {
         $this->analyse([__DIR__.'/Fixture/TablePrefixDefiner.php'], []);
     }
 }

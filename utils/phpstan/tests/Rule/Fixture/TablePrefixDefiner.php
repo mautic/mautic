@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Tests\Rule\Fixture;
+namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // not a test file - the const definition is allowed here
 class TablePrefixDefiner

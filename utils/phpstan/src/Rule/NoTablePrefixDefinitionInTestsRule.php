@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPhpStan\Rule;
+namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
@@ -29,11 +29,14 @@ final class NoTablePrefixDefinitionInTestsRule implements Rule
     }
 
     /**
+     * @param FuncCall $node
+     *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!preg_match('#/Tests/.*Test\.php$#', $scope->getFile())) {
+        // must be test case file
+        if (!str_ends_with($scope->getFile(), 'Test.php') && !str_ends_with($scope->getFile(), 'TestCase.php')) {
             return [];
         }
 
