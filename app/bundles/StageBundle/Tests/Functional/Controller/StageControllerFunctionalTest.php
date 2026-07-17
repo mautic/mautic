@@ -6,6 +6,7 @@ namespace Mautic\StageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
@@ -78,13 +79,13 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $duplicateLogContactId = $duplicateLogContact->getId();
 
         $connection = $this->em->getConnection();
-        $actionLog1 = new LeadStageLog(); 
-        $actionLog1->setStage($mergedStage); 
+        $actionLog1 = new LeadStageLog();
+        $actionLog1->setStage($mergedStage);
         $actionLog1->setLead($contact);
         $actionLog1->setDateFired(new \DateTime(self::MERGE_TEST_LOG_DATE));
         $this->em->persist($actionLog1);
 
-        $changeLog = new LeadStageLog(); 
+        $changeLog = new StagesChangeLog();
         $changeLog->setLead($contact);
         $changeLog->setStage($mergedStage);
         $changeLog->setEventName('Stage changed');
