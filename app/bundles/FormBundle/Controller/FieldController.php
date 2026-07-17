@@ -28,6 +28,14 @@ use Twig\Environment;
 
 class FieldController extends CommonFormController
 {
+    private FieldModel $fieldModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireFieldController(FieldModel $fieldModel): void
+    {
+        $this->fieldModel = $fieldModel;
+    }
+
     public function __construct(
         private readonly FormModel $formModel,
         private readonly FieldModel $formFieldModel,
@@ -117,9 +125,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formFieldModel = $this->getModel('form.field');
-                    \assert($formFieldModel instanceof FieldModel);
-                    $formField['alias'] = $formFieldModel->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->fieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -429,10 +435,7 @@ class FieldController extends CommonFormController
         \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
-
-        $formFieldModel = $this->getModel('form.field');
-        \assert($formFieldModel instanceof FieldModel);
-        $form = $formFieldModel->createForm(
+        $form = $this->fieldModel->createForm(
             $formField,
             $this->formFactory,
             (!empty($formField['id'])) ?
