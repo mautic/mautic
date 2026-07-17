@@ -15,6 +15,13 @@ use Twig\Environment;
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
+    private PageModel $pageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(PageModel $pageModel): void
+    {
+        $this->pageModel = $pageModel;
+    }
 
     public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, PageModel $pageModel, Environment $twig): JsonResponse
     {
@@ -31,9 +38,7 @@ class AjaxController extends CommonAjaxController
     public function pageListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $pageModel = $this->getModel('page.page');
-        \assert($pageModel instanceof PageModel);
-        $results   = $pageModel->getLookupResults('page', $filter);
+        $results   = $this->pageModel->getLookupResults('page', $filter);
         $dataArray = [];
 
         foreach ($results as $r) {
@@ -53,9 +58,6 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens($query)
     {
-        /** @var PageModel $model */
-        $model = $this->getModel('page');
-
-        return $model->getBuilderComponents(null, ['tokens'], $query ?? '');
+        return $this->pageModel->getBuilderComponents(null, ['tokens'], $query ?? '');
     }
 }

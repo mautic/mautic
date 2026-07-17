@@ -61,6 +61,13 @@ class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
+    private NoteModel $noteModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(NoteModel $noteModel): void
+    {
+        $this->noteModel = $noteModel;
+    }
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
 
@@ -443,8 +450,6 @@ class LeadController extends FormController
         $model = $this->getModel('lead.list');
         \assert($model instanceof ListModel);
         $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
-        $leadNoteModel = $this->getModel('lead.note');
-        \assert($leadNoteModel instanceof NoteModel);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -463,7 +468,7 @@ class LeadController extends FormController
                     'events'                 => $this->getEngagements($lead),
                     'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
                     'engagementData'         => $this->getEngagementData($lead),
-                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'noteCount'              => $this->noteModel->getNoteCount($lead, true),
                     'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'                => $leadDeviceRepository->getLeadDevices($lead),
                     'auditlog'               => $this->getAuditlogs($lead),

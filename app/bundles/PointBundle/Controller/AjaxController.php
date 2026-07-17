@@ -10,6 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private \Mautic\PointBundle\Model\PointModel $pointModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\PointBundle\Model\PointModel $pointModel): void
+    {
+        $this->pointModel = $pointModel;
+    }
+
     public function reorderTriggerEventsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray   = ['success' => 0];
@@ -37,10 +45,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         if (!empty($type)) {
-            // get the HTML for the form
-            /** @var \Mautic\PointBundle\Model\PointModel $model */
-            $model   = $this->getModel('point');
-            $actions = $model->getPointActions();
+            $actions = $this->pointModel->getPointActions();
 
             if (isset($actions['actions'][$type])) {
                 $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];

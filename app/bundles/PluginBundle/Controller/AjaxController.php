@@ -13,6 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private PluginModel $pluginModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(PluginModel $pluginModel): void
+    {
+        $this->pluginModel = $pluginModel;
+    }
+
     public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $session      = $request->getSession();
@@ -53,11 +61,8 @@ class AjaxController extends CommonAjaxController
                     $session = $request->getSession();
                     $session->set('mautic.plugin.'.$integration.'.'.$object.'.page', $page);
 
-                    /** @var PluginModel $pluginModel */
-                    $pluginModel = $this->getModel('plugin');
-
                     // Get a list of custom form fields
-                    $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $mauticFields       = ($isLead) ? $this->pluginModel->getLeadFields() : $this->pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
                     $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
@@ -261,10 +266,7 @@ class AjaxController extends CommonAjaxController
             $dataArray = ['success' => 1];
         }
         $entity->setFeatureSettings($featureSettings);
-
-        $pluginModel = $this->getModel('plugin');
-        \assert($pluginModel instanceof PluginModel);
-        $pluginModel->saveFeatureSettings($entity);
+        $this->pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
     }

@@ -33,6 +33,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
+    private PageModel $pageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(PageModel $pageModel): void
+    {
+        $this->pageModel = $pageModel;
+    }
 
     protected ?\Mautic\UserBundle\Entity\User $user;
 
@@ -541,11 +548,9 @@ class CommonController extends AbstractController implements MauticController
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page404)) {
-            $pageModel = $this->getModel('page');
-            \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page404);
+            $page = $this->pageModel->getEntity($page404);
             if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug     = $pageModel->generateSlug($page);
+                $slug     = $this->pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
                     [

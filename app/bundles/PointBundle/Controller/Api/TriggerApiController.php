@@ -43,10 +43,8 @@ class TriggerApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        TriggerModel $triggerModel,
     ) {
-        $triggerModel = $modelFactory->getModel('point.trigger');
-        \assert($triggerModel instanceof TriggerModel);
-
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';

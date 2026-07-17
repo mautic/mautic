@@ -23,6 +23,13 @@ use Symfony\Component\HttpFoundation\Response;
 class CompanyController extends FormController
 {
     use LeadDetailsTrait;
+    private FieldModel $fieldModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(FieldModel $fieldModel): void
+    {
+        $this->fieldModel = $fieldModel;
+    }
 
     private CompanyModel $companyModel;
 
@@ -203,10 +210,7 @@ class CompanyController extends FormController
                 ? ($company['updateSelect'] ?? false)
                 : $request->get('updateSelect', false)
         );
-
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
@@ -379,10 +383,7 @@ class CompanyController extends FormController
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm(
             $entity,
             $this->formFactory,

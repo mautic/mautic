@@ -19,6 +19,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+    private EmailModel $emailModel;
+
+    #[Required]
+    public function autowire(EmailModel $emailModel): void
+    {
+        $this->emailModel = $emailModel;
+    }
 
     private SmsModel $smsModel;
 
@@ -92,9 +99,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens(string $query): array
     {
-        /** @var EmailModel $model */
-        $model        = $this->getModel('email');
-        $components   = $model->getBuilderComponents(null, ['tokens'], $query);
+        $components   = $this->emailModel->getBuilderComponents(null, ['tokens'], $query);
         $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];
         $returnTokens = [];
         $tokens       = $components['tokens'];

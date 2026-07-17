@@ -8,18 +8,24 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private ReportModel $reportModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(ReportModel $reportModel): void
+    {
+        $this->reportModel = $reportModel;
+    }
+
     /**
      * Get updated data for context.
      */
     public function getSourceDataAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
-        $model = $this->getModel('report');
-        \assert($model instanceof ReportModel);
         $context = $request->get('context');
 
-        $graphs  = $model->getGraphList($context);
-        $columns = $model->getColumnList($context);
-        $filters = $model->getFilterList($context);
+        $graphs  = $this->reportModel->getGraphList($context);
+        $columns = $this->reportModel->getColumnList($context);
+        $filters = $this->reportModel->getFilterList($context);
 
         return $this->sendJsonResponse(
             [

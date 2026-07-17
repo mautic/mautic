@@ -11,6 +11,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultController extends CommonController
 {
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(\Mautic\PageBundle\Model\PageModel $pageModel): void
+    {
+        $this->pageModel = $pageModel;
+    }
+
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $root = $this->coreParametersHelper->get('webroot');
@@ -18,15 +26,13 @@ class DefaultController extends CommonController
         if (empty($root)) {
             return $this->redirectToRoute('mautic_dashboard_index');
         }
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $page      = $pageModel->getEntity($root);
+        $page      = $this->pageModel->getEntity($root);
 
         if (empty($page)) {
             return $this->notFound();
         }
 
-        $slug = $pageModel->generateSlug($page);
+        $slug = $this->pageModel->generateSlug($page);
 
         $request->attributes->set('ignore_mismatch', true);
 

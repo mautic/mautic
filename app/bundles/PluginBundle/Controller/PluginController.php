@@ -21,17 +21,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PluginController extends FormController
 {
+    private PluginModel $pluginModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(PluginModel $pluginModel): void
+    {
+        $this->pluginModel = $pluginModel;
+    }
+
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
         // List of plugins for filter and to show as a single integration
-        $plugins = $pluginModel->getEntities(
+        $plugins = $this->pluginModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -154,11 +159,8 @@ class PluginController extends FormController
         }
         $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
         $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
-
-        /** @var PluginModel $pluginModel */
-        $pluginModel   = $this->getModel('plugin');
-        $leadFields    = $pluginModel->getLeadFields();
-        $companyFields = $pluginModel->getCompanyFields();
+        $leadFields    = $this->pluginModel->getLeadFields();
+        $companyFields = $this->pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
         $entity                 = $integrationObject->getIntegrationSettings();
         $existingPublishedState = $entity->getIsPublished();
@@ -364,10 +366,7 @@ class PluginController extends FormController
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
-        $bundle = $pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginModel->getRepository()->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]

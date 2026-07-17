@@ -33,6 +33,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    private SubmissionModel $submissionModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(SubmissionModel $submissionModel): void
+    {
+        $this->submissionModel = $submissionModel;
+    }
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
@@ -222,11 +229,8 @@ class FormController extends CommonFormController
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-
-        $formSubmissionModel = $this->getModel('form.submission');
-        \assert($formSubmissionModel instanceof SubmissionModel);
         // Submission stats per time period
-        $timeStats = $formSubmissionModel->getSubmissionsLineChartData(
+        $timeStats = $this->submissionModel->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -255,7 +259,7 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $formSubmissionModel->getRepository()->getSubmissionCounts($activeForm);
+        $submissionCounts = $this->submissionModel->getRepository()->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
             [

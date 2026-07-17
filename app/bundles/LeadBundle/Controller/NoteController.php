@@ -13,6 +13,13 @@ use Symfony\Component\HttpFoundation\Response;
 class NoteController extends FormController
 {
     use LeadAccessTrait;
+    private NoteModel $noteModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(NoteModel $noteModel): void
+    {
+        $this->noteModel = $noteModel;
+    }
 
     /**
      * Generate's default list view.
@@ -168,9 +175,6 @@ class NoteController extends FormController
         // retrieve the entity
         $note = new LeadNote();
         $note->setLead($lead);
-
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -179,7 +183,7 @@ class NoteController extends FormController
             ]
         );
         // get the user form factory
-        $form       = $model->createForm($note, $this->formFactory, $action);
+        $form       = $this->noteModel->createForm($note, $this->formFactory, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -189,7 +193,7 @@ class NoteController extends FormController
                     $closeModal = true;
 
                     // form is valid so process the data
-                    $model->saveEntity($note);
+                    $this->noteModel->saveEntity($note);
                 }
             } else {
                 $closeModal = true;
@@ -250,10 +254,7 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
-        $note       = $model->getEntity($objectId);
+        $note       = $this->noteModel->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
 
@@ -269,14 +270,14 @@ class NoteController extends FormController
                 'leadId'       => $leadId,
             ]
         );
-        $form = $model->createForm($note, $this->formFactory, $action);
+        $form = $this->noteModel->createForm($note, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($note);
+                    $this->noteModel->saveEntity($note);
                     $closeModal = true;
                 }
             } else {
@@ -332,9 +333,7 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-        $model = $this->getModel('lead.note');
-        \assert($model instanceof NoteModel);
-        $note = $model->getEntity($objectId);
+        $note = $this->noteModel->getEntity($objectId);
 
         if (null === $note) {
             return $this->notFound();
@@ -342,12 +341,12 @@ class NoteController extends FormController
 
         if (
             !$this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy())
-            || $model->isLocked($note)
+            || $this->noteModel->isLocked($note)
         ) {
             $this->throwAccessDenied();
         }
 
-        $model->deleteEntity($note);
+        $this->noteModel->deleteEntity($note);
 
         return new JsonResponse(
             [

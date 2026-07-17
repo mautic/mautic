@@ -26,6 +26,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
+    private TrackableModel $trackableModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(TrackableModel $trackableModel): void
+    {
+        $this->trackableModel = $trackableModel;
+    }
     private FocusModel $focusModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
@@ -179,9 +186,7 @@ class FocusController extends AbstractStandardFormController
                 );
 
                 if ('link' === $item->getType()) {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                    $trackables = $this->trackableModel->getTrackableList('focus', $item->getId());
 
                     $cacheItem->set([$stats, $trackables]);
                     $cacheItem->expiresAfter($cacheTimeout * 60);
