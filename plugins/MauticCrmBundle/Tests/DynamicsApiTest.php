@@ -35,7 +35,7 @@ final class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->fieldsWithUniqueIdentifier
         );
 
-        new DynamicsApi($this->integration);
+        // new DynamicsApi($this->integration);
     }
 
     public function testIntegration(): void

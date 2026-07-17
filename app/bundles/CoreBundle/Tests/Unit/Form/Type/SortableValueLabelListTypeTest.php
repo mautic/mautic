@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -101,7 +102,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         $this->assertEquals([], $view->vars['postaddon']);
     }
 
-    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, FormBuilderInterface $builder): callable
+    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, FormBuilderInterface&MockObject $builder): callable
     {
         $eventListener = null;
         $builder->expects($this->exactly(2))

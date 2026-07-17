@@ -692,7 +692,7 @@ final class MailHelperTest extends TestCase
         if (!$isValid) {
             $this->expectException(InvalidEmailException::class);
         }
-        $this->assertNull($helper::validateEmail($email));
+        $helper::validateEmail($email);
     }
 
     public function testValidateValidEmails(): void
@@ -708,7 +708,7 @@ final class MailHelperTest extends TestCase
 
         foreach ($addresses as $address) {
             // will throw InvalidEmailException if it will find the address invalid
-            $this->assertNull($helper::validateEmail($address));
+            $helper::validateEmail($address);
         }
     }
 

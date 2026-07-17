@@ -11,6 +11,9 @@ use Symfony\Component\Mime\RawMessage;
 class SmtpTransport implements TransportInterface
 {
     /**
+     * Mirrors Symfony\Component\Mailer\Transport\Transports::$transports, which MailHelper::getTransport()
+     * reads by reflection. Never read directly, so it looks unused - removing it breaks MailHelperTest.
+     *
      * @var array<string, mixed>
      */
     private array $transports = [];

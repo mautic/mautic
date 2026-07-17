@@ -29,6 +29,8 @@ parameters:
 		- */Fixture/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
+		# not yet used in an entity, see the comment inside the trait
+		- app/bundles/CoreBundle/Entity/UpsertTrait.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX
@@ -132,6 +134,12 @@ parameters:
 			identifier: method.deprecated
 			message: '#Call to deprecated method getConfig\(\) of interface GuzzleHttp\\ClientInterface#'
 			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/*
+
+		# $transports mirrors Symfony Transports::$transports and is read by reflection in MailHelper::getTransport()
+		-
+			identifier: property.onlyWritten
+			message: '#Property .+Tests\\Helper\\Transport\\.+::\$transports is never read, only written#'
+			path: app/bundles/EmailBundle/Tests/Helper/Transport/*
 
 		# false positive, reflection reference method call
 		-

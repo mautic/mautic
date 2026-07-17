@@ -18,9 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EventExecutionerLockTest extends MauticMysqlTestCase
 {
-    use LoggerTrait {
-        setUp as loggerTraitSetup;
-    }
+    use LoggerTrait;
 
     private const ADD_POINTS = 10;
 

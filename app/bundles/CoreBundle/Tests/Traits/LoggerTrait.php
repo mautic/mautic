@@ -19,10 +19,8 @@ trait LoggerTrait
 
     private TestHandler $testHandler;
 
-    protected function setUp(): void
+    protected function loggerTraitSetup(): void
     {
-        parent::setUp();
-
         $this->logger           = self::getContainer()->get('monolog.logger.mautic');
         $this->originalHandlers = $this->logger->getHandlers();
         $this->logger->setHandlers([$this->testHandler = new TestHandler()]);
