@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -47,6 +48,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     /**
      * @var array<string, mixed>
@@ -896,22 +898,27 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = [];
+            $formIds = $listAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('list' == $type) {
-                        $listIds[] = (int) $fltr;
+                        $listAliases[]       = $fltr;
+                        $searchFilterTerms[] = 'list:'.$fltr;
                     } else {
-                        $formIds[] = (int) $fltr;
+                        $formIds[]           = (int) $fltr;
+                        $searchFilterTerms[] = 'form:'.$fltr;
                     }
                 }
             }
 
-            if (!empty($listIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.campaign.filter', $filter['string']);
+
+            if (!empty($listAliases)) {
                 $joinLists         = true;
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
             if (!empty($formIds)) {
