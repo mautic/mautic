@@ -59,7 +59,7 @@ final class Version20260501090000 extends AbstractMauticMigration
             return [];
         }
 
-        $decoded = @unserialize($permissions, ['allowed_classes' => false]);
+        $decoded = @\Mautic\CoreBundle\Helper\Serializer::decode($permissions);
 
         return is_array($decoded) ? $decoded : [];
     }

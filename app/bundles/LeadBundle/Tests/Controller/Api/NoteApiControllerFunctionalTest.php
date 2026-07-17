@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\HttpFoundation\Response;
 
-class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
+final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ApiTestUserTrait;
 
@@ -33,7 +33,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         ], 'Note API Role');
         $this->authenticateApiUser($apiUser);
 
-        $this->client->request('GET', '/api/notes/'.(string) $note->getId());
+        $this->client->request('GET', '/api/notes/'.$note->getId());
         $getResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful($getResponse->getContent());

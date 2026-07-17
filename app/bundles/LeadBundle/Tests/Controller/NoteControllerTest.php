@@ -54,9 +54,9 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
-        $this->assertStringContainsString('alert alert-warning', $this->client->getResponse()->getContent());
-        $this->assertStringNotContainsString('btn-leadnote-add', $this->client->getResponse()->getContent());
-        $this->assertStringNotContainsString('Test note', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('alert alert-warning', (string) $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('btn-leadnote-add', (string) $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Test note', (string) $this->client->getResponse()->getContent());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$contact->getId());
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
@@ -125,7 +125,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/%d', $contact->getId(), $noteId));
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
-        $this->assertNull($this->em->getRepository(LeadNote::class)->find($noteId));
+        $this->assertNotInstanceOf(LeadNote::class, $this->em->getRepository(LeadNote::class)->find($noteId));
     }
 
     public function testDeleteActionIsDeniedWithoutNotesDeletePermission(): void
@@ -250,7 +250,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
         $this->em->flush();
@@ -302,7 +302,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
         $this->em->flush();
