@@ -50,7 +50,7 @@ final class RestrictionHelperTest extends TypeTestCase
     private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
     /**
-     * @var array<string, mixed>
+     * @var array<array-key, mixed>
      */
     private array $restrictedFields = [
         'monitored_email' => [
