@@ -39,9 +39,7 @@ class AjaxController extends CommonAjaxController
     public function pageListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $pageModel = $this->getModel('page.page');
-        \assert($pageModel instanceof PageModel);
-        $results   = $pageModel->getLookupResults('page', $filter);
+        $results   = $this->pageModel->getLookupResults('page', $filter);
         $dataArray = [];
 
         foreach ($results as $r) {
