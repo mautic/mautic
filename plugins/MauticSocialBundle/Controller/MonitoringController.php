@@ -21,6 +21,14 @@ class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
+    private MonitoringModel $monitoringModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireMonitoringController(MonitoringModel $monitoringModel): void
+    {
+        $this->monitoringModel = $monitoringModel;
+    }
+
     /**
      * @param int $page
      */
@@ -236,10 +244,7 @@ class MonitoringController extends FormController
 
         $action = $this->generateUrl('mautic_social_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
-        /** @var MonitoringModel $model */
-        $model = $this->getModel('social.monitoring');
-
-        $entity  = $model->getEntity($objectId);
+        $entity  = $this->monitoringModel->getEntity($objectId);
         $session = $request->getSession();
 
         // Set the page we came from
@@ -277,7 +282,7 @@ class MonitoringController extends FormController
         }
 
         // get the list of types from the model
-        $networkTypes = $model->getNetworkTypes();
+        $networkTypes = $this->monitoringModel->getNetworkTypes();
 
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
@@ -286,7 +291,7 @@ class MonitoringController extends FormController
         $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : $entity->getNetworkType();
 
         // build the form
-        $form = $model->createForm(
+        $form = $this->monitoringModel->createForm(
             $entity,
             $this->formFactory,
             $action,
@@ -307,7 +312,7 @@ class MonitoringController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity, $saveSubmitButton->isClicked());
+                    $this->monitoringModel->saveEntity($entity, $saveSubmitButton->isClicked());
 
                     // update the audit log
                     $this->updateAuditLog($entity, $ipLookupHelper, 'update');
@@ -329,7 +334,7 @@ class MonitoringController extends FormController
                     );
                 }
             } else {
-                $model->unlockEntity($entity);
+                $this->monitoringModel->unlockEntity($entity);
             }
 
             if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
@@ -351,7 +356,7 @@ class MonitoringController extends FormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($entity);
+            $this->monitoringModel->lockEntity($entity);
         }
 
         return $this->delegateView(
@@ -390,14 +395,11 @@ class MonitoringController extends FormController
 
         $session = $request->getSession();
 
-        /** @var MonitoringModel $model */
-        $model = $this->getModel('social.monitoring');
-
         /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepo */
         $postCountRepo = $this->getModel('social.postcount')->getRepository();
 
         $security         = $this->security;
-        $monitoringEntity = $model->getEntity($objectId);
+        $monitoringEntity = $this->monitoringModel->getEntity($objectId);
 
         // set the asset we came from
         $page = $session->get('mautic.social.monitoring.page', 1);
@@ -513,9 +515,7 @@ class MonitoringController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var MonitoringModel $model */
-            $model  = $this->getModel('social.monitoring');
-            $entity = $model->getEntity($objectId);
+            $entity = $this->monitoringModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -523,7 +523,7 @@ class MonitoringController extends FormController
                     'msg'     => 'mautic.social.monitoring.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->monitoringModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'plugin.mauticSocial.monitoring');
             }
 
@@ -531,7 +531,7 @@ class MonitoringController extends FormController
             $this->updateAuditLog($entity, $ipLookupHelper, 'delete');
 
             // then delete the record
-            $model->deleteEntity($entity);
+            $this->monitoringModel->deleteEntity($entity);
 
             $flashes[] = [
                 'type'    => 'notice',
@@ -578,15 +578,12 @@ class MonitoringController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var MonitoringModel $model */
-            $model = $this->getModel('social.monitoring');
-
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->monitoringModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -594,7 +591,7 @@ class MonitoringController extends FormController
                         'msg'     => 'mautic.social.monitoring.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->monitoringModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'monitoring', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -603,7 +600,7 @@ class MonitoringController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->monitoringModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',

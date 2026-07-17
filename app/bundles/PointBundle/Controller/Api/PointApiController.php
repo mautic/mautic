@@ -30,23 +30,17 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    protected LeadModel $leadModel;
-
     /**
      * @var PointModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, protected LeadModel $leadModel)
     {
-        $leadModel = $modelFactory->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-
         $pointModel = $modelFactory->getModel('point');
         \assert($pointModel instanceof PointModel);
 
         $this->model            = $pointModel;
-        $this->leadModel        = $leadModel;
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
