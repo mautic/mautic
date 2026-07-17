@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
@@ -18,6 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 class NotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
+
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireNotificationController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+    }
 
     /**
      * @param int $page
@@ -185,11 +192,7 @@ class NotificationController extends AbstractFormController
         ) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLog = $this->getModel('core.auditlog');
-        \assert($auditLog instanceof AuditLogModel);
-        $logs = $auditLog->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        $logs = $this->auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];

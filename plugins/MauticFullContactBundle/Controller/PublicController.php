@@ -18,11 +18,17 @@ class PublicController extends FormController
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\LeadBundle\Model\CompanyModel $companyModel): void
-    {
+    public function autowirePublicController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+    ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->notificationModel = $notificationModel;
     }
 
     /**
@@ -35,9 +41,7 @@ class PublicController extends FormController
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+        $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }
 
     /**

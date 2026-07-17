@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
@@ -21,11 +20,14 @@ class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
     private MonitoringModel $monitoringModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireMonitoringController(MonitoringModel $monitoringModel): void
+    public function autowireMonitoringController(MonitoringModel $monitoringModel, \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
     {
+        $this->auditLogModel = $auditLogModel;
         $this->monitoringModel = $monitoringModel;
     }
 
@@ -429,11 +431,7 @@ class MonitoringController extends FormController
                 ]
             );
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs = $auditLogModel->getLogForObject('monitoring', $objectId);
+        $logs = $this->auditLogModel->getLogForObject('monitoring', $objectId);
 
         $returnUrl = $this->generateUrl(
             'mautic_social_action',
@@ -656,9 +654,6 @@ class MonitoringController extends FormController
             'details'   => ['name' => $monitoring->getTitle()],
             'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
         ];
-
-        $auditLog = $this->getModel('core.auditlog');
-        \assert($auditLog instanceof AuditLogModel);
-        $auditLog->writeToLog($log);
+        $this->auditLogModel->writeToLog($log);
     }
 }

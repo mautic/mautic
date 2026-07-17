@@ -29,12 +29,22 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
     protected ?\Mautic\UserBundle\Entity\User $user;
+
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    #[Required]
+    public function autowireCommonController(
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+    ): void {
+        $this->notificationModel = $notificationModel;
+    }
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -655,10 +665,7 @@ class CommonController extends AbstractController implements MauticController
 
         $afterId = $request->get('mauticLastNotificationId');
 
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 

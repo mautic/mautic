@@ -4,7 +4,6 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -20,6 +19,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
+    private \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireCampaignAjaxController(\Mautic\CampaignBundle\Model\EventLogModel $eventLogModel): void
+    {
+        $this->eventLogModel = $eventLogModel;
+    }
+
     public function __construct(
         private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
@@ -66,10 +73,7 @@ class AjaxController extends CommonAjaxController
 
                 if ($newDate >= new \DateTime()) {
                     $log->setTriggerDate($newDate, 'Manual date change via AJAX');
-
-                    /** @var EventLogModel $logModel */
-                    $logModel = $this->getModel('campaign.event_log');
-                    $logModel->saveEntity($log);
+                    $this->eventLogModel->saveEntity($log);
 
                     $dataArray = [
                         'success' => 1,
@@ -94,16 +98,13 @@ class AjaxController extends CommonAjaxController
         if (!empty($eventId) && !empty($contactId)) {
             if ($log = $this->getContactEventLog($eventId, $contactId)) {
                 $log->setIsScheduled(false);
-
-                /** @var EventLogModel $logModel */
-                $logModel           = $this->getModel('campaign.event_log');
                 $metadata           = $log->getMetadata();
                 $metadata['errors'] = $this->translator->trans(
                     'mautic.campaign.event.cancelled.time',
                     ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
                 );
                 $log->setMetadata($metadata);
-                $logModel->getRepository()->saveEntity($log);
+                $this->eventLogModel->getRepository()->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }
@@ -120,11 +121,8 @@ class AjaxController extends CommonAjaxController
         $contact = $this->getModel('lead')->getEntity($contactId);
         if ($contact) {
             if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-                /** @var EventLogModel $logModel */
-                $logModel = $this->getModel('campaign.event_log');
-
                 /** @var LeadEventLog $log */
-                $log = $logModel->getRepository()
+                $log = $this->eventLogModel->getRepository()
                                 ->findOneBy(
                                     [
                                         'lead'  => $contactId,
