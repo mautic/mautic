@@ -29,7 +29,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('bug-nonvisitor@example.test');
 
         // Simulate contact1 visiting the page 5 minutes ago and leaving now
-        $firstHit = $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
+        $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
         $this->em->flush();
 
         // Now contact1 visits the page a SECOND time
@@ -37,7 +37,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Contact2 has never visited this page
-        $otherHit = $this->createHit($page, $contact2, $testUrl, time());
+        $this->createHit($page, $contact2, $testUrl, time());
         $this->em->flush();
 
         // The dwell time for contact1 on this URL should be ~300s (> 60s threshold)
@@ -80,7 +80,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
             ['lead' => $contact1->getId()]
         );
 
-        $onlyHit = $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
+        $this->createHit($page, $contact1, $testUrl, strtotime('-5 minutes'), time());
         $this->em->flush();
 
         $dwellStats2 = $hitRepo->getDwellTimesForUrl($testUrl, ['leadId' => $contact1->getId()]);
@@ -91,6 +91,7 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
         // The point action is never evaluated — the dwell time threshold was crossed silently.
         $this->em->clear();
         $contact1After = $this->em->getRepository(Lead::class)->find($contact1->getId());
+        $this->assertInstanceOf(Lead::class, $contact1After);
         $this->assertSame(0, $contact1After->getPoints(), 'BUG CONFIRMED: points NOT awarded without revisit — dwell time threshold was crossed but no page hit triggered the evaluation');
     }
 
