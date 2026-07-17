@@ -509,7 +509,7 @@ class LeadRepository extends CommonRepository
             ->executeStatement();
     }
 
-    private function getCampaignSegments($campaignId): array
+    private function getCampaignSegments(?int $campaignId): array
     {
         // Get published segments for this campaign
         $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -593,7 +593,7 @@ class LeadRepository extends CommonRepository
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
      */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb): void
+    private function updateQueryWithHistoryExclusion(?int $campaignId, QueryBuilder $qb): void
     {
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
