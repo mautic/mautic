@@ -11,6 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BatchTagController extends AbstractFormController
 {
+    private TagModel $tagModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireBatchTagController(TagModel $tagModel): void
+    {
+        $this->tagModel = $tagModel;
+    }
+
     private const OBJECT_TYPE_COMPANY = 'company';
 
     private const OBJECT_TYPE_LEAD    = 'lead';
@@ -51,12 +59,11 @@ class BatchTagController extends AbstractFormController
         ]);
     }
 
-    public function execAction(Request $request, TagModel $tagModel): JsonResponse
+    public function execAction(Request $request): JsonResponse
     {
         $params     = (array) $request->get('batch_tag');
         $objectType = $this->getObjectType($request);
         $ids        = empty($params['ids']) ? [] : (array) json_decode($params['ids']);
-
         if (empty($ids)) {
             return $this->getBatchModalResponse('mautic.core.error.ids.missing');
         }
@@ -68,7 +75,7 @@ class BatchTagController extends AbstractFormController
             return $this->getBatchModalResponse('mautic.core.error.nothing.to.save');
         }
 
-        $this->applyBatchTags($objectType, $ids, $tagsToAdd, $tagsToRemove, $tagModel);
+        $this->applyBatchTags($objectType, $ids, $tagsToAdd, $tagsToRemove);
 
         return $this->getBatchModalResponse();
     }
@@ -78,15 +85,15 @@ class BatchTagController extends AbstractFormController
      * @param int[] $tagsToAdd
      * @param int[] $tagsToRemove
      */
-    private function applyBatchTags(string $objectType, array $ids, array $tagsToAdd, array $tagsToRemove, TagModel $tagModel): void
+    private function applyBatchTags(string $objectType, array $ids, array $tagsToAdd, array $tagsToRemove): void
     {
         if (self::OBJECT_TYPE_COMPANY === $objectType) {
             if (!empty($tagsToAdd)) {
-                $tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
+                $this->tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
             }
 
             if (!empty($tagsToRemove)) {
-                $tagModel->getRepository()->removeTagsFromCompanies($ids, $tagsToRemove);
+                $this->tagModel->getRepository()->removeTagsFromCompanies($ids, $tagsToRemove);
             }
 
             $this->addFlashMessage('mautic.company.batch_companies_affected', [
@@ -97,11 +104,11 @@ class BatchTagController extends AbstractFormController
         }
 
         if (!empty($tagsToAdd)) {
-            $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+            $this->tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
         }
 
         if (!empty($tagsToRemove)) {
-            $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+            $this->tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
         }
 
         $this->addFlashMessage('mautic.lead.batch_leads_affected', [

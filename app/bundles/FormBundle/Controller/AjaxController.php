@@ -21,6 +21,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
+    private \Mautic\FormBundle\Model\FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireAjaxController(\Mautic\FormBundle\Model\FormModel $formModel): void
+    {
+        $this->formModel = $formModel;
+    }
+
     public function __construct(
         private readonly FieldCollectorInterface $fieldCollector,
         private readonly AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
@@ -91,9 +99,8 @@ class AjaxController extends CommonAjaxController
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
-        $model      = $this->getModel('form');
-        $entity     = $model->getEntity($formId);
-        $formFields = empty($entity) ? [] : $entity->getFields();
+        $entity     = $this->formModel->getEntity($formId);
+        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {
