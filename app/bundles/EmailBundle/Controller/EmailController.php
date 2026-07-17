@@ -663,8 +663,6 @@ final class EmailController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
         Request $request,
@@ -676,7 +674,7 @@ final class EmailController extends FormController
         $objectId,
         $ignorePost = false,
         $forceTypeSelection = false,
-    ) {
+    ): Response {
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $request->getSession();
@@ -1332,10 +1330,8 @@ final class EmailController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return array|Response
      */
-    public function winnerAction(Request $request, $objectId)
+    public function winnerAction(Request $request, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.email', 1);

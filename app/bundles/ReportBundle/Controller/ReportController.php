@@ -155,12 +155,7 @@ final class ReportController extends FormController
         return $this->newAction($request, $entity);
     }
 
-    /**
-     * Deletes the entity.
-     *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
-     */
-    public function deleteAction(Request $request, int $objectId)
+    public function deleteAction(Request $request, int $objectId): bool|Response
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);

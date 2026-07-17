@@ -678,10 +678,8 @@ final class LeadController extends FormController
      * Generates edit form.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 

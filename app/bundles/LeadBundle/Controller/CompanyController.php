@@ -979,10 +979,8 @@ final class CompanyController extends FormController
 
     /**
      * Company Merge function.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, $objectId)
+    public function mergeAction(Request $request, $objectId): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(

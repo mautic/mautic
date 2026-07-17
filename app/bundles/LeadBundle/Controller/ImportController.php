@@ -711,9 +711,15 @@ final class ImportController extends FormController
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
-    protected function getPermissionBase(): ?string
+    protected function getPermissionBase(): string
     {
+<<<<<<< HEAD
         return $this->importModel->getPermissionBase();
+=======
+        $model = $this->getModel($this->getModelName());
+
+        return $model->getPermissionBase();
+>>>>>>> 9deb74a878 (remove return array on controller where never used)
     }
 
     protected function getRouteBase(): string

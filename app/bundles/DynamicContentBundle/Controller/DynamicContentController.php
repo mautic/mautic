@@ -235,10 +235,8 @@ final class DynamicContentController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
         $page   = $request->getSession()->get('mautic.dynamicContent.page', 1);
