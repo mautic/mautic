@@ -137,9 +137,15 @@ class LeadStageLogRepository extends CommonRepository
         // Lead and stage are a composite key, so delete source rows that would duplicate an existing target row.
         $connection->executeStatement(
             sprintf(
-                'DELETE source_log FROM %s source_log INNER JOIN %s target_log ON target_log.lead_id = source_log.lead_id AND target_log.stage_id = :toStageId WHERE source_log.stage_id = :fromStageId AND source_log.lead_id IN (:leadIds)',
-                $table,
-                $table
+                'DELETE FROM %s 
+                 WHERE stage_id = :fromStageId 
+                    AND lead_id IN (:leadIds)
+                    AND EXISTS (
+                     SELECT 1 FROM %s target_log 
+                     WHERE target_log.lead_id = %s.lead_id 
+                     AND target_log.stage_id = :toStageId
+                )',
+                $table, $table, $table   // self-reference for the outer table
             ),
             [
                 'fromStageId' => $fromStageId,
