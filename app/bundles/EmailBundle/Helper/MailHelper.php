@@ -545,7 +545,18 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
-                $this->setMessageFrom($metadatum['from']);
+                $email = $this->getEmail();
+
+                if (!empty($metadatum['from'])) {
+                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
+                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
+                } else {
+                    $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
+                }
+                $this->setReplyToForQueueMessage(
+                    $email,
+                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
                     $this->message->addMetadata($email, $contact);
@@ -2006,6 +2017,33 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
+        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+            $this->setMessageReplyTo($emailToSend->getFromAddress());
+
+            return;
+        }
+
+        // 4. Set the reply to address from the global config if nothing from above is set.
+        $this->setMessageReplyTo($this->getReplyTo());
+    }
+
+    private function setReplyToForQueueMessage(?Email $emailToSend, ?string $ownerEmailFromBatch = null): void
+    {
+        // 1. Set the reply to address from the email "reply-to" setting if set.
+        if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
+            $this->setMessageReplyTo($emailToSend->getReplyToAddress());
+
+            return;
+        }
+
+        // 2. Set the reply to address from the owner address used for this queued batch if set.
+        if (!empty($ownerEmailFromBatch)) {
+            $this->setMessageReplyTo($ownerEmailFromBatch);
+
+            return;
+        }
+
+        // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
         if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
