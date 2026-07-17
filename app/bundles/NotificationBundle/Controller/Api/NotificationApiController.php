@@ -38,8 +38,8 @@ class NotificationApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        NotificationModel $notificationModel,
     ) {
-        $notificationModel    = $modelFactory->getModel('notification');
         \assert($notificationModel instanceof NotificationModel);
 
         $this->model           = $notificationModel;
