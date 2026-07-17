@@ -42,23 +42,24 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    private EmailModel $emailModel;
+
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(LeadModel $leadModel): void
+    public function autowirePublicController(LeadModel $leadModel, EmailModel $emailModel): void
     {
         $this->leadModel = $leadModel;
+        $this->emailModel = $emailModel;
     }
 
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-        $stat  = $model->getEmailStatus($idHash);
+        $stat  = $this->emailModel->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             if ($this->security->isAnonymous()) {
-                $model->hitEmail($stat, $request, true);
+                $this->emailModel->hitEmail($stat, $request, true);
             }
 
             $tokens = $stat->getTokens();
@@ -108,10 +109,8 @@ class PublicController extends CommonFormController
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
         } catch (\Exception $exception) {
             $logger->error($exception->getMessage(), ['idHash' => $idHash]);
-            $emailModel = $this->getModel('email');
-            assert($emailModel instanceof EmailModel);
 
-            $emailModel->hitEmail($idHash, $request);
+            $this->emailModel->hitEmail($idHash, $request);
         }
 
         return TrackingPixelHelper::getResponse($request);
@@ -603,9 +602,6 @@ class PublicController extends CommonFormController
             $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-
         // email is a semicolon delimited list of emails
         $emails    = explode(';', $query['email']);
         $repo = $this->leadModel->getRepository();
@@ -622,7 +618,7 @@ class PublicController extends CommonFormController
             $idHash = hash('crc32', $email.$query['body']);
             $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
 
-            $stat = $model->getEmailStatus($idHash);
+            $stat = $this->emailModel->getEmailStatus($idHash);
 
             // stat doesn't exist, create one
             if (null === $stat) {
@@ -633,7 +629,7 @@ class PublicController extends CommonFormController
             $stat->setSource('email.client');
 
             if ($stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
-                $model->hitEmail($idHash, $request); // add email event
+                $this->emailModel->hitEmail($idHash, $request); // add email event
             }
         }
     }

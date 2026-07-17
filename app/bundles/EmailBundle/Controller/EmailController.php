@@ -38,6 +38,8 @@ class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+    private EmailModel $emailModel;
+
     private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
@@ -46,9 +48,11 @@ class EmailController extends FormController
     public function autowireEmailController(
         \Mautic\LeadBundle\Model\ListModel $listModel,
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        EmailModel $emailModel,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
+        $this->emailModel = $emailModel;
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -1196,9 +1200,7 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('email');
-            \assert($model instanceof EmailModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->emailModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -1213,11 +1215,11 @@ class EmailController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->emailModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
-            $model->deleteEntity($entity);
+            $this->emailModel->deleteEntity($entity);
 
             $flashes[] = [
                 'type'    => 'notice',
@@ -1247,20 +1249,17 @@ class EmailController extends FormController
      */
     public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId): Response
     {
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-
         // permission check
         if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
                 $this->throwAccessDenied();
             }
-            $entity = $model->getEntity();
+            $entity = $this->emailModel->getEntity();
             $entity->setSessionId($objectId);
         } else {
             $isNew  = false;
-            $entity = $model->getEntity($objectId);
+            $entity = $this->emailModel->getEntity($objectId);
             if (null == $entity
                 || !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -1354,9 +1353,7 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('email');
-            \assert($model instanceof EmailModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->emailModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -1371,7 +1368,7 @@ class EmailController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->emailModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
@@ -1379,7 +1376,7 @@ class EmailController extends FormController
             $parent = $entity->getVariantParent() ?? $entity;
             \assert($parent instanceof Email);
 
-            $model->convertWinnerVariant($entity);
+            $this->emailModel->convertWinnerVariant($entity);
 
             $this->dispatcher->dispatch(new ManualWinnerEvent($parent));
 
@@ -1415,9 +1412,7 @@ class EmailController extends FormController
      */
     public function sendAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
-        /** @var EmailModel $model */
-        $model   = $this->getModel('email');
-        $entity  = $model->getEntity($objectId);
+        $entity  = $this->emailModel->getEntity($objectId);
         $session = $request->getSession();
         $page    = $session->get('mautic.email.page', 1);
 
@@ -1500,7 +1495,7 @@ class EmailController extends FormController
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);
-        $pending  = $model->getPendingLeads($entity, null, true);
+        $pending  = $this->emailModel->getPendingLeads($entity, null, true);
         $form     = $this->formFactory->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $request->request->get('complete', false);
 
@@ -1572,15 +1567,13 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('email');
-            \assert($model instanceof EmailModel);
             $ids = json_decode($request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->emailModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -1595,7 +1588,7 @@ class EmailController extends FormController
                 )
                 ) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->emailModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'email', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -1604,7 +1597,7 @@ class EmailController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->emailModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
