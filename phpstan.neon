@@ -149,6 +149,9 @@ parameters:
 			identifier: staticMethod.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
+			identifier: method.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
 			identifier: method.deprecated
 			message: '#class\s+Mautic#'
 		-
