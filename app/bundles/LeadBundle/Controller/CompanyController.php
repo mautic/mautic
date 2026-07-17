@@ -1134,7 +1134,7 @@ class CompanyController extends FormController
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.company-merge-options' : null,
-                    ],
+                ],
             ]
         );
     }
