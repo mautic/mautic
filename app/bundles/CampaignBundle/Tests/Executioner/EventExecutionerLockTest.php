@@ -28,6 +28,8 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->loggerTraitSetup();
 
         $this->eventExecutioner = self::getContainer()->get('mautic.campaign.event_executioner');
