@@ -23,26 +23,26 @@ final class TrackingConfigTest extends MauticMysqlTestCase
             return $snippet->text();
         };
 
-        $legacy = $getSnippet('Legacy tracking script');
-        Assert::assertStringContainsString('/mtc.js', $legacy);
-        Assert::assertStringContainsString("w['MauticTrackingObject']=n", $legacy);
-        Assert::assertStringContainsString("mt('send', 'pageview');", $legacy);
-        Assert::assertStringNotContainsString('/mautic-essential.js', $legacy);
-        Assert::assertStringNotContainsString('/mautic-tracking.js', $legacy);
-
-        $essential = $getSnippet('Essential script');
+        $essential = $getSnippet('Essential script (before consent)');
         Assert::assertStringContainsString('/mautic-essential.js', $essential);
+        Assert::assertStringContainsString("dispatchEvent('mauticEssentialReady')", $essential);
         Assert::assertStringNotContainsString('/mautic-tracking.js', $essential);
         Assert::assertStringNotContainsString('/mtc.js', $essential);
+        Assert::assertStringNotContainsString('MauticTrackingObject', $essential);
+        Assert::assertStringNotContainsString('pageview', $essential);
 
-        $tracking = $getSnippet('Tracking add-on');
+        $tracking = $getSnippet('Tracking add-on (after consent)');
         Assert::assertStringContainsString('/mautic-tracking.js', $tracking);
+        Assert::assertStringContainsString("d.addEventListener('mauticEssentialReady',enableTracking)", $tracking);
+        Assert::assertStringContainsString('w.MauticJS.runtimeReady !== true', $tracking);
         Assert::assertStringContainsString("w['MauticTrackingObject']=n", $tracking);
-        Assert::assertStringContainsString("mt('send', 'pageview');", $tracking);
+        Assert::assertStringContainsString("w[n]('send','pageview')", $tracking);
+        Assert::assertStringContainsString("a.id='mautic-tracking-script'", $tracking);
+        Assert::assertStringContainsString("d.getElementById('mautic-tracking-script')", $tracking);
         Assert::assertStringNotContainsString('/mautic-essential.js', $tracking);
         Assert::assertStringNotContainsString('/mtc.js', $tracking);
 
-        $full = $getSnippet('Essential and tracking scripts');
+        $full = $getSnippet('Full tracking');
         Assert::assertSame(1, substr_count($full, '/mautic-essential.js'));
         Assert::assertSame(1, substr_count($full, '/mautic-tracking.js'));
         Assert::assertStringNotContainsString('/mtc.js', $full);
@@ -55,5 +55,12 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         Assert::assertNotFalse($essentialPosition);
         Assert::assertNotFalse($trackingPosition);
         Assert::assertLessThan($trackingPosition, $essentialPosition);
+
+        $legacy = $getSnippet('Legacy');
+        Assert::assertStringContainsString('/mtc.js', $legacy);
+        Assert::assertStringContainsString("w['MauticTrackingObject']=n", $legacy);
+        Assert::assertStringContainsString("mt('send', 'pageview');", $legacy);
+        Assert::assertStringNotContainsString('/mautic-essential.js', $legacy);
+        Assert::assertStringNotContainsString('/mautic-tracking.js', $legacy);
     }
 }
