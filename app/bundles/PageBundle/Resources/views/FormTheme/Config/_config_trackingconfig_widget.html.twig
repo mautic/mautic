@@ -6,16 +6,63 @@
         <div class="panel-body">
             <div class="form-group">
                 <p>{{ 'mautic.config.tab.pagetracking.info'|trans|purify }}</p>
-                {% include '@MauticCore/Components/code-snippet.html.twig' with {
-                    variant: 'multi',
-                    innerText: '&lt;script&gt;
+                <div class="mb-lg">
+                    <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.legacy.label'|trans }}</h5>
+                    <p class="text-muted small">{{ 'mautic.page.config.tracking.script.legacy.description'|trans }}</p>
+                    {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                        variant: 'multi',
+                        ariaLabel: 'mautic.page.config.tracking.script.legacy.label'|trans,
+                        innerText: '&lt;script&gt;
         (function(w,d,t,u,n,a,m){w[\'MauticTrackingObject\']=n;
             w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
             m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
         })(window,document,\'script\',\'' ~ url('mautic_js') ~ '\',\'mt\');
         mt(\'send\', \'pageview\');
     &lt;/script&gt;',
-                } %}
+                    } %}
+                </div>
+                <div class="mb-lg">
+                    <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.essential.label'|trans }}</h5>
+                    <p class="text-muted small">{{ 'mautic.page.config.tracking.script.essential.description'|trans }}</p>
+                    {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                        variant: 'multi',
+                        ariaLabel: 'mautic.page.config.tracking.script.essential.label'|trans,
+                        innerText: '&lt;script src="' ~ url('mautic_essential_js') ~ '" async&gt;&lt;/script&gt;',
+                    } %}
+                </div>
+                <div class="mb-lg">
+                    <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.tracking.label'|trans }}</h5>
+                    <p class="text-muted small">{{ 'mautic.page.config.tracking.script.tracking.description'|trans }}</p>
+                    {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                        variant: 'multi',
+                        ariaLabel: 'mautic.page.config.tracking.script.tracking.label'|trans,
+                        innerText: '&lt;script&gt;
+        (function(w,d,t,u,n,a,m){w[\'MauticTrackingObject\']=n;
+            w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+            m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
+        })(window,document,\'script\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
+        mt(\'send\', \'pageview\');
+    &lt;/script&gt;',
+                    } %}
+                </div>
+                <div>
+                    <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.full.label'|trans }}</h5>
+                    <p class="text-muted small">{{ 'mautic.page.config.tracking.script.full.description'|trans }}</p>
+                    {% include '@MauticCore/Components/code-snippet.html.twig' with {
+                        variant: 'multi',
+                        ariaLabel: 'mautic.page.config.tracking.script.full.label'|trans,
+                        innerText: '&lt;script&gt;
+        (function(w,d,t,e,r,n,a,m,s){w[\'MauticTrackingObject\']=n;
+            w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+            m=d.getElementsByTagName(t)[0];a.async=1;a.src=e;
+            a.onload=function(){s=d.createElement(t);s.async=1;s.src=r;
+                m.parentNode.insertBefore(s,m)
+            };m.parentNode.insertBefore(a,m)
+        })(window,document,\'script\',\'' ~ url('mautic_essential_js') ~ '\',\'' ~ url('mautic_tracking_js') ~ '\',\'mt\');
+        mt(\'send\', \'pageview\');
+    &lt;/script&gt;',
+                    } %}
+                </div>
             </div>
             <div class="row">
                 <hr>
