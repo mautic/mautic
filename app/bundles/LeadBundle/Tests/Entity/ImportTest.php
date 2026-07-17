@@ -84,13 +84,13 @@ final class ImportTest extends StandardImportTestHelper
         $import->setUpdatedCount($count);
         $import->setInsertedCount($count);
 
-        $expectedCount = (3 * $count);
+        $expectedCount = 3 * $count;
         $this->assertSame($expectedCount, $import->getProcessedRows());
 
         $import->increaseIgnoredCount();
         $import->increaseIgnoredCount();
 
-        $expectedCount = (int) (2 + $expectedCount);
+        $expectedCount = 2 + $expectedCount;
         $this->assertSame($expectedCount, $import->getProcessedRows());
     }
 

@@ -220,6 +220,19 @@ parameters:
 		-
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
+        # allowed in tests for mocking
+		-
+			identifier: class.extendsFinalByPhpDoc
+			path: *Test.php
+		# skipped test
+		-
+			identifier: deadCode.unreachable
+			path: app/bundles/IntegrationsBundle/Tests/Functional/Services/SyncService/SyncServiceTest.php
+		# magic __get()/__set() methods on Email
+		-
+			identifier: property.notFound
+			message: '#Access to an undefined property Mautic\\EmailBundle\\Entity\\Email::#'
+			path: app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

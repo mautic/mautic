@@ -1029,7 +1029,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Updates lead's lastActive with now date/time.
      *
-     * @param int $leadId
+     * @param int|null $leadId
      */
     public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null): void
     {

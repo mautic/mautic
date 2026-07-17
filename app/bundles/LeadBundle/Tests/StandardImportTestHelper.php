@@ -109,7 +109,7 @@ abstract class StandardImportTestHelper extends CommonMocks
     /**
      * @return Import&MockObject
      */
-    protected function initImportEntity(?array $methods = null)
+    protected function initImportEntity(?array $methods = null): MockObject
     {
         /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
