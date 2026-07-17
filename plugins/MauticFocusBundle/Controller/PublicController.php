@@ -13,21 +13,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonController
 {
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(\MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel): void
+    {
+        $this->focusModel = $focusModel;
+    }
+
     public function generateAction($id): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
-
-        /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
-        $model = $this->getModel('focus');
-        $focus = $model->getEntity($id);
+        $focus = $this->focusModel->getEntity($id);
 
         if ($focus) {
             if (!$focus->isPublished()) {
                 return new Response('', Response::HTTP_NOT_FOUND);
             }
 
-            $content = $model->generateJavascript($focus);
+            $content = $this->focusModel->generateJavascript($focus);
 
             return new Response($content, 200, ['Content-Type' => 'application/javascript']);
         }
@@ -39,14 +44,12 @@ class PublicController extends CommonController
     {
         $id = $request->get('id', false);
         if ($id) {
-            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
-            $model = $this->getModel('focus');
-            $focus = $model->getEntity($id);
+            $focus = $this->focusModel->getEntity($id);
 
             $lead = $contactTracker->getContact();
 
             if ($focus && $focus->isPublished() && $lead) {
-                $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $request, $lead);
+                $stat = $this->focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, $request, $lead);
                 if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_VIEW)) {
                     $event = new FocusViewEvent($stat);
                     $this->dispatcher->dispatch($event, FocusEvents::FOCUS_ON_VIEW);

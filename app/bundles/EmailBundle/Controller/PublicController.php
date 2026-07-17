@@ -42,6 +42,14 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    private LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
     {
         /** @var EmailModel $model */
@@ -607,9 +615,7 @@ class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails    = explode(';', $query['email']);
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $repo = $leadModel->getRepository();
+        $repo = $this->leadModel->getRepository();
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
@@ -679,14 +685,12 @@ class PublicController extends CommonFormController
 
     private function createLead(string $email, $repo): ?Lead
     {
-        $model = $this->getModel('lead.lead');
-        \assert($model instanceof LeadModel);
-        $lead  = $model->getEntity();
+        $lead  = $this->leadModel->getEntity();
         // set custom field values
         $data = ['email' => $email];
-        $model->setFieldValues($lead, $data, true);
+        $this->leadModel->setFieldValues($lead, $data, true);
         // create lead
-        $model->saveEntity($lead);
+        $this->leadModel->saveEntity($lead);
 
         // return entity
         return $repo->getLeadByEmail($email);
