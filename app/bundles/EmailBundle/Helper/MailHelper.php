@@ -1669,8 +1669,6 @@ class MailHelper
     }
 
     /**
-     * Create an email stat.
-     *
      * @param bool|true   $persist
      * @param string|null $emailAddress
      */

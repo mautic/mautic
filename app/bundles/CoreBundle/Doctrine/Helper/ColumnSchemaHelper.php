@@ -67,8 +67,6 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get the SchemaManager.
-     *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
