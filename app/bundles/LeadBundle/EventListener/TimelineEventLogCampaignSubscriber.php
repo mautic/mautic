@@ -77,7 +77,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * @param Lead[] $contacts
      */
-    private function writeEntries(array $contacts, Campaign $campaign, $action): void
+    private function writeEntries(array $contacts, Campaign $campaign, ?string $action): void
     {
         $user = $this->userHelper->getUser();
 

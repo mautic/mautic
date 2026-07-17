@@ -75,6 +75,9 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
             __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
         ],
+        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
+        ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
