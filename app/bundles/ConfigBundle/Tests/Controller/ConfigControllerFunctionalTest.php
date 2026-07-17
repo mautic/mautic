@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -246,7 +245,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
 
-        Assert::assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+        $this->assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
 
         $form->setValues(
             [
@@ -260,8 +259,8 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('contact_export_notify_admins', $configParameters);
-        Assert::assertFalse((bool) $configParameters['contact_export_notify_admins']);
+        $this->assertArrayHasKey('contact_export_notify_admins', $configParameters);
+        $this->assertFalse((bool) $configParameters['contact_export_notify_admins']);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         $this->assertResponseIsSuccessful();
@@ -269,7 +268,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
 
-        Assert::assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+        $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
     public function testUserAndSystemLocale(): void

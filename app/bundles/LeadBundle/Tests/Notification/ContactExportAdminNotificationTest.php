@@ -13,11 +13,10 @@ use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactExportAdminNotificationTest extends TestCase
+final class ContactExportAdminNotificationTest extends TestCase
 {
     public function testRequestedNotifiesOtherPublishedAdmins(): void
     {
@@ -50,17 +49,15 @@ class ContactExportAdminNotificationTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
             ->willReturnCallback(
-                static function (string $key, array $parameters = []): string {
-                    return match ($key) {
-                        'mautic.lead.export.admin.notification' => sprintf(
-                            '%s (%s) requested a %s contact export at %s.',
-                            $parameters['%requesting_user_name%'],
-                            $parameters['%requesting_user_email%'],
-                            $parameters['%file_type%'],
-                            $parameters['%requested_at%']
-                        ),
-                        default => $key,
-                    };
+                static fn (string $key, array $parameters = []): string => match ($key) {
+                    'mautic.lead.export.admin.notification' => sprintf(
+                        '%s (%s) requested a %s contact export at %s.',
+                        $parameters['%requesting_user_name%'],
+                        $parameters['%requesting_user_email%'],
+                        $parameters['%file_type%'],
+                        $parameters['%requested_at%']
+                    ),
+                    default => $key,
                 }
             );
 
@@ -84,21 +81,18 @@ class ContactExportAdminNotificationTest extends TestCase
         $notification = new ContactExportAdminNotification($notificationModel, $translator, $userRepository, $mailHelper, $coreParametersHelper, $dateHelper);
         $notification->notifyRequested($contactExportScheduler);
 
-        Assert::assertCount(1, $notificationModel->notifications);
-        Assert::assertSame($otherAdmin, $notificationModel->notifications[0][6]);
-        Assert::assertSame('mautic.lead.export.admin.notification.header', $notificationModel->notifications[0][3]);
-        Assert::assertSame('info', $notificationModel->notifications[0][1]);
-        Assert::assertFalse($notificationModel->notifications[0][2]);
-        Assert::assertInstanceOf(\DateTime::class, $notificationModel->notifications[0][5]);
-        Assert::assertSame(
-            $contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P'),
-            $notificationModel->notifications[0][5]->format('Y-m-d H:i:s P')
-        );
-        Assert::assertStringContainsString('Requester User', $notificationModel->notifications[0][0]);
-        Assert::assertStringContainsString('requester@example.com', $notificationModel->notifications[0][0]);
-        Assert::assertStringContainsString('CSV', $notificationModel->notifications[0][0]);
-        Assert::assertStringContainsString($formattedRequestedAt, $notificationModel->notifications[0][0]);
-        Assert::assertStringNotContainsString('http', $notificationModel->notifications[0][0]);
+        $this->assertCount(1, $notificationModel->notifications);
+        $this->assertSame($otherAdmin, $notificationModel->notifications[0][6]);
+        $this->assertSame('mautic.lead.export.admin.notification.header', $notificationModel->notifications[0][3]);
+        $this->assertSame('info', $notificationModel->notifications[0][1]);
+        $this->assertFalse($notificationModel->notifications[0][2]);
+        $this->assertInstanceOf(\DateTime::class, $notificationModel->notifications[0][5]);
+        $this->assertSame($contactExportScheduler->getScheduledDateTime()->format('Y-m-d H:i:s P'), $notificationModel->notifications[0][5]->format('Y-m-d H:i:s P'));
+        $this->assertStringContainsString('Requester User', (string) $notificationModel->notifications[0][0]);
+        $this->assertStringContainsString('requester@example.com', (string) $notificationModel->notifications[0][0]);
+        $this->assertStringContainsString('CSV', (string) $notificationModel->notifications[0][0]);
+        $this->assertStringContainsString($formattedRequestedAt, (string) $notificationModel->notifications[0][0]);
+        $this->assertStringNotContainsString('http', (string) $notificationModel->notifications[0][0]);
     }
 
     public function testCompletedSendsSharedAdminEmailWithoutLink(): void
@@ -113,26 +107,24 @@ class ContactExportAdminNotificationTest extends TestCase
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
 
-        $notificationModel = $this->createMock(NotificationModel::class);
+        $notificationModel = $this->createStub(NotificationModel::class);
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
             ->willReturnCallback(
-                static function (string $key, array $parameters = []): string {
-                    return match ($key) {
-                        'mautic.lead.export.admin.email_subject' => 'Contact export completed',
-                        'mautic.lead.export.status.completed'    => 'Completed',
-                        'mautic.lead.export.admin.email'         => sprintf(
-                            'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included. {signature}',
-                            $parameters['%requesting_user_name%'],
-                            $parameters['%requesting_user_email%'],
-                            $parameters['%requested_at%'],
-                            $parameters['%completed_at%'],
-                            $parameters['%status%'],
-                            $parameters['%file_type%']
-                        ),
-                        default => $key,
-                    };
+                static fn (string $key, array $parameters = []): string => match ($key) {
+                    'mautic.lead.export.admin.email_subject' => 'Contact export completed',
+                    'mautic.lead.export.status.completed'    => 'Completed',
+                    'mautic.lead.export.admin.email'         => sprintf(
+                        'Hi, Initiated by: %s <%s> Requested at: %s Completed at: %s Status: %s Export type: %s This notification is for security awareness only. The export download link is not included. {signature}',
+                        $parameters['%requesting_user_name%'],
+                        $parameters['%requesting_user_email%'],
+                        $parameters['%requested_at%'],
+                        $parameters['%completed_at%'],
+                        $parameters['%status%'],
+                        $parameters['%file_type%']
+                    ),
+                    default => $key,
                 }
             );
 
@@ -162,20 +154,18 @@ class ContactExportAdminNotificationTest extends TestCase
 
         $mailHelper->expects($this->once())
             ->method('setBody')
-            ->with($this->callback(function (string $message) use ($formattedRequestedAt): bool {
-                Assert::assertStringContainsString('Hi,', $message);
-                Assert::assertStringContainsString('Requester User', $message);
-                Assert::assertStringContainsString('requester@example.com', $message);
-                Assert::assertStringContainsString('Requested at: '.$formattedRequestedAt, $message);
-                Assert::assertStringContainsString('Completed at:', $message);
-                Assert::assertStringContainsString('Status: Completed', $message);
-                Assert::assertStringContainsString('Export type: CSV', $message);
-                Assert::assertStringContainsString('download link is not included', $message);
-                Assert::assertStringContainsString('{signature}', $message);
-                Assert::assertStringNotContainsString('http', $message);
-
-                return true;
-            }));
+            ->willReturnCallback(function (string $message) use ($formattedRequestedAt): void {
+                $this->assertStringContainsString('Hi,', $message);
+                $this->assertStringContainsString('Requester User', $message);
+                $this->assertStringContainsString('requester@example.com', $message);
+                $this->assertStringContainsString('Requested at: '.$formattedRequestedAt, $message);
+                $this->assertStringContainsString('Completed at:', $message);
+                $this->assertStringContainsString('Status: Completed', $message);
+                $this->assertStringContainsString('Export type: CSV', $message);
+                $this->assertStringContainsString('download link is not included', $message);
+                $this->assertStringContainsString('{signature}', $message);
+                $this->assertStringNotContainsString('http', $message);
+            });
         $mailHelper->expects($this->once())
             ->method('parsePlainText');
         $mailHelper->expects($this->once())
@@ -204,7 +194,7 @@ class ContactExportAdminNotificationTest extends TestCase
         $notificationModel->expects($this->never())
             ->method('addNotification');
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->expects($this->never())
@@ -233,15 +223,15 @@ class ContactExportAdminNotificationTest extends TestCase
             'Y-m-d',
             'Y-m-d',
             'H:i:s',
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 
     private function getScheduledDateTimeForDisplay(ContactExportScheduler $contactExportScheduler): \DateTime
     {
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
-        Assert::assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
 
         return \DateTime::createFromInterface($scheduledDateTime);
     }

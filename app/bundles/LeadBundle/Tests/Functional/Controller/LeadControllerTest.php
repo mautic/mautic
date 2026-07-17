@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -23,8 +22,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class LeadControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME           = 'jhony';
+
     private const BATCH_EXPORT_PATH = 's/contacts/batchExport';
+
     private const SIGNATURE_TOKEN   = '{signature}';
+
     /**
      * @var array<string>
      */
@@ -108,7 +110,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ['filetype' => 'csv']
         );
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
@@ -123,7 +125,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
                 'header' => 'mautic.lead.export.being.prepared.header',
             ]
         );
-        Assert::assertCount(1, $requesterNotifications);
+        $this->assertCount(1, $requesterNotifications);
 
         $adminNotifications = $this->em->getRepository(Notification::class)->findBy(
             [
@@ -131,12 +133,13 @@ final class LeadControllerTest extends MauticMysqlTestCase
                 'header' => 'mautic.lead.export.admin.notification.header',
             ]
         );
-        Assert::assertCount(1, $adminNotifications);
-        Assert::assertStringContainsString($requestingAdmin->getName(), $adminNotifications[0]->getMessage());
-        Assert::assertStringContainsString($requestingAdmin->getEmail(), $adminNotifications[0]->getMessage());
-        Assert::assertStringContainsString('CSV', $adminNotifications[0]->getMessage());
-        Assert::assertStringContainsString($requestedAt, $adminNotifications[0]->getMessage());
-        Assert::assertStringNotContainsString('http', $adminNotifications[0]->getMessage());
+        $this->assertCount(1, $adminNotifications);
+        $this->assertInstanceOf(User::class, $requestingAdmin);
+        $this->assertStringContainsString($requestingAdmin->getName(), (string) $adminNotifications[0]->getMessage());
+        $this->assertStringContainsString($requestingAdmin->getEmail(), (string) $adminNotifications[0]->getMessage());
+        $this->assertStringContainsString('CSV', (string) $adminNotifications[0]->getMessage());
+        $this->assertStringContainsString($requestedAt, (string) $adminNotifications[0]->getMessage());
+        $this->assertStringNotContainsString('http', (string) $adminNotifications[0]->getMessage());
 
         $requesterAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
             [
@@ -144,7 +147,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
                 'header' => 'mautic.lead.export.admin.notification.header',
             ]
         );
-        Assert::assertCount(0, $requesterAdminNotifications);
+        $this->assertCount(0, $requesterAdminNotifications);
 
         $nonAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
             [
@@ -152,7 +155,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
                 'header' => 'mautic.lead.export.admin.notification.header',
             ]
         );
-        Assert::assertCount(0, $nonAdminNotifications);
+        $this->assertCount(0, $nonAdminNotifications);
     }
 
     public function testContactExportCompletionEmailsAreSentToRequesterAndAdmins(): void
@@ -180,7 +183,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             self::BATCH_EXPORT_PATH,
             ['filetype' => 'csv']
         );
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
@@ -203,39 +206,40 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $messages = self::getMailerMessages();
-        Assert::assertCount(2, $messages);
+        $this->assertCount(2, $messages);
+        $this->assertInstanceOf(User::class, $requestingAdmin);
 
         $requesterEmail = $this->findMailerMessageByRecipient($requestingAdmin->getEmail());
-        Assert::assertNotNull($requesterEmail);
-        Assert::assertSame('Your contact export is ready', $requesterEmail->getSubject());
-        Assert::assertStringContainsString('Hi '.$requestingAdmin->getName().',', $requesterEmail->getHtmlBody());
-        Assert::assertStringContainsString('Your contact export is ready.', $requesterEmail->getHtmlBody());
-        Assert::assertStringContainsString($downloadLink, $requesterEmail->getHtmlBody());
-        Assert::assertStringContainsString($zipFileName, $requesterEmail->getHtmlBody());
-        Assert::assertStringNotContainsString(self::SIGNATURE_TOKEN, $requesterEmail->getHtmlBody());
-        Assert::assertStringNotContainsString(self::SIGNATURE_TOKEN, $requesterEmail->getTextBody());
+        $this->assertInstanceOf(MauticMessage::class, $requesterEmail);
+        $this->assertSame('Your contact export is ready', $requesterEmail->getSubject());
+        $this->assertStringContainsString('Hi '.$requestingAdmin->getName().',', (string) $requesterEmail->getHtmlBody());
+        $this->assertStringContainsString('Your contact export is ready.', (string) $requesterEmail->getHtmlBody());
+        $this->assertStringContainsString($downloadLink, (string) $requesterEmail->getHtmlBody());
+        $this->assertStringContainsString($zipFileName, (string) $requesterEmail->getHtmlBody());
+        $this->assertStringNotContainsString(self::SIGNATURE_TOKEN, (string) $requesterEmail->getHtmlBody());
+        $this->assertStringNotContainsString(self::SIGNATURE_TOKEN, (string) $requesterEmail->getTextBody());
 
         $adminEmail = $this->findMailerMessageByRecipient($secondaryAdmin->getEmail());
-        Assert::assertNotNull($adminEmail);
-        Assert::assertSame('Contact export completed', $adminEmail->getSubject());
-        Assert::assertStringContainsString('Hi,', $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('Initiated by: '.$requestingAdmin->getName().' &lt;'.$requestingAdmin->getEmail().'&gt;', $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('Requested at: '.$requestedAt, $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('Completed at:', $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('Status: Completed', $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('Export type: CSV', $adminEmail->getHtmlBody());
-        Assert::assertStringContainsString('download link is not included', $adminEmail->getHtmlBody());
-        Assert::assertStringNotContainsString($downloadLink, $adminEmail->getHtmlBody());
-        Assert::assertStringNotContainsString('href=', $adminEmail->getHtmlBody());
-        Assert::assertStringNotContainsString(self::SIGNATURE_TOKEN, $adminEmail->getHtmlBody());
-        Assert::assertStringNotContainsString($downloadLink, $adminEmail->getTextBody());
-        Assert::assertStringNotContainsString(self::SIGNATURE_TOKEN, $adminEmail->getTextBody());
-        Assert::assertCount(1, $adminEmail->getTo());
-        Assert::assertSame($secondaryAdmin->getEmail(), $adminEmail->getTo()[0]->getAddress());
-        Assert::assertCount(1, $adminEmail->getCc());
-        Assert::assertSame($thirdAdmin->getEmail(), $adminEmail->getCc()[0]->getAddress());
+        $this->assertInstanceOf(MauticMessage::class, $adminEmail);
+        $this->assertSame('Contact export completed', $adminEmail->getSubject());
+        $this->assertStringContainsString('Hi,', (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('Initiated by: '.$requestingAdmin->getName().' &lt;'.$requestingAdmin->getEmail().'&gt;', (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('Requested at: '.$requestedAt, (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('Completed at:', (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('Status: Completed', (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('Export type: CSV', (string) $adminEmail->getHtmlBody());
+        $this->assertStringContainsString('download link is not included', (string) $adminEmail->getHtmlBody());
+        $this->assertStringNotContainsString($downloadLink, (string) $adminEmail->getHtmlBody());
+        $this->assertStringNotContainsString('href=', (string) $adminEmail->getHtmlBody());
+        $this->assertStringNotContainsString(self::SIGNATURE_TOKEN, (string) $adminEmail->getHtmlBody());
+        $this->assertStringNotContainsString($downloadLink, (string) $adminEmail->getTextBody());
+        $this->assertStringNotContainsString(self::SIGNATURE_TOKEN, (string) $adminEmail->getTextBody());
+        $this->assertCount(1, $adminEmail->getTo());
+        $this->assertSame($secondaryAdmin->getEmail(), $adminEmail->getTo()[0]->getAddress());
+        $this->assertCount(1, $adminEmail->getCc());
+        $this->assertSame($thirdAdmin->getEmail(), $adminEmail->getCc()[0]->getAddress());
 
-        Assert::assertNull($this->findMailerMessageByRecipient($user->getEmail()));
+        $this->assertNotInstanceOf(MauticMessage::class, $this->findMailerMessageByRecipient($user->getEmail()));
     }
 
     private function createContacts(): void
@@ -271,7 +275,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     private function getScheduledDateTimeForDisplay(ContactExportScheduler $contactExportScheduler): \DateTime
     {
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
-        Assert::assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $scheduledDateTime);
 
         return \DateTime::createFromInterface($scheduledDateTime);
     }

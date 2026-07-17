@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -60,12 +59,12 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
             's/contacts/batchExport',
             ['filetype' => 'csv']
         );
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler   = $this->checkContactExportScheduler(1)[0];
         $contactExportSchedulerId = $contactExportScheduler->getId();
-        Assert::assertNotNull($contactExportSchedulerId);
+        $this->assertNotNull($contactExportSchedulerId);
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $requesterNotifications = $this->em->getRepository(Notification::class)->findBy(
@@ -74,7 +73,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
                 'header' => 'mautic.lead.export.being.prepared.header',
             ]
         );
-        Assert::assertCount(1, $requesterNotifications);
+        $this->assertCount(1, $requesterNotifications);
 
         $adminNotifications = $this->em->getRepository(Notification::class)->findBy(
             [
@@ -82,7 +81,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
                 'header' => 'mautic.lead.export.admin.notification.header',
             ]
         );
-        Assert::assertCount(0, $adminNotifications);
+        $this->assertCount(0, $adminNotifications);
 
         /** @var AuditLog|null $createAuditLog */
         $createAuditLog = $this->em->getRepository(AuditLog::class)->findOneBy(
@@ -92,7 +91,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
                 'action'   => 'create',
             ]
         );
-        Assert::assertNotNull($createAuditLog);
+        $this->assertInstanceOf(AuditLog::class, $createAuditLog);
 
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
@@ -105,7 +104,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
                 'action'   => 'sendEmail',
             ]
         );
-        Assert::assertNotNull($sendEmailAuditLog);
+        $this->assertInstanceOf(AuditLog::class, $sendEmailAuditLog);
 
         /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
@@ -118,15 +117,16 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         );
 
         $messages = self::getMailerMessages();
-        Assert::assertCount(1, $messages);
+        $this->assertCount(1, $messages);
+        $this->assertInstanceOf(User::class, $requestingAdmin);
 
         $requesterEmail = $this->findMailerMessageByRecipient($requestingAdmin->getEmail());
-        Assert::assertNotNull($requesterEmail);
-        Assert::assertSame('Your contact export is ready', $requesterEmail->getSubject());
-        Assert::assertStringContainsString($downloadLink, $requesterEmail->getHtmlBody());
-        Assert::assertStringContainsString($zipFileName, $requesterEmail->getHtmlBody());
+        $this->assertInstanceOf(MauticMessage::class, $requesterEmail);
+        $this->assertSame('Your contact export is ready', $requesterEmail->getSubject());
+        $this->assertStringContainsString($downloadLink, (string) $requesterEmail->getHtmlBody());
+        $this->assertStringContainsString($zipFileName, (string) $requesterEmail->getHtmlBody());
 
-        Assert::assertNull($this->findMailerMessageByRecipient($secondaryAdmin->getEmail()));
+        $this->assertNotInstanceOf(MauticMessage::class, $this->findMailerMessageByRecipient($secondaryAdmin->getEmail()));
     }
 
     private function createContacts(): void
@@ -153,7 +153,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
     {
         $repo    = $this->em->getRepository(ContactExportScheduler::class);
         $allRows = $repo->findAll();
-        Assert::assertCount($count, $allRows);
+        $this->assertCount($count, $allRows);
 
         return $allRows;
     }
@@ -161,6 +161,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
     private function setAdminUser(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', 'admin');
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -185,7 +186,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $user->setUsername($username);
         $user->setEmail($email);
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
         $user->setIsPublished(true);

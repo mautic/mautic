@@ -11,11 +11,10 @@ use Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber
 use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactExportSchedulerNotificationSubscriberTest extends TestCase
+final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
 {
     public function testContactExportScheduledNotifiesRequesterAndDelegatesAdminNotifications(): void
     {
@@ -56,12 +55,12 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $contactExportAdminNotification);
         $subscriber->onContactExportScheduled(new ContactExportSchedulerEvent($contactExportScheduler));
 
-        Assert::assertCount(1, $notificationModel->notifications);
-        Assert::assertSame('Requester notification for requester@example.com', $notificationModel->notifications[0][0]);
-        Assert::assertSame('info', $notificationModel->notifications[0][1]);
-        Assert::assertFalse($notificationModel->notifications[0][2]);
-        Assert::assertSame('mautic.lead.export.being.prepared.header', $notificationModel->notifications[0][3]);
-        Assert::assertSame($requestingUser, $notificationModel->notifications[0][6]);
+        $this->assertCount(1, $notificationModel->notifications);
+        $this->assertSame('Requester notification for requester@example.com', $notificationModel->notifications[0][0]);
+        $this->assertSame('info', $notificationModel->notifications[0][1]);
+        $this->assertFalse($notificationModel->notifications[0][2]);
+        $this->assertSame('mautic.lead.export.being.prepared.header', $notificationModel->notifications[0][3]);
+        $this->assertSame($requestingUser, $notificationModel->notifications[0][6]);
     }
 
     public function testContactExportCompletedDelegatesAdminNotifications(): void
@@ -73,8 +72,8 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
 
-        $notificationModel = $this->createMock(NotificationModel::class);
-        $translator        = $this->createMock(TranslatorInterface::class);
+        $notificationModel = $this->createStub(NotificationModel::class);
+        $translator        = $this->createStub(TranslatorInterface::class);
 
         $contactExportAdminNotification = $this->createMock(ContactExportAdminNotification::class);
         $contactExportAdminNotification->expects($this->once())
