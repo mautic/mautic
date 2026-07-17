@@ -26,15 +26,10 @@ class AjaxController extends CommonAjaxController
 
     #[Required]
     public function autowireSmsAjaxController(
-<<<<<<< HEAD
-        SmsModel $smsModel,
-    ): void {
-=======
         EmailModel $emailModel,
         SmsModel $smsModel,
     ): void {
         $this->emailModel = $emailModel;
->>>>>>> 5ed47aa6d9 ([model] flip getModel('email') to typed injection)
         $this->smsModel = $smsModel;
     }
 

@@ -47,14 +47,10 @@ class PublicController extends CommonFormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
     public function autowirePublicController(
         LeadModel $leadModel,
+        EmailModel $emailModel,
     ): void {
-=======
-    public function autowirePublicController(LeadModel $leadModel, EmailModel $emailModel): void
-    {
->>>>>>> 5ed47aa6d9 ([model] flip getModel('email') to typed injection)
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
     }
