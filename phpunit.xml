@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    backupGlobals="false"
+    backupStaticProperties="false"
+    colors="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    bootstrap="vendor/autoload.php"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+    failOnRisky="true"
+    failOnWarning="true"
+    displayDetailsOnTestsThatTriggerDeprecations="true"
+    displayDetailsOnPhpunitDeprecations="true"
+    displayDetailsOnTestsThatTriggerErrors="true"
+    displayDetailsOnTestsThatTriggerNotices="true"
+    displayDetailsOnTestsThatTriggerWarnings="true"
+    cacheDirectory="var/cache/phpunit-utils"
+  >
+  <source>
+    <include>
+      <directory>utils/ecs/src</directory>
+      <directory>utils/phpstan/src</directory>
+      <directory>utils/rector/src</directory>
+    </include>
+  </source>
+  <testsuites>
+    <!-- Rector must come first: it bundles its own nikic/php-parser copy, which collides
+         with the root one if ECS or PHPStan loads that first. -->
+    <testsuite name="Utils tests">
+      <directory>utils/rector/tests</directory>
+      <directory>utils/phpstan/tests</directory>
+      <directory>utils/ecs/tests</directory>
+      <exclude>utils/rector/tests/*/Fixture</exclude>
+      <exclude>utils/phpstan/tests/Rule/Fixture</exclude>
+      <exclude>utils/ecs/tests/*/Fixture</exclude>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="error_reporting" value="E_ALL"/>
+    <ini name="date.timezone" value="UTC"/>
+  </php>
+</phpunit>

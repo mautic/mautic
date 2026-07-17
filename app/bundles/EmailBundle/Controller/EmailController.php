@@ -42,8 +42,9 @@ class EmailController extends FormController
     private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEmailController(\Mautic\LeadBundle\Model\ListModel $listModel): void
-    {
+    public function autowireEmailController(
+        \Mautic\LeadBundle\Model\ListModel $listModel,
+    ): void {
         $this->listModel = $listModel;
     }
 

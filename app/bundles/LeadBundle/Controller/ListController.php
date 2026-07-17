@@ -36,14 +36,10 @@ class ListController extends FormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-    public function autowireListController(LeadModel $leadModel, ListModel $listModel): void
-    {
-=======
     public function autowireListController(
         LeadModel $leadModel,
+        ListModel $listModel,
     ): void {
->>>>>>> 3468d80e90 (newline all autowire*() methods)
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
     }
