@@ -36,8 +36,9 @@ class FormController extends CommonFormController
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFormController(FormModel $formModel): void
-    {
+    public function autowireFormController(
+        FormModel $formModel,
+    ): void {
         $this->formModel = $formModel;
     }
 

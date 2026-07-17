@@ -23,8 +23,9 @@ class TagController extends FormController
     private TagModel $leadTagModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireTagController(TagModel $leadTagModel): void
-    {
+    public function autowireTagController(
+        TagModel $leadTagModel,
+    ): void {
         $this->leadTagModel = $leadTagModel;
     }
 

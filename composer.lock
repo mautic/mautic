@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "450116e89ddd51bad6163cb8574bd273",
+    "content-hash": "260126bab4447805322c4709ad335b01",
     "packages": [
         {
             "name": "api-platform/core",
@@ -6191,7 +6191,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "8ead463e990895fb726930fb648ac19b3394566c"
+                "reference": "d76efae4c97d56ab37946ddeefd5e87455910575"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6322,8 +6322,7 @@
                     "Mautic\\": "bundles/",
                     "MauticPlugin\\": "plugins/",
                     "Mautic\\Middleware\\": "middlewares/",
-                    "Mautic\\Migrations\\": "migrations/",
-                    "Mautic\\CodingStandards\\": "codingstandards/"
+                    "Mautic\\Migrations\\": "migrations/"
                 },
                 "files": [
                     "AppKernel.php",
@@ -19287,16 +19286,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.2.7",
+            "version": "13.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "735c742244ae3b3b067d5aae3d1dd4b7a48759f7"
+                "reference": "520ec6a6bab9a274502dd378bd2a1a451870f9b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/735c742244ae3b3b067d5aae3d1dd4b7a48759f7",
-                "reference": "735c742244ae3b3b067d5aae3d1dd4b7a48759f7",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/520ec6a6bab9a274502dd378bd2a1a451870f9b2",
+                "reference": "520ec6a6bab9a274502dd378bd2a1a451870f9b2",
                 "shasum": ""
             },
             "require": {
@@ -19331,9 +19330,9 @@
                 "static analysis"
             ],
             "support": {
-                "source": "https://github.com/ecsphp/ecs/tree/13.2.7"
+                "source": "https://github.com/ecsphp/ecs/tree/13.2.8"
             },
-            "time": "2026-07-11T07:53:39+00:00"
+            "time": "2026-07-17T12:24:50+00:00"
         },
         {
             "name": "theseer/tokenizer",

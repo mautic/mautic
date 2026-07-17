@@ -10,6 +10,7 @@ class MultipleParamsController
     }
 }
 
+?>
 -----
 <?php
 
@@ -25,3 +26,5 @@ class MultipleParamsController
     {
     }
 }
+
+?>

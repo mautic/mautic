@@ -25,8 +25,9 @@ class SmsController extends FormController
     private SmsModel $smsModel;
 
     #[Required]
-    public function autowireSmsController(SmsModel $smsModel): void
-    {
+    public function autowireSmsController(
+        SmsModel $smsModel,
+    ): void {
         $this->smsModel = $smsModel;
     }
 

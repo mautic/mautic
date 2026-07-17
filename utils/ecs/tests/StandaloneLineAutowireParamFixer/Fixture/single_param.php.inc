@@ -9,6 +9,7 @@ class SingleParamController
     }
 }
 
+?>
 -----
 <?php
 
@@ -22,3 +23,5 @@ class SingleParamController
     {
     }
 }
+
+?>

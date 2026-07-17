@@ -29,8 +29,9 @@ class FocusController extends AbstractStandardFormController
     private FocusModel $focusModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFocusController(FocusModel $focusModel): void
-    {
+    public function autowireFocusController(
+        FocusModel $focusModel,
+    ): void {
         $this->focusModel = $focusModel;
     }
 

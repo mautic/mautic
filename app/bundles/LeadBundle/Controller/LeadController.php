@@ -77,11 +77,15 @@ class LeadController extends FormController
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireLeadController(
         LeadModel $leadModel,
+<<<<<<< HEAD
         ListModel $listModel,
         \Mautic\StageBundle\Model\StageModel $stageModel,
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
         \Mautic\LeadBundle\Model\FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
+=======
+        \Mautic\StageBundle\Model\StageModel $stageModel,
+>>>>>>> 3468d80e90 (newline all autowire*() methods)
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;

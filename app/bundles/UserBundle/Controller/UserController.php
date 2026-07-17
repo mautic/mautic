@@ -31,8 +31,9 @@ class UserController extends FormController
     private UserModel $userModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireUserController(UserModel $userModel): void
-    {
+    public function autowireUserController(
+        UserModel $userModel,
+    ): void {
         $this->userModel = $userModel;
     }
 
