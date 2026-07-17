@@ -62,6 +62,8 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private NoteModel $noteModel;
+
     private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
@@ -85,6 +87,7 @@ class LeadController extends FormController
         \Mautic\LeadBundle\Model\FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
         \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        NoteModel $noteModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -93,6 +96,7 @@ class LeadController extends FormController
         $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
         $this->campaignModel = $campaignModel;
+        $this->noteModel = $noteModel;
     }
 
     /**
@@ -447,8 +451,6 @@ class LeadController extends FormController
         $model = $this->getModel('lead.list');
         \assert($model instanceof ListModel);
         $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
-        $leadNoteModel = $this->getModel('lead.note');
-        \assert($leadNoteModel instanceof NoteModel);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -467,7 +469,7 @@ class LeadController extends FormController
                     'events'                 => $this->getEngagements($lead),
                     'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
                     'engagementData'         => $this->getEngagementData($lead),
-                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'noteCount'              => $this->noteModel->getNoteCount($lead, true),
                     'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'                => $leadDeviceRepository->getLeadDevices($lead),
                     'auditlog'               => $this->getAuditlogs($lead),
