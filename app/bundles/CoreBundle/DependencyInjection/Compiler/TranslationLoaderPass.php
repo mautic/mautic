@@ -16,7 +16,9 @@ class TranslationLoaderPass implements CompilerPassInterface
 
         $translatorLoader = $container->getDefinition('translator.default');
         $translatorLoader->setClass(TranslatorLoader::class)
-            ->setPublic(true);
+            ->setPublic(true)
+            // en_US ships with the core, so it can be registered up front to always be available as fallback
+            ->addMethodCall('addResource', ['mautic', null, 'en_US', 'messages']);
 
         if (MAUTIC_ENV === 'prod') {
             return;
