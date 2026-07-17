@@ -191,3 +191,7 @@ services:
 		class: MauticPhpStan\Rule\NoTablePrefixDefinitionInTestsRule
 		tags:
 			- phpstan.rules.rule
+	-
+		class: MauticPhpStan\Rule\AutowireMethodNameMustMatchClassRule
+		tags:
+			- phpstan.rules.rule
