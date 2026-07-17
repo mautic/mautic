@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchTagController extends AbstractFormController
+final class BatchTagController extends AbstractFormController
 {
     public function indexAction(): Response
     {

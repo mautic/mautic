@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SmsController extends FormController
+final class SmsController extends FormController
 {
     use EntityContactsTrait;
 

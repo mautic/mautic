@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class StageController extends AbstractFormController
+final class StageController extends AbstractFormController
 {
     /**
      * @param int $page
@@ -385,7 +385,7 @@ class StageController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {

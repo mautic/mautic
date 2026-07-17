@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class DashboardController extends AbstractFormController
+final class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.

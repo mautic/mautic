@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class InstallController extends CommonController
+final class InstallController extends CommonController
 {
     public function __construct(
         private PackageModel $packageModel,

@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TweetController extends FormController
+final class TweetController extends FormController
 {
     protected function getModelName(): string
     {

@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
     private array $tokens = [];
 

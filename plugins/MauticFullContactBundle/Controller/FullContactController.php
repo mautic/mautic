@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FullContactController extends FormController
+final class FullContactController extends FormController
 {
     /**
      * @param string $objectId

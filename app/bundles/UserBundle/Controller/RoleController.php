@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
-class RoleController extends FormController
+final class RoleController extends FormController
 {
     /**
      * @param int|string|null $objectId

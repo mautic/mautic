@@ -8,7 +8,7 @@ use Mautic\PointBundle\Form\Type\PointActionType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function reorderTriggerEventsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {

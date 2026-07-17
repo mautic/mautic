@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class ConfigController extends AbstractFormController
+final class ConfigController extends AbstractFormController
 {
     /**
      * @var BasicIntegration|ConfigFormInterface
@@ -48,7 +48,7 @@ class ConfigController extends AbstractFormController
     private $integrationConfiguration;
 
     /**
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction(
         Request $request,

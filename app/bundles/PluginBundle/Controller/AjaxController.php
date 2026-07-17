@@ -11,7 +11,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {

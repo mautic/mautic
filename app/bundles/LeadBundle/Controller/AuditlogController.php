@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuditlogController extends CommonController
+final class AuditlogController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
@@ -65,7 +65,7 @@ class AuditlogController extends CommonController
     }
 
     /**
-     * @return array|Response
+     * @return Response
      */
     public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
     {

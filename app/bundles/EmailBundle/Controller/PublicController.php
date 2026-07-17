@@ -37,7 +37,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
@@ -300,7 +300,7 @@ class PublicController extends CommonFormController
     {
         $request->attributes->set('unsubscribe_all', 1);
 
-        return $this->forward(static::class.'::unsubscribeAction', [
+        return $this->forward(self::class.'::unsubscribeAction', [
             'request'    => $request,
             'idHash'     => $idHash,
             'urlEmail'   => $urlEmail,

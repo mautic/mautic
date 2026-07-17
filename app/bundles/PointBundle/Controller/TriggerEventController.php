@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TriggerEventController extends CommonFormController
+final class TriggerEventController extends CommonFormController
 {
     /**
      * Generates new form and processes post data.

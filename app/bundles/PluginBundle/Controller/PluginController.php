@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PluginController extends FormController
+final class PluginController extends FormController
 {
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MobileNotificationController extends FormController
+final class MobileNotificationController extends FormController
 {
     use EntityContactsTrait;
 

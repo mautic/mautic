@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
     /**
      * @param string $slug
@@ -312,7 +312,7 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return mixed[]|JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      *
      * @throws FileNotFoundException
      */

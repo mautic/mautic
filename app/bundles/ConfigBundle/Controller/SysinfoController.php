@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SysinfoController extends FormController
+final class SysinfoController extends FormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,

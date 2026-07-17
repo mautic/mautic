@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ActionController extends CommonFormController
+final class ActionController extends CommonFormController
 {
     /**
      * Generates new form and processes post data.

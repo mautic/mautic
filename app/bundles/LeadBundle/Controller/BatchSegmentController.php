@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class BatchSegmentController extends AbstractFormController
+final class BatchSegmentController extends AbstractFormController
 {
     public function __construct(
         private SegmentActionModel $segmentActionModel,

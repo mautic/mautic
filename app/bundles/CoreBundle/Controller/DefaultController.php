@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Almost all other Mautic Bundle controllers extend this default controller.
  */
-class DefaultController extends CommonController
+final class DefaultController extends CommonController
 {
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response

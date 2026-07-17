@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
     /**
      * Generates a new password for the user and emails it to them.

@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DynamicContentController extends FormController
+final class DynamicContentController extends FormController
 {
     protected function getPermissions(): array
     {

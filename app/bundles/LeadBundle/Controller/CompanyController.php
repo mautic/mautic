@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyController extends FormController
+final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
@@ -677,7 +677,7 @@ class CompanyController extends FormController
      *
      * @param int $objectId
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction(Request $request, $objectId)
     {
@@ -1159,7 +1159,7 @@ class CompanyController extends FormController
     /**
      * Export company's data.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return Response
      */
     public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId)
     {

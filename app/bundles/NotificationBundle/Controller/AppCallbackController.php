@@ -10,7 +10,7 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class AppCallbackController extends CommonController
+final class AppCallbackController extends CommonController
 {
     public function indexAction(Request $request, EntityManagerInterface $em): JsonResponse
     {

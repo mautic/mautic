@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TriggerController extends FormController
+final class TriggerController extends FormController
 {
     /**
      * @param int $page

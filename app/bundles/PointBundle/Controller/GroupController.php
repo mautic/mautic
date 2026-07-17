@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GroupController extends AbstractStandardFormController
+final class GroupController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class TagController extends FormController
+final class TagController extends FormController
 {
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
     private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';

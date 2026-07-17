@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
     /**
      * Handles public download of assets by slug.

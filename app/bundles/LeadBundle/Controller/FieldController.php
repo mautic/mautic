@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FieldController extends FormController
+final class FieldController extends FormController
 {
     /**
      * Generate's default list view.

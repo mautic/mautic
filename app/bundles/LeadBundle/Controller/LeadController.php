@@ -60,7 +60,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class LeadController extends FormController
+final class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
@@ -2276,7 +2276,7 @@ class LeadController extends FormController
     }
 
     /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return Response
      */
     public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId)
     {

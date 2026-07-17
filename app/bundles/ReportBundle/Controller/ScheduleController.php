@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ScheduleController extends CommonAjaxController
+final class ScheduleController extends CommonAjaxController
 {
     public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {

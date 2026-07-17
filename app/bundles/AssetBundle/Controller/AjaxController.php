@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
