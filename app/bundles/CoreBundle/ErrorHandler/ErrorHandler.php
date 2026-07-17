@@ -524,7 +524,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $content;
         }
 
-        private function getErrorName($bit): string
+        private function getErrorName(int $bit): string
         {
             return match ($bit) {
                 E_PARSE => 'Parse Error',

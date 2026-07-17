@@ -73,7 +73,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    private function transformKeyValuePair($array): array
+    private function transformKeyValuePair(?array $array): array
     {
         if (null === $array) {
             return ['list' => []];

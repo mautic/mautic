@@ -1216,7 +1216,7 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue($value, Field $f): string|bool
+    private function normalizeValue(mixed $value, Field $f): string|bool
     {
         $value = !is_array($value) ? [$value] : $value;
 

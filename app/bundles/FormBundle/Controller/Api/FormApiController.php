@@ -47,10 +47,8 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        FormModel $formModel,
     ) {
-        $formModel = $modelFactory->getModel('form');
-        \assert($formModel instanceof FormModel);
-
         $this->model            = $formModel;
         $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
