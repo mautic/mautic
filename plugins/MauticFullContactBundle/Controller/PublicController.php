@@ -14,27 +14,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
-<<<<<<< HEAD
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\LeadBundle\Model\CompanyModel $companyModel): void
-    {
-        $this->leadModel = $leadModel;
-        $this->companyModel = $companyModel;
-=======
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel, \Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
-    {
+    public function autowirePublicController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+    ): void {
         $this->leadModel = $leadModel;
+        $this->companyModel = $companyModel;
         $this->notificationModel = $notificationModel;
->>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     /**

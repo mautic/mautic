@@ -77,8 +77,6 @@ class LeadController extends FormController
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
-<<<<<<< HEAD
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $listModel,
@@ -86,6 +84,7 @@ class LeadController extends FormController
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
         \Mautic\LeadBundle\Model\FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
+        \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -93,28 +92,7 @@ class LeadController extends FormController
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
-=======
-=======
->>>>>>> aa3d162ded (corrections)
-<<<<<<< HEAD
-    public function autowireLeadController(LeadModel $leadModel, \Mautic\StageBundle\Model\StageModel $stageModel): void
-    {
-        $this->leadModel = $leadModel;
-        $this->stageModel = $stageModel;
-=======
-<<<<<<< HEAD
-    public function autowireLeadController(LeadModel $leadModel): void
-=======
-    public function autowire(LeadModel $leadModel, \Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
->>>>>>> fdd981286e ([model] flip c* getModels() to typed property inject)
-=======
-    public function autowireLeadController(LeadModel $leadModel, \Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
->>>>>>> 480cfd4a3a (corrections)
-    {
-        $this->leadModel = $leadModel;
         $this->campaignModel = $campaignModel;
->>>>>>> 92c408aa84 ([model] flip c* getModels() to typed property inject)
->>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     /**

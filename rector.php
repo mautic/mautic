@@ -3,17 +3,6 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-use MauticRector\UnserializeToSerializerDecodeRector;
-=======
->>>>>>> 646cc5dd2c ([model] flip c* getModels() to typed property inject)
->>>>>>> 92c408aa84 ([model] flip c* getModels() to typed property inject)
-=======
-use MauticRector\UnserializeToSerializerDecodeRector;
->>>>>>> 480cfd4a3a (corrections)
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;

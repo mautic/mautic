@@ -38,21 +38,17 @@ class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-<<<<<<< HEAD
     private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEmailController(\Mautic\LeadBundle\Model\ListModel $listModel): void
-    {
-        $this->listModel = $listModel;
-=======
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEmailController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
-    {
+    public function autowireEmailController(
+        \Mautic\LeadBundle\Model\ListModel $listModel,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+    ): void {
+        $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
->>>>>>> c003860e32 ([model] flip c* getModels() to typed property inject)
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
