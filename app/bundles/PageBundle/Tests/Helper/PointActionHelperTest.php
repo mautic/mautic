@@ -108,7 +108,7 @@ class PointActionHelperTest extends TestCase
                     'name'       => 'Invalid URL',
                     'properties' => [
                         'page_url'               => 'https://example.com/invalid',
-                        'page_hits'              => 1,
+                        'page_hits'              => 0,
                         'accumulative_time_unit' => 'H',
                         'accumulative_time'      => 0,
                         'returns_within_unit'    => 'H',
@@ -119,6 +119,25 @@ class PointActionHelperTest extends TestCase
                     'points' => 5,
                 ],
                 false,
+            ],
+            'page_hits_works_with_historical_data_regardless_of_url' => [
+                [
+                    'id'         => 4,
+                    'type'       => 'url.hit',
+                    'name'       => 'Page Hits Historical',
+                    'properties' => [
+                        'page_url'               => 'https://example.com/invalid',
+                        'page_hits'              => 1,
+                        'accumulative_time_unit' => 'H',
+                        'accumulative_time'      => 0,
+                        'returns_within_unit'    => 'H',
+                        'returns_within'         => 0,
+                        'returns_after_unit'     => 'H',
+                        'returns_after'          => 0,
+                    ],
+                    'points' => 5,
+                ],
+                true,
             ],
         ];
     }
