@@ -42,8 +42,6 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * Add a violation.
-     *
      * @param string|PhoneNumber $value      the value that should be validated
      * @param Constraint         $constraint the constraint for the validation
      */
