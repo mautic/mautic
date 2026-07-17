@@ -101,6 +101,22 @@
             {% for item in items %}
                 <tr>
                     <td>
+                    {% set customButtons = [] %}
+                    {% if permissions['stage:stages:edit'] and permissions['stage:stages:delete'] %}
+                        {% set customButtons = [
+                            {
+                                'attr' : {
+                                    'data-toggle' : 'ajaxmodal',
+                                    'data-target' : '#MauticSharedModal',
+                                    'data-header' : 'mautic.stage.header.merge'|trans,
+                                    'href'        : path('mautic_stage_action', { 'objectId' : item.getId(), 'objectAction' : 'merge' }),
+                                },
+                                'btnText'   : 'mautic.stage.merge'|trans,
+                                'iconClass' : 'ri-flag-line',
+                                'priority'  : 100,
+                            }
+                        ] %}
+                    {% endif %}
                     {{- include('@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
@@ -109,6 +125,7 @@
                                     'clone'  : permissions['stage:stages:create'],
                                     'delete' : permissions['stage:stages:delete'],
                                 },
+                                'customButtons'   : customButtons,
                                 'routeBase' : 'stage',
                             }) -}}
                     </td>
@@ -167,7 +184,7 @@
                         } %}
                     </div>
                 {% endset %}
-        
+
                 {{ include('@MauticCore/Components/content-block.html.twig', {
                     heading: 'mautic.stage.contentblock.heading',
                     subheading: 'mautic.stage.contentblock.subheading',
