@@ -155,7 +155,10 @@ parameters:
 			identifier: method.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
-			identifier: method.deprecated
+			identifier: new.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: method.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
 			identifier: return.deprecatedClass

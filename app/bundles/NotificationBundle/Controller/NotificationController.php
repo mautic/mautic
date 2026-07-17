@@ -546,8 +546,7 @@ class NotificationController extends AbstractFormController
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
-        $model  = $this->getModel('notification');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->notificationModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('notification:notifications:create')

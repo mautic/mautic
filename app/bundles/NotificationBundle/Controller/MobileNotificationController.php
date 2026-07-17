@@ -27,8 +27,8 @@ class MobileNotificationController extends FormController
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
     ): void {
-        $this->auditLogModel = $auditLogModel;
         $this->notificationModel = $notificationModel;
+        $this->auditLogModel = $auditLogModel;
     }
 
     /**
@@ -158,7 +158,6 @@ class MobileNotificationController extends FormController
         $security = $this->security;
 
         $notification = $this->notificationModel->getEntity($objectId);
-
         // set the page we came from
         $page = $request->getSession()->get('mautic.mobile_notification.page', 1);
 
@@ -558,8 +557,7 @@ class MobileNotificationController extends FormController
      */
     public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
     {
-        $model  = $this->getModel('notification');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->notificationModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('notification:mobile_notifications:create')
