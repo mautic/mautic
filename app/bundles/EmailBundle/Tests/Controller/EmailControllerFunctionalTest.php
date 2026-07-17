@@ -731,6 +731,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->enableProfiler();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
 
+        $this->assertSame('Preview', $crawler->filter('.col-md-3.bdr-l .pa-16 > h5')->text());
+
         // checking if pending count is removed from details page ui
         $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
         $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
