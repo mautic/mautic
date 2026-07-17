@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Entity\Permission;
 
 final class Version20260501090000 extends AbstractMauticMigration
 {
@@ -109,35 +110,29 @@ final class Version20260501090000 extends AbstractMauticMigration
         return $bitwise;
     }
 
-    private function upsertNotesPermission(string $permissionsTable, int $roleId, int $bitwise): void
+    private function upsertNotesPermission(string $table, int $roleId, int $bitwise): void
     {
-        $exists = $this->connection->fetchOne(
-            sprintf('SELECT id FROM %s WHERE role_id = :roleId AND bundle = :bundle AND name = :name', $permissionsTable),
-            [
-                'roleId' => $roleId,
-                'bundle' => 'lead',
-                'name'   => 'notes',
-            ]
-        );
+        /** @var EntityManagerInterface $em */
+        $em = $this->container->get('doctrine.orm.entity_manager');
+        $repo = $em->getRepository(Permission::class);
 
-        if (false !== $exists) {
-            $this->connection->update(
-                $permissionsTable,
-                ['bitwise' => $bitwise],
-                ['id'      => (int) $exists]
-            );
+        $existing = $repo->findOneBy([
+            'bundle' => 'lead',
+            'name'   => 'notes',
+        ]);
 
-            return;
+        if ($existing) {
+            $existing->setBitwise($bitwise);
+            $em->persist($existing);
+        } else {
+            $permission = new Permission();
+            $permission->setBundle('lead');
+            $permission->setName('notes');
+            $permission->setBitwise($bitwise);
+            $permission->setIsPublished(true);
+            $em->persist($permission);
         }
 
-        $this->connection->insert(
-            $permissionsTable,
-            [
-                'role_id' => $roleId,
-                'bundle'  => 'lead',
-                'name'    => 'notes',
-                'bitwise' => $bitwise,
-            ]
-        );
+        $em->flush();
     }
 }
