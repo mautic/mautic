@@ -31,15 +31,11 @@ class CompanyController extends FormController
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-<<<<<<< HEAD
     public function autowireCompanyController(
         \Mautic\LeadBundle\Model\LeadModel $leadModel,
         CompanyModel $companyModel,
+        FieldModel $fieldModel,
     ): void {
-=======
-    public function autowireCompanyController(\Mautic\LeadBundle\Model\LeadModel $leadModel, CompanyModel $companyModel, FieldModel $fieldModel): void
-    {
->>>>>>> 5b2d8a1ae7 ([model] flip getModel('lead.field') to typed injection)
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
@@ -1138,7 +1134,7 @@ class CompanyController extends FormController
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.company-merge-options' : null,
-                ],
+                    ],
             ]
         );
     }
