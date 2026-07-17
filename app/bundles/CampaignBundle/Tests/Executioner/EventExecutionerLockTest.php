@@ -11,26 +11,39 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Tests\Traits\LoggerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\LeadEvents;
+use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EventExecutionerLockTest extends MauticMysqlTestCase
 {
-    use LoggerTrait;
-
     private const ADD_POINTS = 10;
 
     private EventExecutioner $eventExecutioner;
 
     private EventDispatcherInterface $eventDispatcher;
 
+    /**
+     * @var ?HandlerInterface[]
+     */
+    private ?array $originalHandlers = null;
+
+    private Logger $logger;
+
+    private TestHandler $testHandler;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->loggerTraitSetup();
+
+        $this->logger = self::getContainer()->get('monolog.logger.mautic');
+        $this->originalHandlers = $this->logger->getHandlers();
+        $this->logger->setHandlers([$this->testHandler = new TestHandler()]);
 
         $this->eventExecutioner = self::getContainer()->get('mautic.campaign.event_executioner');
         $this->eventDispatcher  = self::getContainer()->get('event_dispatcher');
@@ -136,5 +149,14 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     private function makeEventExecutionPass(callable $listener): void
     {
         $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener);
+    }
+
+    protected function beforeTearDown(): void
+    {
+        $this->testHandler->clear();
+
+        if (null !== $this->originalHandlers) {
+            $this->logger->setHandlers($this->originalHandlers);
+        }
     }
 }
