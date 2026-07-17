@@ -153,7 +153,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getContent());
     }
 
-    public function testExecuteNoteActionWithInvalidActionIsDenied(): void
+    public function testExecuteNoteActionWithInvalidActionReturnsNotFound(): void
     {
         [$user, $contact] = $this->createUserAndOwnedContact([
             'lead:leads' => ['viewown'],
@@ -162,7 +162,10 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/not-real-action/0', $contact->getId()));
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(
+            Response::HTTP_NOT_FOUND,
+            'Unknown note actions should return a not found response.'
+        );
     }
 
     public function testUserCanEditOwnNoteOnOthersContactWithEditOwnPermission(): void
