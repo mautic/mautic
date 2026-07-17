@@ -143,6 +143,9 @@ parameters:
 			identifier: parameter.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
+			identifier: property.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
 			identifier: class.extendsDeprecatedClass
 			message: '#class\s+Mautic#'
 		-
@@ -161,7 +164,7 @@ parameters:
 			identifier: classConstant.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
-			identifier: new.deprecated
+			identifier: new.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
 			identifier: classConstant.deprecated
