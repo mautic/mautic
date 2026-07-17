@@ -31,12 +31,15 @@ class ListController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+    private ListModel $listModel;
+
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireListController(LeadModel $leadModel): void
+    public function autowireListController(LeadModel $leadModel, ListModel $listModel): void
     {
         $this->leadModel = $leadModel;
+        $this->listModel = $listModel;
     }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
@@ -57,8 +60,6 @@ class ListController extends FormController
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        /** @var ListModel $model */
-        $model   = $this->getModel('lead.list');
         $session = $request->getSession();
 
         // set some permissions
@@ -101,7 +102,7 @@ class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $model->getRepository()->getTableAlias();
+        $tableAlias = $this->listModel->getRepository()->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -144,7 +145,7 @@ class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
+        $leadCounts = (!empty($listIds)) ? $this->listModel->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,
@@ -506,9 +507,7 @@ class ListController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
-            $list  = $model->getEntity($objectId);
+            $list  = $this->listModel->getEntity($objectId);
 
             if (null === $list) {
                 $flashes[] = [
@@ -521,11 +520,11 @@ class ListController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($list)) {
+            } elseif ($this->listModel->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
                 try {
-                    $model->deleteEntity($list);
+                    $this->listModel->deleteEntity($list);
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.core.notice.deleted',
@@ -663,10 +662,8 @@ class ListController extends FormController
 
         $leadId = $request->get('leadId');
         if (!empty($leadId) && 'POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
             /** @var LeadList $list */
-            $list = $model->getEntity($listId);
+            $list = $this->listModel->getEntity($listId);
             $lead      = $this->leadModel->getEntity($leadId);
 
             if (null === $lead) {
@@ -689,11 +686,11 @@ class ListController extends FormController
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($lead)) {
+            } elseif ($this->listModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->{$function}($lead, $list, true);
+                $this->listModel->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -831,10 +828,7 @@ class ListController extends FormController
 
     protected function getListModel(): ListModel
     {
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-
-        return $model;
+        return $this->listModel;
     }
 
     protected function getModelName(): string

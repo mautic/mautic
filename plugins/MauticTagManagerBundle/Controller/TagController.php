@@ -20,14 +20,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class TagController extends FormController
 {
-    private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
-
-    private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
-
-    private const PERMISSION_DELETE = 'tagManager:tagManager:delete';
-
-    private const PERMISSION_CREATE = 'tagManager:tagManager:create';
-
     private TagModel $leadTagModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
@@ -35,6 +27,14 @@ class TagController extends FormController
     {
         $this->leadTagModel = $leadTagModel;
     }
+
+    private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
+
+    private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
+
+    private const PERMISSION_DELETE = 'tagManager:tagManager:delete';
+
+    private const PERMISSION_CREATE = 'tagManager:tagManager:create';
 
     /**
      * Generate's default list view.
@@ -449,11 +449,9 @@ class TagController extends FormController
      */
     public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
     {
-        /** @var TagModel $model */
-        $model    = $this->getModel('lead.tag');
         $security = $this->security;
 
-        $tag = $model->getEntity($objectId);
+        $tag = $this->leadTagModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
@@ -707,8 +705,6 @@ class TagController extends FormController
      */
     public function deleteAction(Request $request, $objectId): Response
     {
-        /** @var TagModel $model */
-        $model     = $this->getModel('lead.tag');
         $page      = $request->getSession()->get('mautic.tagmanager.page', 1);
         $returnUrl = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
         $flashes   = [];
@@ -724,7 +720,7 @@ class TagController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            $tag = $model->getEntity($objectId);
+            $tag = $this->leadTagModel->getEntity($objectId);
 
             if (null === $tag) {
                 $flashes[] = [
@@ -736,7 +732,7 @@ class TagController extends FormController
                 $this->throwAccessDenied();
             }
 
-            $model->deleteEntity($tag);
+            $this->leadTagModel->deleteEntity($tag);
 
             $flashes[] = [
                 'type'    => 'notice',
