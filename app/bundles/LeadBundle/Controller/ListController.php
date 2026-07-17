@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -28,6 +29,15 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ListController extends FormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
+
+    private LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireListController(LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
@@ -657,9 +667,7 @@ class ListController extends FormController
             $model = $this->getModel('lead.list');
             /** @var LeadList $list */
             $list = $model->getEntity($listId);
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $lead      = $this->leadModel->getEntity($leadId);
 
             if (null === $lead) {
                 $flashes[] = [
@@ -878,20 +886,24 @@ class ListController extends FormController
 
         $joinCategories = false;
         if (!empty($currentFilters)) {
-            $catIds = [];
+            $catAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('category' == $type) {
-                        $catIds[] = (int) $fltr;
+                        $catAliases[]        = $fltr;
+                        $searchFilterTerms[] = 'category:'.$fltr;
                     } // else for other group filters
                 }
             }
 
-            if (!empty($catIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.lead.list.filter', $filter['string']);
+
+            if (!empty($catAliases)) {
                 $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
             }
         }
 
