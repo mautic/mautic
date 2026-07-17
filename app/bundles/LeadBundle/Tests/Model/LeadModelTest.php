@@ -40,7 +40,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
-use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -399,11 +398,20 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = $this->createMock(StageRepository::class);
-        $stageRepositoryMock->expects($this->once())
-            ->method('findByIdOrName')
-            ->with(1)
-            ->willReturn($stageMock);
+        $stageRepositoryMock = new class(1, $stageMock) {
+            public function __construct(
+                private readonly int|string $expectedValue,
+                private readonly ?Stage $returnValue,
+            ) {
+            }
+
+            public function findByIdOrName(int|string $value): ?Stage
+            {
+                \PHPUnit\Framework\Assert::assertSame($this->expectedValue, $value);
+
+                return $this->returnValue;
+            }
+        };
         $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
@@ -439,11 +447,20 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with($lead->getId())
             ->willReturn(null);
 
-        $stageRepositoryMock = $this->createMock(StageRepository::class);
-        $stageRepositoryMock->expects($this->once())
-            ->method('findByIdOrName')
-            ->with($data['stage'])
-            ->willReturn(null);
+        $stageRepositoryMock = new class($data['stage'], null) {
+            public function __construct(
+                private readonly int|string $expectedValue,
+                private readonly ?Stage $returnValue,
+            ) {
+            }
+
+            public function findByIdOrName(int|string $value): ?Stage
+            {
+                \PHPUnit\Framework\Assert::assertSame($this->expectedValue, $value);
+
+                return $this->returnValue;
+            }
+        };
         $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
