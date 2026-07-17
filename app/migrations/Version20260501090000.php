@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\CoreBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Permission;
 
 final class Version20260501090000 extends AbstractMauticMigration
 {
