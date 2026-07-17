@@ -31,7 +31,7 @@ class AssetController extends FormController
     private BatchDownloadResponder $batchDownloadResponder;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setBatchDownloadServices(
+    public function autowireAssetController(
         BatchDownloadRequestValidator $batchDownloadRequestValidator,
         BatchFileCollector $batchFileCollector,
         ArchiveBuilder $archiveBuilder,
