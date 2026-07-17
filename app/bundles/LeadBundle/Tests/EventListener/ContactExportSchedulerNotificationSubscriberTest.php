@@ -26,7 +26,7 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->setScheduledDateTime(new \DateTimeImmutable('2026-05-12 10:30:00 +00:00'))
             ->setData(['fileType' => 'csv']);
 
-        $notificationModel = new class extends NotificationModel {
+        $notificationModel = new class() extends NotificationModel {
             /**
              * @var array<int, array<int, mixed>>
              */
@@ -91,7 +91,7 @@ class ContactExportSchedulerNotificationSubscriberTest extends TestCase
         $role->setName('User');
 
         // Use a tiny test double so we can assign an entity ID without reflection-based private property access.
-        $user = new class extends User {
+        $user = new class() extends User {
             public function setId(int $id): void
             {
                 $this->id = $id;
