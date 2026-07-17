@@ -65,12 +65,15 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
+
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireLeadController(LeadModel $leadModel): void
+    public function autowireLeadController(LeadModel $leadModel, \Mautic\StageBundle\Model\StageModel $stageModel): void
     {
         $this->leadModel = $leadModel;
+        $this->stageModel = $stageModel;
     }
 
     /**
@@ -1790,14 +1793,12 @@ class LeadController extends FormController
                     ++$count;
 
                     if (!empty($data['addstage'])) {
-                        $stageModel = $this->getModel('stage');
-
-                        $stage = $stageModel->getEntity((int) $data['addstage']);
+                        $stage = $this->stageModel->getEntity((int) $data['addstage']);
                         $model->addToStages($lead, $stage);
                     }
 
                     if (!empty($data['removestage'])) {
-                        $stage = $stageModel->getEntity($data['removestage']);
+                        $stage = $this->stageModel->getEntity($data['removestage']);
                         $model->removeFromStages($lead, $stage);
                     }
                 }
