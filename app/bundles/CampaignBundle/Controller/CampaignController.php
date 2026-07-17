@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -47,6 +48,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     /**
      * @var array<string, mixed>
@@ -881,6 +883,7 @@ class CampaignController extends AbstractStandardFormController
         ];
 
         $currentFilters          = $this->getCurrentCampaignListFilters();
+        $filter['string']        = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $this->getQuickFilterSearchTerms($currentFilters));
         [$joinLists, $joinForms] = $this->applyCampaignListFilters($currentFilters, $categories, $categoryFilterPrefix, $listFilters, $filter);
 
         // Store for customizeViewArguments
@@ -951,6 +954,23 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @param array<string, array<int, string>> $currentFilters
+     *
+     * @return string[]
+     */
+    private function getQuickFilterSearchTerms(array $currentFilters): array
+    {
+        $terms = [];
+        foreach ($currentFilters as $type => $values) {
+            foreach ($values as $value) {
+                $terms[] = $type.':'.$value;
+            }
+        }
+
+        return $terms;
+    }
+
+    /**
      * @param array<string, array<int, string>>       $currentFilters
      * @param array<int|string, array<string, mixed>> $categories
      * @param array<string, mixed>                    $listFilters
@@ -963,7 +983,7 @@ class CampaignController extends AbstractStandardFormController
         $joinLists = $joinForms = false;
 
         if (!empty($currentFilters)) {
-            $listIds = $catIds = $formIds = [];
+            $listAliases = $catIds = $formIds = [];
 
             foreach ($currentFilters as $type => $typeFilters) {
                 $type = $type === $categoryFilterPrefix ? 'category' : $type;
@@ -975,10 +995,10 @@ class CampaignController extends AbstractStandardFormController
                 };
                 $listFilters['filters']['groups'][$key]['values'] = $typeFilters;
 
-                $this->processTypeFilters($type, $typeFilters, $categories, $listIds, $formIds, $catIds);
+                $this->processTypeFilters($type, $typeFilters, $categories, $listAliases, $formIds, $catIds);
             }
 
-            $joinLists = $this->appendCampaignFilter($filter, 'l.id', $listIds);
+            $joinLists = $this->appendCampaignFilter($filter, 'l.alias', $listAliases);
             $joinForms = $this->appendCampaignFilter($filter, 'f.id', $formIds);
             $this->appendCampaignFilter($filter, 'cat.id', $catIds);
         }
@@ -987,22 +1007,22 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array<string, mixed> $filter
-     * @param int[]                $ids
+     * @param array<string, mixed>   $filter
+     * @param array<int, int|string> $values
      */
-    private function appendCampaignFilter(array &$filter, string $column, array $ids): bool
+    private function appendCampaignFilter(array &$filter, string $column, array $values): bool
     {
-        $hasIds = !empty($ids);
+        $hasValues = !empty($values);
 
-        if ($hasIds) {
+        if ($hasValues) {
             $filter['force'][] = [
                 'column' => $column,
                 'expr'   => 'in',
-                'value'  => $ids,
+                'value'  => $values,
             ];
         }
 
-        return $hasIds;
+        return $hasValues;
     }
 
     protected function getModelName(): string
@@ -1389,15 +1409,15 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param array<int|string, mixed>                $typeFilters
      * @param array<int|string, array<string, mixed>> $categories
-     * @param array<int>                              $listIds
+     * @param array<int, string>                      $listAliases
      * @param array<int>                              $formIds
      * @param array<int>                              $catIds
      */
-    private function processTypeFilters(string $type, array $typeFilters, array $categories, array &$listIds, array &$formIds, array &$catIds): void
+    private function processTypeFilters(string $type, array $typeFilters, array $categories, array &$listAliases, array &$formIds, array &$catIds): void
     {
         foreach ($typeFilters as $fltr) {
             if ('list' === $type) {
-                $listIds[] = (int) $fltr;
+                $listAliases[] = (string) $fltr;
                 continue;
             }
 
@@ -1407,6 +1427,11 @@ class CampaignController extends AbstractStandardFormController
             }
 
             if ('category' !== $type) {
+                continue;
+            }
+
+            if (is_numeric($fltr)) {
+                $catIds[] = (int) $fltr;
                 continue;
             }
 

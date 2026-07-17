@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -37,6 +38,7 @@ class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
@@ -154,8 +156,17 @@ class EmailController extends FormController
         }
         $session->set('mautic.email.list_filters', $currentFilters);
 
+        $searchFilterTerms = [];
+        foreach ($currentFilters as $type => $typeFilters) {
+            foreach ($typeFilters as $typeFilter) {
+                $searchFilterTerms[] = $type.':'.$typeFilter;
+            }
+        }
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) $filter['string'], $searchFilterTerms);
+        $session->set('mautic.email.filter', $filter['string']);
+
         if (!empty($currentFilters)) {
-            $listIds = $catIds = $templates = [];
+            $listAliases = $catIds = $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 if ($type === $categoryFilterPrefix) {
                     $type = self::FILTER_TYPE_CATEGORY;
@@ -172,8 +183,13 @@ class EmailController extends FormController
 
                 foreach ($typeFilters as $fltr) {
                     if (self::FILTER_TYPE_LIST === $type) {
-                        $listIds[] = (int) $fltr;
+                        $listAliases[] = $fltr;
                     } elseif (self::FILTER_TYPE_CATEGORY === $type) {
+                        if (is_numeric($fltr)) {
+                            $catIds[] = (int) $fltr;
+                            continue;
+                        }
+
                         foreach ($categories as $category) {
                             if (($category['alias'] ?? null) === $fltr) {
                                 $catIds[] = (int) $category['id'];
@@ -186,8 +202,8 @@ class EmailController extends FormController
                 }
             }
 
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+            if (!empty($listAliases)) {
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => $listAliases];
                 $ignoreListJoin    = false;
             }
 

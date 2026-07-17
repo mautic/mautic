@@ -49,11 +49,11 @@ trait CategoryListFiltersTrait
         }
 
         $categoryIds = $this->getSelectedCategoryIds($selectedCategoryValues, $categories);
-        if (!empty($categoryIds)) {
+        if ([] !== $selectedCategoryValues) {
             $filter['force'][] = [
                 'column' => $filterColumn,
                 'expr'   => 'in',
-                'value'  => $categoryIds,
+                'value'  => $categoryIds ?: [0],
             ];
         }
 
