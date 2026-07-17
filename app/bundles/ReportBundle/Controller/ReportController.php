@@ -287,7 +287,7 @@ final class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, int $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
     {
         $entity  = $this->reportModel->getEntity($objectId);
         $session = $request->getSession();

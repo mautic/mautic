@@ -494,8 +494,6 @@ final class EmailController extends FormController
      * Generates new form and processes post data.
      *
      * @param Email $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(
         Request $request,
@@ -505,7 +503,7 @@ final class EmailController extends FormController
         EmailModel $model,
         ThemeHelper $themeHelper,
         $entity = null,
-    ) {
+    ): Response {
         if (!$entity instanceof Email) {
             $entity = $model->getEntity();
         }

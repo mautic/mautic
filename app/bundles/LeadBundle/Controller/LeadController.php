@@ -507,10 +507,8 @@ final class LeadController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage): Response
     {
         $lead  = $this->leadModel->getEntity();
 
@@ -2306,7 +2304,7 @@ final class LeadController extends FormController
     /**
      * @param array<mixed> $permissions
      */
-    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): Response
+    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): JsonResponse
     {
         $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);

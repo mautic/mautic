@@ -252,10 +252,8 @@ final class NotificationController extends AbstractFormController
      * Generates new form and processes post data.
      *
      * @param Notification $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null)
+    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */

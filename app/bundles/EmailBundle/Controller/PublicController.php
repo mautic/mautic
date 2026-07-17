@@ -675,7 +675,7 @@ final class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead(string $email, $repo): ?Lead
+    private function createLead(string $email, \Mautic\LeadBundle\Entity\LeadRepository $repo): ?Lead
     {
         $lead  = $this->leadModel->getEntity();
         // set custom field values

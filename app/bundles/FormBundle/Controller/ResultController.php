@@ -240,7 +240,7 @@ final class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 

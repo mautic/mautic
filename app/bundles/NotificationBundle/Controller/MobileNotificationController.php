@@ -259,10 +259,8 @@ final class MobileNotificationController extends FormController
      * Generates new form and processes post data.
      *
      * @param Notification $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null)
+    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */

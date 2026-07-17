@@ -256,10 +256,8 @@ final class SmsController extends FormController
      * Generates new form and processes post data.
      *
      * @param Sms $entity
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Sms) {
             /** @var Sms $entity */

@@ -125,7 +125,7 @@ final class DynamicContentController extends FormController
         );
     }
 
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             $this->throwAccessDenied();
