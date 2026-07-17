@@ -37,15 +37,7 @@ class UserController extends FormController
     public function autowireUserController(
         UserModel $userModel,
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
-<<<<<<< HEAD
-<<<<<<< HEAD
         RoleModel $roleModel,
-=======
-=======
->>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
->>>>>>> 2c29e425e5 ([cs] standalone line for the #required setters to ease adding new dependencies)
-=======
->>>>>>> 1ddddc02c5 (rebase)
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;

@@ -32,15 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    private FormModel $formModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFormController(
-        FormModel $formModel,
-    ): void {
-        $this->formModel = $formModel;
-    }
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
