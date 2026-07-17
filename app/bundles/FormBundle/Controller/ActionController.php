@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ActionController extends CommonFormController
 {
+    private FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireActionController(FormModel $formModel): void
+    {
+        $this->formModel = $formModel;
+    }
+
     /**
      * Generates new form and processes post data.
      */
@@ -41,11 +49,7 @@ class ActionController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
-        $customComponents = $formModel->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $form             = $this->formFactory->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
@@ -150,10 +154,8 @@ class ActionController extends CommonFormController
         $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if (null !== $formAction) {
-            $formModel = $this->getModel('form.form');
-            \assert($formModel instanceof FormModel);
             $actionType             = $formAction['type'];
-            $customComponents       = $formModel->getCustomComponents();
+            $customComponents       = $this->formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             // ajax only for form fields

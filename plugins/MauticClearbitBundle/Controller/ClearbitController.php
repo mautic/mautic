@@ -14,6 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClearbitController extends FormController
 {
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireClearbitController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     /**
      * @param string $objectId
      *
@@ -27,9 +35,7 @@ class ClearbitController extends FormController
             $data     = $request->request->all()['clearbit_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
@@ -117,8 +123,6 @@ class ClearbitController extends FormController
      */
     public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->getModel('lead');
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['clearbit_batch_lookup'] ?? [];
         } else {
@@ -134,7 +138,7 @@ class ClearbitController extends FormController
             }
 
             if (is_array($ids) && count($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -230,7 +234,7 @@ class ClearbitController extends FormController
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
             foreach ($lookupEmails as $id => $lookupEmail) {
-                if ($lead = $model->getEntity($id)) {
+                if ($lead = $this->leadModel->getEntity($id)) {
                     try {
                         $lookupHelper->lookupContact($lead, $notify);
                     } catch (\Exception $ex) {
