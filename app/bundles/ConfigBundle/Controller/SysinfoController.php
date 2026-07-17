@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class SysinfoController extends FormController
+final class SysinfoController extends FormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,

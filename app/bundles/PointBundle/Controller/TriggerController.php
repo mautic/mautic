@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerController extends FormController
+final class TriggerController extends FormController
 {
     private TriggerEventModel $triggerEventModel;
 

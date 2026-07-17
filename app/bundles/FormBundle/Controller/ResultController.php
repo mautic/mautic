@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+final class ResultController extends CommonFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,

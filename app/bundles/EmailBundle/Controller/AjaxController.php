@@ -27,7 +27,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
     use AjaxLookupControllerTrait;

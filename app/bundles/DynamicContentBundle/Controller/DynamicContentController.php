@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentController extends FormController
+final class DynamicContentController extends FormController
 {
     private TrackableModel $trackableModel;
 

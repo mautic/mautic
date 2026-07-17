@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class EmailController extends FormController
+final class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
@@ -1021,7 +1021,7 @@ class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
-                            return $this->forward(static::class.'::editAction', [
+                            return $this->forward(self::class.'::editAction', [
                                 'objectId'   => $entity->getId(),
                                 'ignorePost' => true,
                             ]);
@@ -1300,9 +1300,6 @@ class EmailController extends FormController
         ));
     }
 
-    /**
-     * Create an AB test.
-     */
     public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
     {
         $entity = $model->getEntity($objectId);

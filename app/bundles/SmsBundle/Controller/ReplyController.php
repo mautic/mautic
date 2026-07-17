@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ReplyController extends AbstractController
+final class ReplyController extends AbstractController
 {
     public function __construct(
         private readonly HandlerContainer $callbackHandler,

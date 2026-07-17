@@ -63,7 +63,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class LeadController extends FormController
+final class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;

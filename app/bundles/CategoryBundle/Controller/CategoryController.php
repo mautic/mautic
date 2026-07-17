@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class CategoryController extends AbstractFormController
+final class CategoryController extends AbstractFormController
 {
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
@@ -47,7 +47,7 @@ class CategoryController extends AbstractFormController
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
-                static::class.'::'.$objectAction.'Action',
+                self::class.'::'.$objectAction.'Action',
                 [
                     'bundle'      => $bundle,
                     'objectId'    => $objectId,

@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ReportController extends FormController
+final class ReportController extends FormController
 {
     private ReportModel $reportModel;
 

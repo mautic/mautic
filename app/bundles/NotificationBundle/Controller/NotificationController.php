@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class NotificationController extends AbstractFormController
+final class NotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
 

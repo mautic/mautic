@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends AbstractController
+final class EmailGraphStatsController extends AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.

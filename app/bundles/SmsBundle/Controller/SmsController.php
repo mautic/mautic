@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SmsController extends FormController
+final class SmsController extends FormController
 {
     use EntityContactsTrait;
 

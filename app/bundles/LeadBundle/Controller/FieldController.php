@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class FieldController extends FormController
+final class FieldController extends FormController
 {
     private FieldModel $fieldModel;
 

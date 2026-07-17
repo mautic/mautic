@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FocusController extends AbstractStandardFormController
+final class FocusController extends AbstractStandardFormController
 {
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
