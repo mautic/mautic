@@ -14,6 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     /**
      * Write a notification.
      *
@@ -24,9 +32,7 @@ class PublicController extends FormController
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+        $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }
 
     /**

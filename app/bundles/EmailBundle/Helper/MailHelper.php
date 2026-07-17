@@ -1910,7 +1910,7 @@ class MailHelper
         }
     }
 
-    private function buildMetadata($name, array $tokens): array
+    private function buildMetadata(?string $name, array $tokens): array
     {
         return [
             'name'        => $name,
@@ -1950,7 +1950,7 @@ class MailHelper
         $this->from       = $this->systemFrom;
     }
 
-    private function setDefaultReplyTo($systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
+    private function setDefaultReplyTo(?string $systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
     {
         $fromEmail = null;
         if ($systemFromEmail) {
