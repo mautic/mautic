@@ -42,10 +42,8 @@ class AssetApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        AssetModel $assetModel,
     ) {
-        $assetModel = $modelFactory->getModel('asset');
-        \assert($assetModel instanceof AssetModel);
-
         $this->model            = $assetModel;
         $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
