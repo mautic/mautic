@@ -40,8 +40,6 @@ class NotificationApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         NotificationModel $notificationModel,
     ) {
-        \assert($notificationModel instanceof NotificationModel);
-
         $this->model           = $notificationModel;
         $this->entityClass     = Notification::class;
         $this->entityNameOne   = 'notification';
