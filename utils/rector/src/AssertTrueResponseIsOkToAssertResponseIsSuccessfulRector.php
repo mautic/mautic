@@ -57,12 +57,11 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         return [MethodCall::class, StaticCall::class];
     }
 
+    /**
+     * @param MethodCall|StaticCall $node
+     */
     public function refactor(Node $node): ?Node
     {
-        if (!$node instanceof MethodCall && !$node instanceof StaticCall) {
-            return null;
-        }
-
         if (!$this->isInWebTestCase($node)) {
             return null;
         }
@@ -84,7 +83,7 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         return new StaticCall(new Name('self'), 'assertResponseIsSuccessful', $args);
     }
 
-    private function resolveAssertionType(Node $node): ?string
+    private function resolveAssertionType(MethodCall|StaticCall $node): ?string
     {
         if ($this->isName($node->name, 'assertTrue')) {
             return 'assertTrue';
@@ -100,7 +99,7 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
     /**
      * @return Arg[]|null
      */
-    private function resolveReplacementArgs(Node $node, string $assertionType): ?array
+    private function resolveReplacementArgs(MethodCall|StaticCall $node, string $assertionType): ?array
     {
         if ('assertTrue' === $assertionType) {
             if (!isset($node->args[0]) || !$this->isBrowserKitResponseOkCheck($node->args[0], $node)) {

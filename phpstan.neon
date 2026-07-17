@@ -26,6 +26,7 @@ parameters:
 		- *.inc.php
 		- plugins/*/node_modules/*
 		- plugins/*/vendor/*
+		- */Fixture/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
@@ -172,6 +173,9 @@ parameters:
 			paths:
 				- app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
 				- app/bundles/CoreBundle/Controller/AjaxController.php
+		-
+			identifier: mautic.noTablePrefixDefinitionInTests
+			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
