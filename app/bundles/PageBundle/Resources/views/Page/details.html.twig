@@ -265,11 +265,11 @@
           {% if not activePage.isPreferenceCenter %}
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
-                  <div class="panel-title">{{ 'mautic.page.url'|trans }}</div>
+                  <label class="panel-title" for="page-url">{{ 'mautic.page.url'|trans }}</label>
               </div>
               <div class="panel-body pt-xs">
                   <div class="input-group">
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                      <input id="page-url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                              readonly value="{{ pageUrl }}"/>
                       <span class="input-group-btn">
                           {% include '@MauticCore/Helper/button.html.twig' with {
