@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 
 final class Version20260501090000 extends AbstractMauticMigration
 {
@@ -116,8 +117,11 @@ final class Version20260501090000 extends AbstractMauticMigration
         /** @var EntityManagerInterface $em */
         $em = $this->container->get('doctrine.orm.entity_manager');
         $repo = $em->getRepository(Permission::class);
+        $roleRepo = $em->getRepository(Role::class);
+        $role = $roleRepo->find($roleId);
 
         $existing = $repo->findOneBy([
+            'role'   => $role,
             'bundle' => 'lead',
             'name'   => 'notes',
         ]);
@@ -127,10 +131,10 @@ final class Version20260501090000 extends AbstractMauticMigration
             $em->persist($existing);
         } else {
             $permission = new Permission();
+            $permission->setRole($role);
             $permission->setBundle('lead');
             $permission->setName('notes');
             $permission->setBitwise($bitwise);
-            $permission->setIsPublished(true);
             $em->persist($permission);
         }
 
