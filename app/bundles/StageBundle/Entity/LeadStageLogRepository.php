@@ -134,31 +134,28 @@ class LeadStageLogRepository extends CommonRepository
      */
     private function deleteDuplicateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
     {
-        // Lead and stage are a composite key, so delete source rows that would duplicate an existing target row.
-        $connection->executeStatement(
-            sprintf(
-                'DELETE FROM %1$s
-                    WHERE stage_id = :fromStageId
-                    AND lead_id IN (:leadIds)
-                    AND (lead_id, stage_id) IN (
-                        SELECT lead_id, :toStageId
-                        FROM %1$s
-                        WHERE lead_id IN (:leadIds)
-                        AND stage_id = :toStageId
-                    )',
-                $table
-            ),
-            [
-                'fromStageId' => $fromStageId,
-                'leadIds'     => $leadIds,
-                'toStageId'   => $toStageId,
-            ],
-            [
-                'fromStageId' => ParameterType::INTEGER,
-                'leadIds'     => ArrayParameterType::STRING,
-                'toStageId'   => ParameterType::INTEGER,
-            ]
-        );
+        $qb = $connection->createQueryBuilder();
+
+        // Use a derived table to satisfy MySQL's restrictions
+        $subQb = $connection->createQueryBuilder()
+            ->select('lead_id')
+            ->from($table)
+            ->where('stage_id = :toStageId')
+            ->andWhere('lead_id IN (:leadIds)');
+
+        $qb->delete($table)
+            ->where('stage_id = :fromStageId')
+            ->andWhere('lead_id IN (:leadIds)')
+            ->andWhere(
+                $qb->expr()->in(
+                    'lead_id',
+                    $subQb->getSQL()   // sub-select for conflicting leads
+                )
+            )
+            ->setParameter('fromStageId', $fromStageId, ParameterType::INTEGER)
+            ->setParameter('toStageId', $toStageId, ParameterType::INTEGER)
+            ->setParameter('leadIds', $leadIds, ArrayParameterType::STRING)
+            ->executeStatement();
     }
 
     /**
