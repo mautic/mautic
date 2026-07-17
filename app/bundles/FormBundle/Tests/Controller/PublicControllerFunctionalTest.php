@@ -14,6 +14,31 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function testGenerateActionIsIndependentFromMauticTracking(): void
+    {
+        $form = $this->createForm();
+        $form->setIsPublished(true);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/form/generate.js?id={$form->getId()}");
+
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'text/javascript; charset=UTF-8');
+        $content = (string) $this->client->getResponse()->getContent();
+        Assert::assertStringContainsString('mauticform_wrapper_companylookuptest', $content);
+        Assert::assertStringContainsString("/form/submit?formId={$form->getId()}", $content);
+        Assert::assertStringContainsString('media/js/mautic-form.js', $content);
+        Assert::assertStringContainsString('MauticSDK.onLoad()', $content);
+        Assert::assertStringNotContainsString('MauticJS', $content);
+        Assert::assertStringNotContainsString('mtc_id', $content);
+        Assert::assertStringNotContainsString('mautic_device_id', $content);
+        Assert::assertStringNotContainsString('/mtc.js', $content);
+        Assert::assertStringNotContainsString('/mautic-essential.js', $content);
+        Assert::assertStringNotContainsString('/mautic-tracking.js', $content);
+    }
+
     public function testLookupActionWithNoLookupFormField(): void
     {
         $this->makeRequest(['string' => 'Company']);

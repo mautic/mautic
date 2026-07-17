@@ -66,6 +66,7 @@ final class BuildJsSubscriberTest extends TestCase
         Assert::assertStringContainsString('dataLayer.push(arguments)', $js);
         Assert::assertStringContainsString('https://connect.facebook.net/en_US/fbevents.js', $js);
         Assert::assertStringContainsString("typeof events.focus_item !== 'undefined'", $js);
+        Assert::assertStringContainsString("MauticJS.insertScript(e[i]['js']);", $js);
         Assert::assertStringContainsString('m.deliverPageEvent = function', $js);
         Assert::assertStringNotContainsString('MauticJS.serialize = function', $js);
     }

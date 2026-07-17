@@ -53,6 +53,7 @@ final class BuildJsSubscriberTest extends TestCase
         Assert::assertStringContainsString('MauticJS.enhanceDynamicContent = function', $js);
         Assert::assertStringContainsString('MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);', $js);
         Assert::assertStringContainsString('media/js/mautic-form.js', $js);
+        Assert::assertStringContainsString('MauticSDK.onLoad();', $js);
         Assert::assertStringContainsString('search("/focus/")', $js);
         Assert::assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
         Assert::assertSame(2, substr_count($js, 'MauticJS.replaceDynamicContent'));

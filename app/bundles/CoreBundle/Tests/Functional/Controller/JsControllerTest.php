@@ -58,7 +58,8 @@ final class JsControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('requestWithCredentials', $content);
         Assert::assertStringContainsString('replaceDynamicContent', $content);
         Assert::assertStringContainsString('enhanceDynamicContent', $content);
-        Assert::assertStringNotContainsString("localStorage.getItem('mtc_id')", $content);
+        Assert::assertStringNotContainsString('mtc_id', $content);
+        Assert::assertStringNotContainsString('mautic_device_id', $content);
         Assert::assertStringNotContainsString('getTrackedContact', $content);
         Assert::assertStringNotContainsString('setTrackedContact(response)', $content);
         Assert::assertStringNotContainsString('deliverPageEvent', $content);
