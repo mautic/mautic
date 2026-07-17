@@ -124,8 +124,9 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createStub(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+
+        $builderMock       = $this->createMock(FormBuilderInterface::class);
+        $eventListener = $this->getEventListenerFromBuildForm($type, $builderMock);
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
