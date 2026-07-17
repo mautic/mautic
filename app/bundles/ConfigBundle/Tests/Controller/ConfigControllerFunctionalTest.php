@@ -251,6 +251,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'config[coreconfig][site_url]'                     => 'https://mautic-community.local',
                 'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'           => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
                 'config[leadconfig][contact_export_notify_admins]' => '0',
             ]
         );
