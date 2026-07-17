@@ -152,7 +152,7 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:notes:viewown', 'lead:notes:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
 

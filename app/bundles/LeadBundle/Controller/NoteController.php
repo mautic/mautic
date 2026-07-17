@@ -17,7 +17,7 @@ class NoteController extends FormController
     /**
      * Generate's default list view.
      */
-    public function indexAction(Request $request, $leadId = 0, $page = 1): Response
+    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -49,7 +49,6 @@ class NoteController extends FormController
         $orderBy    = $session->get('mautic.lead.'.$lead->getId().'.note.orderby', 'n.dateTime');
         $orderByDir = $session->get('mautic.lead.'.$lead->getId().'.note.orderbydir', 'DESC');
 
-        $model = $this->getModel('lead.note');
         $force = [
             [
                 'column' => 'n.lead',
@@ -80,37 +79,68 @@ class NoteController extends FormController
             ];
         }
 
-        $items = $model->getEntities(
-            [
-                'filter' => [
-                    'force'  => $force,
-                    'string' => $search,
-                ],
-                'start'          => $start,
-                'limit'          => $limit,
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
+        $viewPermissions = $this->security->isGranted(['lead:notes:viewown', 'lead:notes:viewother'], 'RETURN_ARRAY');
+        $canViewOwn      = $viewPermissions['lead:notes:viewown'] ?? false;
+        $canViewOther    = $viewPermissions['lead:notes:viewother'] ?? false;
+        $canViewNotes    = $canViewOwn || $canViewOther;
 
-        $security = $this->security;
+        $items           = [];
+        if ($canViewNotes) {
+            if (!$canViewOther) {
+                $force[] = [
+                    'column' => 'n.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->user?->getId(),
+                ];
+            }
+
+            $items = $model->getEntities(
+                [
+                    'filter' => [
+                        'force'  => $force,
+                        'string' => $search,
+                    ],
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'orderBy'        => $orderBy,
+                    'orderByDir'     => $orderByDir,
+                    'hydration_mode' => 'HYDRATE_ARRAY',
+                ]
+            );
+        }
+
+        $notePermissions = [];
+        foreach ($items as &$item) {
+            $permissionUser      = $item['createdBy'] ?? null;
+            $itemId              = (int) ($item['id'] ?? 0);
+            $notePermission      = [
+                'edit'   => $this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $permissionUser),
+                'delete' => $this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $permissionUser),
+            ];
+            $item['permissions'] = $notePermission;
+            if ($itemId > 0) {
+                $notePermissions[$itemId] = $notePermission;
+            }
+        }
+        unset($item);
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'notes'       => $items,
-                    'lead'        => $lead,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'search'      => $search,
-                    'noteType'    => $noteType,
-                    'noteTypes'   => $noteTypes,
-                    'tmpl'        => $tmpl,
-                    'permissions' => [
-                        'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()),
-                        'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getPermissionUser()),
+                    'notes'           => $items,
+                    'lead'            => $lead,
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'search'          => $search,
+                    'noteType'        => $noteType,
+                    'noteTypes'       => $noteTypes,
+                    'tmpl'            => $tmpl,
+                    'permissions'     => [
+                        'create' => $this->security->isGranted('lead:notes:create'),
+                        'edit'   => $this->security->isGranted(['lead:notes:editown', 'lead:notes:editother'], 'MATCH_ONE'),
+                        'delete' => $this->security->isGranted(['lead:notes:deleteown', 'lead:notes:deleteother'], 'MATCH_ONE'),
                     ],
+                    'notePermissions' => $notePermissions,
                 ],
                 'passthroughVars' => [
                     'route'         => false,
@@ -125,11 +155,14 @@ class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      */
-    public function newAction(Request $request, $leadId): Response|JsonResponse
+    public function newAction(Request $request, $leadId): Response|JsonResponse|array
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
             return $lead;
+        }
+        if (!$this->security->isGranted('lead:notes:create')) {
+            return $this->accessDenied();
         }
 
         // retrieve the entity
@@ -165,8 +198,8 @@ class NoteController extends FormController
 
         $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()),
-            'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getPermissionUser()),
+            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {
@@ -211,7 +244,7 @@ class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse|array
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -224,8 +257,8 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
 
-        if (null === $note || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            $this->throwAccessDenied();
+        if (null === $note || !$this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy())) {
+            return $this->accessDenied();
         }
 
         $action = $this->generateUrl(
@@ -253,8 +286,8 @@ class NoteController extends FormController
 
         $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()),
-            'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getPermissionUser()),
+            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {
@@ -308,7 +341,7 @@ class NoteController extends FormController
         }
 
         if (
-            !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
+            !$this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy())
             || $model->isLocked($note)
         ) {
             $this->throwAccessDenied();
