@@ -24,6 +24,14 @@ class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireCompanyController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
+    {
+        $this->leadModel = $leadModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
     {
         // set some permissions
@@ -624,9 +632,6 @@ class CompanyController extends FormController
     public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
     {
         $this->setListFilters();
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->getModel('lead');
         $session = $request->getSession();
         // set limits
         $limit = $session->get('mautic.company.'.$companyId.'.contacts.limit', $this->coreParametersHelper->get('default_pagelimit'));
@@ -646,7 +651,7 @@ class CompanyController extends FormController
             ],
         ];
 
-        $results = $model->getEntities([
+        $results = $this->leadModel->getEntities([
             'start'          => $start,
             'limit'          => $limit,
             'filter'         => $filter,
