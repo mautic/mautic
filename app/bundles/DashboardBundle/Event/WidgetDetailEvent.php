@@ -93,8 +93,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the cache dir.
-     *
      * @param string     $cacheDir
      * @param mixed|null $uniqueCacheDir
      */
@@ -105,8 +103,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the cache timeout.
-     *
      * @param int|null $cacheTimeout
      */
     public function setCacheTimeout($cacheTimeout): void
@@ -251,8 +247,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get an error message.
-     *
      * @return string
      */
     public function getErrorMessage()

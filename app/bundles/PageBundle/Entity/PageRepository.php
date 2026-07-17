@@ -250,8 +250,6 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant
