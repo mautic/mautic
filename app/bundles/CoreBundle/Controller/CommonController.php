@@ -37,12 +37,16 @@ class CommonController extends AbstractController implements MauticController
 
     protected ?\Mautic\UserBundle\Entity\User $user;
 
+    private PageModel $pageModel;
+
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     #[Required]
     public function autowireCommonController(
+        PageModel $pageModel,
         \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
     ): void {
+        $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
     }
 
@@ -551,11 +555,9 @@ class CommonController extends AbstractController implements MauticController
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page404)) {
-            $pageModel = $this->getModel('page');
-            \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page404);
+            $page = $this->pageModel->getEntity($page404);
             if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug     = $pageModel->generateSlug($page);
+                $slug     = $this->pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
                     [
