@@ -24,7 +24,10 @@ class PublicController extends FormController
     public function autowirePublicController(
         \Mautic\LeadBundle\Model\LeadModel $leadModel,
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+<<<<<<< HEAD
         \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+=======
+>>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;

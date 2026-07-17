@@ -36,8 +36,14 @@ class UserController extends FormController
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireUserController(
         UserModel $userModel,
+<<<<<<< HEAD
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+<<<<<<< HEAD
         RoleModel $roleModel,
+=======
+=======
+>>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
+>>>>>>> 2c29e425e5 ([cs] standalone line for the #required setters to ease adding new dependencies)
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;

@@ -29,8 +29,10 @@ class CompanyController extends FormController
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCompanyController(\Mautic\LeadBundle\Model\LeadModel $leadModel, CompanyModel $companyModel): void
-    {
+    public function autowireCompanyController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        CompanyModel $companyModel,
+    ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
     }

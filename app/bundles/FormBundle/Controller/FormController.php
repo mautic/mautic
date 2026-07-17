@@ -32,6 +32,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+<<<<<<< HEAD
+=======
+    private FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireFormController(
+        FormModel $formModel,
+    ): void {
+        $this->formModel = $formModel;
+    }
+
+>>>>>>> fd54613747 ([cs] standalone line for the #required setters to ease adding new dependencies)
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
