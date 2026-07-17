@@ -27,6 +27,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
+    private RoleModel $roleModel;
+
     private UserModel $userModel;
 
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
@@ -35,9 +37,11 @@ class UserController extends FormController
     public function autowireUserController(
         UserModel $userModel,
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        RoleModel $roleModel,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
+        $this->roleModel = $roleModel;
     }
 
     /**
@@ -324,10 +328,7 @@ class UserController extends FormController
         $auditLogRepository = $this->auditLogModel->getRepository();
         $userActivity       = $auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
-
-        $roleModel = $this->getModel('user.role');
-        \assert($roleModel instanceof RoleModel);
-        $roleRepository     = $roleModel->getRepository();
+        $roleRepository     = $this->roleModel->getRepository();
         $roles              = $roleRepository->getEntities();
 
         // set the page we came from
