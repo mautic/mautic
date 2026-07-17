@@ -19,10 +19,9 @@ class TransportCallback
 
     /**
      * @param string $hashId
-     * @param string $comments
      * @param int    $dncReason
      */
-    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED): void
+    public function addFailureByHashId($hashId, ?string $comments, $dncReason = DNC::BOUNCED): void
     {
         $result = $this->finder->findByHash($hashId);
 
@@ -65,7 +64,7 @@ class TransportCallback
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    private function updateStatDetails(Stat $stat, $comments, $dncReason): void
+    private function updateStatDetails(Stat $stat, ?string $comments, int $dncReason): void
     {
         if (DNC::BOUNCED === $dncReason) {
             $stat->setIsFailed(true);

@@ -10,21 +10,23 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 86.2
-		param: 74.1
-		property: 66.8
+		return: 86.5
+		param: 74.6
+		property: 67.2
 		# wait for PHP 8.3 before changing
 		constant: 3
 	paths:
 		- app/bundles
 		- app/migrations
 		- plugins
+		- utils
 	excludePaths:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
 		- plugins/*/node_modules/*
 		- plugins/*/vendor/*
+		- */Fixture/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
@@ -171,6 +173,9 @@ parameters:
 			paths:
 				- app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
 				- app/bundles/CoreBundle/Controller/AjaxController.php
+		-
+			identifier: mautic.noTablePrefixDefinitionInTests
+			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -184,14 +189,14 @@ parameters:
 
 services:
 	-
-		class: MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule
+		class: Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
 		tags:
 			- phpstan.rules.rule
 	-
-		class: MauticPhpStan\Rule\NoTablePrefixDefinitionInTestsRule
+		class: Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
 		tags:
 			- phpstan.rules.rule
 	-
-		class: MauticPhpStan\Rule\AutowireMethodNameMustMatchClassRule
+		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
 		tags:
 			- phpstan.rules.rule
