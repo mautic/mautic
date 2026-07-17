@@ -134,7 +134,6 @@ final class HttpFactoryTest extends TestCase
          * Even though the method getConfig is deprecated it won't get deprecated
          * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
          */
-        /** @phpstan-ignore-next-line */
         $this->assertSame('https://mautic.com', (string) $client->getConfig('base_uri'));
     }
 
@@ -320,7 +319,6 @@ final class HttpFactoryTest extends TestCase
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware
     {
-        /** @phpstan-ignore-next-line */
         $handler = $client->getConfig()['handler'];
 
         $reflection = new \ReflectionClass($handler);

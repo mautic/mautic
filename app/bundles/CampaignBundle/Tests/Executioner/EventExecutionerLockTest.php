@@ -28,7 +28,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private EventDispatcherInterface $eventDispatcher;
 
-    protected function setUp(): void // @phpstan-ignore phpunit.callParent
+    protected function setUp(): void
     {
         $this->loggerTraitSetup();
 
@@ -124,17 +124,17 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private function makeEventExecutionFail(): callable
     {
-        $listener = function (CampaignExecutionEvent $event): void { // @phpstan-ignore parameter.deprecatedClass
+        $listener = function (CampaignExecutionEvent $event): void {
             $event->setResult(false);
             $event->stopPropagation();
         };
-        $this->eventDispatcher->addListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener, 9999); // @phpstan-ignore classConstant.deprecated
+        $this->eventDispatcher->addListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener, 9999);
 
         return $listener;
     }
 
     private function makeEventExecutionPass(callable $listener): void
     {
-        $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener); // @phpstan-ignore classConstant.deprecated
+        $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION, $listener);
     }
 }

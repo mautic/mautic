@@ -45,13 +45,11 @@ final class IntegrationsListTypeTest extends TestCase
             ->method('getPlugin')
             ->willReturn($plugin);
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
         $integrationInstance1->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
         $integrationInstance2->expects($this->once())
             ->method('getIntegrationSettings')
@@ -70,7 +68,6 @@ final class IntegrationsListTypeTest extends TestCase
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
-                /** @phpstan-ignore classConstant.deprecatedClass */
                 $this->createStub(AbstractIntegration::class)
             );
 
@@ -178,13 +175,11 @@ final class IntegrationsListTypeTest extends TestCase
             ->method('getPlugin')
             ->willReturn($plugin);
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
         $integrationInstance1->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
         $integrationInstance2->expects($this->once())
             ->method('getIntegrationSettings')
@@ -203,7 +198,6 @@ final class IntegrationsListTypeTest extends TestCase
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
-                /** @phpstan-ignore classConstant.deprecatedClass */
                 $this->createStub(AbstractIntegration::class)
             );
 

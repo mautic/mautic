@@ -102,7 +102,7 @@ final class HttpFactoryTest extends TestCase
         $factory = new HttpFactory();
 
         $client  = $factory->getClient($credentials);
-        $headers = $client->getConfig('headers'); /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
+        $headers = $client->getConfig('headers');
         $this->assertArrayHasKey('abc', $headers);
         $this->assertEquals('123', $headers['abc']);
     }

@@ -49,7 +49,6 @@ class FormController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
     ) {
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

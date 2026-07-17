@@ -203,7 +203,6 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
             'type'         => 'email',
         ])->setForm($form);
 
-        // @phpstan-ignore-next-line (using the deprecated method on purpose)
         $field->setLeadField('email');
         $this->em->persist($field);
         $this->em->flush();

@@ -78,7 +78,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
@@ -89,7 +88,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
-                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
+                return $this->grapesJsBuilderRepository;
             }
         };
 
@@ -181,7 +180,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
@@ -192,7 +190,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
-                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
+                return $this->grapesJsBuilderRepository;
             }
         };
 

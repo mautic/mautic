@@ -18,8 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This trait is consumed dynamically by multiple form types at runtime.
- *
- * @phpstan-ignore-next-line trait.unused
  */
 trait FilterTrait
 {

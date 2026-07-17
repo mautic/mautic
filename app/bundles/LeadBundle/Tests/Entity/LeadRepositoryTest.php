@@ -191,6 +191,6 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->repository->updateLastActive(null); // @phpstan-ignore-line this tests if we provide null instead which actually happens.
+        $this->repository->updateLastActive(null);
     }
 }

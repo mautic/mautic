@@ -127,11 +127,11 @@ final class LeadTest extends TestCase
         $lead->setFields($fields);
 
         // This should not killover with a segmentation fault due to a loop
-        $lead->setNotes('hello'); // @phpstan-ignore method.notFound
+        $lead->setNotes('hello');
 
         // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
-        $lead->setTest('hello'); // @phpstan-ignore method.notFound
-        $this->assertEquals('hello', $lead->getTest()); // @phpstan-ignore method.notFound
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
     }
 
     public function testDataIsCleanedCorrectly(): void

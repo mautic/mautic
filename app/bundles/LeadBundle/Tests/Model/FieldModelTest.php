@@ -294,7 +294,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             }
         };
 
-        $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
+        $this->connection->getConfiguration()->setSQLLogger($stack);
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 

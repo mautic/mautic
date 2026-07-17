@@ -41,7 +41,6 @@ final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
 
     public function testGetFormTypeReturnsNull(): void
     {
-        // @phpstan-ignore-next-line - Intentional null check
         $this->assertNull($this->integration->getFormType());
     }
 }

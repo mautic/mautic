@@ -7,25 +7,16 @@ use Doctrine\DBAL\Types\Type;
 
 class ExampleClassWithPrivateProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     private string $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     protected $test = 'value';
 }
 
 class ExampleClassWithPublicProperty
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     public $test = 'value';
 }
 

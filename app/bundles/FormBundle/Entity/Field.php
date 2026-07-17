@@ -1013,8 +1013,6 @@ class Field implements UuidInterface
         /**
          * Ignoring this line because the leadField is deprecated and will be removed in Mautic 4.
          * Todo: Use mappedObject or mappedField instead.
-         *
-         * @phpstan-ignore-next-line
          */
         $this->leadField = null;
     }

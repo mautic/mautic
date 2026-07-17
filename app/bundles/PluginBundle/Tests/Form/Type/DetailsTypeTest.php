@@ -22,7 +22,6 @@ final class DetailsTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
         $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
@@ -91,7 +90,6 @@ final class DetailsTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
         $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
@@ -173,7 +171,6 @@ final class DetailsTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $options = ['integration' => 'integration', 'lead_fields' => 'lead_fields', 'company_fields' => 'company_fields'];
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
         $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
@@ -256,7 +253,6 @@ final class DetailsTypeTest extends TestCase
         /** @var MockObject&FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
 
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
         $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')

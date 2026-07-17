@@ -30,7 +30,6 @@ final class DecisionDispatcherTest extends TestCase
     protected function setUp(): void
     {
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
         $this->config             = $this->createMock(DecisionAccessor::class);
         $this->decisionDispatcher = new DecisionDispatcher($this->dispatcher, $this->legacyDispatcher);

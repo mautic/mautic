@@ -29,7 +29,6 @@ final class SyncServiceTest extends MauticMysqlTestCase
     {
         $this->markTestSkipped('disabled for now');
 
-        // @phpstan-ignore-next-line deadCode.unreachable
         sleep(1);
 
         $prefix             = $this->getContainer()->getParameter('mautic.db_table_prefix');
