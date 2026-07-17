@@ -38,10 +38,7 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\NoteModel;
@@ -67,13 +64,31 @@ class LeadController extends FormController
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
 
+    private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
+
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
+
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+
+    private ListModel $listModel;
+
     private LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireLeadController(LeadModel $leadModel, \Mautic\StageBundle\Model\StageModel $stageModel): void
-    {
+    public function autowireLeadController(
+        LeadModel $leadModel,
+        ListModel $listModel,
+        \Mautic\StageBundle\Model\StageModel $stageModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        \Mautic\LeadBundle\Model\FieldModel $fieldModel,
+        \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
+    ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
+        $this->listModel = $listModel;
+        $this->companyModel = $companyModel;
+        $this->fieldModel = $fieldModel;
+        $this->contactExportSchedulerModel = $contactExportSchedulerModel;
     }
 
     /**
@@ -193,10 +208,7 @@ class LeadController extends FormController
         if (!$this->security->isGranted('lead:lists:viewother')) {
             $listArgs['filter']['force'] = " {$mine}";
         }
-
-        $leadListModel = $this->getModel('lead.list');
-        \assert($leadListModel instanceof ListModel);
-        $lists = $leadListModel->getUserLists();
+        $lists = $this->listModel->getUserLists();
 
         // check to see if in a single list
         $inSingleList = 1 === substr_count($search, "{$listCommand}:");
@@ -405,10 +417,7 @@ class LeadController extends FormController
         $fields            = $lead->getFields();
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-
-        $companyModel = $this->getModel('lead.company');
-        \assert($companyModel instanceof CompanyModel);
-        $companiesRepo = $companyModel->getRepository();
+        $companiesRepo = $this->companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
@@ -503,9 +512,7 @@ class LeadController extends FormController
         // set the page we came from
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
@@ -714,9 +721,7 @@ class LeadController extends FormController
         }
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
@@ -1275,9 +1280,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var ListModel $listModel */
-            $listModel = $this->getModel('lead.list');
-            $lists     = $listModel->getUserLists();
+            $lists     = $this->listModel->getUserLists();
 
             // Get a list of lists for the lead
             $leadsLists = $this->leadModel->getLists($lead, true, true);
@@ -1311,9 +1314,7 @@ class LeadController extends FormController
                 $lead->getOwner()
             )
         ) {
-            $companyModel = $this->getModel('lead.company');
-            \assert($companyModel instanceof CompanyModel);
-            $companies = $companyModel->getUserCompanies();
+            $companies = $this->companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
             $companyLeads = $lead->getCompanies();
@@ -2301,11 +2302,8 @@ class LeadController extends FormController
             $this->throwAccessDenied();
         }
 
-        /** @var ContactExportSchedulerModel $model */
-        $model = $this->getModel('lead.export_scheduler');
-
         try {
-            return $model->getExportFileToDownload($fileName);
+            return $this->contactExportSchedulerModel->getExportFileToDownload($fileName);
         } catch (FileNotFoundException) {
             return $this->notFound();
         }
@@ -2316,10 +2314,8 @@ class LeadController extends FormController
      */
     private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): Response
     {
-        /** @var ContactExportSchedulerModel $model */
-        $model                  = $this->getModel('lead.export_scheduler');
-        $data                   = $model->prepareData($permissions);
-        $contactExportScheduler = $model->saveEntity($data);
+        $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
+        $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
         $dispatcher->dispatch(
             new ContactExportSchedulerEvent($contactExportScheduler),

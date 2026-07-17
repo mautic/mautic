@@ -27,7 +27,6 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +38,14 @@ class EmailController extends FormController
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
+
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireEmailController(\Mautic\LeadBundle\Model\ListModel $listModel): void
+    {
+        $this->listModel = $listModel;
+    }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
@@ -104,11 +111,7 @@ class EmailController extends FormController
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
-
-        // retrieve a list of Lead Lists
-        $leadListModel = $this->getModel('lead.list');
-        \assert($leadListModel instanceof ListModel);
-        $availableLists                                               = $leadListModel->getUserLists();
+        $availableLists                                               = $this->listModel->getUserLists();
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
