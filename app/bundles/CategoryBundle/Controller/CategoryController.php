@@ -67,7 +67,8 @@ class CategoryController extends AbstractFormController
     }
 
     /**
-     * @param int $page
+     * @param string $bundle
+     * @param int    $page
      */
     public function indexAction(Request $request, $bundle, $page = 1): Response
     {
