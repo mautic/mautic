@@ -67,14 +67,18 @@ class CategoryController extends AbstractFormController
     }
 
     /**
-     * @param int $page
+     * @param string $bundle
+     * @param int    $page
      */
     public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
-        $search = $request->query->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $request->query->get('bundle', $session->get('mautic.category.type', $bundle));
+        $categoryFilter = (string) $session->get('mautic.category.filter', '');
+        $search = $request->query->get('search', $categoryFilter);
+
+        $categoryType = (string) $session->get('mautic.category.type', $bundle);
+        $bundle = $request->query->get('bundle', $categoryType);
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
