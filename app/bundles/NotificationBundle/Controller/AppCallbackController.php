@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AppCallbackController extends CommonController
 {
+    private NotificationModel $notificationModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireAppCallbackController(NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     public function indexAction(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), true);
@@ -48,9 +56,7 @@ class AppCallbackController extends CommonController
 
             if (null !== $notification) {
                 $statCreated       = true;
-                $notificationModel = $this->getModel('notification');
-                \assert($notificationModel instanceof NotificationModel);
-                $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
+                $this->notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }
 
