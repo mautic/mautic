@@ -36,7 +36,7 @@
     "liip/test-fixtures-bundle": "^3.5",
     "mautic/transifex": "^5.0",
     "phpstan/extension-installer": "^1.4",
-    "phpstan/phpstan": "^2.0",
+    "phpstan/phpstan": "^2.2.5",
     "phpstan/phpstan-deprecation-rules": "^2.0.4",
     "phpstan/phpstan-doctrine": "^2.0.28",
     "phpstan/phpstan-phpunit": "^2.0.18",
