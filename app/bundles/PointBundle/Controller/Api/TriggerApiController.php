@@ -44,6 +44,7 @@ class TriggerApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         TriggerModel $triggerModel,
+        private TriggerEventModel $triggerEventModel,
     ) {
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
@@ -63,8 +64,6 @@ class TriggerApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();
-        $triggerEventModel = $this->getModel('point.triggerevent');
-        \assert($triggerEventModel instanceof TriggerEventModel);
 
         $isNew             = false;
 
@@ -88,9 +87,9 @@ class TriggerApiController extends CommonApiController
                 if (empty($eventParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $eventParams['id']  = 'new'.hash('sha1', uniqid((string) mt_rand()));
-                    $triggerEventEntity = $triggerEventModel->getEntity();
+                    $triggerEventEntity = $this->triggerEventModel->getEntity();
                 } else {
-                    $triggerEventEntity  = $triggerEventModel->getEntity($eventParams['id']);
+                    $triggerEventEntity  = $this->triggerEventModel->getEntity($eventParams['id']);
                     $requestTriggerIds[] = $eventParams['id'];
                 }
 
@@ -127,10 +126,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm(TriggerEvent $entity): FormInterface
     {
-        $triggerEventModel = $this->getModel('point.triggerevent');
-        \assert($triggerEventModel instanceof TriggerEventModel);
-
-        return $triggerEventModel->createForm(
+        return $this->triggerEventModel->createForm(
             $entity,
             $this->formFactory,
             null,
