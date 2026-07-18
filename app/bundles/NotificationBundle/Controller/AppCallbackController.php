@@ -15,8 +15,9 @@ class AppCallbackController extends CommonController
     private NotificationModel $notificationModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAppCallbackController(NotificationModel $notificationModel): void
-    {
+    public function autowireAppCallbackController(
+        NotificationModel $notificationModel,
+    ): void {
         $this->notificationModel = $notificationModel;
     }
 
