@@ -381,12 +381,6 @@ parameters:
 		-
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/AjaxController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
 			count: 3
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
@@ -4948,12 +4942,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FieldController.php
 
 		-
-			message: '#^Controller must not fetch the "form\.form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 6
@@ -5962,12 +5950,6 @@ parameters:
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 4
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.company" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
 			path: app/bundles/LeadBundle/Controller/CompanyController.php
 
 		-
@@ -8263,19 +8245,7 @@ parameters:
 			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
 
 		-
-			message: '#^Controller must not fetch the "notification" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
-
-		-
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/NotificationController.php
-
-		-
-			message: '#^Controller must not fetch the "notification" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
@@ -13318,12 +13288,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Controller/FullContactController.php
 
 		-
-			message: '#^Controller must not fetch the "user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 4
-			path: plugins/MauticFullContactBundle/Controller/PublicController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$imported \(bool\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 2
@@ -13666,12 +13630,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
 		-
-			message: '#^Controller must not fetch the "social\.postcount" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Entity\\Lead\:\:setDateAdded\(\) has parameter \$dateAdded with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -13944,7 +13902,7 @@ parameters:
 		-
 			message: '#^Controller must not fetch the "tagmanager\.tag" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
-			count: 3
+			count: 1
 			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
 		-
