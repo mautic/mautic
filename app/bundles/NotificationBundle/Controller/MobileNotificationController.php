@@ -572,10 +572,6 @@ class MobileNotificationController extends FormController
             }
 
             $entity      = clone $entity;
-            $session     = $request->getSession();
-            $contentName = 'mautic.mobile_notification.'.$entity->getId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($request, $integrationHelper, $entity);

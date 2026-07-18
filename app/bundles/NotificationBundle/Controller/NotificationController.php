@@ -560,10 +560,6 @@ class NotificationController extends AbstractFormController
             }
 
             $entity      = clone $entity;
-            $session     = $request->getSession();
-            $contentName = 'mautic.notification.'.$entity->getId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($request, $formFactory, $entity);
