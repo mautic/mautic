@@ -152,6 +152,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
@@ -249,6 +251,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
