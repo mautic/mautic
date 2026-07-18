@@ -44,7 +44,7 @@ class TriggerApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         TriggerModel $triggerModel,
-        private TriggerEventModel $triggerEventModel,
+        private readonly TriggerEventModel $triggerEventModel,
     ) {
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;

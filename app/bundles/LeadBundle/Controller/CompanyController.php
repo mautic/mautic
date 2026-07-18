@@ -72,7 +72,7 @@ class CompanyController extends FormController
         $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
 
-        $companies = $this->getModel('lead.company')->getEntities(
+        $companies = $this->companyModel->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,

@@ -447,7 +447,7 @@ class ReportController extends FormController
         $page    = $session->get('mautic.report.page', 1);
 
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'new']);
-        $form   = $this$entity, $this->formFactory, $action);
+        $form   = $this->reportModel->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
