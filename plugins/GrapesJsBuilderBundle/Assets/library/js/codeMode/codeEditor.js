@@ -77,6 +77,52 @@ class CodeEditor {
   }
 
   /**
+   * Extract body content from HTML code.
+   * If the code contains a full HTML document with <html> tag,
+   * only extract the body content to prevent head elements from
+   * being duplicated into the body when saved.
+   * @param {string} code - The HTML code from the code editor
+   * @returns {string} - The body content or original code if no html tag found
+   */
+  extractBodyContent(code) {
+    const trimmedCode = code.trim();
+
+    if (trimmedCode.includes('<html') || trimmedCode.includes('<!DOCTYPE')) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(trimmedCode, 'text/html');
+      const body = doc.body;
+
+      if (body) {
+        return body.innerHTML;
+      }
+    }
+
+    return trimmedCode;
+  }
+
+  /**
+   * Extract head content from HTML code.
+   * Used to preserve user head modifications (styles, scripts, meta) when saving.
+   * @param {string} code - The HTML code from the code editor
+   * @returns {string|null} - The head innerHTML or null if no head found
+   */
+  extractHeadContent(code) {
+    const trimmedCode = code.trim();
+
+    if (trimmedCode.includes('<html') || trimmedCode.includes('<!DOCTYPE')) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(trimmedCode, 'text/html');
+      const head = doc.head;
+
+      if (head && head.innerHTML.trim()) {
+        return head.innerHTML;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Update the main editors canvas content with the
    * content from modals editor.
    * @todo show validation results in UI
@@ -91,7 +137,25 @@ class CodeEditor {
     try {
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+
+      let componentCode = code.trim();
+      // Preserve user head modifications before stripping to body content
+      let userHeadContent = null;
+      if (!ContentService.isMjmlMode(this.editor)) {
+        userHeadContent = this.extractHeadContent(code);
+        componentCode = this.extractBodyContent(code);
+      }
+
+      this.editor.setComponents(componentCode);
+
+      // Restore preserved head content after setComponents() clears it
+      // This fixes the data-loss regression where head edits were silently dropped
+      if (userHeadContent !== null) {
+        const canvasDoc = this.editor.Canvas.getDocument();
+        if (canvasDoc && canvasDoc.head) {
+          canvasDoc.head.innerHTML = userHeadContent;
+        }
+      }
 
       // Reinitialize the content only in MJML mode after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
