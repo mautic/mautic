@@ -18,9 +18,9 @@ class MobileNotificationController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
     private NotificationModel $notificationModel;
+
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireMobileNotificationController(
@@ -558,8 +558,7 @@ class MobileNotificationController extends FormController
      */
     public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
     {
-        $model  = $this->getModel('notification');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->notificationModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('notification:mobile_notifications:create')
@@ -573,10 +572,6 @@ class MobileNotificationController extends FormController
             }
 
             $entity      = clone $entity;
-            $session     = $request->getSession();
-            $contentName = 'mautic.mobile_notification.'.$entity->getId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($request, $integrationHelper, $entity);

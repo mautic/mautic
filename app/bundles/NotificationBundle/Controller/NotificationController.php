@@ -546,8 +546,7 @@ class NotificationController extends AbstractFormController
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
-        $model  = $this->getModel('notification');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->notificationModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('notification:notifications:create')
@@ -561,10 +560,6 @@ class NotificationController extends AbstractFormController
             }
 
             $entity      = clone $entity;
-            $session     = $request->getSession();
-            $contentName = 'mautic.notification.'.$entity->getId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($request, $formFactory, $entity);
