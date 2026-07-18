@@ -156,10 +156,12 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
+        $defaultPageLimit = (int) $this->coreParametersHelper->get('default_pagelimit');
+
         $results = $this->getModel('lead.note')->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPageLimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
@@ -206,10 +208,12 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
+        $defaultPagelimit = (int) $this->coreParametersHelper->get('default_pagelimit');
+
         $results = $this->getModel('lead.device')->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPagelimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
