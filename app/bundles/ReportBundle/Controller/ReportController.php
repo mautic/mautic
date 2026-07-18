@@ -25,8 +25,9 @@ class ReportController extends FormController
     private ReportModel $reportModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireReportController(ReportModel $reportModel): void
-    {
+    public function autowireReportController(
+        ReportModel $reportModel,
+    ): void {
         $this->reportModel = $reportModel;
     }
 
@@ -130,9 +131,9 @@ class ReportController extends FormController
     /**
      * @param int $objectId
      */
-    public function cloneAction(ReportModel $model, Request $request, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
-        $entity = $model->getEntity($objectId);
+        $entity = $this->reportModel->getEntity($objectId);
 
         if ($entity) {
             if (!$this->security->isGranted('report:reports:create')
@@ -150,7 +151,7 @@ class ReportController extends FormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($model, $request, $entity);
+        return $this->newAction($request, $entity);
     }
 
     /**
@@ -182,7 +183,6 @@ class ReportController extends FormController
                 $entity,
                 $objectId,
                 ['report:reports:deleteown', 'report:reports:deleteother'],
-                $this->reportModel,
                 'report'
             );
             if (true !== $check) {
@@ -316,7 +316,6 @@ class ReportController extends FormController
             $entity,
             $objectId,
             ['report:reports:viewown', 'report:reports:viewother'],
-            $this->reportModel,
             'report'
         );
         if (true !== $check) {
@@ -434,21 +433,21 @@ class ReportController extends FormController
         );
     }
 
-    public function newAction(ReportModel $model, Request $request, ?Report $entity = null): Response
+    public function newAction(Request $request, ?Report $entity = null): Response
     {
         if (!$this->security->isGranted('report:reports:create')) {
             $this->throwAccessDenied();
         }
 
         if (!$entity instanceof Report) {
-            $entity = $model->getEntity();
+            $entity = $this->reportModel->getEntity();
         }
 
         $session = $request->getSession();
         $page    = $session->get('mautic.report.page', 1);
 
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'new']);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $this$entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -456,7 +455,7 @@ class ReportController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity);
+                    $this->reportModel->saveEntity($entity);
 
                     $this->addFlashMessage(
                         'mautic.core.notice.created',
@@ -728,7 +727,7 @@ class ReportController extends FormController
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
      */
-    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, ReportModel $model, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
     {
         if (null === $entity) {
             return $this->postActionRedirect(
@@ -748,7 +747,7 @@ class ReportController extends FormController
         }
         if (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
             $this->throwAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->reportModel->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $modelName);
         }
@@ -764,9 +763,7 @@ class ReportController extends FormController
      */
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
-        /** @var ReportModel $model */
-        $model    = $this->getModel('report');
-        $entity   = $model->getEntity($objectId);
+        $entity   = $this->reportModel->getEntity($objectId);
         $security = $this->security;
 
         if (null === $entity) {
@@ -810,7 +807,7 @@ class ReportController extends FormController
 
         if ('csv' === $format) {
             $response = new HttpFoundation\StreamedResponse(
-                function () use ($model, $entity, $format, $options): void {
+                function () use ($entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
                     $options['limit']           = (int) $this->coreParametersHelper->get('report_export_batch_size', 1000);
@@ -819,7 +816,7 @@ class ReportController extends FormController
                     $batchTotals                = [];
                     $batchDataSize              = 0;
                     do {
-                        $reportData = $model->getReportData($entity, null, $options);
+                        $reportData = $this->reportModel->getReportData($entity, null, $options);
 
                         // Calculate number of pages only once
                         if (1 === $options['page']) {
@@ -837,7 +834,7 @@ class ReportController extends FormController
                         // Note this so that it's not recalculated on each batch
                         $options['totalResults'] = $reportData['totalResults'];
 
-                        $model->exportResults($format, $entity, $reportDataResult, $handle, $options['page']);
+                        $this->reportModel->exportResults($format, $entity, $reportDataResult, $handle, $options['page']);
                         ++$options['page'];
                     } while (!empty($reportData['data']));
 
@@ -850,9 +847,9 @@ class ReportController extends FormController
             if ('xlsx' === $format) {
                 $options['ignoreGraphData'] = true;
             }
-            $reportData       = $model->getReportData($entity, null, $options);
+            $reportData       = $this->reportModel->getReportData($entity, null, $options);
             $reportDataResult = new ReportDataResult($reportData);
-            $response         = $model->exportResults($format, $entity, $reportDataResult);
+            $response         = $this->reportModel->exportResults($format, $entity, $reportDataResult);
         }
 
         return $response;

@@ -19,10 +19,21 @@ class PublicController extends FormController
     private UserModel $userModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    public function autowirePublicController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    {
+=======
+>>>>>>> 3c9c419443 ([model] use direct model service in ReportController)
     public function autowirePublicController(
         \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
         UserModel $userModel,
     ): void {
+<<<<<<< HEAD
+=======
+>>>>>>> c56ac501fa (cs)
+>>>>>>> 3c9c419443 ([model] use direct model service in ReportController)
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
     }
