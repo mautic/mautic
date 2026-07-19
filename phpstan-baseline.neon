@@ -381,12 +381,6 @@ parameters:
 		-
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/AjaxController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
 			count: 3
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
@@ -13631,12 +13625,6 @@ parameters:
 
 		-
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
-			message: '#^Controller must not fetch the "social\.postcount" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php

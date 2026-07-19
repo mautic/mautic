@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,10 +22,15 @@ class AjaxController extends CommonAjaxController
 {
     private \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel;
 
+    private LeadModel $leadModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCampaignAjaxController(\Mautic\CampaignBundle\Model\EventLogModel $eventLogModel): void
-    {
+    public function autowireCampaignAjaxController(
+        \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel,
+        LeadModel $leadModel,
+    ): void {
         $this->eventLogModel = $eventLogModel;
+        $this->leadModel     = $leadModel;
     }
 
     public function __construct(
@@ -118,7 +124,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getContactEventLog($eventId, $contactId)
     {
-        $contact = $this->getModel('lead')->getEntity($contactId);
+        $contact = $this->leadModel->getEntity($contactId);
         if ($contact) {
             if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
                 /** @var LeadEventLog $log */
