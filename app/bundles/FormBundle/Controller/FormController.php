@@ -93,7 +93,7 @@ class FormController extends CommonFormController
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
-        $forms      = $this->getModel('form.form')->getEntities(
+        $forms      = $this->formModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
