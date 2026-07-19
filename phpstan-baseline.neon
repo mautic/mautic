@@ -8263,24 +8263,30 @@ parameters:
 			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
 
 		-
+<<<<<<< HEAD
 			message: '#^Controller must not fetch the "notification" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
 
 		-
+=======
+>>>>>>> cf831adfe9 (udpate baseline)
 			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
 
 		-
+<<<<<<< HEAD
 			message: '#^Controller must not fetch the "notification" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
 
 		-
+=======
+>>>>>>> cf831adfe9 (udpate baseline)
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setButton\(\) has parameter \$button with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10033,6 +10039,15 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
+<<<<<<< HEAD
+=======
+			message: '#^Controller must not fetch the "point\.triggerevent" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noGetModelWithStringInController
+			count: 2
+			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
+
+		-
+>>>>>>> cf831adfe9 (udpate baseline)
 			message: '#^Controller must not fetch the "point\.trigger" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 2
@@ -10127,6 +10142,12 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/PointBundle/Model/TriggerModel.php
+
+		-
+			message: '#^Controller must not fetch the "report" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noGetModelWithStringInController
+			count: 1
+			path: app/bundles/ReportBundle/Controller/ReportController.php
 
 		-
 			message: '#^Method Mautic\\ReportBundle\\Controller\\ReportController\:\:downloadAction\(\) should return Symfony\\Component\\HttpFoundation\\BinaryFileResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
@@ -13944,7 +13965,11 @@ parameters:
 		-
 			message: '#^Controller must not fetch the "tagmanager\.tag" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
+<<<<<<< HEAD
 			count: 3
+=======
+			count: 1
+>>>>>>> cf831adfe9 (udpate baseline)
 			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
 		-
