@@ -33,10 +33,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $messageQueue;
 
-    /**
-     * @var MessageQueue
-     */
-    protected $message;
+    protected MessageQueue $message;
 
     /**
      * @var MockObject&LeadModel
@@ -119,10 +116,9 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 
     public function testSendMessagesWithNullEvent(): void
     {
-        $queue = $this->message;
         $lead  = new Lead();
         $lead->setId(1);
-        $queue->setLead($lead);
+        $this->message->setLead($lead);
 
         $contactData = [
             1 => [
@@ -139,18 +135,16 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ->method('detach');
 
         $this->messageQueueRepository->method('getQueuedMessages')
-            ->willReturn([$queue]);
+            ->willReturn([$this->message]);
 
         $this->messageQueue->sendMessages('email', 1);
     }
 
     public function testProcessMessageQueueLeadFieldsShouldNotContainCompany(): void
     {
-        $queue = $this->message;
-
         $lead = new Lead();
         $lead->setId(1);
-        $queue->setLead($lead);
+        $this->message->setLead($lead);
 
         $contactData = [
             1 => [
@@ -163,7 +157,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->method('getRepository')->willReturn($leadRepository);
         $leadRepository->method('getContacts')->willReturn($contactData);
 
-        $this->messageQueue->processMessageQueue($queue);
-        $this->assertArrayNotHasKey('companies', $queue->getLead()->getFields());
+        $this->messageQueue->processMessageQueue($this->message);
+        $this->assertArrayNotHasKey('companies', $this->message->getLead()->getFields());
     }
 }
