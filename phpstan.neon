@@ -228,6 +228,10 @@ services:
 		tags:
 			- phpstan.rules.rule
 	-
+<<<<<<< HEAD
 		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
+=======
+		class: Utils\PHPStan\Rule\NoObjectPropertyAssignToVariableInTestsRule
+>>>>>>> f7eebece06 (setup phsptan rule to avoid property assign to varaible)
 		tags:
 			- phpstan.rules.rule
