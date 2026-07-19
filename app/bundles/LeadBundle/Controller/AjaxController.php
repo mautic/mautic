@@ -42,11 +42,19 @@ class AjaxController extends CommonAjaxController
 
     private LeadModel $leadModel;
 
+    private FieldModel $leadFieldModel;
+
+    private EmailModel $emailModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireLeadAjaxController(
         LeadModel $leadModel,
+        FieldModel $leadFieldModel,
+        EmailModel $emailModel
     ): void {
         $this->leadModel = $leadModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->emailModel = $emailModel;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -473,8 +481,7 @@ class AjaxController extends CommonAjaxController
                 $maxLeadId = $model->getRepository()->getMaxLeadId();
 
                 // We need the EmailRepository to check if a lead is flagged as do not contact
-                /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-                $emailRepo          = $this->getModel('email')->getRepository();
+                $emailRepo          = $this->emailModel->getRepository();
                 $indexMode          = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->render(
@@ -655,7 +662,8 @@ class AjaxController extends CommonAjaxController
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
         $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
-        $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
+
+        $leadField = $this->leadFieldModel->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
             $options       = null;
