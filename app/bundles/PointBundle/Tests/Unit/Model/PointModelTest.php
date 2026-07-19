@@ -43,7 +43,7 @@ final class PointModelTest extends TestCase
 
     private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
 
-    private PointRepository&\PHPUnit\Framework\MockObject\MockObject $pointRepositoryMock;
+    private PointRepository&MockObject $pointRepositoryMock;
 
     private PointModel $pointModel;
 

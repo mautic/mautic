@@ -57,7 +57,7 @@ final class NoObjectPropertyAssignToVariableInTestsRule implements Rule
         }
 
         $propertyType = $scope->getType($node->expr);
-        if ($propertyType->getObjectClassNames() === []) {
+        if ([] === $propertyType->getObjectClassNames()) {
             return [];
         }
 

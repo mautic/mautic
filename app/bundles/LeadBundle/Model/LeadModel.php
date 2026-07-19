@@ -1005,7 +1005,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getFrequencyRules(Lead $lead, $channel = null)
+    public function getFrequencyRules(Lead $lead, $channel = null): array
     {
         if (is_array($channel)) {
             $channel = key($channel);
