@@ -1825,9 +1825,7 @@ class LeadController extends FormController
             );
         }
         // Get a list of lists
-        /** @var \Mautic\StageBundle\Model\StageModel $model */
-        $model  = $this->getModel('stage');
-        $stages = $model->getUserStages();
+        $stages = $this->stageModel->getUserStages();
         $items  = [];
         foreach ($stages as $stage) {
             $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
