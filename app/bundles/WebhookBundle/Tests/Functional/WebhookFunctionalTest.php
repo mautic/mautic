@@ -7,7 +7,6 @@ namespace Mautic\WebhookBundle\Tests\Functional;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -52,8 +51,8 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
 
-        $this->webhookQueueRepository       = $this->em->getRepository(WebhookQueue::class);
-        $this->notificationRepository       = $this->em->getRepository(Notification::class);
+        $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
+        $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
         $this->webhhokRepository            = $this->em->getRepository(Webhook::class);
     }
 
