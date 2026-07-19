@@ -50,7 +50,7 @@ class AjaxController extends CommonAjaxController
     public function autowireLeadAjaxController(
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
-        EmailModel $emailModel
+        EmailModel $emailModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->leadFieldModel = $leadFieldModel;

@@ -71,11 +71,11 @@ class LeadController extends FormController
 
     private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
+    private FieldModel $fieldModel;
 
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    private ListModel $listModel;
+    private ListModel $leadListModel;
 
     private LeadModel $leadModel;
 
@@ -86,10 +86,10 @@ class LeadController extends FormController
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireLeadController(
         LeadModel $leadModel,
-        ListModel $listModel,
+        ListModel $leadListModel,
         \Mautic\StageBundle\Model\StageModel $stageModel,
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\LeadBundle\Model\FieldModel $fieldModel,
+        FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
         \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
         NoteModel $noteModel,
@@ -98,7 +98,7 @@ class LeadController extends FormController
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
-        $this->listModel = $listModel;
+        $this->leadListModel = $leadListModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
@@ -225,7 +225,7 @@ class LeadController extends FormController
         if (!$this->security->isGranted('lead:lists:viewother')) {
             $listArgs['filter']['force'] = " {$mine}";
         }
-        $lists = $this->listModel->getUserLists();
+        $lists = $this->leadListModel->getUserLists();
 
         // check to see if in a single list
         $inSingleList = 1 === substr_count($search, "{$listCommand}:");
@@ -453,9 +453,7 @@ class LeadController extends FormController
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $model = $this->getModel('lead.list');
-        \assert($model instanceof ListModel);
-        $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
+        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -1291,7 +1289,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            $lists     = $this->listModel->getUserLists();
+            $lists     = $this->leadListModel->getUserLists();
 
             // Get a list of lists for the lead
             $leadsLists = $this->leadModel->getLists($lead, true, true);
