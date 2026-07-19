@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -62,6 +63,7 @@ class EventLogApiController extends FetchCommonApiController
         CoreParametersHelper $coreParametersHelper,
         EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
+        private CampaignModel $campaignModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -104,7 +106,7 @@ class EventLogApiController extends FetchCommonApiController
 
         // Ensure campaign exists and user has access
         if (!empty($campaignId)) {
-            $campaign = $this->getModel('campaign')->getEntity($campaignId);
+            $campaign = $this->campaignModel->getEntity($campaignId);
             if (null == $campaign || !$campaign->getId()) {
                 return $this->notFound();
             }
