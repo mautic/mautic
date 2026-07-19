@@ -39,6 +39,7 @@ use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\NoteModel;
@@ -78,6 +79,10 @@ class LeadController extends FormController
 
     private LeadModel $leadModel;
 
+    private FieldModel $leadFieldModel;
+
+    private UserModel $userModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireLeadController(
         LeadModel $leadModel,
@@ -88,6 +93,8 @@ class LeadController extends FormController
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
         \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
         NoteModel $noteModel,
+        FieldModel $leadFieldModel,
+        UserModel $userModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -97,6 +104,8 @@ class LeadController extends FormController
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
         $this->campaignModel = $campaignModel;
         $this->noteModel = $noteModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -298,7 +307,7 @@ class LeadController extends FormController
         // Get the quick add form
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new', 'qf' => 1]);
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -364,10 +373,7 @@ class LeadController extends FormController
      */
     public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-
-        $lead = $model->getEntity($objectId);
+        $lead = $this->leadModel->getEntity($objectId);
 
         if (null === $lead) {
             // get the page we came from
@@ -396,8 +402,7 @@ class LeadController extends FormController
             );
         }
 
-        /** @var Lead $lead */
-        $model->getRepository()->refetchEntity($lead);
+        $this->leadModel->getRepository()->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -1895,8 +1900,7 @@ class LeadController extends FormController
                     ++$count;
 
                     if (!empty($data['addowner'])) {
-                        $userModel = $this->getModel('user');
-                        $user      = $userModel->getEntity((int) $data['addowner']);
+                        $user      = $this->userModel->getEntity((int) $data['addowner']);
                         $lead->setOwner($user);
                     }
                 }
@@ -1917,9 +1921,7 @@ class LeadController extends FormController
                 ]
             );
         }
-        $userModel = $this->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-        $users = $userModel->getRepository()->getUserList('', 0);
+        $users = $this->userModel->getRepository()->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
