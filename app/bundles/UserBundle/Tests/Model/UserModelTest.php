@@ -93,7 +93,11 @@ final class UserModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->logger,
             $this->createStub(CoreParametersHelper::class),
-            $this->twig
+            $this->twig,
+            $this->createStub(UserRepository::class),
+            $this->createStub(\Mautic\UserBundle\Entity\PermissionRepository::class),
+            $this->createStub(\Mautic\UserBundle\Entity\RoleRepository::class),
+            $this->createStub(\Mautic\UserBundle\Entity\UserInviteRepository::class),
         );
     }
 

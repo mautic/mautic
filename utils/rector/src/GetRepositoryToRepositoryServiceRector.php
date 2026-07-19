@@ -30,8 +30,6 @@ use Rector\NodeManipulator\ClassDependencyManipulator;
 use Rector\PhpParser\AstResolver;
 use Rector\PostRector\ValueObject\PropertyMetadata;
 use Rector\Rector\AbstractRector;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 /**
  * Replaces $em->getRepository(SomeEntity::class) with the concrete repository service.
@@ -68,63 +66,6 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
         private readonly ClassDependencyManipulator $classDependencyManipulator,
         private readonly NodeFinder $nodeFinder,
     ) {
-    }
-
-    public function getRuleDefinition(): RuleDefinition
-    {
-        return new RuleDefinition(
-            'Replace $em->getRepository(Entity::class) with the concrete repository service',
-            [
-                new CodeSample(
-                    <<<'CODE_SAMPLE'
-final class HitRepositoryTest extends MauticMysqlTestCase
-{
-    protected function setUp(): void
-    {
-        $this->hitRepository = $this->em->getRepository(Hit::class);
-    }
-}
-CODE_SAMPLE,
-                    <<<'CODE_SAMPLE'
-final class HitRepositoryTest extends MauticMysqlTestCase
-{
-    protected function setUp(): void
-    {
-        $this->hitRepository = self::getContainer()->get(HitRepository::class);
-    }
-}
-CODE_SAMPLE,
-                ),
-                new CodeSample(
-                    <<<'CODE_SAMPLE'
-final class SomeService
-{
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
-    }
-
-    public function count(): int
-    {
-        return $this->entityManager->getRepository(Hit::class)->countHits();
-    }
-}
-CODE_SAMPLE,
-                    <<<'CODE_SAMPLE'
-final class SomeService
-{
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly HitRepository $hitRepository)
-    {
-    }
-
-    public function count(): int
-    {
-        return $this->hitRepository->countHits();
-    }
-}
-CODE_SAMPLE,
-                ),
-            ]
-        );
     }
 
     /**

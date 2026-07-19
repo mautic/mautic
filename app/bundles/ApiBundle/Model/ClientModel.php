@@ -46,6 +46,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\ApiBundle\Entity\oAuth2\ClientRepository $clientRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -70,7 +71,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
     {
-        return $this->em->getRepository(Client::class);
+        return $this->clientRepository;
     }
 
     public function getPermissionBase(): string

@@ -69,10 +69,10 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->messageQueueRepository,
+            $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class) // $frequencyRuleRepository
         );
-
-        $this->entityManager->method('getRepository')->willReturn($this->messageQueueRepository);
 
         $message      = new MessageQueue();
         $scheduleDate = new \DateTime(self::DATE);

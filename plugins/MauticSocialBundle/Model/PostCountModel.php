@@ -10,6 +10,14 @@ use MauticPlugin\MauticSocialBundle\Entity\PostCount;
  */
 class PostCountModel extends AbstractCommonModel
 {
+    private \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePostCountModel(\MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository): void
+    {
+        $this->postCountRepository = $postCountRepository;
+    }
+
     /**
      * Get a specific entity or generate a new one if id is empty.
      */
@@ -32,7 +40,7 @@ class PostCountModel extends AbstractCommonModel
      */
     public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
     {
-        return $this->em->getRepository(PostCount::class);
+        return $this->postCountRepository;
     }
 
     /**
