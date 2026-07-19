@@ -40,7 +40,7 @@ class NotificationApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         NotificationModel $notificationModel,
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
     ) {
         $this->model           = $notificationModel;
         $this->entityClass     = Notification::class;
