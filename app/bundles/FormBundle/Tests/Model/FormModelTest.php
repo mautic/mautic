@@ -368,7 +368,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<string>>
+     * @return \Iterator<(int|string), array<string>>
      */
     public static function fieldTypeProvider(): \Iterator
     {
