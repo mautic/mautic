@@ -1766,14 +1766,12 @@ class LeadController extends FormController
     public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1796,17 +1794,17 @@ class LeadController extends FormController
 
                     if (!empty($data['addstage'])) {
                         $stage = $this->stageModel->getEntity((int) $data['addstage']);
-                        $model->addToStages($lead, $stage);
+                        $this->leadModel->addToStages($lead, $stage);
                     }
 
                     if (!empty($data['removestage'])) {
                         $stage = $this->stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages($lead, $stage);
+                        $this->leadModel->removeFromStages($lead, $stage);
                     }
                 }
             }
             // Save entities
-            $model->saveEntities($entities);
+            $this->leadModel->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [

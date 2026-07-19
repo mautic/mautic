@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticClearbitBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
@@ -18,13 +19,17 @@ class PublicController extends FormController
 
     private UserModel $userModel;
 
+    private LeadModel $leadModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowirePublicController(
         \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
         UserModel $userModel,
+        LeadModel $leadModel,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
+        $this->leadModel = $leadModel;
     }
 
     /**
@@ -70,8 +75,6 @@ class PublicController extends FormController
 
         try {
             if ('person' === $request->request->get('type')) {
-                /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-                $model = $this->getModel('lead');
                 /** @var Lead $lead */
                 $lead       = $validatedRequest['entity'];
                 $currFields = $lead->getFields(true);
@@ -159,8 +162,8 @@ class PublicController extends FormController
                 unset($socialCache['clearbit']['nonce']);
                 $lead->setSocialCache($socialCache);
 
-                $model->setFieldValues($lead, $data);
-                $model->saveEntity($lead);
+                $this->leadModel->setFieldValues($lead, $data);
+                $this->leadModel->saveEntity($lead);
 
                 if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {

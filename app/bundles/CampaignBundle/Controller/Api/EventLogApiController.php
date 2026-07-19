@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -60,6 +61,7 @@ class EventLogApiController extends FetchCommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         EventLogModel $campaignEventLogModel,
+        private LeadModel $leadModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -199,7 +201,7 @@ class EventLogApiController extends FetchCommonApiController
         $errors= [];
 
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
-        $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->getModel('lead'), false);
+        $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
         $this->inBatchMode = true;
         $errors            = [];
