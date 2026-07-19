@@ -71,8 +71,6 @@ class LeadController extends FormController
 
     private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private FieldModel $fieldModel;
-
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     private ListModel $leadListModel;
@@ -89,7 +87,6 @@ class LeadController extends FormController
         ListModel $leadListModel,
         \Mautic\StageBundle\Model\StageModel $stageModel,
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
         \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
         NoteModel $noteModel,
@@ -100,7 +97,6 @@ class LeadController extends FormController
         $this->stageModel = $stageModel;
         $this->leadListModel = $leadListModel;
         $this->companyModel = $companyModel;
-        $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
         $this->campaignModel = $campaignModel;
         $this->noteModel = $noteModel;
@@ -521,7 +517,7 @@ class LeadController extends FormController
         // set the page we came from
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
@@ -730,7 +726,7 @@ class LeadController extends FormController
         }
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
