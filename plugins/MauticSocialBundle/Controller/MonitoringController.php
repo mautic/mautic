@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,13 +25,17 @@ class MonitoringController extends FormController
 
     private MonitoringModel $monitoringModel;
 
+    private PostCountModel $postCountModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        PostCountModel $postCountModel,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
+        $this->postCountModel = $postCountModel;
     }
 
     /**
@@ -399,8 +404,7 @@ class MonitoringController extends FormController
 
         $session = $request->getSession();
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepo */
-        $postCountRepo = $this->getModel('social.postcount')->getRepository();
+        $postCountRepo = $this->postCountModel->getRepository();
 
         $security         = $this->security;
         $monitoringEntity = $this->monitoringModel->getEntity($objectId);
