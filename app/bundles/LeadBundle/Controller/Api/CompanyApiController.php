@@ -48,7 +48,7 @@ class CompanyApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        CompanyModel $companyModel,
+        private CompanyModel $companyModel,
         private LeadModel $leadModel,
     ) {
         $this->model              = $companyModel;
@@ -62,9 +62,7 @@ class CompanyApiController extends CommonApiController
 
     public function getNewEntity(array $params)
     {
-        $leadCompanyModel = $this->getModel('lead.company');
-        \assert($leadCompanyModel instanceof CompanyModel);
-        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $this->companyModel);
         if (count($companyEntities)) {
             return $this->model->getEntity($company['id']);
         }
