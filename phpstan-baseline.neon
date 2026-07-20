@@ -385,9 +385,9 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Controller must not fetch the "campaign\.event" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
+			message: '#^Method "autowireEventLogApiController\(\)" has the \#\[Required\] attribute, but "EventLogApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
+			identifier: mautic.noRequiredMethodWithConstructorInController
+			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
 
 		-
@@ -433,8 +433,8 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
 		-
-			message: '#^Controller must not fetch the "campaign\.event" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Method "autowireEventController\(\)" has the \#\[Required\] attribute, but "EventController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
+			identifier: mautic.noRequiredMethodWithConstructorInController
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/EventController.php
 
