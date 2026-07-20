@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
@@ -466,7 +467,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function assertNotificationMessageContainsForUser(int $userId, string $expectedSubstring): void
     {
-        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notificationRepo = self::getContainer()->get(NotificationRepository::class);
         $notifications    = $notificationRepo->getNotifications($userId);
         $found            = false;
         foreach ($notifications as $notification) {
@@ -481,7 +482,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function assertNotificationMessageDoesNotContainForUser(int $userId, string $expectedSubstring): void
     {
-        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notificationRepo = self::getContainer()->get(NotificationRepository::class);
         $notifications    = $notificationRepo->getNotifications($userId);
 
         foreach ($notifications as $notification) {

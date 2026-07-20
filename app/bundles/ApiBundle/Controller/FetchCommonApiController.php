@@ -199,10 +199,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             }
         }
 
+        /** @var int $defaultPagelimit */
+        $defaultPagelimit = $this->coreParametersHelper->get('default_pagelimit');
         $args = array_merge(
             [
                 'start'  => $request->query->get('start', 0),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->get('limit', $defaultPagelimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => $this->listFilters,

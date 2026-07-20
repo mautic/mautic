@@ -12,8 +12,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,17 +28,21 @@ class AssetController extends FormController
 
     private BatchDownloadResponder $batchDownloadResponder;
 
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireAssetController(
         BatchDownloadRequestValidator $batchDownloadRequestValidator,
         BatchFileCollector $batchFileCollector,
         ArchiveBuilder $archiveBuilder,
         BatchDownloadResponder $batchDownloadResponder,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
     ): void {
         $this->batchDownloadRequestValidator = $batchDownloadRequestValidator;
         $this->batchFileCollector            = $batchFileCollector;
         $this->archiveBuilder                = $archiveBuilder;
         $this->batchDownloadResponder        = $batchDownloadResponder;
+        $this->auditLogModel = $auditLogModel;
     }
 
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
@@ -192,11 +194,7 @@ class AssetController extends FormController
         if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs          = $this->auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,
