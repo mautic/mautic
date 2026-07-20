@@ -17,6 +17,15 @@ class StageController extends AbstractFormController
 {
     use CategoryListFiltersTrait;
 
+    private StageModel $stageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireStageController(
+        StageModel $stageModel,
+    ): void {
+        $this->stageModel = $stageModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions

@@ -16,6 +16,14 @@ class PointController extends AbstractFormController
 {
     use CategoryListFiltersTrait;
 
+    private PointModel $pointModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePointController(PointModel $pointModel): void
+    {
+        $this->pointModel = $pointModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
@@ -49,9 +57,7 @@ class PointController extends AbstractFormController
 
         $orderBy    = $request->getSession()->get('mautic.point.orderby', 'p.name');
         $orderByDir = $request->getSession()->get('mautic.point.orderbydir', 'ASC');
-        $pointModel = $this->getModel('point');
-        \assert($pointModel instanceof PointModel);
-        $points     = $pointModel->getEntities([
+        $points     = $this->pointModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -81,7 +87,7 @@ class PointController extends AbstractFormController
         $pageHelper->rememberPage($page);
 
         // get the list of actions
-        $actions = $pointModel->getPointActions();
+        $actions = $this->pointModel->getPointActions();
 
         return $this->delegateView([
             'viewParameters' => [
@@ -110,12 +116,9 @@ class PointController extends AbstractFormController
      */
     public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
     {
-        $model = $this->getModel('point');
-        \assert($model instanceof PointModel);
-
         if (!$entity instanceof Point) {
             /** @var Point $entity */
-            $entity = $model->getEntity();
+            $entity = $this->pointModel->getEntity();
         }
 
         if (!$this->security->isGranted('point:points:create')) {
@@ -128,8 +131,8 @@ class PointController extends AbstractFormController
         $point      = $request->request->all()['point'] ?? [];
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
-        $actions    = $model->getPointActions();
-        $form       = $model->createForm($entity, $formFactory, $action, [
+        $actions    = $this->pointModel->getPointActions();
+        $form       = $this->pointModel->createForm($entity, $formFactory, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -142,7 +145,7 @@ class PointController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity);
+                    $this->pointModel->saveEntity($entity);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getName(),
@@ -215,9 +218,7 @@ class PointController extends AbstractFormController
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
     {
-        $model = $this->getModel('point');
-        \assert($model instanceof PointModel);
-        $entity = $model->getEntity($objectId);
+        $entity = $this->pointModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.point.page', 1);
@@ -253,7 +254,7 @@ class PointController extends AbstractFormController
         }
         if (!$this->security->isGranted('point:points:edit')) {
             $this->throwAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->pointModel->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'point');
         }
@@ -263,8 +264,8 @@ class PointController extends AbstractFormController
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $actions = $model->getPointActions();
-        $form    = $model->createForm($entity, $formFactory, $action, [
+        $actions = $this->pointModel->getPointActions();
+        $form    = $this->pointModel->createForm($entity, $formFactory, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -276,7 +277,7 @@ class PointController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->pointModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
@@ -294,7 +295,7 @@ class PointController extends AbstractFormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($entity);
+                $this->pointModel->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                 $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
@@ -311,7 +312,7 @@ class PointController extends AbstractFormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($entity);
+            $this->pointModel->lockEntity($entity);
         }
 
         $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];
@@ -347,8 +348,7 @@ class PointController extends AbstractFormController
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
-        $model  = $this->getModel('point');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->pointModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('point:points:create')) {
@@ -386,9 +386,7 @@ class PointController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point');
-            \assert($model instanceof PointModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->pointModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -398,11 +396,11 @@ class PointController extends AbstractFormController
                 ];
             } elseif (!$this->security->isGranted('point:points:delete')) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->pointModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'point');
             }
 
-            $model->deleteEntity($entity);
+            $this->pointModel->deleteEntity($entity);
 
             $identifier = $this->translator->trans($entity->getName());
             $flashes[]  = [
@@ -442,14 +440,12 @@ class PointController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('point');
-            \assert($model instanceof PointModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->pointModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -459,7 +455,7 @@ class PointController extends AbstractFormController
                     ];
                 } elseif (!$this->security->isGranted('point:points:delete')) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->pointModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'point', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -468,7 +464,7 @@ class PointController extends AbstractFormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->pointModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
