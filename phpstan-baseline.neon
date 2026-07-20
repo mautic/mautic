@@ -4858,12 +4858,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
 
 		-
-			message: '#^Controller must not fetch the "form\.form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/FormBundle/Controller/FieldController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
