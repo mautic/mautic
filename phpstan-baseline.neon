@@ -10372,12 +10372,6 @@ parameters:
 			path: app/bundles/StatsBundle/Event/Options/FetchOptions.php
 
 		-
-			message: '#^Controller must not fetch the "user\.user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/UserBundle/Controller/UserController.php
-
-		-
 			message: '#^Parameter \#1 \$isAdmin of method Mautic\\UserBundle\\Entity\\Role\:\:setIsAdmin\(\) expects bool, int given\.$#'
 			identifier: argument.type
 			count: 2
