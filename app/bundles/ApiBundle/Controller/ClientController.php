@@ -39,8 +39,9 @@ class ClientController extends AbstractStandardFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $auditLogModel);
     }
 
     /**

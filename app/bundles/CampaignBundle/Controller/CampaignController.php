@@ -124,8 +124,9 @@ class CampaignController extends AbstractStandardFormController
         CorePermissions $security,
         private EntityManager $em,
         private PublishStateService $publishStateService,
+        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $auditLogModel);
     }
 
     protected function getPermissions(): array

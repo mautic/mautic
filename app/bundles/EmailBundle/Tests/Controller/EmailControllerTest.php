@@ -119,7 +119,8 @@ final class EmailControllerTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(FlashBag::class),
             $this->requestStack,
-            $this->corePermissionsMock
+            $this->corePermissionsMock,
+            $this->createStub(\Mautic\CoreBundle\Model\AuditLogModel::class)
         );
         $this->controller->setContainer($this->containerMock);
         $this->controller->autowireEmailController(
