@@ -69,7 +69,7 @@ class PointSubscriberTest extends TestCase
         $pageHitEvent->expects(self::exactly(2))->method('getHit')->willReturn($hit);
         $pageHitEvent->expects(self::exactly(2))->method('getLead')->willReturn($lead);
         $pointModel->expects(self::exactly(2))->method('triggerAction')
-            ->willReturnCallback(function (string $type, $h, $_, $l) use ($hit, $lead): void {
+            ->willReturnCallback(function (string $type, $h, $_, ?Lead $l) use ($hit, $lead): void {
                 if ('page.hit' === $type) {
                     self::assertSame($hit, $h);
                     self::assertSame($lead, $l);
