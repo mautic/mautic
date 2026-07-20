@@ -45,9 +45,8 @@ class ResultController extends CommonFormController
         CorePermissions $security,
         private readonly FormModel $formModel,
         private readonly SubmissionResultLoader $submissionResultLoader,
-        private readonly SubmissionModel $submissionModel
-    )
-    {
+        private readonly SubmissionModel $submissionModel,
+    ) {
         $this->setStandardParameters(
             'form.submission', // model name
             'form:forms', // permission base
