@@ -19,9 +19,8 @@ return ECSConfig::configure()
         ],
 
         PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
-        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
-        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
