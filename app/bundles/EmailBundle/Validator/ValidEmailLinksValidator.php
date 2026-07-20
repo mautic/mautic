@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Validator;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Validator\Constraint;
@@ -96,8 +97,12 @@ final class ValidEmailLinksValidator extends ConstraintValidator
             return true;
         }
 
-        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
 
-        return in_array($scheme, ['http', 'https', 'mailto', 'tel', 'ftp', 'sms'], true);
+        if (in_array($scheme, ['http', 'https'], true)) {
+            return UrlHelper::isValidUrl($url);
+        }
+
+        return in_array($scheme, ['mailto', 'tel', 'ftp', 'ftps', 'sms'], true);
     }
 }
