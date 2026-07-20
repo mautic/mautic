@@ -14,6 +14,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
+    private DashboardModel $dashboardModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireDashboardAjaxController(DashboardModel $dashboardModel): void
+    {
+        $this->dashboardModel = $dashboardModel;
+    }
+
     /**
      * Count how many visitors are currently viewing a page.
      */
@@ -61,9 +69,7 @@ class AjaxController extends CommonAjaxController
     public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
-        $dashboardModel = $this->getModel('dashboard');
-        \assert($dashboardModel instanceof DashboardModel);
-        $repo = $dashboardModel->getRepository();
+        $repo = $this->dashboardModel->getRepository();
         $repo->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
@@ -77,17 +83,9 @@ class AjaxController extends CommonAjaxController
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];
-
-        // @todo: build permissions
-        // if (!$this->security->isGranted('dashobard:widgets:delete')) {
-        //     return $this->accessDenied();
-        // }
-
-        /** @var DashboardModel $model */
-        $model  = $this->getModel('dashboard');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->dashboardModel->getEntity($objectId);
         if ($entity) {
-            $model->deleteEntity($entity);
+            $this->dashboardModel->deleteEntity($entity);
             $name                 = $entity->getName();
             $dataArray['success'] = 1;
         }

@@ -14,12 +14,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    private UserModel $userModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\LeadBundle\Model\LeadModel $leadModel): void
-    {
+    public function autowirePublicController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        UserModel $userModel,
+    ): void {
         $this->leadModel = $leadModel;
+        $this->companyModel = $companyModel;
+        $this->notificationModel = $notificationModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -32,9 +45,7 @@ class PublicController extends FormController
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+        $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }
 
     /**
@@ -195,10 +206,7 @@ class PublicController extends FormController
             $this->leadModel->getRepository()->saveEntity($lead);
 
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
-                /** @var UserModel $userModel */
-                $userModel = $this->getModel('user');
-
-                if ($user = $userModel->getEntity($notify)) {
+                if ($user = $this->userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
                         'FullContact Plugin',
@@ -210,9 +218,7 @@ class PublicController extends FormController
         } catch (\Exception $ex) {
             try {
                 if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
-                    /** @var UserModel $userModel */
-                    $userModel = $this->getModel('user');
-                    if ($user = $userModel->getEntity($notify)) {
+                    if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),
@@ -246,8 +252,6 @@ class PublicController extends FormController
         $notify = $validatedRequest['notify'];
 
         try {
-            /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-            $model = $this->getModel('lead.company');
             /** @var Company $company */
             $company    = $validatedRequest['entity'];
             $currFields = $company->getFields(true);
@@ -352,13 +356,11 @@ class PublicController extends FormController
             unset($socialCache['fullcontact']['nonce']);
             $company->setSocialCache($socialCache);
 
-            $model->setFieldValues($company, $data);
-            $model->getRepository()->saveEntity($company);
+            $this->companyModel->setFieldValues($company, $data);
+            $this->companyModel->getRepository()->saveEntity($company);
 
             if ($notify) {
-                /** @var UserModel $userModel */
-                $userModel = $this->getModel('user');
-                if ($user = $userModel->getEntity($notify)) {
+                if ($user = $this->userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
                         'FullContact Plugin',
@@ -370,9 +372,7 @@ class PublicController extends FormController
         } catch (\Exception $ex) {
             try {
                 if ($notify && $company) {
-                    /** @var UserModel $userModel */
-                    $userModel = $this->getModel('user');
-                    if ($user = $userModel->getEntity($notify)) {
+                    if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.fullcontact.unable'),

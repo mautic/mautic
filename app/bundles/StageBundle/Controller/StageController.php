@@ -19,8 +19,9 @@ class StageController extends AbstractFormController
     private StageModel $stageModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireStageController(StageModel $stageModel): void
-    {
+    public function autowireStageController(
+        StageModel $stageModel,
+    ): void {
         $this->stageModel = $stageModel;
     }
 
