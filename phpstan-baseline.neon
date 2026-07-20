@@ -3277,18 +3277,6 @@ parameters:
 			path: app/bundles/DashboardBundle/Event/WidgetFormEvent.php
 
 		-
-			message: '#^Controller must not fetch the "page" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
-			message: '#^Controller must not fetch the "page\.trackable" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:newAction\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
