@@ -380,8 +380,9 @@ trait LeadDetailsTrait
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
-    {
+    public function setRequestStackLeadDetailsTrait(
+        ?RequestStack $requestStack,
+    ): void {
         $this->requestStack = $requestStack;
     }
 }
