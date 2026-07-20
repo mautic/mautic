@@ -18,8 +18,8 @@ return ECSConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
         ],
 
-        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
         PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
+        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
         PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
