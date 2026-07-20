@@ -49,17 +49,6 @@ class CampaignController extends AbstractStandardFormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-    private \Mautic\CampaignBundle\Model\EventModel $eventModel;
-
-    private CampaignModel $campaignModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCampaignController(CampaignModel $campaignModel, \Mautic\CampaignBundle\Model\EventModel $eventModel): void
-    {
-        $this->campaignModel = $campaignModel;
-        $this->eventModel = $eventModel;
-    }
-
     /**
      * @var array<string, mixed>
      */
@@ -124,6 +113,8 @@ class CampaignController extends AbstractStandardFormController
         CorePermissions $security,
         private EntityManager $em,
         private PublishStateService $publishStateService,
+        private CampaignModel $campaignModel,
+        private \Mautic\CampaignBundle\Model\EventModel $eventModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
