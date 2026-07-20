@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -24,6 +25,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -67,6 +69,8 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private CampaignModel $campaignModel,
+        private FieldModel $leadFieldModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -119,7 +123,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -152,14 +156,16 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:notes:viewown', 'lead:notes:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
+
+        $defaultPageLimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
         $results = $this->getModel('lead.note')->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPageLimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
@@ -206,10 +212,12 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
+        $defaultPagelimit = (int) $this->coreParametersHelper->get('default_pagelimit');
+
         $results = $this->getModel('lead.device')->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPagelimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
@@ -316,9 +324,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->getModel('campaign');
-            $campaigns     = $campaignModel->getLeadCampaigns($entity, true);
+            $campaigns = $this->campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
                 if (!empty($c['lists'])) {

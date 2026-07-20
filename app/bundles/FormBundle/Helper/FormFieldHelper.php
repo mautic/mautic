@@ -86,9 +86,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         parent::__construct();
     }
 
-    /**
-     * Set the translation key prefix.
-     */
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
