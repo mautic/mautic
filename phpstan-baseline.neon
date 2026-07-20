@@ -385,12 +385,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method "autowireEventLogApiController\(\)" has the \#\[Required\] attribute, but "EventLogApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:afterEntitySave\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -431,12 +425,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method "autowireEventController\(\)" has the \#\[Required\] attribute, but "EventController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/EventController.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\Campaign\:\:addEvent\(\) has parameter \$key with no type specified\.$#'
@@ -4816,28 +4804,22 @@ parameters:
 			path: app/bundles/FormBundle/Controller/ActionController.php
 
 		-
-			message: '#^Method "autowireFormApiController\(\)" has the \#\[Required\] attribute, but "FormApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
-			message: '#^Controller must not fetch the "form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Access to an undefined property Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController\:\:\$formModel\.$#'
+			identifier: property.notFound
 			count: 1
 			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
 
 		-
-			message: '#^Controller must not fetch the "form\.form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Constructor of class Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController has an unused parameter \$formModel\.$#'
+			identifier: constructor.unusedParameter
 			count: 1
-			path: app/bundles/FormBundle/Controller/FieldController.php
+			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -5695,36 +5677,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Method "autowireCompanyApiController\(\)" has the \#\[Required\] attribute, but "CompanyApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.device" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.note" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "stage\.stage" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "user\.user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5741,12 +5693,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:getLineCountLimit\(\) has no return type specified\.$#'
@@ -5783,12 +5729,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/ListController.php
 
 		-
 			message: '#^Parameter \#1 \$unit of method Mautic\\LeadBundle\\Model\\ListModel\:\:getSegmentContactsLineChartData\(\) expects string, null given\.$#'
@@ -10400,12 +10340,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/StatsBundle/Event/Options/FetchOptions.php
-
-		-
-			message: '#^Controller must not fetch the "user\.user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/UserBundle/Controller/UserController.php
 
 		-
 			message: '#^Parameter \#1 \$isAdmin of method Mautic\\UserBundle\\Entity\\Role\:\:setIsAdmin\(\) expects bool, int given\.$#'
