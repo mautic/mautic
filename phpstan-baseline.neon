@@ -4810,8 +4810,14 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
-			message: '#^Controller must not fetch the "form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Access to an undefined property Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController\:\:\$formModel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
+
+		-
+			message: '#^Constructor of class Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController has an unused parameter \$formModel\.$#'
+			identifier: constructor.unusedParameter
 			count: 1
 			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
 
