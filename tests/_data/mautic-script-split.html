@@ -5,7 +5,16 @@
     <title>Mautic script split</title>
 </head>
 <body>
+<div id="dwc-fallback" class="mautic-slot" data-slot-name="acceptance-test" hidden>DWC fallback content</div>
 <script>
+    var fixtureParams = new URLSearchParams(window.location.search);
+    var dwcFallback = document.getElementById('dwc-fallback');
+    if (fixtureParams.get('dwc') === '1') {
+        dwcFallback.hidden = false;
+    } else {
+        dwcFallback.remove();
+    }
+
     window.mauticScriptErrors = [];
     window.mauticStorageAccess = [];
     window.mauticCookieAccess = [];
@@ -111,7 +120,7 @@
         });
     }
 
-    var scriptUrls = new URLSearchParams(window.location.search).getAll('script');
+    var scriptUrls = fixtureParams.getAll('script');
     function loadScript(index) {
         if (index >= scriptUrls.length) {
             window.mauticScriptFinished = true;

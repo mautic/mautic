@@ -10,6 +10,9 @@ final class MauticScriptSplitCest
 
     private bool $corsConfigExisted = false;
 
+    /** @var array<string, mixed>|null */
+    private ?array $corsConfigParameters = null;
+
     public function _before(\AcceptanceTester $I): void
     {
         $I->amOnPage('/tests/_data/mautic-script-split.html');
@@ -184,6 +187,36 @@ JS);
         $I->assertSame(1, $state['pageEventDeliveryCount']);
     }
 
+    public function essentialScriptKeepsDwcFallbackVisible(\AcceptanceTester $I): void
+    {
+        $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $this->loadScripts($I, [$scriptUrl], ['dwc' => '1']);
+        $I->waitForJS('return window.MauticJS && window.MauticJS.runtimeReady === true', 10);
+
+        $state = $this->grabBrowserState($I);
+        $fallback = $I->executeJS(<<<'JS'
+var element = document.getElementById('dwc-fallback');
+
+return {
+    visible: Boolean(element && !element.hidden),
+    text: element ? element.textContent : null
+};
+JS);
+        $dwcRequests = array_values(array_filter(
+            $state['networkRequests'],
+            fn (array $request): bool => str_starts_with((string) parse_url($request['url'], PHP_URL_PATH), '/dwc/'),
+        ));
+
+        $I->assertTrue($state['runtimeReady']);
+        $I->assertFalse($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertSame('function', $I->executeJS('return typeof MauticJS.replaceDynamicContent;'));
+        $I->assertTrue($fallback['visible']);
+        $I->assertSame('DWC fallback content', $fallback['text']);
+        $I->assertSame([], $dwcRequests);
+        $I->assertSame([], $state['trackingRequests']);
+    }
+
     private function loadScript(\AcceptanceTester $I, string $endpoint): string
     {
         $scriptUrl = $this->getMauticUrl($I).$endpoint;
@@ -194,11 +227,17 @@ JS);
     }
 
     /**
-     * @param string[] $scriptUrls
+     * @param string[]              $scriptUrls
+     * @param array<string, string> $fixtureParameters
      */
-    private function loadScripts(\AcceptanceTester $I, array $scriptUrls): void
+    private function loadScripts(\AcceptanceTester $I, array $scriptUrls, array $fixtureParameters = []): void
     {
-        $query      = implode('&', array_map(fn (string $url): string => 'script='.rawurlencode($url), $scriptUrls));
+        $queryParts = array_map(fn (string $url): string => 'script='.rawurlencode($url), $scriptUrls);
+        foreach ($fixtureParameters as $name => $value) {
+            $queryParts[] = rawurlencode($name).'='.rawurlencode($value);
+        }
+
+        $query      = implode('&', $queryParts);
         $fixtureUrl = '/tests/_data/mautic-script-split.html?'.$query;
 
         $I->amOnPage($fixtureUrl);
@@ -284,12 +323,16 @@ JS);
         $configPath                  = $this->getCorsConfigPath();
         $this->corsConfigExisted     = file_exists($configPath);
         $this->corsConfigBackup      = $this->corsConfigExisted ? (string) file_get_contents($configPath) : '';
-        $parameters                  = [];
 
-        if ($this->corsConfigExisted) {
-            include $configPath;
+        if (null === $this->corsConfigParameters) {
+            $parameters = [];
+            if ($this->corsConfigExisted) {
+                include_once $configPath;
+            }
+            $this->corsConfigParameters = $parameters;
         }
 
+        $parameters                          = $this->corsConfigParameters;
         $parameters['cors_restrict_domains'] = true;
         $parameters['cors_valid_domains']    = ['https://web'];
 
