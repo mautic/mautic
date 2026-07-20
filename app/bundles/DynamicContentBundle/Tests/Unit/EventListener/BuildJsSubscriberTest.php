@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,14 +48,14 @@ final class BuildJsSubscriberTest extends TestCase
         $this->subscriber->onBuildJs($event);
 
         $js = $event->getJs();
-        Assert::assertStringContainsString('MauticJS.replaceDynamicContent = function', $js);
-        Assert::assertStringContainsString('MauticJS.enhanceDynamicContent = function', $js);
-        Assert::assertStringContainsString('MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);', $js);
-        Assert::assertStringContainsString('media/js/mautic-form.js', $js);
-        Assert::assertStringContainsString('MauticSDK.onLoad();', $js);
-        Assert::assertStringContainsString('search("/focus/")', $js);
-        Assert::assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
-        Assert::assertSame(2, substr_count($js, 'MauticJS.replaceDynamicContent'));
+        $this->assertStringContainsString('MauticJS.replaceDynamicContent = function', $js);
+        $this->assertStringContainsString('MauticJS.enhanceDynamicContent = function', $js);
+        $this->assertStringContainsString('MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);', $js);
+        $this->assertStringContainsString('media/js/mautic-form.js', $js);
+        $this->assertStringContainsString('MauticSDK.onLoad();', $js);
+        $this->assertStringContainsString('search("/focus/")', $js);
+        $this->assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
+        $this->assertSame(2, substr_count($js, 'MauticJS.replaceDynamicContent'));
     }
 
     public function testTrackingBuildOnlyAddsIdentityResponseHook(): void
@@ -66,12 +65,12 @@ final class BuildJsSubscriberTest extends TestCase
         $this->subscriber->onBuildJs($event);
 
         $js = $event->getJs();
-        Assert::assertStringContainsString('MauticJS.runtimeReady !== true', $js);
-        Assert::assertStringContainsString('MauticJS.onDynamicContentResponse = function(response)', $js);
-        Assert::assertStringContainsString('MauticJS.setTrackedContact(response)', $js);
-        Assert::assertStringNotContainsString('MauticJS.replaceDynamicContent = function', $js);
-        Assert::assertStringNotContainsString('mautic-form.js', $js);
-        Assert::assertStringNotContainsString('search("/focus/")', $js);
+        $this->assertStringContainsString('MauticJS.runtimeReady !== true', $js);
+        $this->assertStringContainsString('MauticJS.onDynamicContentResponse = function(response)', $js);
+        $this->assertStringContainsString('MauticJS.setTrackedContact(response)', $js);
+        $this->assertStringNotContainsString('MauticJS.replaceDynamicContent = function', $js);
+        $this->assertStringNotContainsString('mautic-form.js', $js);
+        $this->assertStringNotContainsString('search("/focus/")', $js);
     }
 
     public function testLegacyBuildHasOneReplacementAndOneEnhancementPass(): void
@@ -81,13 +80,10 @@ final class BuildJsSubscriberTest extends TestCase
         $this->subscriber->onBuildJs($event);
 
         $js = $event->getJs();
-        Assert::assertSame(1, substr_count($js, 'MauticJS.replaceDynamicContent = function'));
-        Assert::assertSame(1, substr_count($js, 'MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);'));
-        Assert::assertSame(1, substr_count($js, "MauticJS.makeCORSRequest('GET', url"));
-        Assert::assertSame(1, substr_count($js, 'MauticJS.enhanceDynamicContent(dwcContent);'));
-        Assert::assertLessThan(
-            strpos($js, 'MauticJS.setTrackedContact(response)'),
-            strpos($js, 'MauticJS.replaceDynamicContent = function'),
-        );
+        $this->assertSame(1, substr_count($js, 'MauticJS.replaceDynamicContent = function'));
+        $this->assertSame(1, substr_count($js, 'MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);'));
+        $this->assertSame(1, substr_count($js, "MauticJS.makeCORSRequest('GET', url"));
+        $this->assertSame(1, substr_count($js, 'MauticJS.enhanceDynamicContent(dwcContent);'));
+        $this->assertLessThan(strpos($js, 'MauticJS.setTrackedContact(response)'), strpos($js, 'MauticJS.replaceDynamicContent = function'));
     }
 }

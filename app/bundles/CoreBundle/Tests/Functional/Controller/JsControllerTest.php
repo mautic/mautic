@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -30,21 +29,21 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/mtc.js');
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $content);
-        Assert::assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\')', $content);
+        $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $content);
+        $this->assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\')', $content);
         $runtimeReadyPosition    = strpos($content, 'runtimeReady');
         $trackingEnabledPosition = strrpos($content, 'trackingEnabled');
-        Assert::assertNotFalse($runtimeReadyPosition);
-        Assert::assertNotFalse($trackingEnabledPosition);
-        Assert::assertLessThan($trackingEnabledPosition, $runtimeReadyPosition);
+        $this->assertNotFalse($runtimeReadyPosition);
+        $this->assertNotFalse($trackingEnabledPosition);
+        $this->assertLessThan($trackingEnabledPosition, $runtimeReadyPosition);
     }
 
     public function testIndexActionRendersSuccessfullyWithAnonymizeIp(): void
     {
         $this->client->request('GET', '/mtc.js');
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('window.gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEssentialEndpointContainsAnonymousRuntimeOnly(): void
@@ -53,21 +52,21 @@ final class JsControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('runtimeReady', $content);
-        Assert::assertStringContainsString('appendTrackedContact', $content);
-        Assert::assertStringContainsString('requestWithCredentials', $content);
-        Assert::assertStringContainsString('replaceDynamicContent', $content);
-        Assert::assertStringContainsString('enhanceDynamicContent', $content);
-        Assert::assertStringNotContainsString('mtc_id', $content);
-        Assert::assertStringNotContainsString('mautic_device_id', $content);
-        Assert::assertStringNotContainsString('getTrackedContact', $content);
-        Assert::assertStringNotContainsString('setTrackedContact(response)', $content);
-        Assert::assertStringNotContainsString('deliverPageEvent', $content);
-        Assert::assertStringNotContainsString('/mtc/event', $content);
-        Assert::assertStringNotContainsString('/mtracking.gif', $content);
-        Assert::assertStringNotContainsString('setTrackedEvents', $content);
-        Assert::assertStringNotContainsString('focus_item', $content);
-        Assert::assertStringNotContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
+        $this->assertStringContainsString('runtimeReady', $content);
+        $this->assertStringContainsString('appendTrackedContact', $content);
+        $this->assertStringContainsString('requestWithCredentials', $content);
+        $this->assertStringContainsString('replaceDynamicContent', $content);
+        $this->assertStringContainsString('enhanceDynamicContent', $content);
+        $this->assertStringNotContainsString('mtc_id', $content);
+        $this->assertStringNotContainsString('mautic_device_id', $content);
+        $this->assertStringNotContainsString('getTrackedContact', $content);
+        $this->assertStringNotContainsString('setTrackedContact(response)', $content);
+        $this->assertStringNotContainsString('deliverPageEvent', $content);
+        $this->assertStringNotContainsString('/mtc/event', $content);
+        $this->assertStringNotContainsString('/mtracking.gif', $content);
+        $this->assertStringNotContainsString('setTrackedEvents', $content);
+        $this->assertStringNotContainsString('focus_item', $content);
+        $this->assertStringNotContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
     }
 
     public function testTrackingEndpointContainsIdentityWithoutRuntime(): void
@@ -76,18 +75,18 @@ final class JsControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('runtimeReady', $content);
-        Assert::assertStringContainsString("localStorage.getItem('mtc_id')", $content);
-        Assert::assertStringContainsString('onDynamicContentResponse', $content);
-        Assert::assertStringContainsString('deliverPageEvent', $content);
-        Assert::assertStringContainsString('/mtc/event', $content);
-        Assert::assertStringContainsString('/mtracking.gif', $content);
-        Assert::assertStringContainsString('setTrackedEvents', $content);
-        Assert::assertStringContainsString('focus_item', $content);
-        Assert::assertStringContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
-        Assert::assertStringNotContainsString('serialize=function', $content);
-        Assert::assertStringNotContainsString('setCookie=function', $content);
-        Assert::assertStringNotContainsString('replaceDynamicContent=function', $content);
+        $this->assertStringContainsString('runtimeReady', $content);
+        $this->assertStringContainsString("localStorage.getItem('mtc_id')", $content);
+        $this->assertStringContainsString('onDynamicContentResponse', $content);
+        $this->assertStringContainsString('deliverPageEvent', $content);
+        $this->assertStringContainsString('/mtc/event', $content);
+        $this->assertStringContainsString('/mtracking.gif', $content);
+        $this->assertStringContainsString('setTrackedEvents', $content);
+        $this->assertStringContainsString('focus_item', $content);
+        $this->assertStringContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
+        $this->assertStringNotContainsString('serialize=function', $content);
+        $this->assertStringNotContainsString('setCookie=function', $content);
+        $this->assertStringNotContainsString('replaceDynamicContent=function', $content);
     }
 
     #[DataProvider('scriptEndpointProvider')]
@@ -99,13 +98,13 @@ final class JsControllerTest extends MauticMysqlTestCase
         self::assertResponseHeaderSame('Content-Type', 'application/javascript');
 
         $content = (string) $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('@package     MauticJS', $content);
+        $this->assertStringContainsString('@package     MauticJS', $content);
 
         $trackingMarker = 'https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD';
         if ($containsTracking) {
-            Assert::assertStringContainsString($trackingMarker, $content);
+            $this->assertStringContainsString($trackingMarker, $content);
         } else {
-            Assert::assertStringNotContainsString($trackingMarker, $content);
+            $this->assertStringNotContainsString($trackingMarker, $content);
         }
     }
 

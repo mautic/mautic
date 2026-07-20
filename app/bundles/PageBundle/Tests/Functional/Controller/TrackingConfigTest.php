@@ -24,38 +24,38 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         };
 
         $essential = $getSnippet('Essential script (before consent)');
-        Assert::assertStringContainsString('/mautic-essential.js', $essential);
-        Assert::assertStringContainsString("dispatchEvent('mauticEssentialReady')", $essential);
-        Assert::assertStringNotContainsString('/mautic-tracking.js', $essential);
-        Assert::assertStringNotContainsString('/mtc.js', $essential);
-        Assert::assertStringNotContainsString('MauticTrackingObject', $essential);
-        Assert::assertStringNotContainsString('pageview', $essential);
+        $this->assertStringContainsString('/mautic-essential.js', $essential);
+        $this->assertStringContainsString("dispatchEvent('mauticEssentialReady')", $essential);
+        $this->assertStringNotContainsString('/mautic-tracking.js', $essential);
+        $this->assertStringNotContainsString('/mtc.js', $essential);
+        $this->assertStringNotContainsString('MauticTrackingObject', $essential);
+        $this->assertStringNotContainsString('pageview', $essential);
 
         $tracking = $getSnippet('Tracking add-on (after consent)');
-        Assert::assertStringContainsString('/mautic-tracking.js', $tracking);
-        Assert::assertStringContainsString("d.addEventListener('mauticEssentialReady',enableTracking)", $tracking);
-        Assert::assertStringContainsString('w.MauticJS.runtimeReady !== true', $tracking);
-        Assert::assertStringContainsString("w['MauticTrackingObject']=n", $tracking);
-        Assert::assertStringContainsString("w[n]('send','pageview')", $tracking);
-        Assert::assertStringContainsString("a.id='mautic-tracking-script'", $tracking);
-        Assert::assertStringContainsString("d.getElementById('mautic-tracking-script')", $tracking);
-        Assert::assertStringNotContainsString('/mautic-essential.js', $tracking);
-        Assert::assertStringNotContainsString('/mtc.js', $tracking);
+        $this->assertStringContainsString('/mautic-tracking.js', $tracking);
+        $this->assertStringContainsString("d.addEventListener('mauticEssentialReady',enableTracking)", $tracking);
+        $this->assertStringContainsString('w.MauticJS.runtimeReady !== true', $tracking);
+        $this->assertStringContainsString("w['MauticTrackingObject']=n", $tracking);
+        $this->assertStringContainsString("w[n]('send','pageview')", $tracking);
+        $this->assertStringContainsString("a.id='mautic-tracking-script'", $tracking);
+        $this->assertStringContainsString("d.getElementById('mautic-tracking-script')", $tracking);
+        $this->assertStringNotContainsString('/mautic-essential.js', $tracking);
+        $this->assertStringNotContainsString('/mtc.js', $tracking);
 
         $full = $getSnippet('Full tracking');
-        Assert::assertSame(1, substr_count($full, '/mautic-essential.js'));
-        Assert::assertSame(1, substr_count($full, '/mautic-tracking.js'));
-        Assert::assertStringNotContainsString('/mtc.js', $full);
-        Assert::assertStringContainsString('a.onload=function()', $full);
-        Assert::assertStringContainsString('s.src=r', $full);
-        Assert::assertStringContainsString("mt('send', 'pageview');", $full);
+        $this->assertSame(1, substr_count($full, '/mautic-essential.js'));
+        $this->assertSame(1, substr_count($full, '/mautic-tracking.js'));
+        $this->assertStringNotContainsString('/mtc.js', $full);
+        $this->assertStringContainsString('a.onload=function()', $full);
+        $this->assertStringContainsString('s.src=r', $full);
+        $this->assertStringContainsString("mt('send', 'pageview');", $full);
 
         $essentialPosition = strpos($full, '/mautic-essential.js');
         $trackingPosition  = strpos($full, '/mautic-tracking.js');
-        Assert::assertNotFalse($essentialPosition);
-        Assert::assertNotFalse($trackingPosition);
-        Assert::assertLessThan($trackingPosition, $essentialPosition);
+        $this->assertNotFalse($essentialPosition);
+        $this->assertNotFalse($trackingPosition);
+        $this->assertLessThan($trackingPosition, $essentialPosition);
 
-        Assert::assertCount(0, $crawler->filter('pre:contains("/mtc.js")'));
+        $this->assertCount(0, $crawler->filter('pre:contains("/mtc.js")'));
     }
 }

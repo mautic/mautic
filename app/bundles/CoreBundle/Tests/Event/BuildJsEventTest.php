@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Event;
 
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -41,10 +40,10 @@ JS;
         $event->appendJsForScope('tracking;', BuildJsScope::TRACKING);
         $event->appendJs('compatibility;');
 
-        Assert::assertSame($expectedJs, $event->getJs());
-        Assert::assertSame(in_array(BuildJsScope::RUNTIME, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::RUNTIME));
-        Assert::assertSame(in_array(BuildJsScope::ESSENTIAL, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::ESSENTIAL));
-        Assert::assertSame(in_array(BuildJsScope::TRACKING, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::TRACKING));
+        $this->assertSame($expectedJs, $event->getJs());
+        $this->assertSame(in_array(BuildJsScope::RUNTIME, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::RUNTIME));
+        $this->assertSame(in_array(BuildJsScope::ESSENTIAL, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::ESSENTIAL));
+        $this->assertSame(in_array(BuildJsScope::TRACKING, $acceptedScopes, true), $event->acceptsScope(BuildJsScope::TRACKING));
     }
 
     public function testLegacyDefaultAcceptsAllScopes(): void
@@ -55,7 +54,7 @@ JS;
         $event->appendJsForScope('tracking;', BuildJsScope::TRACKING);
         $event->appendJs('compatibility;');
 
-        Assert::assertSame('header;runtime;essential;tracking;compatibility;', $event->getJs());
+        $this->assertSame('header;runtime;essential;tracking;compatibility;', $event->getJs());
     }
 
     public function testDebugSectionCommentsAreAddedOnlyForAcceptedScopes(): void
@@ -64,10 +63,10 @@ JS;
         $event->appendJsForScope('runtime;', BuildJsScope::RUNTIME, 'Runtime');
         $event->appendJsForScope('essential;', BuildJsScope::ESSENTIAL, 'Essential');
 
-        Assert::assertStringNotContainsString('Runtime', $event->getJs());
-        Assert::assertStringContainsString('// Essential Start', $event->getJs());
-        Assert::assertStringContainsString('essential;', $event->getJs());
-        Assert::assertStringContainsString('// Essential End', $event->getJs());
+        $this->assertStringNotContainsString('Runtime', $event->getJs());
+        $this->assertStringContainsString('// Essential Start', $event->getJs());
+        $this->assertStringContainsString('essential;', $event->getJs());
+        $this->assertStringContainsString('// Essential End', $event->getJs());
     }
 
     public function testAcceptedScopedOutputIsMinifiedInProduction(): void
@@ -76,7 +75,7 @@ JS;
         $event->appendJsForScope("/** runtime */\nconsole.log('runtime');", BuildJsScope::RUNTIME);
         $event->appendJsForScope("/** essential */\nconsole.log('essential');", BuildJsScope::ESSENTIAL);
 
-        Assert::assertSame("console.log('essential')", $event->getJs());
+        $this->assertSame("console.log('essential')", $event->getJs());
     }
 
     /**
