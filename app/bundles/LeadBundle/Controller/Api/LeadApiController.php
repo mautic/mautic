@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -24,6 +25,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -67,6 +69,8 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private CampaignModel $campaignModel,
+        private FieldModel $leadFieldModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
@@ -119,7 +123,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -320,9 +324,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->getModel('campaign');
-            $campaigns     = $campaignModel->getLeadCampaigns($entity, true);
+            $campaigns = $this->campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
                 if (!empty($c['lists'])) {

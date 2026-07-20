@@ -72,8 +72,11 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
       id: 'mj-button',
       action: 'patch',
       defaultKey: 'button',
+      requiresTokens: false,
       getPatch: (mjClass) => ({
-        content: `<mj-button mj-class="${mjClass}" href="https://">Button</mj-button>`,
+        content: mjClass
+          ? `<mj-button mj-class="${mjClass}" href="https://">Button</mj-button>`
+          : '<mj-button>Button</mj-button>',
       }),
     },
     {
@@ -181,6 +184,7 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
       id: 'mj-button-secondary',
       action: 'add',
       defaultKey: 'buttonSecondary',
+      removeWithoutTokens: true,
       getBlock: (mjClass) => ({
         label: Mautic.translate('grapesjsbuilder.secondaryButtonBlockLabel'),
         category: Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
@@ -198,6 +202,10 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
     getBlockDefinitions().forEach((def) => {
       const defaultMjClass = def.defaultKey ? getDefaultValue(def.defaultKey) : '';
       const hasDefaultTokens = hasAllTokens(defaultMjClass);
+      if (def.removeWithoutTokens && !hasDefaultTokens) {
+        bm.remove(def.id);
+        return;
+      }
       if (def.requiresTokens !== false && !hasDefaultTokens) return;
       const mjClass = hasDefaultTokens ? defaultMjClass : '';
 
