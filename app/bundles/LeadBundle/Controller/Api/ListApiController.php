@@ -47,7 +47,7 @@ class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        ListModel $listModel,
+        private ListModel $listModel,
         private LeadModel $leadModel,
     ) {
         $this->model            = $listModel;
@@ -132,9 +132,7 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction(): Response
     {
-        $listModel = $this->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-        $lists   = $listModel->getUserLists();
+        $lists   = $this->listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);

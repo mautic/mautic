@@ -5719,8 +5719,8 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
-			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Method "autowireListApiController\(\)" has the \#\[Required\] attribute, but "ListApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
+			identifier: mautic.noRequiredMethodWithConstructorInController
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
