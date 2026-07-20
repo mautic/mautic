@@ -379,46 +379,16 @@ parameters:
 			path: app/bundles/CampaignBundle/Command/ValidateEventCommand.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 3
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
 			message: '#^Parameter \#3 \$referenceType of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:generateUrl\(\) expects int, true given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
-
-		-
-			message: '#^Controller must not fetch the "campaign" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
 			message: '#^Controller must not fetch the "campaign\.event" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 2
 			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 3
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:afterEntitySave\(\) has no return type specified\.$#'
@@ -971,12 +941,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CategoryBundle/Security/Permissions/CategoryPermissions.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
 
 		-
 			message: '#^Property Mautic\\ChannelBundle\\Entity\\MessageQueue\:\:\$channelId has no type specified\.$#'
@@ -3487,36 +3451,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Security/Permissions/DynamicContentPermissions.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/EmailBundle/Controller/EmailController.php
-
-		-
-			message: '#^Controller must not fetch the "email" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Controller\\PublicController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -4930,12 +4864,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FieldController.php
 
 		-
-			message: '#^Controller must not fetch the "lead\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/FormBundle/Controller/FieldController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -5791,81 +5719,15 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Controller must not fetch the "email" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AjaxController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AjaxController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 3
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
 			message: '#^Controller must not fetch the "lead\.company" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
-			message: '#^Controller must not fetch the "lead\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
-
-		-
-			message: '#^Controller must not fetch the "campaign" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "core\.auditlog" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "email" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 6
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Controller must not fetch the "lead\.device" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
@@ -5905,58 +5767,10 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 5
-			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
-
-		-
 			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '#^Controller must not fetch the "core\.auditlog" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AuditlogController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 6
-			path: app/bundles/LeadBundle/Controller/AuditlogController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AuditlogController.php
-
-		-
-			message: '#^Controller must not fetch the "core\.auditlog" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 4
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:getLineCountLimit\(\) has no return type specified\.$#'
@@ -5973,60 +5787,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:getCompanies\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "core\.auditlog" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "email" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 7
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 3
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "stage" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Controller must not fetch the "user\.user" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
@@ -6049,12 +5809,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ListController.php
-
-		-
 			message: '#^Controller must not fetch the "lead\.list" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
 			identifier: mautic.noGetModelWithStringInController
 			count: 2
@@ -6065,30 +5819,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Controller/ListController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/LeadBundle/Controller/NoteController.php
-
-		-
-			message: '#^Controller must not fetch the "core\.auditlog" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 6
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Deduplicate\\CompanyDeduper\:\:\$object has no type specified\.$#'
@@ -8233,24 +7963,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Api/OneSignalApi.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/Api/NotificationApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/NotificationController.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setButton\(\) has parameter \$button with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9991,12 +9703,6 @@ parameters:
 			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:logApiPointChange\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -10312,18 +10018,6 @@ parameters:
 			path: app/bundles/SmsBundle/Callback/HandlerContainer.php
 
 		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: app/bundles/SmsBundle/Controller/SmsController.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10550,12 +10244,6 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/SmsBundle/Sms/TransportChain.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 4
-			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
 
 		-
 			message: '#^Method Mautic\\StageBundle\\Entity\\Stage\:\:setWeight\(\) has parameter \$type with no type specified\.$#'
@@ -11042,12 +10730,6 @@ parameters:
 			identifier: return.type
 			count: 2
 			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticClearbitBundle/Controller/PublicController.php
 
 		-
 			message: '#^Controller must not fetch the "lead\.company" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
@@ -13622,12 +13304,6 @@ parameters:
 			identifier: return.type
 			count: 2
 			path: plugins/MauticSocialBundle/Command/MonitorTwitterBaseCommand.php
-
-		-
-			message: '#^Controller must not fetch the "lead" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Entity\\Lead\:\:setDateAdded\(\) has parameter \$dateAdded with no type specified\.$#'
