@@ -50,6 +50,7 @@ class EventController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly CampaignModel $campaignModel,
+        private readonly \Mautic\CampaignBundle\Model\EventModel $eventModel,
     ) {
         // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
@@ -217,7 +218,7 @@ class EventController extends CommonFormController
         $this->setCampaignElements($request->request);
         $event = $this->modifiedEvents[$objectId] ?? [];
         if (empty($event)) {
-            $eventEntity = $this->getModel('campaign.event')->getEntity($objectId);
+            $eventEntity = $this->eventModel->getEntity($objectId);
             if (null === $eventEntity) {
                 return $this->modalAccessDenied();
             }
