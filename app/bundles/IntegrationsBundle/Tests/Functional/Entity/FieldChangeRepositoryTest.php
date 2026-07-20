@@ -22,7 +22,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = $this->em->getRepository(FieldChange::class);
+        $this->repository = self::getContainer()->get(FieldChangeRepository::class);
     }
 
     public function testThatFindChangesBeforeMethodReturnsChangesInCorrectOrder(): void

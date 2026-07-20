@@ -69,7 +69,7 @@ final readonly class ContactTrackingService implements ContactTrackingServiceInt
     /**
      * @return string|null
      */
-    public function getTrackedIdentifier()
+    public function getTrackedIdentifier(): mixed
     {
         return $this->cookieHelper->getCookie('mautic_session_id');
     }

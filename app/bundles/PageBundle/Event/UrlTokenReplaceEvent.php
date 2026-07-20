@@ -43,9 +43,6 @@ final class UrlTokenReplaceEvent extends Event
         return $this->lead;
     }
 
-    /**
-     * Get the email ID.
-     */
     public function getEmailId(): ?int
     {
         return $this->emailId;
