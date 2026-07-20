@@ -51,7 +51,7 @@
             set: function (value) {
                 window.mauticCookieAccess.push({method: 'set', value: String(value)});
 
-                return cookieDescriptor.set.call(document, value);
+                cookieDescriptor.set.call(document, value);
             }
         });
     }
@@ -95,7 +95,7 @@
             set: function (value) {
                 recordNetworkRequest('img', value);
 
-                return imageSrcDescriptor.set.call(this, value);
+                imageSrcDescriptor.set.call(this, value);
             }
         });
     }
