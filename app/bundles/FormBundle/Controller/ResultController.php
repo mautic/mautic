@@ -38,8 +38,11 @@ class ResultController extends CommonFormController
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireResultController(FormModel $formModel, SubmissionResultLoader $submissionResultLoader, SubmissionModel $submissionModel): void
-    {
+    public function autowireResultController(
+        FormModel $formModel,
+        SubmissionResultLoader $submissionResultLoader,
+        SubmissionModel $submissionModel,
+    ): void {
         $this->formModel = $formModel;
         $this->submissionResultLoader = $submissionResultLoader;
         $this->submissionModel = $submissionModel;
@@ -455,8 +458,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = $parameters['objectId'] ?? 0;
-            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
+            $objectId = (int) ($parameters['objectId'] ?? 0);
+            $formId   = $parameters['formId'] ?? $request->query->getInt('formId', $objectId);
         }
 
         return $formId;

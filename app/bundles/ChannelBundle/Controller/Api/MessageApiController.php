@@ -42,9 +42,8 @@ class MessageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        MessageModel $messageModel,
     ) {
-        $messageModel = $modelFactory->getModel('channel.message');
-        \assert($messageModel instanceof MessageModel);
         $this->model            = $messageModel;
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';

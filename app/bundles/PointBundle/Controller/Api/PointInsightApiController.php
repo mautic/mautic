@@ -41,10 +41,8 @@ class PointInsightApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        InsightModel $insightModel,
     ) {
-        $insightModel = $modelFactory->getModel('point.insight');
-        \assert($insightModel instanceof InsightModel);
-
         $this->model            = $insightModel;
         $this->entityClass      = PointInsight::class;
         $this->entityNameOne    = 'insight';
