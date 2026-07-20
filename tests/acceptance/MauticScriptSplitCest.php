@@ -6,6 +6,10 @@ namespace Acceptance;
 
 final class MauticScriptSplitCest
 {
+    private ?string $corsConfigBackup = null;
+
+    private bool $corsConfigExisted = false;
+
     public function _before(\AcceptanceTester $I): void
     {
         $I->amOnPage('/tests/_data/mautic-script-split.html');
@@ -16,6 +20,22 @@ document.cookie.split(';').forEach(function (cookie) {
     document.cookie = cookie.split('=')[0].trim()+'=; Max-Age=0; path=/; Secure';
 });
 JS);
+    }
+
+    public function _after(\AcceptanceTester $I): void
+    {
+        if (null === $this->corsConfigBackup) {
+            return;
+        }
+
+        $configPath = $this->getCorsConfigPath();
+        if ($this->corsConfigExisted) {
+            file_put_contents($configPath, $this->corsConfigBackup);
+        } else {
+            unlink($configPath);
+        }
+
+        $this->corsConfigBackup = null;
     }
 
     public function loadsEssentialScriptFromDistinctOrigin(\AcceptanceTester $I): void
@@ -104,17 +124,59 @@ JS);
         $I->assertStringNotContainsString('mautic_device_id=', $state['cookies']);
     }
 
+    public function essentialThenTrackingInitializesOnce(\AcceptanceTester $I): void
+    {
+        $this->allowCorsFromFixtureOrigin();
+
+        $essentialUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $trackingUrl  = $this->getMauticUrl($I).'/mautic-tracking.js';
+        $this->loadScripts($I, [$essentialUrl, $trackingUrl]);
+        $I->waitForJS('return window.MauticJS && window.MauticJS.firstDeliveryMade === true', 10);
+        $I->waitForJS('return Date.now() - window.mauticLastNetworkActivity >= window.mauticNetworkQuietPeriod', 10);
+
+        $state = $this->grabBrowserState($I);
+        $eventRequests = array_values(array_filter(
+            $state['networkRequests'],
+            fn (array $request): bool => '/mtc/event' === parse_url($request['url'], PHP_URL_PATH),
+        ));
+        $trackingRequestPaths = array_map(
+            fn (string $url): string => (string) parse_url($url, PHP_URL_PATH),
+            $state['trackingRequests'],
+        );
+
+        $I->assertTrue($state['runtimeReady']);
+        $I->assertTrue($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertSame([$essentialUrl, $trackingUrl], array_slice(array_column($state['networkRequests'], 'url'), 0, 2));
+        $I->assertSame(1, count(array_filter($state['resourceUrls'], fn (string $url): bool => $essentialUrl === $url)));
+        $I->assertSame(1, count(array_filter($state['resourceUrls'], fn (string $url): bool => $trackingUrl === $url)));
+        $I->assertCount(1, $eventRequests);
+        $I->assertSame(['/mtc/event'], $trackingRequestPaths);
+        $I->assertSame(1, $state['pageViewCounter']);
+        $I->assertSame(1, $state['pageEventDeliveryCount']);
+    }
+
     private function loadScript(\AcceptanceTester $I, string $endpoint): string
     {
         $scriptUrl = $this->getMauticUrl($I).$endpoint;
-        $fixtureUrl = '/tests/_data/mautic-script-split.html?script='.rawurlencode($scriptUrl);
+
+        $this->loadScripts($I, [$scriptUrl]);
+
+        return $scriptUrl;
+    }
+
+    /**
+     * @param string[] $scriptUrls
+     */
+    private function loadScripts(\AcceptanceTester $I, array $scriptUrls): void
+    {
+        $query      = implode('&', array_map(fn (string $url): string => 'script='.rawurlencode($url), $scriptUrls));
+        $fixtureUrl = '/tests/_data/mautic-script-split.html?'.$query;
 
         $I->amOnPage($fixtureUrl);
         $I->waitForJS('return window.mauticScriptFinished === true', 10);
         $I->assertSame([], $I->executeJS('return window.mauticScriptErrors;'));
         $I->waitForJS('return Date.now() - window.mauticLastNetworkActivity >= window.mauticNetworkQuietPeriod', 10);
-
-        return $scriptUrl;
     }
 
     /**
@@ -151,6 +213,8 @@ return {
     networkRequests: window.mauticNetworkRequests,
     resourceUrls: resourceUrls,
     trackingRequests: trackingRequests,
+    pageViewCounter: window.MauticJS && window.MauticJS.pageViewCounter,
+    pageEventDeliveryCount: window.mauticPageEventDeliveries.length,
     mtcId: localStorage.getItem('mtc_id'),
     deviceId: localStorage.getItem('mautic_device_id'),
     cookies: document.cookie
@@ -185,5 +249,27 @@ JS);
         $I->assertNotSame('', $mauticUrl, 'BROWSERTEST_OUTPUT_BASE_URL must contain the canonical DDEV URL.');
 
         return $mauticUrl;
+    }
+
+    private function allowCorsFromFixtureOrigin(): void
+    {
+        $configPath                  = $this->getCorsConfigPath();
+        $this->corsConfigExisted     = file_exists($configPath);
+        $this->corsConfigBackup      = $this->corsConfigExisted ? (string) file_get_contents($configPath) : '';
+        $parameters                  = [];
+
+        if ($this->corsConfigExisted) {
+            include $configPath;
+        }
+
+        $parameters['cors_restrict_domains'] = true;
+        $parameters['cors_valid_domains']    = ['https://web'];
+
+        file_put_contents($configPath, "<?php\n\n\$parameters = ".var_export($parameters, true).";\n");
+    }
+
+    private function getCorsConfigPath(): string
+    {
+        return dirname(__DIR__, 2).'/config/parameters_local.php';
     }
 }

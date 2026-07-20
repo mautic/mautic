@@ -10,8 +10,16 @@
     window.mauticStorageAccess = [];
     window.mauticCookieAccess = [];
     window.mauticNetworkRequests = [];
+    window.mauticPageEventDeliveries = [];
     window.mauticLastNetworkActivity = Date.now();
     window.mauticNetworkQuietPeriod = 500;
+
+    window.MauticTrackingObject = 'mt';
+    window.mt = function () {
+        window.mt.q.push(arguments);
+    };
+    window.mt.q = [];
+    window.mt('send', 'pageview');
 
     function recordNetworkRequest(type, url) {
         if (!url) {
@@ -27,6 +35,9 @@
     });
     window.addEventListener('unhandledrejection', function (event) {
         window.mauticScriptErrors.push(String(event.reason));
+    });
+    document.addEventListener('mauticPageEventDelivered', function (event) {
+        window.mauticPageEventDeliveries.push(event.detail);
     });
 
     ['getItem', 'setItem', 'removeItem'].forEach(function (method) {
@@ -100,13 +111,19 @@
         });
     }
 
-    var scriptUrl = new URLSearchParams(window.location.search).get('script');
-    if (scriptUrl) {
+    var scriptUrls = new URLSearchParams(window.location.search).getAll('script');
+    function loadScript(index) {
+        if (index >= scriptUrls.length) {
+            window.mauticScriptFinished = true;
+
+            return;
+        }
+
         var script = document.createElement('script');
-        script.src = scriptUrl;
+        script.src = scriptUrls[index];
         script.onload = function () {
             window.mauticScriptLoaded = true;
-            window.mauticScriptFinished = true;
+            loadScript(index + 1);
         };
         script.onerror = function () {
             window.mauticScriptErrors.push('Failed to load '+script.src);
@@ -114,6 +131,7 @@
         };
         document.head.appendChild(script);
     }
+    loadScript(0);
 </script>
 </body>
 </html>
