@@ -5719,8 +5719,8 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Controller must not fetch the "lead\.company" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Method "autowireCompanyApiController\(\)" has the \#\[Required\] attribute, but "CompanyApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
+			identifier: mautic.noRequiredMethodWithConstructorInController
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
