@@ -20,21 +20,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    private \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel;
-
-    private LeadModel $leadModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCampaignAjaxController(
-        \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel,
-        LeadModel $leadModel,
-    ): void {
-        $this->eventLogModel = $eventLogModel;
-        $this->leadModel     = $leadModel;
-    }
-
     public function __construct(
         private readonly DateHelper $dateHelper,
+        private readonly \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel,
+        private readonly LeadModel $leadModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
