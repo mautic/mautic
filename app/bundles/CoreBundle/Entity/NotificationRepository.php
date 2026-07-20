@@ -30,8 +30,6 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * Clear notifications for a user.
-     *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
     public function clearNotificationsForUser($userId, $id = null, $limit = null): void

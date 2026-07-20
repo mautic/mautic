@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -24,7 +23,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->dispatcher            = static::getContainer()->get('event_dispatcher');
-        $this->fieldChangeRepository = $this->em->getRepository(FieldChange::class);
+        $this->fieldChangeRepository = self::getContainer()->get(FieldChangeRepository::class);
 
         static::getContainer()->set(
             'mautic.integrations.helper.sync_integrations',

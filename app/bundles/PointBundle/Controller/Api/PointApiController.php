@@ -48,10 +48,8 @@ class PointApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         protected LeadModel $leadModel,
+        PointModel $pointModel,
     ) {
-        $pointModel = $modelFactory->getModel('point');
-        \assert($pointModel instanceof PointModel);
-
         $this->model            = $pointModel;
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';

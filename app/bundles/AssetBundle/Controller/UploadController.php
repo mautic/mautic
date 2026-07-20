@@ -40,8 +40,9 @@ class UploadController extends DropzoneController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireUploadController(TranslatorInterface $translator): void
-    {
+    public function autowireUploadController(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 }
