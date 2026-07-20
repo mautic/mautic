@@ -4834,12 +4834,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FormController.php
 
 		-
-			message: '#^Controller must not fetch the "form\.submission" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
 			message: '#^Property Mautic\\FormBundle\\Entity\\Action\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
