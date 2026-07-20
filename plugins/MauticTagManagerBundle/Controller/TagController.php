@@ -404,7 +404,6 @@ class TagController extends FormController
      */
     private function getTag(int $tagId)
     {
-        /** @var Tag|null $tag */
         $tag = $this->leadTagModel->getEntity($tagId);
 
         // Check if exists

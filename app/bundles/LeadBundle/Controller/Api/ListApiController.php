@@ -29,13 +29,6 @@ use Symfony\Component\Routing\RouterInterface;
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
-    private ListModel $listModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireListApiController(ListModel $listModel): void
-    {
-        $this->listModel = $listModel;
-    }
 
     /**
      * @var ListModel|null
@@ -54,7 +47,7 @@ class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        ListModel $listModel,
+        private ListModel $listModel,
         private LeadModel $leadModel,
     ) {
         $this->model            = $listModel;

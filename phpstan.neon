@@ -232,3 +232,7 @@ services:
 		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 		tags:
 			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
+		tags:
+			- phpstan.rules.rule

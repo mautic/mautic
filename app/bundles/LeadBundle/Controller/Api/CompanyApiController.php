@@ -30,13 +30,6 @@ class CompanyApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
-    private CompanyModel $companyModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCompanyApiController(CompanyModel $companyModel): void
-    {
-        $this->companyModel = $companyModel;
-    }
 
     /**
      * @var CompanyModel|null
@@ -55,7 +48,7 @@ class CompanyApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        CompanyModel $companyModel,
+        private CompanyModel $companyModel,
         private LeadModel $leadModel,
     ) {
         $this->model              = $companyModel;

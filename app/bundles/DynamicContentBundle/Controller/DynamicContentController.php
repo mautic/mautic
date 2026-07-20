@@ -16,7 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 class DynamicContentController extends FormController
 {
     private TrackableModel $trackableModel;
+
     private PageModel $pageModel;
+
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private DynamicContentModel $dynamicContentModel;

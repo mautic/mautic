@@ -43,23 +43,6 @@ class LeadApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-    private \Mautic\LeadBundle\Model\DeviceModel $deviceModel;
-    private \Mautic\LeadBundle\Model\NoteModel $noteModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireLeadApiController(
-        \Mautic\LeadBundle\Model\NoteModel $noteModel,
-        \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
-        \Mautic\UserBundle\Model\UserModel $userModel,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
-    ): void {
-        $this->noteModel = $noteModel;
-        $this->deviceModel = $deviceModel;
-        $this->userModel = $userModel;
-        $this->stageModel = $stageModel;
-    }
 
     /**
      * @var LeadModel|null
@@ -87,6 +70,10 @@ class LeadApiController extends CommonApiController
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
         LeadModel $leadModel,
+        private \Mautic\LeadBundle\Model\NoteModel $noteModel,
+        private \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
+        private \Mautic\UserBundle\Model\UserModel $userModel,
+        private \Mautic\StageBundle\Model\StageModel $stageModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 

@@ -30,17 +30,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class FormApiController extends CommonApiController
 {
-    private ActionModel $actionModel;
-    private FormModel $formModel;
-    private FieldModel $fieldModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFormApiController(FieldModel $fieldModel, FormModel $formModel, ActionModel $actionModel): void
-    {
-        $this->fieldModel = $fieldModel;
-        $this->formModel = $formModel;
-        $this->actionModel = $actionModel;
-    }
     /**
      * @var FormModel|null
      */
@@ -58,7 +47,9 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        FormModel $formModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $fieldModel,
+        private readonly ActionModel $actionModel,
     ) {
         $this->model            = $formModel;
         $this->entityClass      = Form::class;

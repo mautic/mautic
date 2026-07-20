@@ -31,24 +31,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    private SubmissionModel $submissionModel;
-
-    private SubmissionResultLoader $submissionResultLoader;
-
-    private FormModel $formModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireResultController(
-        FormModel $formModel,
-        SubmissionResultLoader $submissionResultLoader,
-        SubmissionModel $submissionModel,
-    ): void {
-        $this->formModel = $formModel;
-        $this->submissionResultLoader = $submissionResultLoader;
-        $this->submissionModel = $submissionModel;
-    }
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security, private readonly FormModel $formModel, private readonly SubmissionResultLoader $submissionResultLoader, private readonly SubmissionModel $submissionModel)
     {
         $this->setStandardParameters(
             'form.submission', // model name

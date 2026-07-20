@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class PublicController extends FormController
 {
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     private UserModel $userModel;

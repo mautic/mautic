@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Controller\FetchCommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventLogModel;
@@ -33,13 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
-    private EventModel $eventModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEventLogApiController(EventModel $eventModel): void
-    {
-        $this->eventModel = $eventModel;
-    }
 
     private const LOG_SERIALIZATION = 30;
 
@@ -71,6 +63,7 @@ class EventLogApiController extends FetchCommonApiController
         EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
+        private EventModel $eventModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -162,7 +155,7 @@ class EventLogApiController extends FetchCommonApiController
         if ($contact instanceof Response) {
             return $contact;
         }
-        /** @var Event $event */
+
         $event = $this->eventModel->getEntity($eventId);
         if (null === $event || !$event->getId()) {
             return $this->notFound();

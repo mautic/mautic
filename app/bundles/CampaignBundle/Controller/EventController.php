@@ -26,13 +26,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EventController extends CommonFormController
 {
-    private \Mautic\CampaignBundle\Model\EventModel $eventModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireEventController(\Mautic\CampaignBundle\Model\EventModel $eventModel): void
-    {
-        $this->eventModel = $eventModel;
-    }
     /**
      * @var string[]
      */
@@ -57,6 +50,7 @@ class EventController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly CampaignModel $campaignModel,
+        private readonly \Mautic\CampaignBundle\Model\EventModel $eventModel,
     ) {
         // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
