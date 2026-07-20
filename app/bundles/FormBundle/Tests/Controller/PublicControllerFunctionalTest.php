@@ -26,16 +26,16 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'text/javascript; charset=UTF-8');
         $content = (string) $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString('mauticform_wrapper_companylookuptest', $content);
-        Assert::assertStringContainsString("/form/submit?formId={$form->getId()}", $content);
-        Assert::assertStringContainsString('media/js/mautic-form.js', $content);
-        Assert::assertStringContainsString('MauticSDK.onLoad()', $content);
-        Assert::assertStringNotContainsString('MauticJS', $content);
-        Assert::assertStringNotContainsString('mtc_id', $content);
-        Assert::assertStringNotContainsString('mautic_device_id', $content);
-        Assert::assertStringNotContainsString('/mtc.js', $content);
-        Assert::assertStringNotContainsString('/mautic-essential.js', $content);
-        Assert::assertStringNotContainsString('/mautic-tracking.js', $content);
+        $this->assertStringContainsString('mauticform_wrapper_companylookuptest', $content);
+        $this->assertStringContainsString("/form/submit?formId={$form->getId()}", $content);
+        $this->assertStringContainsString('media/js/mautic-form.js', $content);
+        $this->assertStringContainsString('MauticSDK.onLoad()', $content);
+        $this->assertStringNotContainsString('MauticJS', $content);
+        $this->assertStringNotContainsString('mtc_id', $content);
+        $this->assertStringNotContainsString('mautic_device_id', $content);
+        $this->assertStringNotContainsString('/mtc.js', $content);
+        $this->assertStringNotContainsString('/mautic-essential.js', $content);
+        $this->assertStringNotContainsString('/mautic-tracking.js', $content);
     }
 
     public function testLookupActionWithNoLookupFormField(): void
