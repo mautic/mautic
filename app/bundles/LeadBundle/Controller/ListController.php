@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -28,6 +29,20 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ListController extends FormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
+
+    private ListModel $listModel;
+
+    private LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireListController(
+        LeadModel $leadModel,
+        ListModel $listModel,
+    ): void {
+        $this->leadModel = $leadModel;
+        $this->listModel = $listModel;
+    }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
@@ -47,8 +62,6 @@ class ListController extends FormController
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        /** @var ListModel $model */
-        $model   = $this->getModel('lead.list');
         $session = $request->getSession();
 
         // set some permissions
@@ -91,7 +104,7 @@ class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $model->getRepository()->getTableAlias();
+        $tableAlias = $this->listModel->getRepository()->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -134,7 +147,7 @@ class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
+        $leadCounts = (!empty($listIds)) ? $this->listModel->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,
@@ -237,10 +250,8 @@ class ListController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return Response
      */
-    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false)
+    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
     {
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
@@ -395,7 +406,7 @@ class ListController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
@@ -498,9 +509,7 @@ class ListController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
-            $list  = $model->getEntity($objectId);
+            $list  = $this->listModel->getEntity($objectId);
 
             if (null === $list) {
                 $flashes[] = [
@@ -513,11 +522,11 @@ class ListController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($list)) {
+            } elseif ($this->listModel->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
                 try {
-                    $model->deleteEntity($list);
+                    $this->listModel->deleteEntity($list);
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.core.notice.deleted',
@@ -624,18 +633,12 @@ class ListController extends FormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function removeLeadAction(Request $request, $objectId)
+    public function removeLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'remove');
     }
 
-    /**
-     * @return Response
-     */
-    public function addLeadAction(Request $request, $objectId)
+    public function addLeadAction(Request $request, $objectId): Response
     {
         return $this->changeList($request, $objectId, 'add');
     }
@@ -661,13 +664,9 @@ class ListController extends FormController
 
         $leadId = $request->get('leadId');
         if (!empty($leadId) && 'POST' === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model = $this->getModel('lead.list');
             /** @var LeadList $list */
-            $list = $model->getEntity($listId);
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $list = $this->listModel->getEntity($listId);
+            $lead      = $this->leadModel->getEntity($leadId);
 
             if (null === $lead) {
                 $flashes[] = [
@@ -689,11 +688,11 @@ class ListController extends FormController
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($lead)) {
+            } elseif ($this->listModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->{$function}($lead, $list, true);
+                $this->listModel->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -831,10 +830,7 @@ class ListController extends FormController
 
     protected function getListModel(): ListModel
     {
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-
-        return $model;
+        return $this->listModel;
     }
 
     protected function getModelName(): string
@@ -886,20 +882,24 @@ class ListController extends FormController
 
         $joinCategories = false;
         if (!empty($currentFilters)) {
-            $catIds = [];
+            $catAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('category' == $type) {
-                        $catIds[] = (int) $fltr;
+                        $catAliases[]        = $fltr;
+                        $searchFilterTerms[] = 'category:'.$fltr;
                     } // else for other group filters
                 }
             }
 
-            if (!empty($catIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.lead.list.filter', $filter['string']);
+
+            if (!empty($catAliases)) {
                 $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+                $filter['force'][] = ['column' => 'cat.alias', 'expr' => 'in', 'value' => array_values(array_unique($catAliases))];
             }
         }
 

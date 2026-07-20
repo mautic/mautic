@@ -130,11 +130,11 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->filter[0]['operator'] = 'startsWith';
         $this->filter[0]['filter']   = 'my';
 
-        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
 
         $this->lead['custom'] = 'another text';
 
-        self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
     public function testDWCContactWithRegex(): void
@@ -143,7 +143,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->filter[0]['operator'] = 'regexp';
         $this->filter[0]['filter']   = '(13357|04249|20363)';
 
-        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
     public function testDWCContactEndWidth(): void
@@ -151,11 +151,11 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->filter[0]['operator'] = 'endsWith';
         $this->filter[0]['filter']   = 'text';
 
-        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
 
         $this->lead['custom'] = 'another words';
 
-        self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
     public function testDWCContactContains(): void
@@ -163,11 +163,11 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->filter[0]['operator'] = 'contains';
         $this->filter[0]['filter']   = 'custom';
 
-        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
 
         $this->lead['custom'] = 'another words';
 
-        self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+        $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
     public function testMatchFilterForLeadWithNumberType(): void
@@ -318,7 +318,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     /**
@@ -517,7 +517,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidIn(): void
@@ -550,7 +550,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidNotIn(): void
@@ -583,7 +583,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidInAll(): void
@@ -616,7 +616,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidNotInAll(): void
@@ -649,7 +649,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertTrue($trait->match($filter, $lead));
+        $this->assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidInvalidOperator(): void

@@ -174,7 +174,7 @@ abstract class ModeratedCommand extends Command
         ftruncate($fp, 0);
         rewind($fp);
 
-        fputs($fp, (string) getmypid());
+        fwrite($fp, (string) getmypid());
         fflush($fp);
 
         flock($fp, LOCK_UN);

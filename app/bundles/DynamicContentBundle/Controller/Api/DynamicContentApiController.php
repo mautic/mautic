@@ -22,11 +22,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class DynamicContentApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, DynamicContentModel $dynamicContentModel)
     {
-        $dynamicContentModel = $modelFactory->getModel('dynamicContent');
-        \assert($dynamicContentModel instanceof DynamicContentModel);
-
         $this->model            = $dynamicContentModel;
         $this->entityClass      = DynamicContent::class;
         $this->entityNameOne    = 'dynamicContent';

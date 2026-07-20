@@ -83,8 +83,8 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadStageLogRepository->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
+            (string) $event->getLoser()->getId(),
+            (string) $event->getVictor()->getId()
         );
     }
 }

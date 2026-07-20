@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -15,7 +17,7 @@ abstract class AbstractFormController extends CommonController
     /**
      * @param string $objectModel
      *
-     * @return mixed
+     * @return RedirectResponse
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
     {
@@ -24,7 +26,8 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            if (null !== $entity && null !== $entity->getCheckedOutBy()) {
+            if ($entity instanceof FormEntity && null !== $entity->getCheckedOutBy()) {
+                /** @var FormModel $model */
                 $model->unlockEntity($entity);
             }
 
@@ -63,7 +66,7 @@ abstract class AbstractFormController extends CommonController
      * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|array
+     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {

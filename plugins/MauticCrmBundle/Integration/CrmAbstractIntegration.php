@@ -149,8 +149,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the API helper.
-     *
      * @return TApiHelper
      */
     public function getApiHelper()

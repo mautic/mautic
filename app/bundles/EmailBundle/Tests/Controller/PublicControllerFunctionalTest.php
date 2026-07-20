@@ -15,7 +15,9 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,10 +43,9 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['show_contact_categories']         = 0;
         $this->configParams['show_contact_preferred_channels'] = 0;
 
+        $this->configParams['show_contact_preferences'] = 1;
         if (in_array($this->name(), self::UNSUBSCRIBE_TESTS)) {
             $this->configParams['show_contact_preferences'] = 0;
-        } else {
-            $this->configParams['show_contact_preferences'] = 1;
         }
 
         if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
@@ -55,6 +56,10 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
+        if ('testContactPreferencesFormRenderOnUnsubscribePage' === $this->name()) {
+            $this->configParams['show_contact_segments'] = 1;
+        }
+
         parent::setUp();
     }
 
@@ -63,7 +68,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+        $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
@@ -72,7 +77,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+        $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
     public function testMailerCallbackWhenTransportProccessesIt(): void
@@ -81,7 +86,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseIsSuccessful();
-        Assert::assertSame('OK', $this->client->getResponse()->getContent());
+        $this->assertSame('OK', $this->client->getResponse()->getContent());
     }
 
     public function testUnsubscribeFormActionWithoutTheme(): void
@@ -95,7 +100,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
     }
 
     public function testContactPreferencesLandingPageTracking(): void
@@ -111,7 +116,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Page::class);
 
-        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
     }
 
@@ -143,10 +148,10 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $dncRepository = $this->em->getRepository(DoNotContact::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
-        Assert::assertCount(1, $dncRecords);
-        Assert::assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
-        Assert::assertSame('email', $dncRecords[0]->getChannel());
-        Assert::assertSame($stat->getEmail()->getId(), $dncRecords[0]->getChannelId());
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+        $this->assertSame('email', $dncRecords[0]->getChannel());
+        $this->assertSame($stat->getEmail()->getId(), $dncRecords[0]->getChannelId());
     }
 
     public function testUnsubscribeFormActionWithThemeWithoutFormSupport(): void
@@ -159,7 +164,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -173,7 +178,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -187,7 +192,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringNotContainsString('form/submit?formId=', $crawler->html());
+        $this->assertStringNotContainsString('form/submit?formId=', $crawler->html());
         $this->assertResponseIsSuccessful();
     }
 
@@ -571,10 +576,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testUnsubscribeNotFoundEmailStat(): void
     {
         $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash');
-        Assert::assertStringContainsString(
-            'Record not found.',
-            strip_tags((string) $this->client->getResponse()->getContent())
-        );
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
         self::assertResponseIsSuccessful();
     }
 
@@ -599,10 +601,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/email/unsubscribe/existing-tracking-hash');
 
-        Assert::assertStringContainsString(
-            'We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.',
-            strip_tags((string) $this->client->getResponse()->getContent())
-        );
+        $this->assertStringContainsString('We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.', strip_tags((string) $this->client->getResponse()->getContent()));
         self::assertResponseIsSuccessful();
 
         /** @var DoNotContactRepository $dncRepository */
@@ -611,11 +610,11 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findAll();
 
-        Assert::assertCount(1, $dncRecords);
-        Assert::assertSame($contact->getId(), $dncRecords[0]->getLead()->getId());
-        Assert::assertSame('email', $dncRecords[0]->getChannel());
-        Assert::assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
-        Assert::assertSame('User unsubscribed.', $dncRecords[0]->getComments());
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame($contact->getId(), $dncRecords[0]->getLead()->getId());
+        $this->assertSame('email', $dncRecords[0]->getChannel());
+        $this->assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
+        $this->assertSame('User unsubscribed.', $dncRecords[0]->getComments());
     }
 
     public function testUnsubscribeAllFromPreferencesPage(): void
@@ -681,5 +680,86 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $successMessage = $crawler->filter('div.pref-successmessage');
         $this->assertCount(1, $successMessage);
+    }
+
+    public function testContactPreferencesFormRenderOnUnsubscribePage(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+
+        // Preference-center segments - unique public names
+        $segmentOne = $this->createSegment('Segment First', 'Segment 2', 'segment-1');
+        $segmentTwo = $this->createSegment('Segment Second', 'Segment 1', 'segment-2');
+
+        // Same public name segments (must both render, deterministic order)
+        $sameNameOne = $this->createSegment('Same A', 'Same Name', 'same-1');
+        $sameNameTwo = $this->createSegment('Same B', 'Same Name', 'same-2');
+
+        // Unpublished preference segment (should NOT appear)
+        $unpublishedSegment = $this->createSegment('Draft Segment', 'Draft', 'draft-segment', false);
+
+        // Non-preference segment (should NOT appear)
+        $nonPreferenceSegment = $this->createSegment('Hidden Segment', 'Should Not Appear', 'hidden-segment', true, false);
+
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->assertResponseIsSuccessful();
+
+        // Collect only segment labels
+        $labels = $crawler->filter('#contact-segments label[for]')
+            ->each(fn ($node): string => trim($node->text()));
+
+        $this->assertSame(
+            [
+                // same publicName → sorted by ID for stability
+                sprintf('%s (%s)', $sameNameOne->getPublicName(), $sameNameOne->getId()),
+                sprintf('%s (%s)', $sameNameTwo->getPublicName(), $sameNameTwo->getId()),
+
+                // sorted by publicName
+                sprintf('%s (%s)', $segmentTwo->getPublicName(), $segmentTwo->getId()), // Segment 1
+                sprintf('%s (%s)', $segmentOne->getPublicName(), $segmentOne->getId()), // Segment 2
+            ],
+            $labels,
+            'Segments must be ordered by publicName, then by ID for stability'
+        );
+
+        // Assert: non-preference and unpublished segments are excluded
+        $labelText = implode(' ', $labels);
+
+        $this->assertStringNotContainsString($nonPreferenceSegment->getPublicName(), $labelText);
+        $this->assertStringNotContainsString($unpublishedSegment->getPublicName(), $labelText);
+
+        // Assert: checkbox ↔ label wiring
+        $crawler->filter('#contact-segments input[type="checkbox"]')->each(
+            function ($input) use ($crawler): void {
+                $id = $input->attr('id');
+
+                $this->assertGreaterThan(
+                    0,
+                    $crawler->filter(sprintf('label[for="%s"]', $id))->count(),
+                    sprintf('Missing label for checkbox %s', $id)
+                );
+            }
+        );
+    }
+
+    private function createSegment(
+        string $name,
+        string $publicName,
+        string $alias,
+        bool $isPublished = true,
+        bool $isPreferenceCenter = true): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($publicName);
+        $segment->setAlias($alias);
+        $segment->setIsPreferenceCenter($isPreferenceCenter);
+        $segment->setIsPublished($isPublished);
+        $this->em->persist($segment);
+
+        return $segment;
     }
 }

@@ -10,21 +10,23 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 86.2
-		param: 74.1
-		property: 66.8
+		return: 86.5
+		param: 74.6
+		property: 67.2
 		# wait for PHP 8.3 before changing
 		constant: 3
 	paths:
 		- app/bundles
 		- app/migrations
 		- plugins
+		- utils
 	excludePaths:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
 		- plugins/*/node_modules/*
 		- plugins/*/vendor/*
+		- */Fixture/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
@@ -108,6 +110,10 @@ parameters:
 				- app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
 				- app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
 				- app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		-
+			message: '#Anonymous class implements deprecated interface Doctrine\\DBAL\\Logging\\SQLLogger#'
+			path: app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
+
 		# false positive, reflection reference method call
 		-
 			identifier: method.impossibleType
@@ -132,31 +138,41 @@ parameters:
 		# mautic deprecations
 		-
 			identifier: staticMethod.deprecated
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
 		-
 			identifier: parameter.deprecatedClass
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
+		-
+			identifier: property.deprecatedClass
+			message: '#class\s+Mautic#'
 		-
 			identifier: class.extendsDeprecatedClass
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
 		-
 			identifier: staticMethod.deprecatedClass
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
+		-
+			identifier: method.deprecatedClass
+			message: '#class\s+Mautic#'
 		-
 			identifier: method.deprecated
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
 		-
 			identifier: return.deprecatedClass
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
 		-
 			identifier: classConstant.deprecatedClass
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
 		-
-			identifier: new.deprecated
-			message: '#class Mautic#'
+			identifier: new.deprecatedClass
+			message: '#class\s+Mautic#'
 		-
 			identifier: classConstant.deprecated
-			message: '#class Mautic#'
+			message: '#class\s+Mautic#'
+
+		# handle later
+		- '#Call to method convertToPHPValue\(\) of deprecated class Doctrine\\DBAL\\Types\\ArrayType#'
+
 		# child class generic
 		-
 			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
@@ -167,6 +183,22 @@ parameters:
 			paths:
 				- app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
 				- app/bundles/CoreBundle/Controller/AjaxController.php
+		-
+			identifier: mautic.noTablePrefixDefinitionInTests
+			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
+
+		# not useful, rather pedantic from phsptan-* extensions
+		-
+			identifier: argument.templateType
+			path: app/bundles/CoreBundle/Helper/CookieHelper.php
+			count: 1
+		-
+			message: '#Method PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker::willReturnOnConsecutiveCalls\(\) invoked with unpacked array with possibly string key#'
+			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolverTest.php
+		-
+			message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
+			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
+
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -180,6 +212,18 @@ parameters:
 
 services:
 	-
-		class: MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule
+		class: Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 		tags:
 			- phpstan.rules.rule

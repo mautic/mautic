@@ -31,6 +31,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
+    private SubmissionModel $submissionModel;
+
+    private SubmissionResultLoader $submissionResultLoader;
+
+    private FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireResultController(
+        FormModel $formModel,
+        SubmissionResultLoader $submissionResultLoader,
+        SubmissionModel $submissionModel,
+    ): void {
+        $this->formModel = $formModel;
+        $this->submissionResultLoader = $submissionResultLoader;
+        $this->submissionModel = $submissionModel;
+    }
+
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->setStandardParameters(
@@ -50,13 +67,11 @@ class ResultController extends CommonFormController
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
     {
-        /** @var FormModel $formModel */
-        $formModel      = $this->getModel('form.form');
-        $form           = $formModel->getEntity($objectId);
+        $form           = $this->formModel->getEntity($objectId);
         $session        = $request->getSession();
         $formPage       = $session->get('mautic.form.page', 1);
         $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
-        $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         if (null === $form) {
             // redirect back to form list
@@ -191,9 +206,7 @@ class ResultController extends CommonFormController
 
     public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
-        /** @var SubmissionResultLoader $submissionResultLoader */
-        $submissionResultLoader = $this->getModel('form.submission_result_loader');
-        $submission             = $submissionResultLoader->getSubmissionWithResult($submissionId);
+        $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 
         if (!$submission) {
             throw $this->createNotFoundException();
@@ -269,8 +282,7 @@ class ResultController extends CommonFormController
      */
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
-        $formModel = $this->getModel('form.form');
-        $form      = $formModel->getEntity($objectId);
+        $form      = $this->formModel->getEntity($objectId);
         $session   = $request->getSession();
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
@@ -339,11 +351,8 @@ class ResultController extends CommonFormController
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form.submission');
-            \assert($model instanceof SubmissionModel);
-
             // Find the result
-            $entity = $model->getEntity($objectId);
+            $entity = $this->submissionModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -355,7 +364,7 @@ class ResultController extends CommonFormController
                 $this->throwAccessDenied();
             } else {
                 $id = $entity->getId();
-                $model->deleteEntity($entity);
+                $this->submissionModel->deleteEntity($entity);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -449,8 +458,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = $parameters['objectId'] ?? 0;
-            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
+            $objectId = (int) ($parameters['objectId'] ?? 0);
+            $formId   = $parameters['formId'] ?? $request->query->getInt('formId', $objectId);
         }
 
         return $formId;

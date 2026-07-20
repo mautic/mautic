@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -45,7 +44,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 
     public function testLookupActionWithInvalidLookupFormField(): void
@@ -54,7 +53,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 
     public function testLookupActionWithTooFewLetters(): void
@@ -65,7 +64,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST, $clientResponse->getContent());
-        Assert::assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertSame('{"error":"Invalid request param"}', $clientResponse->getContent(), $clientResponse->getContent());
     }
 
     public function testLookupActionWithCompanyData(): void
@@ -79,22 +78,19 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
-        Assert::assertSame(
+        $this->assertSame([
             [
-                [
-                    'id'           => (string) $companyA->getId(),
-                    'companyname'  => 'Company A',
-                    'companycity'  => null,
-                    'companystate' => null,
-                ], [
-                    'id'           => (string) $companyB->getId(),
-                    'companyname'  => 'Company B',
-                    'companycity'  => 'Boston',
-                    'companystate' => 'Massachusetts',
-                ],
+                'id'           => (string) $companyA->getId(),
+                'companyname'  => 'Company A',
+                'companycity'  => null,
+                'companystate' => null,
+            ], [
+                'id'           => (string) $companyB->getId(),
+                'companyname'  => 'Company B',
+                'companycity'  => 'Boston',
+                'companystate' => 'Massachusetts',
             ],
-            json_decode($clientResponse->getContent(), true)
-        );
+        ], json_decode($clientResponse->getContent(), true));
     }
 
     /**

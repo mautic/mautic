@@ -15,9 +15,9 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -47,6 +47,18 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
+    use QuickFilterSearchTrait;
+
+    private \Mautic\CampaignBundle\Model\EventModel $eventModel;
+
+    private CampaignModel $campaignModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireCampaignController(CampaignModel $campaignModel, \Mautic\CampaignBundle\Model\EventModel $eventModel): void
+    {
+        $this->campaignModel = $campaignModel;
+        $this->eventModel = $eventModel;
+    }
 
     /**
      * @var array<string, mixed>
@@ -442,9 +454,7 @@ class CampaignController extends AbstractStandardFormController
      */
     public function newAction(Request $request): Response
     {
-        /** @var CampaignModel $model */
-        $model    = $this->getModel('campaign');
-        $campaign = $model->getEntity();
+        $campaign = $this->campaignModel->getEntity();
 
         if (!$this->security->isGranted('campaign:campaigns:create')) {
             $this->throwAccessDenied();
@@ -455,7 +465,7 @@ class CampaignController extends AbstractStandardFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'new']);
-        $form    = $model->createForm($campaign, $this->formFactory, $action, $options);
+        $form    = $this->campaignModel->createForm($campaign, $this->formFactory, $action, $options);
 
         // /Check for a submitted form and process it
         $isPost = 'POST' === $request->getMethod();
@@ -467,7 +477,7 @@ class CampaignController extends AbstractStandardFormController
                 if ($valid = $this->isFormValid($form)) {
                     if ($valid = $this->beforeEntitySave($campaign, $form, 'new')) {
                         $campaign->setDateModified(new \DateTime());
-                        $model->saveEntity($campaign);
+                        $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
                         if (method_exists($this, 'viewAction')) {
@@ -526,7 +536,7 @@ class CampaignController extends AbstractStandardFormController
 
         $delegateArgs = [
             'viewParameters' => [
-                'permissionBase'  => $model->getPermissionBase(),
+                'permissionBase'  => $this->campaignModel->getPermissionBase(),
                 'mauticContent'   => 'campaign',
                 'actionRoute'     => 'mautic_campaign_action',
                 'indexRoute'      => 'mautic_campaign_index',
@@ -794,9 +804,7 @@ class CampaignController extends AbstractStandardFormController
 
         if ('edit' === $action && null !== $this->connections) {
             if (!empty($this->deletedEvents)) {
-                /** @var EventModel $eventModel */
-                $eventModel = $this->getModel('campaign.event');
-                $eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
+                $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }
         }
 
@@ -896,22 +904,27 @@ class CampaignController extends AbstractStandardFormController
 
         $joinLists = $joinForms = false;
         if (!empty($currentFilters)) {
-            $listIds = [];
+            $formIds = $listAliases = $searchFilterTerms = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ('list' == $type) {
-                        $listIds[] = (int) $fltr;
+                        $listAliases[]       = $fltr;
+                        $searchFilterTerms[] = 'list:'.$fltr;
                     } else {
-                        $formIds[] = (int) $fltr;
+                        $formIds[]           = (int) $fltr;
+                        $searchFilterTerms[] = 'form:'.$fltr;
                     }
                 }
             }
 
-            if (!empty($listIds)) {
+            $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
+            $session->set('mautic.campaign.filter', $filter['string']);
+
+            if (!empty($listAliases)) {
                 $joinLists         = true;
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+                $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
             if (!empty($formIds)) {
@@ -1134,10 +1147,7 @@ class CampaignController extends AbstractStandardFormController
         if (is_array($campaignSources)) {
             foreach ($campaignSources as $type => $sources) {
                 if (!empty($sources)) {
-                    $campaignModel = $this->getModel('campaign');
-                    \assert($campaignModel instanceof CampaignModel);
-
-                    $sourceList                   = $campaignModel->getSourceLists($type, false, true);
+                    $sourceList                   = $this->campaignModel->getSourceLists($type, false, true);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,

@@ -236,15 +236,13 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[] $content
      * @param string[]        $contentTokens
-     * @param ?string         $channel
-     * @param ?int            $channelId
      * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -401,9 +399,6 @@ class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    /**
-     * Create a Trackable entity.
-     */
     protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
         $redirect = $this->getRedirectModel()->createRedirectEntity($url);
@@ -665,17 +660,15 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    private function isContactFieldToken($token): bool
+    private function isContactFieldToken(string $token): bool
     {
-        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield') || str_contains($token, '{ownerfield');
     }
 
     /**
      * @param array<int|string, Redirect|Trackable> $trackableTokens
-     *
-     * @return string
      */
-    private function parseContent($content, $channel, $channelId, array &$trackableTokens)
+    private function parseContent(string $content, ?string $channel, ?int $channelId, array &$trackableTokens): string
     {
         $this->hasFirstPassReplacements = false;
 

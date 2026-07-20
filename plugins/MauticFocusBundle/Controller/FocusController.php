@@ -26,6 +26,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
+    private TrackableModel $trackableModel;
+
+    private FocusModel $focusModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireFocusController(
+        FocusModel $focusModel,
+        TrackableModel $trackableModel,
+    ): void {
+        $this->focusModel = $focusModel;
+        $this->trackableModel = $trackableModel;
+    }
+
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
@@ -76,10 +89,8 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
@@ -165,10 +176,7 @@ class FocusController extends AbstractStandardFormController
             } else {
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
-
-                /** @var FocusModel $model */
-                $model = $this->getModel('focus');
-                $stats = $model->getStats(
+                $stats = $this->focusModel->getStats(
                     $item,
                     null,
                     $statsDateFrom,
@@ -176,9 +184,7 @@ class FocusController extends AbstractStandardFormController
                 );
 
                 if ('link' === $item->getType()) {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                    $trackables = $this->trackableModel->getTrackableList('focus', $item->getId());
 
                     $cacheItem->set([$stats, $trackables]);
                     $cacheItem->expiresAfter($cacheTimeout * 60);

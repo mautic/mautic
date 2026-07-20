@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,8 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
-
     public function testDwcGetEndpointForNoSlotNorContact(): void
     {
         $this->client->request(Request::METHOD_GET, '/dwc/slot-a');
@@ -63,7 +59,7 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $responseArray = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertSame('<some>content</some>', $responseArray['content']);
+        $this->assertSame('<some>content</some>', $responseArray['content']);
     }
 
     public function testCreateDwc(): void

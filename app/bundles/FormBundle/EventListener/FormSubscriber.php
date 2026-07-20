@@ -362,7 +362,7 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    private function postToHtml($post): string
+    private function postToHtml(array $post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
@@ -381,7 +381,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @return array<string, null>
      */
-    private function getEmailsFromString($emailString): array
+    private function getEmailsFromString(?string $emailString): array
     {
         return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
