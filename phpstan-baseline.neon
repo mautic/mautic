@@ -10732,12 +10732,6 @@ parameters:
 			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
 
 		-
-			message: '#^Controller must not fetch the "lead\.company" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticClearbitBundle/Controller/PublicController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$imported \(bool\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
