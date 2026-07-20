@@ -16,8 +16,9 @@ class PublicController extends CommonController
     private \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel): void
-    {
+    public function autowirePublicController(
+        \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel,
+    ): void {
         $this->focusModel = $focusModel;
     }
 

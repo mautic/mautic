@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Functional\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +19,7 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $this->configParams['messenger_dsn_email'] = 'sync://';
 
         parent::setUp();
-        $this->hitRepository = $this->em->getRepository(Hit::class);
+        $this->hitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testPageHitCookieContainsValidHitIdAndUpdatesDateLeft(): void

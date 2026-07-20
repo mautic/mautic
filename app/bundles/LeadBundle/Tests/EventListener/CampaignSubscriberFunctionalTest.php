@@ -86,7 +86,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->contactRepository = $this->em->getRepository(Lead::class);
+        $this->contactRepository = self::getContainer()->get(LeadRepository::class);
     }
 
     protected function beforeBeginTransaction(): void

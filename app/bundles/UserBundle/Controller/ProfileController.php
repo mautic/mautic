@@ -21,8 +21,9 @@ class ProfileController extends FormController
     private UserModel $userModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireProfileController(UserModel $userModel): void
-    {
+    public function autowireProfileController(
+        UserModel $userModel,
+    ): void {
         $this->userModel = $userModel;
     }
 
