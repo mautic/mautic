@@ -156,6 +156,34 @@ JS);
         $I->assertSame(1, $state['pageEventDeliveryCount']);
     }
 
+    public function legacyMtcScriptInitializesAndTracksOnce(\AcceptanceTester $I): void
+    {
+        $this->allowCorsFromFixtureOrigin();
+
+        $scriptUrl = $this->loadScript($I, '/mtc.js');
+        $I->waitForJS('return window.MauticJS && window.MauticJS.firstDeliveryMade === true', 10);
+        $I->waitForJS('return Date.now() - window.mauticLastNetworkActivity >= window.mauticNetworkQuietPeriod', 10);
+
+        $state = $this->grabBrowserState($I);
+        $eventRequests = array_values(array_filter(
+            $state['networkRequests'],
+            fn (array $request): bool => '/mtc/event' === parse_url($request['url'], PHP_URL_PATH),
+        ));
+        $trackingRequestPaths = array_map(
+            fn (string $url): string => (string) parse_url($url, PHP_URL_PATH),
+            $state['trackingRequests'],
+        );
+
+        $I->assertTrue($state['runtimeReady']);
+        $I->assertTrue($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertSame(1, count(array_filter($state['resourceUrls'], fn (string $url): bool => $scriptUrl === $url)));
+        $I->assertCount(1, $eventRequests);
+        $I->assertSame(['/mtc/event'], $trackingRequestPaths);
+        $I->assertSame(1, $state['pageViewCounter']);
+        $I->assertSame(1, $state['pageEventDeliveryCount']);
+    }
+
     private function loadScript(\AcceptanceTester $I, string $endpoint): string
     {
         $scriptUrl = $this->getMauticUrl($I).$endpoint;
