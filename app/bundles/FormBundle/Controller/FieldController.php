@@ -31,8 +31,9 @@ class FieldController extends CommonFormController
     private FieldModel $fieldModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFieldController(FieldModel $fieldModel): void
-    {
+    public function autowireFieldController(
+        FieldModel $fieldModel,
+    ): void {
         $this->fieldModel = $fieldModel;
     }
 
@@ -194,8 +195,6 @@ class FieldController extends CommonFormController
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
-            $leadFieldModel               = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -338,8 +337,6 @@ class FieldController extends CommonFormController
             $blank        = $entity->convertToArray();
             $formField    = array_merge($blank, $formField);
 
-            $leadFieldModel = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
