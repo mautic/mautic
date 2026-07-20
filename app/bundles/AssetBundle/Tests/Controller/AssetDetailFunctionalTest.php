@@ -35,7 +35,7 @@ final class AssetDetailFunctionalTest extends MauticMysqlTestCase
     public function testAssetUrlActions(): void
     {
         $asset = new Asset();
-        $asset->setTitle('Asset URL actions');
+        $asset->setTitle('Download URL actions');
         $asset->setAlias('asset-url-actions');
         $asset->setStorageLocation('local');
         $asset->setPath('asset-url-actions.jpg');
@@ -49,7 +49,7 @@ final class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $copyButton  = $crawler->filter('button[data-copy]');
         $previewLink = $crawler->filter(sprintf('a.btn-link[data-target="#asset-dialog-preview-modal-%d"]', $asset->getId()));
 
-        $this->assertSame('Asset URL', $urlPanel->filter('.panel-title')->text());
+        $this->assertSame('Download URL', $urlPanel->filter('.panel-title')->text());
         $this->assertCount(1, $urlInput);
         $this->assertCount(1, $copyButton);
         $this->assertSame($urlInput->attr('value'), $copyButton->attr('data-copy'));
