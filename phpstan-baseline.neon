@@ -385,12 +385,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method "autowireEventLogApiController\(\)" has the \#\[Required\] attribute, but "EventLogApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:afterEntitySave\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -431,12 +425,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method "autowireEventController\(\)" has the \#\[Required\] attribute, but "EventController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/EventController.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\Campaign\:\:addEvent\(\) has parameter \$key with no type specified\.$#'
@@ -4816,12 +4804,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/ActionController.php
 
 		-
-			message: '#^Method "autowireFormApiController\(\)" has the \#\[Required\] attribute, but "FormApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -5689,18 +5671,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Method "autowireCompanyApiController\(\)" has the \#\[Required\] attribute, but "CompanyApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
-			message: '#^Method "autowireLeadApiController\(\)" has the \#\[Required\] attribute, but "LeadApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5717,12 +5687,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Method "autowireListApiController\(\)" has the \#\[Required\] attribute, but "ListApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
-			identifier: mautic.noRequiredMethodWithConstructorInController
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:getLineCountLimit\(\) has no return type specified\.$#'
