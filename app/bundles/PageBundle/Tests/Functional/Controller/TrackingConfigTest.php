@@ -56,11 +56,6 @@ final class TrackingConfigTest extends MauticMysqlTestCase
         Assert::assertNotFalse($trackingPosition);
         Assert::assertLessThan($trackingPosition, $essentialPosition);
 
-        $legacy = $getSnippet('Legacy');
-        Assert::assertStringContainsString('/mtc.js', $legacy);
-        Assert::assertStringContainsString("w['MauticTrackingObject']=n", $legacy);
-        Assert::assertStringContainsString("mt('send', 'pageview');", $legacy);
-        Assert::assertStringNotContainsString('/mautic-essential.js', $legacy);
-        Assert::assertStringNotContainsString('/mautic-tracking.js', $legacy);
+        Assert::assertCount(0, $crawler->filter('pre:contains("/mtc.js")'));
     }
 }
