@@ -66,9 +66,18 @@ class PointSubscriberTest extends TestCase
         $pointModel   = $this->createMock(PointModel::class);
 
         $pageHitEvent->expects(self::once())->method('getPage')->willReturn($page);
-        $pageHitEvent->expects(self::once())->method('getHit')->willReturn($hit);
-        $pageHitEvent->expects(self::once())->method('getLead')->willReturn($lead);
-        $pointModel->expects(self::once())->method('triggerAction')->with('page.hit', $hit, null, $lead);
+        $pageHitEvent->expects(self::exactly(2))->method('getHit')->willReturn($hit);
+        $pageHitEvent->expects(self::exactly(2))->method('getLead')->willReturn($lead);
+        $pointModel->expects(self::exactly(2))->method('triggerAction')
+            ->willReturnCallback(function (string $type, $h, $_, $l) use ($hit, $lead): void {
+                if ('page.hit' === $type) {
+                    self::assertSame($hit, $h);
+                    self::assertSame($lead, $l);
+                } elseif ('url.hit' === $type) {
+                    self::assertSame($hit, $h);
+                    self::assertSame($lead, $l);
+                }
+            });
 
         $pointSubscriber = new PointSubscriber($pointModel);
         $pointSubscriber->onPageHit($pageHitEvent);
