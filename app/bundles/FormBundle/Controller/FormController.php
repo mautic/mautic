@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 class FormController extends CommonFormController
 {
     use CategoryListFiltersTrait;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
