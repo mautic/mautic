@@ -14,6 +14,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DynamicContentApiController extends CommonController
 {
+    private PageModel $pageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireDynamicContentApiController(PageModel $pageModel): void
+    {
+        $this->pageModel = $pageModel;
+    }
+
     public function processAction(Request $request, $objectAlias): Response
     {
         // Don't store a visitor with this request
@@ -40,10 +48,7 @@ class DynamicContentApiController extends CommonController
         ContactRequestHelper $contactRequestHelper,
         $objectAlias,
     ): Response {
-        /** @var PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-
-        $lead          = $contactRequestHelper->getContactFromQuery($pageModel->getHitQuery($request));
+        $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
