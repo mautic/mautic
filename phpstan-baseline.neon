@@ -4816,21 +4816,9 @@ parameters:
 			path: app/bundles/FormBundle/Controller/ActionController.php
 
 		-
-			message: '#^Controller must not fetch the "form" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
+			message: '#^Method "autowireFormApiController\(\)" has the \#\[Required\] attribute, but "FormApiController" defines its own constructor\. Move the dependency to the constructor and drop the method\.$#'
+			identifier: mautic.noRequiredMethodWithConstructorInController
 			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
-			message: '#^Controller must not fetch the "form\.action" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
-			message: '#^Controller must not fetch the "form\.field" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
