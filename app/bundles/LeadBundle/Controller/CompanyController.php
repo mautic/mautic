@@ -24,15 +24,21 @@ class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
+    private FieldModel $fieldModel;
+
     private CompanyModel $companyModel;
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCompanyController(\Mautic\LeadBundle\Model\LeadModel $leadModel, CompanyModel $companyModel): void
-    {
+    public function autowireCompanyController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        CompanyModel $companyModel,
+        FieldModel $fieldModel,
+    ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->fieldModel = $fieldModel;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
@@ -66,7 +72,7 @@ class CompanyController extends FormController
         $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
         $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
 
-        $companies = $this->getModel('lead.company')->getEntities(
+        $companies = $this->companyModel->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,
@@ -203,10 +209,7 @@ class CompanyController extends FormController
                 ? ($company['updateSelect'] ?? false)
                 : $request->get('updateSelect', false)
         );
-
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
@@ -379,10 +382,7 @@ class CompanyController extends FormController
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm(
             $entity,
             $this->formFactory,

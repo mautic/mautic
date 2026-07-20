@@ -143,6 +143,9 @@ parameters:
 			identifier: parameter.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
+			identifier: property.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
 			identifier: class.extendsDeprecatedClass
 			message: '#class\s+Mautic#'
 		-
@@ -161,11 +164,15 @@ parameters:
 			identifier: classConstant.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
-			identifier: new.deprecated
+			identifier: new.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
 			identifier: classConstant.deprecated
 			message: '#class\s+Mautic#'
+
+		# handle later
+		- '#Call to method convertToPHPValue\(\) of deprecated class Doctrine\\DBAL\\Types\\ArrayType#'
+
 		# child class generic
 		-
 			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
@@ -179,6 +186,19 @@ parameters:
 		-
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
+
+		# not useful, rather pedantic from phsptan-* extensions
+		-
+			identifier: argument.templateType
+			path: app/bundles/CoreBundle/Helper/CookieHelper.php
+			count: 1
+		-
+			message: '#Method PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker::willReturnOnConsecutiveCalls\(\) invoked with unpacked array with possibly string key#'
+			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolverTest.php
+		-
+			message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
+			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
+
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -201,5 +221,9 @@ services:
 			- phpstan.rules.rule
 	-
 		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 		tags:
 			- phpstan.rules.rule

@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -35,8 +36,21 @@ class CompanyApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, CompanyModel $companyModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        CompanyModel $companyModel,
+        private LeadModel $leadModel,
+    ) {
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;
         $this->entityNameOne      = 'company';
@@ -113,8 +127,7 @@ class CompanyApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $contactModel = $this->getModel('lead');
-        $contact      = $contactModel->getEntity($contactId);
+        $contact      = $this->leadModel->getEntity($contactId);
 
         // Does the contact exist and the user has permission to edit
         if (null === $contact) {

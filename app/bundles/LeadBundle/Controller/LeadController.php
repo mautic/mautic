@@ -39,6 +39,7 @@ use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\NoteModel;
@@ -62,37 +63,45 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private NoteModel $noteModel;
+
     private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     private \Mautic\StageBundle\Model\StageModel $stageModel;
 
     private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
     private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    private ListModel $listModel;
+    private ListModel $leadListModel;
 
     private LeadModel $leadModel;
+
+    private FieldModel $leadFieldModel;
+
+    private UserModel $userModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireLeadController(
         LeadModel $leadModel,
-        ListModel $listModel,
+        ListModel $leadListModel,
         \Mautic\StageBundle\Model\StageModel $stageModel,
         \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\LeadBundle\Model\FieldModel $fieldModel,
         \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
         \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        NoteModel $noteModel,
+        FieldModel $leadFieldModel,
+        UserModel $userModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
-        $this->listModel = $listModel;
+        $this->leadListModel = $leadListModel;
         $this->companyModel = $companyModel;
-        $this->fieldModel = $fieldModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
         $this->campaignModel = $campaignModel;
+        $this->noteModel = $noteModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -212,7 +221,7 @@ class LeadController extends FormController
         if (!$this->security->isGranted('lead:lists:viewother')) {
             $listArgs['filter']['force'] = " {$mine}";
         }
-        $lists = $this->listModel->getUserLists();
+        $lists = $this->leadListModel->getUserLists();
 
         // check to see if in a single list
         $inSingleList = 1 === substr_count($search, "{$listCommand}:");
@@ -294,7 +303,7 @@ class LeadController extends FormController
         // Get the quick add form
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new', 'qf' => 1]);
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -360,10 +369,7 @@ class LeadController extends FormController
      */
     public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-
-        $lead = $model->getEntity($objectId);
+        $lead = $this->leadModel->getEntity($objectId);
 
         if (null === $lead) {
             // get the page we came from
@@ -392,8 +398,7 @@ class LeadController extends FormController
             );
         }
 
-        /** @var Lead $lead */
-        $model->getRepository()->refetchEntity($lead);
+        $this->leadModel->getRepository()->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -444,11 +449,7 @@ class LeadController extends FormController
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $model = $this->getModel('lead.list');
-        \assert($model instanceof ListModel);
-        $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
-        $leadNoteModel = $this->getModel('lead.note');
-        \assert($leadNoteModel instanceof NoteModel);
+        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -467,7 +468,7 @@ class LeadController extends FormController
                     'events'                 => $this->getEngagements($lead),
                     'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
                     'engagementData'         => $this->getEngagementData($lead),
-                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'noteCount'              => $this->noteModel->getNoteCount($lead, true),
                     'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'                => $leadDeviceRepository->getLeadDevices($lead),
                     'auditlog'               => $this->getAuditlogs($lead),
@@ -516,7 +517,7 @@ class LeadController extends FormController
         // set the page we came from
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
@@ -725,7 +726,7 @@ class LeadController extends FormController
         }
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $fields = $this->fieldModel->getPublishedFieldArrays('lead');
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
@@ -1284,7 +1285,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            $lists     = $this->listModel->getUserLists();
+            $lists     = $this->leadListModel->getUserLists();
 
             // Get a list of lists for the lead
             $leadsLists = $this->leadModel->getLists($lead, true, true);
@@ -1764,14 +1765,12 @@ class LeadController extends FormController
     public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1794,17 +1793,17 @@ class LeadController extends FormController
 
                     if (!empty($data['addstage'])) {
                         $stage = $this->stageModel->getEntity((int) $data['addstage']);
-                        $model->addToStages($lead, $stage);
+                        $this->leadModel->addToStages($lead, $stage);
                     }
 
                     if (!empty($data['removestage'])) {
                         $stage = $this->stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages($lead, $stage);
+                        $this->leadModel->removeFromStages($lead, $stage);
                     }
                 }
             }
             // Save entities
-            $model->saveEntities($entities);
+            $this->leadModel->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
@@ -1820,9 +1819,7 @@ class LeadController extends FormController
             );
         }
         // Get a list of lists
-        /** @var \Mautic\StageBundle\Model\StageModel $model */
-        $model  = $this->getModel('stage');
-        $stages = $model->getUserStages();
+        $stages = $this->stageModel->getUserStages();
         $items  = [];
         foreach ($stages as $stage) {
             $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
@@ -1895,8 +1892,7 @@ class LeadController extends FormController
                     ++$count;
 
                     if (!empty($data['addowner'])) {
-                        $userModel = $this->getModel('user');
-                        $user      = $userModel->getEntity((int) $data['addowner']);
+                        $user      = $this->userModel->getEntity((int) $data['addowner']);
                         $lead->setOwner($user);
                     }
                 }
@@ -1917,9 +1913,7 @@ class LeadController extends FormController
                 ]
             );
         }
-        $userModel = $this->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-        $users = $userModel->getRepository()->getUserList('', 0);
+        $users = $this->userModel->getRepository()->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];

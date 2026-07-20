@@ -13,10 +13,15 @@ class DefaultController extends CommonController
 {
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireDefaultController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
-    {
+    public function autowireDefaultController(
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        \Mautic\PageBundle\Model\PageModel $pageModel,
+    ): void {
         $this->notificationModel = $notificationModel;
+        $this->pageModel = $pageModel;
     }
 
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -26,15 +31,13 @@ class DefaultController extends CommonController
         if (empty($root)) {
             return $this->redirectToRoute('mautic_dashboard_index');
         }
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $page      = $pageModel->getEntity($root);
+        $page      = $this->pageModel->getEntity($root);
 
-        if (empty($page)) {
+        if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
             return $this->notFound();
         }
 
-        $slug = $pageModel->generateSlug($page);
+        $slug = $this->pageModel->generateSlug($page);
 
         $request->attributes->set('ignore_mismatch', true);
 

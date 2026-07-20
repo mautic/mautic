@@ -48,6 +48,7 @@ class FormController extends CommonFormController
         CorePermissions $security,
         private readonly FormModel $formModel,
         private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        private readonly SubmissionModel $submissionModel,
     ) {
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
@@ -92,7 +93,7 @@ class FormController extends CommonFormController
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
-        $forms      = $this->getModel('form.form')->getEntities(
+        $forms      = $this->formModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -211,11 +212,8 @@ class FormController extends CommonFormController
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-
-        $formSubmissionModel = $this->getModel('form.submission');
-        \assert($formSubmissionModel instanceof SubmissionModel);
         // Submission stats per time period
-        $timeStats = $formSubmissionModel->getSubmissionsLineChartData(
+        $timeStats = $this->submissionModel->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -244,7 +242,7 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $formSubmissionModel->getRepository()->getSubmissionCounts($activeForm);
+        $submissionCounts = $this->submissionModel->getRepository()->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
             [
