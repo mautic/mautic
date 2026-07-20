@@ -6,7 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
-use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
@@ -185,7 +185,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $allUtmTags = $this->em->getRepository(UtmTag::class)->getEntities();
+        $allUtmTags = self::getContainer()->get(UtmTagRepository::class)->getEntities();
         $this->assertNotCount(0, $allUtmTags);
 
         foreach ($allUtmTags as $utmTag) {

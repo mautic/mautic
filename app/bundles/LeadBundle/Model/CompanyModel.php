@@ -394,8 +394,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Remove a lead from company.
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void

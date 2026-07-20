@@ -209,9 +209,6 @@ class LeadModel extends FormModel
         return $this->em->getRepository(FrequencyRule::class);
     }
 
-    /**
-     * Get the Stages change log repository.
-     */
     public function getStagesChangeLogRepository(): \Mautic\LeadBundle\Entity\StagesChangeLogRepository
     {
         return $this->em->getRepository(StagesChangeLog::class);

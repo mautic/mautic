@@ -14,6 +14,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    private UserModel $userModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        UserModel $userModel,
+    ): void {
+        $this->notificationModel = $notificationModel;
+        $this->userModel = $userModel;
+    }
+
     /**
      * Write a notification.
      *
@@ -24,9 +37,7 @@ class PublicController extends FormController
      */
     public function addNewNotification($message, $header, $iconClass, User $user): void
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
-        $notificationModel = $this->getModel('core.notification');
-        $notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
+        $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }
 
     /**
@@ -152,9 +163,7 @@ class PublicController extends FormController
                 $model->saveEntity($lead);
 
                 if ($notify && (!isset($lead->imported) || !$lead->imported)) {
-                    /** @var UserModel $userModel */
-                    $userModel = $this->getModel('user');
-                    if ($user = $userModel->getEntity($notify)) {
+                    if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
                             'Clearbit Plugin',
@@ -242,9 +251,7 @@ class PublicController extends FormController
                     $model->saveEntity($company);
 
                     if ($notify) {
-                        /** @var UserModel $userModel */
-                        $userModel = $this->getModel('user');
-                        if ($user = $userModel->getEntity($notify)) {
+                        if ($user = $this->userModel->getEntity($notify)) {
                             $this->addNewNotification(
                                 sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
                                 'Clearbit Plugin',
@@ -259,9 +266,7 @@ class PublicController extends FormController
             $mauticLogger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
                 if ($notify) {
-                    /** @var UserModel $userModel */
-                    $userModel = $this->getModel('user');
-                    if ($user = $userModel->getEntity($notify)) {
+                    if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(
                                 $this->translator->trans('mautic.plugin.clearbit.unable'),

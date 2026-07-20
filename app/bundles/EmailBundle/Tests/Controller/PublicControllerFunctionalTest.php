@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -115,7 +116,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Page::class);
 
-        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
     }
 
