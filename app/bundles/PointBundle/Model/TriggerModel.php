@@ -55,13 +55,16 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\PointBundle\Entity\TriggerRepository $triggerRepository,
+        private readonly \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\PointBundle\Entity\TriggerRepository
     {
-        return $this->em->getRepository(Trigger::class);
+        return $this->triggerRepository;
     }
 
     /**
@@ -69,7 +72,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getEventRepository(): \Mautic\PointBundle\Entity\TriggerEventRepository
     {
-        return $this->em->getRepository(TriggerEvent::class);
+        return $this->triggerEventRepository;
     }
 
     public function getPermissionBase(): string
@@ -111,8 +114,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
 
-            /** @var LeadRepository $leadRepository */
-            $leadRepository = $this->em->getRepository(Lead::class);
+            $leadRepository = $this->leadRepository;
 
             foreach ($events as $event) {
                 $args = [

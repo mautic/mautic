@@ -45,16 +45,14 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly ContactExportSchedulerRepository $contactExportSchedulerRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): ContactExportSchedulerRepository
     {
-        /** @var ContactExportSchedulerRepository $repo */
-        $repo = $this->em->getRepository(ContactExportScheduler::class);
-
-        return $repo;
+        return $this->contactExportSchedulerRepository;
     }
 
     /**

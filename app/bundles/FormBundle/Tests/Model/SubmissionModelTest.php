@@ -220,7 +220,11 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->createStub(Logger::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(SubmissionRepository::class), // $submissionRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(\Mautic\StageBundle\Entity\StageRepository::class), // $stageRepository
+            $this->createStub(UserRepository::class), // $userRepository
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);

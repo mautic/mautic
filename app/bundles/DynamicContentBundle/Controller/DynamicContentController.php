@@ -12,20 +12,29 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class DynamicContentController extends FormController
 {
+    private TrackableModel $trackableModel;
+
+    private PageModel $pageModel;
+
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private DynamicContentModel $dynamicContentModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireDynamicContentController(
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
+        PageModel $pageModel,
+        TrackableModel $trackableModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->dynamicContentModel = $dynamicContentModel;
+        $this->pageModel = $pageModel;
+        $this->trackableModel = $trackableModel;
     }
 
     protected function getPermissions(): array
@@ -91,11 +100,7 @@ class DynamicContentController extends FormController
         $request->getSession()->set('mautic.dynamicContent.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-
-        // retrieve a list of categories
-        $pageModel  = $this->getModel('page');
-        \assert($pageModel instanceof PageModel);
-        $categories = $pageModel->getLookupResults('category', '', 0);
+        $categories = $this->pageModel->getLookupResults('category', '', 0);
 
         return $this->delegateView(
             [
@@ -394,10 +399,7 @@ class DynamicContentController extends FormController
             null,
             ['dynamic_content_id' => $entity->getId(), 'flag' => 'total_and_unique']
         );
-
-        $trackableModel = $this->getModel('page.trackable');
-        \assert($trackableModel instanceof TrackableModel);
-        $trackables = $trackableModel->getTrackableList('dynamicContent', $entity->getId());
+        $trackables = $this->trackableModel->getTrackableList('dynamicContent', $entity->getId());
 
         return $this->delegateView(
             [

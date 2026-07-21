@@ -412,7 +412,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testAssetUploadPathTraversal(): void
     {
-        $client    = $this->client;
         $container = $this->getContainer();
 
         // Get CSRF token
@@ -432,7 +431,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         );
 
         $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
-        $client->request(
+
+        $this->client->request(
             'POST',
             '/s/_uploader/asset/upload',
             ['tempId' => '../../'.$tmpDir],
@@ -443,7 +443,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             ]
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
 
         // Assert response is successful
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());

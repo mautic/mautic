@@ -70,6 +70,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
+    private AssetRepository&MockObject $assetRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -94,6 +96,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createStub(Translator::class);
         $this->userHelper            = $this->createStub(UserHelper::class);
         $this->logger                = $this->createStub(LoggerInterface::class);
+        $this->assetRepository       = $this->createMock(AssetRepository::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -112,6 +115,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
+            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->assetRepository,
+            $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class), // $downloadRepository
         );
     }
 
@@ -220,14 +226,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedDevice')
             ->willReturn(null);
 
-        $assetRepository = $this->createMock(AssetRepository::class);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Asset::class)
-            ->willReturn($assetRepository);
-
-        $assetRepository->expects($this->once())
+        $this->assetRepository->expects($this->once())
             ->method('upDownloadCount')
             ->with(
                 $asset->getId(),
@@ -315,6 +314,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
+                $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class),
+                $this->createStub(AssetRepository::class),
+                $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

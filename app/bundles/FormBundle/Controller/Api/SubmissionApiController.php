@@ -26,8 +26,21 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class SubmissionApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, SubmissionModel $formSubmissionModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        SubmissionModel $formSubmissionModel,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+    ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
@@ -115,8 +128,7 @@ class SubmissionApiController extends CommonApiController
      */
     protected function getFormOrResponseWithError($formId)
     {
-        $formModel = $this->getModel('form');
-        $form      = $formModel->getEntity($formId);
+        $form = $this->formModel->getEntity($formId);
 
         if (!$form) {
             return $this->notFound();
