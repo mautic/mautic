@@ -26,19 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
-    private TrackableModel $trackableModel;
-
-    private FocusModel $focusModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFocusController(
-        FocusModel $focusModel,
-        TrackableModel $trackableModel,
-    ): void {
-        $this->focusModel = $focusModel;
-        $this->trackableModel = $trackableModel;
-    }
-
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
@@ -52,6 +39,8 @@ class FocusController extends AbstractStandardFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly FocusModel $focusModel,
+        private readonly TrackableModel $trackableModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

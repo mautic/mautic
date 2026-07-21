@@ -137,6 +137,10 @@ class WebhookModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly WebhookService $webhookService,
+        private readonly WebhookRepository $webhookRepository,
+        private readonly WebhookQueueRepository $webhookQueueRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LogRepository $logRepository,
     ) {
         $this->setConfigProps($coreParametersHelper);
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -186,7 +190,7 @@ class WebhookModel extends FormModel
 
     public function getRepository(): WebhookRepository
     {
-        return $this->em->getRepository(Webhook::class);
+        return $this->webhookRepository;
     }
 
     /**
@@ -460,17 +464,17 @@ class WebhookModel extends FormModel
 
     public function getQueueRepository(): WebhookQueueRepository
     {
-        return $this->em->getRepository(WebhookQueue::class);
+        return $this->webhookQueueRepository;
     }
 
     public function getEventRepository(): EventRepository
     {
-        return $this->em->getRepository(Event::class);
+        return $this->eventRepository;
     }
 
     public function getLogRepository(): LogRepository
     {
-        return $this->em->getRepository(Log::class);
+        return $this->logRepository;
     }
 
     /**

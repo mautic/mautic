@@ -56,7 +56,9 @@ final class FocusModelTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class), // $focusRepository
+            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class), // $statRepository
         );
         $focus = [
             'form' => 'xxx',
