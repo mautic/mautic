@@ -197,9 +197,7 @@ class FocusController extends AbstractStandardFormController
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
 
-                /** @var FocusModel $model */
-                $model = $this->getModel('focus');
-                $stats = $model->getStats(
+                $stats = $this->focusModel->getStats(
                     $item,
                     null,
                     $statsDateFrom,

@@ -165,8 +165,7 @@ class FormController extends CommonFormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        /** @var FormModel $model */
-        $model      = $this->getModel('form');
+        $model      = $this->formModel;
         $activeForm = $model->getEntity($objectId);
 
         // set the page we came from
@@ -291,8 +290,7 @@ class FormController extends CommonFormController
      */
     public function newAction(Request $request): Response
     {
-        /** @var FormModel $model */
-        $model   = $this->getModel('form');
+        $model   = $this->formModel;
         $entity  = $model->getEntity();
         $session = $request->getSession();
 
@@ -495,8 +493,7 @@ class FormController extends CommonFormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var FormModel $model */
-        $model            = $this->getModel('form');
+        $model            = $this->formModel;
         $formData         = $request->request->all()['mauticform'] ?? [];
         $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
@@ -856,7 +853,7 @@ class FormController extends CommonFormController
      */
     public function cloneAction(Request $request, $objectId): Response
     {
-        $model = $this->getModel('form.form');
+        $model = $this->formModel;
 
         /** @var Form $entity */
         $entity = $model->getEntity($objectId);
@@ -905,8 +902,7 @@ class FormController extends CommonFormController
      */
     public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper): Response
     {
-        /** @var FormModel $model */
-        $model = $this->getModel('form.form');
+        $model = $this->formModel;
         $form  = $model->getEntity($objectId);
 
         if (null === $form) {
@@ -996,8 +992,7 @@ class FormController extends CommonFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form.form');
-            \assert($model instanceof FormModel);
+            $model = $this->formModel;
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1060,8 +1055,7 @@ class FormController extends CommonFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form');
-            \assert($model instanceof FormModel);
+            $model = $this->formModel;
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
 
@@ -1145,8 +1139,7 @@ class FormController extends CommonFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var FormModel $model */
-            $model = $this->getModel('form');
+            $model = $this->formModel;
             $ids   = json_decode($request->query->get('ids', ''));
             $count = 0;
             // Loop over the IDs to perform access checks pre-delete

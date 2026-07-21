@@ -9,14 +9,15 @@ use Symfony\Component\HttpFoundation\Request;
 trait CategoryListFiltersTrait
 {
     /**
-     * @param array<string, mixed> $filter
+     * @param array<string, mixed>      $filter
+     * @param string|array<int, string> $categoryType
      *
-     * @return array{filters: array<string, mixed>, categories: array<int|string, array<string, mixed>>}
+     * @return array{filters: array<string, mixed>, categories: array<int|string, array<string, mixed>>, searchTerms: array<int, string>}
      */
     protected function applyCategoryListFilter(
         Request $request,
         string $sessionKey,
-        string $categoryType,
+        string|array $categoryType,
         string $filterColumn,
         array &$filter,
         string $filterGroup = 'mautic.core.filter.categories',
@@ -24,7 +25,11 @@ trait CategoryListFiltersTrait
     ): array {
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults($categoryType, '', 0);
+        $categoryTypes        = is_array($categoryType) ? $categoryType : [$categoryType];
+        $categories           = [];
+        foreach ($categoryTypes as $type) {
+            $categories = array_merge($categories, $categoryModel->getLookupResults($type, '', 0));
+        }
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
         $listFilters = [
@@ -60,7 +65,25 @@ trait CategoryListFiltersTrait
         return [
             'filters'    => $listFilters,
             'categories' => $categories,
+            'searchTerms' => $this->getCategorySearchTerms($currentFilters),
         ];
+    }
+
+    /**
+     * @param array<string, array<int, string>> $currentFilters
+     *
+     * @return array<int, string>
+     */
+    private function getCategorySearchTerms(array $currentFilters): array
+    {
+        $searchTerms = [];
+        foreach ($currentFilters as $type => $typeFilters) {
+            foreach ($typeFilters as $typeFilter) {
+                $searchTerms[] = $type.':'.$typeFilter;
+            }
+        }
+
+        return $searchTerms;
     }
 
     /**

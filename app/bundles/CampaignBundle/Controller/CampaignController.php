@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Event\EntityExportEvent;
@@ -115,6 +116,7 @@ class CampaignController extends AbstractStandardFormController
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
         private \Mautic\CampaignBundle\Model\EventModel $eventModel,
+        private CategoryModel $categoryModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -848,9 +850,7 @@ class CampaignController extends AbstractStandardFormController
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $sourceLists = $this->campaignModel->getSourceLists();
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('campaign', '', 0);
+        $categories           = $this->categoryModel->getLookupResults('campaign', '', 0);
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters          = [
             'filters' => [

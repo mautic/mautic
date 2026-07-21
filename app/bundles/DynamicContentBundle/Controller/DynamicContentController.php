@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,8 +20,6 @@ class DynamicContentController extends FormController
 
     private TrackableModel $trackableModel;
 
-    private PageModel $pageModel;
-
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private DynamicContentModel $dynamicContentModel;
@@ -31,12 +28,10 @@ class DynamicContentController extends FormController
     public function autowireDynamicContentController(
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
-        PageModel $pageModel,
         TrackableModel $trackableModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->pageModel = $pageModel;
         $this->trackableModel = $trackableModel;
     }
 
@@ -105,6 +100,7 @@ class DynamicContentController extends FormController
         $request->getSession()->set('mautic.dynamicContent.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+
         return $this->delegateView(
             [
                 'contentTemplate' => '@MauticDynamicContent/DynamicContent/list.html.twig',

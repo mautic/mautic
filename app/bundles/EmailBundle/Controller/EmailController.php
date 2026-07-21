@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -68,7 +69,7 @@ class EmailController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, CategoryModel $categoryModel, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -130,8 +131,6 @@ class EmailController extends FormController
             'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => self::FILTER_TYPE_LIST,
         ];
-        $listAliasLookup = array_column($availableLists, 'alias', 'id');
-
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
             'options' => $themeHelper->getInstalledThemes('email'),
@@ -139,8 +138,6 @@ class EmailController extends FormController
         ];
 
         // retrieve a list of categories
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel                                                     = $this->getModel('category');
         $categories                                                        = $categoryModel->getLookupResults('email', '', 0);
         $categoryFilterPrefix                                              = $this->translator->trans('mautic.core.searchcommand.category');
         $listFilters['filters']['groups']['mautic.core.filter.categories'] = [

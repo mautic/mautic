@@ -847,11 +847,15 @@ class ListController extends FormController
         $categoryFilters  = $this->applyCategoryListFilter(
             $request,
             'mautic.lead.list.list_filters',
-            'segment',
+            ['segment', 'lead.list'],
             'cat.id',
             $filter,
             'mautic.lead.list.source.segment.category',
             'mautic.lead.list.filter.placeholder',
+        );
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch(
+            (string) ($filter['string'] ?? ''),
+            $categoryFilters['searchTerms'],
         );
         $joinCategories = count($filter['force'] ?? []) > $filterForceCount;
 
