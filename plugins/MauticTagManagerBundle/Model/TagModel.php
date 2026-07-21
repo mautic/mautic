@@ -12,9 +12,17 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class TagModel extends BaseTagModel implements GlobalSearchInterface
 {
+    private TagRepository $tagRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePluginTagModel(TagRepository $tagRepository): void
+    {
+        $this->tagRepository = $tagRepository;
+    }
+
     public function getRepository(): TagRepository
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->tagRepository;
     }
 
     /**

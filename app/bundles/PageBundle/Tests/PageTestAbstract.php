@@ -144,7 +144,11 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(StatRepository::class),
             $this->createStub(BotRatioHelper::class),
-            $validatorMock
+            $validatorMock,
+            $this->createStub(PageRepository::class), // $pageRepository
+            $this->createStub(HitRepository::class), // $hitRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class), // $utmTagRepository
         );
     }
 
@@ -166,6 +170,7 @@ abstract class PageTestAbstract extends TestCase
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
                 $shortener,
+                $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class),
             ])
             ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();

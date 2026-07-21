@@ -296,7 +296,7 @@ class ListController extends FormController
      */
     private function getSegment(int $segmentId, string $ownPermission, string $otherPermission): LeadList
     {
-        $segment = $this->getModel('lead.list')->getEntity($segmentId);
+        $segment = $this->listModel->getEntity($segmentId);
 
         // Check if exists
         if (!$segment instanceof LeadList) {
@@ -825,7 +825,7 @@ class ListController extends FormController
      */
     protected function getPermissionBase(): string
     {
-        return $this->getModel('lead.list')->getPermissionBase();
+        return $this->listModel->getPermissionBase();
     }
 
     protected function getListModel(): ListModel

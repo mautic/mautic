@@ -37,18 +37,20 @@ class PluginModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository,
+        private readonly \Mautic\PluginBundle\Entity\IntegrationEntityRepository $integrationEntityRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\PluginBundle\Entity\PluginRepository
     {
-        return $this->em->getRepository(Plugin::class);
+        return $this->pluginRepository;
     }
 
-    public function getIntegrationEntityRepository()
+    public function getIntegrationEntityRepository(): \Mautic\PluginBundle\Entity\IntegrationEntityRepository
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->integrationEntityRepository;
     }
 
     public function getPermissionBase(): string
