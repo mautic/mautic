@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -164,10 +164,10 @@ trait CustomFieldsApiControllerTrait
     }
 
     /**
-     * @param Lead|Company $entity
-     * @param Form         $form
-     * @param mixed[]      $parameters
-     * @param bool         $isPostOrPatch
+     * @param Lead|Company         $entity
+     * @param FormInterface<mixed> $form
+     * @param mixed[]              $parameters
+     * @param bool                 $isPostOrPatch
      *
      * @return bool|void
      */
@@ -209,8 +209,9 @@ trait CustomFieldsApiControllerTrait
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStack(RequestStack $requestStack): void
-    {
+    public function setRequestStack(
+        RequestStack $requestStack,
+    ): void {
         $this->requestStack = $requestStack;
     }
 }

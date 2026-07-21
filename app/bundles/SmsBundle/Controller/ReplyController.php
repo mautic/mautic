@@ -13,17 +13,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ReplyController extends AbstractController
 {
     public function __construct(
-        private HandlerContainer $callbackHandler,
-        private ReplyHelper $replyHelper,
+        private readonly HandlerContainer $callbackHandler,
+        private readonly ReplyHelper $replyHelper,
     ) {
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function callbackAction(Request $request, $transport)
+    public function callbackAction(Request $request, $transport): Response
     {
         define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 

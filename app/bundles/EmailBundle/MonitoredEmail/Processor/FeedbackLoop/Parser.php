@@ -9,16 +9,14 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 class Parser
 {
     public function __construct(
-        private Message $message,
+        private readonly Message $message,
     ) {
     }
 
     /**
-     * @return string|null
-     *
      * @throws FeedbackLoopNotFound
      */
-    public function parse()
+    public function parse(): string
     {
         if (null === $this->message->fblReport) {
             throw new FeedbackLoopNotFound();

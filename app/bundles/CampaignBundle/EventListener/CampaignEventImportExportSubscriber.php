@@ -24,7 +24,7 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignModel $campaignModel,
@@ -116,7 +116,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         ];
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel      = $campaignEvent->getChannel();
@@ -192,7 +194,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
         foreach ($subEvent->getEntities() as $key => $values) {
@@ -200,12 +204,14 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $data[$key] = $values;
             } else {
                 $existingIds = array_column($data[$key], 'id');
-                $data[$key]  = array_merge($data[$key], array_filter($values, fn ($value) => !in_array($value['id'], $existingIds)));
+                $data[$key]  = array_merge($data[$key], array_filter($values, fn (array $value): bool => !in_array($value['id'], $existingIds)));
             }
         }
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
     {
         if ($entityId) {

@@ -50,11 +50,9 @@ class ColumnSchemaHelper
      *
      * @param bool $addPrefix
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
-    public function setName($table, $addPrefix = true)
+    public function setName($table, $addPrefix = true): static
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
@@ -69,11 +67,9 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get the SchemaManager.
-     *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager()
+    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
     {
         return $this->sm;
     }
@@ -133,11 +129,9 @@ class ColumnSchemaHelper
      *
      * @param bool $checkExists Check if table exists; pass false if this has already been done
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
-    public function addColumn(array $column, $checkExists = true)
+    public function addColumn(array $column, $checkExists = true): static
     {
         if (empty($column['name'])) {
             throw new SchemaException('Column is missing required name key.');
@@ -159,7 +153,7 @@ class ColumnSchemaHelper
      * @throws SchemaException
      * @throws \OutOfRangeException
      */
-    public function updateColumnLength(string $column, ?int $length): ColumnSchemaHelper
+    public function updateColumnLength(string $column, ?int $length): self
     {
         if (empty($column)) {
             throw new SchemaException('The column name is should not be empty/missing.');
@@ -176,10 +170,8 @@ class ColumnSchemaHelper
 
     /**
      * Drops a column from table.
-     *
-     * @return $this
      */
-    public function dropColumn($columnName)
+    public function dropColumn($columnName): static
     {
         if ($this->checkColumnExists($columnName)) {
             $this->toTable->dropColumn($columnName);
@@ -235,7 +227,7 @@ class ColumnSchemaHelper
     {
         if (!$this->sm->tablesExist([$table])) {
             if ($throwException) {
-                throw new SchemaException("Table $table does not exist!");
+                throw new SchemaException("Table {$table} does not exist!");
             }
 
             return false;

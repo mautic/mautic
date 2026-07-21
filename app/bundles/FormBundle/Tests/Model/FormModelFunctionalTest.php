@@ -10,10 +10,12 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Tests\Helper\ConditionalFieldOrderTestData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormModelFunctionalTest extends MauticMysqlTestCase
+final class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -41,8 +43,8 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $reloaded = $formModel->getEntity($formId);
-        self::assertNotNull($reloaded);
-        self::assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($reloaded));
+        $this->assertInstanceOf(Form::class, $reloaded);
+        $this->assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($reloaded));
 
         $resaveSessionFields = [];
         foreach ($reloaded->getFields() as $field) {
@@ -59,8 +61,8 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $savedAgain = $formModel->getEntity($formId);
-        self::assertNotNull($savedAgain);
-        self::assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($savedAgain));
+        $this->assertInstanceOf(Form::class, $savedAgain);
+        $this->assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($savedAgain));
 
         $formModel->deleteEntity($savedAgain);
     }
@@ -89,26 +91,26 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
             "/s/forms/preview/{$formId}?email=testform@test.com&firstname=test&description=test-test&checkbox=val1|val3"
         );
         $inputValue = $crawler->filter('input[type=email]')->attr('value');
-        self::assertSame('testform@test.com', $inputValue);
+        $this->assertSame('testform@test.com', $inputValue);
         $inputValue = $crawler->filter('input[type=text]')->attr('value');
-        self::assertSame('test', $inputValue);
+        $this->assertSame('test', $inputValue);
         $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
-        self::assertSame('test-test', $inputValue);
+        $this->assertSame('test-test', $inputValue);
         $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
-        self::assertSame('test-test', $inputValue);
+        $this->assertSame('test-test', $inputValue);
         $inputValue = $crawler->filter('input[value^=val1]')->attr('checked');
-        self::assertNotNull($inputValue, $crawler->html());
+        $this->assertNotNull($inputValue, $crawler->html());
         $inputValue = $crawler->filter('input[value^=val2]')->attr('checked');
-        self::assertNull($inputValue);
+        $this->assertNull($inputValue);
         $inputValue = $crawler->filter('input[value^=val3]')->attr('checked');
-        self::assertNotNull($inputValue);
+        $this->assertNotNull($inputValue);
 
         $this->createPage($formId);
         $crawler    = $this->client->request(Request::METHOD_GET, '/test-page?email=test%2Bpage@test.com&firstname=test');
         $inputValue = $crawler->filter('input[type=email]')->attr('value');
-        self::assertSame('test+page@test.com', $inputValue);
+        $this->assertSame('test+page@test.com', $inputValue);
         $inputValue = $crawler->filter('input[type=text]')->attr('value');
-        self::assertSame('test', $inputValue);
+        $this->assertSame('test', $inputValue);
     }
 
     private function createForm(): int
@@ -206,8 +208,10 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
     {
         $multiselectFieldId = $this->createMultiselectLeadField();
 
+        /** @var FieldModel $fieldModel */
         $fieldModel       = $this->getContainer()->get('mautic.lead.model.field');
         $multiselectField = $fieldModel->getEntity($multiselectFieldId);
+        $this->assertInstanceOf(LeadField::class, $multiselectField);
         $fieldAlias       = $multiselectField->getAlias();
 
         $form   = $this->createFormWithMultiselect($fieldAlias);
@@ -221,6 +225,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
+        /** @var ContactTracker $contactTracker */
         $contactTracker = $this->getContainer()->get('mautic.tracker.contact');
         $contactTracker->setTrackedContact($lead);
 
@@ -286,7 +291,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
 
     private function createMultiselectLeadField(): int
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
         $alias      = 'test_multiselect_'.uniqid();
 

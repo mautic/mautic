@@ -17,28 +17,20 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends TestCase
+final class DecisionDispatcherTest extends TestCase
 {
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
+    private MockObject&EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var MockObject|LegacyEventDispatcher
-     */
-    private MockObject $legacyDispatcher;
+    private MockObject&LegacyEventDispatcher $legacyDispatcher;
 
-    /**
-     * @var MockObject|DecisionAccessor
-     */
-    private MockObject $config;
+    private MockObject&DecisionAccessor $config;
 
     private DecisionDispatcher $decisionDispatcher;
 
     protected function setUp(): void
     {
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
         $this->config             = $this->createMock(DecisionAccessor::class);
         $this->decisionDispatcher = new DecisionDispatcher($this->dispatcher, $this->legacyDispatcher);

@@ -12,12 +12,12 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
-use PHPUnit\Framework\Assert;
 
-class CampaignDecisionTest extends MauticMysqlTestCase
+final class CampaignDecisionTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
     use LeadFieldTestTrait;
+
     protected $useCleanupRollback = false;
 
     /**
@@ -125,19 +125,13 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     ): void {
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
-        Assert::assertCount(count($yesEventLeads), $campaignEventLogs);
-        Assert::assertSame(
-            $yesEventLeads,
-            $this->getLeadIds($campaignEventLogs)
-        );
+        $this->assertCount(count($yesEventLeads), $campaignEventLogs);
+        $this->assertSame($yesEventLeads, $this->getLeadIds($campaignEventLogs));
 
         $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
             ->findBy(['campaign' => $campaign, 'event' => $noEvent], ['event' => 'ASC']);
-        Assert::assertCount(count($noEventLeads), $campaignEventLogs);
-        Assert::assertSame(
-            $noEventLeads,
-            $this->getLeadIds($campaignEventLogs)
-        );
+        $this->assertCount(count($noEventLeads), $campaignEventLogs);
+        $this->assertSame($noEventLeads, $this->getLeadIds($campaignEventLogs));
     }
 
     /**
@@ -149,7 +143,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     {
         $leadIds = [];
         foreach ($campaignEventLogs as $log) {
-            \assert($log instanceof LeadEventLog);
+            $this->assertInstanceOf(LeadEventLog::class, $log);
             $leadIds[] = $log->getLead()->getId();
         }
 

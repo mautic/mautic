@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\IpLookup;
 class IpstackLookup extends AbstractRemoteDataLookup
 {
     public string $country_code = '';
+
     public string $region_code  = '';
+
     public string $metro_code   = '';
 
     public function getAttribution(): string
@@ -43,7 +45,7 @@ class IpstackLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

@@ -25,6 +25,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
+    private SubmissionModel $submissionModel;
+
+    private FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(
+        FormModel $formModel,
+        SubmissionModel $submissionModel,
+    ): void {
+        $this->formModel = $formModel;
+        $this->submissionModel = $submissionModel;
+    }
+
     private array $tokens = [];
 
     /**
@@ -38,7 +51,7 @@ class PublicController extends CommonFormController
         UserRepository $userRepository,
     ) {
         if ('POST' !== $request->getMethod()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $context          = $this->createSubmitContext($request);
@@ -117,8 +130,7 @@ class PublicController extends CommonFormController
         if (!isset($post['formId'])) {
             $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
         } else {
-            $formModel = $this->getModel('form.form');
-            $form      = $formModel->getEntity($post['formId']);
+            $form      = $this->formModel->getEntity($post['formId']);
 
             if (null === $form) {
                 $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
@@ -183,9 +195,6 @@ class PublicController extends CommonFormController
         NotificationModel $notificationModel,
         UserRepository $userRepository,
     ): array {
-        $formSubmissionModel = $this->getModel('form.submission');
-        \assert($formSubmissionModel instanceof SubmissionModel);
-
         $this->doctrine->getManager()->refresh($form);
 
         if ($form->isSubmissionLimitReached()) {
@@ -201,7 +210,7 @@ class PublicController extends CommonFormController
         \assert(is_array($post));
         \assert(is_array($server));
 
-        $result = $formSubmissionModel->saveSubmission($post, $server, $form, $request, true);
+        $result = $this->submissionModel->saveSubmission($post, $server, $form, $request, true);
 
         return $this->handleSubmissionResult($result, $context);
     }
@@ -501,27 +510,23 @@ class PublicController extends CommonFormController
     /**
      * Gives a preview of the form.
      *
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0)
+    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
     {
-        $model = $this->getModel('form.form');
-        \assert($model instanceof FormModel);
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
         $css               = InputHelper::string((string) $request->get('css'));
-        $form              = $model->getEntity($objectId);
+        $form              = $this->formModel->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;
 
         if (null === $form || !$form->isPublished()) {
             return $this->notFound();
         }
-        $html = $model->getContent($form);
+        $html = $this->formModel->getContent($form);
 
-        $model->populateValuesWithGetParameters($form, $html);
+        $this->formModel->populateValuesWithGetParameters($form, $html);
 
         $viewParams = [
             'content'     => $html,
@@ -580,16 +585,13 @@ class PublicController extends CommonFormController
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
         $formId = (int) $request->get('id');
-
-        $model = $this->getModel('form.form');
-        \assert($model instanceof FormModel);
-        $form  = $model->getEntity($formId);
+        $form  = $this->formModel->getEntity($formId);
         $js    = '';
 
         if (null !== $form) {
             $status = $form->getPublishStatus();
             if ('published' === $status) {
-                $js = $model->getAutomaticJavascript($form);
+                $js = $this->formModel->getAutomaticJavascript($form);
             }
         }
 
@@ -601,15 +603,10 @@ class PublicController extends CommonFormController
         return $response;
     }
 
-    /**
-     * @return Response
-     */
-    public function embedAction(Request $request)
+    public function embedAction(Request $request): Response
     {
         $formId = (int) $request->get('id');
-        /** @var FormModel $model */
-        $model = $this->getModel('form');
-        $form  = $model->getEntity($formId);
+        $form  = $this->formModel->getEntity($formId);
 
         if (null !== $form) {
             $status = $form->getPublishStatus();
@@ -617,11 +614,11 @@ class PublicController extends CommonFormController
                 if ($request->get('video')) {
                     return $this->render(
                         '@MauticForm/Public/videoembed.html.twig',
-                        ['form' => $form, 'fieldSettings' => $model->getCustomComponents()['fields']]
+                        ['form' => $form, 'fieldSettings' => $this->formModel->getCustomComponents()['fields']]
                     );
                 }
 
-                $content = $model->getContent($form, false, true);
+                $content = $this->formModel->getContent($form, false, true);
 
                 return new Response($content);
             }

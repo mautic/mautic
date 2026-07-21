@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,32 +15,33 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(TrackableModel::class)]
-class TrackableModelTest extends TestCase
+final class TrackableModelTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as HTML')]
     public function testHtmlIsDetectedInContent(): void
     {
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $mockRedirectModel       = $this->createStub(RedirectModel::class);
+        $mockLeadFieldRepository = $this->createStub(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
@@ -75,21 +78,21 @@ class TrackableModelTest extends TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as plain text')]
     public function testPlainTextIsDetectedInContent(): void
     {
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $mockRedirectModel       = $this->createStub(RedirectModel::class);
+        $mockLeadFieldRepository = $this->createStub(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
@@ -147,17 +150,17 @@ class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey($match[0], $trackables);
+        $this->assertArrayHasKey($match[0], $trackables);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        Assert::assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
+        $this->assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -184,17 +187,17 @@ class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey($match[0], $trackables);
+        $this->assertArrayHasKey($match[0], $trackables);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        Assert::assertEquals($url, $redirect->getUrl());
+        $this->assertEquals($url, $redirect->getUrl());
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -223,13 +226,13 @@ class TrackableModelTest extends TestCase
         $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
 
         // Assert that a trackable token exists
-        Assert::assertTrue((bool) $tokenFound, $content);
+        $this->assertTrue((bool) $tokenFound, $content);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
 
         // Assert the Trackable exists
-        Assert::assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
+        $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a token used in place of a URL is parsed properly')]
@@ -327,6 +330,27 @@ class TrackableModelTest extends TestCase
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
     }
 
+    public function testOwnerFieldTokenizedHostWithoutTokenValue(): void
+    {
+        $url   = 'https://{ownerfield=firstname}.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $tokenFound = preg_match('/\{trackable=(.*?)\}/', $content, $match);
+
+        // Assert that a trackable token exists
+        $this->assertTrue((bool) $tokenFound, $content);
+
+        // Assert the Trackable exists
+        $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
+    }
+
     #[\PHPUnit\Framework\Attributes\TestDox('Test that tokens that are supposed to be ignored are')]
     public function testIgnoredTokensAreNotConverted(): void
     {
@@ -343,7 +367,7 @@ class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($content, $url), 'https:// should have been stripped from the token URL');
+        $this->assertStringNotContainsString($url, (string) $content, 'https:// should have been stripped from the token URL');
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that tokens that are supposed to be ignored are')]
@@ -388,7 +412,7 @@ class TrackableModelTest extends TestCase
         $trackableKey = '{trackable='.$match[1].'}';
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
 
-        $this->assertEquals(1, count($trackables));
+        $this->assertCount(1, $trackables);
         $this->assertEquals('{contactfield=website|https://mautic.org}', $trackables[$trackableKey]->getRedirect()->getUrl());
     }
 
@@ -405,7 +429,23 @@ class TrackableModelTest extends TestCase
             1
         );
 
-        $this->assertTrue(str_contains($content, $url), $content);
+        $this->assertStringContainsString($url, (string) $content, $content);
+    }
+
+    public function testMalformedUrlDoesNotCrashTrackingParsing(): void
+    {
+        $url   = '://example.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+        $this->assertStringContainsString($url, (string) $content);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -431,11 +471,11 @@ class TrackableModelTest extends TestCase
             1
         );
         $token = array_key_first($trackables);
-        Assert::assertNotEmpty($trackables, $content);
-        Assert::assertStringContainsString($token, $content);
+        $this->assertNotEmpty($trackables, $content);
+        $this->assertStringContainsString($token, (string) $content);
 
         // Assert that exactly one trackable found
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -465,11 +505,11 @@ class TrackableModelTest extends TestCase
         );
 
         // Assert that both trackables found
-        Assert::assertCount(3, $trackables);
+        $this->assertCount(3, $trackables);
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertNotFalse(strpos($content, (string) $redirectId), $content);
+            $this->assertStringContainsString((string) $redirectId, (string) $content, $content);
         }
     }
 
@@ -518,7 +558,7 @@ TEXT;
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
         $token = array_key_first($trackables);
-        self::assertNotNull($token);
+        $this->assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
@@ -553,18 +593,18 @@ TEXT;
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
         $token = array_key_first($trackables);
-        self::assertNotNull($token);
+        $this->assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
 
     /**
-     * @param array $doNotTrack
-     * @param array $urlFieldsForPlaintext
+     * @param array<int, string>        $doNotTrack
+     * @param array<string|int, string> $urlFieldsForPlaintext
      *
-     * @return TrackableModel|\PHPUnit\Framework\MockObject\MockObject
+     * @return TrackableModel&MockObject
      */
-    protected function getModel($doNotTrack = [], $urlFieldsForPlaintext = [])
+    protected function getModel(array $doNotTrack = [], array $urlFieldsForPlaintext = []): MockObject
     {
         // Add default DoNotTrack
         $doNotTrack = array_merge(
@@ -583,14 +623,14 @@ TEXT;
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
@@ -599,10 +639,10 @@ TEXT;
             ->method('getDoNotTrackList')
             ->willReturn($doNotTrack);
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getEntitiesFromUrls')
             ->willReturnCallback(
-                function ($trackableUrls, $channel, $channelId) {
+                function ($trackableUrls, $channel, $channelId): array {
                     $entities = [];
                     foreach ($trackableUrls as $url) {
                         $entities[$url] = $this->getTrackableEntity($url);
@@ -612,17 +652,14 @@ TEXT;
                 }
             );
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getContactFieldUrlTokens')
             ->willReturn($urlFieldsForPlaintext);
 
         return $mockModel;
     }
 
-    /**
-     * @return Trackable
-     */
-    protected function getTrackableEntity($url)
+    protected function getTrackableEntity(string $url): Trackable
     {
         $redirect = new Redirect();
         $redirect->setUrl($url);
@@ -655,18 +692,18 @@ TEXT;
                 if ($useMap) {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <map><area href="$url"$dnc alt="alt" /></map> 321ABC
+    ABC123 <map><area href="{$url}"{$dnc} alt="alt" /></map> 321ABC
 CONTENT;
                 } else {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <a href="$url"$dnc>$url</a> 321ABC
+    ABC123 <a href="{$url}"{$dnc}>{$url}</a> 321ABC
 CONTENT;
                 }
             } else {
                 $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 $url 321ABC
+    ABC123 {$url} 321ABC
 CONTENT;
             }
         }
@@ -675,14 +712,12 @@ CONTENT;
     }
 
     /**
-     * @return array<array<bool|null>> Use null to include both <a> and <map> tags
+     * @return \Iterator<(int|string), array<(bool|null)>> Use null to include both <a> and <map> tags
      */
-    public static function trackMapProvider(): array
+    public static function trackMapProvider(): \Iterator
     {
-        return [
-            [true],
-            [false],
-            [null],
-        ];
+        yield [true];
+        yield [false];
+        yield [null];
     }
 }

@@ -14,10 +14,12 @@ use Mautic\SmsBundle\Event\QueueEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SendSmsSubscriber implements EventSubscriberInterface
+final readonly class SendSmsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DoNotContactRepository $dncRepo, private MessageQueueModel $messageQueueModel)
-    {
+    public function __construct(
+        private DoNotContactRepository $dncRepo,
+        private MessageQueueModel $messageQueueModel,
+    ) {
     }
 
     /**
@@ -36,7 +38,7 @@ final class SendSmsSubscriber implements EventSubscriberInterface
     {
         $dnc = $this->dncRepo->getChannelList('sms', array_keys($event->getContacts()));
 
-        if (!$dnc) {
+        if ([] === $dnc) {
             return;
         }
 
@@ -67,8 +69,8 @@ final class SendSmsSubscriber implements EventSubscriberInterface
 
     public function genericFilter(FilterEvent $event): void
     {
-        $contactsWithoutNumbers = array_filter($event->getContacts(), fn (Lead $contact) => empty($contact->getLeadPhoneNumber()));
+        $contactsWithoutNumbers = array_filter($event->getContacts(), fn (Lead $contact): bool => empty($contact->getLeadPhoneNumber()));
 
-        $event->removeContacts(array_map(fn (Lead $contact) => $contact->getId(), $contactsWithoutNumbers));
+        $event->removeContacts(array_map(fn (Lead $contact): int => $contact->getId(), $contactsWithoutNumbers));
     }
 }

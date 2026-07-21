@@ -35,7 +35,7 @@ trait FrequencyRuleTrait
      *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -155,7 +155,7 @@ trait FrequencyRuleTrait
     /**
      * @param int $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null)
     {
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
@@ -187,17 +187,11 @@ trait FrequencyRuleTrait
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setDoNotContactModel(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel): void
-    {
+    public function autowireFrequencyRuleTrait(
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        RequestStack $requestStack,
+    ): void {
         $this->doNotContactModel = $doNotContactModel;
-    }
-
-    /**
-     * The name is different, so it won't collide with other setters.
-     */
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStackObject(RequestStack $requestStack): void
-    {
-        $this->requestStack = $requestStack;
+        $this->requestStack      = $requestStack;
     }
 }

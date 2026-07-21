@@ -24,7 +24,7 @@ class TweetRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $qb->andWhere($qb->expr()->in('t.id', ':search'))
                     ->setParameter('search', $search);
             } else {

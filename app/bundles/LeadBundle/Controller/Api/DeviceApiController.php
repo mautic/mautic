@@ -13,9 +13,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Model\DeviceModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -27,11 +27,8 @@ class DeviceApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, \Mautic\LeadBundle\Model\DeviceModel $leadDeviceModel)
     {
-        $leadDeviceModel = $modelFactory->getModel('lead.device');
-        \assert($leadDeviceModel instanceof DeviceModel);
-
         $this->model           = $leadDeviceModel;
         $this->entityClass     = LeadDevice::class;
         $this->entityNameOne   = 'device';
@@ -41,8 +38,10 @@ class DeviceApiController extends CommonApiController
     }
 
     /**
-     * @param LeadDevice &$entity
-     * @param string     $action
+     * @param LeadDevice           $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

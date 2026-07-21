@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -18,6 +19,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -26,6 +28,8 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Mautic\LeadBundle\Field\CustomFieldFindReplace;
+use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Form\Type\DncType;
@@ -34,8 +38,6 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -61,17 +63,56 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private NoteModel $noteModel;
+
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
+
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
+
+    private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
+
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+
+    private ListModel $leadListModel;
+
+    private LeadModel $leadModel;
+
+    private FieldModel $leadFieldModel;
+
+    private UserModel $userModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireLeadController(
+        LeadModel $leadModel,
+        ListModel $leadListModel,
+        \Mautic\StageBundle\Model\StageModel $stageModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
+        \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        NoteModel $noteModel,
+        FieldModel $leadFieldModel,
+        UserModel $userModel,
+    ): void {
+        $this->leadModel = $leadModel;
+        $this->stageModel = $stageModel;
+        $this->leadListModel = $leadListModel;
+        $this->companyModel = $companyModel;
+        $this->contactExportSchedulerModel = $contactExportSchedulerModel;
+        $this->campaignModel = $campaignModel;
+        $this->noteModel = $noteModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->userModel = $userModel;
+    }
+
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
     public function indexAction(
         Request $request,
         DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
         $page = 1,
-    ) {
+    ): Response {
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -89,13 +130,10 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
-
-        /** @var LeadModel $model */
-        $model   = $this->getModel('lead');
         $session = $request->getSession();
         // set limits
         $limit = $session->get('mautic.lead.limit', $this->coreParametersHelper->get('default_pagelimit'));
@@ -111,7 +149,7 @@ class LeadController extends FormController
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -126,16 +164,16 @@ class LeadController extends FormController
         $anonymousShowing = false;
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
-        $results = $model->getEntities([
+        $results = $this->leadModel->getEntities([
             'start'           => $start,
             'limit'           => $limit,
             'filter'          => $filter,
@@ -181,18 +219,15 @@ class LeadController extends FormController
 
         $listArgs = [];
         if (!$this->security->isGranted('lead:lists:viewother')) {
-            $listArgs['filter']['force'] = " $mine";
+            $listArgs['filter']['force'] = " {$mine}";
         }
-
-        $leadListModel = $this->getModel('lead.list');
-        \assert($leadListModel instanceof ListModel);
-        $lists = $leadListModel->getUserLists();
+        $lists = $this->leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = 1 === substr_count($search, "$listCommand:");
+        $inSingleList = 1 === substr_count($search, "{$listCommand}:");
         $list         = [];
         if ($inSingleList) {
-            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+            preg_match("/{$listCommand}:(.*?)(?=\s|$)/", $search, $matches);
 
             if (!empty($matches[1])) {
                 $alias = $matches[1];
@@ -206,7 +241,7 @@ class LeadController extends FormController
         }
 
         // Get the max ID of the latest lead added
-        $maxLeadId = $model->getRepository()->getMaxLeadId();
+        $maxLeadId = $this->leadModel->getRepository()->getMaxLeadId();
 
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
@@ -262,15 +297,13 @@ class LeadController extends FormController
             && !$permissions['lead:leads:editown']
             && !$permissions['lead:leads:editother']
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
 
         // Get the quick add form
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new', 'qf' => 1]);
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -306,7 +339,7 @@ class LeadController extends FormController
             ]
         );
 
-        $quickForm = $model->createForm($model->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
+        $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -333,15 +366,10 @@ class LeadController extends FormController
 
     /**
      * Loads a specific lead into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-
-        $lead = $model->getEntity($objectId);
+        $lead = $this->leadModel->getEntity($objectId);
 
         if (null === $lead) {
             // get the page we came from
@@ -370,8 +398,7 @@ class LeadController extends FormController
             );
         }
 
-        /** @var Lead $lead */
-        $model->getRepository()->refetchEntity($lead);
+        $this->leadModel->getRepository()->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -393,16 +420,13 @@ class LeadController extends FormController
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fields            = $lead->getFields();
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-
-        $companyModel = $this->getModel('lead.company');
-        \assert($companyModel instanceof CompanyModel);
-        $companiesRepo = $companyModel->getRepository();
+        $companiesRepo = $this->companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
@@ -425,11 +449,7 @@ class LeadController extends FormController
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $model = $this->getModel('lead.list');
-        \assert($model instanceof ListModel);
-        $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
-        $leadNoteModel = $this->getModel('lead.note');
-        \assert($leadNoteModel instanceof NoteModel);
+        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -448,7 +468,7 @@ class LeadController extends FormController
                     'events'                 => $this->getEngagements($lead),
                     'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
                     'engagementData'         => $this->getEngagementData($lead),
-                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'noteCount'              => $this->noteModel->getNoteCount($lead, true),
                     'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'                => $leadDeviceRepository->getLeadDevices($lead),
                     'auditlog'               => $this->getAuditlogs($lead),
@@ -488,21 +508,17 @@ class LeadController extends FormController
      */
     public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-        $lead  = $model->getEntity();
+        $lead  = $this->leadModel->getEntity();
 
         if (!$this->security->isGranted('lead:leads:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -529,7 +545,7 @@ class LeadController extends FormController
                         }
                     }
 
-                    $model->setFieldValues($lead, $data, true);
+                    $this->leadModel->setFieldValues($lead, $data, true);
 
                     // form is valid so process the data
                     $lead->setManipulator(new LeadManipulator(
@@ -546,11 +562,11 @@ class LeadController extends FormController
                     $contactRepository->saveEntity($lead);
 
                     if (!empty($companies)) {
-                        $model->modifyCompanies($lead, $companies);
+                        $this->leadModel->modifyCompanies($lead, $companies);
                     }
 
                     // Save here through the model to trigger all subscribers.
-                    $model->saveEntity($lead);
+                    $this->leadModel->saveEntity($lead);
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
@@ -637,7 +653,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'form'   => $form->createView(),
                     'lead'   => $lead,
-                    'fields' => $model->organizeFieldsByGroup($fields),
+                    'fields' => $this->leadModel->organizeFieldsByGroup($fields),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
@@ -663,9 +679,7 @@ class LeadController extends FormController
      */
     public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.lead.page', 1);
@@ -698,23 +712,22 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
-        } elseif ($model->isLocked($lead)) {
+            $this->throwAccessDenied();
+        } elseif ($this->leadModel->isLocked($lead)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $lead, 'lead.lead');
         }
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -739,7 +752,7 @@ class LeadController extends FormController
                             $companies = [$companies];
                         }
                     }
-                    $model->setFieldValues($lead, $data, true);
+                    $this->leadModel->setFieldValues($lead, $data, true);
 
                     // form is valid so process the data
                     $lead->setManipulator(new LeadManipulator(
@@ -748,15 +761,15 @@ class LeadController extends FormController
                         $objectId,
                         $userHelper->getUser()->getName()
                     ));
-                    $model->modifyCompanies($lead, $companies);
-                    $model->saveEntity($lead, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->leadModel->modifyCompanies($lead, $companies);
+                    $this->leadModel->saveEntity($lead, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
                     if ('custom' == $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        $file = $form['custom_avatar']->getData();
+                        if ($file instanceof UploadedFile) {
                             $this->uploadAvatar($request, $avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update
@@ -790,7 +803,7 @@ class LeadController extends FormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($lead);
+                $this->leadModel->unlockEntity($lead);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -809,14 +822,15 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
-                $lead = $model->getEntity($objectId);
-                $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+                $lead = $this->leadModel->getEntity($objectId);
+                $form = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
             }
         } else {
             // lock the entity
-            $model->lockEntity($lead);
+            $this->leadModel->lockEntity($lead);
         }
 
         return $this->delegateView(
@@ -868,9 +882,7 @@ class LeadController extends FormController
      */
     public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
     {
-        /** @var LeadModel $model */
-        $model    = $this->getModel('lead');
-        $mainLead = $model->getEntity($objectId);
+        $mainLead = $this->leadModel->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
 
         // set the return URL
@@ -926,7 +938,7 @@ class LeadController extends FormController
                 ],
             ];
 
-            $leads = $model->getEntities(
+            $leads = $this->leadModel->getEntities(
                 [
                     'limit'          => 25,
                     'filter'         => $filter,
@@ -959,7 +971,7 @@ class LeadController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $data      = $form->getData();
                     $secLeadId = $data['lead_to_merge'];
-                    $secLead   = $model->getEntity($secLeadId);
+                    $secLead   = $this->leadModel->getEntity($secLeadId);
 
                     if (null === $secLead) {
                         return $this->postActionRedirect(
@@ -970,21 +982,22 @@ class LeadController extends FormController
                                         [
                                             'type'    => 'error',
                                             'msg'     => 'mautic.lead.lead.error.notfound',
-                                            'msgVars' => ['%id%' => $secLead->getId()],
+                                            'msgVars' => ['%id%' => $secLeadId],
                                         ],
                                     ],
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {
-                        return $this->accessDenied();
-                    } elseif ($model->isLocked($mainLead)) {
+                        $this->throwAccessDenied();
+                    } elseif ($this->leadModel->isLocked($mainLead)) {
                         // deny access if the entity is locked
                         return $this->isLocked($postActionVars, $secLead, 'lead');
-                    } elseif ($model->isLocked($secLead)) {
+                    } elseif ($this->leadModel->isLocked($secLead)) {
                         // deny access if the entity is locked
                         return $this->isLocked($postActionVars, $secLead, 'lead');
                     }
@@ -1051,14 +1064,10 @@ class LeadController extends FormController
 
     /**
      * Generates contact frequency rules form and action.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactFrequencyAction(Request $request, $objectId)
+    public function contactFrequencyAction(Request $request, $objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (null === $lead
             || !$this->security->hasEntityAccess(
@@ -1067,7 +1076,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $viewParameters = [
@@ -1149,9 +1158,7 @@ class LeadController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('lead.lead');
-            \assert($model instanceof LeadModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->leadModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -1165,11 +1172,11 @@ class LeadController extends FormController
                 $entity->getPermissionUser()
             )
             ) {
-                return $this->accessDenied();
-            } elseif ($model->isLocked($entity)) {
+                $this->throwAccessDenied();
+            } elseif ($this->leadModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'lead.lead');
             } else {
-                $model->deleteEntity($entity);
+                $this->leadModel->deleteEntity($entity);
 
                 $identifier = $this->translator->trans($entity->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -1213,14 +1220,12 @@ class LeadController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('lead');
-            \assert($model instanceof LeadModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->leadModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -1234,8 +1239,8 @@ class LeadController extends FormController
                     $entity->getPermissionUser()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->getAccessDeniedFlash();
+                } elseif ($this->leadModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -1244,7 +1249,7 @@ class LeadController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->leadModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -1271,9 +1276,7 @@ class LeadController extends FormController
      */
     public function listAction($objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (null != $lead
             && $this->security->hasEntityAccess(
@@ -1282,12 +1285,10 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var ListModel $listModel */
-            $listModel = $this->getModel('lead.list');
-            $lists     = $listModel->getUserLists();
+            $lists     = $this->leadListModel->getUserLists();
 
             // Get a list of lists for the lead
-            $leadsLists = $model->getLists($lead, true, true);
+            $leadsLists = $this->leadModel->getLists($lead, true, true);
         } else {
             $lists = $leadsLists = [];
         }
@@ -1309,9 +1310,7 @@ class LeadController extends FormController
      */
     public function companyAction($objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (null != $lead
             && $this->security->hasEntityAccess(
@@ -1320,9 +1319,7 @@ class LeadController extends FormController
                 $lead->getOwner()
             )
         ) {
-            $companyModel = $this->getModel('lead.company');
-            \assert($companyModel instanceof CompanyModel);
-            $companies = $companyModel->getUserCompanies();
+            $companies = $this->companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
             $companyLeads = $lead->getCompanies();
@@ -1350,8 +1347,7 @@ class LeadController extends FormController
      */
     public function campaignAction($objectId): Response
     {
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (null != $lead
             && $this->security->hasEntityAccess(
@@ -1360,10 +1356,8 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel  = $this->getModel('campaign');
-            $campaigns      = $campaignModel->getPublishedCampaigns(true);
-            $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
+            $campaigns      = $this->campaignModel->getPublishedCampaigns(true);
+            $leadsCampaigns = $this->campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
                 $campaigns[$c['id']]['inCampaign'] = isset($leadsCampaigns[$c['id']]);
@@ -1390,11 +1384,8 @@ class LeadController extends FormController
     {
         $valid = $cancelled = false;
 
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-
         /** @var Lead $lead */
-        $lead = $model->getEntity($objectId);
+        $lead = $this->leadModel->getEntity($objectId);
 
         if (null === $lead
             || !$this->security->hasEntityAccess(
@@ -1579,23 +1570,16 @@ class LeadController extends FormController
      * Bulk edit lead campaigns.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0)
+    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
     {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $this->getModel('campaign');
-
         if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1621,7 +1605,7 @@ class LeadController extends FormController
             $remove = (!empty($data['remove'])) ? $data['remove'] : [];
 
             if ($count = count($entities)) {
-                $campaigns = $campaignModel->getEntities(
+                $campaigns = $this->campaignModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1664,7 +1648,7 @@ class LeadController extends FormController
             );
         }
         // Get a list of campaigns
-        $campaigns = $campaignModel->getPublishedCampaigns(true);
+        $campaigns = $this->campaignModel->getPublishedCampaigns(true);
         $items     = [];
         foreach ($campaigns as $campaign) {
             $items[$campaign['name'].' ('.$campaign['id'].')'] = $campaign['id'];
@@ -1701,10 +1685,8 @@ class LeadController extends FormController
 
     /**
      * Bulk add leads to the DNC list.
-     *
-     * @return JsonResponse|Response
      */
-    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model)
+    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model): JsonResponse|Response
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
@@ -1779,20 +1761,16 @@ class LeadController extends FormController
      * Bulk edit lead stages.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchStagesAction(Request $request, $objectId = 0)
+    public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1814,20 +1792,18 @@ class LeadController extends FormController
                     ++$count;
 
                     if (!empty($data['addstage'])) {
-                        $stageModel = $this->getModel('stage');
-
-                        $stage = $stageModel->getEntity((int) $data['addstage']);
-                        $model->addToStages($lead, $stage);
+                        $stage = $this->stageModel->getEntity((int) $data['addstage']);
+                        $this->leadModel->addToStages($lead, $stage);
                     }
 
                     if (!empty($data['removestage'])) {
-                        $stage = $stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages($lead, $stage);
+                        $stage = $this->stageModel->getEntity($data['removestage']);
+                        $this->leadModel->removeFromStages($lead, $stage);
                     }
                 }
             }
             // Save entities
-            $model->saveEntities($entities);
+            $this->leadModel->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
@@ -1843,9 +1819,7 @@ class LeadController extends FormController
             );
         }
         // Get a list of lists
-        /** @var \Mautic\StageBundle\Model\StageModel $model */
-        $model  = $this->getModel('stage');
-        $stages = $model->getUserStages();
+        $stages = $this->stageModel->getUserStages();
         $items  = [];
         foreach ($stages as $stage) {
             $items[$stage['name'].' ('.$stage['id'].')'] = $stage['id'];
@@ -1884,24 +1858,20 @@ class LeadController extends FormController
      * Bulk edit lead owner.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchOwnersAction(Request $request, $objectId = 0)
+    public function batchOwnersAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
+        if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1922,14 +1892,13 @@ class LeadController extends FormController
                     ++$count;
 
                     if (!empty($data['addowner'])) {
-                        $userModel = $this->getModel('user');
-                        $user      = $userModel->getEntity((int) $data['addowner']);
+                        $user      = $this->userModel->getEntity((int) $data['addowner']);
                         $lead->setOwner($user);
                     }
                 }
             }
             // Save entities
-            $model->saveEntities($entities);
+            $this->leadModel->saveEntities($entities);
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
@@ -1944,9 +1913,7 @@ class LeadController extends FormController
                 ]
             );
         }
-        $userModel = $this->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-        $users = $userModel->getRepository()->getUserList('', 0);
+        $users = $this->userModel->getRepository()->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
@@ -1982,6 +1949,190 @@ class LeadController extends FormController
     }
 
     /**
+     * Bulk find and replace contact field values.
+     */
+    public function batchFindReplaceAction(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace): JsonResponse|Response
+    {
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:editown',
+                'lead:leads:editother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (
+            (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'])
+            || (!$permissions['lead:leads:editown'] && !$permissions['lead:leads:editother'])
+        ) {
+            $this->throwAccessDenied();
+        }
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            return $this->processContactFindReplace($request, $model, $findReplace, $permissions);
+        }
+
+        return $this->createContactFindReplaceFormResponse($request, $findReplace);
+    }
+
+    /**
+     * @param array<string, bool> $permissions
+     */
+    private function processContactFindReplace(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace, array $permissions): JsonResponse
+    {
+        $requestData = $request->request->all();
+        $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
+        $ids         = json_decode($data['ids'] ?? '[]', true);
+        $fieldAlias  = $data['field'] ?? null;
+        $updated     = [];
+
+        if (is_string($fieldAlias) && is_array($ids)) {
+            $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
+            $updated  = $this->replaceContactFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
+
+            if ([] !== $updated) {
+                $model->saveEntities($updated);
+            }
+        }
+
+        $this->addFlashMessage(
+            'mautic.lead.batch_leads_affected',
+            [
+                '%count%' => count($updated),
+            ]
+        );
+
+        return new JsonResponse(
+            [
+                'closeModal' => true,
+                'callback'   => 'refreshFindReplaceList',
+                'flashes'    => $this->getFlashContent(),
+            ]
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, mixed>    $ids
+     * @param array<string, bool>  $permissions
+     *
+     * @return iterable<object>
+     */
+    private function getContactFindReplaceEntities(Request $request, LeadModel $model, array $data, array $ids, array $permissions): iterable
+    {
+        if (!empty($data['all'])) {
+            return $model->getEntities([
+                'filter'           => $this->getCurrentContactListFilter($request, $permissions),
+                'ignore_paginator' => true,
+            ]);
+        }
+
+        return $model->getEntities([
+            'filter'           => [
+                'force' => [
+                    [
+                        'column' => 'l.id',
+                        'expr'   => 'in',
+                        'value'  => $ids,
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param iterable<object>     $entities
+     *
+     * @return array<int, Lead>
+     */
+    private function replaceContactFieldValues(CustomFieldFindReplace $findReplace, string $fieldAlias, array $data, iterable $entities, LeadModel $model): array
+    {
+        /** @var array<int, Lead> $updated */
+        $updated = $findReplace->replace(
+            new CustomFieldFindReplaceCriteria('lead', $fieldAlias, $data['find'] ?? null, $data['replace'] ?? null),
+            $entities,
+            function (CustomFieldEntityInterface $lead, array $values) use ($model): void {
+                \assert($lead instanceof Lead);
+                $model->setFieldValues($lead, $values, true, false);
+            },
+            function (CustomFieldEntityInterface $lead): bool {
+                \assert($lead instanceof Lead);
+
+                return $this->security->hasEntityAccess(
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                );
+            },
+            function (CustomFieldEntityInterface $lead) use ($model): ?CustomFieldEntityInterface {
+                \assert($lead instanceof Lead);
+
+                return $model->getEntity($lead->getId());
+            }
+        );
+
+        return $updated;
+    }
+
+    private function createContactFindReplaceFormResponse(Request $request, CustomFieldFindReplace $findReplace): Response
+    {
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchFindReplace',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->formFactory->createNamed('lead_batch_find_replace', FindReplaceType::class, [], [
+                        'action'        => $route,
+                        'all_items'     => $request->query->getBoolean('all'),
+                        'field_choices' => $findReplace->getFieldChoices('lead'),
+                        'field_label'   => 'mautic.lead.batch.find_replace.field',
+                    ])->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @param array<string,bool> $permissions
+     *
+     * @return array<string,string>
+     */
+    private function getCurrentContactListFilter(Request $request, array $permissions): array
+    {
+        $session    = $request->getSession();
+        $search     = $session->get('mautic.lead.filter', '');
+        $filter     = ['string' => $search, 'force' => ''];
+        $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+
+        if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+            $filter['force'] .= " !{$anonymous}";
+        }
+
+        if (!$permissions['lead:leads:viewother']) {
+            $filter['force'] .= " {$mine}";
+        }
+
+        return $filter;
+    }
+
+    /**
      * Bulk export contacts.
      *
      * @throws \Exception
@@ -2003,21 +2154,18 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fileType = $request->get('filetype', 'csv');
-
-        /** @var LeadModel $model */
-        $model      = $this->getModel('lead');
         $session    = $request->getSession();
         $search     = $session->get('mautic.lead.filter', '');
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $request->get('ids');
 
@@ -2038,11 +2186,11 @@ class LeadController extends FormController
         } else {
             if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
+                $filter['force'] .= " !{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
         }
 
@@ -2056,7 +2204,7 @@ class LeadController extends FormController
         ];
 
         // First, get the total count without creating the iterator
-        $totalContacts      = $model->getEntities($args)['count'];
+        $totalContacts      = $this->leadModel->getEntities($args)['count'];
         $contactExportLimit = $this->coreParametersHelper->get('contact_export_limit', 0);
         // Check if export limit is exceeded
         if ($contactExportLimit > 0 && $totalContacts > $contactExportLimit) {
@@ -2076,9 +2224,9 @@ class LeadController extends FormController
         }
 
         $iterator = new IteratorExportDataModel(
-            $model,
+            $this->leadModel,
             $args,
-            fn ($contact) => $exportHelper->parseLeadToExport($contact)
+            fn (Lead $contact): array => $exportHelper->parseLeadToExport($contact)
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
@@ -2093,10 +2241,7 @@ class LeadController extends FormController
         return $response;
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
-     */
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId)
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2108,17 +2253,14 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
-
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getModel('lead.lead');
-        $lead      = $leadModel->getEntity($contactId);
+        $lead      = $this->leadModel->getEntity($contactId);
         $dataType  = $request->get('filetype', 'csv');
 
-        if (empty($lead)) {
+        if (!$lead instanceof Lead) {
             return $this->notFound();
         }
 
@@ -2150,14 +2292,11 @@ class LeadController extends FormController
             ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        /** @var ContactExportSchedulerModel $model */
-        $model = $this->getModel('lead.export_scheduler');
-
         try {
-            return $model->getExportFileToDownload($fileName);
+            return $this->contactExportSchedulerModel->getExportFileToDownload($fileName);
         } catch (FileNotFoundException) {
             return $this->notFound();
         }
@@ -2168,10 +2307,8 @@ class LeadController extends FormController
      */
     private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): Response
     {
-        /** @var ContactExportSchedulerModel $model */
-        $model                  = $this->getModel('lead.export_scheduler');
-        $data                   = $model->prepareData($permissions);
-        $contactExportScheduler = $model->saveEntity($data);
+        $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
+        $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
         $dispatcher->dispatch(
             new ContactExportSchedulerEvent($contactExportScheduler),
@@ -2187,16 +2324,11 @@ class LeadController extends FormController
 
     /**
      * Loads a specific lead statistic info.
-     *
-     * @return JsonResponse|Response
      */
-    public function contactStatsAction(int $objectId)
+    public function contactStatsAction(int $objectId): Response
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead.lead');
-
         /** @var Lead $lead */
-        $lead = $model->getEntity($objectId);
+        $lead = $this->leadModel->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:viewown',
@@ -2204,13 +2336,13 @@ class LeadController extends FormController
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'emailStats' => $model->getLeadEmailStats($lead),
+                    'emailStats' => $this->leadModel->getLeadEmailStats($lead),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/lead_stats.html.twig',
             ]
@@ -2232,7 +2364,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $pointGroups = $pointGroupModel->getEntities();
@@ -2263,12 +2395,12 @@ class LeadController extends FormController
                         $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];
-                        if (!is_null($oldScore) && is_null($newScore)) {
+                        if (null !== $oldScore && null === $newScore) {
                             // set 0 when the new score is not present, but the record exists
                             $newScore = 0;
                         }
 
-                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                        if (null !== $newScore && $newScore !== $oldScore) {
                             $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
                             $delta = $newScore - ($oldScore ?? 0);
 

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldControllerTest extends MauticMysqlTestCase
+final class FieldControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -24,7 +27,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $labelErrorMessage             = trim($crawler->filter('#leadfield_label')->nextAll()->text());
         $maxLengthErrorMessageTemplate = 'Label value cannot be longer than 191 characters';
 
-        $this->assertEquals($maxLengthErrorMessageTemplate, $labelErrorMessage);
+        $this->assertSame($maxLengthErrorMessageTemplate, $labelErrorMessage);
     }
 
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldSuccess(): void
@@ -37,7 +40,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
-        $this->assertNotNull($field);
+        $this->assertInstanceOf(LeadField::class, $field);
     }
 
     public function testCloneFieldSubmission(): void
@@ -47,11 +50,11 @@ class FieldControllerTest extends MauticMysqlTestCase
         $field->setAlias('field_to_be_cloned');
         $field->setType('text');
 
-        $this->em->getRepository(LeadField::class)->saveEntity($field);
+        self::getContainer()->get(LeadFieldRepository::class)->saveEntity($field);
         $this->em->clear();
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => 'field_to_be_cloned']);
-        $this->assertNotNull($field);
+        $this->assertInstanceOf(LeadField::class, $field);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/clone/'.$field->getId());
 
@@ -65,7 +68,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200);
 
         $clonedField = $this->em->getRepository(LeadField::class)->findOneBy(['label' => 'Cloned Field']);
-        $this->assertNotNull($clonedField);
+        $this->assertInstanceOf(LeadField::class, $clonedField);
         $this->assertNotEquals($field->getId(), $clonedField->getId());
     }
 
@@ -90,7 +93,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $errorMessage             = trim($crawler->filter('#leadfield_charLengthLimit')->nextAll()->text());
         $maxCharLimitErrorMessage = 'This value should be between 1 and 191.';
 
-        $this->assertEquals($maxCharLimitErrorMessage, $errorMessage);
+        $this->assertSame($maxCharLimitErrorMessage, $errorMessage);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
@@ -106,7 +109,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
-        $this->assertNotNull($field);
+        $this->assertInstanceOf(LeadField::class, $field);
     }
 
     /**
@@ -130,7 +133,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
-        $this->assertNotNull($field);
+        $this->assertInstanceOf(LeadField::class, $field);
 
         /** @var ColumnSchemaHelper $helper */
         $helper = $this->getContainer()->get('mautic.schema.helper.column');

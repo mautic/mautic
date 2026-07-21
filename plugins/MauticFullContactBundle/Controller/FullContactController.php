@@ -14,6 +14,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FullContactController extends FormController
 {
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireFullContactController(
+        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+    ): void {
+        $this->leadModel = $leadModel;
+        $this->companyModel = $companyModel;
+    }
+
     /**
      * @param string $objectId
      *
@@ -21,15 +34,13 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead  = $this->leadModel->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
@@ -115,10 +126,8 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model = $this->getModel('lead');
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
@@ -134,7 +143,7 @@ class FullContactController extends FormController
             }
 
             if (is_array($ids) && count($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->leadModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -230,7 +239,7 @@ class FullContactController extends FormController
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
             foreach ($lookupEmails as $id => $lookupEmail) {
-                if ($lead = $model->getEntity($id)) {
+                if ($lead = $this->leadModel->getEntity($id)) {
                     try {
                         $lookupHelper->lookupContact($lead, $notify);
                     } catch (\Exception $ex) {
@@ -264,7 +273,7 @@ class FullContactController extends FormController
         return new Response('Bad Request', 400);
     }
 
-    /***************** COMPANY ***********************/
+    /* COMPANY */
 
     /**
      * @param string $objectId
@@ -273,16 +282,14 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $model = $this->getModel('lead.company');
         /** @var Company $company */
-        $company = $model->getEntity($objectId);
+        $company = $this->companyModel->getEntity($objectId);
 
         if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
@@ -366,10 +373,8 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $model = $this->getModel('lead.company');
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
@@ -385,7 +390,7 @@ class FullContactController extends FormController
             }
 
             if (is_array($ids) && count($ids)) {
-                $entities = $model->getEntities(
+                $entities = $this->companyModel->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -480,7 +485,7 @@ class FullContactController extends FormController
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
             foreach ($lookupWebsites as $id => $lookupWebsite) {
-                if ($company = $model->getEntity($id)) {
+                if ($company = $this->companyModel->getEntity($id)) {
                     try {
                         $lookupHelper->lookupCompany($company, $notify);
                     } catch (\Exception $ex) {

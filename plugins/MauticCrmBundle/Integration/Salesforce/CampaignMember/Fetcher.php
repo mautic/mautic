@@ -32,8 +32,8 @@ class Fetcher
      * @param string|int $campaignId
      */
     public function __construct(
-        private IntegrationEntityRepository $repo,
-        private Organizer $organizer,
+        private readonly IntegrationEntityRepository $repo,
+        private readonly Organizer $organizer,
         private $campaignId,
     ) {
         $this->fetchLeads();
@@ -67,7 +67,7 @@ class Fetcher
         $this->fetchNewlyCreated();
 
         $mauticLeadIds = array_map(
-            fn ($entity) => $entity['internal_entity_id'],
+            fn (array $entity) => $entity['internal_entity_id'],
             $this->knownCampaignMembers
         );
 

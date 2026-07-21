@@ -20,7 +20,7 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
     /**
      * Define the widget(s).
      *
-     * @var string
+     * @var array<string, array<string, string>>
      */
     protected $types = [
         'emails.best.hours' => [

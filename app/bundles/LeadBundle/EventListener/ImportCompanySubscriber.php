@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ImportCompanySubscriber implements EventSubscriberInterface
+final readonly class ImportCompanySubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FieldList $fieldList,

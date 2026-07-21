@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class ConfigControllerFunctionalTest extends MauticMysqlTestCase
+final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testEmailColumnsArePreselectedByDefault(): void
     {
@@ -96,13 +96,13 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
-        $this->assertEquals($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
-        $this->assertEquals($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
-        $this->assertEquals($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
-        $this->assertEquals($data['path'], $form['config[emailconfig][mailer_dsn][path]']->getValue());
-        $this->assertEquals($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
-        $this->assertEquals('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
-        $this->assertEquals($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
+        $this->assertSame($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
+        $this->assertSame($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
+        $this->assertSame($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
+        $this->assertSame($data['path'], $form['config[emailconfig][mailer_dsn][path]']->getValue());
+        $this->assertSame($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
+        $this->assertSame('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
+        $this->assertSame($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
     }
 
     /**

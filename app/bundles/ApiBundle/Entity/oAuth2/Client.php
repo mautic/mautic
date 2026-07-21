@@ -116,10 +116,10 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ($current != $val) {
             $this->changes[$prop] = [$current, $val];
         }
@@ -143,10 +143,8 @@ class Client extends BaseClient
 
     /**
      * @param string $name
-     *
-     * @return Client
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
 
@@ -170,10 +168,7 @@ class Client extends BaseClient
         $this->redirectUris = $redirectUris;
     }
 
-    /**
-     * @return Client
-     */
-    public function addAuthCode(AuthCode $authCodes)
+    public function addAuthCode(AuthCode $authCodes): static
     {
         $this->authCodes[] = $authCodes;
 
@@ -186,7 +181,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection
      */
     public function getAuthCodes()
     {
@@ -205,10 +200,7 @@ class Client extends BaseClient
         return $users->contains($user);
     }
 
-    /**
-     * @return Client
-     */
-    public function addUser(User $users)
+    public function addUser(User $users): static
     {
         $this->users[] = $users;
 
@@ -221,7 +213,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, User>
      */
     public function getUsers()
     {
@@ -231,7 +223,7 @@ class Client extends BaseClient
     /**
      * Add Authorization Grant Type.
      */
-    public function addGrantType(string $grantType): Client
+    public function addGrantType(string $grantType): self
     {
         $this->allowedGrantTypes[] = $grantType;
 

@@ -17,13 +17,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use PHPUnit\Framework\Assert;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
     public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
@@ -87,20 +86,21 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailCount(1);
 
         $email = KernelTestCase::getMailerMessage();
-        \assert($email instanceof EmailMime);
+        $this->assertInstanceOf(EmailMime::class, $email);
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
-        Assert::assertSame('Mautic test email', $email->getSubject());
-        Assert::assertSame('Hi! This is a test email from Mautic. Testing...testing...1...2...3!', $email->getTextBody());
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
-        Assert::assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
-        Assert::assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
+        $this->assertSame('Mautic test email', $email->getSubject());
+        $this->assertSame('Hi! This is a test email from Mautic. Testing...testing...1...2...3!', $email->getTextBody());
+        $this->assertCount(1, $email->getFrom());
+        $this->assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
+        $this->assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
+        $this->assertCount(1, $email->getTo());
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
+        $this->assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
     }
 
     public function testGetDeliveredCount(): void
@@ -293,10 +293,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getBuilderTokens');
         self::assertResponseIsSuccessful();
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertArrayHasKey('tokens', $response);
-        Assert::assertArrayHasKey('{contactfield=email}', $response['tokens']);
-        Assert::assertArrayHasKey('{ownerfield=email}', $response['tokens']);
-        Assert::assertArrayHasKey('{unsubscribe_url}', $response['tokens']);
+        $this->assertArrayHasKey('tokens', $response);
+        $this->assertArrayHasKey('{contactfield=email}', $response['tokens']);
+        $this->assertArrayHasKey('{ownerfield=email}', $response['tokens']);
+        $this->assertArrayHasKey('{unsubscribe_url}', $response['tokens']);
     }
 
     public function testTogglePublishEventIsDispatched(): void
@@ -305,7 +305,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(EmailEvents::EMAIL_ON_TOGGLE_PUBLISH, function (EmailEvent $event) use (&$dispatchedEvent) {
+            ->addListener(EmailEvents::EMAIL_ON_TOGGLE_PUBLISH, function (EmailEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 
@@ -323,9 +323,11 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->find($email->getId());
-        Assert::assertFalse($email->isPublished(), 'The email should not be published.');
-        Assert::assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
-        Assert::assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
+        $this->assertInstanceOf(Email::class, $email);
+        $this->assertFalse($email->isPublished(), 'The email should not be published.');
+        $this->assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        $this->assertInstanceOf(Email::class, $email);
+        $this->assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
     }
 
     private function createContact(string $email): Lead

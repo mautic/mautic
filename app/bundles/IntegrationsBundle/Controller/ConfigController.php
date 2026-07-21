@@ -30,7 +30,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -47,9 +46,6 @@ class ConfigController extends AbstractFormController
      */
     private $integrationConfiguration;
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
@@ -58,10 +54,10 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         string $integration,
-    ) {
+    ): Response {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         try {
@@ -84,7 +80,7 @@ class ConfigController extends AbstractFormController
         // Clear the session of previously stored fields in case it got stuck
         /** @var Session $session */
         $session = $request->getSession();
-        $session->remove("$integration-fields");
+        $session->remove("{$integration}-fields");
 
         return $this->showForm($request, $form, $formExtension);
     }
@@ -120,7 +116,7 @@ class ConfigController extends AbstractFormController
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
             $session       = $request->getSession();
-            $updatedFields = $session->get("$integration-fields", []);
+            $updatedFields = $session->get("{$integration}-fields", []);
 
             $fieldMerger = new FieldMergerHelper($this->integrationObject, $fieldMappings);
 

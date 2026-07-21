@@ -54,8 +54,8 @@ final class ConfigTypeTest extends TypeTestCase
         $permsMock->method('isGranted')->willReturn(false);
 
         $dsnType              = new DsnType(
-            $this->createMock(DsnTransformerFactory::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(DsnTransformerFactory::class),
+            $this->createStub(CoreParametersHelper::class),
         );
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);

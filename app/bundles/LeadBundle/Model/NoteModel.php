@@ -36,7 +36,7 @@ class NoteModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -107,7 +107,7 @@ class NoteModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadNoteEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -120,14 +120,20 @@ class NoteModel extends FormModel
         return null;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNoteCount(Lead $lead, $useFilters = false)
+    public function getNoteCount(Lead $lead, $useFilters = false): int
     {
-        $filter   = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
+        $viewPermissions = $this->security->isGranted(['lead:notes:viewown', 'lead:notes:viewother'], 'RETURN_ARRAY');
+        $canViewOwn      = $viewPermissions['lead:notes:viewown'] ?? false;
+        $canViewOther    = $viewPermissions['lead:notes:viewother'] ?? false;
 
-        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
+        if (!$canViewOwn && !$canViewOther) {
+            return 0;
+        }
+
+        $filter    = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType  = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
+        $createdBy = $canViewOther ? null : $this->userHelper->getUser()?->getId();
+
+        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
     }
 }

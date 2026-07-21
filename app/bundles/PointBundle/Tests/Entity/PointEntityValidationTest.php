@@ -12,7 +12,7 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PointEntityValidationTest extends MauticMysqlTestCase
+final class PointEntityValidationTest extends MauticMysqlTestCase
 {
     /**
      * @throws MappingException
@@ -45,11 +45,11 @@ class PointEntityValidationTest extends MauticMysqlTestCase
 
         if ($errorMessage) {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-            self::assertStringContainsString('error', $response->getContent());
-            self::assertStringContainsString($errorMessage, $response->getContent());
+            $this->assertStringContainsString('error', (string) $response->getContent());
+            $this->assertStringContainsString($errorMessage, (string) $response->getContent());
         } else {
             self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-            self::assertStringNotContainsString('error', $response->getContent());
+            $this->assertStringNotContainsString('error', (string) $response->getContent());
         }
     }
 
@@ -105,9 +105,9 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $response = $this->client->getResponse()->getContent();
-        self::assertStringContainsString($errorMessage, (string) $response);
+        $this->assertStringContainsString($errorMessage, (string) $response);
 
         $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
-        '' == $errorMessage ? self::assertNotNull($pointDetail) : self::assertNull($pointDetail);
+        '' === $errorMessage ? $this->assertInstanceOf(Point::class, $pointDetail) : $this->assertNotInstanceOf(Point::class, $pointDetail);
     }
 }

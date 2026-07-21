@@ -18,8 +18,8 @@ class SegmentDependencyTreeFactory
     private array $usedSegmentIds = [];
 
     public function __construct(
-        private ListModel $segmentModel,
-        private RouterInterface $router,
+        private readonly ListModel $segmentModel,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -61,7 +61,7 @@ class SegmentDependencyTreeFactory
             fn (array $filter): bool => 'leadlist' === $filter['type']
         );
 
-        if (!$segmentMembershipFilters) {
+        if ([] === $segmentMembershipFilters) {
             return [];
         }
 

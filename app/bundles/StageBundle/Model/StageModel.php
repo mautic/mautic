@@ -2,6 +2,7 @@
 
 namespace Mautic\StageBundle\Model;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -11,7 +12,11 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\LeadStageLog;
+use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
@@ -43,10 +48,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\StageBundle\Entity\StageRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
     {
         return $this->em->getRepository(Stage::class);
     }
@@ -107,7 +109,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new StageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -168,10 +170,41 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         return $chart->render();
     }
 
-    /**
-     * @return array
-     */
-    public function getUserStages()
+    public function stageMerge(Stage $primaryStage, Stage $secondaryStage): Stage
+    {
+        $this->logger->debug('STAGE: Merging stages');
+
+        $primaryStageId   = $primaryStage->getId();
+        $secondaryStageId = $secondaryStage->getId();
+
+        if ($primaryStageId === $secondaryStageId) {
+            return $primaryStage;
+        }
+
+        $this->em->wrapInTransaction(function () use ($primaryStageId, $secondaryStage, $secondaryStageId): void {
+            $this->em->getConnection()->createQueryBuilder()
+                ->update(MAUTIC_TABLE_PREFIX.'leads')
+                ->set('stage_id', ':primaryStageId')
+                ->where('stage_id = :secondaryStageId')
+                ->setParameter('primaryStageId', $primaryStageId, ParameterType::INTEGER)
+                ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
+                ->executeStatement();
+
+            /** @var StagesChangeLogRepository $changeLogRepo */
+            $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
+            $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
+
+            /** @var LeadStageLogRepository $leadStageLogRepo */
+            $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
+            $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
+
+            $this->deleteEntity($secondaryStage);
+        });
+
+        return $primaryStage;
+    }
+
+    public function getUserStages(): array
     {
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;

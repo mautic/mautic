@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
-class RoleControllerFunctionalTest extends MauticMysqlTestCase
+final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testNewRoleAction(): void
     {
@@ -26,8 +26,8 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($name, $this->client->getResponse()->getContent());
-        $this->assertStringContainsString($desc, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($name, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($desc, (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditRoleAction(): void
@@ -50,7 +50,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($updatedName, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($updatedName, (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexActionCanSortByUserCount(): void

@@ -12,19 +12,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ActionController extends CommonFormController
 {
+    private FormModel $formModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireActionController(
+        FormModel $formModel,
+    ): void {
+        $this->formModel = $formModel;
+    }
+
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $formAction = $request->request->all()['formaction'] ?? [];
             $actionType = $formAction['type'];
             $formId     = $formAction['formId'];
@@ -43,11 +50,7 @@ class ActionController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
-        $customComponents = $formModel->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $form             = $this->formFactory->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
@@ -57,7 +60,7 @@ class ActionController extends CommonFormController
         $formAction['settings'] = $customComponents['actions'][$actionType];
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -139,10 +142,8 @@ class ActionController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $session    = $request->getSession();
         $method     = $request->getMethod();
@@ -154,10 +155,8 @@ class ActionController extends CommonFormController
         $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if (null !== $formAction) {
-            $formModel = $this->getModel('form.form');
-            \assert($formModel instanceof FormModel);
             $actionType             = $formAction['type'];
-            $customComponents       = $formModel->getCustomComponents();
+            $customComponents       = $this->formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             // ajax only for form fields
@@ -176,7 +175,7 @@ class ActionController extends CommonFormController
             $form->get('formId')->setData($formId);
 
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -273,10 +272,8 @@ class ActionController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session = $request->getSession();
         $formId  = $request->query->get('formId');
@@ -287,11 +284,11 @@ class ActionController extends CommonFormController
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
-        if ('POST' == $request->getMethod() && null !== $formAction) {
+        if ('POST' === $request->getMethod() && null !== $formAction) {
             // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;

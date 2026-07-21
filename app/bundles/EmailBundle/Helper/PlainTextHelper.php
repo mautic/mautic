@@ -224,10 +224,8 @@ class PlainTextHelper
      * Set the source HTML.
      *
      * @param string|null $html HTML source content
-     *
-     * @return PlainTextHelper
      */
-    public function setHtml($html)
+    public function setHtml($html): static
     {
         $this->html      = $html ?? '';
         $this->converted = false;
@@ -280,12 +278,15 @@ class PlainTextHelper
         $this->converted = true;
     }
 
+    /**
+     * @phpstan-impure
+     */
     protected function converter(&$text)
     {
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, $text);
-        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
+        $text = preg_replace_callback($this->callbackSearch, $this->pregCallback(...), $text);
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
@@ -351,7 +352,8 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         }   // link_method defaults to inline
 
@@ -367,7 +369,7 @@ class PlainTextHelper
             // Run our defined tags search-and-replace with callback
             $this->preContent = preg_replace_callback(
                 $this->callbackSearch,
-                [$this, 'pregCallback'],
+                $this->pregCallback(...),
                 $this->preContent
             );
 
@@ -380,7 +382,7 @@ class PlainTextHelper
             // replace the content (use callback because content can contain $0 variable)
             $text = preg_replace_callback(
                 '/<pre[^>]*>.*<\/pre>/ismU',
-                [$this, 'pregPreCallback'],
+                $this->pregPreCallback(...),
                 $text,
                 1
             );
@@ -436,7 +438,7 @@ class PlainTextHelper
                         unset($body);
                     }
                 } else {
-                    if (0 == $level) {
+                    if (0 === $level) {
                         $start  = $m[1];
                         $taglen = strlen($m[0]);
                     }
@@ -453,7 +455,7 @@ class PlainTextHelper
      *
      * @return string
      */
-    protected function pregCallback($matches)
+    protected function pregCallback(array $matches)
     {
         switch (strtolower($matches[1])) {
             case 'b':
@@ -497,7 +499,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function toupper($str): string
+    private function toupper(string $str): string
     {
         // string can contain HTML tags
         $chunks = preg_split('/(<[^>]*>)/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -519,7 +521,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function strtoupper($str): string
+    private function strtoupper(string $str): string
     {
         $str = html_entity_decode($str, ENT_COMPAT, self::ENCODING);
 
@@ -536,7 +538,7 @@ class PlainTextHelper
      * @param string     $breakline
      * @param bool|false $cut
      */
-    private function linewrap($text, $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, int $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

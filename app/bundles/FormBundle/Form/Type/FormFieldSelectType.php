@@ -33,7 +33,7 @@ class FormFieldSelectType extends AbstractType
         );
 
         if (!empty($options['parentData'])) {
-            $default = (empty($options['parentData']['properties']['multiple'])) ? false : true;
+            $default = !empty($options['parentData']['properties']['multiple']);
         } else {
             $default = false;
         }

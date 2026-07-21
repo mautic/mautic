@@ -14,6 +14,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -34,15 +35,13 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        WebhookModel $webhookModel,
     ) {
-        $webhookModel = $modelFactory->getModel('webhook');
-        \assert($webhookModel instanceof WebhookModel);
-
         $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
@@ -61,6 +60,12 @@ class WebhookApiController extends CommonApiController
         $entity->buildTriggers();
     }
 
+    /**
+     * @param Webhook              $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $eventsToKeep = [];
@@ -81,7 +86,7 @@ class WebhookApiController extends CommonApiController
         }
     }
 
-    public function getTriggersAction()
+    public function getTriggersAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->handleView(
             $this->view(

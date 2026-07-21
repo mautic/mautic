@@ -119,13 +119,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $unlock
+     * @param LeadList $entity
+     * @param bool     $unlock
      *
      * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         // set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -149,7 +150,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $count     = count($existing);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
@@ -187,7 +188,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -289,7 +290,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadListEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -368,9 +369,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of preference center lead lists.
      *
-     * @return mixed
+     * @return array<int, array{
+     *      id: int,
+     *      name: string,
+     *      publicName: string,
+     *      alias: string
+     *   }>
      */
-    public function getPreferenceCenterLists()
+    public function getPreferenceCenterLists(): array
     {
         return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
     }
@@ -924,11 +930,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param int                 $limit
+     * @param ?\DateTimeInterface $dateFrom
+     * @param ?\DateTimeInterface $dateTo
+     * @param bool                $canViewOthers
+     * @param int[]               $segments
      *
-     * @return array
+     * @return mixed[]
      */
     public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
     {
@@ -951,10 +959,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if (!empty($segments)) {
             $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
-        if (!empty($dateFrom)) {
+        if ($dateFrom instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added >= '".$dateFrom->format('Y-m-d')."'");
         }
-        if (!empty($dateTo)) {
+        if ($dateTo instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
         if (!$canViewOthers) {
@@ -973,10 +981,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
-            if (!empty($dateFrom)) {
+            if ($dateFrom instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
             }
-            if (!empty($dateTo)) {
+            if ($dateTo instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
             $resultsAll = $qAll->executeQuery()->fetchAllAssociative();
@@ -989,7 +997,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param bool $canViewOthers
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, array $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1002,7 +1010,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($filter['flag']);
         }
 
-        $allLists   = $query->getCountQuery('leads', 'id', 'date_added', null);
+        $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
         $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
@@ -1020,10 +1028,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1081,10 +1088,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -12,6 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SourceController extends CommonFormController
 {
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireSourceController(\Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+    {
+        $this->campaignModel = $campaignModel;
+    }
+
     /**
      * @var string[]
      */
@@ -24,10 +31,8 @@ class SourceController extends CommonFormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -59,10 +64,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType, false, true);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -128,10 +130,7 @@ class SourceController extends CommonFormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;
@@ -166,10 +165,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType, false, true);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -239,10 +235,8 @@ class SourceController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;
@@ -258,10 +252,10 @@ class SourceController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             // Add the field to the delete list
             if (isset($modifiedSources[$sourceType])) {
                 unset($modifiedSources[$sourceType]);

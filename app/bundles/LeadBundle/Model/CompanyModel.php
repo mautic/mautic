@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -84,7 +85,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
-        $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
 
         parent::saveEntity($entity, $unlock);
     }
@@ -100,7 +100,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Update leads primary company name
         foreach ($entities as $entity) {
             $this->setEntityDefaultValues($entity, 'company');
-            $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
         }
         parent::saveEntities($entities, $unlock);
     }
@@ -125,10 +124,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $repo;
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\CompanyLeadRepository
-     */
-    public function getCompanyLeadRepository()
+    public function getCompanyLeadRepository(): CompanyLeadRepository
     {
         return $this->em->getRepository(CompanyLead::class);
     }
@@ -260,7 +256,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen((string) $newValue) > 0 || $overwriteWithBlank)) {
+                    if ($curValue !== $newValue && ('' !== (string) $newValue || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -271,8 +267,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Add lead to company.
-     *
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
@@ -399,8 +393,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Remove a lead from company.
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void
@@ -535,7 +527,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $expr      = new ExpressionBuilder($this->em->getConnection());
-        $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+        $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
 
         // Exclude company if $exclude is provided
         if ('' !== $exclude) {
@@ -591,7 +583,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 }
 
                 $expr      = new ExpressionBuilder($this->em->getConnection());
-                $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+                $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
@@ -648,7 +640,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new CompanyEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -801,14 +793,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     *
-     * @return Company|null
-     *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
+    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -899,13 +886,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($company->isNew() && $entityField['defaultValue']) {
+            }
+            if ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }
         }
 
-        if ($fieldErrors) {
+        if ([] !== $fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
 
             throw new \Exception($fieldErrors);
@@ -933,15 +921,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * @param array $fields
-     * @param array $data
      */
-    protected function getFieldData($fields, $data): array
+    protected function getFieldData($fields, array $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];
         foreach ($fields as $importField => $entityField) {
             // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+            if (array_key_exists($importField, $data) && null !== $data[$importField] && '' != $data[$importField]) {
                 $fieldData[$entityField] = $data[$importField];
             }
         }
@@ -953,7 +940,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $primaryCompanyName = '';
         $companyLead        = null;
-        $newPrimaryCompany  = null;
 
         // Find another company to make primary if applicable
         $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -979,12 +965,65 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             ->setDateModified(new \DateTime());
         $this->em->getRepository(Lead::class)->saveEntity($lead);
 
-        if (null !== $newPrimaryCompany) {
-            $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);
-        }
-
         if (null !== $companyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
+        }
+    }
+
+    /**
+     * @param Company $entity
+     */
+    public function deleteEntity($entity): void
+    {
+        $this->dispatchEvent('pre_delete', $entity);
+        $entity->setDeleted(new \DateTime());
+        $this->getRepository()->saveEntity($entity);
+
+        $event = new CompanyEvent($entity);
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SOFT_DELETE);
+    }
+
+    /**
+     * @param array<int> $ids
+     *
+     * @return array<int,Company>
+     */
+    public function deleteEntities($ids): array
+    {
+        $entities = [];
+        foreach ($ids as $companyId) {
+            $company = $this->getEntity($companyId);
+            if ($company) {
+                $entities[$companyId] = $company;
+                $this->deleteEntity($company);
+            }
+        }
+
+        return $entities;
+    }
+
+    public function permanentDeleteCompany(Company $company): void
+    {
+        $company->deletedId = $company->getId();
+        $this->getRepository()->deleteEntity($company);
+        $this->dispatchEvent('post_delete', $company);
+    }
+
+    public function changePrimaryCompanyToLatest(int $companyId): void
+    {
+        while ($companyLeads = $this->getCompanyLeadRepository()->findBy(['company' => $companyId, 'primary' => 1], [], CompanyLeadRepository::BATCH_SIZE, 0)) {
+            foreach ($companyLeads as $companyLead) {
+                $this->removeLeadFromCompany($companyLead->getCompany(), $companyLead->getlead());
+            }
+        }
+    }
+
+    public function deleteCompanyPermanently(int $companyId): void
+    {
+        $company = $this->getRepository()->find($companyId);
+
+        if ($company) {
+            $this->permanentDeleteCompany($company);
         }
     }
 

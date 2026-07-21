@@ -267,14 +267,14 @@ class ContactSegmentService
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($leadsTableAlias.'.date_identified'));
     }
 
-    /***** DEBUG *****/
+    /* DEBUG */
 
     /**
      * Formatting helper.
      *
      * @return string
      */
-    private function formatPeriod($inputSeconds)
+    private function formatPeriod(float $inputSeconds)
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 

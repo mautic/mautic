@@ -22,8 +22,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxController extends CommonAjaxController
 {
     public function __construct(
-        private FieldCollectorInterface $fieldCollector,
-        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        private readonly FieldCollectorInterface $fieldCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -33,6 +33,7 @@ class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -46,7 +47,7 @@ class AjaxController extends CommonAjaxController
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $request->getSession();
-        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
+        $orderName   = ('fields' === $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->all()[$orderName]);
         $components  = $session->get($sessionName);
 
@@ -91,9 +92,8 @@ class AjaxController extends CommonAjaxController
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
-        $model      = $this->getModel('form');
-        $entity     = $model->getEntity($formId);
-        $formFields = empty($entity) ? [] : $entity->getFields();
+        $entity     = $this->formModel->getEntity($formId);
+        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {

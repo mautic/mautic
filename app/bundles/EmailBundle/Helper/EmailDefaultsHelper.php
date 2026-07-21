@@ -12,8 +12,8 @@ use Mautic\PageBundle\Entity\Page;
 class EmailDefaultsHelper
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EntityManagerInterface $entityManager,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -66,7 +66,7 @@ class EmailDefaultsHelper
         ];
 
         $filtered = array_filter($utmTags, static fn ($tag): bool => null !== $tag && '' !== $tag);
-        if ($filtered) {
+        if ([] !== $filtered) {
             $email->setUtmTags($filtered);
         }
     }

@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
+final class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
 {
     private LeadField $field;
+
     private ColumnSchemaHelper $schemaHelper;
 
     protected $useCleanupRollback = false;
@@ -32,7 +33,7 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $this->schemaHelper->updateColumnLength($this->field->getAlias(), $length);
 
         $column = $this->schemaHelper->getColumns()[$this->field->getAlias()];
-        \assert($column instanceof Column);
+        $this->assertInstanceOf(Column::class, $column);
 
         $this->assertEquals($length, $column->getLength(), 'Column length updated.');
     }
@@ -76,8 +77,9 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $field->setAlias('custom_field_test');
         $field->setCharLengthLimit(64);
 
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

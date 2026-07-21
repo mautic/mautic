@@ -44,8 +44,6 @@ class PublicController extends AbstractFormController
     /**
      * @param string $slug
      *
-     * @return Response
-     *
      * @throws \Exception
      * @throws FileNotFoundException
      */
@@ -60,7 +58,7 @@ class PublicController extends AbstractFormController
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
-        $slug)
+        $slug): RedirectResponse|Response
     {
         /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
@@ -84,7 +82,7 @@ class PublicController extends AbstractFormController
                 }
                 $model->hitPage($entity, $request, 401);
 
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $lead  = null;
@@ -192,7 +190,7 @@ class PublicController extends AbstractFormController
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
                             uasort(
                                 $variants,
-                                function ($a, $b): int {
+                                function (array $a, array $b): int {
                                     if ($a['weight_deficit'] === $b['weight_deficit']) {
                                         if ($a['hits'] === $b['hits']) {
                                             return 0;
@@ -312,11 +310,9 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return mixed[]|JsonResponse|RedirectResponse|Response
-     *
      * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
     {
         $page = $model->getEntity($id);
 
@@ -346,7 +342,7 @@ class PublicController extends AbstractFormController
             'page:pages:viewother',
             $page->getCreatedBy()
         ))) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
@@ -354,7 +350,7 @@ class PublicController extends AbstractFormController
             'lead:leads:viewother'
         ))) {
             // disallow displaying contact information
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (empty($content) && !empty($BCcontent)) {
@@ -401,16 +397,13 @@ class PublicController extends AbstractFormController
         return TrackingPixelHelper::getResponse($request);
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function trackingAction(
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
         ContactTracker $contactTracker,
         PageModel $model,
-    ) {
+    ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
             [
                 'success' => 0,
