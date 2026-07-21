@@ -52,13 +52,17 @@ class UserModel extends FormModel implements GlobalSearchInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly Environment $twig,
+        private readonly UserRepository $userRepository,
+        private readonly \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository,
+        private readonly \Mautic\UserBundle\Entity\RoleRepository $roleRepository,
+        private readonly \Mautic\UserBundle\Entity\UserInviteRepository $userInviteRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): UserRepository
     {
-        return $this->em->getRepository(User::class);
+        return $this->userRepository;
     }
 
     public function getPermissionBase(): string
@@ -138,7 +142,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         if ($entity) {
             // add user's permissions
             $entity->setActivePermissions(
-                $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
+                $this->permissionRepository->getPermissionsByRole($entity->getRole())
             );
         }
 
@@ -150,7 +154,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [
@@ -213,9 +217,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
         $results = [];
 
         return match ($type) {
-            'role'     => $this->em->getRepository(Role::class)->getRoleList($filter, $limit),
-            'user'     => $this->em->getRepository(User::class)->getUserList($filter, $limit),
-            'position' => $this->em->getRepository(User::class)->getPositionList($filter, $limit),
+            'role'     => $this->roleRepository->getRoleList($filter, $limit),
+            'user'     => $this->userRepository->getUserList($filter, $limit),
+            'position' => $this->userRepository->getPositionList($filter, $limit),
             default    => $results,
         };
     }
@@ -511,7 +515,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
     private function getUserInviteRepository(): UserInviteRepositoryInterface
     {
-        $repository = $this->em->getRepository(UserInvite::class);
+        $repository = $this->userInviteRepository;
         \assert($repository instanceof UserInviteRepositoryInterface);
 
         return $repository;

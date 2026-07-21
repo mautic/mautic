@@ -311,17 +311,16 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testEditSegmentWhileLock(): void
     {
-        $segmentA = $this->segmentA;
-        $segmentA->setCheckedOut(new \DateTime());
-        $segmentA->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentA);
+        $this->segmentA->setCheckedOut(new \DateTime());
+        $this->segmentA->setCheckedOutBy($this->userOne);
+        $this->em->persist($this->segmentA);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segmentA->getId());
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        // As $segmentA is locked, so it will redirect user to its view page.
-        $this->assertStringContainsString('/s/segments/view/'.$segmentA->getId(), $this->client->getRequest()->getRequestUri());
+        // As $this->segmentA is locked, so it will redirect user to its view page.
+        $this->assertStringContainsString('/s/segments/view/'.$this->segmentA->getId(), $this->client->getRequest()->getRequestUri());
     }
 
     public function testDeleteSegmentWithoutPermission(): void
