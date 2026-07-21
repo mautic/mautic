@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -64,23 +63,26 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
+        private readonly \Mautic\SmsBundle\Entity\StatRepository $statRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
     {
-        return $this->em->getRepository(Sms::class);
+        return $this->smsRepository;
     }
 
     public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getDoNotContactRepository(): DoNotContactRepository
     {
-        return $this->em->getRepository(DoNotContact::class);
+        return $this->doNotContactRepository;
     }
 
     public function getPermissionBase(): string

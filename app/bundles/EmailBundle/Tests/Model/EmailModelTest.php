@@ -277,6 +277,15 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
             $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -642,6 +651,15 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
             $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $contacts = [
@@ -760,7 +778,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
             $this->userHelper,
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(MessageQueueRepository::class), // $messageQueueRepository
+            $this->frequencyRepository // $frequencyRuleRepository
         );
 
         $emailModel = new EmailModel(
@@ -792,6 +812,15 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
             $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->emailRepository, // $emailRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->leadDeviceRepository, // $leadDeviceRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(TrackableRepository::class), // $trackableRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $this->emailEntity->method('getId')
@@ -854,10 +883,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
-        $this->entityManager->expects($this->exactly(0))
-            ->method('getRepository')
-            ->with(LeadDevice::class)
-            ->willReturn($this->leadDeviceRepository);
+        $this->leadDeviceRepository->expects($this->never())
+            ->method('find');
 
         $this->botRatioHelperMock->expects($this->once())
             ->method('isHitByBot')
@@ -911,11 +938,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(LeadDevice::class)
-            ->willReturn($this->leadDeviceRepository);
-
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
@@ -928,10 +950,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLookupResultsWithNameIsKey(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->emailRepository);
-
         $this->emailRepository->expects($this->once())
             ->method('getEmailList')
             ->with(
@@ -960,10 +978,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLookupResultsWithWithDefaultOptions(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->emailRepository);
-
         $this->emailRepository->expects($this->once())
             ->method('getEmailList')
             ->with(

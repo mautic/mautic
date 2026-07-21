@@ -12,10 +12,8 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
@@ -44,13 +42,16 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         Translator $translator,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StagesChangeLogRepository $stagesChangeLogRepository,
+        private readonly LeadStageLogRepository $leadStageLogRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
     {
-        return $this->em->getRepository(Stage::class);
+        return $this->stageRepository;
     }
 
     public function getPermissionBase(): string
@@ -190,12 +191,10 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
                 ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
-            /** @var StagesChangeLogRepository $changeLogRepo */
-            $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
+            $changeLogRepo = $this->stagesChangeLogRepository;
             $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
 
-            /** @var LeadStageLogRepository $leadStageLogRepo */
-            $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
+            $leadStageLogRepo = $this->leadStageLogRepository;
             $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
 
             $this->deleteEntity($secondaryStage);

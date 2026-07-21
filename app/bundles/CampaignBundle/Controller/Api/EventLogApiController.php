@@ -64,6 +64,7 @@ class EventLogApiController extends FetchCommonApiController
         EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
+        private EventModel $eventModel,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -155,11 +156,8 @@ class EventLogApiController extends FetchCommonApiController
         if ($contact instanceof Response) {
             return $contact;
         }
-
-        /** @var EventModel $eventModel */
-        $eventModel = $this->getModel('campaign.event');
         /** @var Event $event */
-        $event = $eventModel->getEntity($eventId);
+        $event = $this->eventModel->getEntity($eventId);
         if (null === $event || !$event->getId()) {
             return $this->notFound();
         }
@@ -202,7 +200,7 @@ class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
-        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
+        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
         $this->inBatchMode = true;
