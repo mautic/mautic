@@ -45,10 +45,6 @@ final class CampaignModelTransactionalTest extends TestCase
         $entityManagerMock->method('getConnection')
             ->willReturn($this->createStub(Connection::class));
 
-        //        $entityManagerMock->method('getRepository')
-        //            ->with(Campaign::class)
-        //            ->willReturn($this->campaignRepositoryMock);
-
         $userHelperMock = $this->createMock(UserHelper::class);
 
         $this->campaignModel = $this->getMockBuilder(CampaignModel::class)
