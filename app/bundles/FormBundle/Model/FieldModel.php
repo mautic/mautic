@@ -40,6 +40,7 @@ class FieldModel extends CommonFormModel
         CoreParametersHelper $coreParametersHelper,
         private readonly RequestStack $requestStack,
         private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -67,7 +68,7 @@ class FieldModel extends CommonFormModel
 
     public function getRepository(): \Mautic\FormBundle\Entity\FieldRepository
     {
-        return $this->em->getRepository(Field::class);
+        return $this->fieldRepository;
     }
 
     public function getPermissionBase(): string

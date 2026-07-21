@@ -64,7 +64,8 @@ final class RedirectModelTest extends PageTestAbstract
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $shortener
+            $shortener,
+            $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class), // $redirectRepository
         );
 
         $redirect = new Redirect();

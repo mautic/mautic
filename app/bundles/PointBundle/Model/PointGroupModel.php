@@ -23,9 +23,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private GroupRepository $groupRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePointGroupModel(GroupRepository $groupRepository): void
+    {
+        $this->groupRepository = $groupRepository;
+    }
+
     public function getRepository(): GroupRepository
     {
-        return $this->em->getRepository(Group::class);
+        return $this->groupRepository;
     }
 
     public function getPermissionBase(): string

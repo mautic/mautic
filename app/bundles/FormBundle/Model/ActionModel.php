@@ -12,9 +12,17 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ActionModel extends CommonFormModel
 {
+    private \Mautic\FormBundle\Entity\ActionRepository $actionRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireActionModel(\Mautic\FormBundle\Entity\ActionRepository $actionRepository): void
+    {
+        $this->actionRepository = $actionRepository;
+    }
+
     public function getRepository(): \Mautic\FormBundle\Entity\ActionRepository
     {
-        return $this->em->getRepository(Action::class);
+        return $this->actionRepository;
     }
 
     public function getPermissionBase(): string

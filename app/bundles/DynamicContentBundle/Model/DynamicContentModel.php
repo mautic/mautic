@@ -32,6 +32,17 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
+    private \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository;
+
+    private DynamicContentRepository $dynamicContentRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository): void
+    {
+        $this->dynamicContentRepository = $dynamicContentRepository;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * Retrieve the permissions base.
      */
@@ -42,8 +53,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     public function getRepository(): DynamicContentRepository
     {
-        /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository(DynamicContent::class);
+        $repo = $this->dynamicContentRepository;
 
         $repo->setTranslator($this->translator);
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -53,7 +63,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**

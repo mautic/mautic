@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
@@ -42,6 +43,7 @@ final class TrackableModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
+                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
@@ -93,6 +95,7 @@ final class TrackableModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
+                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
@@ -631,6 +634,7 @@ TEXT;
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
+                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
