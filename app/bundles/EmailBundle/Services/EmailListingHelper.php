@@ -99,9 +99,10 @@ final readonly class EmailListingHelper
             return $ignoreListJoin;
         }
 
-        $listIds   = [];
-        $catIds    = [];
-        $templates = [];
+        $listAliases = [];
+        $catIds      = [];
+        $templates   = [];
+        $searchTerms = [];
 
         foreach ($currentFilters as $type => $typeFilters) {
             $groupKey = $this->getListFilterGroupKey($type);
@@ -112,20 +113,27 @@ final readonly class EmailListingHelper
             foreach ($typeFilters as $currentFilter) {
                 switch ($type) {
                     case 'list':
-                        $listIds[] = (int) $currentFilter;
+                        $listAlias     = $this->getListAlias($currentFilter);
+                        $listAliases[] = $listAlias;
+                        $searchTerms[] = 'list:'.$currentFilter;
+                        $searchTerms[] = 'list:'.$listAlias;
                         break;
                     case 'category':
                         $catIds[] = (int) $currentFilter;
+                        $searchTerms[] = 'category:'.$currentFilter;
                         break;
                     case 'theme':
                         $templates[] = $currentFilter;
+                        $searchTerms[] = 'theme:'.$currentFilter;
                         break;
                 }
             }
         }
 
-        if (!empty($listIds)) {
-            $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
+        $filter['string'] = $this->stripQuickFilterTokensFromSearch($filter['string'], $searchTerms);
+
+        if (!empty($listAliases)) {
+            $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             $ignoreListJoin    = false;
         }
 
@@ -161,5 +169,29 @@ final readonly class EmailListingHelper
             'theme'    => 'mautic.core.filter.themes',
             default    => null,
         };
+    }
+
+    private function getListAlias(string $listFilter): string
+    {
+        $listAliasLookup = array_column($this->leadListModel->getUserLists(), 'alias', 'id');
+
+        return $listAliasLookup[(int) $listFilter] ?? $listFilter;
+    }
+
+    /**
+     * @param list<string> $quickFilterTokens
+     */
+    private function stripQuickFilterTokensFromSearch(string $search, array $quickFilterTokens): string
+    {
+        if (empty($quickFilterTokens)) {
+            return $search;
+        }
+
+        $searchTerms = preg_split('/\s+/', trim($search));
+        if (false === $searchTerms) {
+            return $search;
+        }
+
+        return implode(' ', array_diff($searchTerms, $quickFilterTokens));
     }
 }
