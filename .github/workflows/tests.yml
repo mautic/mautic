@@ -69,7 +69,7 @@ jobs:
         env:
           SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
           SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
-          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/ # NOSONAR
         ports:
           - 8086:8080
 
