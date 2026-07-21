@@ -4846,12 +4846,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FormController.php
 
 		-
-			message: '#^Controller must not fetch the "form\.submission" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
 			message: '#^Property Mautic\\FormBundle\\Entity\\Action\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -9631,12 +9625,6 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
-			message: '#^Controller must not fetch the "point\.trigger" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 2
-			path: app/bundles/PointBundle/Controller/TriggerController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -13484,18 +13472,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
-
-		-
-			message: '#^Controller must not fetch the "lead\.tag" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Controller must not fetch the "tagmanager\.tag" model by string\. Inject the model as a typed property instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noGetModelWithStringInController
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countByLeads\(\) has parameter \$tagIds with no type specified\.$#'
