@@ -11,6 +11,13 @@
     var dwcFallback = document.getElementById('dwc-fallback');
     if (fixtureParams.get('dwc') === '1') {
         dwcFallback.hidden = false;
+        if (fixtureParams.get('form') === '1') {
+            dwcFallback.innerHTML = '<div id="mauticform_wrapper_acceptance" class="mauticform_wrapper">'
+                +'<form id="mauticform_acceptance" data-mautic-form="acceptance" action="#" method="post">'
+                +'<input name="mauticform[email]" type="email">'
+                +'<input name="mauticform[formId]" type="hidden" value="acceptance">'
+                +'</form></div>';
+        }
     } else {
         dwcFallback.remove();
     }

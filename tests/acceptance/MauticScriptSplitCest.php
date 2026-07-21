@@ -217,6 +217,41 @@ JS);
         $I->assertSame([], $state['trackingRequests']);
     }
 
+    public function essentialScriptInitializesDwcFallbackFormWithoutTrackingIdentifiers(\AcceptanceTester $I): void
+    {
+        $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $this->loadScripts($I, [$scriptUrl], ['dwc' => '1', 'form' => '1']);
+        $I->waitForJS("return typeof MauticSDK !== 'undefined' && document.getElementById('mauticiframe_acceptance') !== null", 10);
+
+        $formState = $I->executeJS(<<<'JS'
+var form = document.getElementById('mauticform_acceptance');
+form.querySelector('[name="mauticform[email]"]').value = 'visitor@example.test';
+
+return {
+    fields: Array.from(new FormData(form).entries()),
+    hasSubmitHandler: typeof form.onsubmit === 'function',
+    messengerCount: form.querySelectorAll('[name="mauticform[messenger]"]').length,
+    target: form.target
+};
+JS);
+        $state = $this->grabBrowserState($I);
+
+        $I->assertTrue($state['runtimeReady']);
+        $I->assertFalse($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertTrue($formState['hasSubmitHandler']);
+        $I->assertSame(1, $formState['messengerCount']);
+        $I->assertSame('mauticiframe_acceptance', $formState['target']);
+        $I->assertSame([
+            ['mauticform[email]', 'visitor@example.test'],
+            ['mauticform[formId]', 'acceptance'],
+            ['mauticform[messenger]', '1'],
+        ], $formState['fields']);
+        $I->assertSame([], $state['trackingRequests']);
+        $I->assertSame([], $this->filterTrackingIdentifierAccess($state['storageAccess']));
+        $I->assertSame([], $state['cookieAccess']);
+    }
+
     private function loadScript(\AcceptanceTester $I, string $endpoint): string
     {
         $scriptUrl = $this->getMauticUrl($I).$endpoint;
