@@ -1,4 +1,4 @@
-<?php #!/usr/bin/env php
+#!/usr/bin/env php
 <?php
 
 if (empty(ini_get('date.timezone'))) {

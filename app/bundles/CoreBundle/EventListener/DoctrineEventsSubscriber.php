@@ -5,11 +5,11 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Id\SequenceGenerator;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Doctrine\ORM\Id\SequenceGenerator;
 
 #[AsDoctrineListener(Events::loadClassMetadata)]
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]

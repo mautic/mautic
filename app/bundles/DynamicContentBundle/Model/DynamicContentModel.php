@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,7 +22,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\DynamicContentBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -33,7 +33,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
-    private \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository;
+    private StatRepository $statRepository;
 
     private DynamicContentRepository $dynamicContentRepository;
 

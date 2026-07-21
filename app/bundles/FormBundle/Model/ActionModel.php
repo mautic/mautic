@@ -4,9 +4,9 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Mautic\FormBundle\Entity\ActionRepository;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class ActionModel extends CommonFormModel
 {
-    private \Mautic\FormBundle\Entity\ActionRepository $actionRepository;
+    private ActionRepository $actionRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireActionModel(ActionRepository $actionRepository): void

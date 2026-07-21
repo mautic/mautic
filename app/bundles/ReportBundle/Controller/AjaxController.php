@@ -4,8 +4,8 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {

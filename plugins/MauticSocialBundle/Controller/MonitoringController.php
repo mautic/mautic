@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
@@ -21,7 +22,7 @@ class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
 
@@ -30,7 +31,7 @@ class MonitoringController extends FormController
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         PostCountModel $postCountModel,
     ): void {
         $this->monitoringModel = $monitoringModel;

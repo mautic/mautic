@@ -7,12 +7,12 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use PHPUnit\Framework\Exception;
 
 final class FinalizeUpdateStepTest extends AbstractStepTestCase
 {

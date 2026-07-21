@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Validator\Constraints\Upload;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -27,7 +28,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Mautic\CategoryBundle\Entity\Category;
 
 #[ApiResource(
     operations: [
@@ -177,7 +177,7 @@ class Asset extends FormEntity implements UuidInterface
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $category;
@@ -630,7 +630,7 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Mautic\CategoryBundle\Entity\Category|null
+     * @return Category|null
      */
     public function getCategory()
     {

@@ -4,27 +4,27 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\UserBundle\Entity\PermissionRepository;
-use Mautic\UserBundle\Entity\UserRepository;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Role>
  */
 class RoleModel extends FormModel implements GlobalSearchInterface
 {
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
-    private \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository;
+    private PermissionRepository $permissionRepository;
 
     private RoleRepository $roleRepository;
 

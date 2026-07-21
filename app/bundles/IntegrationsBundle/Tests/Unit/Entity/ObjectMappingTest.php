@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 final class ObjectMappingTest extends TestCase
 {

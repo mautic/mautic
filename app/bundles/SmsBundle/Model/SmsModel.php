@@ -21,7 +21,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
@@ -40,8 +42,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\SmsBundle\Entity\SmsRepository;
-use Mautic\SmsBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<Sms>

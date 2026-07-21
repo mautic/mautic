@@ -2,17 +2,17 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\ChannelBundle\Model\MessageQueueModel;
 
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    private \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
+    private MessageQueueModel $messageQueueModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireChannelAjaxController(MessageQueueModel $messageQueueModel): void

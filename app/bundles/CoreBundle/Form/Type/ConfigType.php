@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -30,7 +31,6 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 
 /**
  * @extends AbstractType<mixed>

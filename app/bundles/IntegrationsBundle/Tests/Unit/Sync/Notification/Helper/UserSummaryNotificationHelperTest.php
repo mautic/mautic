@@ -10,10 +10,10 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use PHPUnit\Framework\Exception;
 
 final class UserSummaryNotificationHelperTest extends TestCase
 {

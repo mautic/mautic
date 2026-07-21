@@ -9,6 +9,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Extension\EscaperExtension;
 
 final class PublicControllerTest extends MauticMysqlTestCase
 {
@@ -57,8 +58,8 @@ final class PublicControllerTest extends MauticMysqlTestCase
 
         $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $twig = $this->getContainer()->get('twig');
-        if (!$twig->hasExtension(\Twig\Extension\EscaperExtension::class)) {
-            $twig->addExtension(new \Twig\Extension\EscaperExtension());
+        if (!$twig->hasExtension(EscaperExtension::class)) {
+            $twig->addExtension(new EscaperExtension());
         }
         $url = $twig->getRuntime(\Twig\Runtime\EscaperRuntime::class)->escape($url, 'js');
         $this->assertStringContainsString($url, (string) $content);

@@ -19,6 +19,8 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
@@ -26,12 +28,10 @@ use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\PointBundle\Entity\TriggerEventRepository;
-use Mautic\PointBundle\Entity\TriggerRepository;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Trigger>

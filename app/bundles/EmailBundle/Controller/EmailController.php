@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -26,13 +27,12 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Model\ListModel;
 
 class EmailController extends FormController
 {
@@ -42,9 +42,9 @@ class EmailController extends FormController
 
     private EmailModel $emailModel;
 
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
+    private ListModel $listModel;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireEmailController(

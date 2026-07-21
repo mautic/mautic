@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +40,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
-use Doctrine\DBAL\Exception;
 
 /**
  * @extends FormModel<LeadField>
@@ -606,7 +606,7 @@ class FieldModel extends FormModel
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -647,7 +647,7 @@ class FieldModel extends FormModel
      * @param bool  $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -663,7 +663,7 @@ class FieldModel extends FormModel
      * @param LeadField $entity
      *
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws DeleteEntityDependencyException

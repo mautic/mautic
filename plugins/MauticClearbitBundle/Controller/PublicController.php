@@ -2,9 +2,11 @@
 
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
@@ -15,9 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
     private UserModel $userModel;
 
@@ -25,10 +27,10 @@ class PublicController extends FormController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowirePublicController(
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        NotificationModel $notificationModel,
         UserModel $userModel,
         LeadModel $leadModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        CompanyModel $companyModel,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;

@@ -12,8 +12,8 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use PHPUnit\Framework\Exception;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {

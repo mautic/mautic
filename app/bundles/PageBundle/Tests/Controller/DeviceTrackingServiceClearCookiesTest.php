@@ -6,8 +6,8 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Request;
 
 final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
 {

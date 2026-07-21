@@ -13,9 +13,9 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -227,7 +227,7 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&MockObject
      */
     private function getReportGeneratorEventMock(): MockObject
     {
@@ -242,7 +242,7 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&MockObject
      */
     private function getQueryBuilderMock(): MockObject
     {

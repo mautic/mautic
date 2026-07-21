@@ -28,9 +28,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use PHPUnit\Framework\MockObject\MockObject;
 
 final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -239,9 +239,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return Event&\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getEvent(): MockObject
     {
         $event = $this->getMockBuilder(Event::class)

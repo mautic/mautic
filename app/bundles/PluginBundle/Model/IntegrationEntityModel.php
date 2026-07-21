@@ -4,15 +4,15 @@ namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Integration\IntegrationObject;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Integration\IntegrationObject;
 
 /**
  * @extends FormModel<IntegrationEntity>
  */
 class IntegrationEntityModel extends FormModel
 {
-    private \Mautic\PluginBundle\Entity\IntegrationEntityRepository $integrationEntityRepository;
+    private IntegrationEntityRepository $integrationEntityRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireIntegrationEntityModel(IntegrationEntityRepository $integrationEntityRepository): void

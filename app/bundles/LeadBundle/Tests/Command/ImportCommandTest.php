@@ -8,18 +8,18 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use Monolog\Logger;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Exception\ImportFailedException;
-use PHPUnit\Framework\Exception;
 
 final class ImportCommandTest extends TestCase
 {

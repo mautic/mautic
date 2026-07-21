@@ -3,11 +3,11 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 
 /**
  * Used to manipulate the schema of an existing table.
@@ -15,9 +15,9 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 class ColumnSchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    protected AbstractSchemaManager $sm;
 
     /**
      * @var string
@@ -68,7 +68,7 @@ class ColumnSchemaHelper
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -21,7 +22,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use PHPUnit\Framework\Exception;
 
 final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {

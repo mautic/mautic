@@ -4,14 +4,14 @@ namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
-use Mautic\CampaignBundle\Entity\EventRepository;
 
 /**
  * @extends FormModel<Event>
@@ -20,9 +20,9 @@ class EventModel extends FormModel
 {
     private LeadEventLogRepository $leadEventLogRepository;
 
-    private \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository;
+    private CampaignRepository $campaignRepository;
 
-    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
+    private EventRepository $eventRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireEventModel(

@@ -2,15 +2,15 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Component\HttpFoundation\Request;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
+    private CategoryModel $categoryModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireCategoryAjaxController(CategoryModel $categoryModel): void

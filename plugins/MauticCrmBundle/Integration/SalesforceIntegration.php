@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Mautic\CoreBundle\Entity\Notification;
@@ -3078,7 +3079,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    public function getEntityManager(): \Doctrine\ORM\EntityManager
+    public function getEntityManager(): EntityManager
     {
         return $this->em;
     }

@@ -3,9 +3,12 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\TagEvent;
@@ -13,31 +16,28 @@ use Mautic\LeadBundle\Event\TagMergeEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\FormBundle\Entity\ActionRepository;
-use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\PointBundle\Entity\TriggerEventRepository;
-use Mautic\ReportBundle\Entity\ReportRepository;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Tag>
  */
 class TagModel extends FormModel
 {
-    private \Mautic\ReportBundle\Entity\ReportRepository $reportRepository;
+    private ReportRepository $reportRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+    private LeadListRepository $leadListRepository;
 
-    private \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository;
+    private TriggerEventRepository $triggerEventRepository;
 
-    private \Mautic\FormBundle\Entity\ActionRepository $actionRepository;
+    private ActionRepository $actionRepository;
 
-    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
+    private EventRepository $eventRepository;
 
     private TagRepository $tagRepository;
 

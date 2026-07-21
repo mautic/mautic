@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
@@ -24,7 +25,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Mautic\CoreBundle\Model\AuditLogModel;
 
 class UserController extends FormController
 {
@@ -32,7 +32,7 @@ class UserController extends FormController
 
     private UserModel $userModel;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireUserController(

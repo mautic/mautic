@@ -7,16 +7,16 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\CoreBundle\Model\AuditLogModel;
 
 class AssetController extends FormController
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireAssetController(AuditLogModel $auditLogModel): void

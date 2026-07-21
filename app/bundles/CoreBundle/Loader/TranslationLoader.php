@@ -5,10 +5,10 @@ namespace Mautic\CoreBundle\Loader;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Finder\SplFileInfo;
 
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {

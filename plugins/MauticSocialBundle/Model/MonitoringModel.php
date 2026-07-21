@@ -4,12 +4,14 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -18,10 +20,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MonitoringModel extends FormModel
 {
-    private \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository;
+    private MonitoringRepository $monitoringRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireMonitoringModel(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository): void
+    public function autowireMonitoringModel(MonitoringRepository $monitoringRepository): void
     {
         $this->monitoringRepository = $monitoringRepository;
     }
@@ -45,7 +47,7 @@ class MonitoringModel extends FormModel
      * @param string|null $action
      * @param mixed[]     $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
@@ -126,7 +128,7 @@ class MonitoringModel extends FormModel
         parent::saveEntity($monitoringEntity, $unlock);
     }
 
-    public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
+    public function getRepository(): MonitoringRepository
     {
         return $this->monitoringRepository;
     }

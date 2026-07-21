@@ -3,10 +3,10 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Exception\SchemaException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
  * Used to manipulate creation/removal of tables.
@@ -14,9 +14,9 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 class TableSchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    protected AbstractSchemaManager $sm;
 
     /**
      * @var Schema
@@ -45,7 +45,7 @@ class TableSchemaHelper
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {

@@ -8,8 +8,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use PHPUnit\Framework\Exception;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {

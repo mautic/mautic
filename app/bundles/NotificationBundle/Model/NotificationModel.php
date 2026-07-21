@@ -16,7 +16,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Entity\Stat;
+use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
@@ -29,8 +31,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\NotificationBundle\Entity\NotificationRepository;
-use Mautic\NotificationBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<Notification>

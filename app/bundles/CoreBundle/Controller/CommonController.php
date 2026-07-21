@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -30,8 +32,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Service\Attribute\Required;
-use Mautic\CoreBundle\Model\MauticModelInterface;
-use Mautic\CoreBundle\Model\NotificationModel;
 
 class CommonController extends AbstractController implements MauticController
 {
@@ -41,7 +41,7 @@ class CommonController extends AbstractController implements MauticController
 
     private PageModel $pageModel;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
     #[Required]
     public function autowireCommonController(

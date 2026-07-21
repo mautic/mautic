@@ -5,14 +5,14 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PointBundle\Form\Type\PointActionType;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\PointBundle\Model\PointModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    private \Mautic\PointBundle\Model\PointModel $pointModel;
+    private PointModel $pointModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowirePointAjaxController(PointModel $pointModel): void

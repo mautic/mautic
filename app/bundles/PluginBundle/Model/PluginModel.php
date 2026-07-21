@@ -15,12 +15,12 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use Mautic\PluginBundle\Entity\PluginRepository;
 
 /**
  * @extends FormModel<Plugin>

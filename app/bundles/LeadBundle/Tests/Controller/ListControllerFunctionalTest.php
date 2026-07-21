@@ -7,10 +7,12 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -20,8 +22,6 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\ListLead;
 
 final class ListControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -911,7 +911,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $dnc = new DoNotContact();
         $dnc->setChannel('email');
         $dnc->setLead($contact2);
-        $dnc->setReason(\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED);
+        $dnc->setReason(DoNotContact::UNSUBSCRIBED);
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();

@@ -79,16 +79,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
-            // a getRepository() override
-            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
-            // list lead vs lead list diff
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
-        ],
-
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
 
         // modified with reflection
@@ -100,7 +90,6 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -115,8 +104,6 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',

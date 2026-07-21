@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DefaultController extends CommonController
 {
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
+    private PageModel $pageModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireDefaultController(
@@ -27,7 +27,7 @@ class DefaultController extends CommonController
         $this->pageModel = $pageModel;
     }
 
-    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $root = $this->coreParametersHelper->get('webroot');
 

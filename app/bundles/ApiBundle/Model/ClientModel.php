@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -17,12 +18,11 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
-use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Client>

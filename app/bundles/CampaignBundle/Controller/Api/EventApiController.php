@@ -7,6 +7,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldExclusionStrategy;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -18,7 +19,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use Mautic\CampaignBundle\Model\EventModel;
 
 /**
  * @extends CommonApiController<Event>

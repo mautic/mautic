@@ -3,15 +3,15 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @extends AbstractCommonModel<AuditLog>
  */
 class AuditLogModel extends AbstractCommonModel
 {
-    private \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository;
+    private AuditLogRepository $auditLogRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireAuditLogModel(AuditLogRepository $auditLogRepository): void

@@ -19,11 +19,11 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Message>
@@ -95,7 +95,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      * @param object  $entity
      * @param mixed[] $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
