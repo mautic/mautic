@@ -236,6 +236,29 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         unlink($zipPath);
     }
 
+    public function testBatchDownloadRejectsRemoteAssets(): void
+    {
+        $remoteAsset = $this->createAsset([
+            'title'   => 'Remote asset',
+            'storage' => 'remote',
+            'path'    => 'http://127.0.0.1/internal-resource',
+        ]);
+
+        $ids = json_encode([$remoteAsset->getId()], JSON_THROW_ON_ERROR);
+
+        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => $ids]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $translator = static::getContainer()->get('translator');
+
+        $this->assertSame(
+            $translator->trans('mautic.asset.asset.batch_download.error.remote_unsupported', [], 'flashes'),
+            $content['message']
+        );
+    }
+
     /**
      * Preview action should return the file content.
      */

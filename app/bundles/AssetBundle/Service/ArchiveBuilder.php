@@ -63,19 +63,10 @@ final class ArchiveBuilder
             $filename = $this->generateFilename($asset, $usedNames);
 
             if ($asset->isRemote()) {
-                $this->addRemoteAsset($zipArchive, $asset, $filename);
-            } else {
-                $this->addLocalAsset($zipArchive, $asset, $filename);
+                throw new BatchDownloadException('mautic.asset.asset.batch_download.error.remote_unsupported');
             }
-        }
-    }
 
-    private function addRemoteAsset(\ZipArchive $zipArchive, Asset $asset, string $filename): void
-    {
-        $content = @file_get_contents($asset->getFilePath());
-
-        if (false === $content || false === $zipArchive->addFromString($filename, $content)) {
-            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
+            $this->addLocalAsset($zipArchive, $asset, $filename);
         }
     }
 
