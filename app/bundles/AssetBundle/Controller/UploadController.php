@@ -17,7 +17,7 @@ class UploadController extends DropzoneController
         $request  = $this->getRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
-        $this->setTranslator($this->container->get('translator'));
+        $this->autowireUploadController($this->container->get('translator'));
 
         if (!empty($files)) {
             foreach ($files as $file) {
@@ -40,8 +40,9 @@ class UploadController extends DropzoneController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setTranslator(TranslatorInterface $translator): void
-    {
+    public function autowireUploadController(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 }

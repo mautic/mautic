@@ -30,23 +30,27 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    protected LeadModel $leadModel;
-
     /**
      * @var PointModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $leadModel = $modelFactory->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-
-        $pointModel = $modelFactory->getModel('point');
-        \assert($pointModel instanceof PointModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        protected LeadModel $leadModel,
+        PointModel $pointModel,
+    ) {
         $this->model            = $pointModel;
-        $this->leadModel        = $leadModel;
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
@@ -58,7 +62,7 @@ class PointApiController extends CommonApiController
     /**
      * Return array of available point action types.
      */
-    public function getPointActionTypesAction()
+    public function getPointActionTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
             return $this->accessDenied();

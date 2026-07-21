@@ -30,11 +30,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $sessionMock;
 
     /**
-     * @var MockObject&ModelFactory
-     */
-    private MockObject $modelFactoryMock;
-
-    /**
      * @var MockObject&EmailModel
      */
     private MockObject $modelMock;
@@ -54,12 +49,11 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $containerMock          = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $requestStack           = new RequestStack();
 
         $this->controller = new AjaxController(
             $this->createStub(ManagerRegistry::class),
-            $this->modelFactoryMock,
+            $this->createStub(ModelFactory::class),
             $this->createStub(UserHelper::class),
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -70,6 +64,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->controller->setContainer($containerMock);
+        $this->controller->autowireEmailAjaxController($this->modelMock);
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);
         $parameterBag->expects($this->once())
@@ -89,11 +84,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenNoIdProvided(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $response = $this->controller->sendBatchAction(new Request([], []));
 
         $this->assertSame('{"success":0}', $response->getContent());
@@ -101,11 +91,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenIdProvidedButEmailNotPublished(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
@@ -149,11 +134,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenIdProvidedAndEmailIsPublished(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)

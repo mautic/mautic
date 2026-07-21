@@ -110,6 +110,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private StatRepository $statRepository,
         private BotRatioHelper $botRatioHelper,
         private ValidatorInterface $validator,
+        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
+        private readonly \Mautic\PageBundle\Entity\HitRepository $hitRepository,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private readonly \Mautic\LeadBundle\Entity\UtmTagRepository $utmTagRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -123,7 +127,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
     {
-        $repo = $this->em->getRepository(Page::class);
+        $repo = $this->pageRepository;
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -131,7 +135,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
     {
-        return $this->em->getRepository(Hit::class);
+        return $this->hitRepository;
     }
 
     public function getPermissionBase(): string
@@ -535,7 +539,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
+                $emailRepo = $this->emailRepository;
                 if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
@@ -721,10 +725,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param Redirect|Page|null $page
-     */
-    public function getHitQuery(Request $request, $page = null): array
+    public function getHitQuery(Request $request, Redirect|Page|null $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -1080,7 +1081,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository(UtmTag::class);
+            $repo = $this->utmTagRepository;
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
@@ -1112,7 +1113,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return mixed|string
      */
-    private function getPageUrl(Request $request, $page)
+    private function getPageUrl(Request $request, Redirect|Page|null $page)
     {
         // Default to page_url set in the query from tracking pixel and/or contactfield token
         if ($pageURL = $request->get('page_url')) {

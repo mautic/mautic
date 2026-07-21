@@ -136,10 +136,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected function resetAutoincrement(array $tables): void
     {
         $prefix     = $this->getTablePrefix();
-        $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $this->connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 

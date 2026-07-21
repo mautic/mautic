@@ -86,7 +86,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->contactRepository = $this->em->getRepository(Lead::class);
+        $this->contactRepository = self::getContainer()->get(LeadRepository::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -259,7 +259,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($contacts as $contact) {
             $args['lead'] = $this->contactRepository->getEntity($contact->getId());
 
-            $event      = new CampaignExecutionEvent($args, true); // @phpstan-ignore new.deprecated
+            $event      = new CampaignExecutionEvent($args, true);
             $dispatcher = static::getContainer()->get('event_dispatcher');
             $result     = $dispatcher->dispatch(
                 $event,
@@ -1056,7 +1056,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        $event           = new CampaignExecutionEvent($args, false, $log); // @phpstan-ignore new.deprecated
+        $event           = new CampaignExecutionEvent($args, false, $log);
         $eventDispatcher = static::getContainer()->get('event_dispatcher');
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 

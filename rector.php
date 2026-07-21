@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerActionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -65,6 +66,17 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
+        // skip as might be overriden by 3rd party controllers
+        ResponseReturnTypeControllerActionRector::class => [
+            __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
+            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
+        ],
+        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,

@@ -293,8 +293,6 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
-     * Delete an entity.
-     *
      * @param object $entity
      */
     public function deleteEntity($entity): void

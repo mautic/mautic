@@ -18,6 +18,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MonitoringModel extends FormModel
 {
+    private \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireMonitoringModel(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository): void
+    {
+        $this->monitoringRepository = $monitoringRepository;
+    }
+
     /**
      * @var array<string, mixed>
      */
@@ -120,7 +128,7 @@ class MonitoringModel extends FormModel
 
     public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
     {
-        return $this->em->getRepository(Monitoring::class);
+        return $this->monitoringRepository;
     }
 
     public function getPermissionBase(): string

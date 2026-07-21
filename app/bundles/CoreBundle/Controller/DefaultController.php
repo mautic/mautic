@@ -11,25 +11,33 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultController extends CommonController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction(Request $request)
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireDefaultController(
+        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        \Mautic\PageBundle\Model\PageModel $pageModel,
+    ): void {
+        $this->notificationModel = $notificationModel;
+        $this->pageModel = $pageModel;
+    }
+
+    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
             return $this->redirectToRoute('mautic_dashboard_index');
         }
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-        $page      = $pageModel->getEntity($root);
+        $page      = $this->pageModel->getEntity($root);
 
-        if (empty($page)) {
+        if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
             return $this->notFound();
         }
 
-        $slug = $pageModel->generateSlug($page);
+        $slug = $this->pageModel->generateSlug($page);
 
         $request->attributes->set('ignore_mismatch', true);
 
@@ -59,10 +67,7 @@ class DefaultController extends CommonController
 
     public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
     {
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent(null, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent(null, false, 200);
 
         return $this->delegateView(
             [
