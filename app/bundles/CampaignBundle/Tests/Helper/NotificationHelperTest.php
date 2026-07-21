@@ -221,7 +221,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')
-            ->with(array_map('trim', explode(',', $emails)), 'test', 'test');
+            ->with(array_map(trim(...), explode(',', $emails)), 'test', 'test');
 
         $this->userModel->expects($this->never())
             ->method('emailUser');
@@ -238,7 +238,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getOwner')
             ->willReturn(null);
 
@@ -251,7 +251,6 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($user);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
     }

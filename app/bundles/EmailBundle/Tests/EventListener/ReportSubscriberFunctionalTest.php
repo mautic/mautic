@@ -44,6 +44,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertResponseIsSuccessful();
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
+        $this->assertInstanceOf(Crawler::class, $crawlerTable);
 
         // convert html table to php array
         $table = array_slice($this->domTableToArray($crawlerTable), 1);
@@ -105,6 +106,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
         // convert html table to php array
         $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 3);
+        $this->assertInstanceOf(Crawler::class, $crawlerGraphTable);
         $graphTableArray    = array_slice($this->domTableToArray($crawlerGraphTable), 1);
 
         $this->assertSame([

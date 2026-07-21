@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -104,7 +103,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
-        // @phpstan-ignore new.deprecated
         $event   = new CampaignExecutionEvent(
             [
                 'lead'            => $contact,
@@ -121,8 +119,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
-        Assert::assertSame('form', $event->getChannel());
-        Assert::assertSame($result, $event->getResult());
+        $this->assertSame('form', $event->getChannel());
+        $this->assertSame($result, $event->getResult());
     }
 
     public static function valueProvider(): \Generator

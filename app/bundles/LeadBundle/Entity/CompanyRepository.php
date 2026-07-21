@@ -20,15 +20,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     use CustomFieldRepositoryTrait;
     use ProjectRepositoryTrait;
 
-    /**
-     * @var array
-     */
-    private $availableSearchFields = [];
+    private array $availableSearchFields = [];
 
-    /**
-     * @var EventDispatcherInterface|null
-     */
-    private $dispatcher;
+    private ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * Used by search functions to search using aliases as commands.
@@ -355,7 +349,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     public function getCompaniesForContacts(array $contacts): array
     {
-        if (!$contacts) {
+        if ([] === $contacts) {
             return [];
         }
 

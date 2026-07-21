@@ -627,7 +627,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -678,7 +678,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function setId(int $id): Email
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -833,7 +833,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->sendToDnc;
     }
 
-    public function setSendToDnc(bool $sendToDnc): Email
+    public function setSendToDnc(bool $sendToDnc): self
     {
         $this->isChanged('sendToDnc', $sendToDnc);
         $this->sendToDnc = $sendToDnc;
@@ -903,7 +903,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->preheaderText;
     }
 
-    public function setPreheaderText(?string $preheaderText): Email
+    public function setPreheaderText(?string $preheaderText): self
     {
         $this->isChanged('preheaderText', $preheaderText);
         $this->preheaderText = $preheaderText;
@@ -1392,7 +1392,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function initListChanges(string $property): void
     {
         if (!isset($this->changes[$property])) {
-            $list                     = $this->$property;
+            $list                     = $this->{$property};
             $current                  = $this->getListKeys($list);
             $this->changes[$property] = [$current, $current];
         }
@@ -1496,7 +1496,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param array<mixed> $settings
      */
-    public function setSettings(array $settings): Email
+    public function setSettings(array $settings): self
     {
         $this->isChanged('settings', $settings);
         $this->settings = $settings;

@@ -136,7 +136,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_LEADS;
@@ -154,7 +154,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_CONTACTS;
@@ -418,7 +418,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lead->setEmail('Lead1@sftest.com');
         $lead->setId(1);
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -454,7 +454,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $company->setName('MyCompanyName');
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -641,8 +641,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf
                 ->method('getDncHistory')
                 ->willReturn(
                     $this->getSalesforceDNCHistory($object, 'SF')
@@ -677,8 +677,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
 
             $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
             foreach ($mappedData as $assertion) {
@@ -696,11 +696,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf = $this->getSalesforceIntegration();
         $sf->amendLeadDataBeforePush($input);
 
-        self::assertSame($input, $output);
-        self::assertSame('string', gettype($output[0]));
-        self::assertSame('boolean', gettype($output[1]));
-        self::assertSame('string', gettype($output[2]));
-        self::assertSame('integer', gettype($output[3]));
+        $this->assertSame($input, $output);
+        $this->assertSame('string', gettype($output[0]));
+        $this->assertSame('boolean', gettype($output[1]));
+        $this->assertSame('string', gettype($output[2]));
+        $this->assertSame('integer', gettype($output[3]));
     }
 
     protected function setMaxInvocations(string $name, int $max): self
@@ -731,7 +731,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->expects($spy = $this->any())
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
-                function () use ($spy) {
+                function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
                     $spyParentProperties = self::getParentPrivateProperties($spy);
@@ -748,7 +748,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $auditLogRepo = $this->createMock(AuditLogRepository::class);
 
         $auditLogRepo
-            ->expects($this->any())
             ->method('getAuditLogsForLeads')
             ->willReturn(
                 [
@@ -874,7 +873,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache->expects($this->any())
+        $this->cache
             ->method('get')
             ->willReturnMap(
                 [
@@ -982,23 +981,27 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         case str_contains($args[0], '/query'):
                             if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
                                 return [];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
+                            }
+                            if (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
                                 return [
                                     'records' => [
                                         ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                     ],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
                                 return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                             }
                             // Extract emails

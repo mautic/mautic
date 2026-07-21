@@ -27,9 +27,8 @@ final class CookieHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $requestMock            = $this->createMock(Request::class);
         $this->requestStackMock->method('getMainRequest')
-            ->willReturn($requestMock);
+            ->willReturn($this->createStub(Request::class));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
@@ -39,8 +38,7 @@ final class CookieHelperTest extends TestCase
         $cookieDomain = 'https://test.test';
         $cookieSecure = true;
         $cookieHttp   = false;
-        $requestStack = $this->requestStackMock;
-        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
+        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $this->requestStackMock);
         $cookieName   = 'secureTest';
 
         $cookieHelper->setCookie($cookieName, 'test');
@@ -70,8 +68,7 @@ final class CookieHelperTest extends TestCase
         $cookieDomain = 'https://test.test';
         $cookieSecure = false;
         $cookieHttp   = false;
-        $requestStack = $this->requestStackMock;
-        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
+        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $this->requestStackMock);
         $cookieName   = 'notSecureTest';
 
         $cookieHelper->setCookie($cookieName, 'test');
@@ -100,8 +97,7 @@ final class CookieHelperTest extends TestCase
         $cookieDomain = 'https://test.test';
         $cookieSecure = true;
         $cookieHttp   = false;
-        $requestStack = $this->requestStackMock;
-        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
+        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $this->requestStackMock);
         $cookieName   = 'samesite_test';
 
         $cookieHelper->setCookie(

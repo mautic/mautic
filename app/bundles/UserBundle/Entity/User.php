@@ -308,7 +308,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
-        if ($data instanceof User) {
+        if ($data instanceof self) {
             $isNewUser        = !$data->getId();
             $hasPlainPassword = !empty($data->getPlainPassword());
 
@@ -354,7 +354,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('role' == $prop) {
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];

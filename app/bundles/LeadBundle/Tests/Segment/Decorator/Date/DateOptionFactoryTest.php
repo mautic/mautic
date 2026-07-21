@@ -198,16 +198,14 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return string[][]
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function getRelativeDateNotations(): array
+    public static function getRelativeDateNotations(): \Iterator
     {
-        return [
-            [DateRelativeInterval::class, 'first day of January 2021'],
-            [DateRelativeInterval::class, 'last day of January 2021'],
-            [DateRelativeInterval::class, '5 days ago'],
-            [DateDefault::class, 'day of January 2021'],
-        ];
+        yield [DateRelativeInterval::class, 'first day of January 2021'];
+        yield [DateRelativeInterval::class, 'last day of January 2021'];
+        yield [DateRelativeInterval::class, '5 days ago'];
+        yield [DateDefault::class, 'day of January 2021'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getRelativeDateNotations')]
@@ -238,9 +236,7 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 
     private function getFilterDecorator(?string $filterName): FilterDecoratorInterface
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
         $relativeDate     = $this->createMock(RelativeDate::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(
@@ -262,7 +258,7 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
+        $dateOptionFactory = new DateOptionFactory($this->createStub(DateDecorator::class), $relativeDate, $this->createStub(TimezoneResolver::class));
 
         $filter                    = [
             'glue'     => 'and',

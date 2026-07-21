@@ -46,6 +46,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\ApiBundle\Entity\oAuth2\ClientRepository $clientRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -70,7 +71,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
     {
-        return $this->em->getRepository(Client::class);
+        return $this->clientRepository;
     }
 
     public function getPermissionBase(): string
@@ -152,11 +153,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         // remove the user from the client
-        if ('oauth2' === $this->getApiMode()) {
-            $entity->removeUser($this->userHelper->getUser());
-            $this->saveEntity($entity);
-        } else {
-            $this->getRepository()->deleteAccessTokens($entity, $this->userHelper->getUser());
-        }
+        $entity->removeUser($this->userHelper->getUser());
+        $this->saveEntity($entity);
     }
 }

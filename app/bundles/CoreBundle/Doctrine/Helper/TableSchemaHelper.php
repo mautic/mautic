@@ -43,8 +43,6 @@ class TableSchemaHelper
     }
 
     /**
-     * Get the SchemaManager.
-     *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
@@ -139,7 +137,7 @@ class TableSchemaHelper
         if (!empty($options)) {
             foreach ($options as $option => $value) {
                 $func = ('uniqueIndex' == $option ? 'add' : 'set').ucfirst($option);
-                $newTable->$func($value);
+                $newTable->{$func}($value);
             }
         }
 

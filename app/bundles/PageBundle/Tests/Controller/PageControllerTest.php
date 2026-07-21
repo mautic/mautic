@@ -6,7 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
-use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
@@ -160,7 +160,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $allUtmTags = $this->em->getRepository(UtmTag::class)->getEntities();
+        $allUtmTags = self::getContainer()->get(UtmTagRepository::class)->getEntities();
         $this->assertNotCount(0, $allUtmTags);
 
         foreach ($allUtmTags as $utmTag) {
@@ -207,7 +207,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Page::class, $page);
-        $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
+        $this->assertStringContainsString($page->getTitle(), (string) $clientResponseContent, 'The return must contain the title of page');
     }
 
     /**
@@ -241,7 +241,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -256,7 +256,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -271,7 +271,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('text/html; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     public function testSavePageAliasWithUnderscores(): void

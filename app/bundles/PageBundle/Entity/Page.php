@@ -326,7 +326,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $metadata->addConstraint(new Callback(
             function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
-                if (!is_null($type)) {
+                if (null !== $type) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
@@ -741,7 +741,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -808,7 +808,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function hasDraft(): bool
     {
-        return !is_null($this->getDraft());
+        return null !== $this->getDraft();
     }
 
     public function getDraftContent(): ?string

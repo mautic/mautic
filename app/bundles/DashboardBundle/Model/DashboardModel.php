@@ -46,13 +46,14 @@ class DashboardModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly CacheProviderTagAwareInterface $cacheProvider,
+        private readonly WidgetRepository $widgetRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): WidgetRepository
     {
-        return $this->em->getRepository(Widget::class);
+        return $this->widgetRepository;
     }
 
     public function getPermissionBase(): string
@@ -185,7 +186,7 @@ class DashboardModel extends FormModel
         foreach ($data as $property => $value) {
             $method = 'set'.ucfirst($property);
             if (method_exists($entity, $method)) {
-                $entity->$method($value);
+                $entity->{$method}($value);
             }
             unset($data[$property]);
         }

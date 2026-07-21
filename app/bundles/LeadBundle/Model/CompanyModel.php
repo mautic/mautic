@@ -73,6 +73,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private FieldList $fieldList,
+        private readonly CompanyRepository $companyRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -106,7 +110,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     public function getRepository(): CompanyRepository
     {
-        $repo = $this->em->getRepository(Company::class);
+        $repo = $this->companyRepository;
 
         if (!$this->repoSetup) {
             $this->repoSetup = true;
@@ -126,7 +130,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     public function getCompanyLeadRepository(): CompanyLeadRepository
     {
-        return $this->em->getRepository(CompanyLead::class);
+        return $this->companyLeadRepository;
     }
 
     public function getPermissionBase(): string
@@ -172,7 +176,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->em->getRepository(Company::class)->getCompanies($user);
+        return $this->companyRepository->getCompanies($user);
     }
 
     /**
@@ -371,8 +375,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $lead->addUpdatedField('company', $companyName)
                     ->setDateModified(new \DateTime());
 
-                /** @var LeadRepository $leadRepository */
-                $leadRepository = $this->em->getRepository(Lead::class);
+                $leadRepository = $this->leadRepository;
                 $leadRepository->saveEntity($lead);
             }
         }
@@ -393,8 +396,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Remove a lead from company.
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void
@@ -839,7 +840,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['dateModified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->em->getRepository(User::class);
+            $userRepo      = $this->userRepository;
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $company->setCreatedBy($createdByUser);
@@ -848,7 +849,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->em->getRepository(User::class);
+            $userRepo       = $this->userRepository;
             $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $company->setModifiedBy($modifiedByUser);
@@ -888,13 +889,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($company->isNew() && $entityField['defaultValue']) {
+            }
+            if ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }
         }
 
-        if ($fieldErrors) {
+        if ([] !== $fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
 
             throw new \Exception($fieldErrors);
@@ -929,7 +931,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fieldData = [];
         foreach ($fields as $importField => $entityField) {
             // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+            if (array_key_exists($importField, $data) && null !== $data[$importField] && '' != $data[$importField]) {
                 $fieldData[$entityField] = $data[$importField];
             }
         }
@@ -964,7 +966,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
-        $this->em->getRepository(Lead::class)->saveEntity($lead);
+        $this->leadRepository->saveEntity($lead);
 
         if (null !== $companyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);

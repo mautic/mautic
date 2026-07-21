@@ -43,10 +43,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         /** @var ManagerRegistry&MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->method('getManagerForClass')->willReturn($emMock);
-
-        /** @var ClassMetadata<object>&MockObject $classMetadata */
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $emMock->method('getClassMetadata')->willReturn($classMetadata);
+        $emMock->method('getClassMetadata')->willReturn($this->createStub(ClassMetadata::class));
 
         $this->repo = $this->getMockBuilder(CommonRepository::class)
             ->setConstructorArgs([$managerRegistry, Lead::class])
@@ -182,7 +179,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         foreach ($expectedValues as $expectedValue) {
-            self::assertSame($expectedValue, $this->repo->generateRandomParameterName());
+            $this->assertSame($expectedValue, $this->repo->generateRandomParameterName());
         }
     }
 

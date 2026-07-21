@@ -184,7 +184,7 @@ final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
             'filter' => '1',
         ]);
 
-        $this->assertSame(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEqualsWithDelta(1.0, $baseDecorator->getParameterValue($contactSegmentFilterCrate), PHP_FLOAT_EPSILON);
     }
 
     public function testGetParameterValueLikeNoPercent(): void
@@ -359,8 +359,6 @@ final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 
     private function getDecorator(): BaseDecorator
     {
-        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
-
-        return new BaseDecorator($contactSegmentFilterOperator);
+        return new BaseDecorator($this->createStub(ContactSegmentFilterOperator::class));
     }
 }

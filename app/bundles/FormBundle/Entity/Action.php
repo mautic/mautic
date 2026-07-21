@@ -151,10 +151,10 @@ class Action implements UuidInterface
         ]));
     }
 
-    private function isChanged(string $prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 

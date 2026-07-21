@@ -47,21 +47,17 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($clientResponse->getContent(), true);
 
         // Assert the response structure and content
-        Assert::assertStringContainsString(
-            'Export limit exceeded',
-            $responseData['message']
+        $this->assertStringContainsString('Export limit exceeded', (string) $responseData['message']);
+        $this->assertStringContainsString(
+            '2 contacts',
+            // the limit we set
+            (string) $responseData['message']
         );
-        Assert::assertStringContainsString(
-            '2 contacts',  // the limit we set
-            $responseData['message']
-        );
-        Assert::assertStringContainsString(
-            'Export limit exceeded',
-            $responseData['flashes']
-        );
-        Assert::assertStringContainsString(
-            '2 contacts',  // the limit we set
-            $responseData['flashes']
+        $this->assertStringContainsString('Export limit exceeded', (string) $responseData['flashes']);
+        $this->assertStringContainsString(
+            '2 contacts',
+            // the limit we set
+            (string) $responseData['flashes']
         );
     }
 }

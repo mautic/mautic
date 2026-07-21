@@ -31,7 +31,6 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,7 +63,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content      = \json_decode($response->getContent(), true);
         $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
 
-        $this->assertStringContainsString($expectedLink, $content['newContent']);
+        $this->assertStringContainsString($expectedLink, (string) $content['newContent']);
     }
 
     /**
@@ -296,7 +295,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
-        $this->assertStringContainsString('s/users/edit/'.$user->getId(), $content['newContent']);
+        $this->assertStringContainsString('s/users/edit/'.$user->getId(), (string) $content['newContent']);
     }
 
     /**
@@ -333,7 +332,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertGlobalSearchNotResult($content['newContent']);
 
-        $this->assertStringNotContainsString($notExpectedLink, $content['newContent']);
+        $this->assertStringNotContainsString($notExpectedLink, (string) $content['newContent']);
     }
 
     /**
@@ -448,8 +447,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content = \json_decode($response->getContent(), true);
 
         $translator = self::getContainer()->get('translator');
-        $this->assertStringContainsString('s/contacts?search='.$searchString, $content['newContent']);
-        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), $content['newContent']);
+        $this->assertStringContainsString('s/contacts?search='.$searchString, (string) $content['newContent']);
+        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
         $crawler = new Crawler($content['newContent']);
         $this->assertCount(4, $crawler->filterXPath("//li[contains(@class, 'gsearch--results-item')]"));
@@ -462,8 +461,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content = \json_decode($response->getContent(), true);
 
         $translator = self::getContainer()->get('translator');
-        $this->assertStringContainsString('s/credentials?search='.$searchString, $content['newContent']);
-        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), $content['newContent']);
+        $this->assertStringContainsString('s/credentials?search='.$searchString, (string) $content['newContent']);
+        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
         $crawler = new Crawler($content['newContent']);
         $this->assertCount(4, $crawler->filterXPath("//li[contains(@class, 'gsearch--results-item')]"));
@@ -478,18 +477,16 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setUpSymfony($configParams);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $mockHandler = $this->getClientMockHandler();
         $mockHandler->append(
             function (RequestInterface $request): Response {
-                Assert::assertSame('GET', $request->getMethod());
+                $this->assertSame('GET', $request->getMethod());
 
                 // Later check the logged/displayed URL has no auth details.
-                Assert::assertSame(
-                    'https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz',
-                    (string) $request->getUri()
-                );
+                $this->assertSame('https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', (string) $request->getUri());
 
                 return new Response(SymfonyResponse::HTTP_FORBIDDEN);
             }
@@ -506,21 +503,18 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse();
         // Be aware the exception could be in mock handler expectations.
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content, $response->getContent());
-        self::assertArrayHasKey('success', $content);
-        self::assertSame(0, $content['success']);
-        self::assertArrayHasKey('error', $content);
+        $this->assertCount(2, $content, $response->getContent());
+        $this->assertArrayHasKey('success', $content);
+        $this->assertSame(0, $content['success']);
+        $this->assertArrayHasKey('error', $content);
         // Check the logged/displayed URL has no auth details.
-        self::assertStringStartsWith(
-            'Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to',
-            $content['error']
-        );
+        $this->assertStringStartsWith('Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to', $content['error']);
 
-        self::assertCount(0, $mockHandler);
+        $this->assertCount(0, $mockHandler);
     }
 
     public function testGetIpLookupForm(): void
@@ -531,28 +525,30 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setUpSymfony($configParams);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=getIpLookupForm&service=maxmind_download');
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content);
-        self::assertArrayHasKey('attribution', $content);
-        self::assertArrayHasKey('html', $content);
-        self::assertIsString($content['html']);
-        self::assertStringContainsString('ip_lookup_config', $content['html']);
+        $this->assertCount(2, $content);
+        $this->assertArrayHasKey('attribution', $content);
+        $this->assertArrayHasKey('html', $content);
+        $this->assertIsString($content['html']);
+        $this->assertStringContainsString('ip_lookup_config', $content['html']);
 
-        self::assertStringNotContainsString('_token', $content['html']);
+        $this->assertStringNotContainsString('_token', $content['html']);
     }
 
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);

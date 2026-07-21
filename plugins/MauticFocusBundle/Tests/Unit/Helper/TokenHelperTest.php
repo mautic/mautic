@@ -31,24 +31,23 @@ final class TokenHelperTest extends TestCase
         parent::setUp();
 
         $this->model    = $this->createMock(FocusModel::class);
-        $router         = $this->createMock(RouterInterface::class);
         $this->security = $this->createMock(CorePermissions::class);
 
-        $this->helper = new TokenHelper($this->model, $router, $this->security);
+        $this->helper = new TokenHelper($this->model, $this->createStub(RouterInterface::class), $this->security);
     }
 
     public function testFindFocusTokensNotFound(): void
     {
         $content = 'content';
 
-        self::assertSame([], $this->helper->findFocusTokens($content));
+        $this->assertSame([], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFound(): void
     {
         $content = 'content {focus=1}';
 
-        self::assertSame(['{focus=1}' => ''], $this->helper->findFocusTokens($content));
+        $this->assertSame(['{focus=1}' => ''], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFoundAddScriptByFocusPublishedStatus(): void
@@ -64,10 +63,7 @@ final class TokenHelperTest extends TestCase
             ->with($focusItemId)
             ->willReturn($focusItem);
 
-        self::assertSame(
-            ['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'],
-            $this->helper->findFocusTokens($content)
-        );
+        $this->assertSame(['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'], $this->helper->findFocusTokens($content));
     }
 
     public function testFindFocusTokensFoundAddScriptByAccessCheck(): void
@@ -94,9 +90,6 @@ final class TokenHelperTest extends TestCase
             )
             ->willReturn(true);
 
-        self::assertSame(
-            ['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'],
-            $this->helper->findFocusTokens($content)
-        );
+        $this->assertSame(['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'], $this->helper->findFocusTokens($content));
     }
 }

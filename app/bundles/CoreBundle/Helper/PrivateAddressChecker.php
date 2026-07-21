@@ -34,7 +34,7 @@ class PrivateAddressChecker
     /**
      * @param array<string> $allowedPrivateAddresses
      */
-    public function setAllowedPrivateAddresses(array $allowedPrivateAddresses): PrivateAddressChecker
+    public function setAllowedPrivateAddresses(array $allowedPrivateAddresses): self
     {
         $this->allowedPrivateAddresses = $allowedPrivateAddresses;
 

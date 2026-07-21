@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FieldControllerTest extends MauticMysqlTestCase
@@ -49,7 +50,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $field->setAlias('field_to_be_cloned');
         $field->setType('text');
 
-        $this->em->getRepository(LeadField::class)->saveEntity($field);
+        self::getContainer()->get(LeadFieldRepository::class)->saveEntity($field);
         $this->em->clear();
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => 'field_to_be_cloned']);

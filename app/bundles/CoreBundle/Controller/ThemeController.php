@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -99,10 +98,8 @@ class ThemeController extends FormController
 
     /**
      * Download a theme.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
     {
         $flashes = [];
         $error   = false;
@@ -215,7 +212,7 @@ class ThemeController extends FormController
                 ];
             }
 
-            if ($error) {
+            if ([] !== $error) {
                 $flashes = array_merge($flashes, $error);
             }
         }

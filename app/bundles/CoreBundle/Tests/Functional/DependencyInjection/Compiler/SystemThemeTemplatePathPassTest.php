@@ -41,11 +41,11 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
     public function testUserProfilePageOverrideFromSystemThemDirectory(): void
     {
-        Assert::assertFileExists($this->getOverridePath().'/index.html.twig');
+        $this->assertFileExists($this->getOverridePath().'/index.html.twig');
 
         $this->client->request(Request::METHOD_GET, '/s/account');
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Override test', $this->client->getResponse()->getContent(), 'Page has not override.');
+        $this->assertStringContainsString('Override test', (string) $this->client->getResponse()->getContent(), 'Page has not override.');
     }
 
     protected function beforeTearDown(): void

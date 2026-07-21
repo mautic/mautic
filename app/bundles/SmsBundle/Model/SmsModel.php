@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -64,23 +63,26 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
+        private readonly \Mautic\SmsBundle\Entity\StatRepository $statRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
     {
-        return $this->em->getRepository(Sms::class);
+        return $this->smsRepository;
     }
 
     public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getDoNotContactRepository(): DoNotContactRepository
     {
-        return $this->em->getRepository(DoNotContact::class);
+        return $this->doNotContactRepository;
     }
 
     public function getPermissionBase(): string
@@ -204,7 +206,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($fetchContacts) {
+        if ([] !== $fetchContacts) {
             /** @var Lead[] $foundContacts */
             $foundContacts = $this->leadModel->getEntities(['ids' => $fetchContacts]);
 
@@ -254,7 +256,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $queueEvent->getContacts();
 
         // Check if any contacts remain. If not, return early.
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -270,7 +272,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
         $contacts = $filterEvent->getContacts();
 
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -322,7 +324,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             try {
                 // assumption made that the Sms message is same for all contacts
                 $message = $translatedSms->getMessage();
-                if ($media) {
+                if ([] !== $media) {
                     $this->transport->sendMMS($recipientCollection, $media);
                 } else {
                     $this->transport->sendBatchSms($recipientCollection, $message);
@@ -357,7 +359,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($sentCount) {
+        if ([] !== $sentCount) {
             $repo = $this->getRepository();
             foreach ($sentCount as $id => $count) {
                 $repo->upCount($id, 'sent', $count);

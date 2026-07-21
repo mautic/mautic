@@ -75,6 +75,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly RequestStack $requestStack,
+        private readonly \Mautic\ReportBundle\Entity\ReportRepository $reportRepository,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
@@ -83,7 +84,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
     {
-        return $this->em->getRepository(Report::class);
+        return $this->reportRepository;
     }
 
     public function getPermissionBase(): string
@@ -383,7 +384,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         switch ($format) {
             case 'csv':
-                if (!is_null($handle)) {
+                if (null !== $handle) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
                     return;

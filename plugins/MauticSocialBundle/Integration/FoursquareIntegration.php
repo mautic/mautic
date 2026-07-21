@@ -250,11 +250,12 @@ class FoursquareIntegration extends SocialIntegration
      *
      * @return bool
      */
-    private function getContactUserId(&$identifier, array &$socialCache)
+    private function getContactUserId(array|string &$identifier, array &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } elseif (empty($identifier)) {
+        }
+        if (empty($identifier)) {
             return false;
         }
 

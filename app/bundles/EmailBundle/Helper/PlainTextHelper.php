@@ -352,7 +352,8 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         }   // link_method defaults to inline
 
@@ -537,7 +538,7 @@ class PlainTextHelper
      * @param string     $breakline
      * @param bool|false $cut
      */
-    private function linewrap(string $text, $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, int $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

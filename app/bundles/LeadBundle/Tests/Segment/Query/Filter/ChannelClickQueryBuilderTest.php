@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,11 +40,10 @@ final class ChannelClickQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $dispatcherMock
+            $this->createStub(EventDispatcherInterface::class)
         );
 
         $this->connectionMock->method('quote')
@@ -86,7 +84,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -133,7 +131,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**

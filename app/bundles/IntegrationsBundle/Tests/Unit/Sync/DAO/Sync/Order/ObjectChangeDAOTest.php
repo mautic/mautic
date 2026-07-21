@@ -9,7 +9,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class ObjectChangeDAOTest extends TestCase
@@ -22,9 +21,9 @@ final class ObjectChangeDAOTest extends TestCase
         $objectChangeDAO->addField($fieldDAO, ReportFieldDAO::FIELD_UNCHANGED);
 
         $unchangedFields = $objectChangeDAO->getUnchangedFields();
-        Assert::assertCount(1, $unchangedFields);
-        Assert::assertArrayHasKey('email', $unchangedFields);
-        Assert::assertSame($fieldDAO, $unchangedFields['email']);
+        $this->assertCount(1, $unchangedFields);
+        $this->assertArrayHasKey('email', $unchangedFields);
+        $this->assertSame($fieldDAO, $unchangedFields['email']);
     }
 
     public function testSetAndGetObjectMapping(): void
@@ -34,7 +33,7 @@ final class ObjectChangeDAOTest extends TestCase
 
         $objectChangeDAO->setObjectMapping($objectMapping);
 
-        Assert::assertSame($objectMapping, $objectChangeDAO->getObjectMapping());
+        $this->assertSame($objectMapping, $objectChangeDAO->getObjectMapping());
     }
 
     public function testThatFieldCanBeRemoved(): void
@@ -43,10 +42,10 @@ final class ObjectChangeDAOTest extends TestCase
         $value           = new NormalizedValueDAO('type', 1);
         $field           = new FieldDAO('fieldName', $value);
 
-        Assert::assertCount(0, $objectChangeDAO->getFields());
+        $this->assertCount(0, $objectChangeDAO->getFields());
         $objectChangeDAO->addField($field);
-        Assert::assertCount(1, $objectChangeDAO->getFields());
+        $this->assertCount(1, $objectChangeDAO->getFields());
         $objectChangeDAO->removeField('fieldName');
-        Assert::assertCount(0, $objectChangeDAO->getFields());
+        $this->assertCount(0, $objectChangeDAO->getFields());
     }
 }

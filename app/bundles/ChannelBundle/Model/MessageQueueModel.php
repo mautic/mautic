@@ -42,13 +42,15 @@ class MessageQueueModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly \Mautic\ChannelBundle\Entity\MessageQueueRepository $messageQueueRepository,
+        private readonly \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\ChannelBundle\Entity\MessageQueueRepository
     {
-        return $this->em->getRepository(MessageQueue::class);
+        return $this->messageQueueRepository;
     }
 
     /**
@@ -74,8 +76,7 @@ class MessageQueueModel extends FormModel
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 
-        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-        $frequencyRulesRepo     = $this->em->getRepository(\Mautic\LeadBundle\Entity\FrequencyRule::class);
+        $frequencyRulesRepo     = $this->frequencyRuleRepository;
         $defaultFrequencyNumber = $this->coreParametersHelper->get($channel.'_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->get($channel.'_frequency_time');
 
@@ -163,7 +164,7 @@ class MessageQueueModel extends FormModel
             $messageQueues[] = $messageQueue;
         }
 
-        if ($messageQueues) {
+        if ([] !== $messageQueues) {
             $this->saveEntities($messageQueues);
             $messageQueueRepository = $this->getRepository();
             $messageQueueRepository->detachEntities($messageQueues);

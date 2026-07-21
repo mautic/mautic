@@ -49,12 +49,10 @@ final class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->event->method('getRequest')->willReturn($this->request);
 
-        $twig = $this->createMock(Environment::class);
-
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,
             $this->createStub(TranslatorInterface::class),
-            $twig
+            $this->createStub(Environment::class)
         );
     }
 

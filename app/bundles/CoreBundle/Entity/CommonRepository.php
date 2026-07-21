@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CommonRepository extends ServiceEntityRepository
 {
     /**
-     * @phpstan-param class-string<T>|null $entityFQCN
+     * @param class-string<T>|null $entityFQCN
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
@@ -67,10 +67,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $lastUsedParameterId = 0;
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $expressionBuilder;
+    private ?ExpressionBuilder $expressionBuilder = null;
 
     /**
      * @param string $alias
@@ -161,7 +158,7 @@ class CommonRepository extends ServiceEntityRepository
 
                 $method = 'set'.ucfirst($property);
                 if (method_exists($entity, $method)) {
-                    $entity->$method($v);
+                    $entity->{$method}($v);
                 }
 
                 unset($data[$dbCol]);
@@ -892,7 +889,7 @@ class CommonRepository extends ServiceEntityRepository
             $idGetter  = "get{$idCol}";
             $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
             $columns[] = $column;
-            $values[]  = $assocEntity->$idGetter();
+            $values[]  = $assocEntity->{$idGetter}();
             $types[]   = Types::STRING;
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
@@ -1074,11 +1071,11 @@ class CommonRepository extends ServiceEntityRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
             $expr->add(
-                $q->expr()->$exprFunc($column, ":{$unique}")
+                $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
         }
 
@@ -1141,10 +1138,10 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->$exprFunc($col, ":{$unique}")
+                $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
         }
 
@@ -1304,7 +1301,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
 
                 $joinType = ($hasNullable) ? 'leftJoin' : 'join';
-                $q->$joinType($alias, $targetTable, $property, implode(' AND ', $joinColumns));
+                $q->{$joinType}($alias, $targetTable, $property, implode(' AND ', $joinColumns));
                 $joinAdded = true;
             }
         }
@@ -1431,7 +1428,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
             }
 
-            if ($partials) {
+            if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {

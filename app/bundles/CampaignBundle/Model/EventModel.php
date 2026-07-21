@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Model;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -17,19 +16,34 @@ use Mautic\CoreBundle\Model\FormModel;
  */
 class EventModel extends FormModel
 {
+    private LeadEventLogRepository $leadEventLogRepository;
+
+    private \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository;
+
+    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireEventModel(
+        \Mautic\CampaignBundle\Entity\EventRepository $eventRepository, \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository, LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->eventRepository = $eventRepository;
+        $this->campaignRepository = $campaignRepository;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+    }
+
     public function getRepository(): \Mautic\CampaignBundle\Entity\EventRepository
     {
-        return $this->em->getRepository(Event::class);
+        return $this->eventRepository;
     }
 
     public function getCampaignRepository(): \Mautic\CampaignBundle\Entity\CampaignRepository
     {
-        return $this->em->getRepository(Campaign::class);
+        return $this->campaignRepository;
     }
 
     public function getLeadEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
@@ -73,7 +87,7 @@ class EventModel extends FormModel
             ];
         }
 
-        if ($deletedKeys) {
+        if ([] !== $deletedKeys) {
             $this->getRepository()->nullEventRelationships($deletedKeys);
             $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);

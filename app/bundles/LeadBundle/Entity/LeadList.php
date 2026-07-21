@@ -274,7 +274,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(?Category $category = null): LeadList
+    public function setCategory(?Category $category = null): self
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -520,6 +520,6 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 }

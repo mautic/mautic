@@ -63,7 +63,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $campaignId   = $event->getEntityId();
         $campaignData = $this->fetchCampaignData($campaignId);
 
-        if (!$campaignData) {
+        if ([] === $campaignData) {
             $this->logger->warning("Campaign data not found for ID: {$campaignId}");
 
             return;
@@ -91,7 +91,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $userName = $this->getUserName($userId);
 
         $entityData = $event->getEntityData();
-        if (!$entityData) {
+        if ([] === $entityData) {
             $this->logger->warning('No entity data provided for import.');
             $event->setStatus(EntityImportEvent::ERRORS, ['message' => 'No entity data provided.']);
 
@@ -640,7 +640,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         foreach ($propertyPaths as $path) {
             $existingValue = $this->getNestedValue($event, $path);
 
-            if (!is_null($existingValue)) {
+            if (null !== $existingValue) {
                 if (is_array($existingValue)) {
                     // If the existing value is an array, replace it with a single-element array
                     $this->setNestedValue($event, $path, [$channelId]);

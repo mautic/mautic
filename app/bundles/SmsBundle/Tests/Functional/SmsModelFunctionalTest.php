@@ -49,11 +49,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $template) use ($expectedMessage): true {
-                    $this->assertSame($expectedMessage, $template);
-
-                    return true;
-                })
+                $expectedMessage
             )
             ->willReturn(new RecipientCollection($sms));
 
@@ -61,6 +57,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var SmsModel $smsModel */
         $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
         $smsModel->sendSms($sms, $contact);
@@ -162,6 +159,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var SmsModel $smsModel */
         $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS
         $results = $smsModel->sendSms($sms, [$contact1, $contact2, $contact3]);

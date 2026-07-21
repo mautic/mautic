@@ -267,7 +267,7 @@ trait CustomFieldRepositoryTrait
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
-            $this->getEntityManager()->flush($entity);
+            $this->getEntityManager()->flush();
         }
 
         // Includes prefix
@@ -324,7 +324,7 @@ trait CustomFieldRepositoryTrait
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
 
-                if (!is_null($r)) {
+                if (null !== $r) {
                     switch ($fields[$k]['type']) {
                         case 'number':
                             $r = (float) $r;

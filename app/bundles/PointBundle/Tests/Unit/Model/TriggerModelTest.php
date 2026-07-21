@@ -34,11 +34,6 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
      * @var MockObject&TriggerEventRepository
      */
     private MockObject $triggerEventRepository;
@@ -48,27 +43,24 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $ipLookupHelper               = $this->createMock(IpLookupHelper::class);
-        $leadModel                    = $this->createMock(LeadModel::class);
-        $triggerEventModel            = $this->createMock(TriggerEventModel::class);
-        $contactTracker               = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $translator                   = $this->createMock(Translator::class);
-        $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
-            $ipLookupHelper,
-            $leadModel,
-            $triggerEventModel,
-            $contactTracker,
-            $this->entityManager,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(TriggerEventModel::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(EntityManager::class),
             $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
-            $translator,
+            $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\PointBundle\Entity\TriggerRepository::class), // $triggerRepository
+            $this->triggerEventRepository,
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
 
         // reset private property cachedEvents in TriggerModel instance
@@ -85,17 +77,13 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
         $triggerEvent->setType('email.send_to_user');
 
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->triggerEventRepository);
-
         $this->triggerEventRepository->expects($this->once())
             ->method('find')
             ->willReturn($triggerEvent);
 
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function ($event, $eventName) use ($dispatchCalls, $contact, $triggerEvent) {
+            ->willReturnCallback(function (object $event, ?string $eventName) use ($dispatchCalls, $contact, $triggerEvent): object {
                 $dispatchCalls->append($eventName);
 
                 if (PointEvents::TRIGGER_ON_BUILD === $eventName) {
@@ -113,9 +101,10 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     );
 
                     return $event;
-                } elseif (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
-                    Assert::assertSame($contact, $event->getLead());
-                    Assert::assertSame($triggerEvent, $event->getTriggerEvent());
+                }
+                if (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
+                    $this->assertSame($contact, $event->getLead());
+                    $this->assertSame($triggerEvent, $event->getTriggerEvent());
 
                     return $event;
                 }
@@ -125,8 +114,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);
 
         // Assert both expected events were dispatched
-        Assert::assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
-        Assert::assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
-        Assert::assertCount(2, $dispatchCalls);
+        $this->assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
+        $this->assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
+        $this->assertCount(2, $dispatchCalls);
     }
 }

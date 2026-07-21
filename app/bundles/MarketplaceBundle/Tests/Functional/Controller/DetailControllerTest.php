@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
@@ -33,9 +32,9 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         self::assertResponseStatusCodeSame($responseCode);
-        Assert::assertStringContainsString($foundPackageDesc, $responseContent);
-        Assert::assertStringContainsString($foundPackageName, $responseContent);
-        Assert::assertStringContainsString($latestVersion, $responseContent);
+        $this->assertStringContainsString($foundPackageDesc, (string) $responseContent);
+        $this->assertStringContainsString($foundPackageName, (string) $responseContent);
+        $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
     /**

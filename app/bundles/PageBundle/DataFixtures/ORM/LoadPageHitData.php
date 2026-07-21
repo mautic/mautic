@@ -27,14 +27,14 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                 if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['page', 'ipAddress'])) {
-                        $hit->$setter($this->getReference($col.'-'.$val));
+                        $hit->{$setter}($this->getReference($col.'-'.$val));
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
-                        $hit->$setter(new \DateTime($val));
+                        $hit->{$setter}(new \DateTime($val));
                     } elseif ('browserLanguages' == $col) {
                         $val = Serializer::decode(stripslashes($val));
-                        $hit->$setter($val);
+                        $hit->{$setter}($val);
                     } else {
-                        $hit->$setter($val);
+                        $hit->{$setter}($val);
                     }
                 }
             }
@@ -42,7 +42,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 8;
     }
