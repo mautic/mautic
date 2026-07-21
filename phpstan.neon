@@ -177,7 +177,12 @@ parameters:
 		-
 			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-        # false positive
+
+		-
+			message: '#Parameter (.*?) of method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::createTagModifyResponse\(\) expects MauticPlugin\\MauticTagManagerBundle\\Entity\\Tag, Mautic\\LeadBundle\\Entity\\Tag given#'
+			path: plugins/MauticTagManagerBundle/Controller/TagController.php
+
+		# false positive
 		-
 			message: '#Call to private method getRepository\(\) of class Mautic\\AssetBundle\\Model\\AssetModel#'
 			paths:
