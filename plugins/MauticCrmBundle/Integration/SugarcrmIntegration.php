@@ -1600,7 +1600,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $error = 'Unknown status code '.$item['httpStatusCode'];
                     // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));

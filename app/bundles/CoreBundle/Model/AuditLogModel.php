@@ -10,9 +10,17 @@ use Mautic\UserBundle\Entity\User;
  */
 class AuditLogModel extends AbstractCommonModel
 {
+    private \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireAuditLogModel(\Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository): void
+    {
+        $this->auditLogRepository = $auditLogRepository;
+    }
+
     public function getRepository(): \Mautic\CoreBundle\Entity\AuditLogRepository
     {
-        return $this->em->getRepository(AuditLog::class);
+        return $this->auditLogRepository;
     }
 
     /**
@@ -47,7 +55,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository(AuditLog::class)->saveEntity($log);
+        $this->auditLogRepository->saveEntity($log);
 
         $this->em->detach($log);
     }

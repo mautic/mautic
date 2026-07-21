@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -494,6 +493,7 @@ class FieldModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -790,8 +790,7 @@ class FieldModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->leadRepository;
 
         return $contactRepository->getValueList($type, $filter, $limit);
     }

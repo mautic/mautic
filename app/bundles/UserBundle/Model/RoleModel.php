@@ -19,9 +19,23 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class RoleModel extends FormModel implements GlobalSearchInterface
 {
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
+    private \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository;
+
+    private RoleRepository $roleRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireRoleModel(RoleRepository $roleRepository, \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository, \Mautic\UserBundle\Entity\UserRepository $userRepository): void
+    {
+        $this->roleRepository = $roleRepository;
+        $this->permissionRepository = $permissionRepository;
+        $this->userRepository = $userRepository;
+    }
+
     public function getRepository(): RoleRepository
     {
-        return $this->em->getRepository(Role::class);
+        return $this->roleRepository;
     }
 
     public function getPermissionBase(): string
@@ -42,7 +56,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
 
         if (!$isNew) {
             // delete all existing
-            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
+            $this->permissionRepository->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -80,7 +94,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+        $users = $this->userRepository->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
