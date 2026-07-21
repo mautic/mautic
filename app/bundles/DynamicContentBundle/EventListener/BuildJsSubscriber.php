@@ -81,22 +81,7 @@ MauticJS.onDynamicContentResponse = function() {};
 
 MauticJS.enhanceDynamicContent = function(dwcContent) {
     // form load library
-    if (dwcContent.search("mauticform_wrapper") > 0) {
-        // if doesn't exist
-        if (typeof MauticSDK == 'undefined') {
-            MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
-
-            // check initialize form library
-            var fileInterval = setInterval(function() {
-                if (typeof MauticSDK != 'undefined') {
-                    MauticSDK.onLoad();
-                    clearInterval(fileInterval); // clear interval
-                 }
-             }, 100); // check every 100ms
-        } else {
-            MauticSDK.onLoad();
-         }
-    }
+    MauticJS.initializeForms(dwcContent);
 
     var m;
     var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;
@@ -107,6 +92,39 @@ MauticJS.enhanceDynamicContent = function(dwcContent) {
         }
     }
 };
+
+MauticJS.initializeForms = function(content) {
+    if (content.search("mauticform_wrapper") !== -1) {
+        // if doesn't exist
+        if (typeof MauticSDK == 'undefined') {
+            if (typeof MauticSDKLoaded == 'undefined') {
+                MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
+
+                // check initialize form library
+                var fileInterval = setInterval(function() {
+                    if (typeof MauticSDK != 'undefined') {
+                        MauticSDK.onLoad();
+                        clearInterval(fileInterval); // clear interval
+                     }
+                 }, 100); // check every 100ms
+            }
+        } else {
+            MauticSDK.onLoad();
+         }
+    }
+};
+
+MauticJS.documentReady(function() {
+    var fallbackForms = document.querySelectorAll('.mautic-slot form[data-mautic-form], [data-slot="dwc"] form[data-mautic-form]');
+    var initializationRequested = false;
+    MauticJS.iterateCollection(fallbackForms)(function(form) {
+        var formId = form.getAttribute('data-mautic-form');
+        if (!initializationRequested && !document.getElementById('mauticform_' + formId + '_messenger')) {
+            initializationRequested = true;
+            MauticJS.initializeForms('mauticform_wrapper');
+        }
+    });
+});
 
 MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);
 JS;

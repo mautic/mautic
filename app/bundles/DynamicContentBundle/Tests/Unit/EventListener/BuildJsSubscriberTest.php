@@ -50,8 +50,12 @@ final class BuildJsSubscriberTest extends TestCase
         $js = $event->getJs();
         $this->assertStringContainsString('MauticJS.replaceDynamicContent = function', $js);
         $this->assertStringContainsString('MauticJS.enhanceDynamicContent = function', $js);
+        $this->assertStringContainsString('MauticJS.initializeForms = function', $js);
+        $this->assertStringContainsString("document.querySelectorAll('.mautic-slot form[data-mautic-form]", $js);
+        $this->assertStringContainsString("document.getElementById('mauticform_' + formId + '_messenger')", $js);
         $this->assertStringContainsString('MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);', $js);
         $this->assertStringContainsString('media/js/mautic-form.js', $js);
+        $this->assertStringContainsString("typeof MauticSDKLoaded == 'undefined'", $js);
         $this->assertStringContainsString('MauticSDK.onLoad();', $js);
         $this->assertStringContainsString('search("/focus/")', $js);
         $this->assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
