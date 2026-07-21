@@ -211,6 +211,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -251,6 +252,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }

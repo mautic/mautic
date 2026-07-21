@@ -55,6 +55,8 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly ProcessSignalService $processSignalService,
+        private readonly ImportRepository $importRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -546,12 +548,12 @@ class ImportModel extends FormModel
 
     public function getRepository(): ImportRepository
     {
-        return $this->em->getRepository(Import::class);
+        return $this->importRepository;
     }
 
     public function getEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string

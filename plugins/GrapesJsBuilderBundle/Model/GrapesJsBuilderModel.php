@@ -37,14 +37,14 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): GrapesJsBuilderRepository
     {
-        /** @var GrapesJsBuilderRepository $repository */
-        $repository = $this->em->getRepository(GrapesJsBuilder::class);
+        $repository = $this->grapesJsBuilderRepository;
 
         $repository->setTranslator($this->translator);
 

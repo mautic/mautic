@@ -37,13 +37,14 @@ class NoteModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly RequestStack $requestStack,
+        private readonly LeadNoteRepository $leadNoteRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadNoteRepository
     {
-        return $this->em->getRepository(LeadNote::class);
+        return $this->leadNoteRepository;
     }
 
     public function getPermissionBase(): string

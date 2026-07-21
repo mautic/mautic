@@ -80,6 +80,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly ListLeadRepository $listLeadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -94,8 +96,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getRepository()
     {
-        /** @var LeadListRepository $repo */
-        $repo = $this->em->getRepository(LeadList::class);
+        $repo = $this->leadListRepository;
 
         $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
@@ -105,12 +106,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Returns the repository for the table that houses the leads associated with a list.
-     *
-     * @return ListLeadRepository
      */
-    public function getListLeadRepository()
+    public function getListLeadRepository(): ListLeadRepository
     {
-        return $this->em->getRepository(ListLead::class);
+        return $this->listLeadRepository;
     }
 
     public function getPermissionBase(): string
@@ -353,7 +352,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
-        return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
+        return $this->leadListRepository->getLists($user, $alias);
     }
 
     /**
@@ -363,7 +362,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getGlobalLists()
     {
-        return $this->em->getRepository(LeadList::class)->getGlobalLists();
+        return $this->leadListRepository->getGlobalLists();
     }
 
     /**
@@ -378,7 +377,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getPreferenceCenterLists(): array
     {
-        return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
+        return $this->leadListRepository->getPreferenceCenterList();
     }
 
     /**

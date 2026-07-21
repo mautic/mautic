@@ -70,13 +70,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): FormRepository
     {
-        return $this->em->getRepository(Form::class);
+        return $this->formRepository;
     }
 
     public function getPermissionBase(): string
