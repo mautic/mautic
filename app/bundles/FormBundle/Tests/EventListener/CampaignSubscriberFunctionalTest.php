@@ -103,7 +103,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
-        // @phpstan-ignore new.deprecated
         $event   = new CampaignExecutionEvent(
             [
                 'lead'            => $contact,

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -14,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class EmailStatModel
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly StatRepository $statRepository,
     ) {
     }
 
@@ -40,6 +39,6 @@ class EmailStatModel
 
     public function getRepository(): StatRepository
     {
-        return $this->entityManager->getRepository(Stat::class);
+        return $this->statRepository;
     }
 }

@@ -1036,9 +1036,7 @@ final class MailHelperTest extends TestCase
             $parameterMap
         );
 
-        $coreParametersHelper = $this->coreParametersHelper;
-
-        $coreParametersHelper->method('get')->willReturnMap($parameterMap);
+        $this->coreParametersHelper->method('get')->willReturnMap($parameterMap);
 
         $mockMailboxHelper = $this->createMock(Mailbox::class);
         $mockMailboxHelper->method('isConfigured')
@@ -1049,8 +1047,7 @@ final class MailHelperTest extends TestCase
 
     public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
-        $coreParametersHelper = $this->coreParametersHelper;
-        $coreParametersHelper->expects($this->atLeast(2))->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],

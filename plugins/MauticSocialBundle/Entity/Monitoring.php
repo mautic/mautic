@@ -272,9 +272,6 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * Set the network type.
-     */
     public function setNetworkType($networkType): static
     {
         $this->isChanged('networkType', $networkType);

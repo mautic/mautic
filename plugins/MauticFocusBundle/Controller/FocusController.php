@@ -26,14 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
-    private FocusModel $focusModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFocusController(FocusModel $focusModel): void
-    {
-        $this->focusModel = $focusModel;
-    }
-
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
@@ -47,6 +39,8 @@ class FocusController extends AbstractStandardFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly FocusModel $focusModel,
+        private readonly TrackableModel $trackableModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -179,9 +173,7 @@ class FocusController extends AbstractStandardFormController
                 );
 
                 if ('link' === $item->getType()) {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                    $trackables = $this->trackableModel->getTrackableList('focus', $item->getId());
 
                     $cacheItem->set([$stats, $trackables]);
                     $cacheItem->expiresAfter($cacheTimeout * 60);

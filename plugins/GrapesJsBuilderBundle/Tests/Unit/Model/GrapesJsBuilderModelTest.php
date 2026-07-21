@@ -63,7 +63,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }
@@ -105,7 +105,8 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $grapesJsBuilderRepository, // $grapesJsBuilderRepository
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
@@ -165,7 +166,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }
@@ -208,7 +209,8 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $grapesJsBuilderRepository, // $grapesJsBuilderRepository
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);

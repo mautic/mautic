@@ -16,6 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StageController extends AbstractFormController
 {
+    private StageModel $stageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireStageController(
+        StageModel $stageModel,
+    ): void {
+        $this->stageModel = $stageModel;
+    }
+
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
@@ -44,9 +53,7 @@ class StageController extends AbstractFormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
-        $stageModel = $this->getModel('stage');
-        \assert($stageModel instanceof StageModel);
-        $stages = $stageModel->getEntities(
+        $stages = $this->stageModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -80,7 +87,7 @@ class StageController extends AbstractFormController
         $pageHelper->rememberPage($page);
 
         // get the list of actions
-        $actions = $stageModel->getStageActions();
+        $actions = $this->stageModel->getStageActions();
 
         return $this->delegateView(
             [
@@ -110,12 +117,9 @@ class StageController extends AbstractFormController
      */
     public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
     {
-        $model = $this->getModel('stage');
-        \assert($model instanceof StageModel);
-
         if (!$entity instanceof Stage) {
             /** @var Stage $entity */
-            $entity = $model->getEntity();
+            $entity = $this->stageModel->getEntity();
         }
 
         if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
@@ -128,8 +132,8 @@ class StageController extends AbstractFormController
         $stage      = $request->request->all()['stage'] ?? [];
         $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
-        $actions    = $model->getStageActions();
-        $form       = $model->createForm(
+        $actions    = $this->stageModel->getStageActions();
+        $form       = $this->stageModel->createForm(
             $entity,
             $formFactory,
             $action,
@@ -147,7 +151,7 @@ class StageController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity);
+                    $this->stageModel->saveEntity($entity);
 
                     $this->addFlashMessage(
                         'mautic.core.notice.created',
@@ -197,7 +201,7 @@ class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $model->getRepository()->getStageWeights();
+        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
 
         return $this->delegateView(
             [
@@ -234,9 +238,7 @@ class StageController extends AbstractFormController
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
     {
-        $model = $this->getModel('stage');
-        \assert($model instanceof StageModel);
-        $entity = $model->getEntity($objectId);
+        $entity = $this->stageModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.stage.page', 1);
@@ -275,7 +277,7 @@ class StageController extends AbstractFormController
         }
         if (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
             $this->throwAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->stageModel->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'stage');
         }
@@ -283,8 +285,8 @@ class StageController extends AbstractFormController
         $actionType = 'moved to stage';
 
         $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $actions = $model->getStageActions();
-        $form    = $model->createForm(
+        $actions = $this->stageModel->getStageActions();
+        $form    = $this->stageModel->createForm(
             $entity,
             $formFactory,
             $action,
@@ -300,7 +302,7 @@ class StageController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->stageModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -324,7 +326,7 @@ class StageController extends AbstractFormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($entity);
+                $this->stageModel->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
                 $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
@@ -344,7 +346,7 @@ class StageController extends AbstractFormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($entity);
+            $this->stageModel->lockEntity($entity);
         }
 
         $themes = ['MauticStageBundle:FormTheme\Action'];
@@ -352,7 +354,7 @@ class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $model->getRepository()->getStageWeights();
+        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
 
         return $this->delegateView(
             [
@@ -386,8 +388,7 @@ class StageController extends AbstractFormController
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
     {
-        $model  = $this->getModel('stage');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->stageModel->getEntity($objectId);
 
         if (null !== $entity) {
             if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
@@ -499,9 +500,7 @@ class StageController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('stage');
-            \assert($model instanceof StageModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->stageModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -511,11 +510,11 @@ class StageController extends AbstractFormController
                 ];
             } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->stageModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
             }
 
-            $model->deleteEntity($entity);
+            $this->stageModel->deleteEntity($entity);
 
             $identifier = $this->translator->trans($entity->getName());
             $flashes[]  = [
@@ -558,14 +557,12 @@ class StageController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('stage');
-            \assert($model instanceof StageModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->stageModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -575,7 +572,7 @@ class StageController extends AbstractFormController
                     ];
                 } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->stageModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -584,7 +581,7 @@ class StageController extends AbstractFormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->stageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',

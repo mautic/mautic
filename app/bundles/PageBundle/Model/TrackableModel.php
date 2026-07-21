@@ -71,13 +71,14 @@ class TrackableModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
     {
-        return $this->em->getRepository(Trackable::class);
+        return $this->trackableRepository;
     }
 
     protected function getRedirectModel(): RedirectModel
@@ -399,9 +400,6 @@ class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    /**
-     * Create a Trackable entity.
-     */
     protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
         $redirect = $this->getRedirectModel()->createRedirectEntity($url);

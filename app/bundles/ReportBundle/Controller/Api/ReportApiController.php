@@ -45,10 +45,8 @@ class ReportApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         protected UserHelper $userHelper,
+        ReportModel $reportModel,
     ) {
-        $reportModel = $modelFactory->getModel('report');
-        \assert($reportModel instanceof ReportModel);
-
         $this->model            = $reportModel;
         $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
