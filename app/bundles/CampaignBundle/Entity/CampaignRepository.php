@@ -173,7 +173,7 @@ class CampaignRepository extends CommonRepository
         if ($id) {
             $q->select('cl.leadlist_id')
                 ->where(
-                    $q->expr()->eq('cl.campaign_id', $id)
+                    $q->expr()->eq('cl.campaign_id', (int) $id)
                 );
         } else {
             // Retrieve a list of unique IDs that are assigned to a campaign
@@ -200,7 +200,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
         $q->where(
-            $q->expr()->eq('cl.campaign_id', $id)
+            $q->expr()->eq('cl.campaign_id', (int) $id)
         );
 
         $lists   = [];
