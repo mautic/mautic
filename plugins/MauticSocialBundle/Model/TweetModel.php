@@ -23,6 +23,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
+    private TweetStatRepository $tweetStatRepository;
+
+    private TweetRepository $tweetRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
+    {
+        $this->tweetRepository = $tweetRepository;
+        $this->tweetStatRepository = $tweetStatRepository;
+    }
+
     /**
      * @param string $filter
      * @param int    $limit
@@ -192,12 +203,12 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     public function getRepository(): TweetRepository
     {
-        return $this->em->getRepository(Tweet::class);
+        return $this->tweetRepository;
     }
 
     public function getStatRepository(): TweetStatRepository
     {
-        return $this->em->getRepository(TweetStat::class);
+        return $this->tweetStatRepository;
     }
 
     public function getPermissionBase(): string

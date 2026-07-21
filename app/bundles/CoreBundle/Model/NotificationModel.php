@@ -42,6 +42,7 @@ class NotificationModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly RequestStack $requestStack,
+        private readonly NotificationRepository $notificationRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -64,7 +65,7 @@ class NotificationModel extends FormModel
 
     public function getRepository(): NotificationRepository
     {
-        return $this->em->getRepository(Notification::class);
+        return $this->notificationRepository;
     }
 
     /**

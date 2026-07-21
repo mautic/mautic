@@ -22,14 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractFormController
 {
-    private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCategoryController(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
-    {
-        $this->categoryModel = $categoryModel;
-    }
-
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
@@ -41,6 +33,7 @@ class CategoryController extends AbstractFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\CategoryBundle\Model\CategoryModel $categoryModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

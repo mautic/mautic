@@ -202,7 +202,9 @@ abstract class StandardImportTestHelper extends CommonMocks
             $translator,
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            new ProcessSignalService()
+            new ProcessSignalService(),
+            $importRepository,
+            $logRepository,
         );
     }
 }

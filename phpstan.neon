@@ -36,11 +36,6 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
-        # optional child method access
-		-
-			identifier: '#Call to an undefined method Mautic\\CoreBundle\\Controller\\AbstractFormController::getPermissionBase\(\)#'
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
 		-
@@ -149,9 +144,6 @@ parameters:
 			identifier: class.extendsDeprecatedClass
 			message: '#class\s+Mautic#'
 		-
-			identifier: staticMethod.deprecatedClass
-			message: '#class\s+Mautic#'
-		-
 			identifier: method.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
@@ -177,7 +169,12 @@ parameters:
 		-
 			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-        # false positive
+
+		-
+			message: '#Parameter (.*?) of method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::createTagModifyResponse\(\) expects MauticPlugin\\MauticTagManagerBundle\\Entity\\Tag, Mautic\\LeadBundle\\Entity\\Tag given#'
+			path: plugins/MauticTagManagerBundle/Controller/TagController.php
+
+		# false positive
 		-
 			message: '#Call to private method getRepository\(\) of class Mautic\\AssetBundle\\Model\\AssetModel#'
 			paths:
@@ -225,5 +222,9 @@ services:
 			- phpstan.rules.rule
 	-
 		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 		tags:
 			- phpstan.rules.rule

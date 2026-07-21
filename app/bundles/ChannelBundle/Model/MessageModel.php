@@ -46,6 +46,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly MessageRepository $messageRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -77,7 +78,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     public function getRepository(): ?MessageRepository
     {
-        return $this->em->getRepository(Message::class);
+        return $this->messageRepository;
     }
 
     public function getEntity($id = null): ?Message

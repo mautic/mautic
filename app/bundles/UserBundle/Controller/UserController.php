@@ -68,7 +68,7 @@ class UserController extends FormController
         // do some default filtering
         $filter = ['string' => $search, 'force' => ''];
         $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $users  = $this->getModel('user.user')->getEntities(
+        $users  = $this->userModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -524,8 +524,7 @@ class UserController extends FormController
      */
     public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        $user  = $this->userModel->getEntity($objectId);
 
         // user not found
         if (null === $user) {

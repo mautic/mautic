@@ -65,6 +65,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private readonly \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
+        private readonly \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -159,7 +162,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository(Email::class);
+                    $emailRepo = $this->emailRepository;
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -282,12 +285,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
     {
-        return $this->em->getRepository(Asset::class);
+        return $this->assetRepository;
     }
 
     public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
     {
-        return $this->em->getRepository(Download::class);
+        return $this->downloadRepository;
     }
 
     public function getPermissionBase(): string
