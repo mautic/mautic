@@ -38,8 +38,8 @@ return RectorConfig::configure()
         // other objects
         CommonRepository::class,
         Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
