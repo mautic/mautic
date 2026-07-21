@@ -283,7 +283,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
-  
+
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
