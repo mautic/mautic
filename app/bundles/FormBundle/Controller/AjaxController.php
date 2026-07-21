@@ -21,14 +21,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAjaxController(\Mautic\FormBundle\Model\FormModel $formModel): void
-    {
-        $this->formModel = $formModel;
-    }
-
     public function __construct(
         private readonly FieldCollectorInterface $fieldCollector,
         private readonly AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
@@ -41,6 +33,7 @@ class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

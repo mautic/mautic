@@ -28,14 +28,6 @@ use Twig\Environment;
 
 class FieldController extends CommonFormController
 {
-    private FieldModel $fieldModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireFieldController(FieldModel $fieldModel): void
-    {
-        $this->fieldModel = $fieldModel;
-    }
-
     public function __construct(
         private readonly FormModel $formModel,
         private readonly FieldModel $formFieldModel,
@@ -125,7 +117,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->fieldModel->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -194,8 +186,6 @@ class FieldController extends CommonFormController
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
-            $leadFieldModel               = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -338,8 +328,6 @@ class FieldController extends CommonFormController
             $blank        = $entity->convertToArray();
             $formField    = array_merge($blank, $formField);
 
-            $leadFieldModel = $this->getModel('lead.field');
-            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -430,12 +418,9 @@ class FieldController extends CommonFormController
      */
     private function getFieldForm($formId, array $formField)
     {
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
-        $form = $this->fieldModel->createForm(
+        $form = $this->formFieldModel->createForm(
             $formField,
             $this->formFactory,
             (!empty($formField['id'])) ?

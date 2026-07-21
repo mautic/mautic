@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -24,6 +25,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -41,8 +43,6 @@ class LeadApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
-
-    public const MODEL_ID = 'lead.lead';
 
     /**
      * @var LeadModel|null
@@ -67,11 +67,16 @@ class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private CampaignModel $campaignModel,
+        private FieldModel $leadFieldModel,
+        LeadModel $leadModel,
+        private \Mautic\StageBundle\Model\StageModel $stageModel,
+        private \Mautic\UserBundle\Model\UserModel $userModel,
+        private \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
+        private \Mautic\LeadBundle\Model\NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 
-        $leadModel = $modelFactory->getModel(self::MODEL_ID);
-        \assert($leadModel instanceof LeadModel);
         $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
@@ -119,7 +124,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $fields = $this->leadFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -152,14 +157,16 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:notes:viewown', 'lead:notes:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
 
-        $results = $this->getModel('lead.note')->getEntities(
+        $defaultPageLimit = (int) $this->coreParametersHelper->get('default_pagelimit');
+
+        $results = $this->noteModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPageLimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
@@ -206,10 +213,12 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $results = $this->getModel('lead.device')->getEntities(
+        $defaultPagelimit = (int) $this->coreParametersHelper->get('default_pagelimit');
+
+        $results = $this->deviceModel->getEntities(
             [
                 'start'  => $request->query->get('start', '0'),
-                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'limit'  => $request->query->getInt('limit', $defaultPagelimit),
                 'filter' => [
                     'string' => $request->query->get('search', ''),
                     'force'  => [
@@ -316,9 +325,7 @@ class LeadApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->getModel('campaign');
-            $campaigns     = $campaignModel->getLeadCampaigns($entity, true);
+            $campaigns = $this->campaignModel->getLeadCampaigns($entity, true);
 
             foreach ($campaigns as &$c) {
                 if (!empty($c['lists'])) {
@@ -601,13 +608,13 @@ class LeadApiController extends CommonApiController
         }
 
         if (isset($parameters['owner'])) {
-            $owner = $this->getModel('user.user')->getEntity((int) $parameters['owner']);
+            $owner = $this->userModel->getEntity((int) $parameters['owner']);
             $entity->setOwner($owner);
             unset($parameters['owner']);
         }
 
         if (isset($parameters['stage'])) {
-            $stage = $this->getModel('stage.stage')->getEntity((int) $parameters['stage']);
+            $stage = $this->stageModel->getEntity((int) $parameters['stage']);
             $entity->setStage($stage);
             unset($parameters['stage']);
         }

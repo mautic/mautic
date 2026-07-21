@@ -98,13 +98,17 @@ class SubmissionModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository(Submission::class);
+        return $this->submissionRepository;
     }
 
     /**
@@ -990,7 +994,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->leadRepository->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -1084,7 +1088,7 @@ class SubmissionModel extends CommonFormModel
 
         // Set stage.
         if (!empty($data['stagebyname'])) {
-            $stage = $this->em->getRepository(Stage::class)->findOneBy(['name' => $data['stagebyname']]);
+            $stage = $this->stageRepository->findOneBy(['name' => $data['stagebyname']]);
 
             if ($stage instanceof Stage) {
                 $lead->setStage($stage);
@@ -1110,7 +1114,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Set owner
-        $userRepo = $this->em->getRepository(User::class);
+        $userRepo = $this->userRepository;
         \assert($userRepo instanceof UserRepository);
 
         $user = null;
@@ -1206,7 +1210,7 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue($value, Field $f): string
+    private function normalizeValue(mixed $value, Field $f): string
     {
         $value = !is_array($value) ? [$value] : $value;
 

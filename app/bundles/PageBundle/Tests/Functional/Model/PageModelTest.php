@@ -44,7 +44,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->configParams['bot_helper_blocked_user_agents']  = self::BOT_BLOCKED_USER_AGENTS;
         $this->configParams['site_url']                        = 'https://mautic-cloud.local';
         parent::setUp();
-        $this->pageHitRepository = $this->em->getRepository(Hit::class);
+        $this->pageHitRepository = self::getContainer()->get(HitRepository::class);
         $this->logoutUser();
     }
 

@@ -86,6 +86,11 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\EventRepository::class), // $eventRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\StatRepository::class), // $statRepository
         );
     }
 }

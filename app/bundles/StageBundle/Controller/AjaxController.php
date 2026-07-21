@@ -12,6 +12,15 @@ use Twig\Environment;
 
 class AjaxController extends CommonAjaxController
 {
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireStageAjaxController(
+        \Mautic\StageBundle\Model\StageModel $stageModel,
+    ): void {
+        $this->stageModel = $stageModel;
+    }
+
     public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
     {
         $dataArray = [
@@ -21,10 +30,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            // get the HTML for the form
-            /** @var \Mautic\StageBundle\Model\StageModel $model */
-            $model   = $this->getModel('stage');
-            $actions = $model->getStageActions();
+            $actions = $this->stageModel->getStageActions();
 
             if (isset($actions['actions'][$type])) {
                 $themes = ['MauticStageBundle:FormTheme\Action'];

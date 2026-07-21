@@ -12,6 +12,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EmailDraftModel extends AbstractCommonModel
 {
+    private EmailDraftRepository $emailDraftRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireEmailDraftModel(EmailDraftRepository $emailDraftRepository): void
+    {
+        $this->emailDraftRepository = $emailDraftRepository;
+    }
+
     public function createDraft(Email $email, string $html, string $template, bool $publicPreview = true): EmailDraft
     {
         $emailDraft = $this->getRepository()->findOneBy(['email' => $email]);
@@ -42,6 +50,6 @@ class EmailDraftModel extends AbstractCommonModel
 
     public function getRepository(): EmailDraftRepository
     {
-        return $this->em->getRepository(EmailDraft::class);
+        return $this->emailDraftRepository;
     }
 }

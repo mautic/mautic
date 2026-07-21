@@ -30,8 +30,10 @@ class PublicController extends CommonFormController
     private FormModel $formModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(FormModel $formModel, SubmissionModel $submissionModel): void
-    {
+    public function autowirePublicController(
+        FormModel $formModel,
+        SubmissionModel $submissionModel,
+    ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
     }

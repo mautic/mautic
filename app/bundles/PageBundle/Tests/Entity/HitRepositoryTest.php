@@ -22,7 +22,7 @@ final class HitRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->hitRepository = $this->em->getRepository(Hit::class);
+        $this->hitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testGetLatestHitDateByLead(): void
