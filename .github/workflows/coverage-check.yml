@@ -10,10 +10,6 @@ jobs:
     if: github.event.label.name == 'check-coverage' && github.repository == 'mautic/mautic'
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      pull-requests: write
-
     name: PHPUnit coverage
 
     services:
@@ -41,6 +37,15 @@ jobs:
           - 8086:8080
 
     steps:
+    - name: Save PR number for the cleanup workflow
+      run: echo "${{ github.event.pull_request.number }}" > pr-number.txt
+
+    - name: Upload PR number
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: pr-number
+        path: pr-number.txt
+
     - name: Checkout pull request code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
@@ -49,7 +54,7 @@ jobs:
         fetch-depth: 0
 
     - name: Setup PHP with Composer and extensions
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
       with:
         php-version: '8.2'
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
@@ -81,9 +86,3 @@ jobs:
         fail_ci_if_error: true
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Remove check-coverage label
-      if: always()
-      run: gh pr edit "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --remove-label "check-coverage"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
