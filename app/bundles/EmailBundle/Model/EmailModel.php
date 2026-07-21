@@ -71,6 +71,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\EmailBundle\Entity\CopyRepository;
+use Mautic\EmailBundle\Entity\StatDeviceRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 /**
  * @extends FormModel<Email>
@@ -125,14 +132,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private AbTestSettingsService $abTestSettingsService,
         private EmailVariantConverterService $variantConverterService,
         private readonly EmailRepository $emailRepository,
-        private readonly \Mautic\EmailBundle\Entity\CopyRepository $copyRepository,
-        private readonly \Mautic\EmailBundle\Entity\StatDeviceRepository $statDeviceRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository,
-        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
-        private readonly \Mautic\LeadBundle\Entity\DoNotContactRepository $doNotContactRepository,
+        private readonly CopyRepository $copyRepository,
+        private readonly StatDeviceRepository $statDeviceRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
         private readonly TrackableRepository $trackableRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -148,12 +155,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $this->emailStatModel->getRepository();
     }
 
-    public function getCopyRepository(): \Mautic\EmailBundle\Entity\CopyRepository
+    public function getCopyRepository(): CopyRepository
     {
         return $this->copyRepository;
     }
 
-    public function getStatDeviceRepository(): \Mautic\EmailBundle\Entity\StatDeviceRepository
+    public function getStatDeviceRepository(): StatDeviceRepository
     {
         return $this->statDeviceRepository;
     }

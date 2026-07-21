@@ -41,6 +41,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
+use Mautic\ReportBundle\Entity\ReportRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Report>
@@ -75,14 +77,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly RequestStack $requestStack,
-        private readonly \Mautic\ReportBundle\Entity\ReportRepository $reportRepository,
+        private readonly ReportRepository $reportRepository,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
+    public function getRepository(): ReportRepository
     {
         return $this->reportRepository;
     }
@@ -104,7 +106,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);

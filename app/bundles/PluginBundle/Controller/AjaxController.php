@@ -10,6 +10,7 @@ use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AjaxController extends CommonAjaxController
 {
@@ -21,7 +22,7 @@ class AjaxController extends CommonAjaxController
         $this->pluginModel = $pluginModel;
     }
 
-    public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function setIntegrationFilterAction(Request $request): JsonResponse
     {
         $session      = $request->getSession();
         $pluginFilter = (int) $request->get('plugin');
@@ -33,7 +34,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for list of fields.
      */
-    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -113,7 +114,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for integration properties.
      */
-    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -167,7 +168,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -221,7 +222,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');

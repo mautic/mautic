@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use PHPUnit\Framework\Exception;
 
 final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -96,7 +97,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
                     return true;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->repository->expects($this->once())

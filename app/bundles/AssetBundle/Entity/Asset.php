@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\CategoryBundle\Entity\Category;
 
 #[ApiResource(
     operations: [
@@ -620,7 +621,7 @@ class Asset extends FormEntity implements UuidInterface
         return $this->language;
     }
 
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null): static
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

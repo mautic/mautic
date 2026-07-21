@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -37,7 +38,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     private DynamicContentRepository $dynamicContentRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository): void
+    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, StatRepository $statRepository): void
     {
         $this->dynamicContentRepository = $dynamicContentRepository;
         $this->statRepository = $statRepository;
@@ -61,7 +62,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $repo;
     }
 
-    public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
         return $this->statRepository;
     }

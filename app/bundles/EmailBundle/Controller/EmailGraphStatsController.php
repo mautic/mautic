@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmailGraphStatsController extends AbstractController
 {
@@ -31,7 +32,7 @@ class EmailGraphStatsController extends AbstractController
         $isVariant,
         $dateFrom = null,
         $dateTo = null,
-    ): \Symfony\Component\HttpFoundation\Response {
+    ): Response {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
 

@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Client>
@@ -46,7 +48,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\ApiBundle\Entity\oAuth2\ClientRepository $clientRepository,
+        private readonly ClientRepository $clientRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -69,7 +71,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         $this->apiMode = $apiMode;
     }
 
-    public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
+    public function getRepository(): ClientRepository
     {
         return $this->clientRepository;
     }
@@ -82,7 +84,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);

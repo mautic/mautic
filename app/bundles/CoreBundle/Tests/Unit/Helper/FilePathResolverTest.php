@@ -11,6 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use PHPUnit\Framework\Exception;
 
 final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
@@ -61,7 +62,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->fileMock->expects($this->once())

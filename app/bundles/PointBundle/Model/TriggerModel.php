@@ -29,6 +29,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\PointBundle\Entity\TriggerRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Trigger>
@@ -55,14 +58,14 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\PointBundle\Entity\TriggerRepository $triggerRepository,
-        private readonly \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository,
+        private readonly TriggerRepository $triggerRepository,
+        private readonly TriggerEventRepository $triggerEventRepository,
         private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PointBundle\Entity\TriggerRepository
+    public function getRepository(): TriggerRepository
     {
         return $this->triggerRepository;
     }
@@ -70,7 +73,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Retrieves an instance of the TriggerEventRepository.
      */
-    public function getEventRepository(): \Mautic\PointBundle\Entity\TriggerEventRepository
+    public function getEventRepository(): TriggerEventRepository
     {
         return $this->triggerEventRepository;
     }
@@ -83,7 +86,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);

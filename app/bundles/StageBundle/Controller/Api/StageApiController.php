@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\StageBundle\Model\StageModel;
 
 /**
  * @extends CommonApiController<Stage>
@@ -38,7 +39,7 @@ class StageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
+        StageModel $stageModel,
         private LeadModel $leadModel,
     ) {
         $this->model            = $stageModel;

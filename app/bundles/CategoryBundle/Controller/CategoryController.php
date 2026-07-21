@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CategoryBundle\Model\CategoryModel;
 
 class CategoryController extends AbstractFormController
 {
@@ -33,7 +34,7 @@ class CategoryController extends AbstractFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private readonly \Mautic\CategoryBundle\Model\CategoryModel $categoryModel,
+        private readonly CategoryModel $categoryModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

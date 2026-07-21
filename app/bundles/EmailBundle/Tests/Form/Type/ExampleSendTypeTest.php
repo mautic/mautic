@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\Exception;
 
 final class ExampleSendTypeTest extends TestCase
 {
@@ -115,7 +116,7 @@ final class ExampleSendTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);

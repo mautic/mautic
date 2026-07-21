@@ -48,6 +48,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -643,7 +644,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             /**
              * @param array<mixed> $leads
              */
-            public function dispatchBatchEventForTest(string $action, array $leads): ?\Symfony\Contracts\EventDispatcher\Event
+            public function dispatchBatchEventForTest(string $action, array $leads): ?Event
             {
                 return $this->dispatchBatchEvent($action, $leads);
             }

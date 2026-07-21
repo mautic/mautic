@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
+use Symfony\Component\Form\FormInterface;
 
 class AjaxController extends CommonAjaxController
 {
@@ -30,7 +31,7 @@ class AjaxController extends CommonAjaxController
             $request,
             $pageModel,
             fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (\Symfony\Component\Form\FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
+            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
             'page'
         ));

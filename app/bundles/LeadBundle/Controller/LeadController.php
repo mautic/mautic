@@ -57,6 +57,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
+use Mautic\StageBundle\Model\StageModel;
 
 class LeadController extends FormController
 {
@@ -85,10 +89,10 @@ class LeadController extends FormController
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $leadListModel,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
-        \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        StageModel $stageModel,
+        CompanyModel $companyModel,
+        ContactExportSchedulerModel $contactExportSchedulerModel,
+        CampaignModel $campaignModel,
         NoteModel $noteModel,
         FieldModel $leadFieldModel,
         UserModel $userModel,

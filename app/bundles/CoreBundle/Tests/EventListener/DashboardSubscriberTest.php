@@ -24,6 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\Exception;
 
 final class DashboardSubscriberTest extends TestCase
 {
@@ -249,7 +250,7 @@ final class DashboardSubscriberTest extends TestCase
                     return null;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->router->expects($this->exactly(5))

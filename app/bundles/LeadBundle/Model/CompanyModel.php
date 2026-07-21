@@ -37,6 +37,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Company>
@@ -76,7 +78,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         private readonly CompanyRepository $companyRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly LeadRepository $leadRepository,
-        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -147,7 +149,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Company']);

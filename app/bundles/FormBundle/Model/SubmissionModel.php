@@ -65,6 +65,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\StageBundle\Entity\StageRepository;
 
 /**
  * @extends CommonFormModel<Submission>
@@ -99,8 +101,8 @@ class SubmissionModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly SubmissionRepository $submissionRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 
 /**
  * Used to manipulate the schema of an existing table.
@@ -69,7 +70,7 @@ class ColumnSchemaHelper
     /**
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
+    public function getSchemaManager(): AbstractSchemaManager
     {
         return $this->sm;
     }

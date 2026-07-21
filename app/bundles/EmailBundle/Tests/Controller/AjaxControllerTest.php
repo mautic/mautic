@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use PHPUnit\Framework\Exception;
 
 final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -118,7 +119,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())
@@ -163,7 +164,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())

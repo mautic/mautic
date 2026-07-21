@@ -34,6 +34,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\LeadBundle\Model\DeviceModel;
+use Mautic\LeadBundle\Model\NoteModel;
+use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Model\UserModel;
 
 /**
  * @extends CommonApiController<Lead>
@@ -70,10 +74,10 @@ class LeadApiController extends CommonApiController
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
         LeadModel $leadModel,
-        private \Mautic\StageBundle\Model\StageModel $stageModel,
-        private \Mautic\UserBundle\Model\UserModel $userModel,
-        private \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
-        private \Mautic\LeadBundle\Model\NoteModel $noteModel,
+        private StageModel $stageModel,
+        private UserModel $userModel,
+        private DeviceModel $deviceModel,
+        private NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 

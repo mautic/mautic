@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 
 /**
  * @extends FormModel<IntegrationEntity>
@@ -14,12 +15,12 @@ class IntegrationEntityModel extends FormModel
     private \Mautic\PluginBundle\Entity\IntegrationEntityRepository $integrationEntityRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireIntegrationEntityModel(\Mautic\PluginBundle\Entity\IntegrationEntityRepository $integrationEntityRepository): void
+    public function autowireIntegrationEntityModel(IntegrationEntityRepository $integrationEntityRepository): void
     {
         $this->integrationEntityRepository = $integrationEntityRepository;
     }
 
-    public function getIntegrationEntityRepository(): \Mautic\PluginBundle\Entity\IntegrationEntityRepository
+    public function getIntegrationEntityRepository(): IntegrationEntityRepository
     {
         return $this->integrationEntityRepository;
     }

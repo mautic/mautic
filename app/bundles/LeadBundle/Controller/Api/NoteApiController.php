@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\LeadBundle\Model\NoteModel;
 
 /**
  * @extends CommonApiController<LeadNote>
@@ -26,7 +27,7 @@ class NoteApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, \Mautic\LeadBundle\Model\NoteModel $leadNoteModel)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, NoteModel $leadNoteModel)
     {
         $this->model            = $leadNoteModel;
         $this->entityClass      = LeadNote::class;

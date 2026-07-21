@@ -31,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Point>
@@ -74,7 +75,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);

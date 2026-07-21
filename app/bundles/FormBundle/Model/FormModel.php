@@ -42,6 +42,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Form>
@@ -90,7 +91,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);

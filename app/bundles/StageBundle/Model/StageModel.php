@@ -26,6 +26,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\StageBundle\Entity\StageRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Stage>
@@ -42,14 +44,14 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         Translator $translator,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StageRepository $stageRepository,
         private readonly StagesChangeLogRepository $stagesChangeLogRepository,
         private readonly LeadStageLogRepository $leadStageLogRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
+    public function getRepository(): StageRepository
     {
         return $this->stageRepository;
     }
@@ -62,7 +64,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);

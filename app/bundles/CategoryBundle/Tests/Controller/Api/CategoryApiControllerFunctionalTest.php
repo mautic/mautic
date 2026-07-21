@@ -8,6 +8,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadCategory;
 
 final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -75,13 +77,13 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $category->setIsPublished(true);
         $this->em->persist($category);
 
-        $lead = new \Mautic\LeadBundle\Entity\Lead();
+        $lead = new Lead();
         $lead->setFirstname('Test');
         $lead->setLastname('Lead');
         $lead->setEmail('test@example.com');
         $this->em->persist($lead);
 
-        $leadCategory = new \Mautic\LeadBundle\Entity\LeadCategory();
+        $leadCategory = new LeadCategory();
         $leadCategory->setCategory($category);
         $leadCategory->setLead($lead);
         $leadCategory->setDateAdded(new \DateTime());

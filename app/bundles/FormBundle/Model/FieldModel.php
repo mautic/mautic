@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\FormBundle\Entity\FieldRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<Field>
@@ -40,7 +42,7 @@ class FieldModel extends CommonFormModel
         CoreParametersHelper $coreParametersHelper,
         private readonly RequestStack $requestStack,
         private readonly ColumnSchemaHelper $columnSchemaHelper,
-        private readonly \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
+        private readonly FieldRepository $fieldRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -57,7 +59,7 @@ class FieldModel extends CommonFormModel
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -66,7 +68,7 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    public function getRepository(): \Mautic\FormBundle\Entity\FieldRepository
+    public function getRepository(): FieldRepository
     {
         return $this->fieldRepository;
     }

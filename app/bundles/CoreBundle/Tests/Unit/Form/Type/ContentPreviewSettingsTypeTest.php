@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\Exception;
 
 final class ContentPreviewSettingsTypeTest extends TestCase
 {
@@ -126,7 +127,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -223,7 +224,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -289,7 +290,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -395,7 +396,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formBuilder = $this->createMock(FormBuilderInterface::class);

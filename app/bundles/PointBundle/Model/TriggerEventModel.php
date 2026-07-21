@@ -8,6 +8,7 @@ use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends CommonFormModel<TriggerEvent>
@@ -44,7 +45,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);

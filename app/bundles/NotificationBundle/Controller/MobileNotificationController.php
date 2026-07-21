@@ -13,6 +13,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class MobileNotificationController extends FormController
 {
@@ -24,7 +25,7 @@ class MobileNotificationController extends FormController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireMobileNotificationController(
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
     ): void {
         $this->auditLogModel = $auditLogModel;

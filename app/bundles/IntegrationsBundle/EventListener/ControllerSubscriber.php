@@ -9,6 +9,7 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class ControllerSubscriber implements EventSubscriberInterface
 {
@@ -25,7 +26,7 @@ class ControllerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelController(\Symfony\Component\HttpKernel\Event\ControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();
 

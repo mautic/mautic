@@ -5,18 +5,20 @@ namespace Mautic\CategoryBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AjaxController extends CommonAjaxController
 {
     private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCategoryAjaxController(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
+    public function autowireCategoryAjaxController(CategoryModel $categoryModel): void
     {
         $this->categoryModel = $categoryModel;
     }
 
-    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function categoryListAction(Request $request): JsonResponse
     {
         $bundle        = InputHelper::clean($request->query->get('bundle'));
         $filter        = InputHelper::clean($request->query->get('filter'));

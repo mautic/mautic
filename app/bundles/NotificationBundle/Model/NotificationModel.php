@@ -29,6 +29,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
+use Mautic\NotificationBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<Notification>
@@ -49,18 +51,18 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\NotificationBundle\Entity\NotificationRepository $notificationRepository,
-        private readonly \Mautic\NotificationBundle\Entity\StatRepository $statRepository,
+        private readonly NotificationRepository $notificationRepository,
+        private readonly StatRepository $statRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\NotificationBundle\Entity\NotificationRepository
+    public function getRepository(): NotificationRepository
     {
         return $this->notificationRepository;
     }
 
-    public function getStatRepository(): \Mautic\NotificationBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
         return $this->statRepository;
     }

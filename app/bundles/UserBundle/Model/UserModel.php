@@ -30,6 +30,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\UserInviteRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<User>
@@ -53,9 +57,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
         CoreParametersHelper $coreParametersHelper,
         private readonly Environment $twig,
         private readonly UserRepository $userRepository,
-        private readonly \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository,
-        private readonly \Mautic\UserBundle\Entity\RoleRepository $roleRepository,
-        private readonly \Mautic\UserBundle\Entity\UserInviteRepository $userInviteRepository,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly RoleRepository $roleRepository,
+        private readonly UserInviteRepository $userInviteRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -119,7 +123,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         return $entity->getPassword();
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));

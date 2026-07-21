@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Message>
@@ -96,7 +97,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;

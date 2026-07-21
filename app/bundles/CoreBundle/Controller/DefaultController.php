@@ -5,6 +5,9 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Almost all other Mautic Bundle controllers extend this default controller.
@@ -17,8 +20,8 @@ class DefaultController extends CommonController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireDefaultController(
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
-        \Mautic\PageBundle\Model\PageModel $pageModel,
+        NotificationModel $notificationModel,
+        PageModel $pageModel,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->pageModel = $pageModel;
@@ -44,7 +47,7 @@ class DefaultController extends CommonController
         return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
     }
 
-    public function globalSearchAction(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function globalSearchAction(Request $request): Response
     {
         $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
         $request->getSession()->set('mautic.global_search', $searchStr);
@@ -65,7 +68,7 @@ class DefaultController extends CommonController
         );
     }
 
-    public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
+    public function notificationsAction(): Response
     {
         [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent(null, false, 200);
 

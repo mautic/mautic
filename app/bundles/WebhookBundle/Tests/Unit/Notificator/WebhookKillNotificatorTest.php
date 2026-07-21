@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use PHPUnit\Framework\Exception;
 
 final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -242,7 +243,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                     return $this->details;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->webhook->expects($this->once())

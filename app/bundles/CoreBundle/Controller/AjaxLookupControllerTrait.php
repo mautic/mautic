@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 
 trait AjaxLookupControllerTrait
 {
@@ -80,7 +81,7 @@ trait AjaxLookupControllerTrait
      *
      * @return AbstractCommonModel<object>
      */
-    abstract protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface;
+    abstract protected function getModel($modelNameKey): MauticModelInterface;
 
     /**
      * Get's the content of error page.

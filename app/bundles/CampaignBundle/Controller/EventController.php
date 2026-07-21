@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CampaignBundle\Model\EventModel;
 
 class EventController extends CommonFormController
 {
@@ -50,7 +51,7 @@ class EventController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly CampaignModel $campaignModel,
-        private readonly \Mautic\CampaignBundle\Model\EventModel $eventModel,
+        private readonly EventModel $eventModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

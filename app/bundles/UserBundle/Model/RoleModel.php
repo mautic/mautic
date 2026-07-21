@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Role>
@@ -26,7 +29,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
     private RoleRepository $roleRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireRoleModel(RoleRepository $roleRepository, \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository, \Mautic\UserBundle\Entity\UserRepository $userRepository): void
+    public function autowireRoleModel(RoleRepository $roleRepository, PermissionRepository $permissionRepository, UserRepository $userRepository): void
     {
         $this->roleRepository = $roleRepository;
         $this->permissionRepository = $permissionRepository;
@@ -102,7 +105,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);

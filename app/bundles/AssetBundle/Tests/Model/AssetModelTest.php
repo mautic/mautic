@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use PHPUnit\Framework\Exception;
 
 final class AssetModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -207,7 +208,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())

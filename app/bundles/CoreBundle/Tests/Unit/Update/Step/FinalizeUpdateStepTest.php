@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\Exception;
 
 final class FinalizeUpdateStepTest extends AbstractStepTestCase
 {
@@ -79,7 +80,7 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
                     return $updateSuccessfulKey;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->pathsHelper->expects($this->once())

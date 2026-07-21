@@ -29,6 +29,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class FormController extends CommonFormController
 {
@@ -47,7 +48,7 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly FormModel $formModel,
-        private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);

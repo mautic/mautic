@@ -34,6 +34,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Webhook>
@@ -164,7 +165,7 @@ class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);

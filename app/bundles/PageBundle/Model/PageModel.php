@@ -57,6 +57,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
+use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\PageRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Page>
@@ -110,10 +115,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private StatRepository $statRepository,
         private BotRatioHelper $botRatioHelper,
         private ValidatorInterface $validator,
-        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
-        private readonly \Mautic\PageBundle\Entity\HitRepository $hitRepository,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        private readonly \Mautic\LeadBundle\Entity\UtmTagRepository $utmTagRepository,
+        private readonly PageRepository $pageRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly UtmTagRepository $utmTagRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -125,7 +130,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
+    public function getRepository(): PageRepository
     {
         $repo = $this->pageRepository;
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -133,7 +138,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
+    public function getHitRepository(): HitRepository
     {
         return $this->hitRepository;
     }
@@ -211,7 +216,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);

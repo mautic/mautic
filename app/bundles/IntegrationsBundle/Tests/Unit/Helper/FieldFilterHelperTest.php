@@ -8,6 +8,7 @@ use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 final class FieldFilterHelperTest extends TestCase
 {
@@ -62,7 +63,7 @@ final class FieldFilterHelperTest extends TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject&ConfigFormSyncInterface
      */
-    private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
+    private function getIntegrationObject(): MockObject
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getLabel')

@@ -37,6 +37,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\AssetBundle\Entity\AssetRepository;
+use Mautic\AssetBundle\Entity\DownloadRepository;
+use Mautic\EmailBundle\Entity\EmailRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Asset>
@@ -65,9 +69,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        private readonly \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
-        private readonly \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly AssetRepository $assetRepository,
+        private readonly DownloadRepository $downloadRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -283,12 +287,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
+    public function getRepository(): AssetRepository
     {
         return $this->assetRepository;
     }
 
-    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
+    public function getDownloadRepository(): DownloadRepository
     {
         return $this->downloadRepository;
     }
@@ -303,7 +307,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);

@@ -18,6 +18,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Doctrine\DBAL\Exception\DriverException;
 
 final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
@@ -141,7 +142,7 @@ final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $driverException = new \Doctrine\DBAL\Exception\DriverException($dbalException, null);
+        $driverException = new DriverException($dbalException, null);
 
         $this->columnSchemaHelper->expects($this->once())
             ->method('executeChanges')

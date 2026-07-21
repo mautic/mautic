@@ -16,6 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class ExportHelperTest extends TestCase
 {
@@ -129,7 +130,7 @@ final class ExportHelperTest extends TestCase
 
     public function testWriteToZipFileIncludesAssetsWithCustomPath(): void
     {
-        $filesystem = new \Symfony\Component\Filesystem\Filesystem();
+        $filesystem = new Filesystem();
         $tempDir    = sys_get_temp_dir();
         $customDir  = $tempDir.'/export_test_'.uniqid();
         $filesystem->mkdir($customDir);

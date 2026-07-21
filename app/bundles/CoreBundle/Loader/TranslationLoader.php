@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Finder\SplFileInfo;
 
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
@@ -76,7 +77,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations(MessageCatalogue $catalogue, string $locale, \Symfony\Component\Finder\SplFileInfo $file): void
+    private function loadTranslations(MessageCatalogue $catalogue, string $locale, SplFileInfo $file): void
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);

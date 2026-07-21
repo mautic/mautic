@@ -15,6 +15,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -216,7 +217,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
+    private function getReportGeneratorEventMock(): MockObject
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
@@ -231,7 +232,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
+    private function getQueryBuilderMock(): MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 

@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 
 /**
  * @extends FormModel<MessageQueue>
@@ -42,13 +44,13 @@ class MessageQueueModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private readonly \Mautic\ChannelBundle\Entity\MessageQueueRepository $messageQueueRepository,
-        private readonly \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepository,
+        private readonly MessageQueueRepository $messageQueueRepository,
+        private readonly FrequencyRuleRepository $frequencyRuleRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\ChannelBundle\Entity\MessageQueueRepository
+    public function getRepository(): MessageQueueRepository
     {
         return $this->messageQueueRepository;
     }

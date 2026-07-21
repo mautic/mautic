@@ -43,6 +43,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CampaignBundle\Model\EventModel;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -114,7 +115,7 @@ class CampaignController extends AbstractStandardFormController
         private EntityManager $em,
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
-        private \Mautic\CampaignBundle\Model\EventModel $eventModel,
+        private EventModel $eventModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

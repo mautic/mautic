@@ -17,6 +17,12 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\FormBundle\Entity\ActionRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\ReportBundle\Entity\ReportRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Tag>
@@ -36,7 +42,7 @@ class TagModel extends FormModel
     private TagRepository $tagRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireTagModel(TagRepository $tagRepository, \Mautic\CampaignBundle\Entity\EventRepository $eventRepository, \Mautic\FormBundle\Entity\ActionRepository $actionRepository, \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository, \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository, \Mautic\ReportBundle\Entity\ReportRepository $reportRepository): void
+    public function autowireTagModel(TagRepository $tagRepository, EventRepository $eventRepository, ActionRepository $actionRepository, TriggerEventRepository $triggerEventRepository, LeadListRepository $leadListRepository, ReportRepository $reportRepository): void
     {
         $this->tagRepository = $tagRepository;
         $this->eventRepository = $eventRepository;
@@ -83,7 +89,7 @@ class TagModel extends FormModel
      * @param Tag   $entity
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);

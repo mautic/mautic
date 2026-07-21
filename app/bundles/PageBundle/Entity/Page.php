@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ApiResource(
     operations: [
@@ -219,8 +220,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function __construct()
     {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
     }
 

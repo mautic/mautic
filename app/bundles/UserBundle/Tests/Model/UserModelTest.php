@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Doctrine\DBAL\Exception;
 
 final class UserModelTest extends TestCase
 {
@@ -147,7 +148,7 @@ final class UserModelTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('flush')
-            ->willThrowException(new \Doctrine\DBAL\Exception($errorMessage));
+            ->willThrowException(new Exception($errorMessage));
 
         $this->translator->expects($this->exactly(2))
             ->method('trans')

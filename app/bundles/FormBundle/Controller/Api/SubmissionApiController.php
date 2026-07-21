@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\FormBundle\Model\FormModel;
 
 /**
  * @extends CommonApiController<Submission>
@@ -39,7 +40,7 @@ class SubmissionApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         SubmissionModel $formSubmissionModel,
-        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+        private readonly FormModel $formModel,
     ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;

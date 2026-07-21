@@ -13,6 +13,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use PHPUnit\Framework\Exception;
 
 final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -106,7 +107,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
                     return 'upload2.txt';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formUploader->uploadFiles($filesToUpload, $submission);

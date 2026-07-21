@@ -40,6 +40,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\SmsBundle\Entity\SmsRepository;
+use Mautic\SmsBundle\Entity\StatRepository;
 
 /**
  * @extends FormModel<Sms>
@@ -63,19 +65,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
-        private readonly \Mautic\SmsBundle\Entity\StatRepository $statRepository,
+        private readonly SmsRepository $smsRepository,
+        private readonly StatRepository $statRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
+    public function getRepository(): SmsRepository
     {
         return $this->smsRepository;
     }
 
-    public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
         return $this->statRepository;
     }

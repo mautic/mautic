@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class SmsController extends FormController
 {
@@ -28,7 +29,7 @@ class SmsController extends FormController
     #[Required]
     public function autowireSmsController(
         SmsModel $smsModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
     ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;

@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Widget>
@@ -273,7 +274,7 @@ class DashboardModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');

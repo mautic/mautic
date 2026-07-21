@@ -8,13 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CampaignBundle\Model\CampaignModel;
 
 class SourceController extends CommonFormController
 {
     private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireSourceController(\Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+    public function autowireSourceController(CampaignModel $campaignModel): void
     {
         $this->campaignModel = $campaignModel;
     }

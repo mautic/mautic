@@ -30,6 +30,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Service\Attribute\Required;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 
 class CommonController extends AbstractController implements MauticController
 {
@@ -44,7 +46,7 @@ class CommonController extends AbstractController implements MauticController
     #[Required]
     public function autowireCommonController(
         PageModel $pageModel,
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        NotificationModel $notificationModel,
     ): void {
         $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
@@ -153,7 +155,7 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
      *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
      */
-    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
+    protected function getModel($modelNameKey): MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }

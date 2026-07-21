@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twilio\Exceptions\ConfigurationException;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class TwilioCallback implements CallbackInterface
 {
@@ -27,7 +28,7 @@ class TwilioCallback implements CallbackInterface
     /**
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request): \Doctrine\Common\Collections\ArrayCollection
+    public function getContacts(Request $request): ArrayCollection
     {
         $this->validateRequest($request->request);
 

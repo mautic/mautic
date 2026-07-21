@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<LeadDevice>
@@ -64,7 +65,7 @@ class DeviceModel extends FormModel
     /**
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);

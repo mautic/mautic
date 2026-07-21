@@ -21,13 +21,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 
 class AjaxController extends CommonController
 {
     private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCoreAjaxController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    public function autowireCoreAjaxController(NotificationModel $notificationModel): void
     {
         $this->notificationModel = $notificationModel;
     }

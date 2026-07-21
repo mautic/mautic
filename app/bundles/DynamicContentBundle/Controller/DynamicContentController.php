@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class DynamicContentController extends FormController
 {
@@ -26,7 +27,7 @@ class DynamicContentController extends FormController
 
     #[Required]
     public function autowireDynamicContentController(
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
         PageModel $pageModel,
         TrackableModel $trackableModel,

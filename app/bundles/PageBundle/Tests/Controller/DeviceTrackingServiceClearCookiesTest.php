@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\BrowserKit\Cookie;
 
 final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
 {
@@ -33,7 +34,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
         $this->em->flush();
 
         if ($shouldClearCookies) {
-            $this->client->getCookieJar()->set(new \Symfony\Component\BrowserKit\Cookie('Blocked-Tracking', '1'));
+            $this->client->getCookieJar()->set(new Cookie('Blocked-Tracking', '1'));
         }
 
         $this->client->request(Request::METHOD_GET, '/test-clear-cookies');

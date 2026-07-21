@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 
 /**
  * @extends AbstractType<mixed>
@@ -589,7 +590,7 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_flip(array_map(fn (\Mautic\CoreBundle\Shortener\ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
+        $choices         = array_flip(array_map(fn (ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
 
         $builder->add(
             Shortener::SHORTENER_SERVICE,

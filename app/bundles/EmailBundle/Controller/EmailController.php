@@ -31,6 +31,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 class EmailController extends FormController
 {
@@ -46,8 +48,8 @@ class EmailController extends FormController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireEmailController(
-        \Mautic\LeadBundle\Model\ListModel $listModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        ListModel $listModel,
+        AuditLogModel $auditLogModel,
         EmailModel $emailModel,
     ): void {
         $this->listModel = $listModel;

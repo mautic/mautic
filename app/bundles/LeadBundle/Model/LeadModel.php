@@ -72,6 +72,21 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
+use Mautic\LeadBundle\Entity\LeadCategoryRepository;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\MergeRecordRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
+use Mautic\StageBundle\Entity\StageRepository;
+use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Lead>
@@ -133,21 +148,21 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly LeadRepository $leadRepository,
-        private readonly \Mautic\LeadBundle\Entity\TagRepository $tagRepository,
-        private readonly \Mautic\LeadBundle\Entity\PointsChangeLogRepository $pointsChangeLogRepository,
-        private readonly \Mautic\LeadBundle\Entity\UtmTagRepository $utmTagRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
-        private readonly \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepository,
-        private readonly \Mautic\LeadBundle\Entity\StagesChangeLogRepository $stagesChangeLogRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadCategoryRepository $leadCategoryRepository,
-        private readonly \Mautic\LeadBundle\Entity\MergeRecordRepository $mergeRecordRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly TagRepository $tagRepository,
+        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
+        private readonly UtmTagRepository $utmTagRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly FrequencyRuleRepository $frequencyRuleRepository,
+        private readonly StagesChangeLogRepository $stagesChangeLogRepository,
+        private readonly LeadCategoryRepository $leadCategoryRepository,
+        private readonly MergeRecordRepository $mergeRecordRepository,
+        private readonly LeadListRepository $leadListRepository,
         private readonly GroupContactScoreRepository $groupContactScoreRepository,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
-        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
-        private readonly \Mautic\LeadBundle\Entity\CompanyLeadRepository $companyLeadRepository,
-        private readonly \Mautic\LeadBundle\Entity\DoNotContactRepository $doNotContactRepository,
+        private readonly StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -180,12 +195,12 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      */
-    public function getTagRepository(): \Mautic\LeadBundle\Entity\TagRepository
+    public function getTagRepository(): TagRepository
     {
         return $this->tagRepository;
     }
 
-    public function getPointLogRepository(): \Mautic\LeadBundle\Entity\PointsChangeLogRepository
+    public function getPointLogRepository(): PointsChangeLogRepository
     {
         return $this->pointsChangeLogRepository;
     }
@@ -193,7 +208,7 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      */
-    public function getUtmTagRepository(): \Mautic\LeadBundle\Entity\UtmTagRepository
+    public function getUtmTagRepository(): UtmTagRepository
     {
         return $this->utmTagRepository;
     }
@@ -201,7 +216,7 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      */
-    public function getDeviceRepository(): \Mautic\LeadBundle\Entity\LeadDeviceRepository
+    public function getDeviceRepository(): LeadDeviceRepository
     {
         return $this->leadDeviceRepository;
     }
@@ -209,7 +224,7 @@ class LeadModel extends FormModel
     /**
      * Get the lead event log repository.
      */
-    public function getEventLogRepository(): \Mautic\LeadBundle\Entity\LeadEventLogRepository
+    public function getEventLogRepository(): LeadEventLogRepository
     {
         return $this->leadEventLogRepository;
     }
@@ -217,12 +232,12 @@ class LeadModel extends FormModel
     /**
      * Get the frequency rules repository.
      */
-    public function getFrequencyRuleRepository(): \Mautic\LeadBundle\Entity\FrequencyRuleRepository
+    public function getFrequencyRuleRepository(): FrequencyRuleRepository
     {
         return $this->frequencyRuleRepository;
     }
 
-    public function getStagesChangeLogRepository(): \Mautic\LeadBundle\Entity\StagesChangeLogRepository
+    public function getStagesChangeLogRepository(): StagesChangeLogRepository
     {
         return $this->stagesChangeLogRepository;
     }
@@ -230,17 +245,17 @@ class LeadModel extends FormModel
     /**
      * Get the lead categories repository.
      */
-    public function getLeadCategoryRepository(): \Mautic\LeadBundle\Entity\LeadCategoryRepository
+    public function getLeadCategoryRepository(): LeadCategoryRepository
     {
         return $this->leadCategoryRepository;
     }
 
-    public function getMergeRecordRepository(): \Mautic\LeadBundle\Entity\MergeRecordRepository
+    public function getMergeRecordRepository(): MergeRecordRepository
     {
         return $this->mergeRecordRepository;
     }
 
-    public function getLeadListRepository(): \Mautic\LeadBundle\Entity\LeadListRepository
+    public function getLeadListRepository(): LeadListRepository
     {
         return $this->leadListRepository;
     }
@@ -269,7 +284,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');

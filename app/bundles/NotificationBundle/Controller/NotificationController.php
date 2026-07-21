@@ -13,6 +13,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class NotificationController extends AbstractFormController
 {
@@ -24,7 +25,7 @@ class NotificationController extends AbstractFormController
 
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireNotificationController(
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
     ): void {
         $this->auditLogModel = $auditLogModel;

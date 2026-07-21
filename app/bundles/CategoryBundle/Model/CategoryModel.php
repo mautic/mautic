@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @extends FormModel<Category>
@@ -107,7 +108,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);

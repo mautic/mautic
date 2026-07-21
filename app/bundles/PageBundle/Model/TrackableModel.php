@@ -19,6 +19,7 @@ use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\PageBundle\Entity\TrackableRepository;
 
 /**
  * @extends AbstractCommonModel<Trackable>
@@ -71,12 +72,12 @@ class TrackableModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly TrackableRepository $trackableRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
+    public function getRepository(): TrackableRepository
     {
         return $this->trackableRepository;
     }

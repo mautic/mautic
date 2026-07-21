@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class UserController extends FormController
 {
@@ -36,7 +37,7 @@ class UserController extends FormController
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireUserController(
         UserModel $userModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         RoleModel $roleModel,
     ): void {
         $this->userModel = $userModel;

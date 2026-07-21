@@ -12,13 +12,14 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class AssetController extends FormController
 {
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAssetController(\Mautic\CoreBundle\Model\AuditLogModel $auditLogModel): void
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
     {
         $this->auditLogModel = $auditLogModel;
     }

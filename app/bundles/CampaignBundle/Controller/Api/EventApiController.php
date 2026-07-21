@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Mautic\CampaignBundle\Model\EventModel;
 
 /**
  * @extends CommonApiController<Event>
@@ -26,7 +27,7 @@ class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, \Mautic\CampaignBundle\Model\EventModel $campaignEventModel)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, EventModel $campaignEventModel)
     {
         $this->model                    = $campaignEventModel;
         $this->entityClass              = Event::class;

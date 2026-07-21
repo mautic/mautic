@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends CommonApiController<Page>
@@ -44,7 +45,7 @@ class PageApiController extends CommonApiController
     /**
      * Obtains a list of pages.
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): \Symfony\Component\HttpFoundation\Response
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         // get parent level only
         $this->listFilters[] = [
