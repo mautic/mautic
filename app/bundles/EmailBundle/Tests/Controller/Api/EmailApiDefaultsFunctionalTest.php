@@ -73,7 +73,6 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $savedEmail = $this->em->find(Email::class, $emailId);
         $this->assertInstanceOf(Email::class, $savedEmail, 'Email must be persisted');
         $this->assertNull($savedEmail->getPreferenceCenter(), 'Preference center must remain null for runtime fallback');
-        $this->assertNotInstanceOf(Page::class, $savedEmail->getPreferenceCenter(), 'Preference center must remain null for runtime fallback');
     }
 
     public function testNewEmailViaApiDoesNotOverwriteExplicitValues(): void
