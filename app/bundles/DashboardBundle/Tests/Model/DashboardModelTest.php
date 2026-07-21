@@ -54,6 +54,7 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(\Mautic\DashboardBundle\Entity\WidgetRepository::class), // $widgetRepository
         );
     }
 
@@ -123,6 +124,7 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $logger,
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(\Mautic\DashboardBundle\Entity\WidgetRepository::class), // $widgetRepository
         );
 
         // Pass timezone to skip userHelper->getUser()->getTimezone()
