@@ -9,6 +9,7 @@ use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<TriggerEvent>
@@ -17,7 +18,7 @@ class TriggerEventModel extends CommonFormModel
 {
     private TriggerEventRepository $triggerEventRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTriggerEventModel(TriggerEventRepository $triggerEventRepository): void
     {
         $this->triggerEventRepository = $triggerEventRepository;

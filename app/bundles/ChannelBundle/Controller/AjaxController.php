@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
@@ -14,7 +15,7 @@ class AjaxController extends CommonAjaxController
 
     private MessageQueueModel $messageQueueModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireChannelAjaxController(MessageQueueModel $messageQueueModel): void
     {
         $this->messageQueueModel = $messageQueueModel;

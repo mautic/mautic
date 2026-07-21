@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Monitoring>
@@ -22,7 +23,7 @@ class MonitoringModel extends FormModel
 {
     private MonitoringRepository $monitoringRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireMonitoringModel(MonitoringRepository $monitoringRepository): void
     {
         $this->monitoringRepository = $monitoringRepository;

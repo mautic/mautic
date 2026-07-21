@@ -9,12 +9,13 @@ use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     private PointModel $pointModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePointAjaxController(PointModel $pointModel): void
     {
         $this->pointModel = $pointModel;

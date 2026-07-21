@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class UserController extends FormController
 {
@@ -34,7 +35,7 @@ class UserController extends FormController
 
     private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireUserController(
         UserModel $userModel,
         AuditLogModel $auditLogModel,

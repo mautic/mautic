@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Almost all other Mautic Bundle controllers extend this default controller.
@@ -18,7 +19,7 @@ class DefaultController extends CommonController
 
     private PageModel $pageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireDefaultController(
         NotificationModel $notificationModel,
         PageModel $pageModel,

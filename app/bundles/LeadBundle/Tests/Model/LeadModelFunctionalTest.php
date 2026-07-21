@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class LeadModelFunctionalTest extends MauticMysqlTestCase
@@ -183,7 +184,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldValueProvider')]
+    #[DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
         /** @var FieldModel $fieldModel */

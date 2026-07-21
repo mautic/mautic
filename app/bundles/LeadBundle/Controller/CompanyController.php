@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CompanyController extends FormController
 {
@@ -31,7 +32,7 @@ class CompanyController extends FormController
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireCompanyController(
         LeadModel $leadModel,
         CompanyModel $companyModel,

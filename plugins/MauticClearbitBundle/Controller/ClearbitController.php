@@ -13,6 +13,7 @@ use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class ClearbitController extends FormController
 {
@@ -20,7 +21,7 @@ class ClearbitController extends FormController
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireClearbitController(
         LeadModel $leadModel,
         CompanyModel $companyModel,

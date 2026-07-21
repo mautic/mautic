@@ -61,6 +61,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class LeadController extends FormController
 {
@@ -85,7 +86,7 @@ class LeadController extends FormController
 
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $leadListModel,

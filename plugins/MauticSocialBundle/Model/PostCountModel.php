@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<PostCount>
@@ -13,7 +14,7 @@ class PostCountModel extends AbstractCommonModel
 {
     private PostCountRepository $postCountRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePostCountModel(PostCountRepository $postCountRepository): void
     {
         $this->postCountRepository = $postCountRepository;

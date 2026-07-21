@@ -22,12 +22,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonController
 {
     private NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireCoreAjaxController(NotificationModel $notificationModel): void
     {
         $this->notificationModel = $notificationModel;

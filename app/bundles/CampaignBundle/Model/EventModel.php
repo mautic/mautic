@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Event>
@@ -24,7 +25,7 @@ class EventModel extends FormModel
 
     private EventRepository $eventRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireEventModel(
         EventRepository $eventRepository, CampaignRepository $campaignRepository, LeadEventLogRepository $leadEventLogRepository,
     ): void {

@@ -9,13 +9,14 @@ use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
 class AjaxController extends CommonAjaxController
 {
     private StageModel $stageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireStageAjaxController(
         StageModel $stageModel,
     ): void {

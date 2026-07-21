@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Tag>
@@ -41,7 +42,7 @@ class TagModel extends FormModel
 
     private TagRepository $tagRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTagModel(TagRepository $tagRepository, EventRepository $eventRepository, ActionRepository $actionRepository, TriggerEventRepository $triggerEventRepository, LeadListRepository $leadListRepository, ReportRepository $reportRepository): void
     {
         $this->tagRepository = $tagRepository;

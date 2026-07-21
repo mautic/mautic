@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class MonitoringController extends FormController
 {
@@ -28,7 +29,7 @@ class MonitoringController extends FormController
 
     private PostCountModel $postCountModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
         AuditLogModel $auditLogModel,

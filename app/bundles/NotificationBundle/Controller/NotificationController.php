@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class NotificationController extends AbstractFormController
 {
@@ -23,7 +24,7 @@ class NotificationController extends AbstractFormController
 
     private NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireNotificationController(
         AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,

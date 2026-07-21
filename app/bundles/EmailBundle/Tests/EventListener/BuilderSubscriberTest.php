@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -90,7 +91,7 @@ final class BuilderSubscriberTest extends TestCase
         $this->assertSame('Owner Signature', $event->getTokens()['{signature}']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fixEmailAccessibilityContent')]
+    #[DataProvider('fixEmailAccessibilityContent')]
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');

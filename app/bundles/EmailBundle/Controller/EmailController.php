@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class EmailController extends FormController
 {
@@ -46,7 +47,7 @@ class EmailController extends FormController
 
     private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireEmailController(
         ListModel $listModel,
         AuditLogModel $auditLogModel,

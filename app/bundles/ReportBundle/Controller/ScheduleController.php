@@ -7,12 +7,13 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class ScheduleController extends CommonAjaxController
 {
     private ReportModel $reportModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireScheduleController(ReportModel $reportModel): void
     {
         $this->reportModel = $reportModel;

@@ -14,6 +14,7 @@ use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class PublicController extends FormController
 {
@@ -25,7 +26,7 @@ class PublicController extends FormController
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         NotificationModel $notificationModel,
         UserModel $userModel,

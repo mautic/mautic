@@ -13,12 +13,13 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AssetController extends FormController
 {
     private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireAssetController(AuditLogModel $auditLogModel): void
     {
         $this->auditLogModel = $auditLogModel;

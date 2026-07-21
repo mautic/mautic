@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Role>
@@ -28,7 +29,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
 
     private RoleRepository $roleRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireRoleModel(RoleRepository $roleRepository, PermissionRepository $permissionRepository, UserRepository $userRepository): void
     {
         $this->roleRepository = $roleRepository;

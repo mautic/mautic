@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,7 +21,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
         yield 'without blocked tracking cookie' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieDataProvider')]
+    #[DataProvider('blockedTrackingCookieDataProvider')]
     public function testClearTrackingCookiesBehavior(bool $shouldClearCookies): void
     {
         $this->logoutUser();

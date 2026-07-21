@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -808,7 +809,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(LeadList::class, $segmentExistCheck);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
+    #[DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(

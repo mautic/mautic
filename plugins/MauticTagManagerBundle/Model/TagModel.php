@@ -10,12 +10,13 @@ use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class TagModel extends BaseTagModel implements GlobalSearchInterface
 {
     private TagRepository $tagRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePluginTagModel(TagRepository $tagRepository): void
     {
         $this->tagRepository = $tagRepository;

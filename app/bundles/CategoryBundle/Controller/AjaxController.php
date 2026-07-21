@@ -7,12 +7,13 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     private CategoryModel $categoryModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireCategoryAjaxController(CategoryModel $categoryModel): void
     {
         $this->categoryModel = $categoryModel;

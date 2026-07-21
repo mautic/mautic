@@ -7,14 +7,16 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\EscaperExtension;
 
 final class PublicControllerTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testGenerateActionWithContactTokenInLinkUrl(): void
     {
         $linkUrl = 'https://{contactfield=site_url}/tour';

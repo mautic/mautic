@@ -13,6 +13,7 @@ use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class FullContactController extends FormController
 {
@@ -20,7 +21,7 @@ class FullContactController extends FormController
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireFullContactController(
         LeadModel $leadModel,
         CompanyModel $companyModel,

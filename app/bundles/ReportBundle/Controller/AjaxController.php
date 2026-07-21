@@ -6,12 +6,13 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     private ReportModel $reportModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireReportAjaxController(ReportModel $reportModel): void
     {
         $this->reportModel = $reportModel;

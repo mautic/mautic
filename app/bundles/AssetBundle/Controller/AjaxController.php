@@ -11,12 +11,13 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     private AssetModel $assetModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireAssetAjaxController(
         AssetModel $assetModel,
     ): void {

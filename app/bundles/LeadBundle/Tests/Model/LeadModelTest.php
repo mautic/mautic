@@ -41,6 +41,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -769,7 +770,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that email validation is triggered for invalid values like 0, "0".
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailValidationDuringImportProvider')]
+    #[DataProvider('emailValidationDuringImportProvider')]
     public function testEmailValidationDuringImport(
         mixed $emailValue,
         bool $shouldValidate,

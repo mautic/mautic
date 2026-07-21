@@ -9,12 +9,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class SourceController extends CommonFormController
 {
     private CampaignModel $campaignModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireSourceController(CampaignModel $campaignModel): void
     {
         $this->campaignModel = $campaignModel;

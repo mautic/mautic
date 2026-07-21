@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<IntegrationEntity>
@@ -14,7 +15,7 @@ class IntegrationEntityModel extends FormModel
 {
     private IntegrationEntityRepository $integrationEntityRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireIntegrationEntityModel(IntegrationEntityRepository $integrationEntityRepository): void
     {
         $this->integrationEntityRepository = $integrationEntityRepository;

@@ -7,11 +7,12 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TimezoneResolverTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTimezones')]
+    #[DataProvider('dataTimezones')]
     public function testTimezones(?string $configuredTimezone, string $expectedTimezone): void
     {
         $coreParametersHelper = new class($configuredTimezone) extends CoreParametersHelper {

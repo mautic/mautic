@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Tweet>
@@ -28,7 +29,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     private TweetRepository $tweetRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
     {
         $this->tweetRepository = $tweetRepository;

@@ -8,6 +8,7 @@ use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Action>
@@ -16,7 +17,7 @@ class ActionModel extends CommonFormModel
 {
     private ActionRepository $actionRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireActionModel(ActionRepository $actionRepository): void
     {
         $this->actionRepository = $actionRepository;
