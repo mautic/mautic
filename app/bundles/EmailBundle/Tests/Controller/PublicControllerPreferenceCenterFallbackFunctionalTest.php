@@ -9,7 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PublicControllerPreferenceCenterFallbackFunctionalTest extends MauticMysqlTestCase
@@ -49,7 +48,7 @@ final class PublicControllerPreferenceCenterFallbackFunctionalTest extends Mauti
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Default A', $crawler->html());
+        $this->assertStringContainsString('Default A', $crawler->html());
 
         $this->setUpSymfony(array_merge($this->configParams, [
             'email_default_preference_center_id' => $defaultB->getId(),
@@ -57,8 +56,8 @@ final class PublicControllerPreferenceCenterFallbackFunctionalTest extends Mauti
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Default B', $crawler->html());
-        Assert::assertStringNotContainsString('Default A', $crawler->html());
+        $this->assertStringContainsString('Default B', $crawler->html());
+        $this->assertStringNotContainsString('Default A', $crawler->html());
     }
 
     private function createPreferenceCenterPage(string $alias, string $html): Page
