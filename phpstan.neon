@@ -4,7 +4,7 @@ includes:
 parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
-	#reportUnmatchedIgnoredErrors: false
+	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	parallel:
 		processTimeout: 1000.0
@@ -36,11 +36,6 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
-        # optional child method access
-		-
-			identifier: '#Call to an undefined method Mautic\\CoreBundle\\Controller\\AbstractFormController::getPermissionBase\(\)#'
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
 		-
@@ -147,9 +142,6 @@ parameters:
 			message: '#class\s+Mautic#'
 		-
 			identifier: class.extendsDeprecatedClass
-			message: '#class\s+Mautic#'
-		-
-			identifier: staticMethod.deprecatedClass
 			message: '#class\s+Mautic#'
 		-
 			identifier: method.deprecatedClass
