@@ -71,7 +71,7 @@ abstract class AbstractHelper implements StatHelperInterface
      *
      * @param string $emailIdColumn
      */
-    protected function limitQueryToCreator(QueryBuilder $q, $emailIdColumn = 't.email_id'): void
+    protected function limitQueryToCreator(QueryBuilder $q, $emailIdColumn = 't.email_id')
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = '.$emailIdColumn)
             ->andWhere('e.created_by = :userId')
@@ -82,7 +82,7 @@ abstract class AbstractHelper implements StatHelperInterface
      * @param string $column
      * @param string $prefix
      */
-    protected function limitQueryToEmailIds(QueryBuilder $q, array $ids, $column, $prefix): void
+    protected function limitQueryToEmailIds(QueryBuilder $q, array $ids, $column, $prefix)
     {
         if (0 === count($ids)) {
             return;
@@ -102,7 +102,7 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @throws \Exception
      */
-    protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection): void
+    protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {
         $results = $q->executeQuery()->fetchAllAssociative();
         foreach ($results as $result) {

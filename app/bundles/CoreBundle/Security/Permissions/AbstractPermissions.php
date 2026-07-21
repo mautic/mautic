@@ -331,7 +331,7 @@ abstract class AbstractPermissions
      * @param array $permissionNames
      * @param bool  $includePublish
      */
-    protected function addStandardPermissions($permissionNames, $includePublish = true): void
+    protected function addStandardPermissions($permissionNames, $includePublish = true)
     {
         if (!is_array($permissionNames)) {
             $permissionNames = [$permissionNames];
@@ -360,7 +360,7 @@ abstract class AbstractPermissions
      * @param array                $data
      * @param bool                 $includePublish
      */
-    protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true): void
+    protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.view'   => 'view',
@@ -405,7 +405,7 @@ abstract class AbstractPermissions
      *
      * @param array $permissionNames
      */
-    protected function addManagePermission($permissionNames): void
+    protected function addManagePermission($permissionNames)
     {
         if (!is_array($permissionNames)) {
             $permissionNames = [$permissionNames];
@@ -426,7 +426,7 @@ abstract class AbstractPermissions
      * @param FormBuilderInterface $builder
      * @param array                $data
      */
-    protected function addManageFormFields($bundle, $level, &$builder, $data): void
+    protected function addManageFormFields($bundle, $level, &$builder, $data)
     {
         $choices = [
             'mautic.core.permissions.manage' => 'manage',
@@ -452,7 +452,7 @@ abstract class AbstractPermissions
      * @param array|string $permissionNames
      * @param bool         $includePublish
      */
-    protected function addExtendedPermissions($permissionNames, $includePublish = true): void
+    protected function addExtendedPermissions($permissionNames, $includePublish = true)
     {
         if (!is_array($permissionNames)) {
             $permissionNames = [$permissionNames];
@@ -486,7 +486,7 @@ abstract class AbstractPermissions
      * @param array                $data
      * @param bool                 $includePublish
      */
-    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true): void
+    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.viewown'     => 'viewown',

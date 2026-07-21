@@ -44,7 +44,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     /**
      * Fetch data from lookup service.
      */
-    protected function lookup(): void
+    protected function lookup()
     {
         $url = $this->getUrl();
 
