@@ -232,45 +232,17 @@ class PublicController extends CommonFormController
 
                 $formView = $form->createView();
 
-                $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
-                if ($prefCenter instanceof Page) {
-                    // Set the page language if there is no lead preferred locale
-                    if (empty($language) && $language = $prefCenter->getLanguage()) {
-                        $this->translator->setLocale($language);
-                    }
-
-                    $html = $prefCenter->getCustomHtml();
-                    // check if tokens are present
-                    if (str_contains($html, BuilderSubscriber::saveprefsRegex)) {
-                        // set custom tag to inject end form
-                        // update show pref center tokens by looking for their presence in the html
-                        $showParameters  = $this->buildShowParametersBasedOnContent($html, $viewParameters);
-                        $eventParameters = array_merge(
-                            $viewParameters,
-                            $showParameters,
-                            [
-                                'form'       => $formView,
-                                'startform'  => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
-                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
-                            ]
-                        );
-
-                        $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
-                        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
-
-                        $html = $event->getContent();
-                        $session->remove($successSessionName);
-
-                        $html = preg_replace(
-                            '/'.BuilderSubscriber::identifierToken.'/',
-                            $lead->getPrimaryIdentifier(),
-                            $html
-                        );
-                        $pageModel->hitPage($prefCenter, $request, 200, $lead);
-                    } else {
-                        unset($html);
-                    }
-                }
+                $html = $this->getPreferenceCenterHtml(
+                    $request,
+                    $lead,
+                    $email,
+                    $formView,
+                    $viewParameters,
+                    $language ?? null,
+                    $successSessionName,
+                    $emailDefaultsHelper,
+                    $pageModel
+                );
 
                 if (empty($html)) {
                     $html = $this->getHtml($formView, $lead, $viewParameters);
@@ -301,6 +273,50 @@ class PublicController extends CommonFormController
         }
 
         return new Response($themeHelper->renderThemeTemplate($contentTemplate, $viewParams));
+    }
+
+    /**
+     * @param array<mixed> $viewParameters
+     */
+    private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, EmailDefaultsHelper $emailDefaultsHelper, PageModel $pageModel): ?string
+    {
+        $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
+        if (!$prefCenter instanceof Page) {
+            return null;
+        }
+
+        // Set the page language if there is no lead preferred locale.
+        if (empty($language) && $language = $prefCenter->getLanguage()) {
+            $this->translator->setLocale($language);
+        }
+
+        $html = $prefCenter->getCustomHtml();
+        if (!str_contains($html, BuilderSubscriber::saveprefsRegex)) {
+            return null;
+        }
+
+        $showParameters  = $this->buildShowParametersBasedOnContent($html, $viewParameters);
+        $eventParameters = array_merge(
+            $viewParameters,
+            $showParameters,
+            [
+                'form'       => $formView,
+                'startform'  => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
+                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
+            ]
+        );
+
+        $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
+        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
+        $request->getSession()->remove($successSessionName);
+        $pageModel->hitPage($prefCenter, $request, 200, $lead);
+
+        return preg_replace(
+            '/'.BuilderSubscriber::identifierToken.'/',
+            $lead->getPrimaryIdentifier(),
+            $event->getContent()
+        );
     }
 
     public function unsubscribeAllAction(Request $request, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
