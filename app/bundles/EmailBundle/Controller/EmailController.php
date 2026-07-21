@@ -104,7 +104,6 @@ class EmailController extends FormController
             'options' => array_column($availableLists, 'name', 'alias'),
             'prefix'  => 'list',
         ];
-        $listAliasLookup = array_column($availableLists, 'alias', 'id');
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [

@@ -15,7 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class EmailControllerListingPageTest extends MauticMysqlTestCase
 {
     private const EMAIL_INDEX_PATH            = '/s/emails';
+
     private const EMAIL_VIEW_SELECTOR_PREFIX  = 'a[href="/s/emails/view/';
+
     private const DEFAULT_EMAIL_NAME          = 'Email A';
 
     protected function setUp(): void
@@ -133,7 +135,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
     public function testEmailListingShowsOnlyOwnedEmailsWithoutViewOtherPermission(): void
     {
         $ownerUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
-        $this->assertNotNull($ownerUser);
+        $this->assertInstanceOf(User::class, $ownerUser);
         $this->setPermission($ownerUser->getRole(), ['email:emails' => ['viewown']]);
 
         $ownedEmail = $this->createEmail('Owned Email', null, 'template', 'blank');
@@ -152,8 +154,8 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString("var LoginUserName                   = 'sales'", $content);
-        $this->assertStringNotContainsString('Other Email', $content);
+        $this->assertStringContainsString("var LoginUserName                   = 'sales'", (string) $content);
+        $this->assertStringNotContainsString('Other Email', (string) $content);
     }
 
     public function testEmailListingRedirectsToLastAvailablePageWhenPageIsOutOfBounds(): void

@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class EmailColumnsType extends AbstractType
 {
     public function __construct(
-        private EmailColumnsDictionary $columnsDictionary,
+        private readonly EmailColumnsDictionary $columnsDictionary,
     ) {
     }
 

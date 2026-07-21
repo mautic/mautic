@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL           = 'subdomain_url.com';
+
     private const DEFAULT_CONTACT_COLUMNS = ['name', 'email', 'id'];
+
     private const DEFAULT_EMAIL_COLUMNS   = ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
 
     private string $prefix;

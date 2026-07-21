@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class EmailListingHelper
+final readonly class EmailListingHelper
 {
     public function __construct(
-        private readonly CorePermissions $security,
-        private readonly ListModel $leadListModel,
-        private readonly TranslatorInterface $translator,
+        private CorePermissions $security,
+        private ListModel $leadListModel,
+        private TranslatorInterface $translator,
     ) {
     }
 
