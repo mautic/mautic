@@ -23,6 +23,29 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TagModel extends FormModel
 {
+    private \Mautic\ReportBundle\Entity\ReportRepository $reportRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
+    private \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository;
+
+    private \Mautic\FormBundle\Entity\ActionRepository $actionRepository;
+
+    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
+
+    private TagRepository $tagRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireTagModel(TagRepository $tagRepository, \Mautic\CampaignBundle\Entity\EventRepository $eventRepository, \Mautic\FormBundle\Entity\ActionRepository $actionRepository, \Mautic\PointBundle\Entity\TriggerEventRepository $triggerEventRepository, \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository, \Mautic\ReportBundle\Entity\ReportRepository $reportRepository): void
+    {
+        $this->tagRepository = $tagRepository;
+        $this->eventRepository = $eventRepository;
+        $this->actionRepository = $actionRepository;
+        $this->triggerEventRepository = $triggerEventRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->reportRepository = $reportRepository;
+    }
+
     /**
      * @var array<int, string>
      */
@@ -32,12 +55,9 @@ class TagModel extends FormModel
         'tags',
     ];
 
-    /**
-     * @return TagRepository
-     */
-    public function getRepository()
+    public function getRepository(): TagRepository
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->tagRepository;
     }
 
     public function getPermissionBase(): string
@@ -168,19 +188,19 @@ class TagModel extends FormModel
         $secondaryTagId = (int) $secondaryTag->getId();
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(CampaignEvent::class)->findBy(['type' => ['lead.changetags', 'lead.tags']]),
+            $this->eventRepository->findBy(['type' => ['lead.changetags', 'lead.tags']]),
             $primaryTag,
             $secondaryTag,
         );
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(Action::class)->findBy(['type' => 'lead.changetags']),
+            $this->actionRepository->findBy(['type' => 'lead.changetags']),
             $primaryTag,
             $secondaryTag,
         );
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(TriggerEvent::class)->findBy(['type' => 'lead.changetags']),
+            $this->triggerEventRepository->findBy(['type' => 'lead.changetags']),
             $primaryTag,
             $secondaryTag,
         );
@@ -214,7 +234,7 @@ class TagModel extends FormModel
     private function replaceTagFiltersInSegments(int $primaryTagId, int $secondaryTagId): void
     {
         /** @var LeadList $segment */
-        foreach ($this->em->getRepository(LeadList::class)->createQueryBuilder('l')
+        foreach ($this->leadListRepository->createQueryBuilder('l')
             ->where('l.filters LIKE :tagFilter')
             ->setParameter('tagFilter', '%"tags"%')
             ->getQuery()
@@ -234,7 +254,7 @@ class TagModel extends FormModel
     private function replaceTagFiltersInReports(int $primaryTagId, int $secondaryTagId): void
     {
         /** @var Report $report */
-        foreach ($this->em->getRepository(Report::class)->createQueryBuilder('r')
+        foreach ($this->reportRepository->createQueryBuilder('r')
             ->where('r.filters LIKE :tagFilter')
             ->setParameter('tagFilter', '%tag"%')
             ->getQuery()

@@ -55,6 +55,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \MauticPlugin\MauticFocusBundle\Entity\FocusRepository $focusRepository,
+        private readonly \MauticPlugin\MauticFocusBundle\Entity\StatRepository $statRepository,
     ) {
         $this->dispatcher     = $dispatcher;
 
@@ -93,12 +95,12 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
     {
-        return $this->em->getRepository(Focus::class);
+        return $this->focusRepository;
     }
 
     public function getStatRepository(): \MauticPlugin\MauticFocusBundle\Entity\StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**

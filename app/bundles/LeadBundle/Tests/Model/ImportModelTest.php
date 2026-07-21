@@ -11,7 +11,6 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
@@ -435,15 +434,6 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository->expects($this->exactly(3))->method('getValue')
             ->willReturnOnConsecutiveCalls(true, false, false);
 
-        $this->entityManager->expects($this->atLeast(2))
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [LeadEventLog::class, $logRepository],
-                    [Import::class, $importRepository],
-                ]
-            );
-
         $this->entityManager
             ->method('isOpen')
             ->willReturn(true);
@@ -497,7 +487,9 @@ final class ImportModelTest extends StandardImportTestHelper
             $translator,
             $userHelper,
             $this->createStub(LoggerInterface::class),
-            new ProcessSignalService()
+            new ProcessSignalService(),
+            $importRepository,
+            $logRepository,
         );
 
         $this->setUpBeforeClass();

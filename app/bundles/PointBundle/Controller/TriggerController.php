@@ -54,7 +54,7 @@ class TriggerController extends FormController
 
         $orderBy    = $request->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $request->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
-        $triggers   = $this->getModel('point.trigger')->getEntities(
+        $triggers   = $this->triggerModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -111,7 +111,7 @@ class TriggerController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $entity = $this->getModel('point.trigger')->getEntity($objectId);
+        $entity = $this->triggerModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.point.trigger.page', 1);

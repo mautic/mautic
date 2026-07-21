@@ -7,27 +7,37 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class DynamicContentController extends FormController
 {
     use CategoryListFiltersTrait;
 
+    private TrackableModel $trackableModel;
+
+    private PageModel $pageModel;
+
     private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     private DynamicContentModel $dynamicContentModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireDynamicContentController(
         \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
+        PageModel $pageModel,
+        TrackableModel $trackableModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->dynamicContentModel = $dynamicContentModel;
+        $this->pageModel = $pageModel;
+        $this->trackableModel = $trackableModel;
     }
 
     protected function getPermissions(): array
@@ -95,7 +105,6 @@ class DynamicContentController extends FormController
         $request->getSession()->set('mautic.dynamicContent.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-
         return $this->delegateView(
             [
                 'contentTemplate' => '@MauticDynamicContent/DynamicContent/list.html.twig',
@@ -394,10 +403,7 @@ class DynamicContentController extends FormController
             null,
             ['dynamic_content_id' => $entity->getId(), 'flag' => 'total_and_unique']
         );
-
-        $trackableModel = $this->getModel('page.trackable');
-        \assert($trackableModel instanceof TrackableModel);
-        $trackables = $trackableModel->getTrackableList('dynamicContent', $entity->getId());
+        $trackables = $this->trackableModel->getTrackableList('dynamicContent', $entity->getId());
 
         return $this->delegateView(
             [
