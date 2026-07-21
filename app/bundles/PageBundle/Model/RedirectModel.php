@@ -33,13 +33,14 @@ class RedirectModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly Shortener $shortener,
+        private readonly RedirectRepository $redirectRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): RedirectRepository
     {
-        return $this->em->getRepository(Redirect::class);
+        return $this->redirectRepository;
     }
 
     /**

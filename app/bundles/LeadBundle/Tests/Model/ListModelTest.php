@@ -74,7 +74,9 @@ final class ListModelTest extends TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->leadListRepositoryMock,
+            $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class), // $listLeadRepository
         );
     }
 
@@ -119,7 +121,9 @@ final class ListModelTest extends TestCase
                 $this->createStub(UrlGeneratorInterface::class),
                 $this->createStub(Translator::class),
                 $this->createStub(UserHelper::class),
-                $this->createStub(LoggerInterface::class)])
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(LeadListRepository::class),
+                $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class)])
             ->onlyMethods([])
             ->getMock();
 
