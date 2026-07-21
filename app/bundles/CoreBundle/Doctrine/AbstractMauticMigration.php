@@ -178,7 +178,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      * purposely does not have any SQL statements,
      * such as when moving data using the query builder.
      */
-    protected function suppressNoSQLStatementError()
+    protected function suppressNoSQLStatementError(): void
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
     }
