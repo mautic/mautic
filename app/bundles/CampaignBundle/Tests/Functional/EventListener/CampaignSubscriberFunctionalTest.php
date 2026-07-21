@@ -67,7 +67,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        /** @phpstan-ignore new.deprecated */
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
 
         $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);

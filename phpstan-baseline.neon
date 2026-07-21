@@ -4822,18 +4822,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
-			message: '#^Access to an undefined property Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController\:\:\$formModel\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
-
-		-
-			message: '#^Constructor of class Mautic\\FormBundle\\Controller\\Api\\SubmissionApiController has an unused parameter \$formModel\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/SubmissionApiController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1

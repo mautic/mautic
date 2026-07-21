@@ -87,7 +87,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $scheduler = $this->createMock(EventScheduler::class);
 
-        /** @phpstan-ignore new.deprecated */
         $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $scheduler,

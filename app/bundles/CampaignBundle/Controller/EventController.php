@@ -52,7 +52,6 @@ class EventController extends CommonFormController
         private readonly CampaignModel $campaignModel,
         private readonly \Mautic\CampaignBundle\Model\EventModel $eventModel,
     ) {
-        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
