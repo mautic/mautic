@@ -252,6 +252,36 @@ JS);
         $I->assertSame([], $state['cookieAccess']);
     }
 
+    public function essentialThenTrackingRequestsDwcOnce(\AcceptanceTester $I): void
+    {
+        $this->allowCorsFromFixtureOrigin();
+
+        $essentialUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $trackingUrl  = $this->getMauticUrl($I).'/mautic-tracking.js';
+        $this->loadScripts($I, [$essentialUrl, $trackingUrl], ['dwc' => '1']);
+        $I->waitForJS('return window.MauticJS && window.MauticJS.firstDeliveryMade === true', 10);
+        $I->waitForJS('return Date.now() - window.mauticLastNetworkActivity >= window.mauticNetworkQuietPeriod', 10);
+
+        $state = $this->grabBrowserState($I);
+        $eventRequests = array_values(array_filter(
+            $state['networkRequests'],
+            fn (array $request): bool => '/mtc/event' === parse_url($request['url'], PHP_URL_PATH),
+        ));
+        $dwcRequests = array_values(array_filter(
+            $state['networkRequests'],
+            fn (array $request): bool => '/dwc/acceptance-test' === parse_url($request['url'], PHP_URL_PATH),
+        ));
+
+        $I->assertTrue($state['runtimeReady']);
+        $I->assertTrue($state['trackingEnabled']);
+        $I->assertSame([], $state['errors']);
+        $I->assertSame([$essentialUrl, $trackingUrl], array_slice(array_column($state['networkRequests'], 'url'), 0, 2));
+        $I->assertCount(1, $eventRequests);
+        $I->assertCount(1, $dwcRequests);
+        $I->assertSame(1, $state['pageViewCounter']);
+        $I->assertSame(1, $state['pageEventDeliveryCount']);
+    }
+
     private function loadScript(\AcceptanceTester $I, string $endpoint): string
     {
         $scriptUrl = $this->getMauticUrl($I).$endpoint;
