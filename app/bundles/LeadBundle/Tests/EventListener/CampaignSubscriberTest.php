@@ -230,7 +230,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
@@ -268,7 +267,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
@@ -312,7 +310,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -357,7 +354,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -402,7 +398,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());

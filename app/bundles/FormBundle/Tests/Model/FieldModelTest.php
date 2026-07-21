@@ -58,7 +58,8 @@ final class FieldModelTest extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(RequestStack::class),
-            $schemaHelper
+            $schemaHelper,
+            $this->createStub(\Mautic\FormBundle\Entity\FieldRepository::class) // $fieldRepository
         );
 
         $entityManager

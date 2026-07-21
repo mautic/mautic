@@ -72,17 +72,8 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
-        $entityManager               = $this->createMock(EntityManager::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
-
-        $entityManager
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [Form::class, $this->formRepository],
-                ]
-            );
 
         $this->formModel = new FormModel(
             $this->createStub(RequestStack::class),
@@ -98,14 +89,15 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(ColumnSchemaHelper::class),
             $this->createStub(TableSchemaHelper::class),
             $this->createStub(MappedObjectCollectorInterface::class),
-            $entityManager,
+            $this->createStub(EntityManager::class),
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcher::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->formRepository,
         );
     }
 
@@ -376,15 +368,13 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string[]>
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function fieldTypeProvider(): array
+    public static function fieldTypeProvider(): \Iterator
     {
-        return [
-            ['select'],
-            ['multiselect'],
-            ['lookup'],
-        ];
+        yield ['select'];
+        yield ['multiselect'];
+        yield ['lookup'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('fieldTypeProvider')]

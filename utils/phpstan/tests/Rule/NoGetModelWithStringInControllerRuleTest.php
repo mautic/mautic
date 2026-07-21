@@ -28,5 +28,8 @@ final class NoGetModelWithStringInControllerRuleTest extends RuleTestCase
         ]);
 
         $this->analyse([__DIR__.'/Fixture/GetModelByStringService.php'], []);
+
+        // a trait would be reported in every controller using it, in a file that does not contain the call
+        $this->analyse([__DIR__.'/Fixture/GetModelByStringTrait.php', __DIR__.'/Fixture/GetModelByStringTraitUsingController.php'], []);
     }
 }
