@@ -34,11 +34,6 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
      * @var MockObject&TriggerEventRepository
      */
     private MockObject $triggerEventRepository;
@@ -49,21 +44,23 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
             $this->createStub(IpLookupHelper::class),
             $this->createStub(LeadModel::class),
             $this->createStub(TriggerEventModel::class),
             $this->createStub(ContactTracker::class),
-            $this->entityManager,
+            $this->createStub(EntityManager::class),
             $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\PointBundle\Entity\TriggerRepository::class), // $triggerRepository
+            $this->triggerEventRepository,
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
 
         // reset private property cachedEvents in TriggerModel instance
@@ -79,10 +76,6 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $dispatchCalls = new \ArrayObject();
 
         $triggerEvent->setType('email.send_to_user');
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->triggerEventRepository);
 
         $this->triggerEventRepository->expects($this->once())
             ->method('find')

@@ -36,13 +36,14 @@ class VideoModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly VideoHitRepository $videoHitRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getHitRepository(): VideoHitRepository
     {
-        return $this->em->getRepository(VideoHit::class);
+        return $this->videoHitRepository;
     }
 
     public function getPermissionBase(): string
