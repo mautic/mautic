@@ -43,11 +43,8 @@ final class CampaignRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            '(c.isPublished = :par1) AND (c.publishDown IS NOT NULL) AND (c.publishDown <> \'\') AND (c.publishDown < CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(c.isPublished = :par1) AND (c.publishDown IS NOT NULL) AND (c.publishDown <> \'\') AND (c.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
@@ -59,17 +56,14 @@ final class CampaignRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            '(c.isPublished = :par1) AND (c.publishUp IS NOT NULL) AND (c.publishUp <> \'\') AND (c.publishUp > CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(c.isPublished = :par1) AND (c.publishUp IS NOT NULL) AND (c.publishUp <> \'\') AND (c.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repository->getSearchCommands();
-        self::assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.campaign.campaign.searchcommand.ispending', $commands);
     }
 }

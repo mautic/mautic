@@ -40,7 +40,7 @@ final class AbstractIntegrationTest extends TestCase
 JSON;
 
         $json = $integrationDouble->parseCallbackResponse($jsonString);
-        self::assertArrayHasKey('webinars', $json);
+        $this->assertArrayHasKey('webinars', $json);
     }
 
     private function buildAbstractIntegrationDouble(): AbstractIntegration

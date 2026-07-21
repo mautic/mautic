@@ -7,7 +7,6 @@ namespace Mautic\UserBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -42,9 +41,6 @@ final class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString(
-            'login',
-            (string) $clientResponse->getContent()
-        );
+        $this->assertStringContainsString('login', (string) $clientResponse->getContent());
     }
 }

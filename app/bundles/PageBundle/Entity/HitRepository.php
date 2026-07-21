@@ -192,11 +192,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Count how many visitors hit some page in last X $seconds.
-     *
-     * @param int  $seconds
-     * @param bool $notLeft
      */
-    public function countVisitors($seconds = 60, $notLeft = false): int
+    public function countVisitors(int $seconds = 60, bool $notLeft = false): int
     {
         $now         = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
@@ -224,8 +221,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the latest hit.
-     *
      * @param array{
      *     leadId?: int,
      *     urls?: string[]|string|null,

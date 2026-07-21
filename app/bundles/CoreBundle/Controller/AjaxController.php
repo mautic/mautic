@@ -24,6 +24,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AjaxController extends CommonController
 {
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireCoreAjaxController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     /**
      * @param int  $statusCode
      * @param bool $addIgnoreWdt
@@ -49,13 +57,11 @@ class AjaxController extends CommonController
 
     /**
      * Executes an action requested via ajax.
-     *
-     * @return Response
      */
     public function delegateAjaxAction(
         Request $request,
         AuthorizationCheckerInterface $authorizationChecker,
-    ) {
+    ): Response|JsonResponse {
         // process ajax actions
         $action     = $request->get('action');
         $bundleName = null;
@@ -106,14 +112,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 0]);
     }
 
-    /**
-     * @return Response
-     */
     public function executeAjaxAction(
         Request $request,
         $action,
         $bundle = null,
-    ) {
+    ): Response|JsonResponse {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
                 static::class.'::'.$action.'Action',
@@ -323,10 +326,7 @@ class AjaxController extends CommonController
     public function clearNotificationAction(Request $request): JsonResponse
     {
         $id = (int) $request->get('id', 0);
-
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-        $model->clearNotification($id, 200);
+        $this->notificationModel->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);
     }

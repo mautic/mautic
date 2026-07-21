@@ -33,6 +33,7 @@ class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -91,9 +92,8 @@ class AjaxController extends CommonAjaxController
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
-        $model      = $this->getModel('form');
-        $entity     = $model->getEntity($formId);
-        $formFields = empty($entity) ? [] : $entity->getFields();
+        $entity     = $this->formModel->getEntity($formId);
+        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {

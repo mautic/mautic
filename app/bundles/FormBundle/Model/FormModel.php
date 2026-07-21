@@ -880,7 +880,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(\DOMDocument &$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, string $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -907,7 +907,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Extract script from html.
      */
-    private function extractScriptTag($html): array
+    private function extractScriptTag(string $html): array
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -925,7 +925,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Remove script from html.
      */
-    private function removeScriptTag($html): string
+    private function removeScriptTag(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();

@@ -40,10 +40,8 @@ class WebhookApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        WebhookModel $webhookModel,
     ) {
-        $webhookModel = $modelFactory->getModel('webhook');
-        \assert($webhookModel instanceof WebhookModel);
-
         $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
@@ -88,7 +86,7 @@ class WebhookApiController extends CommonApiController
         }
     }
 
-    public function getTriggersAction()
+    public function getTriggersAction(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->handleView(
             $this->view(

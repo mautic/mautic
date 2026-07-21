@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -12,6 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SourceController extends CommonFormController
 {
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireSourceController(\Mautic\CampaignBundle\Model\CampaignModel $campaignModel): void
+    {
+        $this->campaignModel = $campaignModel;
+    }
+
     /**
      * @var string[]
      */
@@ -57,10 +64,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType, false, true);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -161,10 +165,7 @@ class SourceController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        $campaignModel = $this->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-        $sourceList = $campaignModel->getSourceLists($sourceType, false, true);
+        $sourceList = $this->campaignModel->getSourceLists($sourceType, false, true);
         $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
@@ -234,10 +235,8 @@ class SourceController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;

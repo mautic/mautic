@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Twig\Extension;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ConfigExtensionTest extends MauticMysqlTestCase
@@ -32,9 +31,6 @@ final class ConfigExtensionTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/');
 
-        Assert::assertStringContainsString(
-            '[{"name":"Arial","font":"Arial, Helvetica, sans-serif","url":"https:\/\/custom-font.test\/arial.css"},{"name":"Courier New","font":"Courier New, Courier, monospace","url":"https:\/\/custom-font.test\/courier.css"}];',
-            $crawler->html()
-        );
+        $this->assertStringContainsString('[{"name":"Arial","font":"Arial, Helvetica, sans-serif","url":"https:\/\/custom-font.test\/arial.css"},{"name":"Courier New","font":"Courier New, Courier, monospace","url":"https:\/\/custom-font.test\/courier.css"}];', $crawler->html());
     }
 }

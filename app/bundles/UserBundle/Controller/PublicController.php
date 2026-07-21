@@ -17,14 +17,20 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PublicController extends FormController
 {
+    private UserModel $userModel;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(
+        UserModel $userModel,
+    ): void {
+        $this->userModel = $userModel;
+    }
+
     /**
      * Generates a new password for the user and emails it to them.
      */
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
     {
-        /** @var UserModel $model */
-        $model = $this->getModel('user');
-
         $data   = ['identifier' => ''];
         $action = $this->generateUrl('mautic_user_passwordreset');
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
@@ -34,7 +40,7 @@ class PublicController extends FormController
             if ($isValid = $this->isFormValid($form)) {
                 // find the user
                 $data = $form->getData();
-                $user = $model->getRepository()->findByIdentifier($data['identifier']);
+                $user = $this->userModel->getRepository()->findByIdentifier($data['identifier']);
 
                 /**
                  * Calculation of time to standardize fix response for vulnerability
@@ -45,7 +51,7 @@ class PublicController extends FormController
 
                 try {
                     if (null !== $user) {
-                        $model->sendResetEmail($user);
+                        $this->userModel->sendResetEmail($user);
                     }
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
                 } catch (\RuntimeException $e) {
@@ -77,9 +83,6 @@ class PublicController extends FormController
 
     public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): RedirectResponse|Response
     {
-        /** @var UserModel $model */
-        $model = $this->getModel('user');
-
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
         $form     = $this->formFactory->create(PasswordResetConfirmType::class, [], ['action' => $action]);
         $token    = $request->query->get('token');
@@ -93,7 +96,7 @@ class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $model, $hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $this->userModel, $hasher, $data);
             }
         }
 

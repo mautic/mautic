@@ -59,24 +59,24 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $crawlerAfterSubmit = $this->client->submit($createForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertCount(0, $crawlerAfterSubmit->filter('div.has-error'), 'Expected no validation errors for valid remote image URL with query string');
+        $this->assertCount(0, $crawlerAfterSubmit->filter('div.has-error'), 'Expected no validation errors for valid remote image URL with query string');
 
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
-        Assert::assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
+        $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
 
         $crawlerEdit = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
         $editForm    = $crawlerEdit->selectButton('Save')->form();
 
         $crawlerAfterEdit = $this->client->submit($editForm);
         $this->assertResponseIsSuccessful();
-        Assert::assertCount(0, $crawlerAfterEdit->filter('div.has-error'), 'Expected no validation errors when re-saving edited remote asset URL with query string');
+        $this->assertCount(0, $crawlerAfterEdit->filter('div.has-error'), 'Expected no validation errors when re-saving edited remote asset URL with query string');
 
         $this->em->clear();
         $editedAsset = $this->em->find(Asset::class, $asset->getId());
-        Assert::assertInstanceOf(Asset::class, $editedAsset);
-        Assert::assertSame('remote', $editedAsset->getStorageLocation());
-        Assert::assertSame($fileUrl, $editedAsset->getRemotePath());
-        Assert::assertSame('jpg', strtolower((string) $editedAsset->getExtension()));
+        $this->assertInstanceOf(Asset::class, $editedAsset);
+        $this->assertSame('remote', $editedAsset->getStorageLocation());
+        $this->assertSame($fileUrl, $editedAsset->getRemotePath());
+        $this->assertSame('jpg', strtolower((string) $editedAsset->getExtension()));
     }
 
     public function testCreateNewLocalZipAssetCanBeSaved(): void
@@ -106,9 +106,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $uploadResponse = json_decode((string) $this->client->getResponse()->getContent(), true);
-        Assert::assertIsArray($uploadResponse);
-        Assert::assertArrayNotHasKey('error', $uploadResponse, (string) $this->client->getResponse()->getContent());
-        Assert::assertArrayHasKey('tmpFileName', $uploadResponse, (string) $this->client->getResponse()->getContent());
+        $this->assertIsArray($uploadResponse);
+        $this->assertArrayNotHasKey('error', $uploadResponse, (string) $this->client->getResponse()->getContent());
+        $this->assertArrayHasKey('tmpFileName', $uploadResponse, (string) $this->client->getResponse()->getContent());
 
         $response = $this->client->request(Request::METHOD_GET, '/s/assets/new');
         $this->assertResponseIsSuccessful();
@@ -131,8 +131,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         );
 
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $assetTitle]);
-        Assert::assertInstanceOf(Asset::class, $asset);
-        Assert::assertSame('zip', strtolower((string) $asset->getExtension()));
+        $this->assertInstanceOf(Asset::class, $asset);
+        $this->assertSame('zip', strtolower((string) $asset->getExtension()));
 
         if (file_exists($tmpUploadFile)) {
             unlink($tmpUploadFile);
@@ -168,7 +168,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
         $this->assertResponseIsSuccessful();
-        Assert::assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
+        $this->assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
 
     /**
@@ -367,8 +367,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertArrayHasKey('tmpFileName', $responseData);
 
         // Assert file was created in the correct directory
-        $expectedDir      = $container->getParameter('mautic.upload_dir').join('/', ['', 'tmp', $tmpDir]);
-        $expectedFilePath = join('/', [$expectedDir, $responseData['tmpFileName']]);
+        $expectedDir      = $container->getParameter('mautic.upload_dir').implode('/', ['', 'tmp', $tmpDir]);
+        $expectedFilePath = implode('/', [$expectedDir, $responseData['tmpFileName']]);
         $this->assertFileExists($expectedFilePath);
 
         // Clean up
@@ -500,7 +500,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $savedAsset = $this->em->find(Asset::class, $asset->getId());
         $this->assertInstanceOf(Asset::class, $savedAsset);
-        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 
     /**
@@ -530,9 +530,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = $this->client->getResponse()->getContent();
 
         if ($isAllowed) {
-            Assert::assertStringNotContainsString($message, (string) $content);
+            $this->assertStringNotContainsString($message, (string) $content);
         } else {
-            Assert::assertStringContainsString($message, (string) $content);
+            $this->assertStringContainsString($message, (string) $content);
         }
     }
 }
