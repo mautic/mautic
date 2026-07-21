@@ -155,7 +155,7 @@ trait FrequencyRuleTrait
     /**
      * @param int $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
