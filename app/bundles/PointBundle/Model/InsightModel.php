@@ -37,13 +37,14 @@ class InsightModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly PointInsightRepository $pointInsightRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): PointInsightRepository
     {
-        return $this->em->getRepository(PointInsight::class);
+        return $this->pointInsightRepository;
     }
 
     public function getPermissionBase(): string

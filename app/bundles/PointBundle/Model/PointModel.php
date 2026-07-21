@@ -56,13 +56,14 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly PointGroupModel $pointGroupModel,
+        private readonly PointRepository $pointRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): PointRepository
     {
-        return $this->em->getRepository(Point::class);
+        return $this->pointRepository;
     }
 
     public function getPermissionBase(): string
