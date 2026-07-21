@@ -42,6 +42,7 @@ class MessageController extends AbstractStandardFormController
         FlashBag $flashBag,
         private RequestStack $requestStack,
         CorePermissions $security,
+        private MessageModel $messageModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -96,8 +97,6 @@ class MessageController extends AbstractStandardFormController
      */
     protected function getViewArguments(array $args, $action): array
     {
-        /** @var MessageModel $model */
-        $model          = $this->getModel($this->getModelName());
         $viewParameters = [];
         switch ($action) {
             case 'index':
@@ -130,11 +129,11 @@ class MessageController extends AbstractStandardFormController
                 $chart                   = new LineChart(null, $dateFrom, $dateTo);
 
                 /** @var Channel[] $channels */
-                $channels        = $model->getChannels();
+                $channels        = $this->messageModel->getChannels();
                 $messageChannels = $message->getChannels();
                 $chart->setDataset(
                     $this->translator->trans('mautic.core.all'),
-                    $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
+                    $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
                 );
 
                 $messagedLeads = [
@@ -153,7 +152,7 @@ class MessageController extends AbstractStandardFormController
                     if ($channel->isEnabled() && isset($channels[$channel->getChannel()])) {
                         $chart->setDataset(
                             $channels[$channel->getChannel()]['label'],
-                            $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
+                            $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
                         );
 
                         $messagedLeads[$channel->getChannel()] = $this->forward(
@@ -173,7 +172,7 @@ class MessageController extends AbstractStandardFormController
 
                 $viewParameters = [
                     'channels'        => $channels,
-                    'channelContents' => $model->getMessageChannels($message->getId()),
+                    'channelContents' => $this->messageModel->getMessageChannels($message->getId()),
                     'dateRangeForm'   => $dateRangeForm->createView(),
                     'eventCounts'     => $chart->render(),
                     'messagedLeads'   => $messagedLeads,
@@ -182,7 +181,7 @@ class MessageController extends AbstractStandardFormController
             case 'new':
             case 'edit':
                 $viewParameters = [
-                    'channels' => $model->getChannels(),
+                    'channels' => $this->messageModel->getChannels(),
                 ];
 
                 break;
