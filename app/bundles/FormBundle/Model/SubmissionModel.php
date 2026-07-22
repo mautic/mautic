@@ -1180,8 +1180,6 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value.
-     *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
     protected function validateFieldValue(Field $field, $value)
