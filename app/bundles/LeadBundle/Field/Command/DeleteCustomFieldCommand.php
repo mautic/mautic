@@ -18,7 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: 'mautic:custom-field:delete-column', description: 'Delete custom field column in the background')]
+#[AsCommand(
+    name: 'mautic:custom-field:delete-column',
+    description: 'Delete custom field column in the background'
+)]
 final class DeleteCustomFieldCommand extends Command
 {
     public function __construct(

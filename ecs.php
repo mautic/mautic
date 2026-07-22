@@ -24,12 +24,11 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
-        \Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
     ->withRules([
-        \Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        \Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ])
     ->withPreparedSets(
         comments: true,

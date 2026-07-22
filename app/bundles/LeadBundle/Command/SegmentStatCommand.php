@@ -15,7 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[AsCommand(name: 'mautic:segments:stat', description: 'Gather Segment Statistics')]
+#[AsCommand(
+    name: 'mautic:segments:stat',
+    description: 'Gather Segment Statistics'
+)]
 final class SegmentStatCommand extends ModeratedCommand
 {
     public function __construct(

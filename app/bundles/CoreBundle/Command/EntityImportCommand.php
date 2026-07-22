@@ -14,7 +14,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[AsCommand(name: 'mautic:entity:import', description: 'Import entity data from a ZIP file.')]
+#[AsCommand(
+    name: 'mautic:entity:import',
+    description: 'Import entity data from a ZIP file.'
+)]
 final class EntityImportCommand extends ModeratedCommand
 {
     public function __construct(
