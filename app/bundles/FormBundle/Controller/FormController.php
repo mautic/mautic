@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -47,7 +48,7 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly FormModel $formModel,
-        private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);

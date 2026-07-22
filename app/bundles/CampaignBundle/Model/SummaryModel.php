@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<Summary>
@@ -21,7 +22,7 @@ class SummaryModel extends AbstractCommonModel
 
     private SummaryRepository $summaryRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireSummaryModel(SummaryRepository $summaryRepository, LeadEventLogRepository $leadEventLogRepository): void
     {
         $this->summaryRepository = $summaryRepository;

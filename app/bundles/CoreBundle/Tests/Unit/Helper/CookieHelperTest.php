@@ -6,6 +6,8 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(CookieHelper::class)]
+#[CoversClass(CookieHelper::class)]
 final class CookieHelperTest extends TestCase
 {
     /**
@@ -31,7 +33,7 @@ final class CookieHelperTest extends TestCase
             ->willReturn($this->createStub(Request::class));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
+    #[TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
     public function testSetCookieWhenSecure(): void
     {
         $cookiePath   = '/';
@@ -61,7 +63,7 @@ final class CookieHelperTest extends TestCase
         $cookieHelper->onResponse($event);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when not secure and contain samesite=lax')]
+    #[TestDox('The helper is instantiated correctly when not secure and contain samesite=lax')]
     public function testSetCookieWhenNotSecure(): void
     {
         $cookiePath   = '/';

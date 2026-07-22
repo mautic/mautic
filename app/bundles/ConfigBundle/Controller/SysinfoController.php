@@ -15,6 +15,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class SysinfoController extends FormController
 {
@@ -35,7 +36,7 @@ class SysinfoController extends FormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {
             $this->throwAccessDenied();

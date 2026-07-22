@@ -6,11 +6,12 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('endpointProvider')]
+    #[DataProvider('endpointProvider')]
     public function testViewOwnCannotReadForeignContactOnApiEndpoints(string $endpointTemplate): void
     {
         $owner    = $this->createUserWithPermissions(

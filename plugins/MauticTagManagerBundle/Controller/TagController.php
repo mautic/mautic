@@ -17,6 +17,7 @@ use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class TagController extends FormController
 {
@@ -24,7 +25,7 @@ class TagController extends FormController
 
     private TagManagerModel $tagManagerModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTagController(
         TagModel $leadTagModel,
         TagManagerModel $tagManagerModel,

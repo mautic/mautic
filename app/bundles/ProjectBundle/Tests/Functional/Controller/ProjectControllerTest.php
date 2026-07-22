@@ -11,6 +11,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
@@ -42,7 +43,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('indexUrlsProvider')]
+    #[DataProvider('indexUrlsProvider')]
     public function testIndexActionDisplaysProjects(string $url): void
     {
         $this->client->request('GET', $url);

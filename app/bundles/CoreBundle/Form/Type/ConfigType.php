@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -589,7 +590,7 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_flip(array_map(fn (\Mautic\CoreBundle\Shortener\ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
+        $choices         = array_flip(array_map(fn (ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
 
         $builder->add(
             Shortener::SHORTENER_SERVICE,

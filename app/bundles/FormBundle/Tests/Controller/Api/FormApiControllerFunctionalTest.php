@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -90,7 +91,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $expectedResponse
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formDataProvider')]
+    #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request('POST', '/api/forms/new', $payload);

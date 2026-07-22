@@ -4798,18 +4798,6 @@ parameters:
 			path: app/bundles/EmailBundle/Stats/StatHelperContainer.php
 
 		-
-			message: '#^Parameter \#1 \$dispatcher of class Mautic\\EmailBundle\\Model\\EmailStatModel constructor expects Symfony\\Component\\EventDispatcher\\EventDispatcherInterface, Doctrine\\ORM\\EntityManager&PHPUnit\\Framework\\MockObject\\MockObject given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/EmailStatModelTest.php
-
-		-
-			message: '#^Parameter \#2 \$statRepository of class Mautic\\EmailBundle\\Model\\EmailStatModel constructor expects Mautic\\EmailBundle\\Entity\\StatRepository, Symfony\\Component\\EventDispatcher\\EventDispatcher@anonymous/app/bundles/EmailBundle/Tests/Model/EmailStatModelTest\.php\:41 given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/EmailStatModelTest.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -9517,12 +9505,6 @@ parameters:
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getMauticContactsById\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getMauticContactsById\(\) has parameter \$integrationName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9547,12 +9529,6 @@ parameters:
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getSyncedRecords\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getSyncedRecords\(\) has parameter \$integrationName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9569,12 +9545,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getIntegrationEntityRepository\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/PluginModel.php
 
 		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addManagePermission\(\) expects array, string given\.$#'
@@ -10466,12 +10436,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/UserBundle/Security/SAML/User/UserCreator.php
-
-		-
-			message: '#^Return type of call to method PHPUnit\\Framework\\TestCase\:\:createMock\(\) contains unresolvable type\.$#'
-			identifier: method.unresolvableReturnType
-			count: 1
-			path: app/bundles/UserBundle/Tests/Model/UserModelTest.php
 
 		-
 			message: '#^Method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:editAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
