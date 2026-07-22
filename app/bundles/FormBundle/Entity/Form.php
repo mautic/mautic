@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Form extends FormEntity implements UuidInterface, TranslationEntityInterface // NOSONAR Existing Doctrine entity is not split in this feature PR.
+class Form extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
     use TranslationEntityTrait;
