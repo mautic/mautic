@@ -9,20 +9,22 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     private AssetModel $assetModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireAssetAjaxController(
         AssetModel $assetModel,
     ): void {
         $this->assetModel = $assetModel;
     }
 
-    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function categoryListAction(Request $request): JsonResponse
     {
         $filter     = InputHelper::clean($request->query->get('filter'));
         $results    = $this->assetModel->getLookupResults('category', $filter, 10);
@@ -40,7 +42,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @throws \Exception
      */
-    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));

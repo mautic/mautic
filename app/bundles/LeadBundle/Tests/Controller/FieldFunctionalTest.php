@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,7 +17,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldLength')]
+    #[DataProvider('provideFieldLength')]
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         /** @var FieldModel $fieldModel */
@@ -149,7 +150,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanField')]
+    #[DataProvider('dataForCreatingNewBooleanField')]
     public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');

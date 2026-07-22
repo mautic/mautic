@@ -18,12 +18,13 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class PluginController extends FormController
 {
     private PluginModel $pluginModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePluginController(PluginModel $pluginModel): void
     {
         $this->pluginModel = $pluginModel;

@@ -76,7 +76,7 @@ class CompanyApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         $this->setCustomFieldValues($entity, $form, $parameters);
     }

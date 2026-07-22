@@ -12,6 +12,7 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
@@ -32,7 +33,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
     /**
      * @param array<int> $logStatusCodes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataFailureWithPreviousLogs')]
+    #[DataProvider('dataFailureWithPreviousLogs')]
     public function testFailureWithPreviousLogs(array $logStatusCodes, bool $expectedIsPublished, int $expectedNumberOfLogs): void
     {
         $this->clientMockHandler->append(new Response(401));

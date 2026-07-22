@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -150,7 +151,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @param array<int, array<string, mixed>> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
+    #[DataProvider('validateDataProvider')]
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)

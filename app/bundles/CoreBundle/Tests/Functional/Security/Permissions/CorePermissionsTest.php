@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Security\Permissions\VirtualPermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CorePermissionsTest extends MauticMysqlTestCase
 {
@@ -22,7 +23,7 @@ final class CorePermissionsTest extends MauticMysqlTestCase
         yield 'Permission declined' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataVirtualPermission')]
+    #[DataProvider('dataVirtualPermission')]
     public function testVirtualPermission(bool $grant): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);

@@ -104,7 +104,7 @@ class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)
+    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
     {
         $trans      = $this->translator;
         $ip         = $ipLookupHelper->getIpAddress();
