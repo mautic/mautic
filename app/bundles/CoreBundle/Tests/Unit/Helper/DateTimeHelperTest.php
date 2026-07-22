@@ -6,11 +6,14 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
+#[CoversClass(DateTimeHelper::class)]
 final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
+    #[TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
@@ -242,7 +245,7 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setTimeIfMissingDataProvider')]
+    #[DataProvider('setTimeIfMissingDataProvider')]
     public function testSetTimeIfMissing(string $input, string $defaultTime, string $timezone, string $expectedOutput, string $expectedTimezone): void
     {
         $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);

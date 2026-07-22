@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -406,7 +407,7 @@ final class ContactSegmentFilterTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataDoesColumnSupportEmptyValue')]
+    #[DataProvider('dataDoesColumnSupportEmptyValue')]
     public function testDoesColumnSupportEmptyValue(string $type, bool $doesColumnSupportEmptyValue): void
     {
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => $type]);
