@@ -47,7 +47,6 @@ final class ScheduleController extends CommonAjaxController
         /** @var \Mautic\ReportBundle\Entity\Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (empty($report)) {
