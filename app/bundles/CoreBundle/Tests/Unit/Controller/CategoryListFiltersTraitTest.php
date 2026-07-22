@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Controller;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Translation\Translator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -183,20 +182,12 @@ final class CategoryListFiltersTraitTest extends TestCase
                 ['mautic.lead.list.filter.placeholder', [], null, null, 'Filter by segment category'],
             ]);
 
-        return new class($categoryModel, $translator) {
+        $controller = new class($translator) {
             use CategoryListFiltersTrait;
 
             public function __construct(
-                private CategoryModel $categoryModel,
                 public Translator $translator,
             ) {
-            }
-
-            public function getModel(string $name): CategoryModel
-            {
-                Assert::assertSame('category', $name);
-
-                return $this->categoryModel;
             }
 
             /**
@@ -224,5 +215,9 @@ final class CategoryListFiltersTraitTest extends TestCase
                 );
             }
         };
+
+        $controller->autowireCategoryListFiltersTrait($categoryModel);
+
+        return $controller;
     }
 }

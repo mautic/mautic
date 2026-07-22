@@ -4,10 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait CategoryListFiltersTrait
 {
+    private CategoryModel $categoryModel;
+
+    #[Required]
+    public function autowireCategoryListFiltersTrait(CategoryModel $categoryModel): void
+    {
+        $this->categoryModel = $categoryModel;
+    }
+
     /**
      * @param array<string, mixed>      $filter
      * @param string|array<int, string> $categoryType
@@ -23,12 +33,10 @@ trait CategoryListFiltersTrait
         string $filterGroup = 'mautic.core.filter.categories',
         string $placeholder = 'mautic.core.category.filter.placeholder',
     ): array {
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
         $categoryTypes        = is_array($categoryType) ? $categoryType : [$categoryType];
         $categories           = [];
         foreach ($categoryTypes as $type) {
-            $categories = array_merge($categories, $categoryModel->getLookupResults($type, '', 0));
+            $categories = array_merge($categories, $this->categoryModel->getLookupResults($type, '', 0));
         }
         $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
 
