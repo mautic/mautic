@@ -13,7 +13,7 @@ trait FiltersEntityTrait
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $filters = [];
 
-    protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
+    protected static function addFiltersMetadata(ClassMetadataBuilder $builder): void
     {
         $builder->createField('filters', 'array')
             ->columnName('filters')

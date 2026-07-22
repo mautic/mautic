@@ -654,7 +654,7 @@ class CampaignController extends AbstractStandardFormController
      * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null)
+    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null): void
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -668,7 +668,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param bool $isClone
      */
-    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -683,7 +683,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param bool $isClone
      */
-    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -1126,7 +1126,7 @@ class CampaignController extends AbstractStandardFormController
         return [];
     }
 
-    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
+    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false): void
     {
         $this->campaignSources = [];
         if (is_array($campaignSources)) {
