@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait LeadDetailsTrait
 {
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
@@ -382,7 +382,7 @@ trait LeadDetailsTrait
 
     #[Required]
     public function setRequestStackLeadDetailsTrait(
-        ?RequestStack $requestStack,
+        RequestStack $requestStack,
     ): void {
         $this->requestStack = $requestStack;
     }

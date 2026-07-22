@@ -30,7 +30,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private LeadListRepository $listRepo;
 
-    protected SegmentCountCacheHelper $segmentCountCacheHelper;
+    private SegmentCountCacheHelper $segmentCountCacheHelper;
 
     private LeadRepository $leadRepo;
 
