@@ -43,6 +43,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     private const SUBJECT_C      = 'Subject C';
 
+    private const SEGMENT_B      = 'Segment B';
+
     private const CLICK_URL_LOW  = 'https://example.com/low';
 
     private const CLICK_URL_MID  = 'https://example.com/mid';
@@ -601,7 +603,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCloneAction(): void
     {
-        $segment = $this->createSegment('Segment B', 'segment-B');
+        $segment = $this->createSegment(self::SEGMENT_B, 'segment-B');
         $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
@@ -755,7 +757,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testSegmentEmailDetailsShowSegmentsBasedOnViewPermission(bool $canViewSegments): void
     {
         $firstSegment  = $this->createSegment('Segment A', 'segment-a');
-        $secondSegment = $this->createSegment('Segment B', 'segment-b');
+        $secondSegment = $this->createSegment(self::SEGMENT_B, 'segment-b');
         $email         = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Test html', $firstSegment);
         $email->addList($secondSegment);
         $this->em->flush();
@@ -782,7 +784,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $segmentsUsed);
         $this->assertStringContainsString('Segments used', $segmentsUsed->text());
         $this->assertStringContainsString('Segment A', $segmentsUsed->text());
-        $this->assertStringContainsString('Segment B', $segmentsUsed->text());
+        $this->assertStringContainsString(self::SEGMENT_B, $segmentsUsed->text());
         $this->assertCount(1, $segmentsUsed->filter('.label-gray'));
         $this->assertCount(1, $segmentsUsed->filter('.label-red'));
         $this->assertCount(0, $segmentsUsed->filter('.label i'));
@@ -800,7 +802,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testAbTestAction(): void
     {
-        $segment        = $this->createSegment('Segment B', 'segment-B');
+        $segment        = $this->createSegment(self::SEGMENT_B, 'segment-B');
         $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
         $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
         $this->em->flush();
