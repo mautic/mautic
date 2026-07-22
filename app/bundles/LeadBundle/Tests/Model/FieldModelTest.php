@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,7 +33,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed[]> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
+    #[DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
@@ -211,6 +212,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -251,6 +253,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }
@@ -258,8 +261,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     public function testUniqueIdentifierIndexToggleForContacts(): void
     {
         // Log queries so we can detect if alter queries were executed
-        /**  $stack */
-        $stack                    = new class() implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
+        $stack = new class() implements SQLLogger {
             /**
              * @var array<mixed>
              */

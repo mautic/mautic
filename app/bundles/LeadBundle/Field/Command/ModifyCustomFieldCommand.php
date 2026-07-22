@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:fields:modify', description: 'Change the sizes of the fields')]
 final class ModifyCustomFieldCommand extends Command
 {
     public function __construct(
@@ -24,8 +25,6 @@ final class ModifyCustomFieldCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('mautic:fields:modify')
-            ->setDescription('Change the sizes of the fields')
             ->addArgument(
                 'csv-path',
                 InputArgument::REQUIRED,

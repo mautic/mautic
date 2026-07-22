@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Loader;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -76,7 +77,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations(MessageCatalogue $catalogue, string $locale, \Symfony\Component\Finder\SplFileInfo $file): void
+    private function loadTranslations(MessageCatalogue $catalogue, string $locale, SplFileInfo $file): void
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);

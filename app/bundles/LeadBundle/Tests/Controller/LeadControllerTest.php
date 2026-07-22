@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
@@ -145,21 +146,21 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertCount(7, $leadListsTableRows);
 
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:segment-test-category-1"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertCount(4, $leadListsTableRows);
         $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text(null, false));
         $this->assertSame('Lead List 1 - Segment Category 1 (lead-list-1)', $firstLeadListLinkTest);
 
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:segment-test-category-2"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertCount(2, $leadListsTableRows);
 
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2","category:1"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:segment-test-category-2","category:segment-test-category-1"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertCount(6, $leadListsTableRows);
 
-        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:4"]');
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:segment-form-category-2"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertCount(0, $leadListsTableRows);
     }
@@ -531,7 +532,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
+    #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');

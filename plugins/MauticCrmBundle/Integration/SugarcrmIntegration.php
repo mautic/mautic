@@ -1480,7 +1480,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
+    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1600,7 +1600,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $error = 'Unknown status code '.$item['httpStatusCode'];
                     // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));

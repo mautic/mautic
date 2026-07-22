@@ -1257,6 +1257,7 @@ export default class BuilderService {
 
         [grapesjsMjmlThemeTokens]: {
           headContent: mjHeadContent,
+          mjmlParser: headInjectingParser,
         },
 
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),

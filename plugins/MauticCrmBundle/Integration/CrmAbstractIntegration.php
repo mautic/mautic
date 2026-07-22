@@ -149,8 +149,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the API helper.
-     *
      * @return TApiHelper
      */
     public function getApiHelper()
@@ -620,8 +618,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Limits the string.
-     *
      * @param mixed  $value
      * @param string $fieldType
      *

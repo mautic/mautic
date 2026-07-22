@@ -6,8 +6,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\Serializer::class)]
+#[CoversClass(\Mautic\CoreBundle\Helper\Serializer::class)]
 final class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testEncodingCanBeDecoded(): void
