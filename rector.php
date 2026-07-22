@@ -72,6 +72,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+        // to be fixed in dev-main
+        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
+            '*Command.php',
+        ],
+
         // skip as might be overriden by 3rd party controllers
         ResponseReturnTypeControllerActionRector::class => [
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',

@@ -158,10 +158,9 @@ class LeadController extends FormController
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
-        $translator  = $this->translator;
-        $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
-        $mine        = $translator->trans('mautic.core.searchcommand.ismine');
+        $anonymous   = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $listCommand = $this->translator->trans('mautic.lead.lead.searchcommand.list');
+        $mine        = $this->translator->trans('mautic.core.searchcommand.ismine');
         $indexMode   = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
 
         $session->set('mautic.lead.indexmode', $indexMode);
@@ -2175,9 +2174,8 @@ class LeadController extends FormController
         $ids        = $request->get('ids');
 
         $filter     = ['string' => $search, 'force' => ''];
-        $translator = $this->translator;
-        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+        $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
         if (!empty($ids)) {
