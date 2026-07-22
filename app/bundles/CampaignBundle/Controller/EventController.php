@@ -137,7 +137,7 @@ class EventController extends CommonFormController
                     $keyId = 'new'.bin2hex(random_bytes(32));
 
                     // save the properties to return with request
-                    $modifiedEvents = $this->getModifiedEvents();
+                    $modifiedEvents = $this->modifiedEvents;
                     $formData       = $form->getData();
                     $event          = array_merge($event, $formData);
                     $event['id']    = $event['tempId']    = $keyId;
@@ -288,7 +288,7 @@ class EventController extends CommonFormController
         $event['settings'] = $supportedEvents[$event['type']];
 
         $form->get('campaignId')->setData($campaignId);
-        $modifiedEvents = $this->getModifiedEvents();
+        $modifiedEvents = $this->modifiedEvents;
 
         // Check for a submitted form and process it
         if ('1' === $request->request->get('submit')) {
@@ -358,7 +358,7 @@ class EventController extends CommonFormController
     public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
-        $modifiedEvents = $this->getModifiedEvents();
+        $modifiedEvents = $this->modifiedEvents;
         $deletedEvents  = $this->deletedEvents;
 
         // ajax only for form fields
@@ -423,7 +423,7 @@ class EventController extends CommonFormController
     {
         $campaignId     = $request->query->get('campaignId');
         $this->setCampaignElements($request->request);
-        $modifiedEvents = $this->getModifiedEvents();
+        $modifiedEvents = $this->modifiedEvents;
         $deletedEvents  = $this->deletedEvents;
 
         // ajax only for form fields
@@ -490,7 +490,7 @@ class EventController extends CommonFormController
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
         $this->setCampaignElements($request->request);
-        $modifiedEvents = $this->getModifiedEvents();
+        $modifiedEvents = $this->modifiedEvents;
         $campaign       = $this->campaignModel->getEntity($campaignId);
 
         // ajax only for form fields
@@ -548,7 +548,7 @@ class EventController extends CommonFormController
         $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
         $event['id']    = $event['tempId'] = $keyId;
 
-        $modifiedEvents         = $this->getModifiedEvents();
+        $modifiedEvents         = $this->modifiedEvents;
         $modifiedEvents[$keyId] = $event;
         $this->modifiedEvents   = $modifiedEvents;
 
@@ -651,13 +651,5 @@ class EventController extends CommonFormController
         if ($request->get('deletedEvents')) {
             $this->deletedEvents = json_decode($request->get('deletedEvents'), true);
         }
-    }
-
-    /**
-     * @return array<string, array<string, mixed>>
-     */
-    private function getModifiedEvents(): array
-    {
-        return $this->modifiedEvents;
     }
 }
