@@ -71,8 +71,7 @@ class CommonController extends AbstractController implements MauticController
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-
+        $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             throw new \RuntimeException('Request is not set.');
         }
