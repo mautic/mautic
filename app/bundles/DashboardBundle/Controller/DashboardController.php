@@ -23,13 +23,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
 class DashboardController extends AbstractFormController
 {
     private DashboardModel $dashboardModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireDashboardController(DashboardModel $dashboardModel): void
     {
         $this->dashboardModel = $dashboardModel;

@@ -7,6 +7,7 @@ namespace Mautic\CategoryBundle\Tests\Model;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
@@ -54,7 +55,7 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
                     return true;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -88,7 +89,7 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
                     return true;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -181,7 +182,7 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
                     return [2, 3];
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
         $matcher = $this->exactly(2);
 

@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -32,12 +34,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
-    private \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository;
+    private StatRepository $statRepository;
 
     private DynamicContentRepository $dynamicContentRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository): void
+    #[Required]
+    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, StatRepository $statRepository): void
     {
         $this->dynamicContentRepository = $dynamicContentRepository;
         $this->statRepository = $statRepository;
@@ -61,7 +63,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $repo;
     }
 
-    public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
         return $this->statRepository;
     }

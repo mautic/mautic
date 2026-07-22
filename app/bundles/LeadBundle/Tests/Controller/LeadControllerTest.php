@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
@@ -531,7 +532,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
+    #[TestDox('Ensure correct Preferred Timezone placeholder on add/edit contact page')]
     public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');

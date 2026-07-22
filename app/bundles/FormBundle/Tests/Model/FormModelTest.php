@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -377,7 +378,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         yield ['lookup'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldTypeProvider')]
+    #[DataProvider('fieldTypeProvider')]
     public function testSyncListField(string $type): void
     {
         $formEntity = $this->createMock(Form::class);

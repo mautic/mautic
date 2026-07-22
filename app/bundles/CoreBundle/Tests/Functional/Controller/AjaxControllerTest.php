@@ -31,6 +31,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +49,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearch')]
+    #[DataProvider('dataForGlobalSearch')]
     public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
     {
         $this->em->persist($entity);
@@ -301,7 +302,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @param array<string, string|int> $roleData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearchForNonAdminUser')]
+    #[DataProvider('dataForGlobalSearchForNonAdminUser')]
     public function testGlobalSearchForNonAdminUser(
         string $searchString,
         mixed $entity,

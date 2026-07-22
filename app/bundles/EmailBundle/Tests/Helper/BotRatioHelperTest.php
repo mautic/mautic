@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BotRatioHelperTest extends TestCase
@@ -16,7 +17,7 @@ final class BotRatioHelperTest extends TestCase
      * @param array<string> $ipDoNotTrackList
      * @param array<string> $blockedUserAgents
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('hitBotScenariosProvider')]
+    #[DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBot(
         string $sentBefore,
         int $botHelperTimeEmailThreshold,

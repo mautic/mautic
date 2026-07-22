@@ -6,7 +6,7 @@ use Page\Acceptance\ThemesPage;
 
 class ThemeManagementCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(\AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
 
