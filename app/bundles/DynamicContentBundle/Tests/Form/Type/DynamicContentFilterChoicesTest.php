@@ -4,107 +4,133 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
-use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Test case to verify that filter choice transformations are working correctly.
- * This tests the fix for the locale/timezone filter validation issue.
+ * Drives the real DWC form (DynamicContentType) end-to-end through the
+ * controller with locale, timezone and region filter values to prove the form
+ * actually accepts those choices and persists them.
  */
-final class DynamicContentFilterChoicesTest extends TestCase
+final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
 {
-    private const AMERICA_NEW_YORK = 'America/New_York';
+    private const LOCALE_VALUE   = 'en_US';
 
-    public function testLocaleChoicesAreFlipped(): void
+    private const TIMEZONE_VALUE = 'America/New_York';
+
+    private const REGION_VALUE   = 'California';
+
+    private const REGION_INDEX_NUMBER = '4';
+
+    public function testLocaleFilterValueIsAcceptedByTheForm(): void
     {
-        $originalChoices    = FormFieldHelper::getLocaleChoices();
-        $transformedChoices = array_flip($originalChoices);
+        $entity  = $this->submitDwcForm('DWC locale filter', [
+            $this->buildFilter('preferred_locale', 'locale', self::LOCALE_VALUE),
+        ]);
+        $filters = array_values($entity->getFilters());
 
-        $this->assertIsArray($transformedChoices);
-        $this->assertNotEmpty($transformedChoices);
-
-        $keys = array_keys($transformedChoices);
-        $this->assertContains('en_US', $keys, 'en_US locale should be available as a key');
-
-        if (isset($transformedChoices['en_US'])) {
-            $this->assertIsString($transformedChoices['en_US']);
-            $this->assertNotSame('en_US', $transformedChoices['en_US'], 'Value should be different from key');
-        }
+        Assert::assertCount(1, $filters);
+        Assert::assertSame('preferred_locale', $filters[0]['field']);
+        Assert::assertSame('locale', $filters[0]['type']);
+        Assert::assertSame(self::LOCALE_VALUE, $filters[0]['filter']);
     }
 
-    public function testTimezoneChoicesAreFlattenedAndFlipped(): void
+    public function testTimezoneFilterValueIsAcceptedByTheForm(): void
     {
-        $originalChoices    = FormFieldHelper::getTimezonesChoices();
-        $flattenedChoices   = ArrayHelper::flatten($originalChoices);
-        $transformedChoices = array_flip($flattenedChoices);
+        $entity  = $this->submitDwcForm('DWC timezone filter', [
+            $this->buildFilter('timezone', 'timezone', self::TIMEZONE_VALUE),
+        ]);
+        $filters = array_values($entity->getFilters());
 
-        $this->assertIsArray($transformedChoices);
-        $this->assertNotEmpty($transformedChoices);
-
-        $keys = array_keys($transformedChoices);
-        $this->assertContains(
-            self::AMERICA_NEW_YORK,
-            $keys,
-            self::AMERICA_NEW_YORK.' timezone should be available as a key'
-        );
-
-        if (isset($transformedChoices[self::AMERICA_NEW_YORK])) {
-            $this->assertIsString($transformedChoices[self::AMERICA_NEW_YORK]);
-            $this->assertNotSame(
-                self::AMERICA_NEW_YORK,
-                $transformedChoices[self::AMERICA_NEW_YORK],
-                'Value should be different from key'
-            );
-        }
+        Assert::assertCount(1, $filters);
+        Assert::assertSame('timezone', $filters[0]['field']);
+        Assert::assertSame('timezone', $filters[0]['type']);
+        Assert::assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
     }
 
-    public function testRegionChoicesAreFlattenedAndFlipped(): void
+    public function testTimezoneLocaleAndRegionFiltersAreSavedTogether(): void
     {
-        $originalChoices    = FormFieldHelper::getRegionChoices();
-        $flattenedChoices   = ArrayHelper::flatten($originalChoices);
-        $transformedChoices = array_flip($flattenedChoices);
+        $entity  = $this->submitDwcForm('DWC locale timezone region filters', [
+            $this->buildFilter('timezone', 'timezone', self::TIMEZONE_VALUE),
+            $this->buildFilter('preferred_locale', 'locale', self::LOCALE_VALUE),
+            $this->buildFilter('state', 'region', self::REGION_INDEX_NUMBER),
+        ]);
+        $filters = array_values($entity->getFilters());
 
-        $this->assertIsArray($transformedChoices);
-        $this->assertNotEmpty($transformedChoices);
-
-        $keys = array_keys($transformedChoices);
-        $this->assertIsArray($keys);
-        $this->assertNotEmpty($keys);
-
-        foreach ($keys as $key) {
-            $this->assertIsString($key, 'All region keys should be strings');
-            $this->assertIsString($transformedChoices[$key], 'All region values should be strings');
-        }
+        Assert::assertCount(3, $filters);
+        Assert::assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
+        Assert::assertSame(self::LOCALE_VALUE, $filters[1]['filter']);
+        Assert::assertSame(self::REGION_VALUE, $filters[2]['filter']);
     }
 
-    public function testCountryChoicesRemainUnchanged(): void
+    public function testInvalidLocaleFilterValueIsRejectedByTheForm(): void
     {
-        $originalChoices = FormFieldHelper::getCountryChoices();
+        $name    = 'DWC invalid locale filter';
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        self::assertResponseIsSuccessful();
 
-        $this->assertIsArray($originalChoices);
-        $this->assertNotEmpty($originalChoices);
+        $form   = $crawler->selectButton('Save')->form();
+        $values = $form->getPhpValues();
 
-        $keys   = array_keys($originalChoices);
-        $values = array_values($originalChoices);
+        $values['dwc']['name']    = $name;
+        $values['dwc']['type']    = 'html';
+        $values['dwc']['content'] = 'Some content';
+        $values['dwc']['filters'] = [
+            $this->buildFilter('preferred_locale', 'locale', 'not-a-real-locale'),
+        ];
 
-        $this->assertContainsOnly('string', $keys, true, 'All country keys should be strings');
-        $this->assertContainsOnly('string', $values, true, 'All country values should be strings');
+        $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+
+        $entity = $this->em->getRepository(DynamicContent::class)->findOneBy(['name' => $name]);
+        Assert::assertNull($entity, 'A DWC with an invalid locale filter value must not be saved.');
     }
 
-    public function testChoiceTransformationsMatchCampaignEventPattern(): void
+    /**
+     * Submits the real DWC form with the given filters and returns the
+     * saved entity.
+     *
+     * @param array<int, array<string, string>> $filters
+     */
+    private function submitDwcForm(string $name, array $filters): DynamicContent
     {
-        $localeChoices = array_flip(FormFieldHelper::getLocaleChoices());
-        $this->assertIsArray($localeChoices);
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        self::assertResponseIsSuccessful();
 
-        $timezoneChoices = array_flip(ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices()));
-        $this->assertIsArray($timezoneChoices);
+        $form   = $crawler->selectButton('Save')->form();
+        $values = $form->getPhpValues();
 
-        $regionChoices = array_flip(ArrayHelper::flatten(FormFieldHelper::getRegionChoices()));
-        $this->assertIsArray($regionChoices);
+        $values['dwc']['name']    = $name;
+        $values['dwc']['type']    = 'html';
+        $values['dwc']['content'] = 'Some content';
+        $values['dwc']['filters'] = $filters;
 
-        $this->assertNotEmpty($localeChoices);
-        $this->assertNotEmpty($timezoneChoices);
-        $this->assertNotEmpty($regionChoices);
+        $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+
+        $this->em->clear();
+
+        $entity = $this->em->getRepository(DynamicContent::class)->findOneBy(['name' => $name]);
+        Assert::assertInstanceOf(DynamicContent::class, $entity, 'The DWC should have been saved.');
+
+        return $entity;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildFilter(string $field, string $type, string $value): array
+    {
+        return [
+            'glue'     => 'and',
+            'field'    => $field,
+            'object'   => 'lead',
+            'type'     => $type,
+            'operator' => '=',
+            'filter'   => $value,
+            'display'  => '',
+        ];
     }
 }
