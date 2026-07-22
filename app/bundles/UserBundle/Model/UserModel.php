@@ -519,10 +519,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
     private function getUserInviteRepository(): UserInviteRepositoryInterface
     {
-        $repository = $this->userInviteRepository;
-        \assert($repository instanceof UserInviteRepositoryInterface);
-
-        return $repository;
+        return $this->userInviteRepository;
     }
 
     private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void
