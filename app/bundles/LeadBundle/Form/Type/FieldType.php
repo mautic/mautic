@@ -734,8 +734,8 @@ class FieldType extends AbstractType
                      }',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(groups: 'indexableFieldWithLimits'),
-                    new Assert\Range(min: 1, max: SchemaDefinition::MAX_VARCHAR_LENGTH, groups: 'indexableFieldWithLimits'),
+                    new Assert\NotBlank(groups: ['indexableFieldWithLimits']),
+                    new Assert\Range(min: 1, max: SchemaDefinition::MAX_VARCHAR_LENGTH, groups: ['indexableFieldWithLimits']),
                 ],
             ]
         );
