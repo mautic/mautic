@@ -98,6 +98,10 @@ class PointActionHelper
             }
         }
 
+        if ($urlMatches && [] === $changePoints) {
+            return true;
+        }
+
         return !in_array(false, $changePoints) && [] !== $changePoints;
     }
 }
