@@ -23,10 +23,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to push language resources to Transifex.
  */
-#[AsCommand(
-    name: PushTransifexCommand::NAME,
-    description: 'Pushes Mautic translation resources to Transifex'
-)]
+#[AsCommand(name: PushTransifexCommand::NAME, description: 'Pushes Mautic translation resources to Transifex', help: <<<'TXT'
+The <info>%command.name%</info> command is used to push translation resources to Transifex
+
+<info>php %command.full_name%</info>
+
+You can optionally choose to update resources for one bundle only with the --bundle option:
+
+<info>php %command.full_name% --bundle AssetBundle</info>
+TXT)]
 class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';
@@ -42,17 +47,7 @@ class PushTransifexCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle')
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command is used to push translation resources to Transifex
-
-<info>php %command.full_name%</info>
-
-You can optionally choose to update resources for one bundle only with the --bundle option:
-
-<info>php %command.full_name% --bundle AssetBundle</info>
-EOT
-            );
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -17,10 +17,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(
-    name: 'mautic:custom-field:update-column',
-    description: 'Create custom field column in the background'
-)]
+#[AsCommand(name: 'mautic:custom-field:update-column', description: 'Create custom field column in the background', help: <<<'TXT'
+The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
+
+<info>php %command.full_name%</info>
+TXT)]
 class UpdateCustomFieldCommand extends Command
 {
     public function __construct(
@@ -36,14 +37,7 @@ class UpdateCustomFieldCommand extends Command
 
         $this
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
-            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

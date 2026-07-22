@@ -12,10 +12,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to convert PHP theme config to JSON.
  */
-#[AsCommand(
-    name: 'mautic:theme:json-config',
-    description: 'Converts theme config to JSON from PHP'
-)]
+#[AsCommand(name: 'mautic:theme:json-config', description: 'Converts theme config to JSON from PHP', help: <<<'TXT'
+The <info>%command.name%</info> command converts a PHP theme config file to JSON.
+
+<info>php %command.full_name%</info>
+
+You must specify the name of the theme via the --theme parameter:
+
+<info>php %command.full_name% --theme=<theme></info>
+
+You may opt to save the PHP config file by using the --save-php-config option.
+
+<info>php %command.full_name% --save-php-config</info>
+TXT)]
 class ConvertConfigCommand extends Command
 {
     public function __construct(
@@ -36,21 +45,7 @@ class ConvertConfigCommand extends Command
                     'save-php-config', null, InputOption::VALUE_NONE,
                     'When used, the theme\'s PHP config file will be saved.'
                 ),
-            ])
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command converts a PHP theme config file to JSON.
-
-<info>php %command.full_name%</info>
-
-You must specify the name of the theme via the --theme parameter:
-
-<info>php %command.full_name% --theme=<theme></info>
-
-You may opt to save the PHP config file by using the --save-php-config option.
-
-<info>php %command.full_name% --save-php-config</info>
-EOT
-            );
+            ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
