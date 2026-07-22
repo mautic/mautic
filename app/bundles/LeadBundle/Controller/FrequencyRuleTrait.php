@@ -27,7 +27,7 @@ trait FrequencyRuleTrait
 
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     /**
      * @param array $viewParameters
@@ -190,6 +190,6 @@ trait FrequencyRuleTrait
         RequestStack $requestStack,
     ): void {
         $this->doNotContactModel = $doNotContactModel;
-        $this->requestStack      = $requestStack;
+        $this->requestStack = $requestStack;
     }
 }
