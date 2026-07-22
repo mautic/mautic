@@ -618,8 +618,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Limits the string.
-     *
      * @param mixed  $value
      * @param string $fieldType
      *

@@ -52,8 +52,6 @@ final class AssetsHelper
     }
 
     /**
-     * Gets asset prefix.
-     *
      * @param bool $includeEndingSlash
      *
      * @return string
