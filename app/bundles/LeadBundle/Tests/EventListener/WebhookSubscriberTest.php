@@ -17,6 +17,7 @@ use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -110,7 +111,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that webhook is queued for channel subscription changes')]
+    #[TestDox('Test that webhook is queued for channel subscription changes')]
     public function testChannelChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->createMock(WebhookModel::class);
@@ -147,7 +148,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that webhook is queued for lead company changes')]
+    #[TestDox('Test that webhook is queued for lead company changes')]
     public function testLeadCompanyChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->createMock(WebhookModel::class);

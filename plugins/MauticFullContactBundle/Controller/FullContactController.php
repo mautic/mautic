@@ -5,23 +5,26 @@ namespace MauticPlugin\MauticFullContactBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType;
 use MauticPlugin\MauticFullContactBundle\Form\Type\LookupType;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class FullContactController extends FormController
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireFullContactController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;

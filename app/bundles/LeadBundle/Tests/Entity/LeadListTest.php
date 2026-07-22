@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class LeadListTest extends \PHPUnit\Framework\TestCase
 {
@@ -155,7 +156,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string, array<int, mixed>> $changes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsGlobalDataProvider')]
+    #[DataProvider('setIsGlobalDataProvider')]
     public function testSetIsGlobal(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();
@@ -181,7 +182,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string, array<int, mixed>> $changes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
+    #[DataProvider('setIsPreferenceCenterDataProvider')]
     public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();

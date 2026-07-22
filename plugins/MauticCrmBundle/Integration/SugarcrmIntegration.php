@@ -1480,7 +1480,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
+    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
