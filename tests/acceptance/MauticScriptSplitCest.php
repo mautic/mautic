@@ -189,6 +189,10 @@ JS);
 
     public function essentialScriptKeepsDwcFallbackVisible(\AcceptanceTester $I): void
     {
+        // DWC slots wait for first event delivery to be replaced. Before consent
+        // (tracking disabled), fallback content must stay visible and no DWC/tracking
+        // requests should fire. The fixture provides a synthetic .mautic-slot div to
+        // test the JS behavior independently of a published DWC item in Mautic.
         $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
         $this->loadScripts($I, [$scriptUrl], ['dwc' => '1']);
         $I->waitForJS('return window.MauticJS && window.MauticJS.runtimeReady === true', 10);
@@ -219,6 +223,10 @@ JS);
 
     public function essentialScriptInitializesDwcFallbackFormWithoutTrackingIdentifiers(\AcceptanceTester $I): void
     {
+        // Mautic supports forms inside DWC slots. Before consent, the fallback form
+        // (inside a .mautic-slot) must be initialized with submit handler, iframe
+        // target, and messenger field -- without reading/writing tracking IDs or
+        // cookies. The synthetic fixture markup tests this JS behavior in isolation.
         $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
         $this->loadScripts($I, [$scriptUrl], ['dwc' => '1', 'form' => '1']);
         $I->waitForJS("return typeof MauticSDK !== 'undefined' && document.getElementById('mauticiframe_acceptance') !== null", 10);
@@ -254,6 +262,9 @@ JS);
 
     public function essentialThenTrackingRequestsDwcOnce(\AcceptanceTester $I): void
     {
+        // After consent (essential + tracking loaded together), DWC fallback should
+        // be replaced via a single DWC API request, triggered before the first event
+        // delivery. Test verifies exactly 1 DWC request + 1 event request fire.
         $this->allowCorsFromFixtureOrigin();
 
         $essentialUrl = $this->getMauticUrl($I).'/mautic-essential.js';
