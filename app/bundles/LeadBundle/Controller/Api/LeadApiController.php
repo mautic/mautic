@@ -439,8 +439,7 @@ class LeadApiController extends CommonApiController
 
         $comments = InputHelper::clean($request->request->get('comments'));
 
-        $doNotContact = $this->doNotContactModel;
-        $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
+        $this->doNotContactModel->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
@@ -451,8 +450,6 @@ class LeadApiController extends CommonApiController
      */
     public function removeDncAction($id, $channel): Response
     {
-        $doNotContact = $this->doNotContactModel;
-
         $entity = $this->model->getEntity((int) $id);
 
         if (null === $entity) {
@@ -463,7 +460,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $result = $doNotContact->removeDncForContact($entity->getId(), $channel);
+        $result = $this->doNotContactModel->removeDncForContact($entity->getId(), $channel);
         $view   = $this->view(
             [
                 'recordFound'        => $result,
@@ -585,11 +582,9 @@ class LeadApiController extends CommonApiController
             $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
             \assert($existingEntity instanceof Lead);
 
-            $contactMerger = $this->contactMerger;
-
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
-                    $entity = $contactMerger->merge($entity, $existingEntity);
+                    $entity = $this->contactMerger->merge($entity, $existingEntity);
                 } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
