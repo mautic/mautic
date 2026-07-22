@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public function testMarkSpamBlocksDomainForFutureSubmissions(): void

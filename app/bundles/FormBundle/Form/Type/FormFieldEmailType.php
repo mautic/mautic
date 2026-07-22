@@ -24,7 +24,7 @@ class FormFieldEmailType extends AbstractType
     {
         $doNotSubmitEmails  = $this->coreParametersHelper->get('do_not_submit_emails');
         $hasDenyList        = !empty($doNotSubmitEmails) && is_array($doNotSubmitEmails);
-        $defaultDonotSubmit = $options['data']['donotsubmit'] ?? ($hasDenyList ? true : false);
+        $defaultDonotSubmit = $options['data']['donotsubmit'] ?? $hasDenyList;
 
         $builder->add(
             'donotsubmit',

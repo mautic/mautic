@@ -210,19 +210,17 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(function (string $key) {
-                return match ($key) {
-                    'do_not_submit_emails'         => ['blocked.com'],
-                    'blocked_free_email_providers' => [],
-                    default                        => [],
-                };
+            ->willReturnCallback(fn (string $key): array => match ($key) {
+                'do_not_submit_emails'         => ['blocked.com'],
+                'blocked_free_email_providers' => [],
+                default                        => [],
             });
 
         $event = new ValidationEvent($field, 'user@blocked.com');
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Cannot be sent with this email', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Cannot be sent with this email', $event->getInvalidReason());
     }
 
     public function testEmailDonotSubmitPlainDomainAllowsDifferentDomain(): void
@@ -236,18 +234,16 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(function (string $key) {
-                return match ($key) {
-                    'do_not_submit_emails'         => ['blocked.com'],
-                    'blocked_free_email_providers' => [],
-                    default                        => [],
-                };
+            ->willReturnCallback(fn (string $key): array => match ($key) {
+                'do_not_submit_emails'         => ['blocked.com'],
+                'blocked_free_email_providers' => [],
+                default                        => [],
             });
 
         $event = new ValidationEvent($field, 'user@allowed.com');
         $this->subscriber->onFormValidate($event);
 
-        self::assertTrue($event->isValid());
+        $this->assertTrue($event->isValid());
     }
 
     public function testEmailBlockedFreeProviderTriggersFailure(): void

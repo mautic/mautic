@@ -21,6 +21,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Model\SubmissionResultLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -118,7 +119,7 @@ final class ResultControllerTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->expects($this->once())->method('getEntity')->with($submissionId)->willReturn($submission);
         $formModel = $this->createMock(FormModel::class);
@@ -235,12 +236,10 @@ final class ResultControllerTest extends TestCase
         $managerRegistry->method('getConnection')->willReturn($connection);
 
         $submissionModel = $this->createMock(SubmissionModel::class);
-        $submissionModel->method('getEntity')->willReturnCallback(function (int $id): ?Submission {
-            return match ($id) {
-                1       => $this->createSubmission('first@example.com'),
-                2       => $this->createSubmission('second@test.com'),
-                default => null,
-            };
+        $submissionModel->method('getEntity')->willReturnCallback(fn (int $id): ?Submission => match ($id) {
+            1       => $this->createSubmission('first@example.com'),
+            2       => $this->createSubmission('second@test.com'),
+            default => null,
         });
         $formModel = $this->createMock(FormModel::class);
         $formModel->expects($this->once())
@@ -293,7 +292,7 @@ final class ResultControllerTest extends TestCase
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
 
         $submissionModel = $this->createMock(SubmissionModel::class);
         $submissionModel->method('getEntity')->willReturn(null);
@@ -353,9 +352,9 @@ final class ResultControllerTest extends TestCase
         $requestStack->push($request);
 
         $controller = $this->createController(
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(CoreParametersHelper::class),
             $requestStack,
             $security
         );
@@ -363,26 +362,29 @@ final class ResultControllerTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $controller->markSpamAction(
             $request,
-            $this->createMock(Configurator::class),
+            $this->createStub(Configurator::class),
             $submissionModel,
-            $this->createMock(FormModel::class)
+            $this->createStub(FormModel::class)
         );
     }
 
     private function createController(ManagerRegistry $managerRegistry, ModelFactory $modelFactory, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack, CorePermissions $security): TestResultController
     {
         return new TestResultController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(FormFieldHelper::class),
             $managerRegistry,
             $modelFactory,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $coreParametersHelper,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(FlashBag::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $security
+            $security,
+            $this->createStub(FormModel::class),
+            $this->createStub(SubmissionResultLoader::class),
+            $this->createStub(SubmissionModel::class),
         );
     }
 
