@@ -20,6 +20,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(
+        privatization: true,
         deadCode: true,
         typeDeclarations: true,
         phpunitCodeQuality: true,
