@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait LeadDetailsTrait
 {
@@ -379,7 +380,7 @@ trait LeadDetailsTrait
         );
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function setRequestStackLeadDetailsTrait(
         ?RequestStack $requestStack,
     ): void {

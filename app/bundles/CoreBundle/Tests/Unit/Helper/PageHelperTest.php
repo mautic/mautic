@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PageHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -26,7 +27,7 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack->method('getSession')->willReturn($this->session);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('PageProvider')]
+    #[DataProvider('PageProvider')]
     public function testCountPage(int $count, int $limit, int $page): void
     {
         $this->session->expects($this->once())
@@ -53,7 +54,7 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         yield [16, 15, 2];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('startProvider')]
+    #[DataProvider('startProvider')]
     public function testCountStart(int $page, int $limit, int $start): void
     {
         $this->session->expects($this->once())

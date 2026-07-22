@@ -7,15 +7,18 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -806,7 +809,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(LeadList::class, $segmentExistCheck);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dateFieldProvider')]
+    #[DataProvider('dateFieldProvider')]
     public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(
@@ -891,14 +894,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact2->setFirstname('DNC');
         $this->em->persist($contact2);
         $this->em->flush();
-        $segmentContact1 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact1 = new ListLead();
         $segmentContact1->setList($segment);
         $segmentContact1->setLead($contact1);
         $segmentContact1->setDateAdded(new \DateTime());
         $segmentContact1->setManuallyAdded(false);
         $segmentContact1->setManuallyRemoved(false);
         $this->em->persist($segmentContact1);
-        $segmentContact2 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact2 = new ListLead();
         $segmentContact2->setList($segment);
         $segmentContact2->setLead($contact2);
         $segmentContact2->setDateAdded(new \DateTime());
@@ -906,10 +909,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentContact2->setManuallyRemoved(false);
         $this->em->persist($segmentContact2);
         $this->em->flush();
-        $dnc = new \Mautic\LeadBundle\Entity\DoNotContact();
+        $dnc = new DoNotContact();
         $dnc->setChannel('email');
         $dnc->setLead($contact2);
-        $dnc->setReason(\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED);
+        $dnc->setReason(DoNotContact::UNSUBSCRIBED);
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();

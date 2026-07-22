@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -147,7 +148,7 @@ final class UserModelTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('flush')
-            ->willThrowException(new \Doctrine\DBAL\Exception($errorMessage));
+            ->willThrowException(new Exception($errorMessage));
 
         $this->translator->expects($this->exactly(2))
             ->method('trans')

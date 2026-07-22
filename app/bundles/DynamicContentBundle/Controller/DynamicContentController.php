@@ -4,6 +4,7 @@ namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -20,13 +21,13 @@ class DynamicContentController extends FormController
 
     private PageModel $pageModel;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     private DynamicContentModel $dynamicContentModel;
 
     #[Required]
     public function autowireDynamicContentController(
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         DynamicContentModel $dynamicContentModel,
         PageModel $pageModel,
         TrackableModel $trackableModel,
