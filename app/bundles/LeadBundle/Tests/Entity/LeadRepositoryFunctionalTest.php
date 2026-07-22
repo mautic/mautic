@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
@@ -121,7 +122,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @param mixed[] $contactIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetContacts')]
+    #[DataProvider('dataForGetContacts')]
     public function testGetContacts(array $contactIds, bool $includeLead, int $expectedCount): void
     {
         if ($includeLead) {
@@ -162,7 +163,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @param string[]|string $emails
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
+    #[DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
     public function testAjaxGetLeadsByFieldValue(string|array $emails, bool $createFlag, int $expectedCount): void
     {
         $this->createLeads($emails, $createFlag);

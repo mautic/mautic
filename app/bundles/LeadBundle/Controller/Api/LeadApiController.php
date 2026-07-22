@@ -24,9 +24,13 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\NoteModel;
+use Mautic\StageBundle\Model\StageModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -70,10 +74,10 @@ class LeadApiController extends CommonApiController
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
         LeadModel $leadModel,
-        private \Mautic\StageBundle\Model\StageModel $stageModel,
-        private \Mautic\UserBundle\Model\UserModel $userModel,
-        private \Mautic\LeadBundle\Model\DeviceModel $deviceModel,
-        private \Mautic\LeadBundle\Model\NoteModel $noteModel,
+        private StageModel $stageModel,
+        private UserModel $userModel,
+        private DeviceModel $deviceModel,
+        private NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
 

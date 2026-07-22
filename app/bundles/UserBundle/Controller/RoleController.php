@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class RoleController extends FormController
 {
@@ -31,7 +32,7 @@ class RoleController extends FormController
 
     private RoleModel $roleModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireRoleController(
         RoleModel $roleModel,
     ): void {

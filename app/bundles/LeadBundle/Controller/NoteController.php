@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class NoteController extends FormController
 {
@@ -16,7 +17,7 @@ class NoteController extends FormController
 
     private NoteModel $noteModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireNoteController(NoteModel $noteModel): void
     {
         $this->noteModel = $noteModel;

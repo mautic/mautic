@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Helper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
@@ -21,7 +22,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->fixture = new FormFieldHelper($this->createStub(Translator::class), $this->createStub(ValidatorInterface::class));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
+    #[DataProvider('fieldProvider')]
     public function testPopulateField(Field $field, mixed $value, string &$formHtml, mixed $expectedValue, string $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
@@ -151,7 +152,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         return $list;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('selectAutoFillProvider')]
+    #[DataProvider('selectAutoFillProvider')]
     public function testPopulateFieldSelectAutoFill(string $type, string $value, string $options, string $expectedOptions, string $message): void
     {
         $open = '<select name="mauticform['.$type.']" id="mauticform_input_mautic_'.$type.'" class="form-control">';

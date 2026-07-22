@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -314,7 +315,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestUnsubscribeFormActionWithUsingLandingPage')]
+    #[DataProvider('dataForTestUnsubscribeFormActionWithUsingLandingPage')]
     public function testUnsubscribeFormActionWithUsingLandingPage(?string $contactLocale, ?string $pageLocale, string $expectedLocale): void
     {
         $lead = $this->createLead($contactLocale);
