@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
     "content-hash": "28651d4264b6fb26e73bf8ea5594c8fe",
-=======
-    "content-hash": "fa5902fe993240df30f294211376bf71",
->>>>>>> 5508eb212f ([composer] add symplify phsptan rules to spot more relevant errors)
     "packages": [
         {
             "name": "api-platform/core",

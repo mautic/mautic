@@ -170,8 +170,7 @@ class LeadModel extends FormModel
 
     public function getRepository(): LeadRepository
     {
-        $repo = $this->leadRepository;
-        $repo->setDispatcher($this->dispatcher);
+        $this->leadRepository->setDispatcher($this->dispatcher);
 
         if (!$this->repoSetup) {
             $this->repoSetup = true;
@@ -180,16 +179,16 @@ class LeadModel extends FormModel
             $fields = $this->leadFieldModel->getFieldList(true, false);
 
             $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : [];
-            $repo->setAvailableSocialFields($socialFields);
+            $this->leadRepository->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
-            $repo->setAvailableSearchFields($searchFields);
+            $this->leadRepository->setAvailableSearchFields($searchFields);
         }
 
-        return $repo;
+        return $this->leadRepository;
     }
 
     /**
@@ -936,9 +935,7 @@ class LeadModel extends FormModel
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
-        $repo = $this->leadListRepository;
-
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
+        return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**
@@ -948,9 +945,7 @@ class LeadModel extends FormModel
      */
     public function getCompanies(Lead $lead): array
     {
-        $repo = $this->companyLeadRepository;
-
-        return $repo->getCompaniesByLeadId($lead->getId());
+        return $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
     }
 
     /**
@@ -1026,8 +1021,7 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        $frequencyRuleRepo = $this->frequencyRuleRepository;
-        $frequencyRules    = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
+        $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules($channel, $lead->getId());
 
         if (empty($frequencyRules)) {
             return [];
@@ -1324,8 +1318,7 @@ class LeadModel extends FormModel
         unset($fieldData['dateIdentified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->userRepository;
-            $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
+            $createdByUser = $this->userRepository->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $lead->setCreatedBy($createdByUser);
             }
@@ -1333,8 +1326,7 @@ class LeadModel extends FormModel
         unset($fieldData['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->userRepository;
-            $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
+            $modifiedByUser = $this->userRepository->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $lead->setModifiedBy($modifiedByUser);
             }
@@ -2390,9 +2382,7 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        $dncRepo = $this->doNotContactRepository;
-
-        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+        $dncEntries = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
         if (empty($dncEntries)) {
@@ -2418,9 +2408,7 @@ class LeadModel extends FormModel
      */
     public function getLeadEmailStats(Lead $lead): array
     {
-        $statRepository = $this->statRepository;
-
-        return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
+        return $this->statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
 
     public function removeTagFromLead(int $leadId, int $tagId): void

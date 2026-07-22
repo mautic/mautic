@@ -36,10 +36,7 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 
     public function getRepository(): ProjectRepository
     {
-        $repository = $this->projectRepository;
-        \assert($repository instanceof ProjectRepository);
-
-        return $repository;
+        return $this->projectRepository;
     }
 
     /**

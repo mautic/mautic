@@ -195,6 +195,10 @@ parameters:
 		-
 			message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
 			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
+		# inteitional, as overrides the proeprty
+		-
+			identifier: symplify.noJustPropertyAssign
+			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
