@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * This test is breaking other tests, so running it in a separate process.

@@ -21,6 +21,9 @@
                 <div class="tab-content pa-md">
                     <div class="tab-pane bdr-w-0 active in" id="tracking-snippet-consent">
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.consent.description'|trans }}</p>
+                        <div class="alert alert-info" role="alert">
+                            {{ 'mautic.page.config.tracking.script.consent.focus_notice'|trans }}
+                        </div>
                         <h5 class="fw-sb mb-xs">{{ 'mautic.page.config.tracking.script.essential.label'|trans }}</h5>
                         <p class="text-muted small">{{ 'mautic.page.config.tracking.script.essential.description'|trans }}</p>
                         {% include '@MauticCore/Components/code-snippet.html.twig' with {
