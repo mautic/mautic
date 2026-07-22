@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Id\SequenceGenerator;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
@@ -87,7 +88,7 @@ class DoctrineEventsSubscriber
                 $classMetadata->setSequenceGeneratorDefinition($newDefinition);
                 $em = $args->getEntityManager();
                 if (isset($classMetadata->idGenerator)) {
-                    $sequenceGenerator = new \Doctrine\ORM\Id\SequenceGenerator(
+                    $sequenceGenerator = new SequenceGenerator(
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
                             $newDefinition,
                             $classMetadata,

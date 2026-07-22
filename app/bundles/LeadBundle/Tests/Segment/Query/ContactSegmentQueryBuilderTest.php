@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -44,7 +45,7 @@ final class ContactSegmentQueryBuilderTest extends TestCase
     /**
      * @param array<string, mixed> $batchLimiters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataAddNewContactsRestrictionsWithBatchLimiters')]
+    #[DataProvider('dataAddNewContactsRestrictionsWithBatchLimiters')]
     public function testAddNewContactsRestrictionsWithBatchLimiters(array $batchLimiters, string $expectedWhereClause): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());

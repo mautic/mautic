@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PlainTextHelperTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailContentProvider')]
+    #[DataProvider('emailContentProvider')]
     public function testGetText(string $htmlContent, string $expectedPlainText): void
     {
         $plainTextHelper = new PlainTextHelper();
@@ -99,7 +100,7 @@ HTML,
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getPreviewProvider')]
+    #[DataProvider('getPreviewProvider')]
     public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText): void
     {
         $options = [];
