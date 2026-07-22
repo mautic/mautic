@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
@@ -71,12 +72,12 @@ class TrackableModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly TrackableRepository $trackableRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
+    public function getRepository(): TrackableRepository
     {
         return $this->trackableRepository;
     }

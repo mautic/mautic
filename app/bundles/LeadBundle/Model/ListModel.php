@@ -877,7 +877,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Batch sleep according to settings.
      */
-    protected function batchSleep()
+    protected function batchSleep(): void
     {
         $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
         if (false === $leadSleepTime) {

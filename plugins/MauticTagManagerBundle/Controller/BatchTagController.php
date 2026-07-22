@@ -8,12 +8,13 @@ use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class BatchTagController extends AbstractFormController
 {
     private TagModel $tagModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireBatchTagController(
         TagModel $tagModel,
     ): void {

@@ -6,7 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
@@ -23,6 +25,7 @@ use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -32,6 +35,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -65,9 +69,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        private readonly \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
-        private readonly \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly AssetRepository $assetRepository,
+        private readonly DownloadRepository $downloadRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -283,12 +287,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
+    public function getRepository(): AssetRepository
     {
         return $this->assetRepository;
     }
 
-    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
+    public function getDownloadRepository(): DownloadRepository
     {
         return $this->downloadRepository;
     }
@@ -303,7 +307,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);

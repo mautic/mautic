@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -241,7 +242,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string> $channels
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormDNC')]
+    #[DataProvider('provideFormDNC')]
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);

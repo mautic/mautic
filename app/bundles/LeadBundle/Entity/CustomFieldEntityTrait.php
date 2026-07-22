@@ -265,7 +265,7 @@ trait CustomFieldEntityTrait
         return $this;
     }
 
-    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
+    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions): void
     {
         foreach ($fields as $fieldProperty) {
             $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;

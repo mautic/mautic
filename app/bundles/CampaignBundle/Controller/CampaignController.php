@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -114,7 +115,7 @@ class CampaignController extends AbstractStandardFormController
         private EntityManager $em,
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
-        private \Mautic\CampaignBundle\Model\EventModel $eventModel,
+        private EventModel $eventModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -654,7 +655,7 @@ class CampaignController extends AbstractStandardFormController
      * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null)
+    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null): void
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -668,7 +669,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param bool $isClone
      */
-    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -683,7 +684,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @param bool $isClone
      */
-    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -1126,7 +1127,7 @@ class CampaignController extends AbstractStandardFormController
         return [];
     }
 
-    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
+    protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false): void
     {
         $this->campaignSources = [];
         if (is_array($campaignSources)) {

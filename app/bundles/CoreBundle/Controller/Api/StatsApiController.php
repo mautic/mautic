@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends CommonApiController<object>
@@ -21,7 +22,7 @@ class StatsApiController extends CommonApiController
      * @param array  $order
      * @param array  $where
      */
-    public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): \Symfony\Component\HttpFoundation\Response
+    public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): Response
     {
         $response = [];
         $where    = InputHelper::cleanArray(empty($where) ? $request->query->all()['where'] ?? [] : $where);
