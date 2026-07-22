@@ -441,8 +441,6 @@ class Mailbox
     }
 
     /**
-     * Gets listing the folders.
-     *
      * This function returns an object containing listing the folders.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
      *

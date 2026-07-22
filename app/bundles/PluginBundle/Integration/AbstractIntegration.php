@@ -427,8 +427,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Encrypts API keys.
-     *
      * @return array
      */
     public function encryptApiKeys(array $keys)
@@ -444,8 +442,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Decrypts API keys.
-     *
      * @param bool $mainDecryptOnly
      *
      * @return array
