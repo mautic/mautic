@@ -42,12 +42,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias = $this->generateRandomParameterName();
 
             $relTable = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin(
-                $leadsTableAlias,
-                $filter->getRelationJoinTable(),
-                $relTable,
-                $this->getRelationJoinCondition($relTable, $leadsTableAlias)
-            );
+            $queryBuilder->leftJoin($leadsTableAlias, $filter->getRelationJoinTable(), $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
             $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.'
                 .$filter->getRelationJoinTableField());
         }
@@ -199,11 +194,6 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             return $this->generateRandomParameterName();
         }
 
-        return array_map(fn (): string => $this->generateRandomParameterName(), $filterParameters);
-    }
-
-    protected function getRelationJoinCondition(string $relationAlias, string $leadsTableAlias): string
-    {
-        return $relationAlias.'.lead_id = '.$leadsTableAlias.'.id';
+        return array_map($this->generateRandomParameterName(...), $filterParameters);
     }
 }

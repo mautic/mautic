@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
-use PHPUnit\Framework\Assert;
 
 final class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
 {
@@ -23,10 +22,7 @@ final class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationV
 
     public function testGetServiceId(): void
     {
-        Assert::assertSame(
-            'mautic.lead.query.builder.complex_relation.value',
-            $this->queryBuilder::getServiceId()
-        );
+        $this->assertSame('mautic.lead.query.builder.complex_relation.value', $this->queryBuilder::getServiceId());
     }
 
     public function testApplyQueryCreatesJoinAndReturnsExpectedExpression(): void
@@ -44,19 +40,10 @@ final class ComplexRelationValueFilterQueryBuilderTest extends AbstractRelationV
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        Assert::assertStringContainsString('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l', $debugOutput);
-        Assert::assertStringContainsString(
-            'LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies_leads rel ON rel.lead_id = l.id',
-            $debugOutput
-        );
-        Assert::assertStringContainsString(
-            'LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp ON cmp.id = rel.company_id',
-            $debugOutput
-        );
-        Assert::assertStringContainsString(
-            '(cmp.company_name IS NULL) OR (cmp.company_name = )',
-            $debugOutput
-        );
+        $this->assertStringContainsString('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l', (string) $debugOutput);
+        $this->assertStringContainsString('LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies_leads rel ON rel.lead_id = l.id', (string) $debugOutput);
+        $this->assertStringContainsString('LEFT JOIN '.MAUTIC_TABLE_PREFIX.'companies cmp ON cmp.id = rel.company_id', (string) $debugOutput);
+        $this->assertStringContainsString('(cmp.company_name IS NULL) OR (cmp.company_name = )', (string) $debugOutput);
     }
 
     public function testApplyQueryThrowsOnUnsupportedOperator(): void

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-class ContactSegmentFilterCrate // NOSONAR Existing segment filter value object is not split in this feature PR.
+class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
 

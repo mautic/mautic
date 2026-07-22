@@ -27,7 +27,6 @@ use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -93,7 +92,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         /** @var Lead $lead */
         $lead = $this->getReference($reference);
         $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
-        \assert($lead instanceof Lead);
+        $this->assertInstanceOf(Lead::class, $lead);
 
         return $lead;
     }
@@ -101,7 +100,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function clearLoggedInUser(): void
     {
         $tokenStorage = static::getContainer()->get('security.token_storage');
-        \assert($tokenStorage instanceof TokenStorageInterface);
+        $this->assertInstanceOf(TokenStorageInterface::class, $tokenStorage);
 
         $tokenStorage->setToken(null);
         $this->client->getCookieJar()->clear();
@@ -110,7 +109,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function loginAdminUser(): void
     {
         $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        \assert($admin instanceof User);
+        $this->assertInstanceOf(User::class, $admin);
 
         $this->loginUser($admin);
     }
@@ -138,7 +137,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
 
-        return array_map('intval', array_column($results[$segment->getId()], 'id'));
+        return array_map(intval(...), array_column($results[$segment->getId()], 'id'));
     }
 
     public function testSegmentCountIsCorrect(): void
@@ -226,7 +225,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Secondary Company', 'segment-secondary-company');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertContains($lead->getId(), $leadIds);
+        $this->assertContains($lead->getId(), $leadIds);
 
         $primarySegment = $this->createSegment([
             [
@@ -241,7 +240,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Primary Company', 'segment-primary-company');
         $primaryLeadIds = $this->getSegmentLeadIds($primarySegment);
 
-        Assert::assertNotContains($lead->getId(), $primaryLeadIds);
+        $this->assertNotContains($lead->getId(), $primaryLeadIds);
     }
 
     public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
@@ -263,9 +262,9 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ], 'Segment Company All Not Like', 'segment-company-all-not-like');
         $leadIds = $this->getSegmentLeadIds($segment);
 
-        Assert::assertContains($leadWithCompany->getId(), $leadIds);
-        Assert::assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
-        Assert::assertNotContains($leadWithoutCompany->getId(), $leadIds);
+        $this->assertContains($leadWithCompany->getId(), $leadIds);
+        $this->assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
     }
 
     public function testSegmentRebuildCommand(): void

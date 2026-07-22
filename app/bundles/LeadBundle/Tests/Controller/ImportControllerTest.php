@@ -596,14 +596,14 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function selectCompanyMapping(Crawler $crawler, Form $mappingForm): void
     {
-        $options = $crawler->filter('#lead_field_import_company option');
+        $options = $crawler->filter("#lead_field_import_company > optgroup[label=\"Contact's primary company\"] option");
         $values  = array_filter($options->each(function ($node) {
             if ('Company Name' === $node->text()) {
                 return $node->attr('value');
             }
         }));
 
-        Assert::assertNotEmpty($values, 'Company Name mapping option must be available in the import form.');
+        $this->assertNotEmpty($values, 'Company Name mapping option must be available in the import form.');
 
         $mappingForm['lead_field_import[company]']->setValue(end($values));
     }

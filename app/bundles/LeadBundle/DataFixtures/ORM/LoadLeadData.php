@@ -19,6 +19,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
     {
         $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
+        $salesUser = $manager->getRepository(User::class)->findOneBy(['username' => 'sales']);
 
         foreach ($leads as $count => $l) {
             $key  = $count + 1;
@@ -30,7 +31,6 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);
 
-            $salesUser = $manager->getRepository(User::class)->findOneBy(['username' => 'sales']);
             if ($salesUser instanceof User) {
                 $lead->setOwner($salesUser);
             }
