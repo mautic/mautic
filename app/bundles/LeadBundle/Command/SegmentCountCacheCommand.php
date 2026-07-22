@@ -24,10 +24,6 @@ class SegmentCountCacheCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-    }
-
     /**
      * @throws InvalidArgumentException
      */
