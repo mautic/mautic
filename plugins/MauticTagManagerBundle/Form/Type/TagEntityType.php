@@ -33,9 +33,7 @@ class TagEntityType extends AbstractType
                 'attr'        => ['class' => 'form-control', 'readonly' => $tagReadOnly],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

@@ -43,9 +43,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 ],
                 'constraints' => [
                     new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
                 ],
                 'required' => false,

@@ -72,7 +72,7 @@ class FormFieldFileType extends AbstractType
                     'tooltip' => $this->translator->trans('mautic.form.field.file.tooltip.allowed_size', ['%uploadSize%' => $maxUploadSize]),
                 ],
                 'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE],
-                'constraints' => [new LessThanOrEqual(['value' => $maxUploadSize])],
+                'constraints' => [new LessThanOrEqual(value: $maxUploadSize)],
             ]
         );
 

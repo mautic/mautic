@@ -32,14 +32,10 @@ class SubmitActionRepostType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                     new Url(
-                        [
-                            'message' => 'mautic.core.valid_url_required',
-                        ]
+                        message: 'mautic.core.valid_url_required'
                     ),
                 ],
             ]
@@ -73,9 +69,7 @@ class SubmitActionRepostType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
+                    message: 'mautic.core.email.required'
                 ),
             ]
         );
