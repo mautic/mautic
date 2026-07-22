@@ -26,6 +26,8 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -44,7 +46,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
+#[CoversClass(RestrictionHelper::class)]
 final class RestrictionHelperTest extends TypeTestCase
 {
     private string $displayMode = RestrictionHelper::MODE_REMOVE;
@@ -144,7 +146,7 @@ final class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are removed from the config')]
+    #[TestDox('Test that the restricted fields are removed from the config')]
     public function testRestrictedFieldsAreRemoved(): void
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
@@ -173,7 +175,7 @@ final class RestrictionHelperTest extends TypeTestCase
         $this->assertTrue($unsubscribes->has('host'));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are masked')]
+    #[TestDox('Test that the restricted fields are masked')]
     public function testRestrictedFieldsAreMasked(): void
     {
         $this->displayMode = RestrictionHelper::MODE_MASK;

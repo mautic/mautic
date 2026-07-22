@@ -15,14 +15,15 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
@@ -64,23 +65,26 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SmsRepository $smsRepository,
+        private readonly StatRepository $statRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
+    public function getRepository(): SmsRepository
     {
-        return $this->em->getRepository(Sms::class);
+        return $this->smsRepository;
     }
 
-    public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getDoNotContactRepository(): DoNotContactRepository
     {
-        return $this->em->getRepository(DoNotContact::class);
+        return $this->doNotContactRepository;
     }
 
     public function getPermissionBase(): string

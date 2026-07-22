@@ -7,13 +7,14 @@ namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailAddressValidatorTest extends AbstractMauticTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
+    #[DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void
     {
         /** @var EmailAddressValidator $emailAddressValidator */

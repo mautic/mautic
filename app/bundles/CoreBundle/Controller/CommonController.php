@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -30,6 +32,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CommonController extends AbstractController implements MauticController
 {
@@ -40,6 +43,19 @@ class CommonController extends AbstractController implements MauticController
     private const VIEW_OTHER_SUFFIX     = ':viewother';
 
     protected ?User $user;
+
+    private PageModel $pageModel;
+
+    private NotificationModel $notificationModel;
+
+    #[Required]
+    public function autowireCommonController(
+        PageModel $pageModel,
+        NotificationModel $notificationModel,
+    ): void {
+        $this->pageModel = $pageModel;
+        $this->notificationModel = $notificationModel;
+    }
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -52,7 +68,7 @@ class CommonController extends AbstractController implements MauticController
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         private FlashBag $flashBag,
-        private ?RequestStack $requestStack,
+        private RequestStack $requestStack,
         protected ?CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
@@ -60,8 +76,7 @@ class CommonController extends AbstractController implements MauticController
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-
+        $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             throw new \RuntimeException('Request is not set.');
         }
@@ -144,7 +159,7 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
      *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
      */
-    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
+    protected function getModel($modelNameKey): MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -497,7 +512,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @throws AccessDeniedHttpException
      */
-    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
     {
         throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
     }
@@ -546,11 +561,9 @@ class CommonController extends AbstractController implements MauticController
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page404)) {
-            $pageModel = $this->getModel('page');
-            \assert($pageModel instanceof PageModel);
-            $page = $pageModel->getEntity($page404);
+            $page = $this->pageModel->getEntity($page404);
             if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
-                $slug     = $pageModel->generateSlug($page);
+                $slug     = $this->pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
                     [
@@ -660,10 +673,7 @@ class CommonController extends AbstractController implements MauticController
 
         $afterId = $request->get('mauticLastNotificationId');
 
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-
-        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $this->notificationModel->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 

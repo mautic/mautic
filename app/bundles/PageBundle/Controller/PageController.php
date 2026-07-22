@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class PageController extends FormController
 {
@@ -37,6 +38,14 @@ class PageController extends FormController
     private const PERMISSION_PREFCENTER_VIEW_OWN   = 'page:preference_center:viewown';
 
     private const PERMISSION_PREFCENTER_VIEW_OTHER = 'page:preference_center:viewother';
+
+    private PageModel $pageModel;
+
+    #[Required]
+    public function autowirePageController(PageModel $pageModel): void
+    {
+        $this->pageModel = $pageModel;
+    }
 
     public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
     {
@@ -99,12 +108,10 @@ class PageController extends FormController
             ];
         }
 
-        $translator = $this->translator;
-
         // do not list variants in the main list
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
-        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
+        $langSearchCommand = $this->translator->trans('mautic.core.searchcommand.lang');
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
@@ -368,10 +375,8 @@ class PageController extends FormController
      * Generates new form and processes post data.
      *
      * @param Page|null $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
+    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();
@@ -682,10 +687,8 @@ class PageController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -794,14 +797,12 @@ class PageController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var PageModel $model */
-            $model     = $this->getModel('page');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->pageModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -813,7 +814,7 @@ class PageController extends FormController
                     'page:pages:deleteown', 'page:pages:deleteother', $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->pageModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'page', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -822,7 +823,7 @@ class PageController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -845,10 +846,8 @@ class PageController extends FormController
      * Activate the builder.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         // permission check
         if (str_contains((string) $objectId, 'new')) {
@@ -890,10 +889,8 @@ class PageController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId)
+    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 

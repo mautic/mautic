@@ -12,10 +12,13 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -64,7 +67,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
      * @param mixed[]           $configParams
      * @param array<string,int> $selectorsAndExpectedCounts
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('frequencyFormRenderingDataProvider')]
+    #[DataProvider('frequencyFormRenderingDataProvider')]
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
         $emailStat = $this->createStat(

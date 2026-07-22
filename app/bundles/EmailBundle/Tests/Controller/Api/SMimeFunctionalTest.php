@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
 
@@ -46,7 +47,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         yield 'encrypted certificate' => ['encrypted' => true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('certificateTypeProvider')]
+    #[DataProvider('certificateTypeProvider')]
     public function testSendingSegmentEmailWithSMime(bool $encrypted): void
     {
         if ($encrypted) {

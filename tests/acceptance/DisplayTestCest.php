@@ -6,7 +6,7 @@ use Page\Acceptance\EmailsPage;
 
 class DisplayTestCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(\AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
     }

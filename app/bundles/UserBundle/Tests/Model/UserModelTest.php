@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -71,6 +72,13 @@ final class UserModelTest extends TestCase
      */
     private MockObject $twig;
 
+    /**
+     * @var MockObject&UserInviteRepositoryInterface
+     */
+    private MockObject $userInviteRepository;
+
+    private MockObject $userRepository;
+
     protected function setUp(): void
     {
         $this->mailHelper       = $this->createMock(MailHelper::class);
@@ -81,6 +89,9 @@ final class UserModelTest extends TestCase
         $this->translator       = $this->createMock(Translator::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
+
+        $this->userInviteRepository = $this->createMock(\Mautic\UserBundle\Entity\UserInviteRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->userModel = new UserModel(
             $this->mailHelper,
@@ -93,7 +104,11 @@ final class UserModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->logger,
             $this->createStub(CoreParametersHelper::class),
-            $this->twig
+            $this->twig,
+            $this->userRepository,
+            $this->createStub(\Mautic\UserBundle\Entity\PermissionRepository::class),
+            $this->createStub(\Mautic\UserBundle\Entity\RoleRepository::class),
+            $this->userInviteRepository,
         );
     }
 
@@ -133,7 +148,7 @@ final class UserModelTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('flush')
-            ->willThrowException(new \Doctrine\DBAL\Exception($errorMessage));
+            ->willThrowException(new Exception($errorMessage));
 
         $this->translator->expects($this->exactly(2))
             ->method('trans')
@@ -209,15 +224,9 @@ final class UserModelTest extends TestCase
         $link      = 'https://mautic.example/invite/token';
         $role      = new Role();
 
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('revokeOutstandingInvites')
             ->with($email);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->entityManager->expects($this->once())
             ->method('persist')
@@ -279,33 +288,21 @@ final class UserModelTest extends TestCase
     public function testHasUserWithEmailReturnsWhetherUserExists(): void
     {
         $email      = 'invitee@example.com';
-        $repository = $this->createMock(UserRepository::class);
 
-        $repository->expects($this->once())
+        $this->userRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['email' => $email])
             ->willReturn(new User());
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->willReturn($repository);
 
         $this->assertTrue($this->userModel->hasUserWithEmail($email));
     }
 
     public function testGetInviteReturnsNullWhenInviteDoesNotExist(): void
     {
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('findOneByTokenSelector')
             ->with('missing-selector')
             ->willReturn(null);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->logger->expects($this->once())
             ->method('warning')
@@ -319,16 +316,10 @@ final class UserModelTest extends TestCase
         $invite = (new UserInvite(new Role()))
             ->setExpiration(new \DateTimeImmutable('-1 minute'));
 
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('findOneByTokenSelector')
             ->with('expired-selector')
             ->willReturn($invite);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->logger->expects($this->once())
             ->method('warning')
@@ -343,16 +334,10 @@ final class UserModelTest extends TestCase
             ->setTokenVerifierHash(password_hash('expected-verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('findOneByTokenSelector')
             ->with('active-selector')
             ->willReturn($invite);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->logger->expects($this->once())
             ->method('warning')
@@ -368,16 +353,10 @@ final class UserModelTest extends TestCase
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('findOneByTokenSelector')
             ->with('used-selector')
             ->willReturn($invite);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->logger->expects($this->once())
             ->method('warning')
@@ -388,9 +367,6 @@ final class UserModelTest extends TestCase
 
     public function testGetInviteReturnsNullWhenTokenFormatIsInvalid(): void
     {
-        $this->entityManager->expects($this->never())
-            ->method('getRepository');
-
         $this->logger->expects($this->once())
             ->method('warning')
             ->with('User invite link rejected: token format is invalid', []);
@@ -404,16 +380,10 @@ final class UserModelTest extends TestCase
             ->setTokenVerifierHash(password_hash('verifier', PASSWORD_DEFAULT))
             ->setExpiration(new \DateTimeImmutable('+1 minute'));
 
-        $inviteRepository = $this->createMock(UserInviteRepositoryInterface::class);
-        $inviteRepository->expects($this->once())
+        $this->userInviteRepository->expects($this->once())
             ->method('findOneByTokenSelector')
             ->with('active-selector')
             ->willReturn($invite);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(UserInvite::class)
-            ->willReturn($inviteRepository);
 
         $this->assertSame($invite, $this->userModel->getInvite('active-selector.verifier'));
     }
