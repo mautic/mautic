@@ -58,8 +58,16 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private array $renderedContentCache = [];
 
-    public function __construct(private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly TokenHelper $tokenHelper,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PageModel $pageModel,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly Environment $twig,
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -85,7 +93,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 'title',
                 'id'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }
@@ -134,7 +142,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 $labelFilter,
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
 
@@ -149,7 +157,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                 'slot_name',
                 $expr
             );
-            if ($dwcTokens) {
+            if ([] !== $dwcTokens) {
                 $event->addTokens($dwcTokens);
             }
 
@@ -368,19 +376,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $parent   = $page->getTranslationParent();
         $children = $page->getTranslationChildren();
 
-        if (empty($parent) && empty($children)) {
+        if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 
         // If this page has a parent, then fetch the children from the parent
-        if (!empty($parent)) {
+        if ($parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
             $children = $parent->getTranslationChildren();
         } else {
             // Otherwise this is the parent page.
             $parent = $page;
         }
 
-        if (empty($children)) {
+        if (!$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 
@@ -405,7 +413,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $language   = $page->getLanguage();
         $translated = $this->translator->trans('mautic.page.lang.'.$language);
 
-        if ($translated == 'mautic.page.lang.'.$language) {
+        if ($translated === 'mautic.page.lang.'.$language) {
             $translated = $language;
         }
 

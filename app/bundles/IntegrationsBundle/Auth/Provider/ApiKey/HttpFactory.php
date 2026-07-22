@@ -100,7 +100,7 @@ class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                fn (Request $request) => $request->withUri(
+                fn (Request $request): \Psr\Http\Message\RequestInterface => $request->withUri(
                     Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
                 )
             )

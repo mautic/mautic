@@ -15,10 +15,10 @@ class TwigExtension extends AbstractExtension
      *
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('phpversion', [$this, 'phpversion']),
+            new TwigFilter('phpversion', $this->phpversion(...)),
         ];
     }
 

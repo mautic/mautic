@@ -16,7 +16,7 @@ class ReportDAO
 
     private array $remappedObjects = [];
 
-    private RelationsDAO $relationsDAO;
+    private readonly RelationsDAO $relationsDAO;
 
     /**
      * @param string $integration
@@ -35,10 +35,7 @@ class ReportDAO
         return $this->integration;
     }
 
-    /**
-     * @return $this
-     */
-    public function addObject(ObjectDAO $objectDAO)
+    public function addObject(ObjectDAO $objectDAO): static
     {
         if (!isset($this->objects[$objectDAO->getObject()])) {
             $this->objects[$objectDAO->getObject()] = [];

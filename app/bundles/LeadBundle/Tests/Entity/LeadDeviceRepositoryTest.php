@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 
-class LeadDeviceRepositoryTest extends MauticMysqlTestCase
+final class LeadDeviceRepositoryTest extends MauticMysqlTestCase
 {
     public function testFindExistingDevice(): void
     {
@@ -50,8 +50,9 @@ class LeadDeviceRepositoryTest extends MauticMysqlTestCase
         $existingDevice       = $leadDeviceRepository->findExistingDevice($newDevice);
 
         // Using assertTrue instead of assertNull to reduce test output
-        $this->assertTrue(
-            null === $existingDevice,
+        $this->assertNotInstanceOf(
+            LeadDevice::class,
+            $existingDevice,
             'The existing device should be null because the device has a different OS.'
         );
     }

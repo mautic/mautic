@@ -77,7 +77,7 @@ class FormModel extends AbstractCommonModel
      * Unlock an entity that prevents multiple people from editing.
      *
      * @param object $entity
-     * @param        $extra  Can be used by model to determine what to unlock
+     * @param mixed  $extra  Can be used by model to determine what to unlock
      */
     public function unlockEntity($entity, $extra = null): void
     {
@@ -97,10 +97,8 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity.
      *
-     * @param object $entity
-     * @param bool   $unlock
-     *
-     * @phpstan-param T $entity
+     * @param T    $entity
+     * @param bool $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -225,6 +223,8 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
+        $this->dispatchEvent('on_toggle_publish', $entity);
+
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
         $this->getRepository()->saveEntity($entity);
@@ -293,8 +293,6 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
-     * Delete an entity.
-     *
      * @param object $entity
      */
     public function deleteEntity($entity): void
@@ -350,7 +348,7 @@ class FormModel extends AbstractCommonModel
         }
         $this->em->flush();
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -422,7 +420,7 @@ class FormModel extends AbstractCommonModel
         $nameGetter = $this->getNameGetter();
 
         return $this->translator->trans($msg, [
-            '%entityName%' => $entity->$nameGetter(),
+            '%entityName%' => $entity->{$nameGetter}(),
             '%entityId%'   => $entity->getId(),
         ]);
     }
@@ -488,7 +486,7 @@ class FormModel extends AbstractCommonModel
      * Catch the exception in production and log the error.
      * Throw the exception in the dev mode only.
      */
-    protected function flushAndCatch()
+    protected function flushAndCatch(): void
     {
         try {
             $this->em->flush();

@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,16 +23,16 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         // Check the address.
         $companyRepository = $this->em->getRepository(Company::class);
         $companiesOriginal = $companyRepository->findBy(['address1' => 'Keplerova']);
-        Assert::assertCount(1, $companiesOriginal);
+        $this->assertCount(1, $companiesOriginal);
 
         // Create contact with the same company but different address.
         $this->submitFormWithCompanies($formId, $formAlias, 'test2@acquia.cz', 'Luk', 'Syk', 'Acquia', 'Krejpskeho');
 
         // Check that the address is changed.
         $companiesOld = $companyRepository->findBy(['address1' => 'Keplerova']);
-        Assert::assertCount(0, $companiesOld);
+        $this->assertCount(0, $companiesOld);
         $companiesNew = $companyRepository->findBy(['address1' => 'Krejpskeho']);
-        Assert::assertCount(1, $companiesNew);
+        $this->assertCount(1, $companiesNew);
     }
 
     public function testSaveSubmissionChangeContactField(): void
@@ -45,16 +44,16 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         // Check the contact.
         $contactRepository = $this->em->getRepository(Lead::class);
         $contactsOriginal  = $contactRepository->findBy(['lastname' => 'Doe Smith']);
-        Assert::assertCount(1, $contactsOriginal);
+        $this->assertCount(1, $contactsOriginal);
 
         // Create contact with the same email but different lastname.
         $this->submitFormWithoutCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Sykora');
 
         // Check that the address is changed.
         $contactsOld = $contactRepository->findBy(['lastname' => 'Doe Smith']);
-        Assert::assertCount(0, $contactsOld);
+        $this->assertCount(0, $contactsOld);
         $contactsNew = $contactRepository->findBy(['lastname' => 'Sykora']);
-        Assert::assertCount(1, $contactsNew);
+        $this->assertCount(1, $contactsNew);
     }
 
     /**
@@ -159,11 +158,10 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
     private function createForm(array $payload): array
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $formId         = $response['form']['id'];
-        $formAlias      = $response['form']['alias'];
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response  = json_decode($this->client->getResponse()->getContent(), true);
+        $formId    = $response['form']['id'];
+        $formAlias = $response['form']['alias'];
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         return [$formId, $formAlias];
     }
@@ -202,6 +200,6 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues($values);
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
     }
 }

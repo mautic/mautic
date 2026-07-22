@@ -24,19 +24,16 @@ class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -61,7 +58,7 @@ class ConfigController extends FormController
         $openTab    = null;
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
@@ -76,7 +73,7 @@ class ConfigController extends FormController
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -122,7 +119,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
@@ -183,25 +180,21 @@ class ConfigController extends FormController
         );
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
+    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId): Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
 
         if (!in_array($objectId, $fileFields)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content  = $this->coreParametersHelper->get($objectId);
@@ -222,20 +215,16 @@ class ConfigController extends FormController
         return $this->notFound();
     }
 
-    /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
+    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId): JsonResponse
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();

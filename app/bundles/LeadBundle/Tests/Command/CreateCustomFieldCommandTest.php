@@ -9,42 +9,28 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommandTest extends TestCase
+final class CreateCustomFieldCommandTest extends TestCase
 {
-    private BackgroundService $backgroundServiceMock;
-
-    private TranslatorInterface $translatorMock;
-
-    private LeadFieldRepository $leadFieldRepositoryMock;
-
-    private PathsHelper $pathsHelperMock;
-
-    private CoreParametersHelper $coreParametersHelper;
-
     protected function setUp(): void
     {
-        $this->backgroundServiceMock   = $this->createMock(BackgroundService::class);
-        $this->translatorMock          = $this->createMock(TranslatorInterface::class);
-        $this->leadFieldRepositoryMock = $this->createMock(LeadFieldRepository::class);
-        $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
+    #[DataProvider('completeRunMethodProvider')]
     public function testCompleteRunMethodIsCalled(bool $checkRunStatusResult, int $completeRunExpected): void
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)
             ->setConstructorArgs([
-                $this->backgroundServiceMock,
-                $this->translatorMock,
-                $this->leadFieldRepositoryMock,
-                $this->pathsHelperMock,
-                $this->coreParametersHelper,
+                $this->createStub(BackgroundService::class),
+                $this->createStub(TranslatorInterface::class),
+                $this->createStub(LeadFieldRepository::class),
+                $this->createStub(PathsHelper::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['completeRun', 'checkRunStatus'])
             ->getMock();
@@ -60,13 +46,12 @@ class CreateCustomFieldCommandTest extends TestCase
     }
 
     /**
-     * @return array<int, array<int, bool|int>>
+     * @return \Iterator<int, array<int, (bool|int)>>
      */
-    public static function completeRunMethodProvider(): array
+    public static function completeRunMethodProvider(): \Iterator
     {
-        return [
-            [true, 1],  // `completeRun` should be called once
-            [false, 0], // `completeRun` should never be called
-        ];
+        yield [true, 1];
+        // `completeRun` should be called once
+        yield [false, 0];
     }
 }

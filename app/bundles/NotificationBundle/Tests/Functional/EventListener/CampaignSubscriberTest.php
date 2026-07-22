@@ -19,7 +19,7 @@ use Mautic\NotificationBundle\Tests\NotificationTrait;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 
-class CampaignSubscriberTest extends MauticMysqlTestCase
+final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     use NotificationTrait;
 
@@ -513,7 +513,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         int $status = 200,
         ?string $body = null,
     ): callable {
-        return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body) {
+        return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body): Response {
             Assert::assertSame($expectedMethod, $request->getMethod());
             Assert::assertSame($expectedUri, $request->getUri()->__toString());
             Assert::assertSame(json_encode($expectedData), $request->getBody()->getContents());
@@ -549,7 +549,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function noMoreRequestAssertion(): callable
     {
-        return function () {
+        return function (): never {
             $this->fail('No other request was expected');
         };
     }
@@ -569,25 +569,25 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
     private function assertEventLogPassed(CampaignEvent $event, Lead $leadOne): void
     {
         $log = $this->findEventLog($event, $leadOne);
-        Assert::assertFalse($log->getIsScheduled());
+        $this->assertFalse($log->getIsScheduled());
 
         $metadata = $log->getMetadata();
-        Assert::assertIsArray($metadata);
-        Assert::assertArrayHasKey('status', $metadata);
-        Assert::assertSame('mautic.notification.timeline.status.delivered', $metadata['status']);
+        $this->assertIsArray($metadata);
+        $this->assertArrayHasKey('status', $metadata);
+        $this->assertSame('mautic.notification.timeline.status.delivered', $metadata['status']);
     }
 
     private function assertEventLogFailed(CampaignEvent $event, Lead $leadOne, ?string $reason, bool $isScheduled = false): void
     {
         $log = $this->findEventLog($event, $leadOne);
-        Assert::assertSame($isScheduled, $log->getIsScheduled());
+        $this->assertSame($isScheduled, $log->getIsScheduled());
 
         $metadata = $log->getMetadata();
-        Assert::assertIsArray($metadata);
-        Assert::assertArrayHasKey('failed', $metadata);
-        Assert::assertSame(1, $metadata['failed']);
-        Assert::assertArrayHasKey('reason', $metadata);
-        Assert::assertSame($reason, $metadata['reason']);
+        $this->assertIsArray($metadata);
+        $this->assertArrayHasKey('failed', $metadata);
+        $this->assertSame(1, $metadata['failed']);
+        $this->assertArrayHasKey('reason', $metadata);
+        $this->assertSame($reason, $metadata['reason']);
     }
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
@@ -597,7 +597,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
             'lead'     => $leadOne,
             'rotation' => 1,
         ]);
-        Assert::assertNotNull($log);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         return $log;
     }

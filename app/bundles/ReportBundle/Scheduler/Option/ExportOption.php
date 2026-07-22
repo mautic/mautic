@@ -4,14 +4,14 @@ namespace Mautic\ReportBundle\Scheduler\Option;
 
 class ExportOption
 {
-    private int $reportId;
+    private readonly int $reportId;
 
     /**
      * @param int|null $reportId
      */
     public function __construct($reportId)
     {
-        if (!is_null($reportId) && !is_numeric($reportId)) {
+        if (null !== $reportId && !is_numeric($reportId)) {
             throw new \InvalidArgumentException();
         }
 

@@ -8,10 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
+final class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -37,15 +36,15 @@ class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $pageContent = $this->client->request(Request::METHOD_GET, '/page-page-anonymizaiton-off');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $pageContent->text());
-        Assert::assertStringContainsString('Test Html', $pageContent->text());
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Test Html', $pageContent->text());
 
         /** @var HitRepository $hitRepository */
         $hitRepository = $this->em->getRepository(Hit::class);
 
         /** @var Hit[] $hits */
         $hits = $hitRepository->findBy(['page' => $pageObject->getId()]);
-        Assert::assertCount(1, $hits);
-        Assert::assertSame('127.0.0.1', $hits[0]->getIpAddress()->getIpAddress());
+        $this->assertCount(1, $hits);
+        $this->assertSame('127.0.0.1', $hits[0]->getIpAddress()->getIpAddress());
     }
 }

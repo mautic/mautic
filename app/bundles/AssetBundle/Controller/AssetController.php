@@ -13,13 +13,19 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AssetController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1)
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
+    }
+
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -35,7 +41,7 @@ class AssetController extends FormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['asset:assets:viewown'] && !$permissions['asset:assets:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -129,10 +135,8 @@ class AssetController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, AssetModel $model, $objectId)
+    public function viewAction(Request $request, AssetModel $model, $objectId): Response
     {
         $activeAsset = $model->getEntity($objectId);
 
@@ -166,14 +170,11 @@ class AssetController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
-            return $this->accessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+            $this->throwAccessDenied();
+        }
+        $logs          = $this->auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,
@@ -221,10 +222,8 @@ class AssetController extends FormController
      * Show a preview of the file.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function previewAction(Request $request, AssetModel $model, $objectId)
+    public function previewAction(Request $request, AssetModel $model, $objectId): JsonResponse|Response
     {
         $activeAsset = $model->getEntity($objectId);
 
@@ -271,10 +270,8 @@ class AssetController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null)
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -286,7 +283,7 @@ class AssetController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('asset:assets:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $maxSize    = $model->getMaxUploadSize();
@@ -316,7 +313,7 @@ class AssetController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -409,7 +406,7 @@ class AssetController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess('asset:assets:editown', 'asset:assets:editother', $entity->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->coreParametersHelper->get('max_size')));
@@ -457,11 +454,12 @@ class AssetController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'asset.asset');
@@ -477,7 +475,7 @@ class AssetController extends FormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -564,10 +562,8 @@ class AssetController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId)
+    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
         $clone  = null;
@@ -578,7 +574,7 @@ class AssetController extends FormController
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $clone = clone $entity;
@@ -629,7 +625,7 @@ class AssetController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'asset.asset');
             }
@@ -691,7 +687,7 @@ class AssetController extends FormController
                     'asset:assets:deleteown', 'asset:assets:deleteother', $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'asset', true);
                 } else {

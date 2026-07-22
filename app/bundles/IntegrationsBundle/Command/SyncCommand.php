@@ -23,7 +23,7 @@ class SyncCommand extends Command
     public const NAME = 'mautic:integrations:sync';
 
     public function __construct(
-        private SyncServiceInterface $syncService,
+        private readonly SyncServiceInterface $syncService,
     ) {
         parent::__construct();
     }
@@ -34,8 +34,7 @@ class SyncCommand extends Command
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
-                'Fetch objects from integration.',
-                null
+                'Fetch objects from integration.'
             )
             ->addOption(
                 '--start-datetime',

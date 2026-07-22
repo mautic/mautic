@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use PHPUnit\Framework\TestCase;
 
-class ValueNormalizerTest extends TestCase
+final class ValueNormalizerTest extends TestCase
 {
     public function testNullDateTimeValue(): void
     {

@@ -32,14 +32,15 @@ class RedirectModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private Shortener $shortener,
+        private readonly Shortener $shortener,
+        private readonly RedirectRepository $redirectRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): RedirectRepository
     {
-        return $this->em->getRepository(Redirect::class);
+        return $this->redirectRepository;
     }
 
     /**
@@ -65,12 +66,12 @@ class RedirectModel extends FormModel
         $shortenUrl = false,
         $utmTags = [],
     ) {
-        if (count(func_get_args()) > 2) {
+        if (func_num_args() > 2) {
             $deprecation = '$shortenUrl is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::shortenUrl.';
             trigger_error($deprecation, E_USER_DEPRECATED);
         }
 
-        if (count(func_get_args()) > 3) {
+        if (func_num_args() > 3) {
             $deprecation = '$utmTags is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::applyUtmTags.';
             trigger_error($deprecation, E_USER_DEPRECATED);
         }

@@ -65,6 +65,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
+                        [],
                         $canViewOthers
                     ),
                 ]);
@@ -80,7 +81,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->assetModel->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers),
+                    'chartData'   => $this->assetModel->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
                 ]);
             }
 
@@ -99,7 +100,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $assets = $this->assetModel->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $assets = $this->assetModel->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
                 $items  = [];
 
                 // Build table rows with links

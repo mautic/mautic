@@ -12,7 +12,7 @@ class DbHelper extends Module
     private array $dbConfig;
     private string $dumpFilePath = 'tests/_data/dump.sql';
 
-    public function _beforeSuite($settings = [])
+    public function _beforeSuite($settings = []): void
     {
         $this->loadEnv();
         $this->dbConfig = [
@@ -105,9 +105,9 @@ class DbHelper extends Module
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $this->fail("$description failed with error: ".$process->getErrorOutput());
+            $this->fail("{$description} failed with error: ".$process->getErrorOutput());
         } else {
-            $this->debug("$description completed successfully");
+            $this->debug("{$description} completed successfully");
         }
     }
 }

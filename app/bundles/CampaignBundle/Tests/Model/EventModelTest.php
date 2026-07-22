@@ -20,46 +20,41 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class EventModelTest extends TestCase
+final class EventModelTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|MockObject
+     * @var MockObject&EventRepository
      */
-    private $entityManagerMock;
+    private MockObject $eventRepositoryMock;
 
     /**
-     * @var EventRepository|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
-    private $eventRepositoryMock;
-
-    /**
-     * @var EventDispatcherInterface|MockObject
-     */
-    private $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     private MockObject|EventModel $eventModel;
 
     protected function setUp(): void
     {
-        $this->entityManagerMock   = $this->createMock(EntityManagerInterface::class);
         $this->eventRepositoryMock = $this->createMock(EventRepository::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
 
         $this->eventModel          = new EventModel(
-            $this->entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcherMock,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
-        $this->entityManagerMock
-            ->method('getRepository')
-            ->with(Event::class)
-            ->willReturn($this->eventRepositoryMock);
+        $this->eventModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class),
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+        );
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
@@ -157,7 +152,7 @@ class EventModelTest extends TestCase
 
     public function testDeleteEventsByCampaignId(): void
     {
-        /** @var EventModel&MockObject */
+        /** @var EventModel&MockObject $mockModel */
         $mockModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])

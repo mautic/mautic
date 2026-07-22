@@ -85,7 +85,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit($hitConfig, ObjectManager $manager)
+    protected function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
@@ -104,10 +104,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

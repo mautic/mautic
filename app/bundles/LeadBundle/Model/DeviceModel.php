@@ -16,6 +16,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -26,7 +27,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class DeviceModel extends FormModel
 {
     public function __construct(
-        private LeadDeviceRepository $leadDeviceRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -39,10 +40,7 @@ class DeviceModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadDeviceRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadDeviceRepository
     {
         return $this->leadDeviceRepository;
     }
@@ -67,7 +65,7 @@ class DeviceModel extends FormModel
     /**
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);
@@ -107,7 +105,7 @@ class DeviceModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadDeviceEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

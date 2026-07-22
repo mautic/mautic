@@ -44,6 +44,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -54,6 +55,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -82,14 +84,14 @@ class SubmissionModel extends CommonFormModel
         protected LeadFieldModel $leadFieldModel,
         protected CompanyModel $companyModel,
         protected FormFieldHelper $fieldHelper,
-        private UploadFieldValidator $uploadFieldValidator,
-        private FormUploader $formUploader,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private FieldValueTransformer $fieldValueTransformer,
-        private DateHelper $dateHelper,
-        private ContactTracker $contactTracker,
-        private ContactMerger $contactMerger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly UploadFieldValidator $uploadFieldValidator,
+        private readonly FormUploader $formUploader,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly FieldValueTransformer $fieldValueTransformer,
+        private readonly DateHelper $dateHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly ContactMerger $contactMerger,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -98,23 +100,25 @@ class SubmissionModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository(Submission::class);
+        return $this->submissionRepository;
     }
 
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission(array $post, array $server, Form $form, Request $request, $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 
@@ -182,7 +186,8 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
-            } elseif ($f->isFileType()) {
+            }
+            if ($f->isFileType()) {
                 try {
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
@@ -330,10 +335,10 @@ class SubmissionModel extends CommonFormModel
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
 
-        /*
+        /**
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
-         * The action can still be invalidated below - deleteEntity takes care for File deletion
+         * The action can still be invalidated below - deleteEntity takes care for File deletion.
          *
          * @todo Refactor form validation to execute this code only if Submission is valid
          */
@@ -383,7 +388,7 @@ class SubmissionModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setAction(null);
+            $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
@@ -460,11 +465,11 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @return StreamedResponse|Response
+     * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -571,11 +576,9 @@ class SubmissionModel extends CommonFormModel
      * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -932,7 +935,7 @@ class SubmissionModel extends CommonFormModel
         $uniqueLeadFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
 
         // Closure to get data and unique fields
-        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
+        $getData = function (array $currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
@@ -950,7 +953,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields): array {
+        $getCompanyData = function (array $currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company' => 'company']);
@@ -965,7 +968,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
+        $checkForIdentifierConflict = function (array $fieldSet1, array $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)
@@ -993,7 +996,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->leadRepository->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -1087,7 +1090,7 @@ class SubmissionModel extends CommonFormModel
 
         // Set stage.
         if (!empty($data['stagebyname'])) {
-            $stage = $this->em->getRepository(Stage::class)->findOneBy(['name' => $data['stagebyname']]);
+            $stage = $this->stageRepository->findOneBy(['name' => $data['stagebyname']]);
 
             if ($stage instanceof Stage) {
                 $lead->setStage($stage);
@@ -1113,7 +1116,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Set owner
-        $userRepo = $this->em->getRepository(User::class);
+        $userRepo = $this->userRepository;
         \assert($userRepo instanceof UserRepository);
 
         $user = null;
@@ -1177,8 +1180,6 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value.
-     *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
     protected function validateFieldValue(Field $field, $value)
@@ -1209,7 +1210,7 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue($value, Field $f): string
+    private function normalizeValue(mixed $value, Field $f): string
     {
         $value = !is_array($value) ? [$value] : $value;
 

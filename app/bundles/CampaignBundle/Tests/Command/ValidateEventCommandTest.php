@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
-class ValidateEventCommandTest extends AbstractCampaignCommand
+final class ValidateEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
@@ -72,7 +74,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
 
         // Remove a contact from the campaign
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
-            ->set('manually_removed', 1)
+            ->set('manually_removed', '1')
             ->where('lead_id = 1')
             ->executeStatement();
 

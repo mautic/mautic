@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,12 +22,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class InstallDataCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition([
@@ -52,6 +53,7 @@ EOT
         $force   = $options['force'];
 
         if (!$force) {
+            /** @var QuestionHelper $helper */
             $helper         = $this->getHelper('question');
             $questionString = $this->translator->trans('mautic.core.command.install_data_confirm').' (y = '.$this->translator->trans('mautic.core.form.yes').', n = '.$this->translator->trans('mautic.core.form.no').'): ';
             $question       = new ConfirmationQuestion($questionString, false);

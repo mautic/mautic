@@ -21,7 +21,7 @@ class Submission
 
     /**
      * @var Form
-     **/
+     */
     private $form;
 
     /**
@@ -131,22 +131,15 @@ class Submission
             ->build();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set dateSubmitted.
-     *
      * @param \DateTime $dateSubmitted
-     *
-     * @return Submission
      */
-    public function setDateSubmitted($dateSubmitted)
+    public function setDateSubmitted($dateSubmitted): static
     {
         $this->dateSubmitted = $dateSubmitted;
 
@@ -154,9 +147,7 @@ class Submission
     }
 
     /**
-     * Get dateSubmitted.
-     *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSubmitted()
     {
@@ -164,13 +155,9 @@ class Submission
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
-     *
-     * @return Submission
      */
-    public function setReferer($referer)
+    public function setReferer($referer): static
     {
         $this->referer = $referer;
 
@@ -178,21 +165,14 @@ class Submission
     }
 
     /**
-     * Get referer.
-     *
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
         return $this->referer;
     }
 
-    /**
-     * Set form.
-     *
-     * @return Submission
-     */
-    public function setForm(Form $form)
+    public function setForm(Form $form): static
     {
         $this->form = $form;
 
@@ -200,21 +180,14 @@ class Submission
     }
 
     /**
-     * Get form.
-     *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {
         return $this->form;
     }
 
-    /**
-     * Set ipAddress.
-     *
-     * @return Submission
-     */
-    public function setIpAddress(?IpAddress $ipAddress = null)
+    public function setIpAddress(?IpAddress $ipAddress = null): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -222,7 +195,7 @@ class Submission
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -230,8 +203,6 @@ class Submission
     }
 
     /**
-     * Get results.
-     *
      * @return array
      */
     public function getResults()
@@ -239,24 +210,14 @@ class Submission
         return $this->results;
     }
 
-    /**
-     * Get results.
-     *
-     * @return Submission
-     */
-    public function setResults($results)
+    public function setResults($results): static
     {
         $this->results = $results;
 
         return $this;
     }
 
-    /**
-     * Set page.
-     *
-     * @return Submission
-     */
-    public function setPage(?Page $page = null)
+    public function setPage(?Page $page = null): static
     {
         $this->page = $page;
 
@@ -264,9 +225,7 @@ class Submission
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return Page|null
      */
     public function getPage()
     {
@@ -274,17 +233,14 @@ class Submission
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(?Lead $lead = null)
+    public function setLead(?Lead $lead = null): static
     {
         $this->lead = $lead;
 
@@ -292,17 +248,14 @@ class Submission
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTrackingId()
     {
         return $this->trackingId;
     }
 
-    /**
-     * @return $this
-     */
-    public function setTrackingId($trackingId)
+    public function setTrackingId($trackingId): static
     {
         $this->trackingId = $trackingId;
 

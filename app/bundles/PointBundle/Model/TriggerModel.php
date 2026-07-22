@@ -19,6 +19,8 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
@@ -26,6 +28,7 @@ use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -40,13 +43,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @var array<string, mixed[]>
      */
-    private $cachedEvents = [];
+    private array $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -55,26 +58,24 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly TriggerRepository $triggerRepository,
+        private readonly TriggerEventRepository $triggerEventRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PointBundle\Entity\TriggerRepository
-     */
-    public function getRepository()
+    public function getRepository(): TriggerRepository
     {
-        return $this->em->getRepository(Trigger::class);
+        return $this->triggerRepository;
     }
 
     /**
      * Retrieves an instance of the TriggerEventRepository.
-     *
-     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
      */
-    public function getEventRepository()
+    public function getEventRepository(): TriggerEventRepository
     {
-        return $this->em->getRepository(TriggerEvent::class);
+        return $this->triggerEventRepository;
     }
 
     public function getPermissionBase(): string
@@ -85,7 +86,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -104,7 +105,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         parent::saveEntity($entity, $unlock);
 
@@ -116,8 +117,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
 
-            /** @var LeadRepository $leadRepository */
-            $leadRepository = $this->em->getRepository(Lead::class);
+            $leadRepository = $this->leadRepository;
 
             foreach ($events as $event) {
                 $args = [
@@ -224,7 +224,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
@@ -255,7 +255,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    $event->$func($v);
+                    $event->{$func}($v);
                 }
             }
             $event->setTrigger($entity);
@@ -275,7 +275,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if (empty($this->cachedEvents)) {
             $event = new TriggerBuilderEvent($this->translator);
@@ -310,7 +310,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, ?Lead $lead = null, $force = false)
+    public function triggerEvent(array $event, ?Lead $lead = null, $force = false)
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -354,7 +354,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         return $triggerExecutedEvent->getResult();
     }
 
-    private function invokeCallback($event, Lead $lead, array $settings): mixed
+    private function invokeCallback(array $event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'  => $event,
@@ -391,7 +391,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
-        /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo         = $this->getEventRepository();
         $events       = $repo->getPublishedByPointTotal($points);
         $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());

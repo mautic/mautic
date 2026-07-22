@@ -2,40 +2,22 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @template TApiHelper of CrmApi
+ */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
 
     protected $helper;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, TranslatorInterface $translator, LoggerInterface $logger, EncryptionHelper $encryptionHelper, LeadModel $leadModel, CompanyModel $companyModel, PathsHelper $pathsHelper, NotificationModel $notificationModel, FieldModel $fieldModel, IntegrationEntityModel $integrationEntityModel, DoNotContactModel $doNotContact, protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
-    {
-        parent::__construct($eventDispatcher, $cacheStorageHelper, $entityManager, $requestStack, $router, $translator, $logger, $encryptionHelper, $leadModel, $companyModel, $pathsHelper, $notificationModel, $fieldModel, $integrationEntityModel, $doNotContact, $fieldsWithUniqueIdentifier);
-    }
 
     public function setIntegrationSettings(Integration $settings): void
     {
@@ -167,9 +149,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the API helper.
-     *
-     * @return CrmApi
+     * @return TApiHelper
      */
     public function getApiHelper()
     {
@@ -353,7 +333,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param mixed|null  $identifiers
      * @param string|null $object
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
@@ -369,12 +349,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
-        /** @var LeadModel $leadModel */
-        $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
         $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
@@ -388,14 +366,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
-        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
+        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) === count($uniqueLeadFields)) {
             // return if uniqueIdentifiers have no data set to avoid duplicating leads.
             $this->logger->debug('getMauticLead: No unique identifiers', [
                 'uniqueLeadFields' => $uniqueLeadFields,
                 'matchedFields'    => $matchedFields,
             ]);
 
-            return;
+            return null;
         }
 
         // Default to new lead
@@ -421,7 +399,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (empty($fieldsToUpdateInMautic)) {
                 $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
 
-                return;
+                return null;
             }
 
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
@@ -431,7 +409,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
@@ -472,7 +450,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 null,
                 $this->getDisplayName()
             ));
-            $leadModel->saveEntity($lead, false);
+            $this->leadModel->saveEntity($lead, false);
         }
 
         return $lead;
@@ -527,7 +505,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $objects
+     * @param string[]|string|null $objects
      *
      * @return array
      */
@@ -639,8 +617,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Limits the string.
-     *
      * @param mixed  $value
      * @param string $fieldType
      *

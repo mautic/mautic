@@ -31,7 +31,7 @@ class StatsDAO
     /**
      * @return YearStat[]
      */
-    public function getYears()
+    public function getYears(): array
     {
         ksort($this->years);
 
