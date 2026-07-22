@@ -53,6 +53,10 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
+        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
