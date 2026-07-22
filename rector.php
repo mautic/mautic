@@ -53,6 +53,10 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
+        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -66,6 +70,11 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
+        // to be fixed in dev-main
+        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
+            '*Command.php',
         ],
 
         // skip as might be overriden by 3rd party controllers
