@@ -12,13 +12,12 @@ use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 class CacheClearSubscriber implements CacheClearerInterface
 {
     /**
-     * @var CacheProvider
+     * @param CacheProvider $cacheProvider
      */
-    private AdapterInterface $cacheProvider;
-
-    public function __construct(AdapterInterface $cacheProvider, private readonly LoggerInterface $logger)
-    {
-        $this->cacheProvider = $cacheProvider;
+    public function __construct(
+        private readonly AdapterInterface $cacheProvider,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     /**

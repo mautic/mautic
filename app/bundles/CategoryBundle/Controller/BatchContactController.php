@@ -17,12 +17,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ContactActionModel $actionModel,
-        private CategoryModel $categoryModel,
+        private readonly ContactActionModel $actionModel,
+        private readonly CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -68,7 +69,7 @@ class BatchContactController extends AbstractFormController
     /**
      * View the modal form for adding contacts into categories in batches.
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_category_batch_contact_set');
         $rows  = $this->categoryModel->getLookupResults('global', '', 300);

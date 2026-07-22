@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
+final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * Regression test: a contact with an asset_downloads row whose asset_id is NULL
@@ -37,10 +37,10 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         // timeline twig from erroring on a missing href key. The DownloadRepository
         // LEFT JOINs assets, so a.title resolves to NULL once asset_id is NULL;
         // the subscriber falls back to a localized "Deleted asset" placeholder.
-        self::assertIsString($event['eventLabel']);
-        self::assertNotEmpty($event['eventLabel']);
-        self::assertNull($event['extra']['asset']);
-        self::assertNull($event['extra']['assetDownloadUrl']);
+        $this->assertIsString($event['eventLabel']);
+        $this->assertNotEmpty($event['eventLabel']);
+        $this->assertNull($event['extra']['asset']);
+        $this->assertNull($event['extra']['assetDownloadUrl']);
     }
 
     /**
@@ -54,11 +54,11 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $event = $this->getFirstAssetDownloadEvent($leadId);
 
-        self::assertIsArray($event['eventLabel']);
-        self::assertArrayHasKey('href', $event['eventLabel']);
-        self::assertSame('Live asset', $event['eventLabel']['label']);
-        self::assertInstanceOf(Asset::class, $event['extra']['asset']);
-        self::assertNotNull($event['extra']['assetDownloadUrl']);
+        $this->assertIsArray($event['eventLabel']);
+        $this->assertArrayHasKey('href', $event['eventLabel']);
+        $this->assertSame('Live asset', $event['eventLabel']['label']);
+        $this->assertInstanceOf(Asset::class, $event['extra']['asset']);
+        $this->assertNotNull($event['extra']['assetDownloadUrl']);
     }
 
     /**
@@ -86,7 +86,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $download->setLead($lead);
         $download->setDateDownload(new \DateTime('2026-01-01 00:00:00'));
         $download->setCode(200);
-        $download->setTrackingId(random_int(1, 99999));
+        $download->setTrackingId((string) random_int(1, 99999));
         $this->em->persist($download);
         $this->em->flush();
 
@@ -108,7 +108,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
             $payload['events'],
             static fn (array $event): bool => 'asset.download' === ($event['event'] ?? null),
         ));
-        self::assertCount(1, $assetDownloadEvents);
+        $this->assertCount(1, $assetDownloadEvents);
 
         return $assetDownloadEvents[0];
     }

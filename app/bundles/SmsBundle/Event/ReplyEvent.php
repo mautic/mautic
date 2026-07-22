@@ -13,12 +13,10 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
     private ?LeadEventLog $eventLog = null;
 
     /**
-     * ReplyEvent constructor.
-     *
      * @param string $message
      */
     public function __construct(
-        private Lead $contact,
+        private readonly Lead $contact,
         private $message,
     ) {
     }

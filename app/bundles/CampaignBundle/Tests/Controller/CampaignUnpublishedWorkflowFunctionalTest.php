@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
@@ -115,8 +117,8 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $content = $response->getContent();
 
         foreach ($attributes as $key => $val) {
-            $this->assertStringContainsString($key, $content);
-            $this->assertStringContainsString($val, $content);
+            $this->assertStringContainsString($key, (string) $content);
+            $this->assertStringContainsString($val, (string) $content);
         }
     }
 }

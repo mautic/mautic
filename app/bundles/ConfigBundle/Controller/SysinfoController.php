@@ -15,13 +15,14 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class SysinfoController extends FormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private SysinfoModel $sysinfoModel,
+        private readonly SysinfoModel $sysinfoModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -32,11 +33,10 @@ class SysinfoController extends FormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
-        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {
             $this->throwAccessDenied();

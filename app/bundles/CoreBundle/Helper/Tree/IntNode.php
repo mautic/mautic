@@ -19,7 +19,7 @@ class IntNode implements NodeInterface
     private int $position = 0;
 
     public function __construct(
-        private int $value,
+        private readonly int $value,
         private ?NodeInterface $parent = null,
     ) {
     }

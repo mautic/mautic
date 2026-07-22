@@ -21,25 +21,21 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var Collection
-     *
-     * @phpstan-var Collection<int, T>
-     **/
+     * @var Collection<int, T>
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface|null
-     *
-     * @phpstan-var T|null
-     **/
+     * @var T|null
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
     private $translationParent;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write', 'form:read', 'form:write'])]
-    private string $language = 'en';
+    private ?string $language = 'en';
 
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
+    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang', bool $nullableLanguage = false): void
     {
         $builder->createOneToMany('translationChildren', $entityClass)
             ->setIndexBy('id')
@@ -52,9 +48,14 @@ trait TranslationEntityTrait
             ->addJoinColumn('translation_parent_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->createField('language', 'string')
-            ->columnName($languageColumnName)
-            ->build();
+        $languageField = $builder->createField('language', 'string')
+            ->columnName($languageColumnName);
+
+        if ($nullableLanguage) {
+            $languageField->nullable();
+        }
+
+        $languageField->build();
     }
 
     public function addTranslationChild(TranslationEntityInterface $child): static
@@ -187,12 +188,12 @@ trait TranslationEntityTrait
 
         [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
-            $count = $parent->$getter();
+            $count = $parent->{$getter}();
         }
 
         foreach ($children as $translation) {
             if ($variantParent != $translation) {
-                $count += $translation->$getter();
+                $count += $translation->{$getter}();
             }
         }
 

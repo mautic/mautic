@@ -89,7 +89,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
@@ -225,7 +225,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
         $builder->addField('alias', 'string');
 
-        self::addTranslationMetadata($builder, self::class);
+        self::addTranslationMetadata($builder, self::class, nullableLanguage: true);
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -400,7 +400,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
         self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
@@ -427,10 +427,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $name
-     *
-     * @return Form
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -448,10 +446,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $description
-     *
-     * @return Form
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -475,10 +471,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $cachedHtml
-     *
-     * @return Form
      */
-    public function setCachedHtml($cachedHtml)
+    public function setCachedHtml($cachedHtml): static
     {
         $this->cachedHtml = $cachedHtml;
 
@@ -503,10 +497,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $postAction
-     *
-     * @return Form
      */
-    public function setPostAction($postAction)
+    public function setPostAction($postAction): static
     {
         $this->isChanged('postAction', $postAction);
         $this->postAction = $postAction;
@@ -524,10 +516,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $postActionProperty
-     *
-     * @return Form
      */
-    public function setPostActionProperty($postActionProperty)
+    public function setPostActionProperty($postActionProperty): static
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -551,10 +541,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return Form
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -572,10 +560,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return Form
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -593,10 +579,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addField($key, Field $field)
+    public function addField($key, Field $field): static
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -655,7 +639,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
                 ],
                 $this->getFields()->getValues(),
             ),
-            fn ($elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
+            fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
     }
 
@@ -709,10 +693,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $alias
-     *
-     * @return Form
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -728,10 +710,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
         return $this->alias;
     }
 
-    /**
-     * @return Form
-     */
-    public function addSubmission(Submission $submissions)
+    public function addSubmission(Submission $submissions): static
     {
         $this->submissions[] = $submissions;
 
@@ -744,7 +723,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return Collection<int, Submission>
      */
     public function getSubmissions(): Collection
     {
@@ -753,10 +732,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addAction($key, Action $action)
+    public function addAction($key, Action $action): static
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', [$key, $changes]);
@@ -867,10 +844,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
      * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
      * @param mixed $formType
-     *
-     * @return Form
      */
-    public function setFormType($formType)
+    public function setFormType($formType): static
     {
         trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
         $this->formType = $formType;
@@ -898,10 +873,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param string $formAttributes
-     *
-     * @return Form
      */
-    public function setFormAttributes($formAttributes)
+    public function setFormAttributes($formAttributes): static
     {
         $this->isChanged('formAttributes', $formAttributes);
         $this->formAttributes = $formAttributes;
@@ -984,10 +957,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     /**
      * @param int $progressiveProfilingLimit
-     *
-     * @return Form
      */
-    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit): static
     {
         $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
         $this->progressiveProfilingLimit = $progressiveProfilingLimit;

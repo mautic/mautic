@@ -12,10 +12,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MenuBuilder
 {
     public function __construct(
-        private FactoryInterface $factory,
-        private MatcherInterface $matcher,
-        private EventDispatcherInterface $dispatcher,
-        private MenuHelper $menuHelper,
+        private readonly FactoryInterface $factory,
+        private readonly MatcherInterface $matcher,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly MenuHelper $menuHelper,
     ) {
     }
 
@@ -48,10 +48,12 @@ class MenuBuilder
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     // current match
                     return $item;
-                } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
+                }
+                if ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
                     // route uri match
                     return $item;
-                } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
+                }
+                if (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
                     // route name match
                     return $item;
                 }
@@ -70,7 +72,7 @@ class MenuBuilder
     /**
      * @return mixed
      */
-    private function buildMenu($name)
+    private function buildMenu(string $name)
     {
         static $menus = [];
 

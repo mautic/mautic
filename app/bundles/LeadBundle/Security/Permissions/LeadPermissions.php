@@ -26,7 +26,10 @@ class LeadPermissions extends AbstractPermissions
 
     public const LISTS_FULL         = 'lead:lists:full';
 
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
 
@@ -38,6 +41,7 @@ class LeadPermissions extends AbstractPermissions
         ];
 
         $this->addExtendedPermissions('leads', false);
+        $this->addExtendedPermissions('notes', false);
         $this->addExtendedPermissions('lists');
         $this->addStandardPermissions('imports');
         $this->addCustomPermission('export', ['enable' => 1024]);
@@ -51,6 +55,7 @@ class LeadPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addExtendedFormFields($this->getName(), 'leads', $builder, $data, false);
+        $this->addExtendedFormFields($this->getName(), 'notes', $builder, $data, false);
 
         $this->addExtendedFormFields('lead', 'lists', $builder, $data);
 
@@ -88,7 +93,7 @@ class LeadPermissions extends AbstractPermissions
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
             (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms))
-            && (isset($permissions['lists']) || isset($permissions['fields']))
+            && (isset($permissions['lists']) || isset($permissions['notes']) || isset($permissions['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }

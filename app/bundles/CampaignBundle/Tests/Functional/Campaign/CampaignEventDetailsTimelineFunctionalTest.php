@@ -81,18 +81,18 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.parent.details', ['%path%' => 'yes', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead2->getId()));
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.parent.details', ['%path%' => 'no', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 }

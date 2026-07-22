@@ -126,7 +126,7 @@ class HitRepository extends CommonRepository
      *
      * @param int $code
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200): array
+    public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -144,6 +144,12 @@ class HitRepository extends CommonRepository
             $dateHelper = new DateTimeHelper($fromDate);
             $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
                 ->setParameter('date', $dateHelper->toUtcString());
+        }
+
+        if (null != $toDate) {
+            $dateHelper = new DateTimeHelper($toDate);
+            $q->andwhere($q->expr()->lte('h.date_hit', ':dateTo'))
+                ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
@@ -173,8 +179,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count email clickthrough.
-     *
      * @return int
      */
     public function countEmailClickthrough()
@@ -188,11 +192,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Count how many visitors hit some page in last X $seconds.
-     *
-     * @param int  $seconds
-     * @param bool $notLeft
      */
-    public function countVisitors($seconds = 60, $notLeft = false): int
+    public function countVisitors(int $seconds = 60, bool $notLeft = false): int
     {
         $now         = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
@@ -220,8 +221,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the latest hit.
-     *
      * @param array{
      *     leadId?: int,
      *     urls?: string[]|string|null,
@@ -275,9 +274,9 @@ class HitRepository extends CommonRepository
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
+        $pages      = $q->select("p.id, p.{$hitsColumn} as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->$inOrEq('p.id', $pageIds))
+            ->where($q->expr()->{$inOrEq}('p.id', $pageIds))
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -295,7 +294,7 @@ class HitRepository extends CommonRepository
         // else we would have recorded the date_left on a subsequent page hit
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
-            $q->expr()->$inOrEq('h.page_id', $pageIds),
+            $q->expr()->{$inOrEq}('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),
             $q->expr()->isNull('h.date_left')
         );

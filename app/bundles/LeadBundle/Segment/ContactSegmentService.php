@@ -6,6 +6,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Psr\Log\LoggerInterface;
 
 class ContactSegmentService
 {
@@ -14,7 +15,7 @@ class ContactSegmentService
     public function __construct(
         private ContactSegmentFilterFactory $contactSegmentFilterFactory,
         private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
-        private \Psr\Log\LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -267,14 +268,14 @@ class ContactSegmentService
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($leadsTableAlias.'.date_identified'));
     }
 
-    /***** DEBUG *****/
+    /* DEBUG */
 
     /**
      * Formatting helper.
      *
      * @return string
      */
-    private function formatPeriod($inputSeconds)
+    private function formatPeriod(float $inputSeconds)
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 

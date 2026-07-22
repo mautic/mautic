@@ -11,16 +11,11 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
 class ScheduleModel
 {
-    /**
-     * @var SchedulerRepository
-     */
-    private \Doctrine\ORM\EntityRepository $schedulerRepository;
-
     public function __construct(
-        private EntityManager $entityManager,
-        private SchedulerPlanner $schedulerPlanner,
+        private readonly EntityManager $entityManager,
+        private readonly SchedulerPlanner $schedulerPlanner,
+        private readonly SchedulerRepository $schedulerRepository,
     ) {
-        $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
     /**

@@ -18,20 +18,26 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class PluginController extends FormController
 {
+    private PluginModel $pluginModel;
+
+    #[Required]
+    public function autowirePluginController(PluginModel $pluginModel): void
+    {
+        $this->pluginModel = $pluginModel;
+    }
+
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
         // List of plugins for filter and to show as a single integration
-        $plugins = $pluginModel->getEntities(
+        $plugins = $this->pluginModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -88,7 +94,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            fn ($a, $b): int => strnatcasecmp($a, $b)
+            strnatcasecmp(...)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -123,10 +129,8 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -156,11 +160,8 @@ class PluginController extends FormController
         }
         $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
         $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
-
-        /** @var PluginModel $pluginModel */
-        $pluginModel   = $this->getModel('plugin');
-        $leadFields    = $pluginModel->getLeadFields();
-        $companyFields = $pluginModel->getCompanyFields();
+        $leadFields    = $this->pluginModel->getLeadFields();
+        $companyFields = $this->pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
         $entity                 = $integrationObject->getIntegrationSettings();
         $existingPublishedState = $entity->getIsPublished();
@@ -176,7 +177,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -366,10 +367,7 @@ class PluginController extends FormController
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
-        $bundle = $pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginModel->getRepository()->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]

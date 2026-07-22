@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -46,6 +47,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly MessageRepository $messageRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -77,7 +79,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     public function getRepository(): ?MessageRepository
     {
-        return $this->em->getRepository(Message::class);
+        return $this->messageRepository;
     }
 
     public function getEntity($id = null): ?Message
@@ -90,12 +92,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @param object $entity
-     * @param array  $options
+     * @param object  $entity
+     * @param mixed[] $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;

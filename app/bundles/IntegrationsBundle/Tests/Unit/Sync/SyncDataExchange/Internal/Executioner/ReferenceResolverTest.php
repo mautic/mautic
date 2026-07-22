@@ -12,14 +12,13 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ReferenceResolverTest extends TestCase
+final class ReferenceResolverTest extends TestCase
 {
     /**
-     * @var Connection|MockObject
+     * @var MockObject&Connection
      */
     private MockObject $connection;
 
@@ -49,24 +48,24 @@ class ReferenceResolverTest extends TestCase
         $this->referenceResolver->resolveReferences('lead', [$changedObject]);
 
         $companyField = $changedObject->getField('company');
-        Assert::assertInstanceOf(FieldDAO::class, $companyField);
-        Assert::assertSame('Company name', $companyField->getValue()->getOriginalValue());
-        Assert::assertSame('Company name', $companyField->getValue()->getNormalizedValue());
+        $this->assertInstanceOf(FieldDAO::class, $companyField);
+        $this->assertSame('Company name', $companyField->getValue()->getOriginalValue());
+        $this->assertSame('Company name', $companyField->getValue()->getNormalizedValue());
 
         $userField = $changedObject->getField('user');
-        Assert::assertInstanceOf(FieldDAO::class, $userField);
-        Assert::assertNull($userField->getValue()->getOriginalValue());
-        Assert::assertNull($userField->getValue()->getNormalizedValue());
+        $this->assertInstanceOf(FieldDAO::class, $userField);
+        $this->assertNull($userField->getValue()->getOriginalValue());
+        $this->assertNull($userField->getValue()->getNormalizedValue());
 
         $cityField = $changedObject->getField('city');
-        Assert::assertInstanceOf(FieldDAO::class, $cityField);
-        Assert::assertSame('Some city', $cityField->getValue()->getOriginalValue());
-        Assert::assertSame('Some city', $cityField->getValue()->getNormalizedValue());
+        $this->assertInstanceOf(FieldDAO::class, $cityField);
+        $this->assertSame('Some city', $cityField->getValue()->getOriginalValue());
+        $this->assertSame('Some city', $cityField->getValue()->getNormalizedValue());
 
         $managerField = $changedObject->getField('manager');
-        Assert::assertInstanceOf(FieldDAO::class, $managerField);
-        Assert::assertNull($managerField->getValue()->getOriginalValue());
-        Assert::assertNull($managerField->getValue()->getNormalizedValue());
+        $this->assertInstanceOf(FieldDAO::class, $managerField);
+        $this->assertNull($managerField->getValue()->getOriginalValue());
+        $this->assertNull($managerField->getValue()->getNormalizedValue());
     }
 
     public function testResolveCompanyReferences(): void
@@ -82,9 +81,9 @@ class ReferenceResolverTest extends TestCase
         $this->referenceResolver->resolveReferences('company', [$changedObject]);
 
         $companyField = $changedObject->getField('company');
-        Assert::assertInstanceOf(FieldDAO::class, $companyField);
-        Assert::assertSame($companyReference, $companyField->getValue()->getOriginalValue());
-        Assert::assertSame($companyReference, $companyField->getValue()->getNormalizedValue());
+        $this->assertInstanceOf(FieldDAO::class, $companyField);
+        $this->assertSame($companyReference, $companyField->getValue()->getOriginalValue());
+        $this->assertSame($companyReference, $companyField->getValue()->getNormalizedValue());
     }
 
     private function createReference(string $type, int $value): ReferenceValueDAO
@@ -97,11 +96,11 @@ class ReferenceResolverTest extends TestCase
     }
 
     /**
-     * @param mixed ...$returnValues
+     * @param mixed $returnValues
      *
-     * @return QueryBuilder|MockObject
+     * @return QueryBuilder&MockObject
      */
-    private function createQueryBuilder(...$returnValues)
+    private function createQueryBuilder(...$returnValues): MockObject
     {
         $result = $this->createMock(Result::class);
         $result->method('fetchOne')

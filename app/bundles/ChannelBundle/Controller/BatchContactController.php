@@ -18,13 +18,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ChannelActionModel $channelActionModel,
-        private FrequencyActionModel $frequencyActionModel,
-        private LeadModel $contactModel,
+        private readonly ChannelActionModel $channelActionModel,
+        private readonly FrequencyActionModel $frequencyActionModel,
+        private readonly LeadModel $contactModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -69,7 +70,7 @@ class BatchContactController extends AbstractFormController
     /**
      * View for batch action.
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

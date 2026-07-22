@@ -15,9 +15,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadListSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $helper,
-        private ListModel $listModel,
-        private TranslatorInterface $translator,
+        private readonly IntegrationHelper $helper,
+        private readonly ListModel $listModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -48,7 +48,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName): void {
+                            function (array &$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );
@@ -83,7 +83,7 @@ class LeadListSubscriber implements EventSubscriberInterface
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
-    public function onLeadListProcessList(ListPreProcessListEvent $event)
+    public function onLeadListProcessList(ListPreProcessListEvent $event): void
     {
         // get Integration Campaign members
         $list    = $event->getList();
@@ -115,6 +115,6 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        return $event->setResult($success);
+        $event->setResult($success);
     }
 }

@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(Mapper::class)]
-class MapperTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Mapper::class)]
+final class MapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>
@@ -40,7 +44,9 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     protected array $mappedFields = [
         'Company'   => 'company',
         'Email'     => 'email',
@@ -49,7 +55,9 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         'LastName'  => 'lastname',
     ];
 
-    /** @var array<int, array<string, int|string|null>> */
+    /**
+     * @var array<int, array<string, int|string|null>>
+     */
     protected array $contacts = [
         [
             'firstname'             => 'FirstName1',
@@ -80,7 +88,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that array is generated according to the mapping')]
+    #[TestDox('Test that array is generated according to the mapping')]
     public function testArrayIsGeneratedBasedOnMapping(): void
     {
         $mapper = new Mapper($this->availableFields);
@@ -110,10 +118,10 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that contacts do not inherit previous contact information')]
+    #[TestDox('Test that contacts do not inherit previous contact information')]
     public function testContactDoesNotInheritPreviousContactData(): void
     {
         $mapper = new Mapper($this->availableFields);
@@ -148,10 +156,10 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that array is generated according to the mapping')]
+    #[TestDox('Test that array is generated according to the mapping')]
     public function testArrayIsGeneratedBasedOnMappingWithId(): void
     {
         $mapper = new Mapper($this->availableFields);
@@ -172,8 +180,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'id'         => 'def',
-                'First Name' => 'FirstName2',
                 'Email'      => 'zoho2@email.com',
+                'First Name' => 'FirstName2',
                 'Last Name'  => 'LastName2',
             ],
             [
@@ -184,10 +192,10 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test asking for a key returns the correct contact')]
+    #[TestDox('Test asking for a key returns the correct contact')]
     public function testThatContactIdMatchesGivenKey(): void
     {
         $mapper = new Mapper($this->availableFields);
@@ -204,7 +212,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $mapper->getContactIdByKey(0));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox("Test asking for a key that doesn't exist throws exception")]
+    #[TestDox("Test asking for a key that doesn't exist throws exception")]
     public function testThatExceptionIsThrownIfKeyNotFound(): void
     {
         $this->expectException(MatchingKeyNotFoundException::class);

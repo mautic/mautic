@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -17,40 +19,37 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends TestCase
+final class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData
      */
     private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
-     * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&HitRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
-
     private ReportSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
-            $this->dncReportService
+            $this->createStub(DncReportService::class)
         );
     }
 
@@ -79,18 +78,22 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $mockEvent->expects($this->exactly(9))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setGraphs): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
+
+                return $mockEvent;
             });
 
         $this->companyReportData->expects($this->once())
@@ -229,11 +232,11 @@ class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
+        $mockExprBuilder = $this->createStub(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
@@ -262,11 +265,11 @@ class ReportSubscriberTest extends TestCase
                 ]
             );
 
-        $mockQueryBuilder->expects($this->any())
+        $mockQueryBuilder
             ->method('expr')
             ->willReturn($mockExprBuilder);
 
-        $mockQueryBuilder->expects($this->any())
+        $mockQueryBuilder
             ->method('executeQuery')
             ->willReturn($mockStmt);
 
@@ -285,15 +288,15 @@ class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('loadAndBuildTimeData')
             ->willReturn(['a', 'b', 'c']);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCount')
             ->willReturn(2);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCountDateDiff')
             ->willReturn(2);
 
@@ -308,7 +311,7 @@ class ReportSubscriberTest extends TestCase
             ->method('checkContext')
             ->willReturn(true);
 
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getOptions')
             ->willReturn($graphOptions);
 

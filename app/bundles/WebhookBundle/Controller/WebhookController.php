@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends FormController
 {
@@ -31,7 +32,6 @@ class WebhookController extends FormController
             'mauticWebhook' // mauticContent
         );
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -40,7 +40,7 @@ class WebhookController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }
@@ -63,7 +63,7 @@ class WebhookController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }

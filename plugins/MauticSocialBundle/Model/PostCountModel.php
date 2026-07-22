@@ -4,12 +4,22 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
+use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<PostCount>
  */
 class PostCountModel extends AbstractCommonModel
 {
+    private PostCountRepository $postCountRepository;
+
+    #[Required]
+    public function autowirePostCountModel(PostCountRepository $postCountRepository): void
+    {
+        $this->postCountRepository = $postCountRepository;
+    }
+
     /**
      * Get a specific entity or generate a new one if id is empty.
      */
@@ -29,18 +39,14 @@ class PostCountModel extends AbstractCommonModel
 
     /**
      * Get this model's repository.
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
      */
-    public function getRepository()
+    public function getRepository(): PostCountRepository
     {
-        return $this->em->getRepository(PostCount::class);
+        return $this->postCountRepository;
     }
 
-    /*
-     * Updates a monitor record's post count on a daily basis
-     *
-     * @return boolean
+    /**
+     * Updates a monitor record's post count on a daily basis.
      */
     public function updatePostCount($monitor, \DateTime $postDate): bool
     {
@@ -55,7 +61,6 @@ class PostCountModel extends AbstractCommonModel
         // ignore paginator so we can use the array later
         $args['ignore_paginator'] = true;
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountsRepository */
         $postCountsRepository = $this->getRepository();
 
         // get any existing records

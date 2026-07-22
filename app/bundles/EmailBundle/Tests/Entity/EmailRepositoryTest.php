@@ -10,10 +10,11 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailRepositoryTest extends TestCase
+final class EmailRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -24,10 +25,10 @@ class EmailRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = $this->configureRepository(Email::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.email.email.searchcommand.isexpired' => 'is:expired',
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
@@ -39,7 +40,7 @@ class EmailRepositoryTest extends TestCase
      * @param int[] $variantIds
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForCount')]
+    #[DataProvider('dataGetEmailPendingQueryForCount')]
     public function testGetEmailPendingQueryForCount(?array $variantIds, bool $countWithMaxMin, array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);
@@ -91,7 +92,7 @@ class EmailRepositoryTest extends TestCase
     /**
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
+    #[DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
     public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);
@@ -123,7 +124,7 @@ class EmailRepositoryTest extends TestCase
             'listIds'      => $listIds,
         ];
 
-        if ($excludedListIds) {
+        if ([] !== $excludedListIds) {
             $expectedParams['excludedListIds'] = $excludedListIds;
         }
 
@@ -239,7 +240,7 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
+        $this->assertSame([
             'sent_count' => 100,
             'read_count' => 60,
             'not_read'   => 40,
@@ -276,9 +277,9 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
-            'sent_count' => 0,
+        $this->assertSame([
             'read_count' => 0,
+            'sent_count' => 0,
             'not_read'   => 0,
         ], $result);
     }
@@ -306,11 +307,8 @@ class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertSame(
-            '(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
@@ -322,17 +320,14 @@ class EmailRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
 
-        self::assertSame(
-            '(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())',
-            (string) $expr
-        );
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame('(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repo->getSearchCommands();
-        self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.ispending', $commands);
     }
 }

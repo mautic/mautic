@@ -69,6 +69,9 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
+    /**
+     * @param mixed[] $fields
+     */
     public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
@@ -123,7 +126,7 @@ trait CustomFieldEntityTrait
             if ('' === $value) {
                 $value = null;
             }
-            $this->$setter($value);
+            $this->{$setter}($value);
         }
 
         if (is_string($value)) {
@@ -145,7 +148,7 @@ trait CustomFieldEntityTrait
             $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
-        if ($oldValue !== $value && (!('' === $oldValue && null === $value) && !(null === $oldValue && '' === $value))) {
+        if ($oldValue !== $value && (('' !== $oldValue || null !== $value) && (null !== $oldValue || '' !== $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }
@@ -262,7 +265,7 @@ trait CustomFieldEntityTrait
         return $this;
     }
 
-    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
+    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions): void
     {
         foreach ($fields as $fieldProperty) {
             $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;

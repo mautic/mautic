@@ -124,7 +124,7 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":$unique"),
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishDown'),
                     $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
@@ -134,7 +134,7 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":$unique"),
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishUp'),
                     $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
@@ -181,7 +181,7 @@ class FormRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [

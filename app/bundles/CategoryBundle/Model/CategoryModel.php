@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,6 +44,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly CategoryRepository $categoryRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -50,7 +52,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     // @phpstan-ignore-next-line method.childReturnType
     public function getRepository(): CategoryRepository
     {
-        $repository = $this->em->getRepository(Category::class);
+        $repository = $this->categoryRepository;
         \assert($repository instanceof CategoryRepository);
 
         return $repository;
@@ -94,7 +96,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
@@ -106,7 +108,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -171,8 +173,6 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param string               $type
      * @param string               $filter
      * @param int                  $limit

@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class UserControllerFunctionalTest extends MauticMysqlTestCase
+final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -43,7 +44,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('has been updated!', $response->getContent());
+        $this->assertStringContainsString('has been updated!', (string) $response->getContent());
     }
 
     public function testEditActionFormSubmissionInvalid(): void
@@ -60,7 +61,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexIncludesInviteForm(): void
@@ -84,13 +85,13 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('name="user_invite"', (string) $this->client->getResponse()->getContent());
     }
 
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
+    #[DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -106,7 +107,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -149,7 +150,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
+    #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
@@ -159,7 +160,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**

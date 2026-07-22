@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
@@ -26,20 +28,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    public function __construct(?string $name = null)
-    {
-        parent::__construct($name);
-
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
-    }
-
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -139,10 +136,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected function resetAutoincrement(array $tables): void
     {
         $prefix     = $this->getTablePrefix();
-        $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $this->connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
@@ -166,7 +162,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function applySqlFromFile($file): void
+    private function applySqlFromFile(string $file): void
     {
         $connectionParams = $this->connection->getParams();
         $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
@@ -388,7 +384,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function clearCache(): void
     {
         $cacheProvider = static::getContainer()->get('mautic.cache.provider');
-        \assert($cacheProvider instanceof CacheItemPoolInterface);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

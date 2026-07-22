@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-class CompanyTest extends MauticMysqlTestCase
+final class CompanyTest extends MauticMysqlTestCase
 {
     public function testChangingPropertiesHydratesFieldChanges(): void
     {
@@ -21,7 +21,7 @@ class CompanyTest extends MauticMysqlTestCase
         $company->addUpdatedField('email', $email);
         $changes = $company->getChanges();
 
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['fields']['email'][1]);
     }

@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
@@ -35,7 +36,7 @@ trait FrequencyRuleTrait
      *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
@@ -155,7 +156,7 @@ trait FrequencyRuleTrait
     /**
      * @param int $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
@@ -186,18 +187,12 @@ trait FrequencyRuleTrait
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setDoNotContactModel(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel): void
-    {
+    #[Required]
+    public function autowireFrequencyRuleTrait(
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        RequestStack $requestStack,
+    ): void {
         $this->doNotContactModel = $doNotContactModel;
-    }
-
-    /**
-     * The name is different, so it won't collide with other setters.
-     */
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setRequestStackObject(RequestStack $requestStack): void
-    {
-        $this->requestStack = $requestStack;
+        $this->requestStack      = $requestStack;
     }
 }

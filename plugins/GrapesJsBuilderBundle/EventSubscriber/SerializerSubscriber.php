@@ -16,8 +16,8 @@ use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
-        private Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly Config $config,
     ) {
     }
 
@@ -46,7 +46,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         }
 
         $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
-        if (is_null($grapesJsBuilder)) {
+        if (null === $grapesJsBuilder) {
             return;
         }
 

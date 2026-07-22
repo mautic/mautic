@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Connection $db,
-        private TranslatorInterface $translator,
+        private readonly Connection $db,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -30,7 +30,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $this->cleanData($event, 'lead_utmtags');
     }
 
-    private function cleanData(MaintenanceEvent $event, $table): void
+    private function cleanData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -76,7 +76,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
                 $leadsIds = array_column($subQb->executeQuery()->fetchAllAssociative(), 'id');
 
-                if (0 === sizeof($leadsIds)) {
+                if (0 === count($leadsIds)) {
                     break;
                 }
 
@@ -85,7 +85,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                       $qb->expr()->in(
                           'lead_id', ':leadsIds')
                   )
-                  ->setParameter('leadsIds', array_map('intval', $leadsIds), ArrayParameterType::INTEGER)
+                  ->setParameter('leadsIds', array_map(intval(...), $leadsIds), ArrayParameterType::INTEGER)
                     ->executeStatement();
                 ++$loop;
             }

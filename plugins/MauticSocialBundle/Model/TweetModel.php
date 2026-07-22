@@ -13,8 +13,10 @@ use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Tweet>
@@ -23,6 +25,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
+    private TweetStatRepository $tweetStatRepository;
+
+    private TweetRepository $tweetRepository;
+
+    #[Required]
+    public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
+    {
+        $this->tweetRepository = $tweetRepository;
+        $this->tweetStatRepository = $tweetStatRepository;
+    }
+
     /**
      * @param string $filter
      * @param int    $limit
@@ -70,10 +83,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param string $source
      * @param int    $sourceId
-     *
-     * @return $this
      */
-    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null)
+    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
         $statRepo = $this->getStatRepository();
 
@@ -126,7 +137,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet        $entity
      * @param array<mixed> $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);
@@ -194,12 +205,12 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     public function getRepository(): TweetRepository
     {
-        return $this->em->getRepository(Tweet::class);
+        return $this->tweetRepository;
     }
 
     public function getStatRepository(): TweetStatRepository
     {
-        return $this->em->getRepository(TweetStat::class);
+        return $this->tweetStatRepository;
     }
 
     public function getPermissionBase(): string

@@ -6,7 +6,7 @@ use Page\Acceptance\ThemesPage;
 
 class ThemeManagementCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(\AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
 
@@ -34,7 +34,7 @@ class ThemeManagementCest
 
                 // Fail only if there's no href attribute
                 if (!$I->seeElement($linkXpath.'[@href]')) {
-                    $I->fail("AJAX link in row $i (link $j) is missing an href.");
+                    $I->fail("AJAX link in row {$i} (link {$j}) is missing an href.");
                 }
             }
         }

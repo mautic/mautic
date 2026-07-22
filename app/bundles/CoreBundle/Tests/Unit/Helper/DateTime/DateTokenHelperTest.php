@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const DATE_FORMAT      = 'F j, Y';
 
@@ -22,7 +24,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokens(): void
     {
-        $coreParametersHelper = new class($this->createMock(ContainerInterface::class)) extends CoreParametersHelper {
+        $coreParametersHelper = new class($this->createStub(ContainerInterface::class)) extends CoreParametersHelper {
             public function get($name, $default = null)
             {
                 switch ($name) {
@@ -36,7 +38,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $dateTimeLocalization = new class($this->createMock(TranslatorInterface::class)) extends DateTimeLocalization {
+        $dateTimeLocalization = new class($this->createStub(TranslatorInterface::class)) extends DateTimeLocalization {
             public function localize(string $format): string
             {
                 return $format;

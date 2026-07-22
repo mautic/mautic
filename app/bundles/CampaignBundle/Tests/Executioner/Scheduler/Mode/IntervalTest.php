@@ -12,15 +12,15 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableExceptio
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 
-class IntervalTest extends \PHPUnit\Framework\TestCase
+final class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideBatchReschedulingData')]
+    #[DataProvider('provideBatchReschedulingData')]
     public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = []): void
     {
         $contact1 = $this->createMock(Lead::class);
@@ -62,53 +62,51 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        Assert::assertEquals($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
+        $this->assertSame($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
     }
 
     /**
-     * @return array<string, array<mixed>>
+     * @return \Iterator<string, array<mixed>>
      */
-    public static function provideBatchReschedulingData(): array
+    public static function provideBatchReschedulingData(): \Iterator
     {
-        return [
-            'test on specified hour'                     => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')],
-            'test on previous day specified hour'        => [new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-17 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')],
-            'test on next day specified hour'            => [new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-19 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')],
-            'test on start time'                         => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time'                  => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time previous day'     => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time next day'         => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time'                   => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time previous day'      => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time next day'          => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')],
-            'test on end time'                           => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time'                    => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time previous day'       => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time next day'           => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time'                     => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time previous day'        => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time next day'            => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')],
-            'test in time range'                         => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')],
-            'test on before time range'                  => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on before time range previous day'     => [new \DateTime('2018-10-18 10:00'), new \DateTime('2018-10-18 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on before time range next day'         => [new \DateTime('2018-10-20 10:00'), new \DateTime('2018-10-20 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on after end time range'               => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on after end time range previous day'  => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on after end time range next day'      => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on allowed day'                        => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 8:00'), 'UTC', null, null, null, [0]],
-            'test on restricted days'                    => [new \DateTime('2018-10-24 08:00'), new \DateTime('2018-10-21 08:00'), 'UTC', null, null, null, [3, 5]],
-            'test on all restricted days'                => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), 'UTC', null, null, null, []],
-            'test in between wrong start/end time order' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 8:00')],
-            'test combination of rules'                  => [new \DateTime('2018-10-26 08:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]],
-            'test valid timezone'                        => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 09:00'), 'America/New_York', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')],
-            'test invalid timezone'                      => [new \DateTime('2018-10-19 09:00'), new \DateTime('2018-10-19 13:00'), 'UTC2', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')],
-        ];
+        yield 'test on specified hour' => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')];
+        yield 'test on previous day specified hour' => [new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-17 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')];
+        yield 'test on next day specified hour' => [new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-19 16:00'), 'UTC', new \DateTime('2018-10-18 16:00')];
+        yield 'test on start time' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time previous day' => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time next day' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time' => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time previous day' => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time next day' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on end time' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time previous day' => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time next day' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time' => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time previous day' => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time next day' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test in time range' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on before time range' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on before time range previous day' => [new \DateTime('2018-10-18 10:00'), new \DateTime('2018-10-18 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on before time range next day' => [new \DateTime('2018-10-20 10:00'), new \DateTime('2018-10-20 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on after end time range' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time range previous day' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-18 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time range next day' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on allowed day' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 8:00'), 'UTC', null, null, null, [0]];
+        yield 'test on restricted days' => [new \DateTime('2018-10-24 08:00'), new \DateTime('2018-10-21 08:00'), 'UTC', null, null, null, [3, 5]];
+        yield 'test on all restricted days' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), 'UTC', null, null, null, []];
+        yield 'test in between wrong start/end time order' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-19 10:00'), 'UTC', null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 8:00')];
+        yield 'test combination of rules' => [new \DateTime('2018-10-26 08:00'), new \DateTime('2018-10-20 12:00'), 'UTC', null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]];
+        yield 'test valid timezone' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 09:00'), 'America/New_York', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test invalid timezone' => [new \DateTime('2018-10-19 09:00'), new \DateTime('2018-10-19 13:00'), 'UTC2', null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')];
     }
 
     /**
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideReschedulingData')]
+    #[DataProvider('provideReschedulingData')]
     public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
         $event = $this->createMock(Event::class);
@@ -138,45 +136,43 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval         = $this->getInterval();
         $scheduledForDate = $interval->getExecutionDateTime($event, $scheduledOnDate, $scheduledOnDate);
 
-        Assert::assertEquals($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
+        $this->assertSame($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
     }
 
     /**
-     * @return array<string, array<mixed>>
+     * @return \Iterator<string, array<mixed>>
      */
-    public static function ProvidereschedulingData(): array
+    public static function ProvidereschedulingData(): \Iterator
     {
-        return [
-            'test on specified hour'                     => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00')],
-            'test on previous day specified hour'        => [new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-18 16:00')],
-            'test on next day specified hour'            => [new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-18 16:00')],
-            'test on start time'                         => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time'                  => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time previous day'     => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on before start time next day'         => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time'                   => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time previous day'      => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on after start time next day'          => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 10:00')],
-            'test on end time'                           => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time'                    => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time previous day'       => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on before end time next day'           => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time'                     => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time previous day'        => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test on after end time next day'            => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, null, new \DateTime('2018-10-19 10:00')],
-            'test in time range'                         => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')],
-            'test on before time range'                  => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on before time range previous day'     => [new \DateTime('2018-10-18 10:00'), new \DateTime('2018-10-18 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on before time range next day'         => [new \DateTime('2018-10-20 10:00'), new \DateTime('2018-10-20 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')],
-            'test on after end time range'               => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on after end time range previous day'  => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on after end time range next day'      => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')],
-            'test on allowed day'                        => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 8:00'), null, null, null, [0]],
-            'test on restricted days'                    => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, [3, 5]],
-            'test on all restricted days'                => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, []],
-            'test in between wrong start/end time order' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 8:00')],
-            'test combination of rules'                  => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]],
-        ];
+        yield 'test on specified hour' => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00')];
+        yield 'test on previous day specified hour' => [new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-17 16:00'), new \DateTime('2018-10-18 16:00')];
+        yield 'test on next day specified hour' => [new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-19 16:00'), new \DateTime('2018-10-18 16:00')];
+        yield 'test on start time' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time previous day' => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before start time next day' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time' => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time previous day' => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after start time next day' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on end time' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time' => [new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 8:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time previous day' => [new \DateTime('2018-10-18 08:00'), new \DateTime('2018-10-18 8:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on before end time next day' => [new \DateTime('2018-10-20 08:00'), new \DateTime('2018-10-20 8:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time' => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time previous day' => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time next day' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, null, new \DateTime('2018-10-19 10:00')];
+        yield 'test in time range' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 8:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on before time range' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on before time range previous day' => [new \DateTime('2018-10-18 10:00'), new \DateTime('2018-10-18 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on before time range next day' => [new \DateTime('2018-10-20 10:00'), new \DateTime('2018-10-20 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 11:00')];
+        yield 'test on after end time range' => [new \DateTime('2018-10-19 12:00'), new \DateTime('2018-10-19 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time range previous day' => [new \DateTime('2018-10-18 12:00'), new \DateTime('2018-10-18 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on after end time range next day' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00')];
+        yield 'test on allowed day' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 8:00'), null, null, null, [0]];
+        yield 'test on restricted days' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, [3, 5]];
+        yield 'test on all restricted days' => [new \DateTime('2018-10-21 08:00'), new \DateTime('2018-10-21 08:00'), null, null, null, []];
+        yield 'test in between wrong start/end time order' => [new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 10:00'), null, new \DateTime('2018-10-19 10:00'), new \DateTime('2018-10-19 8:00')];
+        yield 'test combination of rules' => [new \DateTime('2018-10-20 12:00'), new \DateTime('2018-10-20 12:00'), null, new \DateTime('2018-10-19 08:00'), new \DateTime('2018-10-19 10:00'), [5, 6]];
     }
 
     public function testGetExecutionDateTimeThrowsNotSchedulableException(): void
@@ -276,17 +272,17 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
                 case 'America/Los_Angeles':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([1, 2], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/North_Dakota/Center':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([3, 4], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 08:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 08:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/New_York':
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([5, 6, 7, 8], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
                     break;
             }
         }
@@ -323,8 +319,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertSame($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
@@ -360,8 +356,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
@@ -379,8 +375,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectIntervalUnit(): void
@@ -411,9 +407,9 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event3));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event2));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event3));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithValidTriggerHour(): void
@@ -430,7 +426,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithDayOfWeekRestrictions(): void
@@ -449,7 +445,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithStartAndStopHours(): void
@@ -472,7 +468,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertTrue($interval->isContactSpecificExecutionDateRequired($event));
     }
 
     private function getInterval(): Interval
@@ -525,7 +521,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08 17:00:00'));
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 
-        $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertSame('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenForExactHour(): void
@@ -561,7 +557,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        $this->assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredShouldReturnFalseForNegativePathAction(): void
@@ -591,6 +587,6 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
+        $this->assertFalse($interval->isContactSpecificExecutionDateRequired($event));
     }
 }

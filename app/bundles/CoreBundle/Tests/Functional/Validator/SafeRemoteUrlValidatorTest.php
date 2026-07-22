@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Functional\Validator;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\CoreBundle\Validator\SafeRemoteUrlValidator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -34,7 +33,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\\CoreBundle\\\\Validator\\\\SafeRemoteUrl"/');
 
         $validator  = new SafeRemoteUrlValidator(self::getContainer()->get('mautic.helper.core_parameters'));
-        $validator->initialize($this->createMock(ExecutionContextInterface::class));
+        $validator->initialize($this->createStub(ExecutionContextInterface::class));
         $validator->validate('value', new Constraints\NotBlank());
     }
 
@@ -56,7 +55,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $validator = self::getContainer()->get('validator');
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
-        Assert::assertCount(0, $errors);
+        $this->assertCount(0, $errors);
     }
 
     /**
@@ -79,6 +78,6 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $validator = self::getContainer()->get('validator');
         $errors    = $validator->validate($value, new SafeRemoteUrl());
 
-        Assert::assertCount($valid ? 0 : 1, $errors);
+        $this->assertCount($valid ? 0 : 1, $errors);
     }
 }

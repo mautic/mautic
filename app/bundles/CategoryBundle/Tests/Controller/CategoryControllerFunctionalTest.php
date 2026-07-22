@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Tests\Controller;
 
 use Mautic\CategoryBundle\Entity\Category;
@@ -13,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryControllerFunctionalTest extends MauticMysqlTestCase
+final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
     private TranslatorInterface $translator;
 
@@ -60,8 +62,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
-        $this->assertStringContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must contain TestTitleCategoryController2');
+        $this->assertStringContainsString('TestTitleCategoryController1', (string) $clientResponseContent, 'The return must contain TestTitleCategoryController1');
+        $this->assertStringContainsString('TestTitleCategoryController2', (string) $clientResponseContent, 'The return must contain TestTitleCategoryController2');
     }
 
     /**
@@ -74,8 +76,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
-        $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
+        $this->assertStringContainsString('TestTitleCategoryController1', (string) $clientResponseContent, 'The return must contain TestTitleCategoryController1');
+        $this->assertStringNotContainsString('TestTitleCategoryController2', (string) $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
 
     public function testNewActionWithInForm(): void
@@ -144,12 +146,13 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $category->setTitle('New Category');
         $category->setAlias('category');
         $category->setBundle('global');
+        $this->assertInstanceOf(User::class, $user);
         $category->setCheckedOutBy($user);
         $category->setCheckedOut(new \DateTime('now'));
         $categoryModel->saveEntity($category, false);
 
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
-        $this->assertStringContainsString('is currently checked out by', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('is currently checked out by', (string) $this->client->getResponse()->getContent());
     }
 
     public function testTypeFieldPersistsAfterValidationFailure(): void
@@ -201,7 +204,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
 
     public function testBatchDeleteUsedInStage(): void
@@ -236,7 +239,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
 
     public function testEditCategoryByMultipleUsers(): void
@@ -259,7 +262,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString(
             'Category for concurrent edit is currently checked out by',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -279,7 +282,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString(
             'You do not have access to the requested area',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -316,7 +319,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

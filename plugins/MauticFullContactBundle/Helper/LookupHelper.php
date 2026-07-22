@@ -44,8 +44,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Person $fullcontact */
-        if ($fullcontact = $this->getFullContact()) {
+        $fullcontact = $this->getFullContact();
+        if ($fullcontact instanceof FullContact_Person) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
@@ -90,8 +90,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact(false)) {
+        $fullcontact = $this->getFullContact(false);
+        if ($fullcontact instanceof FullContact_Company) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($website);
@@ -126,12 +126,17 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid)
+    /**
+     * @return array{notify: mixed, entity: mixed, type: mixed}|false
+     */
+    public function validateRequest($oid): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
         $type                              = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -160,12 +165,7 @@ class LookupHelper
         return false;
     }
 
-    /**
-     * @param bool $person
-     *
-     * @return bool|FullContact_Company|FullContact_Person
-     */
-    protected function getFullContact($person = true)
+    protected function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;

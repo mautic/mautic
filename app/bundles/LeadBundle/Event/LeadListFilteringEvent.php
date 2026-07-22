@@ -16,7 +16,7 @@ class LeadListFilteringEvent extends CommonEvent
 
     protected string $subQuery;
 
-    private string $leadsTableAlias;
+    private readonly string $leadsTableAlias;
 
     /**
      * @param array        $details

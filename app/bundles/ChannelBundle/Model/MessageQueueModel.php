@@ -5,6 +5,7 @@ namespace Mautic\ChannelBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
@@ -13,6 +14,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -42,16 +44,15 @@ class MessageQueueModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly MessageQueueRepository $messageQueueRepository,
+        private readonly FrequencyRuleRepository $frequencyRuleRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageQueueRepository
-     */
-    public function getRepository()
+    public function getRepository(): MessageQueueRepository
     {
-        return $this->em->getRepository(MessageQueue::class);
+        return $this->messageQueueRepository;
     }
 
     /**
@@ -77,8 +78,7 @@ class MessageQueueModel extends FormModel
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 
-        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-        $frequencyRulesRepo     = $this->em->getRepository(\Mautic\LeadBundle\Entity\FrequencyRule::class);
+        $frequencyRulesRepo     = $this->frequencyRuleRepository;
         $defaultFrequencyNumber = $this->coreParametersHelper->get($channel.'_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->get($channel.'_frequency_time');
 
@@ -166,7 +166,7 @@ class MessageQueueModel extends FormModel
             $messageQueues[] = $messageQueue;
         }
 
-        if ($messageQueues) {
+        if ([] !== $messageQueues) {
             $this->saveEntities($messageQueues);
             $messageQueueRepository = $this->getRepository();
             $messageQueueRepository->detachEntities($messageQueues);
@@ -312,10 +312,7 @@ class MessageQueueModel extends FormModel
         $message->setProcessed();
     }
 
-    /**
-     * @param array $channelIds
-     */
-    public function getQueuedChannelCount($channel, $channelIds = []): int
+    public function getQueuedChannelCount($channel, ?array $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }
