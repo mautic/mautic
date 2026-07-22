@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(InstagramIntegration::class)]
+#[CoversClass(InstagramIntegration::class)]
 final class InstagramIntegrationTest extends AbstractIntegrationTestCase
 {
     private InstagramIntegration $integration;

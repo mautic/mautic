@@ -51,6 +51,7 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -618,7 +619,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataStatRecordExistance')]
+    #[DataProvider('dataStatRecordExistance')]
     public function testSendSegmentEmailToContact(bool $recordExist): void
     {
         $sendToContactModelMock  = $this->createMock(SendEmailToContact::class);

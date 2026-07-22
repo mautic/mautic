@@ -10,10 +10,12 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
+#[CoversClass(IpLookupHelper::class)]
 final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -58,7 +60,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ip->getIpAddress()->isTrackable());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check if IP outside a request that local IP is returned')]
+    #[TestDox('Check if IP outside a request that local IP is returned')]
     public function testLocalIpIsReturnedWhenNotInRequestScope(): void
     {
         $ip = $this->getIpHelper()->getIpAddress();
@@ -66,7 +68,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('127.0.0.1', $ip->getIpAddress());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that the first IP is returned when the request is a proxy')]
+    #[TestDox('Check that the first IP is returned when the request is a proxy')]
     public function testClientIpIsReturnedFromProxy(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
@@ -75,7 +77,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('73.77.245.52', $ip->getIpAddress());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that the first IP is returned with a web proxy')]
+    #[TestDox('Check that the first IP is returned with a web proxy')]
     public function testClientIpIsReturnedFromRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
@@ -84,7 +86,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('73.77.245.53', $ip->getIpAddress());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that a local IP is returned for internal IPs')]
+    #[TestDox('Check that a local IP is returned for internal IPs')]
     public function testLocalIpIsReturnedForInternalNetworkIp(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
@@ -93,7 +95,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('127.0.0.1', $ip->getIpAddress());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that internal IP is returned if track_private_ip_ranges is set to true')]
+    #[TestDox('Check that internal IP is returned if track_private_ip_ranges is set to true')]
     public function testInternalNetworkIpIsReturnedIfSetToTrack(): void
     {
         $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
@@ -108,7 +110,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('192.168.0.1', $ip->getIpAddress());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that prefetch requests are not trackable')]
+    #[TestDox('Check that prefetch requests are not trackable')]
     public function testIsRequestTrackableWithPrefetchHeader(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -119,7 +121,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that prerender requests are not trackable')]
+    #[TestDox('Check that prerender requests are not trackable')]
     public function testIsRequestTrackableWithSecPurposePrerenderHeader(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -130,7 +132,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that GPC requests are not trackable')]
+    #[TestDox('Check that GPC requests are not trackable')]
     public function testIsRequestTrackableWithGpcHeader(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -141,7 +143,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that DNT requests are not trackable')]
+    #[TestDox('Check that DNT requests are not trackable')]
     public function testIsRequestTrackableWithDntHeader(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -152,7 +154,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that HEAD requests are not trackable')]
+    #[TestDox('Check that HEAD requests are not trackable')]
     public function testIsRequestTrackableWithHeadMethod(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -163,7 +165,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that normal requests are trackable')]
+    #[TestDox('Check that normal requests are trackable')]
     public function testIsRequestTrackableReturnsTrueForNormalRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
@@ -173,7 +175,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Check that requests without request context fall back to IP trackability')]
+    #[TestDox('Check that requests without request context fall back to IP trackability')]
     public function testIsRequestTrackableWithoutRequest(): void
     {
         $result = $this->getIpHelper()->isRequestTrackable();

@@ -21,7 +21,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
@@ -63,19 +65,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
-        private readonly \Mautic\SmsBundle\Entity\StatRepository $statRepository,
+        private readonly SmsRepository $smsRepository,
+        private readonly StatRepository $statRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
+    public function getRepository(): SmsRepository
     {
         return $this->smsRepository;
     }
 
-    public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
         return $this->statRepository;
     }

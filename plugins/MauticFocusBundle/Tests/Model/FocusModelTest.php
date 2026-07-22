@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount as InvokedCountMatcher;
@@ -36,7 +37,7 @@ final class FocusModelTest extends TestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('focusTypeProvider')]
+    #[DataProvider('focusTypeProvider')]
     public function testGetContentWithForm(string $type, InvokedCount $count): void
     {
         $this->formModel->expects($this->once())->method('getPages')->willReturn(['', '']);

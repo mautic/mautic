@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
@@ -121,7 +122,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
      * @param string $xssPayload         Malicious XSS payload to test
      * @param string $dangerousSubstring Substring that should NOT appear in escaped output
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
+    #[DataProvider('xssPayloadsProvider')]
     public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
     {
         /** @var ProjectModel $projectModel */
@@ -214,7 +215,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
      *
      * @param string $projectName Project name with special characters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('specialCharacterProjectNamesProvider')]
+    #[DataProvider('specialCharacterProjectNamesProvider')]
     public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
     {
         /** @var ProjectModel $projectModel */

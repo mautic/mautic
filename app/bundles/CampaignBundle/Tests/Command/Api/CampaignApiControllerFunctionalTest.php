@@ -10,11 +10,12 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('withContactCountsProvider')]
+    #[DataProvider('withContactCountsProvider')]
     public function testCampaignAPI(string $withContactCounts, bool $fromCache, int $expectedContacts): void
     {
         $contact  = $this->createLead('Test');
