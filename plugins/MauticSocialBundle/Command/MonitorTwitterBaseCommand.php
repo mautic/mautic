@@ -230,7 +230,7 @@ abstract class MonitorTwitterBaseCommand extends Command
      *
      * @param array $statuses
      */
-    protected function printTweets($statuses)
+    protected function printTweets($statuses): void
     {
         if (!$this->input->getOption('show-posts') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERY_VERBOSE) {
             return;
@@ -253,7 +253,7 @@ abstract class MonitorTwitterBaseCommand extends Command
      * Prints the search query metadata from twitter.
      * Only shows stats if explicitly requested or if we're in verbose mode.
      */
-    protected function printQueryMetadata(array $metadata)
+    protected function printQueryMetadata(array $metadata): void
     {
         if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;
@@ -278,7 +278,7 @@ abstract class MonitorTwitterBaseCommand extends Command
      *
      * @param Monitoring $monitor
      */
-    protected function printInformation($monitor, array $results)
+    protected function printInformation($monitor, array $results): void
     {
         if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;

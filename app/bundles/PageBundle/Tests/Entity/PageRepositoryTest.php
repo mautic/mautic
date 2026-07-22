@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -31,7 +32,7 @@ final class PageRepositoryTest extends TestCase
         return $repository;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataExpirationFilters')]
+    #[DataProvider('dataExpirationFilters')]
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(string $command, string $expected): void
     {
         $repository = $this->getRepository();

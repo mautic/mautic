@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(FoursquareIntegration::class)]
+#[CoversClass(FoursquareIntegration::class)]
 final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
 {
     private FoursquareIntegration $integration;

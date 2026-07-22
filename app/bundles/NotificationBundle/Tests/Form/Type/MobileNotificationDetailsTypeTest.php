@@ -8,6 +8,7 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -67,7 +68,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
      * @param array<int, string> $platforms
      * @param array<int, string> $settings
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('platformProvider')]
+    #[DataProvider('platformProvider')]
     public function testPlatformSelected(array $platforms, array $settings): void
     {
         $this->integrationSettings->method('getFeatureSettings')

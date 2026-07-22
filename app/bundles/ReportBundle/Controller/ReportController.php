@@ -19,12 +19,13 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class ReportController extends FormController
 {
     private ReportModel $reportModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireReportController(
         ReportModel $reportModel,
     ): void {

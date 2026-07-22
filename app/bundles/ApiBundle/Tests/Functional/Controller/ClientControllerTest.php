@@ -6,13 +6,14 @@ namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[RunInSeparateProcess]
     public function testIndexActionForPager(): void
     {
         $this->createApiClients();

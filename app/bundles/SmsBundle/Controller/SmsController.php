@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
@@ -21,14 +22,14 @@ class SmsController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
 
     #[Required]
     public function autowireSmsController(
         SmsModel $smsModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
     ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;

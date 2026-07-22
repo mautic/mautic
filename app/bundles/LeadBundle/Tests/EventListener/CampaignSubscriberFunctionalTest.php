@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
@@ -1076,7 +1077,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaign->addLead($lead->getId(), $campaignLead);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
+    #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
         $this->useCleanupRollback = false;
