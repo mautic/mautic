@@ -26,6 +26,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private const ADMIN_USER = 'admin';
 
+    private const BATCH_DOWNLOAD_PATH = '/s/assets/batchDownload';
+
     protected function setUp(): void
     {
         $this->configParams['validate_remote_domains'] = false;
@@ -173,7 +175,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testBatchDownloadWithoutIdsReturnsError(): void
     {
-        $this->client->request('GET', '/s/assets/batchDownload');
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH);
 
         $response   = $this->client->getResponse();
         $translator = static::getContainer()->get('translator');
@@ -189,7 +191,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testBatchDownloadRejectsObjectShapedIds(): void
     {
-        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => '{"asset": 1}']);
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => '{"asset": 1}']);
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
@@ -202,7 +204,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
 
-        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => $ids]);
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
 
         $response = $this->client->getResponse();
 
@@ -246,7 +248,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $ids = json_encode([$remoteAsset->getId()], JSON_THROW_ON_ERROR);
 
-        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => $ids]);
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
