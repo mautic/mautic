@@ -8,13 +8,14 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:segments:stat', description: 'Gather Segment Statistics')]
+#[AsCommand(name: 'mautic:segments:stat', description: 'Gather Segment Statistics')]
 final class SegmentStatCommand extends ModeratedCommand
 {
     public function __construct(

@@ -6,13 +6,14 @@ namespace Mautic\LeadBundle\Field\Command;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:fields:modify', description: 'Change the sizes of the fields')]
+#[AsCommand(name: 'mautic:fields:modify', description: 'Change the sizes of the fields')]
 final class ModifyCustomFieldCommand extends Command
 {
     public function __construct(
