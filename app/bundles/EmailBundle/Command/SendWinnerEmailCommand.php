@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class SendWinnerEmailCommand extends ModeratedCommand
 {
-    protected static string $defaultDescription = 'Send winner email variant to remaining contacts';
+    private static string $defaultDescription = 'Send winner email variant to remaining contacts';
 
     public const COMMAND_NAME                   = 'mautic:email:sendwinner';
 
