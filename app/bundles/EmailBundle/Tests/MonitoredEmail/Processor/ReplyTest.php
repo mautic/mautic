@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -86,7 +87,7 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed

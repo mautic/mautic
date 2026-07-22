@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StatTest extends TestCase
@@ -14,7 +15,7 @@ final class StatTest extends TestCase
     /**
      * @param int $count How many openDetails to add to the entity
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('addOpenDetailsTestProvider')]
+    #[DataProvider('addOpenDetailsTestProvider')]
     public function testAddOpenDetails(int $count): void
     {
         $stat = new Stat();

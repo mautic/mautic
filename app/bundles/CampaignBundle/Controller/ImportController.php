@@ -32,6 +32,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -177,7 +178,7 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function cancelAction(): RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
             $this->throwAccessDenied();

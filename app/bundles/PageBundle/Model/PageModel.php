@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
@@ -30,6 +31,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -39,7 +41,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
@@ -49,6 +53,7 @@ use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -110,10 +115,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private StatRepository $statRepository,
         private BotRatioHelper $botRatioHelper,
         private ValidatorInterface $validator,
-        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
-        private readonly \Mautic\PageBundle\Entity\HitRepository $hitRepository,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        private readonly \Mautic\LeadBundle\Entity\UtmTagRepository $utmTagRepository,
+        private readonly PageRepository $pageRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly UtmTagRepository $utmTagRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -125,7 +130,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
+    public function getRepository(): PageRepository
     {
         $repo = $this->pageRepository;
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -133,7 +138,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
+    public function getHitRepository(): HitRepository
     {
         return $this->hitRepository;
     }
@@ -211,7 +216,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);

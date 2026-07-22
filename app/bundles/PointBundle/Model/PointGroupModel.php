@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Group>
@@ -25,7 +26,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
     private GroupRepository $groupRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePointGroupModel(GroupRepository $groupRepository): void
     {
         $this->groupRepository = $groupRepository;

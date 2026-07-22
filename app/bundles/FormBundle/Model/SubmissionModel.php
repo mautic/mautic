@@ -44,6 +44,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -54,6 +55,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -99,8 +101,8 @@ class SubmissionModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly SubmissionRepository $submissionRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly StageRepository $stageRepository,
         private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

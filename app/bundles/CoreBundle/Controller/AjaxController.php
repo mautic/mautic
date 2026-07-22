@@ -13,6 +13,7 @@ use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Service\SearchCommandListInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,13 +22,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonController
 {
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCoreAjaxController(\Mautic\CoreBundle\Model\NotificationModel $notificationModel): void
+    #[Required]
+    public function autowireCoreAjaxController(NotificationModel $notificationModel): void
     {
         $this->notificationModel = $notificationModel;
     }

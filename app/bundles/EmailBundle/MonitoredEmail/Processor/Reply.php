@@ -105,7 +105,7 @@ class Reply implements ProcessorInterface
     /**
      * @param string $messageId
      */
-    protected function createReply(Stat $stat, $messageId)
+    protected function createReply(Stat $stat, $messageId): void
     {
         $replies = $stat->getReplies()->filter(
             fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId

@@ -784,7 +784,7 @@ class MailHelper
     /**
      * Set plain text for $this->message, replacing if necessary.
      */
-    protected function setMessagePlainText()
+    protected function setMessagePlainText(): void
     {
         if ($this->tokenizationEnabled && $this->plainTextSet) {
             // No need to find and replace since tokenization happens at the transport level
@@ -1054,7 +1054,7 @@ class MailHelper
      *
      * @throws BatchQueueMaxException
      */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
+    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to'): void
     {
         if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
@@ -1498,7 +1498,7 @@ class MailHelper
     /**
      * Log exception.
      */
-    protected function logError($error, $context = null)
+    protected function logError($error, $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];
@@ -1574,7 +1574,7 @@ class MailHelper
     /**
      * Creates a download stat for the asset.
      */
-    protected function createAssetDownloadEntries()
+    protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
         if ($this->fatal || empty($this->assetStats)) {
@@ -1611,7 +1611,7 @@ class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
      */
-    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null)
+    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
         if ($this->internalSend || empty($this->assets)) {
             return;

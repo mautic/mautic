@@ -50,7 +50,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
     /**
      * Extract the IP from the local database.
      */
-    protected function lookup()
+    protected function lookup(): void
     {
         try {
             $reader = new Reader($this->getLocalDataStoreFilepath());
