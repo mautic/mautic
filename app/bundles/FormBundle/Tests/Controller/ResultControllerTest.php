@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ResultControllerTest extends TestCase
@@ -82,6 +83,7 @@ final class ResultControllerTest extends TestCase
         $configurator->expects($this->once())->method('write');
 
         $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(true);
         $security->method('hasEntityAccess')->willReturn(true);
 
         $requestStack = new RequestStack();
@@ -136,6 +138,7 @@ final class ResultControllerTest extends TestCase
         $configurator->expects($this->never())->method('mergeParameters');
 
         $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(true);
         $security->method('hasEntityAccess')->willReturn(true);
 
         $requestStack = new RequestStack();
@@ -197,6 +200,7 @@ final class ResultControllerTest extends TestCase
         $configurator->expects($this->never())->method('write');
 
         $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(true);
         $security->method('hasEntityAccess')->willReturn(true);
 
         $requestStack = new RequestStack();
@@ -265,6 +269,7 @@ final class ResultControllerTest extends TestCase
         $configurator->expects($this->once())->method('write');
 
         $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(true);
         $security->method('hasEntityAccess')->willReturn(true);
 
         $requestStack = new RequestStack();
@@ -309,6 +314,7 @@ final class ResultControllerTest extends TestCase
         $configurator->expects($this->never())->method('mergeParameters');
 
         $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(true);
         $security->method('hasEntityAccess')->willReturn(true);
 
         $requestStack = new RequestStack();
@@ -329,6 +335,38 @@ final class ResultControllerTest extends TestCase
         $submission = $this->createSubmission('Person@Example.org');
 
         $this->assertSame('example.org', $submission->getEmailDomain());
+    }
+
+    public function testMarkSpamActionRejectsNonAdminUsersBeforeReadingSubmission(): void
+    {
+        $request = Request::create('', Request::METHOD_POST);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $security = $this->createMock(CorePermissions::class);
+        $security->method('isAdmin')->willReturn(false);
+        $security->method('isAnonymous')->willReturn(false);
+
+        $submissionModel = $this->createMock(SubmissionModel::class);
+        $submissionModel->expects($this->never())->method('getEntity');
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $controller = $this->createController(
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(ModelFactory::class),
+            $this->createMock(CoreParametersHelper::class),
+            $requestStack,
+            $security
+        );
+
+        $this->expectException(AccessDeniedHttpException::class);
+        $controller->markSpamAction(
+            $request,
+            $this->createMock(Configurator::class),
+            $submissionModel,
+            $this->createMock(FormModel::class)
+        );
     }
 
     private function createController(ManagerRegistry $managerRegistry, ModelFactory $modelFactory, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack, CorePermissions $security): TestResultController

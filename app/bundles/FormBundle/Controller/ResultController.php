@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController // NOSONAR Existing controller is not split in this feature PR.
+class ResultController extends CommonFormController
 {
     private const FORM_RESULT_PAGE_SUFFIX = '.page';
 
@@ -176,6 +176,7 @@ class ResultController extends CommonFormController // NOSONAR Existing controll
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
+                    'canBlockDomains'       => $this->security->isAdmin(),
                     'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('form:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => '@MauticForm/Result/list.html.twig',
@@ -397,6 +398,10 @@ class ResultController extends CommonFormController // NOSONAR Existing controll
 
     public function markSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
+        if (!$this->security->isAdmin()) {
+            return $this->accessDenied();
+        }
+
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
         $page     = $this->getFormResultPage($request, $formId);
@@ -441,6 +446,10 @@ class ResultController extends CommonFormController // NOSONAR Existing controll
 
     public function batchMarkSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
+        if (!$this->security->isAdmin()) {
+            return $this->accessDenied();
+        }
+
         $formId  = $this->getFormIdFromRequest();
         $page    = $this->getFormResultPage($request, $formId);
         $flashes = [];

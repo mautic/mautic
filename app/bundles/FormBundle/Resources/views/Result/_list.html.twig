@@ -9,6 +9,7 @@
     - limit
     - tmpl
     - canDelete
+    - canBlockDomains
 #}
 {% set formId = form.id %}
 <div class="table-responsive table-responsive-force">
@@ -88,7 +89,7 @@
                               {% set hasEmail = true %}
                           {% endif %}
                       {% endfor %}
-                      {% if hasEmail %}
+                      {% if canBlockDomains and hasEmail %}
                           {% set custom = custom|merge([{
                               'attr': {
                                   'href': path('mautic_form_results_action', {'objectAction': 'markSpam', 'objectId': item.id, 'formId': formId}),
