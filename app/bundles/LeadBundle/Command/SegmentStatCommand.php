@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:segments:stat', description: 'Gather Segment Statistics')]
 final class SegmentStatCommand extends ModeratedCommand
 {
     public function __construct(
@@ -22,15 +23,6 @@ final class SegmentStatCommand extends ModeratedCommand
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setName('mautic:segments:stat')
-            ->setDescription('Gather Segment Statistics');
-
-        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

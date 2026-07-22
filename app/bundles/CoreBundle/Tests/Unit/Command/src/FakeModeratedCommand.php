@@ -7,15 +7,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockInterface;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:fake:command')]
 class FakeModeratedCommand extends ModeratedCommand
 {
-    protected function configure(): void
-    {
-        $this->setName('mautic:fake:command');
-
-        parent::configure();
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->checkRunStatus($input, $output);
