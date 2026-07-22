@@ -64,12 +64,14 @@ final class VisitUrlWithTimeSpentBugTest extends MauticMysqlTestCase
             ],
         ];
 
-        $helper = static::getContainer()->get(PointActionHelper::class);
-        $this->assertInstanceOf(PointActionHelper::class, $helper);
+        $factory = new class($this->em) {
+            public function __construct(private \Doctrine\ORM\EntityManager $em) {}
+            public function getEntityManager() { return $this->em; }
+        };
 
         // Evaluate using the REVISIT hit — should return TRUE (accumulative time met)
         $eventDetails = $revisitHit;
-        $result       = $helper->validateUrlHit($eventDetails, $action);
+        $result       = PointActionHelper::validateUrlHit($factory, $eventDetails, $action);
         $this->assertTrue($result, 'BUG #12336: accumulative_time should trigger on revisit when dwell time exceeds threshold');
 
         // Now delete all hits and re-add only the FIRST hit (with dateLeft) — simulate that
