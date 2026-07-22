@@ -84,7 +84,7 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $entity = $this->em->getRepository(DynamicContent::class)->findOneBy(['name' => $name]);
-        $this->assertNull($entity, 'A DWC with an invalid locale filter value must not be saved.');
+        $this->assertNotInstanceOf(DynamicContent::class, $entity, 'A DWC with an invalid locale filter value must not be saved.');
     }
 
     /**
