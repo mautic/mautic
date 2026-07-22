@@ -65,11 +65,7 @@ final class ResultControllerTest extends TestCase
             ->method('enableDonotSubmitValidationOnEmailFields')
             ->with([]);
 
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.submission', $submissionModel],
-            ['form.form', $formModel],
-        ]);
+        $modelFactory = $this->createStub(ModelFactory::class);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->once())
@@ -126,11 +122,7 @@ final class ResultControllerTest extends TestCase
         $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
         $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.submission', $submissionModel],
-            ['form.form', $formModel],
-        ]);
+        $modelFactory = $this->createStub(ModelFactory::class);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->never())->method('get');
@@ -184,11 +176,7 @@ final class ResultControllerTest extends TestCase
         $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
         $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.submission', $submissionModel],
-            ['form.form', $formModel],
-        ]);
+        $modelFactory = $this->createStub(ModelFactory::class);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->once())
@@ -249,11 +237,7 @@ final class ResultControllerTest extends TestCase
             ->method('enableDonotSubmitValidationOnEmailFields')
             ->with([]);
 
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.submission', $submissionModel],
-            ['form.form', $formModel],
-        ]);
+        $modelFactory = $this->createStub(ModelFactory::class);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->once())
@@ -300,11 +284,7 @@ final class ResultControllerTest extends TestCase
         $formModel->expects($this->never())->method('findEmailFieldsWithMissingDonotSubmitValidation');
         $formModel->expects($this->never())->method('enableDonotSubmitValidationOnEmailFields');
 
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')->willReturnMap([
-            ['form.submission', $submissionModel],
-            ['form.form', $formModel],
-        ]);
+        $modelFactory = $this->createStub(ModelFactory::class);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->never())->method('get');
