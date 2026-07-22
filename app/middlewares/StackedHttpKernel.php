@@ -35,10 +35,8 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Constructs a stacked HTTP kernel.
      *
-     * @param HttpKernelInterface $kernel
-     *                                         The decorated kernel
-     * @param array               $middlewares
-     *                                         An array of previous middleware services
+     * @param HttpKernelInterface $kernel      The decorated kernel
+     * @param array               $middlewares An array of previous middleware services
      */
     public function __construct(HttpKernelInterface $kernel, array $middlewares)
     {
