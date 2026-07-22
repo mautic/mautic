@@ -18,11 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends email to winner variant after predetermined amount of time.
  */
-#[AsCommand(name: self::COMMAND_NAME, help: <<<'TXT'
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    help: <<<'TXT'
 The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of time
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 final class SendWinnerEmailCommand extends ModeratedCommand
 {
     protected static string $defaultDescription = 'Send winner email variant to remaining contacts';

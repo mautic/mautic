@@ -18,11 +18,15 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: 'mautic:custom-field:delete-column', description: 'Delete custom field column in the background', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:custom-field:delete-column',
+    description: 'Delete custom field column in the background',
+    help: <<<'TXT'
 The <info>%command.name%</info> command will delete a column in a lead_fields table if the proces should run in background.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 final class DeleteCustomFieldCommand extends Command
 {
     public function __construct(

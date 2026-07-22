@@ -9,11 +9,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: 'mautic:donotsell:download', description: 'Fetch remote do not sell list from MaxMind', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:donotsell:download',
+    description: 'Fetch remote do not sell list from MaxMind',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class UpdateDoNotSellListCommand extends Command
 {
     public function __construct(

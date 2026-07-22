@@ -13,11 +13,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-#[AsCommand(name: 'mautic:unusedip:delete', description: 'Deletes IP addresses that are not used in any other database table', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:unusedip:delete',
+    description: 'Deletes IP addresses that are not used in any other database table',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to delete IP addresses that are not used in any other database table.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;

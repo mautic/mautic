@@ -62,7 +62,7 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
-    //->withComposerBased(symfony: true)
+    // ->withComposerBased(symfony: true)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 

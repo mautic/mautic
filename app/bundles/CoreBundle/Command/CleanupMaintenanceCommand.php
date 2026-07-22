@@ -20,7 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to purge old data per settings.
  */
-#[AsCommand(name: CleanupMaintenanceCommand::NAME, description: 'Updates the Mautic application', help: <<<'TXT'
+#[AsCommand(
+    name: CleanupMaintenanceCommand::NAME,
+    description: 'Updates the Mautic application',
+    help: <<<'TXT'
 <info>%command.name%</info> purges records of anonymous contacts (<comment>unless the <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
 Adjust the threshold by using <info>--days-old</info>.
 
@@ -47,7 +50,8 @@ Deletes records of anonymous <options=bold>and inactive identified</> contacts o
 Shows you how many records of anonymous contacts <info>%command.name%</info> will purge.
 
 The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners, as not all data is applicable to be purged).
-TXT)]
+TXT
+)]
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:maintenance:cleanup';

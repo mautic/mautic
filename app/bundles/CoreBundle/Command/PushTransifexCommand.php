@@ -23,7 +23,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to push language resources to Transifex.
  */
-#[AsCommand(name: PushTransifexCommand::NAME, description: 'Pushes Mautic translation resources to Transifex', help: <<<'TXT'
+#[AsCommand(
+    name: PushTransifexCommand::NAME,
+    description: 'Pushes Mautic translation resources to Transifex',
+    help: <<<'TXT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
@@ -31,7 +34,8 @@ The <info>%command.name%</info> command is used to push translation resources to
 You can optionally choose to update resources for one bundle only with the --bundle option:
 
 <info>php %command.full_name% --bundle AssetBundle</info>
-TXT)]
+TXT
+)]
 class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';

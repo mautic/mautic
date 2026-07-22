@@ -18,11 +18,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to send a scheduled broadcast.
  */
-#[AsCommand(name: 'mautic:broadcasts:send', description: 'Process contacts pending to receive a channel broadcast.', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:broadcasts:send',
+    description: 'Process contacts pending to receive a channel broadcast.',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
 
 <info>php %command.full_name% --channel=email --id=3</info>
-TXT)]
+TXT
+)]
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
     public function __construct(

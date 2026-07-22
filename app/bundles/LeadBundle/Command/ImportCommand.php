@@ -21,11 +21,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to import data.
  */
-#[AsCommand(name: ImportCommand::COMMAND_NAME, description: 'Imports data to Mautic', help: <<<'TXT'
+#[AsCommand(
+    name: ImportCommand::COMMAND_NAME,
+    description: 'Imports data to Mautic',
+    help: <<<'TXT'
 The <info>%command.name%</info> command starts to import CSV files when some are created.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';

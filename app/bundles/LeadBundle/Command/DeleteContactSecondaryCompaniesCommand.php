@@ -14,11 +14,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: DeleteContactSecondaryCompaniesCommand::NAME, description: "Deletes all contact\'s secondary companies.", help: <<<'TXT'
+#[AsCommand(
+    name: DeleteContactSecondaryCompaniesCommand::NAME,
+    description: "Deletes all contact\'s secondary companies.",
+    help: <<<'TXT'
 The <info>%command.name%</info> command deletes non-primary companies of every contact.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME                    = 'mautic:contact:delete:secondary-companies';

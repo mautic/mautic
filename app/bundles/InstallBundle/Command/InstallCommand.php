@@ -20,9 +20,13 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * CLI Command to install Mautic.
  */
-#[AsCommand(name: InstallCommand::COMMAND, description: 'Installs Mautic', help: <<<'TXT'
+#[AsCommand(
+    name: InstallCommand::COMMAND,
+    description: 'Installs Mautic',
+    help: <<<'TXT'
 This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
-TXT)]
+TXT
+)]
 class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';

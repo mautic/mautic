@@ -15,7 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to install Mautic sample data.
  */
-#[AsCommand(name: 'mautic:install:data', description: 'Installs Mautic with sample data', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:install:data',
+    description: 'Installs Mautic with sample data',
+    help: <<<'TXT'
 The <info>%command.name%</info> command re-installs Mautic with sample data.
 
 <info>php %command.full_name%</info>
@@ -23,7 +26,8 @@ The <info>%command.name%</info> command re-installs Mautic with sample data.
 You can optionally specify to bypass the verification check with the --force option:
 
 <info>php %command.full_name% --force</info>
-TXT)]
+TXT
+)]
 class InstallDataCommand extends Command
 {
     public function __construct(

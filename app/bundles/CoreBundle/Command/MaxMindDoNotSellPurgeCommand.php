@@ -17,7 +17,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  * CLI Command to purge data from Mautic that appears on the
  * MaxMind Do Not Sell list.
  */
-#[AsCommand(name: 'mautic:max-mind:purge', description: 'Purge data connected to MaxMind Do Not Sell list.', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:max-mind:purge',
+    description: 'Purge data connected to MaxMind Do Not Sell list.',
+    help: <<<'TXT'
 The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
 
 <info>php %command.full_name% --dry-run</info>
@@ -27,7 +30,8 @@ Performs a dry-run which will not actually purge any data, but will produce a li
 <info>php %command.full_name% --batch-size</info>
 
 Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
-TXT)]
+TXT
+)]
 class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(

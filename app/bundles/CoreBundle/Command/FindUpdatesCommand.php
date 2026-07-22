@@ -12,11 +12,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to fetch application updates.
  */
-#[AsCommand(name: 'mautic:update:find', description: 'Fetches updates for Mautic', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:update:find',
+    description: 'Fetches updates for Mautic',
+    help: <<<'TXT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class FindUpdatesCommand extends Command
 {
     public function __construct(

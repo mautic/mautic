@@ -13,11 +13,15 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI Command to clean up obsolete files in the media folder.
  */
-#[AsCommand(name: 'mautic:assets:cleanup', description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:assets:cleanup',
+    description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class CleanupMediaAssetsCommand extends Command
 {
     public function __construct(

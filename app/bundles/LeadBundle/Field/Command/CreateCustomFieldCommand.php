@@ -22,11 +22,15 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: CreateCustomFieldCommand::COMMAND_NAME, description: 'Create custom field column in the background', help: <<<'TXT'
+#[AsCommand(
+    name: CreateCustomFieldCommand::COMMAND_NAME,
+    description: 'Create custom field column in the background',
+    help: <<<'TXT'
 The <info>%command.name%</info> command will create columns in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';

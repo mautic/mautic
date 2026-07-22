@@ -13,11 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to fetch updated Maxmind database.
  */
-#[AsCommand(name: 'mautic:iplookup:download', description: 'Fetch remote datastores for IP lookup services that leverage local lookups', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:iplookup:download',
+    description: 'Fetch remote datastores for IP lookup services that leverage local lookups',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
 
 <info>php %command.full_name%</info>
-TXT)]
+TXT
+)]
 class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(

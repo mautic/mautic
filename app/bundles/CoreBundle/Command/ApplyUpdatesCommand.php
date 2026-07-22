@@ -19,7 +19,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to update the application.
  */
-#[AsCommand(name: 'mautic:update:apply', description: 'Updates the Mautic application', help: <<<'TXT'
+#[AsCommand(
+    name: 'mautic:update:apply',
+    description: 'Updates the Mautic application',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command updates the Mautic application.
 
 <info>php %command.full_name%</info>
@@ -31,7 +34,8 @@ You can optionally specify to bypass the verification check with the --force opt
 To force install a local package, pass the full path to the package as follows:
 
 <info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
-TXT)]
+TXT
+)]
 class ApplyUpdatesCommand extends Command
 {
     public function __construct(

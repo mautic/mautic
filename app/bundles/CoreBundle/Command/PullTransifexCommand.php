@@ -24,7 +24,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to pull language resources from Transifex.
  */
-#[AsCommand(name: PullTransifexCommand::NAME, description: 'Fetches translations for Mautic from Transifex', help: <<<'TXT'
+#[AsCommand(
+    name: PullTransifexCommand::NAME,
+    description: 'Fetches translations for Mautic from Transifex',
+    help: <<<'TXT'
 The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
 
 <info>php %command.full_name%</info>
@@ -32,7 +35,8 @@ The <info>%command.name%</info> command is used to retrieve updated Mautic trans
 The command can optionally only pull files for a specific language with the --language option
 
 <info>php %command.full_name% --language=<language_code></info>
-TXT)]
+TXT
+)]
 class PullTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:pull';
