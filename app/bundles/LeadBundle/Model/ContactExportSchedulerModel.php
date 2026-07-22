@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -46,6 +47,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly ContactExportSchedulerRepository $contactExportSchedulerRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -135,7 +137,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
             return [(int) $user->getId()];
         }
 
-        $userIds = $this->em->getRepository(User::class)->findUserIdsByRole((int) $user->getRole()->getId());
+        $userIds = $this->userRepository->findUserIdsByRole((int) $user->getRole()->getId());
 
         return $userIds ?: [(int) $user->getId()];
     }

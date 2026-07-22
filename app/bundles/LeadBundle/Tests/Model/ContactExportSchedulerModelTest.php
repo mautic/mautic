@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\Role;
@@ -50,13 +51,7 @@ final class ContactExportSchedulerModelTest extends TestCase
             ->with(5)
             ->willReturn([10, 20]);
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->willReturn($userRepository);
-
-        $model = $this->createModel($entityManager, $user);
+        $model = $this->createModel($this->createStub(EntityManager::class), $user, $userRepository);
 
         $data = $model->prepareData([
             'lead:leads:viewother'    => false,
@@ -105,7 +100,7 @@ final class ContactExportSchedulerModelTest extends TestCase
         ], $data['filter']['force']);
     }
 
-    private function createModel(EntityManager $entityManager, User $user): ContactExportSchedulerModel
+    private function createModel(EntityManager $entityManager, User $user, ?UserRepository $userRepository = null): ContactExportSchedulerModel
     {
         $requestStack = new RequestStack();
         $request      = Request::create('/s/contacts/batchExport');
@@ -137,7 +132,9 @@ final class ContactExportSchedulerModelTest extends TestCase
             $translator,
             $userHelper,
             $this->createStub(LoggerInterface::class),
-            $coreParametersHelper
+            $coreParametersHelper,
+            $this->createStub(ContactExportSchedulerRepository::class),
+            $userRepository ?? $this->createStub(UserRepository::class),
         );
     }
 }
