@@ -55,7 +55,7 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
     /**
      * @var array<string, string>
      */
-    protected array $fixedFields = [
+    private array $fixedFields = [
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
     ];
@@ -63,7 +63,7 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
     /**
      * @var array<int, string>
      */
-    protected array $baseColumns = [
+    private array $baseColumns = [
         'preferred_profile_image',
         'firstname',
         'lastname',
@@ -72,7 +72,7 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
     /**
      * @var array<int, string>
      */
-    protected array $fieldGroups = [
+    private array $fieldGroups = [
         'core',
         'social',
         'personal',
