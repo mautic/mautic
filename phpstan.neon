@@ -215,6 +215,7 @@ parameters:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 
+<<<<<<< HEAD
 rules:
 	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
 	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
@@ -223,4 +224,38 @@ rules:
 	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+<<<<<<< HEAD
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+=======
+=======
+services:
+	-
+		class: Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+		tags:
+			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+		tags:
+			- phpstan.rules.rule
+>>>>>>> 41e96b7cf0 ([phpstan] kick of getRepository(...) warning with exact class)
+>>>>>>> 400faa4637 ([phpstan] kick of getRepository(...) warning with exact class)
