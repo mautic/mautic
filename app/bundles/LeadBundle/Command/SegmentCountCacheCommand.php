@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: self::COMMAND_NAME, description: 'Update segment count cache for changed segments.')]
 class SegmentCountCacheCommand extends Command
 {
     public const COMMAND_NAME = 'lead:list:count-cache-update';
@@ -21,12 +22,6 @@ class SegmentCountCacheCommand extends Command
         private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Update segment count cache for changed segments.');
     }
 
     /**

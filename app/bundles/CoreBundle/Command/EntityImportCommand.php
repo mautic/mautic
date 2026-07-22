@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:entity:import', description: 'Import entity data from a ZIP file.')]
 final class EntityImportCommand extends ModeratedCommand
 {
     public function __construct(
@@ -27,8 +28,6 @@ final class EntityImportCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->setName('mautic:entity:import')
-            ->setDescription('Import entity data from a ZIP file.')
             ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'The name of the entity to import (e.g., campaign, email)')
             ->addOption(
                 'file',
