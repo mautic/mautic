@@ -49,7 +49,12 @@
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
     "symfony/web-profiler-bundle": "~7.4.0",
+<<<<<<< HEAD
     "symplify/easy-coding-standard": "^13.2.13",
+=======
+    "symplify/easy-coding-standard": "^13.2.9",
+    "symplify/phpstan-rules": "^14.10",
+>>>>>>> 5508eb212f ([composer] add symplify phsptan rules to spot more relevant errors)
     "tomasvotruba/type-coverage": "^2.2.1"
   },
   "replace": {
