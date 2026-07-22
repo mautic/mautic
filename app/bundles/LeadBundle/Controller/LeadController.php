@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
@@ -38,6 +39,8 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -48,6 +51,7 @@ use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PointBundle\Model\PointGroupModel;
+use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -57,6 +61,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class LeadController extends FormController
 {
@@ -65,13 +70,13 @@ class LeadController extends FormController
 
     private NoteModel $noteModel;
 
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
+    private CampaignModel $campaignModel;
 
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
+    private StageModel $stageModel;
 
-    private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
+    private ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
     private ListModel $leadListModel;
 
@@ -81,14 +86,14 @@ class LeadController extends FormController
 
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $leadListModel,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
-        \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        StageModel $stageModel,
+        CompanyModel $companyModel,
+        ContactExportSchedulerModel $contactExportSchedulerModel,
+        CampaignModel $campaignModel,
         NoteModel $noteModel,
         FieldModel $leadFieldModel,
         UserModel $userModel,

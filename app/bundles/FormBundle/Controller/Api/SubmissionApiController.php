@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -39,7 +40,7 @@ class SubmissionApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         SubmissionModel $formSubmissionModel,
-        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+        private readonly FormModel $formModel,
     ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;

@@ -12,12 +12,14 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AssetController extends FormController
 {
@@ -29,15 +31,15 @@ class AssetController extends FormController
 
     private BatchDownloadResponder $batchDownloadResponder;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireAssetController(
         BatchDownloadRequestValidator $batchDownloadRequestValidator,
         BatchFileCollector $batchFileCollector,
         ArchiveBuilder $archiveBuilder,
         BatchDownloadResponder $batchDownloadResponder,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
     ): void {
         $this->batchDownloadRequestValidator = $batchDownloadRequestValidator;
         $this->batchFileCollector            = $batchFileCollector;

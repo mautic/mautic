@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class DateYearNext extends DateYearAbstract
 {
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {
         $dateTimeHelper->setDateTime('midnight first day of January next year', null);
     }

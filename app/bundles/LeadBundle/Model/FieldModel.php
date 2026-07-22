@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -605,7 +606,7 @@ class FieldModel extends FormModel
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -628,7 +629,7 @@ class FieldModel extends FormModel
                 $this->customFieldColumn->createLeadColumn($entity);
             } catch (CustomFieldLimitException $e) {
                 // Convert to original Exception not to cause BC
-                throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
+                throw new Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
             }
         } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
@@ -646,7 +647,7 @@ class FieldModel extends FormModel
      * @param bool  $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -662,7 +663,7 @@ class FieldModel extends FormModel
      * @param LeadField $entity
      *
      * @throws AbortColumnUpdateException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws DeleteEntityDependencyException

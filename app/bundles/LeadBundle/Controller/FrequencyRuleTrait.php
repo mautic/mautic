@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
@@ -155,7 +156,7 @@ trait FrequencyRuleTrait
     /**
      * @param int $currentChannelId
      */
-    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null)
+    protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
@@ -186,7 +187,7 @@ trait FrequencyRuleTrait
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireFrequencyRuleTrait(
         \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
         RequestStack $requestStack,
