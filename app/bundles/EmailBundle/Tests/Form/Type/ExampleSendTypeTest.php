@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -51,7 +52,7 @@ final class ExampleSendTypeTest extends TestCase
     {
         $userId  = 37;
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -101,7 +102,7 @@ final class ExampleSendTypeTest extends TestCase
     public function testBuildFormWithContact(): void
     {
         $userId  = 37;
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -115,11 +116,11 @@ final class ExampleSendTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(4);
+        $matcher = $this->exactly(4);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {

@@ -4,23 +4,33 @@ namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<IntegrationEntity>
  */
 class IntegrationEntityModel extends FormModel
 {
-    public function getIntegrationEntityRepository()
+    private IntegrationEntityRepository $integrationEntityRepository;
+
+    #[Required]
+    public function autowireIntegrationEntityModel(IntegrationEntityRepository $integrationEntityRepository): void
     {
-        return $this->em->getRepository(IntegrationEntity::class);
+        $this->integrationEntityRepository = $integrationEntityRepository;
+    }
+
+    public function getIntegrationEntityRepository(): IntegrationEntityRepository
+    {
+        return $this->integrationEntityRepository;
     }
 
     public function logDataSync(IntegrationObject $integrationObject): void
     {
     }
 
-    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null)
+    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null): array
     {
         if (!$formattedRecords = $this->formatListOfContacts($recordList)) {
             return [];
@@ -69,7 +79,7 @@ class IntegrationEntityModel extends FormModel
         return '"'.$csList.'"';
     }
 
-    public function getMauticContactsById($mauticContactIds, $integrationName, $internalObject)
+    public function getMauticContactsById($mauticContactIds, $integrationName, $internalObject): array
     {
         if (!$formattedRecords = $this->formatListOfContacts($mauticContactIds)) {
             return [];

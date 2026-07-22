@@ -18,10 +18,9 @@ return ECSConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
         ],
 
-        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
         PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
-        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
         PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
@@ -29,18 +28,12 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
     ->withRules([
-        PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        PhpCsFixer\Fixer\StringNotation\ExplicitStringVariableFixer::class,
-        PhpCsFixer\Fixer\ControlStructure\NoSuperfluousElseifFixer::class,
-        PhpCsFixer\Fixer\LanguageConstruct\IsNullFixer::class,
-        PhpCsFixer\Fixer\LanguageConstruct\ExplicitIndirectVariableFixer::class,
-        PhpCsFixer\Fixer\Operator\NewWithParenthesesFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
         docblocks: true,
         namespaces: true,
         cleanup: true,
-        // controlStructures: true,
+        controlStructures: true,
     );

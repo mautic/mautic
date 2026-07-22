@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -49,47 +50,45 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @return array<int, array<string, array<int, string>|bool|int|null>>
+     * @return \Iterator<int, array<string, (array<int, string>|bool|int|null)>>
      */
-    public static function provideFormDNC(): array
+    public static function provideFormDNC(): \Iterator
     {
-        return [
-            [
-                'reason'   => 1,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 3,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 0,
-            ],
+        yield [
+            'reason'   => 1,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 3,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 0,
         ];
     }
 
@@ -232,7 +231,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
@@ -244,7 +242,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string> $channels
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormDNC')]
+    #[DataProvider('provideFormDNC')]
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -270,7 +268,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
@@ -314,7 +311,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -359,7 +355,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -404,7 +399,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());

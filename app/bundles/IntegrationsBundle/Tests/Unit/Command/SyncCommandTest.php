@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,8 +17,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class SyncCommandTest extends TestCase
 {
-    use IsolatedTestTrait;
-
     private const INTEGRATION_NAME = 'Test';
 
     /**
@@ -57,8 +56,8 @@ final class SyncCommandTest extends TestCase
         $this->assertSame(1, $this->commandTester->execute([]));
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testExecuteWithSomeOptions(): void
     {
         $this->syncService->expects($this->once())
@@ -82,8 +81,8 @@ final class SyncCommandTest extends TestCase
         $this->assertSame(0, $code);
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testExecuteWhenSyncThrowsException(): void
     {
         $this->syncService->expects($this->once())
@@ -93,7 +92,7 @@ final class SyncCommandTest extends TestCase
 
                 return true;
             }))
-            ->will($this->throwException(new \Exception()));
+            ->willThrowException(new \Exception());
 
         $code = $this->commandTester->execute(['integration' => self::INTEGRATION_NAME]);
 

@@ -30,8 +30,8 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
         $submission->setForm($form);
         $transformer->transformValuesAfterSubmit($submissionEvent);
 
-        Assert::assertSame([], $submissionEvent->getTokens());
-        Assert::assertSame([], $submissionEvent->getContactFieldMatches());
+        $this->assertSame([], $submissionEvent->getTokens());
+        $this->assertSame([], $submissionEvent->getContactFieldMatches());
     }
 
     public function testTransformValuesAfterSubmitWithFileFieldMatchesAndTokens(): void
@@ -77,13 +77,13 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
         $submissionEvent->setContactFieldMatches(['contact_field_1' => 'original/route']);
         $transformer->transformValuesAfterSubmit($submissionEvent);
 
-        Assert::assertSame(['{formfield=file_field_1}' => 'generated/route'], $submissionEvent->getTokens());
-        Assert::assertSame(['{formfield=file_field_1}' => 'generated/route'], $transformer->getTokensToUpdate());
-        Assert::assertSame(['contact_field_1' => 'generated/route'], $submissionEvent->getContactFieldMatches());
-        Assert::assertSame(['contact_field_1' => 'generated/route'], $transformer->getContactFieldsToUpdate());
+        $this->assertSame(['{formfield=file_field_1}' => 'generated/route'], $submissionEvent->getTokens());
+        $this->assertSame(['{formfield=file_field_1}' => 'generated/route'], $transformer->getTokensToUpdate());
+        $this->assertSame(['contact_field_1' => 'generated/route'], $submissionEvent->getContactFieldMatches());
+        $this->assertSame(['contact_field_1' => 'generated/route'], $transformer->getContactFieldsToUpdate());
 
         // Calling it for the second time to ensure it's executed only once.
         $transformer->transformValuesAfterSubmit($submissionEvent);
-        Assert::assertSame(1, $router->generateMethodCallCounter);
+        $this->assertSame(1, $router->generateMethodCallCounter);
     }
 }

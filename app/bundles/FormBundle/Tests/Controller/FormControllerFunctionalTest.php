@@ -15,7 +15,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -402,7 +402,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
+    #[DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -657,18 +657,18 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
-        Assert::assertCount(2, $forms);
+        $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];
         $clonedForm   = $forms[1];
-        Assert::assertSame($form->getId(), $originalForm->getId());
-        Assert::assertNotSame($form->getId(), $clonedForm->getId());
+        $this->assertSame($form->getId(), $originalForm->getId());
+        $this->assertNotSame($form->getId(), $clonedForm->getId());
 
         $fields = $clonedForm->getFields()->getValues();
-        Assert::assertCount(3, $fields);
+        $this->assertCount(3, $fields);
 
         [$clonedField1, $clonedField2, $clonedSubmit] = $fields;
-        Assert::assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
+        $this->assertSame((int) $clonedField2->getParent(), $clonedField1->getId());
     }
 
     public function testFormWithProject(): void
@@ -692,7 +692,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedForm = $this->em->find(Form::class, $form->getId());
         $this->assertInstanceOf(Form::class, $savedForm);
-        Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
     }
 
     public function testFormDetailsViewWithPreviewPanel(): void

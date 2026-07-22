@@ -74,7 +74,9 @@ final class ListModelTest extends TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->leadListRepositoryMock,
+            $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class), // $listLeadRepository
         );
     }
 
@@ -119,7 +121,9 @@ final class ListModelTest extends TestCase
                 $this->createStub(UrlGeneratorInterface::class),
                 $this->createStub(Translator::class),
                 $this->createStub(UserHelper::class),
-                $this->createStub(LoggerInterface::class)])
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(LeadListRepository::class),
+                $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class)])
             ->onlyMethods([])
             ->getMock();
 
@@ -127,66 +131,64 @@ final class ListModelTest extends TestCase
     }
 
     /**
-     * @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}>
+     * @return \Iterator<int, array{array<int, mixed>, (string|null), array<(int|string), mixed>}>
      */
-    public static function sourceTypeTestDataProvider(): array
+    public static function sourceTypeTestDataProvider(): \Iterator
     {
-        return [
+        yield [
+            [],
+            'categories',
+            [],
+        ];
+        yield [
             [
-                [],
-                'categories',
-                [],
-            ],
-            [
-                [
-                    0 => [
-                        'id'     => 1,
-                        'title'  => 'Segment Test Category 1',
-                        'alias'  => 'Alias Test Category 1',
-                        'bundle' => 'segment',
-                    ],
-                    1 => [
-                        'id'     => 2,
-                        'title'  => 'Segment Test Category 2',
-                        'alias'  => 'Alias Test Category 2',
-                        'bundle' => 'segment',
-                    ],
+                0 => [
+                    'id'     => 1,
+                    'title'  => 'Segment Test Category 1',
+                    'alias'  => 'Alias Test Category 1',
+                    'bundle' => 'segment',
                 ],
-                null,
-                [
-                    'categories' => [
-                        'Alias Test Category 1' => 'Segment Test Category 1',
-                        'Alias Test Category 2' => 'Segment Test Category 2',
-                    ],
+                1 => [
+                    'id'     => 2,
+                    'title'  => 'Segment Test Category 2',
+                    'alias'  => 'Alias Test Category 2',
+                    'bundle' => 'segment',
                 ],
             ],
+            null,
             [
-                [
-                    0 => [
-                        'id'     => 1,
-                        'title'  => 'Segment Test Category 1',
-                        'alias'  => 'Alias Test Category 1',
-                        'bundle' => 'segment',
-                    ],
-                    1 => [
-                        'id'     => 2,
-                        'title'  => 'Segment Test Category 2',
-                        'alias'  => 'Alias Test Category 2',
-                        'bundle' => 'segment',
-                    ],
-                ],
-                'categories',
-                [
+                'categories' => [
                     'Alias Test Category 1' => 'Segment Test Category 1',
                     'Alias Test Category 2' => 'Segment Test Category 2',
                 ],
             ],
+        ];
+        yield [
             [
-                [],
-                null,
-                [
-                    'categories' => [],
+                0 => [
+                    'id'     => 1,
+                    'title'  => 'Segment Test Category 1',
+                    'alias'  => 'Alias Test Category 1',
+                    'bundle' => 'segment',
                 ],
+                1 => [
+                    'id'     => 2,
+                    'title'  => 'Segment Test Category 2',
+                    'alias'  => 'Alias Test Category 2',
+                    'bundle' => 'segment',
+                ],
+            ],
+            'categories',
+            [
+                'Alias Test Category 1' => 'Segment Test Category 1',
+                'Alias Test Category 2' => 'Segment Test Category 2',
+            ],
+        ];
+        yield [
+            [],
+            null,
+            [
+                'categories' => [],
             ],
         ];
     }
@@ -230,7 +232,7 @@ final class ListModelTest extends TestCase
             ->with($leadList)
             ->willReturn($orphanLeadsCount);
 
-        self::assertSame(0, $this->model->rebuildListLeads($leadList));
+        $this->assertSame(0, $this->model->rebuildListLeads($leadList));
 
         $this->segmentCountCacheHelper
             ->expects($this->once())
@@ -240,7 +242,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testRemoveLeadWillDecrementCacheCounter(): void
@@ -260,7 +262,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $currentLeadCount - 1], $leadCounts);
+        $this->assertSame([$segmentId => $currentLeadCount - 1], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromCache(): void
@@ -277,7 +279,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testAddLeadWillIncrementCacheCounter(): void
@@ -297,7 +299,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
 
-        self::assertSame([$segmentId => $currentLeadCount + 1], $leadCounts);
+        $this->assertSame([$segmentId => $currentLeadCount + 1], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromDatabaseHavingCache(): void
@@ -320,7 +322,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testGetSegmentContactCountFromDatabase(): void
@@ -343,7 +345,7 @@ final class ListModelTest extends TestCase
 
         $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
-        self::assertSame([$segmentId => $leadCount], $leadCounts);
+        $this->assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     public function testGetActiveSegmentContactCount(): void
@@ -370,7 +372,7 @@ final class ListModelTest extends TestCase
         $property->setValue($this->model, $doNotContactRepository);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);
-        self::assertSame($total - $dnc, $active);
+        $this->assertSame($total - $dnc, $active);
     }
 
     public function testLeadListExists(): void
@@ -382,7 +384,7 @@ final class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn(true);
 
-        self::assertTrue($this->model->leadListExists($segmentId));
+        $this->assertTrue($this->model->leadListExists($segmentId));
     }
 
     private function mockLeadList(int $id): LeadList

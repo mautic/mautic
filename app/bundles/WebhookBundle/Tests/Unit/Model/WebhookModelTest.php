@@ -13,8 +13,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
-use Mautic\WebhookBundle\Entity\Log;
-use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
@@ -75,19 +73,12 @@ final class WebhookModelTest extends TestCase
         // The secret hash is null at first.
         $this->assertNull($entity->getSecret());
 
-        $this->entityManagerMock->expects($this->once())
-            ->method('getRepository')
-            ->with(Webhook::class)
-            ->willReturn($this->webhookRepository);
-
         $this->webhookRepository->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Webhook $entity): true {
+            ->willReturnCallback(function (Webhook $entity): void {
                 // The secret hash is not empty on save.
                 $this->assertNotEmpty($entity->getSecret());
-
-                return true;
-            }));
+            });
 
         $this->model->saveEntity($entity);
     }
@@ -130,8 +121,6 @@ final class WebhookModelTest extends TestCase
         $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
         $queueMock->method('getId')->willReturn('12');
 
-        $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
-
         $this->parametersHelperMock->method('get')
             ->willReturnCallback(function ($param): string|int|null {
                 if ('queue_mode' === $param) {
@@ -145,15 +134,10 @@ final class WebhookModelTest extends TestCase
             });
 
         $this->entityManagerMock->expects($this->once())
-            ->method('getRepository')
-            ->with(WebhookQueue::class)
-            ->willReturn($queueRepositoryMock);
-
-        $this->entityManagerMock->expects($this->once())
             ->method('detach')
             ->with($queueMock);
 
-        $queueRepositoryMock->expects($this->once())
+        $this->webhookQueueRepository->expects($this->once())
             ->method('getEntities')
             ->willReturn([$queueMock]);
 
@@ -223,18 +207,7 @@ final class WebhookModelTest extends TestCase
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
-        $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
-        $webhookLogRepoMock   = $this->createStub(LogRepository::class);
-        $webhookRepoMock      = $this->createStub(WebhookRepository::class);
-
-        $this->entityManagerMock->expects($this->exactly(3))->method('getRepository')
-            ->willReturnMap([
-                [WebhookQueue::class, $webhookQueueRepoMock],
-                [Log::class, $webhookLogRepoMock],
-                [Webhook::class, $webhookRepoMock],
-            ]);
-
-        $webhookQueueRepoMock
+        $this->webhookQueueRepository
             ->method('deleteQueuesById')
             ->with([1]);
 
@@ -251,7 +224,7 @@ final class WebhookModelTest extends TestCase
             ->with('test-webhook.com', $responsePayload)
             ->willReturn(new Response(200, [], 'Success'));
 
-        self::assertTrue($this->model->processWebhook($webhook, $queue));
+        $this->assertTrue($this->model->processWebhook($webhook, $queue));
     }
 
     public function testMinAndMaxQueueIdWhenNoneIsSet(): void
@@ -264,11 +237,6 @@ final class WebhookModelTest extends TestCase
         };
 
         $webhook->setEventsOrderbyDir('ASC');
-
-        $this->entityManagerMock->expects($this->once())
-            ->method('getRepository')
-            ->with(WebhookQueue::class)
-            ->willReturn($this->webhookQueueRepository);
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
 
@@ -339,11 +307,6 @@ final class WebhookModelTest extends TestCase
         };
 
         $webhook->setEventsOrderbyDir('ASC');
-
-        $this->entityManagerMock->expects($this->once())
-            ->method('getRepository')
-            ->with(WebhookQueue::class)
-            ->willReturn($this->webhookQueueRepository);
 
         $this->webhookQueueRepository->method('getTableAlias')->willReturn('w');
         $webhookRetryTime = (new \DateTimeImmutable())
@@ -428,7 +391,11 @@ final class WebhookModelTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(Logger::class),
-            $this->createStub(WebhookService::class)
+            $this->createStub(WebhookService::class),
+            $this->webhookRepository, // $webhookRepository
+            $this->webhookQueueRepository, // $webhookQueueRepository
+            $this->createStub(\Mautic\WebhookBundle\Entity\EventRepository::class), // $eventRepository
+            $this->createStub(\Mautic\WebhookBundle\Entity\LogRepository::class), // $logRepository
         );
 
         return $model;

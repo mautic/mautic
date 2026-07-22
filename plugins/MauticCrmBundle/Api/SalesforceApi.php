@@ -286,7 +286,7 @@ class SalesforceApi extends CrmApi
                 $results              = [];
                 foreach ($chunked as $chunk) {
                     // We can only submit 25 at a time
-                    if ($chunk) {
+                    if ([] !== $chunk) {
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;
@@ -558,7 +558,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function processError(array $error, $isRetry)
+    private function processError(array $error, bool $isRetry)
     {
         switch ($error['errorCode']) {
             case 'INVALID_SESSION_ID':
@@ -580,7 +580,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function revalidateSession($isRetry): void
+    private function revalidateSession(bool $isRetry): void
     {
         if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
             throw new ApiErrorException($refreshError);
@@ -638,7 +638,7 @@ class SalesforceApi extends CrmApi
         return $this->optOutFieldAccessible;
     }
 
-    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): self
     {
         $this->optOutFieldAccessible = $optOutFieldAccessible;
 
@@ -662,7 +662,7 @@ class SalesforceApi extends CrmApi
             ));
         }
         try {
-            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $leadsQuery = sprintf($baseQuery, implode(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
         } catch (ApiErrorException $e) {
             [$missingField, $entityType] = $this->parseMissingField($e->getMessage());

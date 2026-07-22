@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerActionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -21,7 +22,7 @@ return RectorConfig::configure()
     ->withPreparedSets(
         deadCode: true,
         typeDeclarations: true,
-        // phpunitCodeQuality: true,
+        phpunitCodeQuality: true,
     )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
@@ -37,29 +38,28 @@ return RectorConfig::configure()
         // other objects
         CommonRepository::class,
         Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
+        Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ChangeMockObjectReturnUnionToIntersectionRector::class,
         TypedPropertyFromAssignsRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
+        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
-        // phpunit specific asserts
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertIssetToSpecificMethodRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWithMethodRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class,
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
+        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(38)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
@@ -67,42 +67,20 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
-        ],
-
-        // waits for descission
-        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
-
-        // fix in rector-dev
-        Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
-        ],
-
-        // offer next
-        Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
-
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
-        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
-        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
-        // checking child classes
-        Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+        // skip as might be overriden by 3rd party controllers
+        ResponseReturnTypeControllerActionRector::class => [
+            __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
+            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
+            __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
         ],
-
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
-            // a getRepository() override
-            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
-            // list lead vs lead list diff
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
+        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
@@ -114,14 +92,8 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
 
-        // from upcoming PHP 8.1
-        Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
-
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
-
-        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -142,6 +114,13 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
+
+        // will be fixed
+        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+
+        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
+        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -86,14 +87,14 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $this->leadRepository->expects(self::atLeastOnce())
+        $this->leadRepository->expects($this->atLeastOnce())
             ->method('detachEntity');
 
         $this->contactFinder->method('findByHash')
@@ -173,12 +174,10 @@ BODY;
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat): true {
+            ->willReturnCallback(function (EmailReply $emailReply) use ($stat): void {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
-
-                return true;
-            }));
+            });
 
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')

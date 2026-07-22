@@ -258,7 +258,7 @@ class PlainTextHelper
         return $preview;
     }
 
-    protected function convert()
+    protected function convert(): void
     {
         $this->linkList = [];
 
@@ -281,7 +281,7 @@ class PlainTextHelper
     /**
      * @phpstan-impure
      */
-    protected function converter(&$text)
+    protected function converter(&$text): void
     {
         $this->convertBlockquotes($text);
         $this->convertPre($text);
@@ -360,7 +360,7 @@ class PlainTextHelper
         return $display.' ['.$url.']';
     }
 
-    protected function convertPre(&$text)
+    protected function convertPre(&$text): void
     {
         // get the content of PRE element
         while (preg_match('/<pre[^>]*>(.*)<\/pre>/ismU', $text, $matches)) {
@@ -397,7 +397,7 @@ class PlainTextHelper
      *
      * @param string $text HTML content
      */
-    protected function convertBlockquotes(&$text)
+    protected function convertBlockquotes(&$text): void
     {
         if (preg_match_all('/<\/*blockquote[^>]*>/i', $text, $matches, PREG_OFFSET_CAPTURE)) {
             $start  = 0;
@@ -538,7 +538,7 @@ class PlainTextHelper
      * @param string     $breakline
      * @param bool|false $cut
      */
-    private function linewrap(string $text, $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, int $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

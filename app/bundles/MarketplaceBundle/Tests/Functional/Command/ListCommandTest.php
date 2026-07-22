@@ -10,7 +10,7 @@ use Mautic\MarketplaceBundle\Command\ListCommand;
 use Mautic\MarketplaceBundle\DTO\Allowlist as DTOAllowlist;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Exception;
 
 final class ListCommandTest extends AbstractMauticTestCase
 {
@@ -58,8 +58,8 @@ final class ListCommandTest extends AbstractMauticTestCase
         Execution time:
         EOF;
 
-        Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString($expected, $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
     }
 
     public function testCommmandWithAllowlist(): void
@@ -117,7 +117,7 @@ final class ListCommandTest extends AbstractMauticTestCase
                 return json_decode($plugin2, true);
             }
 
-            throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+            throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
         });
 
         $allowlistPayload = DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true));
@@ -151,7 +151,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         Execution time:
         EOF;
 
-        Assert::assertStringContainsString($expected, $result->getDisplay());
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString($expected, $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
     }
 }

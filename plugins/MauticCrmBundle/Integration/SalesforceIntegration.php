@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Mautic\CoreBundle\Entity\Notification;
@@ -32,7 +33,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @method SalesforceApi getApiHelper()
+ * @extends CrmAbstractIntegration<SalesforceApi>
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
@@ -364,7 +365,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if ($dataObject) {
+                if ([] !== $dataObject) {
                     $entity = null;
                     switch ($object) {
                         case 'Contact':
@@ -1425,7 +1426,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Catch left overs
-                if ($persistEntities) {
+                if ([] !== $persistEntities) {
                     $integrationEntityRepo->saveEntities($persistEntities);
                     $integrationEntityRepo->detachEntities($persistEntities);
                 }
@@ -2094,7 +2095,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticLeadFieldString,
         array $sfEntityRecords,
         $progress = null,
-    ) {
+    ): void {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
             $skipObject = false;
             $syncLead   = false;
@@ -2240,7 +2241,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array &$checkEmailsInSF,
         array &$processedLeads,
         array $objectFields,
-    ) {
+    ): void {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
                 if ($this->buildCompositeBody(
@@ -2272,7 +2273,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param int $totalCreated
      * @param int $totalErrored
      */
-    protected function makeCompositeRequest($mauticData, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0)
+    protected function makeCompositeRequest($mauticData, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): void
     {
         if (empty($mauticData)) {
             return;
@@ -2288,7 +2289,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($chunked as $chunk) {
             // We can only submit 25 at a time
-            if ($chunk) {
+            if ([] !== $chunk) {
                 $request['compositeRequest'] = $chunk;
                 $result                      = $apiHelper->syncMauticToSalesforce($request);
                 $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, true));
@@ -2745,7 +2746,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 );
             }
 
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $sfEntityRecords = $this->getSalesforceAccountsByName($checkCompaniesInSF, implode(',', array_keys($config['companyFields'])));
 
                 if (!isset($sfEntityRecords['records'])) {
@@ -2758,7 +2759,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // We're done
-            if (!$checkCompaniesInSF) {
+            if ([] === $checkCompaniesInSF) {
                 break;
             }
 
@@ -2775,7 +2776,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // Only create left over if Lead object is enabled in integration settings
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $this->prepareMauticCompaniesToCreate(
                     $mauticData,
                     $checkCompaniesInSF,
@@ -2820,7 +2821,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array $objectFields,
         array $sfEntityRecords,
         $progress = null,
-    ) {
+    ): void {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
             $update      = false;
@@ -2909,7 +2910,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array &$checkCompaniesInSF,
         array &$processedCompanies,
         array $objectFields,
-    ) {
+    ): void {
         foreach ($checkCompaniesInSF as $key => $company) {
             if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
                 if ($this->buildCompositeBody(
@@ -2977,7 +2978,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $toDate,
         &$totalCount,
         $progress = null,
-    ) {
+    ): void {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $entitiesToCreate      = $integrationEntityRepo->findLeadsToCreate(
             'Salesforce',
@@ -3078,7 +3079,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    public function getEntityManager(): \Doctrine\ORM\EntityManager
+    public function getEntityManager(): EntityManager
     {
         return $this->em;
     }

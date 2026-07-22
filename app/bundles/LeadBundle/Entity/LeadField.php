@@ -568,7 +568,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         return $this->object;
     }
 
-    public function setCharLengthLimit(?int $charLengthLimit): LeadField
+    public function setCharLengthLimit(?int $charLengthLimit): self
     {
         $this->isChanged('charLengthLimit', $charLengthLimit);
         $this->charLengthLimit = $charLengthLimit;

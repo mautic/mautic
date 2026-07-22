@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,7 +28,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
      * @param mixed[]  $filters
      * @param string[] $expectedTranslations
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('filterProvider')]
+    #[DataProvider('filterProvider')]
     public function testSegmentFilterAlertMessages(array $filters, array $expectedTranslations): void
     {
         $segment   = $this->saveSegment('Segment D', 'segment-d', $filters);
@@ -108,18 +109,18 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
-        self::assertSame(5, $leadCount);
+        $this->assertSame(5, $leadCount);
 
         $listModel->deleteEntity($segment);
         $this->em->flush();
 
-        self::assertNull($listModel->getEntity($segmentId));
+        $this->assertNotInstanceOf(LeadList::class, $listModel->getEntity($segmentId));
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
-        self::assertNull($deletedEntity);
+        $this->assertNotInstanceOf(LeadList::class, $deletedEntity);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
-        self::assertSame(0, $leadCount);
+        $this->assertSame(0, $leadCount);
     }
 
     /**

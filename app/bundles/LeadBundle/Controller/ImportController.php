@@ -52,8 +52,6 @@ class ImportController extends FormController
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    private readonly ImportModel $importModel;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -67,13 +65,8 @@ class ImportController extends FormController
         FlashBag $flashBag,
         private readonly RequestStack $requestStack,
         CorePermissions $security,
+        private readonly ImportModel $importModel,
     ) {
-        /** @var ImportModel $model */
-        $model = $modelFactory->getModel($this->getModelName());
-
-        $this->importModel = $model;
-
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -722,7 +715,7 @@ class ImportController extends FormController
 
     protected function getPermissionBase(): ?string
     {
-        return $this->getModel($this->getModelName())->getPermissionBase();
+        return $this->importModel->getPermissionBase();
     }
 
     protected function getRouteBase(): string

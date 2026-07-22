@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Field\SchemaDefinition;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SchemaDefinitionTest extends TestCase
@@ -14,11 +14,11 @@ final class SchemaDefinitionTest extends TestCase
     /**
      * @param mixed[] $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetSchemaDefinition')]
+    #[DataProvider('dataGetSchemaDefinition')]
     public function testGetSchemaDefinition(string $alias, string $type, bool $isUnique, ?int $length, array $expected): void
     {
-        Assert::assertSame($expected, SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique, $length));
-        Assert::assertSame($expected, (new SchemaDefinition())->getSchemaDefinitionNonStatic($alias, $type, $isUnique, $length));
+        $this->assertSame($expected, SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique, $length));
+        $this->assertSame($expected, (new SchemaDefinition())->getSchemaDefinitionNonStatic($alias, $type, $isUnique, $length));
     }
 
     /**
@@ -170,10 +170,10 @@ final class SchemaDefinitionTest extends TestCase
     /**
      * @param mixed[] $schemaDefinition
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetFieldCharLengthLimit')]
+    #[DataProvider('dataGetFieldCharLengthLimit')]
     public function testGetFieldCharLengthLimit(array $schemaDefinition, ?int $expected): void
     {
-        Assert::assertSame($expected, SchemaDefinition::getFieldCharLengthLimit($schemaDefinition));
+        $this->assertSame($expected, SchemaDefinition::getFieldCharLengthLimit($schemaDefinition));
     }
 
     /**

@@ -19,6 +19,8 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Form\Type\TriggerType;
@@ -26,6 +28,7 @@ use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -55,21 +58,24 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly TriggerRepository $triggerRepository,
+        private readonly TriggerEventRepository $triggerEventRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PointBundle\Entity\TriggerRepository
+    public function getRepository(): TriggerRepository
     {
-        return $this->em->getRepository(Trigger::class);
+        return $this->triggerRepository;
     }
 
     /**
      * Retrieves an instance of the TriggerEventRepository.
      */
-    public function getEventRepository(): \Mautic\PointBundle\Entity\TriggerEventRepository
+    public function getEventRepository(): TriggerEventRepository
     {
-        return $this->em->getRepository(TriggerEvent::class);
+        return $this->triggerEventRepository;
     }
 
     public function getPermissionBase(): string
@@ -80,7 +86,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -111,8 +117,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
 
-            /** @var LeadRepository $leadRepository */
-            $leadRepository = $this->em->getRepository(Lead::class);
+            $leadRepository = $this->leadRepository;
 
             foreach ($events as $event) {
                 $args = [

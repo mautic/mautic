@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -87,7 +88,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $scheduler = $this->createMock(EventScheduler::class);
 
-        /** @phpstan-ignore new.deprecated */
         $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $scheduler,
@@ -192,10 +192,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $successful = $pendingEvent->getSuccessful();
 
         // SMS should be noted as DNC
-        $this->assertFalse(empty($successful->get(2)->getMetadata()['sms']['dnc']));
+        $this->assertNotEmpty($successful->get(2)->getMetadata()['sms']['dnc']);
 
         // Nothing recorded for success
-        $this->assertTrue(empty($successful->get(1)->getMetadata()));
+        $this->assertEmpty($successful->get(1)->getMetadata());
     }
 
     public function sendMarketingMessageEmail(PendingEvent $event): void
@@ -239,10 +239,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return Event&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
+    private function getEvent(): MockObject&Event
     {
         $event = $this->getMockBuilder(Event::class)
             ->onlyMethods(['getId'])

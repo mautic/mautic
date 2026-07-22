@@ -157,6 +157,6 @@ final class TransportChainTest extends MauticMysqlTestCase
             }
         }
 
-        self::assertSame(2, $sentCount);
+        $this->assertSame(2, $sentCount);
     }
 }

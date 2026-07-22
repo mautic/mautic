@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -138,7 +139,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Tests that all contacts are temporarily failed if an Email entity happens to be incorrectly configured')]
+    #[TestDox('Tests that all contacts are temporarily failed if an Email entity happens to be incorrectly configured')]
     public function testContactsAreFailedIfSettingEmailEntityFails(): void
     {
         $this->mailHelper->method('setEmail')
@@ -168,7 +169,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $failedContacts);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Tests that bad emails are failed')]
+    #[TestDox('Tests that bad emails are failed')]
     public function testExceptionIsThrownIfEmailIsSentToBadContact(): void
     {
         $emailMock = $this->createMock(Email::class);
@@ -220,7 +221,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $failedContacts);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test a tokenized transport that limits batches does not throw BatchQueueMaxException on subsequent contacts when one fails')]
+    #[TestDox('Test a tokenized transport that limits batches does not throw BatchQueueMaxException on subsequent contacts when one fails')]
     public function testBadEmailDoesNotCauseBatchQueueMaxExceptionOnSubsequentContacts(): void
     {
         /** @var Email&MockObject $emailMock */
@@ -250,7 +251,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         );
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -332,7 +333,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         // We made it this far so all of the emails were processed despite a bad email in the batch
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test a tokenized transport that fills tokens correctly')]
+    #[TestDox('Test a tokenized transport that fills tokens correctly')]
     public function testBatchQueueContactsHaveTokensHydrated(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(2))
@@ -360,7 +361,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (EmailSendEvent $event, $eventName): EmailSendEvent {
+                function (EmailSendEvent $event, ?string $eventName): EmailSendEvent {
                     $lead = $event->getLead();
 
                     $tokens = [];
@@ -383,7 +384,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
@@ -439,7 +440,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $transport->getMetadatas());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that stat entries are saved in batches of 20')]
+    #[TestDox('Test that stat entries are saved in batches of 20')]
     public function testThatStatEntriesAreCreatedAndPersistedEveryBatch(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
@@ -466,7 +467,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -558,7 +559,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(21, $transport->getMetadatas());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that a failed email from the transport is handled')]
+    #[TestDox('Test that a failed email from the transport is handled')]
     public function testThatAFailureFromTransportIsHandled(): void
     {
         $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
@@ -584,7 +585,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $routerMock = $this->createStub(Router::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -665,7 +666,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $errorMessages);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that sending an email with invalid Bcc address is handled')]
+    #[TestDox('Test that sending an email with invalid Bcc address is handled')]
     public function testThatInvalidBccFailureIsHandled(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
@@ -689,7 +690,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $twig = $this->createStub(Environment::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $coreParametersHelper->expects($this->atLeast(3))->method('get')

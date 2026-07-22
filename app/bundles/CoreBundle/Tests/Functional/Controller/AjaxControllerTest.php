@@ -31,7 +31,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +49,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearch')]
+    #[DataProvider('dataForGlobalSearch')]
     public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
     {
         $this->em->persist($entity);
@@ -302,7 +302,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @param array<string, string|int> $roleData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearchForNonAdminUser')]
+    #[DataProvider('dataForGlobalSearchForNonAdminUser')]
     public function testGlobalSearchForNonAdminUser(
         string $searchString,
         mixed $entity,
@@ -484,13 +484,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $mockHandler = $this->getClientMockHandler();
         $mockHandler->append(
             function (RequestInterface $request): Response {
-                Assert::assertSame('GET', $request->getMethod());
+                $this->assertSame('GET', $request->getMethod());
 
                 // Later check the logged/displayed URL has no auth details.
-                Assert::assertSame(
-                    'https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz',
-                    (string) $request->getUri()
-                );
+                $this->assertSame('https://123123:test@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', (string) $request->getUri());
 
                 return new Response(SymfonyResponse::HTTP_FORBIDDEN);
             }
@@ -507,21 +504,18 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse();
         // Be aware the exception could be in mock handler expectations.
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content, $response->getContent());
-        self::assertArrayHasKey('success', $content);
-        self::assertSame(0, $content['success']);
-        self::assertArrayHasKey('error', $content);
+        $this->assertCount(2, $content, $response->getContent());
+        $this->assertArrayHasKey('success', $content);
+        $this->assertSame(0, $content['success']);
+        $this->assertArrayHasKey('error', $content);
         // Check the logged/displayed URL has no auth details.
-        self::assertStringStartsWith(
-            'Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to',
-            $content['error']
-        );
+        $this->assertStringStartsWith('Automatically fetching the IP lookup data failed. Download https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz, extract if necessary, and upload to', $content['error']);
 
-        self::assertCount(0, $mockHandler);
+        $this->assertCount(0, $mockHandler);
     }
 
     public function testGetIpLookupForm(): void
@@ -538,17 +532,17 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=getIpLookupForm&service=maxmind_download');
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
 
         $content = \json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertCount(2, $content);
-        self::assertArrayHasKey('attribution', $content);
-        self::assertArrayHasKey('html', $content);
-        self::assertIsString($content['html']);
-        self::assertStringContainsString('ip_lookup_config', $content['html']);
+        $this->assertCount(2, $content);
+        $this->assertArrayHasKey('attribution', $content);
+        $this->assertArrayHasKey('html', $content);
+        $this->assertIsString($content['html']);
+        $this->assertStringContainsString('ip_lookup_config', $content['html']);
 
-        self::assertStringNotContainsString('_token', $content['html']);
+        $this->assertStringNotContainsString('_token', $content['html']);
     }
 
     private function loginOtherUser(string $name): void

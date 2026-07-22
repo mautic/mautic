@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -142,7 +143,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @param array<string, mixed> $companyData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('companyCreateDataProvider')]
+    #[DataProvider('companyCreateDataProvider')]
     public function testCreateCompanyViaApiPlatform(array $companyData, int $expectedStatusCode): void
     {
         $this->client->request(
@@ -182,23 +183,21 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{companyData: array<string, mixed>, expectedStatusCode: int}>
+     * @return \Iterator<string, array{companyData: array<string, mixed>, expectedStatusCode: int}>
      */
-    public static function companyCreateDataProvider(): array
+    public static function companyCreateDataProvider(): \Iterator
     {
-        return [
-            'valid company with all fields' => [
-                'companyData' => [
-                    'score'       => 0,
-                    'socialCache' => [],
-                    'city'        => 'Boston',
-                    'state'       => 'Massachusetts',
-                    'country'     => 'United States',
-                    'name'        => 'Mautic',
-                    'industry'    => 'Software',
-                ],
-                'expectedStatusCode' => Response::HTTP_CREATED,
+        yield 'valid company with all fields' => [
+            'companyData' => [
+                'score'       => 0,
+                'socialCache' => [],
+                'city'        => 'Boston',
+                'state'       => 'Massachusetts',
+                'country'     => 'United States',
+                'name'        => 'Mautic',
+                'industry'    => 'Software',
             ],
+            'expectedStatusCode' => Response::HTTP_CREATED,
         ];
     }
 

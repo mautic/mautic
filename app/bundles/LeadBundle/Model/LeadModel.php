@@ -27,25 +27,36 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRule;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadCategoryRepository;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
@@ -61,14 +72,16 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
@@ -134,14 +147,30 @@ class LeadModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly LeadRepository $leadRepository,
+        private readonly TagRepository $tagRepository,
+        private readonly PointsChangeLogRepository $pointsChangeLogRepository,
+        private readonly UtmTagRepository $utmTagRepository,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly FrequencyRuleRepository $frequencyRuleRepository,
+        private readonly StagesChangeLogRepository $stagesChangeLogRepository,
+        private readonly LeadCategoryRepository $leadCategoryRepository,
+        private readonly MergeRecordRepository $mergeRecordRepository,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly GroupContactScoreRepository $groupContactScoreRepository,
+        private readonly StageRepository $stageRepository,
+        private readonly UserRepository $userRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
+        private readonly StatRepository $statRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadRepository
     {
-        /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(Lead::class);
+        $repo = $this->leadRepository;
         $repo->setDispatcher($this->dispatcher);
 
         if (!$this->repoSetup) {
@@ -166,77 +195,74 @@ class LeadModel extends FormModel
     /**
      * Get the tags repository.
      */
-    public function getTagRepository(): \Mautic\LeadBundle\Entity\TagRepository
+    public function getTagRepository(): TagRepository
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->tagRepository;
     }
 
-    public function getPointLogRepository(): \Mautic\LeadBundle\Entity\PointsChangeLogRepository
+    public function getPointLogRepository(): PointsChangeLogRepository
     {
-        return $this->em->getRepository(PointsChangeLog::class);
-    }
-
-    /**
-     * Get the tags repository.
-     */
-    public function getUtmTagRepository(): \Mautic\LeadBundle\Entity\UtmTagRepository
-    {
-        return $this->em->getRepository(UtmTag::class);
+        return $this->pointsChangeLogRepository;
     }
 
     /**
      * Get the tags repository.
      */
-    public function getDeviceRepository(): \Mautic\LeadBundle\Entity\LeadDeviceRepository
+    public function getUtmTagRepository(): UtmTagRepository
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadDevice::class);
+        return $this->utmTagRepository;
+    }
+
+    /**
+     * Get the tags repository.
+     */
+    public function getDeviceRepository(): LeadDeviceRepository
+    {
+        return $this->leadDeviceRepository;
     }
 
     /**
      * Get the lead event log repository.
      */
-    public function getEventLogRepository(): \Mautic\LeadBundle\Entity\LeadEventLogRepository
+    public function getEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     /**
      * Get the frequency rules repository.
      */
-    public function getFrequencyRuleRepository(): \Mautic\LeadBundle\Entity\FrequencyRuleRepository
+    public function getFrequencyRuleRepository(): FrequencyRuleRepository
     {
-        return $this->em->getRepository(FrequencyRule::class);
+        return $this->frequencyRuleRepository;
     }
 
-    /**
-     * Get the Stages change log repository.
-     */
-    public function getStagesChangeLogRepository(): \Mautic\LeadBundle\Entity\StagesChangeLogRepository
+    public function getStagesChangeLogRepository(): StagesChangeLogRepository
     {
-        return $this->em->getRepository(StagesChangeLog::class);
+        return $this->stagesChangeLogRepository;
     }
 
     /**
      * Get the lead categories repository.
      */
-    public function getLeadCategoryRepository(): \Mautic\LeadBundle\Entity\LeadCategoryRepository
+    public function getLeadCategoryRepository(): LeadCategoryRepository
     {
-        return $this->em->getRepository(LeadCategory::class);
+        return $this->leadCategoryRepository;
     }
 
-    public function getMergeRecordRepository(): \Mautic\LeadBundle\Entity\MergeRecordRepository
+    public function getMergeRecordRepository(): MergeRecordRepository
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\MergeRecord::class);
+        return $this->mergeRecordRepository;
     }
 
-    public function getLeadListRepository(): \Mautic\LeadBundle\Entity\LeadListRepository
+    public function getLeadListRepository(): LeadListRepository
     {
-        return $this->em->getRepository(LeadList::class);
+        return $this->leadListRepository;
     }
 
     public function getGroupContactScoreRepository(): GroupContactScoreRepository
     {
-        return $this->em->getRepository(GroupContactScore::class);
+        return $this->groupContactScoreRepository;
     }
 
     public function getPermissionBase(): string
@@ -254,11 +280,11 @@ class LeadModel extends FormModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\FormInterface<Lead>
+     * @return FormInterface<Lead>
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -546,7 +572,7 @@ class LeadModel extends FormModel
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
                 /** @var Stage|null $currentStage */
-                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
+                $currentStage = $this->stageRepository->findByIdOrName($currentLeadStageId);
                 if ($currentStage) {
                     $currentLeadStageName = $currentStage->getName();
                 }
@@ -555,7 +581,7 @@ class LeadModel extends FormModel
             $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
             if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
                 /** @var Stage|null $newStage */
-                $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
+                $newStage = $this->stageRepository->findByIdOrName($newLeadStageIdOrName);
                 if ($newStage) {
                     $lead->stageChangeLogEntry(
                         $newStage,
@@ -701,7 +727,7 @@ class LeadModel extends FormModel
 
         switch ($type) {
             case 'user':
-                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                $results = $this->userRepository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
             case 'contact':
                 $fetchResults = $this->getEntities(['start' => $start, 'limit' => $limit, 'filter' => $filter]);
@@ -729,7 +755,7 @@ class LeadModel extends FormModel
      */
     public function getOwnerList()
     {
-        return $this->em->getRepository(User::class)->getUserList('', 0);
+        return $this->userRepository->getUserList('', 0);
     }
 
     /**
@@ -910,7 +936,7 @@ class LeadModel extends FormModel
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
-        $repo = $this->em->getRepository(LeadList::class);
+        $repo = $this->leadListRepository;
 
         return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -920,9 +946,9 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getCompanies(Lead $lead)
+    public function getCompanies(Lead $lead): array
     {
-        $repo = $this->em->getRepository(CompanyLead::class);
+        $repo = $this->companyLeadRepository;
 
         return $repo->getCompaniesByLeadId($lead->getId());
     }
@@ -994,14 +1020,13 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getFrequencyRules(Lead $lead, $channel = null)
+    public function getFrequencyRules(Lead $lead, $channel = null): array
     {
         if (is_array($channel)) {
             $channel = key($channel);
         }
 
-        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepo */
-        $frequencyRuleRepo = $this->em->getRepository(FrequencyRule::class);
+        $frequencyRuleRepo = $this->frequencyRuleRepository;
         $frequencyRules    = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
 
         if (empty($frequencyRules)) {
@@ -1056,7 +1081,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($entities)) {
-            $this->em->getRepository(FrequencyRule::class)->saveEntities($entities);
+            $this->frequencyRuleRepository->saveEntities($entities);
         }
 
         foreach ($data['lead_lists'] as $leadList) {
@@ -1093,7 +1118,7 @@ class LeadModel extends FormModel
         // Delete channels that were removed
         $deleted = array_diff_key($frequencyRules, $entities);
         if (!empty($deleted)) {
-            $this->em->getRepository(FrequencyRule::class)->deleteEntities($deleted);
+            $this->frequencyRuleRepository->deleteEntities($deleted);
         }
 
         return true;
@@ -1299,7 +1324,7 @@ class LeadModel extends FormModel
         unset($fieldData['dateIdentified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->em->getRepository(User::class);
+            $userRepo      = $this->userRepository;
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $lead->setCreatedBy($createdByUser);
@@ -1308,7 +1333,7 @@ class LeadModel extends FormModel
         unset($fieldData['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->em->getRepository(User::class);
+            $userRepo       = $this->userRepository;
             $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $lead->setModifiedBy($modifiedByUser);
@@ -1352,7 +1377,7 @@ class LeadModel extends FormModel
             $stageName     = $data[$fields['stage']];
             if (!array_key_exists($stageName, $stages)) {
                 // Set stage for contact
-                $stage = $this->em->getRepository(Stage::class)->getStageByName($stageName);
+                $stage = $this->stageRepository->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -1501,7 +1526,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if ($fieldErrors) {
+        if ([] !== $fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
 
             throw new \Exception($fieldErrors);
@@ -2255,7 +2280,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($companyArray)) {
-            $this->em->getRepository(Lead::class)->saveEntity($lead);
+            $this->leadRepository->saveEntity($lead);
             $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
         }
 
@@ -2365,8 +2390,7 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository(DNC::class);
+        $dncRepo = $this->doNotContactRepository;
 
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
@@ -2394,8 +2418,7 @@ class LeadModel extends FormModel
      */
     public function getLeadEmailStats(Lead $lead): array
     {
-        /** @var StatRepository $statRepository */
-        $statRepository = $this->em->getRepository(Stat::class);
+        $statRepository = $this->statRepository;
 
         return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }

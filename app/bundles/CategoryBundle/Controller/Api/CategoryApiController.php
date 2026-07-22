@@ -22,11 +22,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class CategoryApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, CategoryModel $categoryModel)
     {
-        $categoryModel = $modelFactory->getModel('category');
-        \assert($categoryModel instanceof CategoryModel);
-
         $this->model            = $categoryModel;
         $this->entityClass      = Category::class;
         $this->entityNameOne    = 'category';

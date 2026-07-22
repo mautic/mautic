@@ -38,10 +38,9 @@ class InstallCommand extends Command
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND)
             ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',

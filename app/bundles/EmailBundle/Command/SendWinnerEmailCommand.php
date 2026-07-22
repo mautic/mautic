@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends email to winner variant after predetermined amount of time.
  */
+#[\Symfony\Component\Console\Attribute\AsCommand(name: self::COMMAND_NAME)]
 final class SendWinnerEmailCommand extends ModeratedCommand
 {
     protected static string $defaultDescription = 'Send winner email variant to remaining contacts';
@@ -34,7 +35,6 @@ final class SendWinnerEmailCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of time

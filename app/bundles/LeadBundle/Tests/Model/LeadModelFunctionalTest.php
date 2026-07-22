@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class LeadModelFunctionalTest extends MauticMysqlTestCase
@@ -74,14 +75,14 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testMultipleAssignedCompany(): void
     {
-        self::assertCount(2, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
-        self::assertCount(1, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(1, $this->getContactWithAssignTwoCompanies());
     }
 
     /**
@@ -183,7 +184,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldValueProvider')]
+    #[DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
         /** @var FieldModel $fieldModel */
@@ -255,14 +256,12 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function fieldValueProvider(): array
+    public static function fieldValueProvider(): \Iterator
     {
-        return [
-            'allowed_value'    => ['female', 'female'],
-            'disallowed_value' => ['gibberish', null],
-            'with_quotes'      => ['other\'s', 'other\'s'],
-        ];
+        yield 'allowed_value' => ['female', 'female'];
+        yield 'disallowed_value' => ['gibberish', null];
+        yield 'with_quotes' => ['other\'s', 'other\'s'];
     }
 }

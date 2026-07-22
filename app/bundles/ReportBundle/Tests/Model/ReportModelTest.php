@@ -63,7 +63,8 @@ final class ReportModelTest extends \PHPUnit\Framework\TestCase
             $translatorMock,
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(RequestStack::class)
+            $this->createStub(RequestStack::class),
+            $this->createStub(\Mautic\ReportBundle\Entity\ReportRepository::class), // $reportRepository
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

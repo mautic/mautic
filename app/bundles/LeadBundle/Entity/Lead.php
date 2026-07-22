@@ -549,7 +549,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param mixed      $val
      * @param mixed|null $oldValue
      */
-    protected function isChanged($prop, $val, $oldValue = null)
+    protected function isChanged($prop, $val, $oldValue = null): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $oldValue ?? $this->{$getter}();
@@ -1914,7 +1914,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->groupScores = $groupScores;
     }
 
-    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    public function addGroupScore(GroupContactScore $groupContactScore): self
     {
         $this->groupScores[] = $groupContactScore;
 

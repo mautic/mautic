@@ -293,8 +293,6 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
-     * Delete an entity.
-     *
      * @param object $entity
      */
     public function deleteEntity($entity): void
@@ -350,7 +348,7 @@ class FormModel extends AbstractCommonModel
         }
         $this->em->flush();
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -488,7 +486,7 @@ class FormModel extends AbstractCommonModel
      * Catch the exception in production and log the error.
      * Throw the exception in the dev mode only.
      */
-    protected function flushAndCatch()
+    protected function flushAndCatch(): void
     {
         try {
             $this->em->flush();

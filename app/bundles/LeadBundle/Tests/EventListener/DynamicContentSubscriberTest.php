@@ -32,12 +32,9 @@ final class DynamicContentSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        self::assertSame(
-            [
-                DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE => ['onContactFilterEvaluate', 0],
-            ],
-            DynamicContentSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE => ['onContactFilterEvaluate', 0],
+        ], DynamicContentSubscriber::getSubscribedEvents());
     }
 
     public function testOnContactFilterEvaluateUnknownOperator(): void
@@ -79,8 +76,8 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 
     public function testOnContactFilterEvaluateNotEmpty(): void
@@ -103,8 +100,8 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 
     public function testOnContactFilterEvaluateNotIn(): void
@@ -127,8 +124,8 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 
     public function testOnContactFilterEvaluateNotNotIn(): void
@@ -151,8 +148,8 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 
     public function testOnContactFilterEvaluateNotInAll(): void
@@ -175,8 +172,8 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 
     public function testOnContactFilterEvaluateNotNotInAll(): void
@@ -199,7 +196,7 @@ final class DynamicContentSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->subscriber->onContactFilterEvaluate($event);
-        self::assertTrue($event->isEvaluated());
-        self::assertTrue($event->isMatched());
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
     }
 }

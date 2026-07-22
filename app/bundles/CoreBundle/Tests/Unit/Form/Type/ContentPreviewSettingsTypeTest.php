@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -96,7 +97,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
     public function testGetBlockPrefix(): void
     {
-        self::assertSame('content_preview_settings', $this->form->getBlockPrefix());
+        $this->assertSame('content_preview_settings', $this->form->getBlockPrefix());
     }
 
     public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
@@ -111,7 +112,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                 'children' => [],
             ],
         ];
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
@@ -126,7 +127,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -136,7 +137,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
-                        self::assertEquals($this->contactFieldDefinition, $parameters);
+                        $this->assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -146,7 +147,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
-        $this->security->expects(self::never())
+        $this->security->expects($this->never())
             ->method('hasEntityAccess');
 
         $this->form->buildForm($builder, $options);
@@ -185,7 +186,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::never())
+        $builder->expects($this->never())
             ->method('add');
         $this->form->buildForm($builder, $options);
     }
@@ -206,9 +207,9 @@ final class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
-        $this->security->expects(self::never())
+        $this->security->expects($this->never())
             ->method('hasEntityAccess');
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
@@ -223,7 +224,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -233,7 +234,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
-                        self::assertEquals($this->contactFieldDefinition, $parameters);
+                        $this->assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -274,7 +275,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
@@ -289,7 +290,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -299,7 +300,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturnCallback(
                 function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
-                        self::assertEquals($this->contactFieldDefinition, $parameters);
+                        $this->assertEquals($this->contactFieldDefinition, $parameters);
                     }
 
                     return $builder;
@@ -368,9 +369,9 @@ final class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
-        $this->security->expects(self::never())
+        $this->security->expects($this->never())
             ->method('hasEntityAccess');
-        $matcher = self::exactly(4);
+        $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
             ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
@@ -395,11 +396,11 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     return 'nomatches';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formBuilder = $this->createMock(FormBuilderInterface::class);
-        $matcher     = self::exactly(3);
+        $matcher     = $this->exactly(3);
         $formBuilder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $expectedTranslationChoices, $parentEmailId, $expectedVariantChoices, $formBuilder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -427,7 +428,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
                     ], $parameters[2]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    self::assertEquals($this->contactFieldDefinition, $parameters);
+                    $this->assertEquals($this->contactFieldDefinition, $parameters);
                 }
 
                 return $formBuilder;

@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadEventLog>
@@ -145,7 +146,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+        $query = new QueryBuilder($this->_em->getConnection());
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -677,7 +678,7 @@ SQL;
      */
     public function markEventLogsQueued(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

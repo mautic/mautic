@@ -28,11 +28,8 @@ class RoleApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, RoleModel $roleModel)
     {
-        $roleModel = $modelFactory->getModel('user.role');
-        \assert($roleModel instanceof RoleModel);
-
         $this->model            = $roleModel;
         $this->entityClass      = Role::class;
         $this->entityNameOne    = 'role';
@@ -48,7 +45,7 @@ class RoleApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         if (isset($parameters['rawPermissions'])) {
             $this->model->setRolePermissions($entity, $parameters['rawPermissions']);

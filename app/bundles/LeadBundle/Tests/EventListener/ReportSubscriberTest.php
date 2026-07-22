@@ -28,7 +28,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -286,32 +286,28 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return \Iterator<int, array<int, string>>
      */
-    public static function eventDataProvider(): array
+    public static function eventDataProvider(): \Iterator
     {
-        return [
-            ['leads'],
-            ['contact.frequencyrules'],
-            ['lead.pointlog'],
-            ['contact.attribution.first'],
-            ['contact.attribution.multi'],
-            ['contact.attribution.last'],
-            ['companies'],
-        ];
+        yield ['leads'];
+        yield ['contact.frequencyrules'];
+        yield ['lead.pointlog'];
+        yield ['contact.attribution.first'];
+        yield ['contact.attribution.multi'];
+        yield ['contact.attribution.last'];
+        yield ['companies'];
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return \Iterator<int, array<int, string>>
      */
-    public static function reportGraphEventDataProvider(): array
+    public static function reportGraphEventDataProvider(): \Iterator
     {
-        return [
-            ['leads'],
-            ['lead.pointlog'],
-            ['contact.attribution.multi'],
-            ['companies'],
-        ];
+        yield ['leads'];
+        yield ['lead.pointlog'];
+        yield ['contact.attribution.multi'];
+        yield ['companies'];
     }
 
     public function testNotRelevantContextBuilder(): void
@@ -368,7 +364,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testOnReportBuilder(string $event): void
     {
         if ('companies' !== $event) {
@@ -839,7 +835,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $reportBuilderEvent->getTables());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testReportGenerate(string $context): void
     {
         $matcher = $this->any();
@@ -872,7 +868,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testonReportGraphGenerate(string $event): void
     {
         $this->reportGraphEventMock->expects($this->once())
@@ -944,7 +940,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGraphGenerate($this->reportGraphEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testOnReportDisplay(string $event): void
     {
         $this->reportBuilderEventMock
@@ -1045,7 +1041,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 
     public function testOnReportColumnCollectForContact(): void
@@ -1090,6 +1086,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 }
