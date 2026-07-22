@@ -42,18 +42,15 @@ final class InactiveHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->scheduler             = $this->createMock(EventScheduler::class);
-        $inactiveContactFinder       = $this->createMock(InactiveContactFinder::class);
         $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
-        $eventRepository             = $this->createMock(EventRepository::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $logger                      = $this->createMock(LoggerInterface::class);
         $decisionHelper              = new DecisionHelper($this->leadRepository);
         $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
-            $inactiveContactFinder,
+            $this->createStub(InactiveContactFinder::class),
             $this->eventLogRepository,
-            $eventRepository,
-            $logger,
+            $this->createStub(EventRepository::class),
+            $this->createStub(LoggerInterface::class),
             $decisionHelper
         );
     }
@@ -87,19 +84,19 @@ final class InactiveHelperTest extends TestCase
                 $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]);
 
-        /** @var LeadEventLog&MockObject */
+        /** @var LeadEventLog&MockObject $log */
         $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
-        /** @var Campaign&MockObject */
+        /** @var Campaign&MockObject $campaign */
         $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(2);
 
-        /** @var Event&MockObject */
+        /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);
         $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')
@@ -111,19 +108,18 @@ final class InactiveHelperTest extends TestCase
         $event->setCampaign($campaign);
         $event->setEventType(Event::TYPE_DECISION);
 
-        $parentEvent->expects($this->any())
+        $parentEvent
             ->method('getNegativeChildren')
             ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection([$event]));
 
-        $parentEvent->expects($this->any())
-            ->method('getPositiveChildren')
-            ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection());
+        $parentEvent
+            ->method('getPositiveChildren')->willReturn(new ArrayCollection());
 
         $this->leadRepository->expects($this->exactly(4))
             ->method('getContactRotations')
             ->willReturn([]);
 
-        $this->scheduler->expects($this->any())
+        $this->scheduler
             ->method('getExecutionDateTime')
             ->willReturn(\DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
 

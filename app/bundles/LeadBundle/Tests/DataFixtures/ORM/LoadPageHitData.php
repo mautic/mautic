@@ -4,13 +4,13 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $hits = [
@@ -87,7 +87,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit($hitConfig, ObjectManager $manager)
+    protected function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
@@ -106,19 +106,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    private function getManagedLead(Lead $lead, ObjectManager $manager): Lead
-    {
-        \assert($manager instanceof EntityManagerInterface);
-        $managedLead = $manager->getReference(Lead::class, $lead->getId());
-        \assert($managedLead instanceof Lead);
-
-        return $managedLead;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

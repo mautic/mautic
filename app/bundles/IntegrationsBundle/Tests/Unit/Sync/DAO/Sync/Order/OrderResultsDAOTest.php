@@ -9,7 +9,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class OrderResultsDAOTest extends TestCase
@@ -45,28 +44,28 @@ final class OrderResultsDAOTest extends TestCase
         $orderResults = new OrderResultsDAO($newObjectMappings, $updatedObjectMappings, $remappedObjects, $deletedObjects);
 
         $fooNewObjectMappings = $orderResults->getNewObjectMappings('foo');
-        Assert::assertCount(1, $fooNewObjectMappings);
-        Assert::assertEquals('abc', $fooNewObjectMappings[0]->getIntegrationObjectId());
+        $this->assertCount(1, $fooNewObjectMappings);
+        $this->assertEquals('abc', $fooNewObjectMappings[0]->getIntegrationObjectId());
 
         $barNewObjectMappings = $orderResults->getNewObjectMappings('bar');
-        Assert::assertCount(1, $barNewObjectMappings);
-        Assert::assertEquals('efg', $barNewObjectMappings[0]->getIntegrationObjectId());
+        $this->assertCount(1, $barNewObjectMappings);
+        $this->assertEquals('efg', $barNewObjectMappings[0]->getIntegrationObjectId());
 
         $fooRemappedObjects = $orderResults->getRemappedObjects('foo');
-        Assert::assertCount(1, $fooRemappedObjects);
-        Assert::assertEquals('foo1', $fooRemappedObjects[0]->getNewObjectId());
+        $this->assertCount(1, $fooRemappedObjects);
+        $this->assertEquals('foo1', $fooRemappedObjects[0]->getNewObjectId());
 
         $barRemappedObjects = $orderResults->getRemappedObjects('bar');
-        Assert::assertCount(1, $barRemappedObjects);
-        Assert::assertEquals('bar1', $barRemappedObjects[0]->getNewObjectId());
+        $this->assertCount(1, $barRemappedObjects);
+        $this->assertEquals('bar1', $barRemappedObjects[0]->getNewObjectId());
 
         $fooDeletedObjects = $orderResults->getDeletedObjects('foo');
-        Assert::assertCount(1, $fooDeletedObjects);
-        Assert::assertEquals('foo1', $fooDeletedObjects[0]->getObjectId());
+        $this->assertCount(1, $fooDeletedObjects);
+        $this->assertEquals('foo1', $fooDeletedObjects[0]->getObjectId());
 
         $barDeletedObjects = $orderResults->getDeletedObjects('bar');
-        Assert::assertCount(1, $barDeletedObjects);
-        Assert::assertEquals('bar1', $barDeletedObjects[0]->getObjectId());
+        $this->assertCount(1, $barDeletedObjects);
+        $this->assertEquals('bar1', $barDeletedObjects[0]->getObjectId());
     }
 
     public function testExceptionThrownIfObjectNotFoundForNewObjectMappings(): void
@@ -114,11 +113,11 @@ final class OrderResultsDAOTest extends TestCase
         $orderResults = new OrderResultsDAO([$newObjectMapping], [$updatedObjectMapping], [], []);
 
         $objectMappings = $orderResults->getObjectMappings('foo');
-        Assert::assertCount(2, $objectMappings);
-        Assert::assertEquals('abc', $objectMappings[0]->getIntegrationObjectId());
-        Assert::assertEquals('hij', $objectMappings[1]->getIntegrationObjectId());
+        $this->assertCount(2, $objectMappings);
+        $this->assertEquals('abc', $objectMappings[0]->getIntegrationObjectId());
+        $this->assertEquals('hij', $objectMappings[1]->getIntegrationObjectId());
 
         $objectMappings = $orderResults->getObjectMappings('bar');
-        Assert::assertEmpty($objectMappings);
+        $this->assertEmpty($objectMappings);
     }
 }

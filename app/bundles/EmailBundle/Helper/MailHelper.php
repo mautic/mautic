@@ -545,7 +545,18 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
-                $this->setMessageFrom($metadatum['from']);
+                $email = $this->getEmail();
+
+                if (!empty($metadatum['from'])) {
+                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
+                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
+                } else {
+                    $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
+                }
+                $this->setReplyToForQueueMessage(
+                    $email,
+                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
                     $this->message->addMetadata($email, $contact);
@@ -720,12 +731,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         $content = $this->twig->render($template, $vars);
 
@@ -774,7 +784,7 @@ class MailHelper
     /**
      * Set plain text for $this->message, replacing if necessary.
      */
-    protected function setMessagePlainText()
+    protected function setMessagePlainText(): void
     {
         if ($this->tokenizationEnabled && $this->plainTextSet) {
             // No need to find and replace since tokenization happens at the transport level
@@ -877,7 +887,7 @@ class MailHelper
             $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
-            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
+            $addresses = array_reduce($addresses, function (array $address, $item) use ($name): array {
                 $address[$item] = $name;
 
                 return $address;
@@ -1044,7 +1054,7 @@ class MailHelper
      *
      * @throws BatchQueueMaxException
      */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
+    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to'): void
     {
         if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
@@ -1105,9 +1115,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1283,8 +1292,6 @@ class MailHelper
     }
 
     /**
-     * Set custom headers.
-     *
      * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true): void
@@ -1374,7 +1381,7 @@ class MailHelper
                 );
             }
 
-            return "<$url>";
+            return "<{$url}>";
         }
 
         if (!empty($this->queuedRecipients) || !empty($this->lead)) {
@@ -1491,7 +1498,7 @@ class MailHelper
     /**
      * Log exception.
      */
-    protected function logError($error, $context = null)
+    protected function logError($error, $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];
@@ -1508,7 +1515,7 @@ class MailHelper
         }
 
         if ($context) {
-            $error .= " ($context)";
+            $error .= " ({$context})";
 
             if ('send' === $context) {
                 $error .= '; '.implode(', ', $this->errors['failures']);
@@ -1567,7 +1574,7 @@ class MailHelper
     /**
      * Creates a download stat for the asset.
      */
-    protected function createAssetDownloadEntries()
+    protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
         if ($this->fatal || empty($this->assetStats)) {
@@ -1604,7 +1611,7 @@ class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
      */
-    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null)
+    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
         if ($this->internalSend || empty($this->assets)) {
             return;
@@ -1662,8 +1669,6 @@ class MailHelper
     }
 
     /**
-     * Create an email stat.
-     *
      * @param bool|true   $persist
      * @param string|null $emailAddress
      */
@@ -1771,14 +1776,16 @@ class MailHelper
 
     /**
      * Generate bounce email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
@@ -1793,14 +1800,16 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
@@ -1899,7 +1908,7 @@ class MailHelper
         }
     }
 
-    private function buildMetadata($name, array $tokens): array
+    private function buildMetadata(?string $name, array $tokens): array
     {
         return [
             'name'        => $name,
@@ -1939,7 +1948,7 @@ class MailHelper
         $this->from       = $this->systemFrom;
     }
 
-    private function setDefaultReplyTo($systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
+    private function setDefaultReplyTo(?string $systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
     {
         $fromEmail = null;
         if ($systemFromEmail) {
@@ -2006,6 +2015,33 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
+        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+            $this->setMessageReplyTo($emailToSend->getFromAddress());
+
+            return;
+        }
+
+        // 4. Set the reply to address from the global config if nothing from above is set.
+        $this->setMessageReplyTo($this->getReplyTo());
+    }
+
+    private function setReplyToForQueueMessage(?Email $emailToSend, ?string $ownerEmailFromBatch = null): void
+    {
+        // 1. Set the reply to address from the email "reply-to" setting if set.
+        if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
+            $this->setMessageReplyTo($emailToSend->getReplyToAddress());
+
+            return;
+        }
+
+        // 2. Set the reply to address from the owner address used for this queued batch if set.
+        if (!empty($ownerEmailFromBatch)) {
+            $this->setMessageReplyTo($ownerEmailFromBatch);
+
+            return;
+        }
+
+        // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
         if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 

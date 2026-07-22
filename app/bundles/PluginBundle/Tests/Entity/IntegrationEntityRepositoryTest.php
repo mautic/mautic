@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use PHPUnit\Framework\Assert;
 
 /**
  * IntegrationRepository.
@@ -29,7 +28,7 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
         $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
+        $this->integrationEntityRepository = self::getContainer()->get(IntegrationEntityRepository::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void
@@ -61,9 +60,9 @@ final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
             0
         );
 
-        Assert::assertCount(1, $results);
-        Assert::assertSame($integrationEntityId, (int) $results[0]['integration_entity_id']);
-        Assert::assertSame($internalEntityId, (int) $results[0]['internal_entity_id']);
+        $this->assertCount(1, $results);
+        $this->assertSame($integrationEntityId, (int) $results[0]['integration_entity_id']);
+        $this->assertSame($internalEntityId, (int) $results[0]['internal_entity_id']);
     }
 
     public function testFindLeadsToUpdate(): void

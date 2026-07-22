@@ -103,7 +103,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['campaign:read', 'campaign:write'])]
     private $category;
 
@@ -283,10 +283,10 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @param string $prop
      * @param mixed  $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -691,12 +691,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
-    /**
-     * Get contact membership.
-     */
     public function getContactMembership(Contact $contact): Collection
     {
         return $this->leads->matching(

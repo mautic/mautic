@@ -46,7 +46,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         }
 
         $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
-        if (is_null($grapesJsBuilder)) {
+        if (null === $grapesJsBuilder) {
             return;
         }
 

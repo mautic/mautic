@@ -46,7 +46,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param string      $type
      * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
@@ -56,7 +55,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?Responses
+    public function execute(string $type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();
@@ -179,7 +178,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCampaignData($type): void
+    private function fetchCampaignData(string $type): void
     {
         if (!$this->events = $this->eventRepository->getContactPendingEvents($this->contact->getId(), $type)) {
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');

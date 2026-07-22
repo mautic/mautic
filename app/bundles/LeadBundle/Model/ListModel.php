@@ -80,6 +80,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly ListLeadRepository $listLeadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -94,8 +96,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getRepository()
     {
-        /** @var LeadListRepository $repo */
-        $repo = $this->em->getRepository(LeadList::class);
+        $repo = $this->leadListRepository;
 
         $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
@@ -105,12 +106,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Returns the repository for the table that houses the leads associated with a list.
-     *
-     * @return ListLeadRepository
      */
-    public function getListLeadRepository()
+    public function getListLeadRepository(): ListLeadRepository
     {
-        return $this->em->getRepository(ListLead::class);
+        return $this->listLeadRepository;
     }
 
     public function getPermissionBase(): string
@@ -188,7 +187,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -353,7 +352,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
-        return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
+        return $this->leadListRepository->getLists($user, $alias);
     }
 
     /**
@@ -363,17 +362,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getGlobalLists()
     {
-        return $this->em->getRepository(LeadList::class)->getGlobalLists();
+        return $this->leadListRepository->getGlobalLists();
     }
 
     /**
      * Get a list of preference center lead lists.
      *
-     * @return mixed
+     * @return array<int, array{
+     *      id: int,
+     *      name: string,
+     *      publicName: string,
+     *      alias: string
+     *   }>
      */
-    public function getPreferenceCenterLists()
+    public function getPreferenceCenterLists(): array
     {
-        return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
+        return $this->leadListRepository->getPreferenceCenterList();
     }
 
     /**
@@ -873,7 +877,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Batch sleep according to settings.
      */
-    protected function batchSleep()
+    protected function batchSleep(): void
     {
         $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
         if (false === $leadSleepTime) {
@@ -992,7 +996,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param bool $canViewOthers
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, array $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1005,7 +1009,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($filter['flag']);
         }
 
-        $allLists   = $query->getCountQuery('leads', 'id', 'date_added', null);
+        $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
         $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
@@ -1023,10 +1027,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1084,10 +1087,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

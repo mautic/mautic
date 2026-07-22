@@ -34,6 +34,7 @@ class CategoryController extends AbstractFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly CategoryModel $categoryModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -60,14 +61,18 @@ class CategoryController extends AbstractFormController
     }
 
     /**
-     * @param int $page
+     * @param string $bundle
+     * @param int    $page
      */
     public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
-        $search = $request->query->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $request->query->get('bundle', $session->get('mautic.category.type', $bundle));
+        $categoryFilter = (string) $session->get('mautic.category.filter', '');
+        $search = $request->query->get('search', $categoryFilter);
+
+        $categoryType = (string) $session->get('mautic.category.type', $bundle);
+        $bundle = $request->query->get('bundle', $categoryType);
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
@@ -79,11 +84,7 @@ class CategoryController extends AbstractFormController
         }
 
         $session->set('mautic.category.filter', $search);
-
-        // set some permissions
-        $categoryModel  = $this->getModel('category');
-        \assert($categoryModel instanceof CategoryModel);
-        $permissionBase = $categoryModel->getPermissionBase($bundle);
+        $permissionBase = $this->categoryModel->getPermissionBase($bundle);
         $permissions    = $this->security->isGranted(
             [
                 $permissionBase.':view',
@@ -127,7 +128,7 @@ class CategoryController extends AbstractFormController
         $orderBy    = $request->getSession()->get('mautic.category.orderby', 'c.title');
         $orderByDir = $request->getSession()->get('mautic.category.orderbydir', 'DESC');
 
-        $entities = $categoryModel->getEntities(
+        $entities = $this->categoryModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -205,17 +206,15 @@ class CategoryController extends AbstractFormController
      */
     public function newAction(Request $request, $bundle): JsonResponse|Response
     {
-        $model = $this->getModel('category');
-        \assert($model instanceof CategoryModel);
         $session    = $request->getSession();
-        $entity     = $model->getEntity();
+        $entity     = $this->categoryModel->getEntity();
         $success    = 0;
         $cancelled  = $valid  = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
 
         // not found
-        if (!$this->security->isGranted($model->getPermissionBase($bundle).':create')) {
+        if (!$this->security->isGranted($this->categoryModel->getPermissionBase($bundle).':create')) {
             return $this->modalAccessDenied();
         }
         // Create the form
@@ -223,7 +222,7 @@ class CategoryController extends AbstractFormController
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
-        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
+        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
         $form['inForm']->setData($inForm);
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
@@ -233,7 +232,7 @@ class CategoryController extends AbstractFormController
                     $success = 1;
 
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->categoryModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.category.notice.created', [
                         '%name%' => $entity->getTitle(),
@@ -272,7 +271,8 @@ class CategoryController extends AbstractFormController
                     'closeModal'    => 1,
                 ],
             ]);
-        } elseif (!empty($valid)) {
+        }
+        if (!empty($valid)) {
             // return edit view to prevent duplicates
             return $this->editAction($request, $bundle, $entity->getId(), true);
         }
@@ -301,9 +301,7 @@ class CategoryController extends AbstractFormController
     public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
-        $model   = $this->getModel('category');
-        \assert($model instanceof CategoryModel);
-        $entity    = $model->getEntity($objectId);
+        $entity    = $this->categoryModel->getEntity($objectId);
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
         $method    = $request->getMethod();
@@ -312,9 +310,9 @@ class CategoryController extends AbstractFormController
         // not found
         if (null === $entity) {
             $closeModal = true;
-        } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':edit')) {
+        } elseif (!$this->security->isGranted($this->categoryModel->getPermissionBase($bundle).':edit')) {
             $response = $this->modalAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->categoryModel->isLocked($entity)) {
             $flashMsg = $this->isLocked([], $entity, 'category', true);
             $this->addFlashMessage($flashMsg['msg'], $flashMsg['msgVars'], FlashBag::LEVEL_ERROR);
 
@@ -337,7 +335,7 @@ class CategoryController extends AbstractFormController
                 'bundle'       => $bundle,
             ]
         );
-        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
+        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
         $form['inForm']->setData($inForm);
 
         // /Check for a submitted form and process it
@@ -348,7 +346,7 @@ class CategoryController extends AbstractFormController
                     $success = 1;
 
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->categoryModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
                         'mautic.category.notice.updated',
@@ -367,18 +365,18 @@ class CategoryController extends AbstractFormController
                                 'bundle'       => $bundle,
                             ]
                         );
-                        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
+                        $form = $this->categoryModel->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
                     }
                 }
             } else {
                 $success = 1;
 
                 // unlock the entity
-                $model->unlockEntity($entity);
+                $this->categoryModel->unlockEntity($entity);
             }
         } else {
             // lock the entity
-            $model->lockEntity($entity);
+            $this->categoryModel->lockEntity($entity);
         }
 
         $closeModal = ($closeModal || $cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
@@ -462,9 +460,7 @@ class CategoryController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model  = $this->getModel('category');
-            \assert($model instanceof CategoryModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->categoryModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -472,14 +468,14 @@ class CategoryController extends AbstractFormController
                     'msg'     => 'mautic.category.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
+            } elseif (!$this->security->isGranted($this->categoryModel->getPermissionBase($bundle).':delete')) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->categoryModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
             }
 
             try {
-                $model->deleteEntity($entity);
+                $this->categoryModel->deleteEntity($entity);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -533,15 +529,13 @@ class CategoryController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('category');
-            \assert($model instanceof CategoryModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks and delete
             $deletedExceptions = [];
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->categoryModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -549,14 +543,14 @@ class CategoryController extends AbstractFormController
                         'msg'     => 'mautic.category.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
+                } elseif (!$this->security->isGranted($this->categoryModel->getPermissionBase($bundle).':delete')) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->categoryModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
                 } else {
                     try {
                         // Delete everything we are able to
-                        $model->deleteEntity($entity);
+                        $this->categoryModel->deleteEntity($entity);
                         $deleteIds[] = $objectId;
                     } catch (DeleteEntityDependencyException $exception) {
                         $deletedExceptions[] = $exception;

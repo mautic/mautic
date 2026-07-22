@@ -32,6 +32,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends CrmAbstractIntegration<SugarcrmApi>
+ */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
     /**
@@ -161,7 +164,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
      * @param array $parameters
      *
      * @return array
@@ -404,12 +406,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
      * @param array|null $query
      *
      * @return int|null
      */
-    public function getCompanies($params = [], $query = null, $executed = null): int|float|null
+    public function getCompanies(array $params = [], $query = null, $executed = null): int|float|null
     {
         $executed = null;
 
@@ -1096,7 +1097,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         try {
             if ($this->isAuthorized()) {
-                if (!is_null($lead->getOwner())) {
+                if (null !== $lead->getOwner()) {
                     $sugarOwnerId = $this->getApiHelper()->getIdBySugarEmail(['emails' => [$lead->getOwner()->getEmail()]]);
                     if (!empty($sugarOwnerId)) {
                         $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
@@ -1144,11 +1145,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $fields
      * @param array  $keys
      * @param string $object
      */
-    public function cleanSugarData($fields, $keys, $object): array
+    public function cleanSugarData(array $fields, $keys, $object): array
     {
         $leadFields = [];
 
@@ -1164,11 +1164,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
@@ -1250,7 +1248,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $checkEmailsInSugar = array_merge($checkEmailsUpdatedInSugar, $checkEmailsInSugar);
         }
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
-        if ($deletedSugarLeads) {
+        if ([] !== $deletedSugarLeads) {
             $integrationEntityRepo->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
         }
 
@@ -1325,7 +1323,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
-        if (is_null($lead)) {
+        if (null === $lead) {
             return;
         }
 
@@ -1470,10 +1468,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $result;
     }
 
-    /**
-     * @param array $lead
-     */
-    protected function getOwnerEmail($lead)
+    protected function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
             /** @var \Mautic\UserBundle\Entity\User $user */
@@ -1485,7 +1480,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSugarUpdate, $object, $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
+    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1605,14 +1600,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $error = 'Unknown status code '.$item['httpStatusCode'];
                     // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
                 }
             }
 
-            if ($persistEntities) {
+            if ([] !== $persistEntities) {
                 $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 unset($persistEntities);

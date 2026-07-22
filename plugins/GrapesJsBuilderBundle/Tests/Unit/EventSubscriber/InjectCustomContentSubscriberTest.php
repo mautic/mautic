@@ -20,16 +20,24 @@ use Twig\Environment;
 
 final class InjectCustomContentSubscriberTest extends TestCase
 {
-    /** @var MockObject&Config */
+    /**
+     * @var MockObject&Config
+     */
     private MockObject $config;
 
-    /** @var MockObject&GrapesJsBuilderModel */
+    /**
+     * @var MockObject&GrapesJsBuilderModel
+     */
     private MockObject $model;
 
-    /** @var MockObject&Environment */
+    /**
+     * @var MockObject&Environment
+     */
     private MockObject $twig;
 
-    /** @var MockObject&RouterInterface */
+    /**
+     * @var MockObject&RouterInterface
+     */
     private MockObject $router;
 
     protected function setUp(): void
@@ -49,11 +57,11 @@ final class InjectCustomContentSubscriberTest extends TestCase
         $subscriber = new InjectCustomContentSubscriber($this->config, $this->model, $this->twig, $requestStack, $this->router);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
 
-        $this->twig->expects(self::never())->method('render');
+        $this->twig->expects($this->never())->method('render');
 
         $subscriber->injectViewCustomContent($event);
 
-        self::assertSame([], $event->getContent());
+        $this->assertSame([], $event->getContent());
     }
 
     public function testInjectViewCustomContentUsesRequestCustomMjmlOnPost(): void
@@ -82,7 +90,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $subscriber->injectViewCustomContent($event);
 
-        self::assertSame(['<div>ok</div>'], $event->getContent());
+        $this->assertSame(['<div>ok</div>'], $event->getContent());
     }
 
     public function testInjectViewCustomContentUsesStoredMjmlOnGet(): void
@@ -109,7 +117,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $subscriber->injectViewCustomContent($event);
 
-        self::assertSame(['<div>stored</div>'], $event->getContent());
+        $this->assertSame(['<div>stored</div>'], $event->getContent());
     }
 
     public function testInjectViewCustomContentInjectsPageHeaderVars(): void
@@ -119,7 +127,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $this->config->method('isPublished')->willReturn(true);
 
-        $this->router->expects(self::exactly(3))
+        $this->router->expects($this->exactly(3))
             ->method('generate')
             ->willReturnMap([
                 ['grapesjsbuilder_assets', [], 0, 'https://example.test/assets'],
@@ -144,6 +152,6 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $subscriber->injectViewCustomContent($event);
 
-        self::assertSame(['<script>vars</script>'], $event->getContent());
+        $this->assertSame(['<script>vars</script>'], $event->getContent());
     }
 }

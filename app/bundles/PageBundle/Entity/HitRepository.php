@@ -179,8 +179,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count email clickthrough.
-     *
      * @return int
      */
     public function countEmailClickthrough()
@@ -194,11 +192,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Count how many visitors hit some page in last X $seconds.
-     *
-     * @param int  $seconds
-     * @param bool $notLeft
      */
-    public function countVisitors($seconds = 60, $notLeft = false): int
+    public function countVisitors(int $seconds = 60, bool $notLeft = false): int
     {
         $now         = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
@@ -226,8 +221,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the latest hit.
-     *
      * @param array{
      *     leadId?: int,
      *     urls?: string[]|string|null,
@@ -281,9 +274,9 @@ class HitRepository extends CommonRepository
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
+        $pages      = $q->select("p.id, p.{$hitsColumn} as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->where($q->expr()->$inOrEq('p.id', $pageIds))
+            ->where($q->expr()->{$inOrEq}('p.id', $pageIds))
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -301,7 +294,7 @@ class HitRepository extends CommonRepository
         // else we would have recorded the date_left on a subsequent page hit
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
-            $q->expr()->$inOrEq('h.page_id', $pageIds),
+            $q->expr()->{$inOrEq}('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),
             $q->expr()->isNull('h.date_left')
         );

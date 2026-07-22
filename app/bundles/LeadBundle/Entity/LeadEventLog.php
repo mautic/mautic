@@ -122,17 +122,11 @@ class LeadEventLog
             ->build();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
-    /**
-     * Set lead.
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
@@ -141,8 +135,6 @@ class LeadEventLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead|null
      */
     public function getLead()
@@ -151,8 +143,6 @@ class LeadEventLog
     }
 
     /**
-     * Set userId.
-     *
      * @param int $userId
      */
     public function setUserId($userId): static
@@ -163,8 +153,6 @@ class LeadEventLog
     }
 
     /**
-     * Get userId.
-     *
      * @return int|null
      */
     public function getUserId()
@@ -173,8 +161,6 @@ class LeadEventLog
     }
 
     /**
-     * Set object.
-     *
      * @param string $object
      */
     public function setObject($object): static
@@ -185,8 +171,6 @@ class LeadEventLog
     }
 
     /**
-     * Get object.
-     *
      * @return string|null
      */
     public function getObject()
@@ -195,8 +179,6 @@ class LeadEventLog
     }
 
     /**
-     * Set objectId.
-     *
      * @param int $objectId
      */
     public function setObjectId($objectId): static
@@ -207,8 +189,6 @@ class LeadEventLog
     }
 
     /**
-     * Get objectId.
-     *
      * @return int|null
      */
     public function getObjectId()
@@ -217,8 +197,6 @@ class LeadEventLog
     }
 
     /**
-     * Set action.
-     *
      * @param string $action
      */
     public function setAction($action): static
@@ -229,8 +207,6 @@ class LeadEventLog
     }
 
     /**
-     * Get action.
-     *
      * @return string|null
      */
     public function getAction()
@@ -238,9 +214,6 @@ class LeadEventLog
         return $this->action;
     }
 
-    /**
-     * Set properties.
-     */
     public function setProperties(array $properties): static
     {
         $this->properties = $properties;
@@ -262,8 +235,6 @@ class LeadEventLog
     }
 
     /**
-     * Get properties.
-     *
      * @return array|null
      */
     public function getProperties()
@@ -272,8 +243,6 @@ class LeadEventLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -284,8 +253,6 @@ class LeadEventLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -294,8 +261,6 @@ class LeadEventLog
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
      */
     public function setBundle($bundle): static
@@ -306,8 +271,6 @@ class LeadEventLog
     }
 
     /**
-     * Get bundle.
-     *
      * @return string|null
      */
     public function getBundle()
@@ -316,8 +279,6 @@ class LeadEventLog
     }
 
     /**
-     * Set userName.
-     *
      * @param string $userName
      */
     public function setUserName($userName): static
@@ -328,8 +289,6 @@ class LeadEventLog
     }
 
     /**
-     * Get userName.
-     *
      * @return string|null
      */
     public function getUserName()

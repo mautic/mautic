@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Tests email unsubscribe statistics generation with various filters and permissions.
@@ -48,7 +49,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
         $this->createLeadsAndStats();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('statsFilterProvider')]
+    #[DataProvider('statsFilterProvider')]
     public function testStatsWithFilters(
         bool $canViewOthers,
         bool $useCampaignFilter,
@@ -264,6 +265,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
 
         // Create campaign_lead_event_log entries (required for campaign filter)
         $leadEventLog1 = new LeadEventLog();
+        $this->assertInstanceOf(Event::class, $event);
         $leadEventLog1->setEvent($event);
         $leadEventLog1->setLead($this->lead1);
         $leadEventLog1->setCampaign($this->campaign);
@@ -286,6 +288,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
         $stat1->setEmailAddress($this->lead1->getEmail());
         $stat1->setDateSent(new \DateTime());
         $stat1->setSource('campaign.event');
+        $this->assertInstanceOf(Event::class, $event);
         $stat1->setSourceId($event->getId());
         $this->em->persist($stat1);
 

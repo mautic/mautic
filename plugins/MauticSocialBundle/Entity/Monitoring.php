@@ -158,8 +158,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -168,8 +166,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -178,8 +174,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get lists.
-     *
      * @return array
      */
     public function getLists()
@@ -188,8 +182,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get network type.
-     *
      * @return string
      */
     public function getNetworkType()
@@ -198,8 +190,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get revision.
-     *
      * @return int
      */
     public function getRevision()
@@ -218,8 +208,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get title.
-     *
      * @return string
      */
     public function getTitle()
@@ -228,8 +216,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -238,8 +224,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishDown()
@@ -248,8 +232,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishUp()
@@ -269,8 +251,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      */
     public function setDescription($description): static
@@ -292,9 +272,6 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * Set the network type.
-     */
     public function setNetworkType($networkType): static
     {
         $this->isChanged('networkType', $networkType);
@@ -343,8 +320,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      */
     public function setProperties($properties): static
@@ -356,8 +331,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      */
     public function setPublishDown($publishDown): static
@@ -369,8 +342,6 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      */
     public function setPublishUp($publishUp): static

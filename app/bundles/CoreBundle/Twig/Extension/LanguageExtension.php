@@ -10,11 +10,12 @@ use Twig\TwigFilter;
 
 class LanguageExtension extends AbstractExtension
 {
-    public function __construct(private readonly Security $security)
-    {
+    public function __construct(
+        private readonly Security $security,
+    ) {
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('language_name', $this->getLanguageName(...)),

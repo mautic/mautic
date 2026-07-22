@@ -101,7 +101,7 @@ class ExportHelper
             return $zipFilePath;
         }
 
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+        throw new FilePathException("Could not create zip archive at {$zipFilePath}.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse

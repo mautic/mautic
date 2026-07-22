@@ -330,8 +330,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Merge api keys.
-     *
      * @param bool|false $return Returns the key array rather than setting them
      *
      * @return void|array
@@ -417,7 +415,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if (0 !== count($keys) && 0 === count($decrypted)) {
                 $decrypted = $this->decryptApiKeys($keys);
                 $this->encryptAndSetApiKeys($decrypted, $entity);
-                $this->em->flush($entity);
+                $this->em->flush();
             }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
                 PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
@@ -429,8 +427,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Encrypts API keys.
-     *
      * @return array
      */
     public function encryptApiKeys(array $keys)
@@ -446,8 +442,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Decrypts API keys.
-     *
      * @param bool $mainDecryptOnly
      *
      * @return array
@@ -592,21 +586,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
 
                 return implode('; ', $errors);
-            } elseif (!empty($response->error->message)) {
+            }
+            if (!empty($response->error->message)) {
                 return $response->error->message;
             }
 
             return (string) $response;
-        } elseif (is_array($response)) {
+        }
+        if (is_array($response)) {
             if (isset($response['error_description'])) {
                 return $response['error_description'];
-            } elseif (isset($response['error'])) {
+            }
+            if (isset($response['error'])) {
                 if (is_array($response['error'])) {
                     return $response['error']['message'] ?? implode(', ', $response['error']);
                 }
 
                 return $response['error'];
-            } elseif (isset($response['errors'])) {
+            }
+            if (isset($response['errors'])) {
                 $errors = [];
                 foreach ($response['errors'] as $err) {
                     if (is_array($err)) {
@@ -956,7 +954,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         }
 
                         $headers = [
-                            "oauth-token: $authTokenKey",
+                            "oauth-token: {$authTokenKey}",
                             "Authorization: OAuth {$authToken}",
                         ];
                     }
@@ -1395,7 +1393,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
          * @param $mauticFields
          * @param $fieldType
          */
-        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
+        $cleanup = function (array &$mappedFields, array $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
             $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
             $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
 
@@ -1838,11 +1836,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
                 $values = $data[$field];
             } else {
-                if (!isset($data->$field)) {
+                if (!isset($data->{$field})) {
                     $info[$field] = '';
                     continue;
                 }
-                $values = $data->$field;
+                $values = $data->{$field};
             }
 
             switch ($fieldDetails['type']) {
@@ -1852,10 +1850,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
                 case 'object':
                     foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
+                        if (isset($values->{$f})) {
                             $fn = $this->matchFieldName($field, $f);
 
-                            $info[$fn] = $values->$f;
+                            $info[$fn] = $values->{$f};
                         }
                     }
                     break;
@@ -2150,7 +2148,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    protected function dispatchIntegrationKeyEvent($eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
@@ -2408,14 +2406,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return bool
      */
-    public function isCompoundMauticField($fieldName)
+    public function isCompoundMauticField(string $fieldName)
     {
         $compoundFields = [
             'mauticContactTimelineLink' => 'mauticContactTimelineLink',
             'mauticContactId'           => 'mauticContactId',
         ];
 
-        if (true === $this->updateDncByDate()) {
+        if ($this->updateDncByDate()) {
             $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
         }
 

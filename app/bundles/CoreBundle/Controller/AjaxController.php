@@ -13,6 +13,7 @@ use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Service\SearchCommandListInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,17 +22,25 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonController
 {
+    private NotificationModel $notificationModel;
+
+    #[Required]
+    public function autowireCoreAjaxController(NotificationModel $notificationModel): void
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
     /**
-     * @param array $dataArray
-     * @param int   $statusCode
-     * @param bool  $addIgnoreWdt
+     * @param int  $statusCode
+     * @param bool $addIgnoreWdt
      *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
+    protected function sendJsonResponse(array $dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 
@@ -50,13 +59,11 @@ class AjaxController extends CommonController
 
     /**
      * Executes an action requested via ajax.
-     *
-     * @return Response
      */
     public function delegateAjaxAction(
         Request $request,
         AuthorizationCheckerInterface $authorizationChecker,
-    ) {
+    ): Response|JsonResponse {
         // process ajax actions
         $action     = $request->get('action');
         $bundleName = null;
@@ -107,14 +114,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 0]);
     }
 
-    /**
-     * @return Response
-     */
     public function executeAjaxAction(
         Request $request,
         $action,
         $bundle = null,
-    ) {
+    ): Response|JsonResponse {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
                 static::class.'::'.$action.'Action',
@@ -324,10 +328,7 @@ class AjaxController extends CommonController
     public function clearNotificationAction(Request $request): JsonResponse
     {
         $id = (int) $request->get('id', 0);
-
-        /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
-        $model = $this->getModel('core.notification');
-        $model->clearNotification($id, 200);
+        $this->notificationModel->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);
     }
@@ -373,7 +374,7 @@ class AjaxController extends CommonController
                         $dataArray['error'] = $this->translator->trans(
                             'mautic.core.ip_lookup.remote_fetch_error',
                             [
-                                '%remoteUrl%' => $remoteUrl,
+                                '%remoteUrl%' => AbstractLocalDataLookup::cleanUrl($remoteUrl),
                                 '%localPath%' => $localPath,
                             ]
                         );
@@ -396,8 +397,8 @@ class AjaxController extends CommonController
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 
-        if ($request->request->has('service')) {
-            $serviceName = $request->request->get('service');
+        if ($request->query->has('service')) {
+            $serviceName = $request->query->get('service');
 
             $ipService = $ipServiceFactory->getService($serviceName);
 
@@ -408,9 +409,20 @@ class AjaxController extends CommonController
                         $themes   = $ipService->getConfigFormThemes();
                         $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
 
-                        $form = $formFactory->create($formType, [], ['ip_lookup_service' => $ipService]);
+                        $form = $formFactory->createBuilder()
+                            ->add(
+                                'ip_lookup_config',
+                                $formType,
+                                [
+                                    'label'             => false,
+                                    'ip_lookup_service' => $ipService,
+                                    'csrf_protection'   => false,
+                                ]
+                            )
+                            ->getForm();
+
                         $html = $this->renderView(
-                            '@MauticCore/FormTheme/Config/ip_lookup_config_row.html.twig',
+                            '@MauticCore/Default/ajax_form.html.twig',
                             [
                                 'form'       => $form->createView(),
                                 'formThemes' => $themes,

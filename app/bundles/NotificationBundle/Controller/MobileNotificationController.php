@@ -14,19 +14,30 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class MobileNotificationController extends FormController
 {
     use EntityContactsTrait;
+
+    private NotificationModel $notificationModel;
+
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireMobileNotificationController(
+        AuditLogModel $auditLogModel,
+        NotificationModel $notificationModel,
+    ): void {
+        $this->auditLogModel = $auditLogModel;
+        $this->notificationModel = $notificationModel;
+    }
 
     /**
      * @param int $page
      */
     public function indexAction(Request $request, $page = 1): Response
     {
-        /** @var NotificationModel $model */
-        $model = $this->getModel('notification');
-
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -82,7 +93,7 @@ class MobileNotificationController extends FormController
         $orderBy    = $session->get('mautic.mobile_notification.orderby', 'e.name');
         $orderByDir = $session->get('mautic.mobile_notification.orderbydir', 'DESC');
 
-        $notifications = $model->getEntities(
+        $notifications = $this->notificationModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -128,7 +139,7 @@ class MobileNotificationController extends FormController
                     'limit'       => $limit,
                     'tmpl'        => $request->get('tmpl', 'index'),
                     'permissions' => $permissions,
-                    'model'       => $model,
+                    'model'       => $this->notificationModel,
                     'security'    => $this->security,
                 ],
                 'contentTemplate' => '@MauticNotification/MobileNotification/list.html.twig',
@@ -146,12 +157,10 @@ class MobileNotificationController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        /** @var NotificationModel $model */
-        $model    = $this->getModel('notification');
         $security = $this->security;
 
-        /** @var Notification $notification */
-        $notification = $model->getEntity($objectId);
+        $notification = $this->notificationModel->getEntity($objectId);
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.mobile_notification.page', 1);
 
@@ -177,7 +186,8 @@ class MobileNotificationController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $notification->getCreatedBy()
@@ -185,17 +195,13 @@ class MobileNotificationController extends FormController
         ) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs = $auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        $logs = $this->auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        $entityViews     = $model->getHitsLineChartData(
+        $entityViews     = $this->notificationModel->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -204,7 +210,7 @@ class MobileNotificationController extends FormController
         );
 
         // Get click through stats
-        $trackableLinks = $model->getNotificationClickStats($notification->getId());
+        $trackableLinks = $this->notificationModel->getNotificationClickStats($notification->getId());
 
         [$translationParent, $translationChildren] = $notification->getTranslations();
 
@@ -258,12 +264,9 @@ class MobileNotificationController extends FormController
      */
     public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null)
     {
-        /** @var NotificationModel $model */
-        $model = $this->getModel('notification');
-
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
-            $entity = $model->getEntity();
+            $entity = $this->notificationModel->getEntity();
         }
 
         $method  = $request->getMethod();
@@ -286,7 +289,7 @@ class MobileNotificationController extends FormController
         }
 
         // create the form
-        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->notificationModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -294,7 +297,7 @@ class MobileNotificationController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity);
+                    $this->notificationModel->saveEntity($entity);
 
                     $this->addFlashMessage(
                         'mautic.core.notice.created',
@@ -395,10 +398,8 @@ class MobileNotificationController extends FormController
      */
     public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var NotificationModel $model */
-        $model   = $this->getModel('notification');
         $method  = $request->getMethod();
-        $entity  = $model->getEntity($objectId);
+        $entity  = $this->notificationModel->getEntity($objectId);
         $session = $request->getSession();
         $page    = $session->get('mautic.mobile_notification.page', 1);
 
@@ -431,14 +432,15 @@ class MobileNotificationController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $entity->getCreatedBy()
         )
         ) {
             $this->throwAccessDenied();
-        } elseif ($model->isLocked($entity)) {
+        } elseif ($this->notificationModel->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'notification');
         }
@@ -450,7 +452,7 @@ class MobileNotificationController extends FormController
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->notificationModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
@@ -458,7 +460,7 @@ class MobileNotificationController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->notificationModel->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -480,7 +482,7 @@ class MobileNotificationController extends FormController
                 // clear any modified content
                 $session->remove('mautic.mobile_notification.'.$objectId.'.content');
                 // unlock the entity
-                $model->unlockEntity($entity);
+                $this->notificationModel->unlockEntity($entity);
             }
 
             $template    = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
@@ -523,7 +525,7 @@ class MobileNotificationController extends FormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($entity);
+            $this->notificationModel->lockEntity($entity);
         }
 
         $integration = $integrationHelper->getIntegrationObject('OneSignal');
@@ -555,13 +557,10 @@ class MobileNotificationController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
+    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
     {
-        $model  = $this->getModel('notification');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->notificationModel->getEntity($objectId);
 
         if (null != $entity) {
             if (!$this->security->isGranted('notification:mobile_notifications:create')
@@ -575,10 +574,6 @@ class MobileNotificationController extends FormController
             }
 
             $entity      = clone $entity;
-            $session     = $request->getSession();
-            $contentName = 'mautic.mobile_notification.'.$entity->getId().'.content';
-
-            $session->set($contentName, $entity->getContent());
         }
 
         return $this->newAction($request, $integrationHelper, $entity);
@@ -606,9 +601,7 @@ class MobileNotificationController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('notification');
-            \assert($model instanceof NotificationModel);
-            $entity = $model->getEntity($objectId);
+            $entity = $this->notificationModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -623,11 +616,11 @@ class MobileNotificationController extends FormController
             )
             ) {
                 $this->throwAccessDenied();
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->notificationModel->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
             }
 
-            $model->deleteEntity($entity);
+            $this->notificationModel->deleteEntity($entity);
 
             $flashes[] = [
                 'type'    => 'notice',
@@ -669,15 +662,13 @@ class MobileNotificationController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('notification');
-            \assert($model instanceof NotificationModel);
             $ids = json_decode($request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->notificationModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -692,7 +683,7 @@ class MobileNotificationController extends FormController
                 )
                 ) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->notificationModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'notification', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -701,7 +692,7 @@ class MobileNotificationController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->notificationModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -725,9 +716,7 @@ class MobileNotificationController extends FormController
 
     public function previewAction($objectId): Response
     {
-        /** @var NotificationModel $model */
-        $model        = $this->getModel('notification');
-        $notification = $model->getEntity($objectId);
+        $notification = $this->notificationModel->getEntity($objectId);
 
         return $this->delegateView(
             [

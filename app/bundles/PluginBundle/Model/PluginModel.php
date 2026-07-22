@@ -15,7 +15,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,21 +39,20 @@ class PluginModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly PluginRepository $pluginRepository,
+        private readonly IntegrationEntityRepository $integrationEntityRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PluginBundle\Entity\PluginRepository
-     */
-    public function getRepository()
+    public function getRepository(): PluginRepository
     {
-        return $this->em->getRepository(Plugin::class);
+        return $this->pluginRepository;
     }
 
-    public function getIntegrationEntityRepository()
+    public function getIntegrationEntityRepository(): IntegrationEntityRepository
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->integrationEntityRepository;
     }
 
     public function getPermissionBase(): string
@@ -70,8 +71,6 @@ class PluginModel extends FormModel
     }
 
     /**
-     * Get Company fields.
-     *
      * @return mixed[]
      */
     public function getCompanyFields(): array

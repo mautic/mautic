@@ -76,7 +76,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
@@ -115,17 +115,11 @@ class LeadList extends FormEntity implements UuidInterface
      */
     private $leads;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltDate;
+    private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
-    /**
-     * @var float|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltTime;
+    private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -280,7 +274,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(?Category $category = null): LeadList
+    public function setCategory(?Category $category = null): self
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -294,8 +288,6 @@ class LeadList extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publicName.
-     *
      * @return string|null
      */
     public function getPublicName()
@@ -528,6 +520,6 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 }

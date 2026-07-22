@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -57,82 +56,82 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
     public function testFailConfigMediaPathWithDots(): void
     {
         $crawler = $this->setImagePathRequest('media/..');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('..');
-        Assert::assertStringContainsString('The image path is invalid', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid', $crawler->text());
 
         $crawler = $this->setImagePathRequest('...');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('./');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('../');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('./../');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
     }
 
     public function testFailConfigMediaPathWithSystemDirectories(): void
     {
         $crawler = $this->setImagePathRequest('app/');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('app\\');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('app\\..');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('app/../');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('app\\../');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('app\\..\\');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('bin');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('bin/');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('themes');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
     }
 
     public function testFoldersThatDontExist(): void
     {
         $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/this-folder-does-not-exist');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/this-folder-does-not-exist/');
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
     }
 
     public function testValidFolders(): void
     {
         $crawler = $this->setImagePathRequest('media/');
-        Assert::assertStringNotContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
 
         $crawler = $this->setImagePathRequest('media/files/');
-        Assert::assertStringNotContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
 
         $newFolder = $this->getContainer()->getParameter('mautic.image_path').'/../../media/newFolder';
 
         $crawler = $this->setImagePathRequest('media/newFolder');
 
-        Assert::assertStringContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
 
         if (!file_exists($newFolder)) {
             mkdir($newFolder, 0777, true);
@@ -140,7 +139,7 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
 
         $crawler = $this->setImagePathRequest('media/newFolder');
 
-        Assert::assertStringNotContainsString('The image path is invalid.', $crawler->text());
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
 
         if (is_dir($newFolder)) {
             rmdir($newFolder);

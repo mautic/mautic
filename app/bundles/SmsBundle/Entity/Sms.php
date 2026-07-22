@@ -110,7 +110,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['sms:read', 'sms:write'])]
     private $category;
 
@@ -288,10 +288,10 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         self::addProjectsInLoadApiMetadata($metadata, 'sms');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';

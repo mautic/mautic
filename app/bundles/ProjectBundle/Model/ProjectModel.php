@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Psr\Log\LoggerInterface;
@@ -30,21 +29,20 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
         private readonly ProjectEntityLoaderService $entityLoaderService,
+        private readonly ProjectRepository $projectRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function getRepository(): ProjectRepository
     {
-        $repository = $this->em->getRepository(Project::class);
+        $repository = $this->projectRepository;
         \assert($repository instanceof ProjectRepository);
 
         return $repository;
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param string               $type
      * @param string               $filter
      * @param int                  $limit

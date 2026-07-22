@@ -75,9 +75,6 @@ class ContactMerger
         return $winner;
     }
 
-    /**
-     * Merge timestamps.
-     */
     public function mergeTimestamps(Lead $winner, Lead $loser): static
     {
         // The winner should keep the most recent last active timestamp of the two
@@ -262,7 +259,7 @@ class ContactMerger
             $this->logger->debug('CONTACT: Associating '.$winner->getId().' with company '.$loserCompanyLead->getCompany()->getId());
         }
 
-        if ($newCompanyLeads) {
+        if ([] !== $newCompanyLeads) {
             // Pass $new = false so the repository does not reset the winner's existing primary company
             $this->companyLeadRepository->saveEntities($newCompanyLeads, false);
             $this->companyLeadRepository->detachEntities($newCompanyLeads);

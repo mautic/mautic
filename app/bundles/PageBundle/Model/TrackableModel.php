@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
@@ -71,16 +72,14 @@ class TrackableModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly TrackableRepository $trackableRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
-     */
-    public function getRepository()
+    public function getRepository(): TrackableRepository
     {
-        return $this->em->getRepository(Trackable::class);
+        return $this->trackableRepository;
     }
 
     protected function getRedirectModel(): RedirectModel
@@ -89,15 +88,14 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array      $clickthrough
-     * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param bool|false $shortenUrl If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
      *
      * @return string
      */
     public function generateTrackableUrl(
         Trackable $trackable,
-        $clickthrough = [],
+        array $clickthrough = [],
         $shortenUrl = false,
         $utmTags = [],
     ) {
@@ -240,15 +238,13 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string|string[] $content
      * @param string[]        $contentTokens
-     * @param ?string         $channel
-     * @param ?int            $channelId
      * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -405,9 +401,6 @@ class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    /**
-     * Create a Trackable entity.
-     */
     protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
         $redirect = $this->getRedirectModel()->createRedirectEntity($url);
@@ -564,11 +557,11 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
-     * @param $urlParts Array from parse_url
+     * @param array<string, mixed> $urlParts from parse_url
      *
      * @return array|false
      */
-    protected function extractTokensFromQuery(&$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts)
     {
         $tokenizedParams = false;
 
@@ -669,17 +662,15 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    private function isContactFieldToken($token): bool
+    private function isContactFieldToken(string $token): bool
     {
-        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield') || str_contains($token, '{ownerfield');
     }
 
     /**
      * @param array<int|string, Redirect|Trackable> $trackableTokens
-     *
-     * @return string
      */
-    private function parseContent($content, $channel, $channelId, array &$trackableTokens)
+    private function parseContent(string $content, ?string $channel, ?int $channelId, array &$trackableTokens): string
     {
         $this->hasFirstPassReplacements = false;
 

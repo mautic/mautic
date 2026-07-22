@@ -15,7 +15,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class LeadModelFunctionalTest extends MauticMysqlTestCase
@@ -28,7 +30,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = static::getContainer()->get('event_dispatcher');
-        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
+        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
@@ -46,6 +48,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         // Clear from doctrine memory so we get a fresh entity to ensure the points are definitely saved
         $em->detach($lead);
         $lead = $model->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertEquals(10, $lead->getPoints());
     }
@@ -72,14 +75,14 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testMultipleAssignedCompany(): void
     {
-        self::assertCount(2, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
-        self::assertCount(1, $this->getContactWithAssignTwoCompanies());
+        $this->assertCount(1, $this->getContactWithAssignTwoCompanies());
     }
 
     /**
@@ -120,7 +123,9 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testGetCustomLeadFieldLength(): void
     {
+        /** @var LeadModel $leadModel */
         $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
@@ -171,6 +176,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->expectException(DBALException::class);
 
+        /** @var LeadModel $leadModel */
         $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
@@ -178,9 +184,10 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldValueProvider')]
+    #[DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = self::getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
@@ -197,6 +204,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
+        /** @var LeadModel $leadModel */
         $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
 
         $fields = [
@@ -242,19 +250,18 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertSame($expectedValue, $lead->getFieldValue($selectField->getAlias()));
     }
 
     /**
-     * @return array<mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function fieldValueProvider(): array
+    public static function fieldValueProvider(): \Iterator
     {
-        return [
-            'allowed_value'    => ['female', 'female'],
-            'disallowed_value' => ['gibberish', null],
-            'with_quotes'      => ['other\'s', 'other\'s'],
-        ];
+        yield 'allowed_value' => ['female', 'female'];
+        yield 'disallowed_value' => ['gibberish', null];
+        yield 'with_quotes' => ['other\'s', 'other\'s'];
     }
 }

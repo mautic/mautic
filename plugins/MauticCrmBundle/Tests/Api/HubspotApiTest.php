@@ -7,11 +7,12 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
 final class HubspotApiTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test Hubspot api when the api-key is invalid')]
+    #[TestDox('Test Hubspot api when the api-key is invalid')]
     public function testHubspotWhenKeyIsInvalid(): void
     {
         $integration = $this->createMock(HubspotIntegration::class);

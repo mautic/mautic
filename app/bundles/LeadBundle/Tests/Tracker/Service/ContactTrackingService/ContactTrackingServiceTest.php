@@ -64,7 +64,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     public function testGetTrackedLeadNoTrackedIdentifier(): void
@@ -81,7 +81,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -98,7 +98,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->cookieHelperMock->expects($matcher)
-            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId) {
+            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId): mixed {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_session_id', $parameters[0]);
                     $this->assertNull($parameters[1]);
@@ -111,6 +111,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
@@ -119,7 +121,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -137,7 +139,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->cookieHelperMock->expects($matcher)
-            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId) {
+            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId): mixed {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_session_id', $parameters[0]);
                     $this->assertNull($parameters[1]);
@@ -150,6 +152,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
@@ -163,7 +167,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -182,7 +186,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->cookieHelperMock->expects($matcher)
-            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId) {
+            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId): mixed {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_session_id', $parameters[0]);
                     $this->assertNull($parameters[1]);
@@ -195,6 +199,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
@@ -213,7 +219,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -232,7 +238,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->cookieHelperMock->expects($matcher)
-            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId) {
+            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId): mixed {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_session_id', $parameters[0]);
                     $this->assertNull($parameters[1]);
@@ -245,6 +251,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $requestMock->expects($this->once())
@@ -282,7 +290,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->cookieHelperMock->expects($matcher)
-            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId, $leadId) {
+            ->method('getCookie')->willReturnCallback(function (...$parameters) use ($matcher, $trackingId, $leadId): mixed {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_session_id', $parameters[0]);
                     $this->assertNull($parameters[1]);
@@ -295,6 +303,8 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                     return $leadId;
                 }
+
+                return null;
             });
 
         $this->leadRepositoryMock->expects($this->once())

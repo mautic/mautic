@@ -125,7 +125,7 @@ final class PageHitValidatorTest extends TestCase
 
         $context->expects($this->once())
             ->method('buildViolation')
-            ->with($this->equalTo('page_id / redirect_id / page_url & page_title should not be empty'))
+            ->with('page_id / redirect_id / page_url & page_title should not be empty')
             ->willReturn($builder);
 
         $pageHitValidator = new PageHitValidator($this->coreParametersHelperMock);

@@ -16,8 +16,12 @@ class EmailDraft
      */
     private int $id;
 
-    public function __construct(private Email $email, private ?string $html, private ?string $template, private ?bool $publicPreview = true)
-    {
+    public function __construct(
+        private Email $email,
+        private ?string $html,
+        private ?string $template,
+        private ?bool $publicPreview = true,
+    ) {
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

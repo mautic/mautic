@@ -47,10 +47,10 @@ class FormApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $fieldModel,
+        private readonly ActionModel $actionModel,
     ) {
-        $formModel = $modelFactory->getModel('form');
-        \assert($formModel instanceof FormModel);
-
         $this->model            = $formModel;
         $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
@@ -67,10 +67,8 @@ class FormApiController extends CommonApiController
 
     /**
      * Delete fields from a form.
-     *
-     * @return Response
      */
-    public function deleteFieldsAction(Request $request, $formId)
+    public function deleteFieldsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -97,10 +95,8 @@ class FormApiController extends CommonApiController
 
     /**
      * Delete fields from a form.
-     *
-     * @return Response
      */
-    public function deleteActionsAction(Request $request, $formId)
+    public function deleteActionsAction(Request $request, $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -133,10 +129,6 @@ class FormApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $fieldModel = $this->getModel('form.field');
-        \assert($fieldModel instanceof FieldModel);
-        $actionModel = $this->getModel('form.action');
-        \assert($actionModel instanceof ActionModel);
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
         $alias  = $entity->getAlias();
@@ -173,13 +165,13 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    $fieldEntity       = $fieldModel->getEntity();
+                    $fieldEntity       = $this->fieldModel->getEntity();
                 } else {
-                    $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
+                    $fieldEntity       = $this->fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }
 
-                if (is_null($fieldEntity)) {
+                if (null === $fieldEntity) {
                     $msg = $this->translator->trans(
                         'mautic.core.error.entity.not.found',
                         [
@@ -197,7 +189,7 @@ class FormApiController extends CommonApiController
                 $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
 
                 if (!empty($fieldParams['alias'])) {
-                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
+                    $fieldParams['alias'] = $this->fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
                         $fieldEntityArray['alias'] = $fieldParams['alias'];
@@ -205,7 +197,7 @@ class FormApiController extends CommonApiController
                 }
 
                 if (empty($fieldEntityArray['alias'])) {
-                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
+                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $this->fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
                 }
 
                 // Check that the alias is not already in use by another field
@@ -240,7 +232,7 @@ class FormApiController extends CommonApiController
                 }
             }
 
-            if ($fieldsToDelete) {
+            if ([] !== $fieldsToDelete) {
                 $this->model->deleteFields($entity, $fieldsToDelete);
             }
         }
@@ -251,9 +243,9 @@ class FormApiController extends CommonApiController
             foreach ($parameters['actions'] as &$actionParams) {
                 if (empty($actionParams['id'])) {
                     $actionParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    $actionEntity       = $actionModel->getEntity();
+                    $actionEntity       = $this->actionModel->getEntity();
                 } else {
-                    $actionEntity       = $actionModel->getEntity($actionParams['id']);
+                    $actionEntity       = $this->actionModel->getEntity($actionParams['id']);
                     $requestActionIds[] = $actionParams['id'];
                 }
 
@@ -287,7 +279,7 @@ class FormApiController extends CommonApiController
                 }
             }
 
-            if ($actionsToDelete) {
+            if ([] !== $actionsToDelete) {
                 $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
@@ -300,15 +292,10 @@ class FormApiController extends CommonApiController
      */
     protected function createActionEntityForm(Action $entity, array $action)
     {
-        /** @var FormModel $formModel */
-        $formModel  = $this->getModel('form');
-        $components = $formModel->getCustomComponents();
+        $components = $this->formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
 
-        $formActionModel = $this->getModel('form.action');
-        \assert($formActionModel instanceof ActionModel);
-
-        return $formActionModel->createForm(
+        return $this->actionModel->createForm(
             $entity,
             $this->formFactory,
             null,
@@ -327,10 +314,7 @@ class FormApiController extends CommonApiController
      */
     protected function createFieldEntityForm($entity)
     {
-        $formFieldModel = $this->getModel('form.field');
-        \assert($formFieldModel instanceof FieldModel);
-
-        return $formFieldModel->createForm(
+        return $this->fieldModel->createForm(
             $entity,
             $this->formFactory,
             null,

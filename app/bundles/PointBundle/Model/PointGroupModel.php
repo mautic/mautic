@@ -17,15 +17,24 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Group>
  */
 class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private GroupRepository $groupRepository;
+
+    #[Required]
+    public function autowirePointGroupModel(GroupRepository $groupRepository): void
+    {
+        $this->groupRepository = $groupRepository;
+    }
+
     public function getRepository(): GroupRepository
     {
-        return $this->em->getRepository(Group::class);
+        return $this->groupRepository;
     }
 
     public function getPermissionBase(): string

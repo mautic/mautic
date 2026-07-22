@@ -20,6 +20,8 @@ use Mautic\PointBundle\Form\Type\PointInsightType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -37,16 +39,14 @@ class InsightModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly PointInsightRepository $pointInsightRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return PointInsightRepository
-     */
-    public function getRepository()
+    public function getRepository(): PointInsightRepository
     {
-        return $this->em->getRepository(PointInsight::class);
+        return $this->pointInsightRepository;
     }
 
     public function getPermissionBase(): string
@@ -57,12 +57,12 @@ class InsightModel extends CommonFormModel
     /**
      * @param array<string, mixed> $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof PointInsight) {
-            throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['PointInsight']);
+            throw new MethodNotAllowedHttpException(['PointInsight']);
         }
 
         if (!empty($action)) {

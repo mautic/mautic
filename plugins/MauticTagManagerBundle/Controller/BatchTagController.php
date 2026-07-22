@@ -8,9 +8,19 @@ use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class BatchTagController extends AbstractFormController
 {
+    private TagModel $tagModel;
+
+    #[Required]
+    public function autowireBatchTagController(
+        TagModel $tagModel,
+    ): void {
+        $this->tagModel = $tagModel;
+    }
+
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_tagmanager_batch_set_action');
@@ -49,8 +59,6 @@ class BatchTagController extends AbstractFormController
     public function execAction(Request $request): JsonResponse
     {
         $params   = $request->get('batch_tag');
-        $tagModel = $this->getModel('tagmanager.tag');
-        assert($tagModel instanceof TagModel);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
         if (empty($ids)) {
             $this->addFlashMessage('mautic.core.error.ids.missing');
@@ -81,11 +89,11 @@ class BatchTagController extends AbstractFormController
         }
 
         if (!empty($tagsToAdd)) {
-            $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+            $this->tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
         }
 
         if (!empty($tagsToRemove)) {
-            $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+            $this->tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
         }
 
         $this->addFlashMessage('mautic.lead.batch_leads_affected', [

@@ -14,7 +14,6 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 
 final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -38,6 +37,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
         $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
+        /** @var ListModel $segmentModel */
         $segmentModel = static::getContainer()->get('mautic.lead.model.list');
         $this->assertInstanceOf(ListModel::class, $segmentModel);
 
@@ -53,15 +53,15 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $contacts = [new Lead()];
         $contactRepository->saveEntities($contacts);
 
-        Assert::assertFalse($webhookQueueRepository->exists($webhook->getId()));
+        $this->assertFalse($webhookQueueRepository->exists($webhook->getId()));
 
         $segmentModel->addLead($contacts[0], $segment);
 
-        Assert::assertTrue($webhookQueueRepository->exists($webhook->getId()));
+        $this->assertTrue($webhookQueueRepository->exists($webhook->getId()));
 
         $queueWebhook   = $webhookQueueRepository->getEntity(1);
         $decodedPayload = json_decode($queueWebhook->getPayload(), true);
-        Assert::assertEquals('added', $decodedPayload['action']);
+        $this->assertEquals('added', $decodedPayload['action']);
     }
 
     private function createWebhook(): Webhook

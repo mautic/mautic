@@ -31,6 +31,7 @@ use Mautic\WebhookBundle\WebhookEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
@@ -137,6 +138,10 @@ class WebhookModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly WebhookService $webhookService,
+        private readonly WebhookRepository $webhookRepository,
+        private readonly WebhookQueueRepository $webhookQueueRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LogRepository $logRepository,
     ) {
         $this->setConfigProps($coreParametersHelper);
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -160,7 +165,7 @@ class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -184,12 +189,9 @@ class WebhookModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return WebhookRepository
-     */
-    public function getRepository()
+    public function getRepository(): WebhookRepository
     {
-        return $this->em->getRepository(Webhook::class);
+        return $this->webhookRepository;
     }
 
     /**
@@ -461,28 +463,19 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
     }
 
-    /**
-     * @return WebhookQueueRepository
-     */
-    public function getQueueRepository()
+    public function getQueueRepository(): WebhookQueueRepository
     {
-        return $this->em->getRepository(WebhookQueue::class);
+        return $this->webhookQueueRepository;
     }
 
-    /**
-     * @return EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
-        return $this->em->getRepository(Event::class);
+        return $this->eventRepository;
     }
 
-    /**
-     * @return LogRepository
-     */
-    public function getLogRepository()
+    public function getLogRepository(): LogRepository
     {
-        return $this->em->getRepository(Log::class);
+        return $this->logRepository;
     }
 
     /**
@@ -541,7 +534,6 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
         $webhookRetryTime = (new \DateTimeImmutable())

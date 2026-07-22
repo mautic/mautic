@@ -161,12 +161,12 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('p.language', ":$unique").' OR '.$q->expr()->like('p.language', ":$langUnique").')';
+                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.$q->expr()->like('p.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -189,7 +189,7 @@ class PageRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -250,8 +250,6 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant

@@ -55,6 +55,8 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly ProcessSignalService $processSignalService,
+        private readonly ImportRepository $importRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -216,7 +218,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            throw new ImportFailedException('Database had been overloaded');
+            throw new ImportFailedException('Database had been overloaded', $e->getCode(), $e);
         }
 
         $import->end();
@@ -504,9 +506,8 @@ class ImportModel extends FormModel
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
@@ -545,20 +546,14 @@ class ImportModel extends FormModel
         return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
-    /**
-     * @return ImportRepository
-     */
-    public function getRepository()
+    public function getRepository(): ImportRepository
     {
-        return $this->em->getRepository(Import::class);
+        return $this->importRepository;
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
@@ -642,7 +637,7 @@ class ImportModel extends FormModel
      *
      * @param string $msg
      */
-    protected function logDebug($msg, ?Import $import = null)
+    protected function logDebug($msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

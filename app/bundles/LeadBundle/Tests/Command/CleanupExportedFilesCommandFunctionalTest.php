@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Command\CleanupExportedFilesCommand;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCase
@@ -31,7 +31,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
         $filePath = $this->exportContactToCsvFile();
 
         $this->testSymfonyCommand(CleanupExportedFilesCommand::COMMAND_NAME);
-        Assert::assertFileDoesNotExist($filePath);
+        $this->assertFileDoesNotExist($filePath);
     }
 
     private function exportContactToCsvFile(): string
@@ -53,7 +53,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
-        Assert::assertFileExists($filePath);
+        $this->assertFileExists($filePath);
 
         return $filePath;
     }
@@ -71,6 +71,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
         $leadModel->saveEntities($contacts);
     }
@@ -82,7 +83,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
     {
         $repo    = $this->em->getRepository(ContactExportScheduler::class);
         $allRows = $repo->findAll();
-        Assert::assertCount($count, $allRows);
+        $this->assertCount($count, $allRows);
 
         return $allRows;
     }

@@ -6,13 +6,13 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 
 class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $dnc = new DoNotContact();
@@ -25,19 +25,7 @@ class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    private function getManagedLead(Lead $lead, ObjectManager $manager): Lead
-    {
-        \assert($manager instanceof EntityManagerInterface);
-        $managedLead = $manager->getReference(Lead::class, $lead->getId());
-        \assert($managedLead instanceof Lead);
-
-        return $managedLead;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 8;
     }

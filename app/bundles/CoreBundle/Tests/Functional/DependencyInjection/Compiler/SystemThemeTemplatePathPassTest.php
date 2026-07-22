@@ -19,6 +19,7 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
         // This test require cache to be cleared
         // as the template override must exist before the cache is generated.
+        /** @var PathsHelper $pathsHelper */
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
         $this->assertInstanceOf(PathsHelper::class, $pathsHelper);
         $cacheDir    = $pathsHelper->getCachePath();
@@ -40,11 +41,11 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
     public function testUserProfilePageOverrideFromSystemThemDirectory(): void
     {
-        Assert::assertFileExists($this->getOverridePath().'/index.html.twig');
+        $this->assertFileExists($this->getOverridePath().'/index.html.twig');
 
         $this->client->request(Request::METHOD_GET, '/s/account');
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Override test', $this->client->getResponse()->getContent(), 'Page has not override.');
+        $this->assertStringContainsString('Override test', (string) $this->client->getResponse()->getContent(), 'Page has not override.');
     }
 
     protected function beforeTearDown(): void

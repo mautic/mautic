@@ -7,6 +7,8 @@ namespace Mautic\LeadBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,24 +22,22 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, list<array<string, bool>>>
+     * @return \Iterator<int, list<array<string, bool>>>
      */
-    public static function joinIpAddressesProvider(): array
+    public static function joinIpAddressesProvider(): \Iterator
     {
-        return [
-            [[]],
-            [['joinIpAddresses' => true]],
-            [['joinIpAddresses' => false]],
-        ];
+        yield [[]];
+        yield [['joinIpAddresses' => true]];
+        yield [['joinIpAddresses' => false]];
     }
 
     /**
      * @param array<string, bool> $args
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('joinIpAddressesProvider')]
+    #[DataProvider('joinIpAddressesProvider')]
     public function testSaveIpAddressToContacts(array $args): void
     {
-        $contactRepo = $this->em->getRepository(Lead::class);
+        $contactRepo = self::getContainer()->get(LeadRepository::class);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();
@@ -73,9 +73,9 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         foreach ($finalQueries as $query) {
             if ($args['joinIpAddresses'] ?? true) {
-                $this->assertStringContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+                $this->assertStringContainsString('LEFT JOIN test_ip_addresses', (string) $query['sql']);
             } else {
-                $this->assertStringNotContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+                $this->assertStringNotContainsString('LEFT JOIN test_ip_addresses', (string) $query['sql']);
             }
         }
     }

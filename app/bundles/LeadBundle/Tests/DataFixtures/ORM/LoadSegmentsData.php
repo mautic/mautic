@@ -4,14 +4,19 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
+    public function __construct(
+        private readonly ListModel $listModel,
+        private readonly LeadModel $contactModel,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
         $segments = [
@@ -1062,7 +1067,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    protected function createSegment($listConfig, ObjectManager $manager)
+    protected function createSegment(array $listConfig, ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');
 
@@ -1079,40 +1084,24 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->persist($list);
         $manager->flush();
 
+        if ($listConfig['populate']) {
+            $this->listModel->rebuildListLeads($list);
+        }
+
         if (!empty($listConfig['manually_add'])) {
             foreach ($listConfig['manually_add'] as $lead) {
-                $this->createManualMembership($manager, $list, (int) $lead, true);
+                $this->contactModel->addToLists($lead, $list);
             }
         }
 
         if (!empty($listConfig['manually_remove'])) {
             foreach ($listConfig['manually_remove'] as $lead) {
-                $this->createManualMembership($manager, $list, (int) $lead, false);
+                $this->contactModel->removeFromLists($lead, $list);
             }
         }
     }
 
-    private function createManualMembership(ObjectManager $manager, LeadList $list, int $leadId, bool $manuallyAdded): void
-    {
-        \assert($manager instanceof EntityManagerInterface);
-        $lead = $manager->getReference(Lead::class, $leadId);
-        \assert($lead instanceof Lead);
-
-        $listLead = new ListLead();
-        $listLead->setList($list);
-        $listLead->setLead($lead);
-        $listLead->setDateAdded(new \DateTime());
-        $listLead->setManuallyAdded($manuallyAdded);
-        $listLead->setManuallyRemoved(!$manuallyAdded);
-
-        $manager->persist($listLead);
-        $manager->flush();
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 7;
     }

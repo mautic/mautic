@@ -36,7 +36,8 @@ class CommonEntity implements \Stringable
     {
         if (str_starts_with($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ('getName' === $name && method_exists($this, 'getTitle')) {
+        }
+        if ('getName' === $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
@@ -62,7 +63,7 @@ class CommonEntity implements \Stringable
     protected function isChanged($prop, $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
