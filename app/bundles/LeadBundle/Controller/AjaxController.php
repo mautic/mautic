@@ -34,6 +34,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
@@ -46,7 +47,7 @@ class AjaxController extends CommonAjaxController
 
     private EmailModel $emailModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireLeadAjaxController(
         LeadModel $leadModel,
         FieldModel $leadFieldModel,

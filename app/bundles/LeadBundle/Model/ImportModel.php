@@ -637,7 +637,7 @@ class ImportModel extends FormModel
      *
      * @param string $msg
      */
-    protected function logDebug($msg, ?Import $import = null)
+    protected function logDebug($msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

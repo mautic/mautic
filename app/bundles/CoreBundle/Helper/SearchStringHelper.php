@@ -86,7 +86,7 @@ class SearchStringHelper
         }
     }
 
-    protected function addFilterCommand(&$filters, $mergeFilter)
+    protected function addFilterCommand(&$filters, $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {

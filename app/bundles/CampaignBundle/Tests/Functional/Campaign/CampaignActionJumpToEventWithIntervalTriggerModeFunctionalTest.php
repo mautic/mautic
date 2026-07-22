@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
@@ -32,7 +33,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
+    #[DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
     public function testCampaignWithJumpToEventWithIntervalTriggerMode(Event $adjustPointEvent, callable $assertEventLog): void
     {
         // Create Campaign

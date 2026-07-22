@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -207,7 +208,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())

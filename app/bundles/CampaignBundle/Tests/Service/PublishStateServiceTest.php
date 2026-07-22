@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PublishStateServiceTest extends MauticMysqlTestCase
 {
@@ -19,7 +20,7 @@ final class PublishStateServiceTest extends MauticMysqlTestCase
      * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
      * @param array<array{fromDate: ?string, toDate: ?string}>                           $expectedunpublishedranges
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('unpublishStateDataProvider')]
+    #[DataProvider('unpublishStateDataProvider')]
     public function testUnpublishStateCompilationFromAuditLog(array $auditLogs, array $expectedunpublishedranges, ?string $expectedLastPublishedDate, ?int $expectedUnpublishedSecondsSinceCampaignCreated = null): void
     {
         $campaign     = new Campaign();

@@ -9,12 +9,13 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class TriggerEventController extends CommonFormController
 {
     private TriggerModel $triggerModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTriggerEventController(TriggerModel $triggerModel): void
     {
         $this->triggerModel = $triggerModel;

@@ -1395,7 +1395,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
-    protected function postSaveEntity($entity)
+    protected function postSaveEntity($entity): void
     {
         // Check if points need to be appended
         if ($entity->getPointChanges()) {
@@ -1414,7 +1414,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    protected function prepareDbalFieldsForSave(array &$fields)
+    protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Do not save points as they are handled by postSaveEntity
         unset($fields['points']);

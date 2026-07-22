@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -371,7 +372,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
      * @throws NotSupported
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
+    #[DataProvider('scheduleProvider')]
     public function testScheduleEdit(?string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();

@@ -10,6 +10,7 @@ use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class ReportGenerator
 {
@@ -45,9 +46,9 @@ class ReportGenerator
     /**
      * @param array $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\FormInterface<Report>
+     * @return FormInterface<Report>
      */
-    public function getForm(Report $entity, $options): \Symfony\Component\Form\FormInterface
+    public function getForm(Report $entity, $options): FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
