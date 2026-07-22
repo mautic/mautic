@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Validator\Constraints\Upload;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -176,7 +177,7 @@ class Asset extends FormEntity implements UuidInterface
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $category;
@@ -620,7 +621,7 @@ class Asset extends FormEntity implements UuidInterface
         return $this->language;
     }
 
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null): static
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -629,7 +630,7 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Mautic\CategoryBundle\Entity\Category|null
+     * @return Category|null
      */
     public function getCategory()
     {

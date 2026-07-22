@@ -9,12 +9,13 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
 use Mautic\EmailBundle\Entity\EmailDraftRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class EmailDraftModel extends AbstractCommonModel
 {
     private EmailDraftRepository $emailDraftRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireEmailDraftModel(EmailDraftRepository $emailDraftRepository): void
     {
         $this->emailDraftRepository = $emailDraftRepository;

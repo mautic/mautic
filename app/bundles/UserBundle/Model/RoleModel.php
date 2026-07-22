@@ -4,29 +4,33 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Role>
  */
 class RoleModel extends FormModel implements GlobalSearchInterface
 {
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
-    private \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository;
+    private PermissionRepository $permissionRepository;
 
     private RoleRepository $roleRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireRoleModel(RoleRepository $roleRepository, \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository, \Mautic\UserBundle\Entity\UserRepository $userRepository): void
+    #[Required]
+    public function autowireRoleModel(RoleRepository $roleRepository, PermissionRepository $permissionRepository, UserRepository $userRepository): void
     {
         $this->roleRepository = $roleRepository;
         $this->permissionRepository = $permissionRepository;
@@ -102,7 +106,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);

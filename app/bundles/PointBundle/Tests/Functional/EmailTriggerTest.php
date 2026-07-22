@@ -8,14 +8,16 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailTriggerTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
     {
         $email = new Email();
@@ -42,8 +44,8 @@ final class EmailTriggerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', (string) $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
     {
         $trigger      = $this->createTrigger();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -121,7 +122,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         return $eventListener;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventListenerDataProvider')]
+    #[DataProvider('eventListenerDataProvider')]
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
@@ -172,7 +173,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('slugifyDataProvider')]
+    #[DataProvider('slugifyDataProvider')]
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();

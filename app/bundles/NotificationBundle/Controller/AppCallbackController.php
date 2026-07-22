@@ -9,12 +9,13 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AppCallbackController extends CommonController
 {
     private NotificationModel $notificationModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireAppCallbackController(
         NotificationModel $notificationModel,
     ): void {
