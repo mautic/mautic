@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -31,10 +30,10 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         ]);
         $filters = array_values($entity->getFilters());
 
-        Assert::assertCount(1, $filters);
-        Assert::assertSame('preferred_locale', $filters[0]['field']);
-        Assert::assertSame('locale', $filters[0]['type']);
-        Assert::assertSame(self::LOCALE_VALUE, $filters[0]['filter']);
+        $this->assertCount(1, $filters);
+        $this->assertSame('preferred_locale', $filters[0]['field']);
+        $this->assertSame('locale', $filters[0]['type']);
+        $this->assertSame(self::LOCALE_VALUE, $filters[0]['filter']);
     }
 
     public function testTimezoneFilterValueIsAcceptedByTheForm(): void
@@ -44,10 +43,10 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         ]);
         $filters = array_values($entity->getFilters());
 
-        Assert::assertCount(1, $filters);
-        Assert::assertSame('timezone', $filters[0]['field']);
-        Assert::assertSame('timezone', $filters[0]['type']);
-        Assert::assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
+        $this->assertCount(1, $filters);
+        $this->assertSame('timezone', $filters[0]['field']);
+        $this->assertSame('timezone', $filters[0]['type']);
+        $this->assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
     }
 
     public function testTimezoneLocaleAndRegionFiltersAreSavedTogether(): void
@@ -59,10 +58,10 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         ]);
         $filters = array_values($entity->getFilters());
 
-        Assert::assertCount(3, $filters);
-        Assert::assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
-        Assert::assertSame(self::LOCALE_VALUE, $filters[1]['filter']);
-        Assert::assertSame(self::REGION_VALUE, $filters[2]['filter']);
+        $this->assertCount(3, $filters);
+        $this->assertSame(self::TIMEZONE_VALUE, $filters[0]['filter']);
+        $this->assertSame(self::LOCALE_VALUE, $filters[1]['filter']);
+        $this->assertSame(self::REGION_VALUE, $filters[2]['filter']);
     }
 
     public function testInvalidLocaleFilterValueIsRejectedByTheForm(): void
@@ -85,7 +84,7 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $entity = $this->em->getRepository(DynamicContent::class)->findOneBy(['name' => $name]);
-        Assert::assertNull($entity, 'A DWC with an invalid locale filter value must not be saved.');
+        $this->assertNull($entity, 'A DWC with an invalid locale filter value must not be saved.');
     }
 
     /**
@@ -113,7 +112,7 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $entity = $this->em->getRepository(DynamicContent::class)->findOneBy(['name' => $name]);
-        Assert::assertInstanceOf(DynamicContent::class, $entity, 'The DWC should have been saved.');
+        $this->assertInstanceOf(DynamicContent::class, $entity, 'The DWC should have been saved.');
 
         return $entity;
     }

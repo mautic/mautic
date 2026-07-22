@@ -243,8 +243,8 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         $formHtml = $crawler->html();
 
-        Assert::assertStringContainsString('preferred_locale', $formHtml);
-        Assert::assertStringContainsString('timezone', $formHtml);
+        $this->assertStringContainsString('preferred_locale', $formHtml);
+        $this->assertStringContainsString('timezone', $formHtml);
 
         $buttonCrawler = $crawler->selectButton('Save');
         $form          = $buttonCrawler->form();
@@ -256,11 +256,11 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         $content = $crawler->text();
 
-        Assert::assertStringNotContainsString('This value is not valid', $content);
-        Assert::assertStringNotContainsString('form-error', $crawler->html());
+        $this->assertStringNotContainsString('This value is not valid', $content);
+        $this->assertStringNotContainsString('form-error', $crawler->html());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Edit Dynamic Content', $content);
-        Assert::assertStringContainsString('Test Locale Timezone Filter Validation', $content);
+        $this->assertStringContainsString('Edit Dynamic Content', $content);
+        $this->assertStringContainsString('Test Locale Timezone Filter Validation', $content);
     }
 }
