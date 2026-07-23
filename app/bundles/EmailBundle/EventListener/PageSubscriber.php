@@ -9,7 +9,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EmailModel $emailModel,

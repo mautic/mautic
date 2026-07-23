@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessBounceSubscriber implements EventSubscriberInterface
+final class ProcessBounceSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 

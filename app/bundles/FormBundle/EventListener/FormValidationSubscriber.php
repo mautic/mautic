@@ -13,7 +13,7 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormValidationSubscriber implements EventSubscriberInterface
+final class FormValidationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

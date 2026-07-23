@@ -12,7 +12,7 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListSubscriber implements EventSubscriberInterface
+final class LeadListSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IntegrationHelper $helper,

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TagModel $model,

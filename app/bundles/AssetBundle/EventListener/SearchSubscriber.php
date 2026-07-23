@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AssetModel $assetModel,

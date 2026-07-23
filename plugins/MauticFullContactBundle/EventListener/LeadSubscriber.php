@@ -8,7 +8,7 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LookupHelper $lookupHelper,

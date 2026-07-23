@@ -8,7 +8,7 @@ use Mautic\UserBundle\Event as Events;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class UserSubscriber implements EventSubscriberInterface
+final class UserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,

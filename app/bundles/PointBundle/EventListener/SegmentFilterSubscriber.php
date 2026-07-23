@@ -12,7 +12,7 @@ use Mautic\PointBundle\Entity\GroupRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentFilterSubscriber implements EventSubscriberInterface
+final class SegmentFilterSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly GroupRepository $groupRepository,

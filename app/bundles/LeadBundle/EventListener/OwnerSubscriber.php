@@ -13,7 +13,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OwnerSubscriber implements EventSubscriberInterface
+final class OwnerSubscriber implements EventSubscriberInterface
 {
     private const OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
 

@@ -34,7 +34,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EmailModel $emailModel,

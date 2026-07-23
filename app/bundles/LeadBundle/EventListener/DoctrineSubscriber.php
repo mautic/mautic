@@ -11,7 +11,7 @@ use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
-class DoctrineSubscriber
+final class DoctrineSubscriber
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]

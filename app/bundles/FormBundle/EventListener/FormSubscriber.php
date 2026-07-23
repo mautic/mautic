@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final class FormSubscriber implements EventSubscriberInterface
 {
     private readonly MailHelper $mailer;
 

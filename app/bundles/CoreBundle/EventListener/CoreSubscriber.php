@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class CoreSubscriber implements EventSubscriberInterface
+final class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly BundleHelper $bundleHelper,

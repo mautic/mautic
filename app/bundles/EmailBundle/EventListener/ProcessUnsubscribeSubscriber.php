@@ -11,7 +11,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
+final class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 

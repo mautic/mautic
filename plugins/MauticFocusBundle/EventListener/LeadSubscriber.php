@@ -11,7 +11,7 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Translator $translator,

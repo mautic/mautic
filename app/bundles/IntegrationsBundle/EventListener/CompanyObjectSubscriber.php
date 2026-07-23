@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\Compan
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class CompanyObjectSubscriber implements EventSubscriberInterface
+final class CompanyObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly CompanyObjectHelper $companyObjectHelper,

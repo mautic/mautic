@@ -11,7 +11,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriber implements EventSubscriberInterface
+final class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,

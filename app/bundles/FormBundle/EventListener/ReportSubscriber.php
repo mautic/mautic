@@ -18,7 +18,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
 

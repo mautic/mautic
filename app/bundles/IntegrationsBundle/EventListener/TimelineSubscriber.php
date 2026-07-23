@@ -10,7 +10,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TimelineSubscriber implements EventSubscriberInterface
+final class TimelineSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LeadEventLogRepository $eventLogRepository,

@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-class CacheClearSubscriber implements CacheClearerInterface
+final class CacheClearSubscriber implements CacheClearerInterface
 {
     /**
      * @param CacheProvider $cacheProvider

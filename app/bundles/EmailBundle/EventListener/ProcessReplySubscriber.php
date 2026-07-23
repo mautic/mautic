@@ -10,7 +10,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessReplySubscriber implements EventSubscriberInterface
+final class ProcessReplySubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 

@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AssetsHelper $assetsHelper,

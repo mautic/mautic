@@ -8,7 +8,7 @@ use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,

@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BroadcastSubscriber implements EventSubscriberInterface
+final class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EmailModel $model,

@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AssetModel $assetModel,

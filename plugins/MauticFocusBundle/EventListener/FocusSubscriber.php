@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-class FocusSubscriber implements EventSubscriberInterface
+final class FocusSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RouterInterface $router,

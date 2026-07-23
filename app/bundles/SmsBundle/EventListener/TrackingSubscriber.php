@@ -8,7 +8,7 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TrackingSubscriber implements EventSubscriberInterface
+final class TrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly StatRepository $statRepository,

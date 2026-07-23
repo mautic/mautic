@@ -8,7 +8,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportNormalizeSubscriber implements EventSubscriberInterface
+final class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly FieldModel $fieldModel,

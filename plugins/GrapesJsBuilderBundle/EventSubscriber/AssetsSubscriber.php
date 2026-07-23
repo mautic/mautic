@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AssetsSubscriber implements EventSubscriberInterface
+final class AssetsSubscriber implements EventSubscriberInterface
 {
     private const ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 

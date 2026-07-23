@@ -8,7 +8,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentReportSubscriber implements EventSubscriberInterface
+final class SegmentReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_MEMBERSHIP = 'segment.membership';
 

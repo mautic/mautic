@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly NotificationHelper $notificationHelper,

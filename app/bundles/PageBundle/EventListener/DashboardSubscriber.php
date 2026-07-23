@@ -8,7 +8,7 @@ use Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Routing\RouterInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).

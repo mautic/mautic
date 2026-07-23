@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class InjectCustomContentSubscriber implements EventSubscriberInterface
+final class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Config $config,

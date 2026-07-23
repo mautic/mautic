@@ -10,7 +10,7 @@ use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PluginSubscriber implements EventSubscriberInterface
+final class PluginSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly PluginDatabase $pluginDatabase,

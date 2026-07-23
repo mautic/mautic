@@ -7,7 +7,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSchedulerSubscriber implements EventSubscriberInterface
+final class ReportSchedulerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly SchedulerPlanner $schedulerPlanner,

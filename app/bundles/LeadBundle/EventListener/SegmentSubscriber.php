@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriber implements EventSubscriberInterface
+final class SegmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,

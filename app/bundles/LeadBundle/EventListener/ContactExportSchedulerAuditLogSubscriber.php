@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterface
+final class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AuditLogModel $auditLogModel,

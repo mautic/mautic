@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class CampaignConditionSubscriber implements EventSubscriberInterface
+final class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EmailValidator $validator,

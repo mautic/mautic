@@ -11,7 +11,7 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly PointModel $pointModel,

@@ -11,7 +11,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ChannelSubscriber implements EventSubscriberInterface
+final class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,

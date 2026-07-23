@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
  */
-class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         protected TranslatorInterface $translator,

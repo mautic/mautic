@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 
 #[AsDoctrineListener(Events::postUpdate)]
-class OptimisticLockSubscriber
+final class OptimisticLockSubscriber
 {
     public function __construct(
         private readonly OptimisticLockServiceInterface $optimisticLockService,

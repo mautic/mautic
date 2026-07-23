@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ClientSubscriber implements EventSubscriberInterface
+final class ClientSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,

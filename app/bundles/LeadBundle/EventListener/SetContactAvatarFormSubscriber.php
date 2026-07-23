@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SetContactAvatarFormSubscriber implements EventSubscriberInterface
+final class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AvatarHelper $avatarHelper,

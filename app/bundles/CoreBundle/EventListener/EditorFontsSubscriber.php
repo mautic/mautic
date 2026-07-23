@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EditorFontsSubscriber implements EventSubscriberInterface
+final class EditorFontsSubscriber implements EventSubscriberInterface
 {
     public const PARAMETER_EDITOR_FONTS = 'editor_fonts';
 

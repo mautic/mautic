@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ImportSubscriber implements EventSubscriberInterface
+final class ImportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,

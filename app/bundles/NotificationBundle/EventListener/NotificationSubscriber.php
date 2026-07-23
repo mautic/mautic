@@ -14,7 +14,7 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class NotificationSubscriber implements EventSubscriberInterface
+final class NotificationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AuditLogModel $auditLogModel,

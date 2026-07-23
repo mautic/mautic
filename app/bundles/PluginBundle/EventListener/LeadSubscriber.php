@@ -11,7 +11,7 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     private const FEATURE_PUSH_LEAD = 'push_lead';
 

@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class EnvironmentSubscriber implements EventSubscriberInterface
+final class EnvironmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

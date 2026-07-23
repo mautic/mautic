@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 
-class SerializerSubscriber implements EventSubscriberInterface
+final class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly GrapesJsBuilderModel $grapesJsBuilderModel,

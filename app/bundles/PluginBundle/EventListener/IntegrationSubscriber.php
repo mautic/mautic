@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class can provide useful debugging information for API requests and responses.
  * The information is displayed when a command is executed from the console and the -vv flag is passed to it.
  */
-class IntegrationSubscriber implements EventSubscriberInterface
+final class IntegrationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LoggerInterface $logger,

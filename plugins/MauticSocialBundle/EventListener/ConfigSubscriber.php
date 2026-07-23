@@ -9,7 +9,7 @@ use MauticPlugin\MauticSocialBundle\Form\Type\ConfigType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Config $config,

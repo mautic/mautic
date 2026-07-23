@@ -7,7 +7,7 @@ use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly FocusModel $model,
