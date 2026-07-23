@@ -180,7 +180,9 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
+        $contactNameSelector = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($contactNameSelector, 10);
+        $contactName = $I->grabTextFrom($contactNameSelector);
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');
@@ -200,7 +202,9 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage('/s/contacts');
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
+        $contactNameSelector = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($contactNameSelector, 10);
+        $contactName = $I->grabTextFrom($contactNameSelector);
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');
