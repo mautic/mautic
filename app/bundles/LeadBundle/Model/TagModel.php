@@ -3,8 +3,8 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\ActionRepository;

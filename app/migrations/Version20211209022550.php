@@ -31,6 +31,7 @@ final class Version20211209022550 extends AbstractMauticMigration
                     ],
                 ],
             ],
+            'iterable_mode'  => true,
         ]);
 
         /** @var Role $role */
