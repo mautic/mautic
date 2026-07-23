@@ -6,7 +6,6 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -18,19 +17,21 @@ final class Version20211209022550 extends AbstractMauticMigration
     {
         $roleModel = $this->container->get(RoleModel::class);
 
-        // Build custom query to force OBJECT hydration
-        $qb = $roleModel->getRepository()->createQueryBuilder('r');
-
-        // Get all non admin roles
-        $qb->where($qb->expr()->eq('r.isAdmin', ':isAdmin'))
-            ->setParameter('isAdmin', 0)
-            ->orderBy('r.id', 'ASC');
-
-        $query = $qb->getQuery();
-        $query->setHint(Query::HINT_REFRESH, true);          // Force refresh / full hydration
-        $query->setHydrationMode(Query::HYDRATE_OBJECT);     // Explicitly force object
-
-        $roles = $query->getResult();
+        // Get all non admin roles.
+        $roles = $roleModel->getEntities([
+            'orderBy'       => 'r.id',
+            'orderByDir'    => 'ASC',
+            'filter'        => [
+                'where' => [
+                    [
+                        'col'  => 'r.isAdmin',
+                        'expr' => 'eq',
+                        'val'  => 0,
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
 
         /** @var Role $role */
         foreach ($roles as $role) {

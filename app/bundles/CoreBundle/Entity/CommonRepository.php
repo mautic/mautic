@@ -360,6 +360,17 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($args['qb'])) {
             $q = $args['qb'];
         } else {
+            /*
+             * Index By Behavior:
+             * When indexBy is used, Doctrine changes its hydration behavior.
+             * Instead of returning a standard list of objects, it attempts to map the database results into keys.
+             *
+             * PostgreSQL Driver Differences:
+             * The PostgreSQL PDO driver returns row identifiers and integer columns differently than MySQL.
+             * When Doctrine processes an indexBy query with HYDRATE_OBJECT on PostgreSQL,
+             * a known driver quirk causes the hydration to fail to map into entity instances,
+             * silently falling back to returning an array of data arrays indexed by the ID string.
+             */
             $q = $this->_em
                 ->createQueryBuilder()
                 ->select($alias)
