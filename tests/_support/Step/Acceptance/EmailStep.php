@@ -22,7 +22,7 @@ class EmailStep extends \AcceptanceTester
         $I->waitForElementClickable(EmailsPage::CONTACT_SEGMENT_OPTION);
         $I->click(EmailsPage::CONTACT_SEGMENT_OPTION);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
-        $I->waitForText($name, 10, 'h1.page-header-title');
+        $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }
 
     /**
@@ -38,7 +38,7 @@ class EmailStep extends \AcceptanceTester
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
         $I->click(EmailsPage::SAVE_AND_CLOSE);
-        $I->waitForText($name, 10, 'h1.page-header-title');
+        $I->waitForText($name, self::TIMEOUT, 'h1.page-header-title');
     }
 
     /**
