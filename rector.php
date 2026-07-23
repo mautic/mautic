@@ -58,6 +58,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
