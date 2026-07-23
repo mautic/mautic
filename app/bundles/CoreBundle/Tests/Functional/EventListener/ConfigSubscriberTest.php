@@ -12,8 +12,6 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    protected string $prefix = '';
-
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
@@ -24,8 +22,6 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
         $this->configParams['locale'] = 'en_US';
 
         parent::setUp();
-
-        $this->prefix = MAUTIC_TABLE_PREFIX;
 
         $configPath = $this->getConfigPath();
         if (file_exists($configPath)) {

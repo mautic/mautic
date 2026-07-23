@@ -102,7 +102,7 @@ final class MailHelperTest extends TestCase
     /**
      * @var array<array<string,string|int>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',

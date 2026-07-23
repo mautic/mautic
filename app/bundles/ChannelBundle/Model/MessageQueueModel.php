@@ -78,11 +78,10 @@ class MessageQueueModel extends FormModel
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 
-        $frequencyRulesRepo     = $this->frequencyRuleRepository;
         $defaultFrequencyNumber = $this->coreParametersHelper->get($channel.'_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->get($channel.'_frequency_time');
 
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
+        $dontSendTo = $this->frequencyRuleRepository->getAppliedFrequencyRules(
             $channel,
             $leadIds,
             $defaultFrequencyNumber,
