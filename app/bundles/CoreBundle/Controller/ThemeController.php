@@ -224,9 +224,6 @@ class ThemeController extends FormController
         );
     }
 
-    /**
-     * Deletes a theme.
-     */
     public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];

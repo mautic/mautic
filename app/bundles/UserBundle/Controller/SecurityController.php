@@ -39,7 +39,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        ?RequestStack $requestStack,
+        RequestStack $requestStack,
         ?CorePermissions $security,
         private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {

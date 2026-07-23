@@ -15,7 +15,7 @@ final class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, array<string, array<string, mixed>>>
      */
-    protected array $availableFields = [
+    private array $availableFields = [
         'Leads' => [
             'Company'   => [
                 'type'     => 'string',
@@ -47,7 +47,7 @@ final class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    protected array $mappedFields = [
+    private array $mappedFields = [
         'Company'   => 'company',
         'Email'     => 'email',
         'Country'   => 'country',
@@ -58,7 +58,7 @@ final class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<int, array<string, int|string|null>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'firstname'             => 'FirstName1',
             'lastname'              => 'LastName1',
