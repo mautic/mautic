@@ -35,7 +35,15 @@ final class NoNullableServiceInConstructorRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_CLASS_TYPES = ['Symfony\\Component\\Security\\Http\\Authenticator\\Passport\\Badge\\BadgeInterface'];
+    private const SKIPPED_CLASS_TYPES = [
+        'Symfony\\Component\\Security\\Http\\Authenticator\\Passport\\Badge\\BadgeInterface',
+        'Symfony\\Component\\Form\\FormTypeInterface',
+    ];
+
+    /**
+     * @var string[]
+     */
+    private const SKIPPED_EXACT_CLASSES = ['Mautic\\CoreBundle\\IpLookup\\AbstractLookup'];
 
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,
@@ -66,6 +74,10 @@ final class NoNullableServiceInConstructorRule implements Rule
 
         // a data-holder namespace (entity, event, DTO, ...) carries values, not services
         if ($this->isSkippedNamespace($classReflection->getName())) {
+            return [];
+        }
+
+        if (in_array($classReflection->getName(), self::SKIPPED_EXACT_CLASSES, true)) {
             return [];
         }
 
