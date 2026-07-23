@@ -6,8 +6,8 @@ on:
 
 jobs:
   coverage:
-    # Only the "check-coverage" label triggers this workflow
-    if: github.event.label.name == 'check-coverage' && github.repository == 'mautic/mautic'
+    # Only the "check-coverage" and "ready-to-commit" labels trigger this workflow
+    if: (github.event.label.name == 'check-coverage' || github.event.label.name == 'ready-to-commit') && github.repository == 'mautic/mautic'
     runs-on: ubuntu-latest
 
     name: PHPUnit coverage
