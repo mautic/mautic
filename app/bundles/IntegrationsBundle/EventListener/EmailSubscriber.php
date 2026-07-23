@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
  */
-final class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,

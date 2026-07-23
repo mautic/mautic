@@ -12,10 +12,10 @@ use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TransportChain $transportChain,
+        private TransportChain $transportChain,
     ) {
     }
 

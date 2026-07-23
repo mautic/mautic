@@ -10,12 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
-        private readonly EntityManager $em,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private EntityManager $em,
     ) {
     }
 
@@ -35,7 +35,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->addSmsEvents($event, 'failed');
     }
 
-    private function addSmsEvents(LeadTimelineEvent $event, $state): void
+    private function addSmsEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types
         $eventTypeKey  = 'sms.'.$state;

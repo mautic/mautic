@@ -18,7 +18,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
 
@@ -27,13 +27,13 @@ final class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
     public function __construct(
-        private readonly CompanyReportData $companyReportData,
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly FormModel $formModel,
-        private readonly ReportHelper $reportHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly TranslatorInterface $translator,
-        private readonly DncReportService $dncReportService,
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
     ) {
     }
 

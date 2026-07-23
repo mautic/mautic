@@ -8,10 +8,10 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-final class SAMLSubscriber implements EventSubscriberInterface
+final readonly class SAMLSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RouterInterface $router,
+        private RouterInterface $router,
     ) {
     }
 

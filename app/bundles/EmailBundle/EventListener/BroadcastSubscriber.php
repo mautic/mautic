@@ -11,12 +11,12 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $model,
-        private readonly EntityManager $em,
-        private readonly TranslatorInterface $translator,
+        private EmailModel $model,
+        private EntityManager $em,
+        private TranslatorInterface $translator,
     ) {
     }
 

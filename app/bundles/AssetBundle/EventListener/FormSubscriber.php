@@ -19,15 +19,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AssetModel $assetModel,
+        private AssetModel $assetModel,
         private TranslatorInterface $translator,
-        private readonly AnalyticsHelper $analyticsHelper,
-        private readonly AssetsHelper $assetsHelper,
-        private readonly ThemeHelperInterface $themeHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

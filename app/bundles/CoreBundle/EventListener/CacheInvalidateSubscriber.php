@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsDoctrineListener(Events::postPersist)]
 #[AsDoctrineListener(Events::postUpdate)]
 #[AsDoctrineListener(Events::postRemove)]
-final class CacheInvalidateSubscriber
+final readonly class CacheInvalidateSubscriber
 {
     private const ACTION_PERSIST = 'persist';
 
@@ -26,7 +26,7 @@ final class CacheInvalidateSubscriber
 
     public function __construct(
         #[Autowire(service: 'doctrine.orm.default_configuration')]
-        private readonly Configuration $ormConfiguration,
+        private Configuration $ormConfiguration,
     ) {
     }
 

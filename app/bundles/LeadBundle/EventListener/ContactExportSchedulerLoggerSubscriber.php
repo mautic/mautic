@@ -11,10 +11,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
+final readonly class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

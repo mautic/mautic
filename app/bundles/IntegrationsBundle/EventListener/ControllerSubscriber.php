@@ -11,11 +11,11 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class ControllerSubscriber implements EventSubscriberInterface
+final readonly class ControllerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IntegrationsHelper $integrationsHelper,
-        private readonly ControllerResolverInterface $resolver,
+        private IntegrationsHelper $integrationsHelper,
+        private ControllerResolverInterface $resolver,
     ) {
     }
 

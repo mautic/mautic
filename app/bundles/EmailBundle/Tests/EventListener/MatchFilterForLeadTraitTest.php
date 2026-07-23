@@ -688,7 +688,7 @@ class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 
-    private LeadListRepository $segmentRepository;
+    protected LeadListRepository $segmentRepository;
 
     public function setRepository(LeadListRepository $segmentRepository): void
     {
