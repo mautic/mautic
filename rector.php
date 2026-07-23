@@ -125,13 +125,6 @@ return RectorConfig::configure()
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
-        // will be fixed
-        // Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
-        ],
-
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
     ]);
