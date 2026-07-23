@@ -9,12 +9,16 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\Symfony\Component\Console\Attribute\AsCommand(name: self::COMMAND_NAME, description: 'Export entity data.')]
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Export entity data.'
+)]
 final class EntityExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:entity:export';

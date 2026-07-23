@@ -91,17 +91,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     private array $leadChangeLists = [];
 
-    /**
-     * @return LeadListRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadListRepository
     {
-        $repo = $this->leadListRepository;
+        $this->leadListRepository->setDispatcher($this->dispatcher);
+        $this->leadListRepository->setTranslator($this->translator);
 
-        $repo->setDispatcher($this->dispatcher);
-        $repo->setTranslator($this->translator);
-
-        return $repo;
+        return $this->leadListRepository;
     }
 
     /**

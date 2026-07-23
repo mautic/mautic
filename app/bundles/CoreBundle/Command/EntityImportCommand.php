@@ -8,12 +8,16 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:entity:import', description: 'Import entity data from a ZIP file.')]
+#[AsCommand(
+    name: 'mautic:entity:import',
+    description: 'Import entity data from a ZIP file.'
+)]
 final class EntityImportCommand extends ModeratedCommand
 {
     public function __construct(

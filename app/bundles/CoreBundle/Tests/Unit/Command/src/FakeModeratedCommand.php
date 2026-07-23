@@ -3,11 +3,14 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command\src;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockInterface;
 
-#[\Symfony\Component\Console\Attribute\AsCommand(name: 'mautic:fake:command')]
+#[AsCommand(
+    name: 'mautic:fake:command'
+)]
 class FakeModeratedCommand extends ModeratedCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int

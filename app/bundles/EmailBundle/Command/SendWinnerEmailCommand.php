@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Model\AbTest\SendWinnerService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,7 +18,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends email to winner variant after predetermined amount of time.
  */
-#[\Symfony\Component\Console\Attribute\AsCommand(name: self::COMMAND_NAME)]
+#[AsCommand(
+    name: self::COMMAND_NAME
+)]
 final class SendWinnerEmailCommand extends ModeratedCommand
 {
     protected static string $defaultDescription = 'Send winner email variant to remaining contacts';
