@@ -215,7 +215,6 @@ parameters:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 
-<<<<<<< HEAD
 rules:
 	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
 	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
@@ -224,6 +223,7 @@ rules:
 	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+<<<<<<< HEAD
 <<<<<<< HEAD
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 =======
@@ -259,3 +259,6 @@ services:
 			- phpstan.rules.rule
 >>>>>>> 41e96b7cf0 ([phpstan] kick of getRepository(...) warning with exact class)
 >>>>>>> 400faa4637 ([phpstan] kick of getRepository(...) warning with exact class)
+=======
+	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+>>>>>>> 6e2e8afe8e (autowire repository services over getRepository() service locator)
