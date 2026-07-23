@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -7,8 +9,9 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use PHPUnit\Framework\TestCase;
 
-class FileHandlerTest extends \PHPUnit\Framework\TestCase
+final class FileHandlerTest extends TestCase
 {
     public function testFileCanBeAttached(): void
     {
@@ -17,12 +20,12 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
 
         $filePropertyMock = $this->createMock(FileProperties::class);
 
-        $coreParametersHelperMock->expects($this->any())
+        $coreParametersHelperMock
             ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn(0);
 
-        $filePathResolver = $this->createMock(FilePathResolver::class);
+        $filePathResolver = $this->createStub(FilePathResolver::class);
 
         $filePropertyMock->expects($this->once())
             ->method('getFileSize')
