@@ -299,8 +299,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Adds IP address.
-     *
      * @param bool $nullable
      */
     public function addIpAddress($nullable = false): static
@@ -437,8 +435,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Adds Index with options.
-     *
      * @param list<string>         $columns
      * @param array<string, mixed> $options
      */
