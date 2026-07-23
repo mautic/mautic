@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class FieldApiControllerTest extends TestCase
 {
-    /** @var array<int, array<string, mixed>> */
+    /**
+     * @var array<int, array<string, mixed>>
+     */
     private array $defaultWhere = [
         [
             'col'  => 'object',
@@ -64,12 +66,9 @@ final class FieldApiControllerTest extends TestCase
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getCurrentRequest')
             ->willReturn($request);
-
-        $fieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldModel      = $this->createMock(FieldModel::class);
         $fieldModel->method('getRepository')
-            ->willReturn($fieldRepository);
-        $modelFactory = $this->createMock(ModelFactory::class);
+            ->willReturn($this->createStub(LeadFieldRepository::class));
         $controller   = new FieldApiController(
             $this->createStub(CorePermissions::class),
             $this->createStub(Translator::class),
@@ -79,7 +78,7 @@ final class FieldApiControllerTest extends TestCase
             $this->createStub(AppVersion::class),
             $requestStack,
             $this->createStub(ManagerRegistry::class),
-            $modelFactory,
+            $this->createStub(ModelFactory::class),
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $fieldModel,

@@ -287,8 +287,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -316,8 +314,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Set source.
-     *
      * @param string $source
      */
     public function setSource($source): static

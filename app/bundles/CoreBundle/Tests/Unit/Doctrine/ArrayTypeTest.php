@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Type;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
 class ExampleClassWithPrivateProperty
 {
@@ -33,10 +34,7 @@ final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
-    /**
-     * @var Type
-     */
-    private $arrayType;
+    private Type $arrayType;
 
     private MySQLPlatform $platform;
 
@@ -108,7 +106,7 @@ final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
             'fields' => [
                 'field_account_executive_o' => [
                     null,
-                    new \Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO(),
+                    new ReferenceValueDAO(),
                 ],
             ],
             'dateModified' => [

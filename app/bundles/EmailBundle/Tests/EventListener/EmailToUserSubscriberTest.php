@@ -13,7 +13,9 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
 final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $config = [
         'useremail' => [
             'email' => 33,
@@ -65,7 +67,7 @@ final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockSendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with($this->config, $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException()));
+            ->willThrowException(new EmailCouldNotBeSentException());
 
         $triggerEvent = new TriggerEvent();
         $triggerEvent->setProperties($this->config);

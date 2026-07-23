@@ -22,7 +22,9 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 
     private const SVG_HEIGHT      = 80;
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $tempFilePaths = [];
 
     protected function beforeTearDown(): void
@@ -153,7 +155,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($content['data']);
 
         $assetList         = $content['data'];
-        $uploadedFileNames = array_map([$this, 'getFileNameFromUrl'], $uploadedFiles);
+        $uploadedFileNames = array_map($this->getFileNameFromUrl(...), $uploadedFiles);
 
         // Check if the first 'IMAGE_COUNT' assets in the list are the recently uploaded files
         for ($i = 0; $i < self::IMAGE_COUNT; ++$i) {

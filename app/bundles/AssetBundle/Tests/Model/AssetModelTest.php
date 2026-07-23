@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -70,17 +71,17 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
+    private AssetRepository&MockObject $assetRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
-            ->with($this->equalTo('max_size'))
+            ->with('max_size')
             ->willReturn('2MB');
-
-        $container                   = $this->createMock(ContainerInterface::class);
-        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $container);
+        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
         $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
@@ -96,6 +97,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createStub(Translator::class);
         $this->userHelper            = $this->createStub(UserHelper::class);
         $this->logger                = $this->createStub(LoggerInterface::class);
+        $this->assetRepository       = $this->createMock(AssetRepository::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -114,6 +116,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
+            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->assetRepository,
+            $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class), // $downloadRepository
         );
     }
 
@@ -164,14 +169,14 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $serverBag->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('HTTP_REFERER'))
+            ->with('HTTP_REFERER')
             ->willReturn('http://localhost');
 
         $request->server = $serverBag;
         $matcher         = $this->exactly(6);
 
         $request->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): string|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals('utm_campaign', $parameters[0]);
 
@@ -202,6 +207,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())
@@ -220,19 +227,12 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedDevice')
             ->willReturn(null);
 
-        $assetRepository = $this->createMock(AssetRepository::class);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with($this->equalTo(Asset::class))
-            ->willReturn($assetRepository);
-
-        $assetRepository->expects($this->once())
+        $this->assetRepository->expects($this->once())
             ->method('upDownloadCount')
             ->with(
-                $this->equalTo($asset->getId()),
-                $this->equalTo(1),
-                $this->equalTo(true),
+                $asset->getId(),
+                1,
+                true,
             );
 
         $ipAddress = new IpAddress('127.0.0.1');
@@ -243,7 +243,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with($this->equalTo(AssetEvents::ASSET_ON_LOAD))
+            ->with(AssetEvents::ASSET_ON_LOAD)
             ->willReturn(false);
 
         /** @var ?Download $download */
@@ -253,8 +253,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('persist')
             ->with($this->callback(function ($downloadPersist) use (&$download): bool {
                 $download = $downloadPersist;
+                $this->assertInstanceOf(Download::class, $download);
 
-                return $download instanceof Download;
+                return true;
             }));
 
         $this->entityManager->expects($this->once())
@@ -270,11 +271,11 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assetModel->trackDownload($asset);
 
-        $this->assertEquals('test_utm_campaign', $download->getUtmCampaign());
-        $this->assertEquals('test_utm_content', $download->getUtmContent());
-        $this->assertEquals('test_utm_medium', $download->getUtmMedium());
-        $this->assertEquals('test_utm_source', $download->getUtmSource());
-        $this->assertEquals('test_utm_term', $download->getUtmTerm());
+        $this->assertSame('test_utm_campaign', $download->getUtmCampaign());
+        $this->assertSame('test_utm_content', $download->getUtmContent());
+        $this->assertSame('test_utm_medium', $download->getUtmMedium());
+        $this->assertSame('test_utm_source', $download->getUtmSource());
+        $this->assertSame('test_utm_term', $download->getUtmTerm());
         $this->assertEquals('200', $download->getCode());
         $this->assertEquals($ipAddress, $download->getIpAddress());
         $this->assertEquals($lead, $download->getLead());
@@ -314,6 +315,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
+                $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class),
+                $this->createStub(AssetRepository::class),
+                $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

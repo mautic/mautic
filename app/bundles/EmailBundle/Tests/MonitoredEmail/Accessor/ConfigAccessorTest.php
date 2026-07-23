@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Accessor;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
+use PHPUnit\Framework\Attributes\TestDox;
 
 final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, string> */
-    protected array $config = [
+    /**
+     * @var array<string, string>
+     */
+    private array $config = [
         'imap_path' => 'path',
         'user'      => 'user',
         'host'      => 'host',
         'folder'    => 'folder',
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('All getters return appropriate values')]
+    #[TestDox('All getters return appropriate values')]
     public function testGetters(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -27,7 +30,7 @@ final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->config['folder'], $configAccessor->getFolder());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Key is formatted appropriately')]
+    #[TestDox('Key is formatted appropriately')]
     public function testKeyIsPathAndUser(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -35,7 +38,7 @@ final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('path_user', $configAccessor->getKey());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered configured if we have a host and a folder')]
+    #[TestDox('Test its considered configured if we have a host and a folder')]
     public function testIsConfigured(): void
     {
         $configAccessor = new ConfigAccessor($this->config);
@@ -43,7 +46,7 @@ final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($configAccessor->isConfigured());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered not configured if folder is missing')]
+    #[TestDox('Test its considered not configured if folder is missing')]
     public function testIsNotConfiguredIfFolderIsMissing(): void
     {
         $config = $this->config;
@@ -52,7 +55,7 @@ final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configAccessor->isConfigured());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test its considered not configured if host is missing')]
+    #[TestDox('Test its considered not configured if host is missing')]
     public function testIsNotConfiguredIfHostIsMissing(): void
     {
         $config = $this->config;

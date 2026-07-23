@@ -139,7 +139,7 @@ final class RouteHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectRouteEvent $event) use ($internalObject): void {
                         $this->assertSame($internalObject, $event->getObject());

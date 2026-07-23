@@ -36,12 +36,11 @@ final class EventModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $entityManagerMock         = $this->createMock(EntityManagerInterface::class);
         $this->eventRepositoryMock = $this->createMock(EventRepository::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
 
         $this->eventModel          = new EventModel(
-            $entityManagerMock,
+            $this->createStub(EntityManagerInterface::class),
             $this->createStub(CorePermissions::class),
             $this->dispatcherMock,
             $this->createStub(UrlGeneratorInterface::class),
@@ -51,10 +50,11 @@ final class EventModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class)
         );
 
-        $entityManagerMock
-            ->method('getRepository')
-            ->with(Event::class)
-            ->willReturn($this->eventRepositoryMock);
+        $this->eventModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class),
+            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+        );
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
@@ -152,7 +152,7 @@ final class EventModelTest extends TestCase
 
     public function testDeleteEventsByCampaignId(): void
     {
-        /** @var EventModel&MockObject */
+        /** @var EventModel&MockObject $mockModel */
         $mockModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])

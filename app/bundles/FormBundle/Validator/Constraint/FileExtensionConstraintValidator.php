@@ -29,7 +29,7 @@ class FileExtensionConstraintValidator extends ConstraintValidator
 
         $blacklistedExtensions = $this->coreParametersHelper->get('blacklisted_extensions');
         $intersect             = array_intersect($value, $blacklistedExtensions);
-        if ($intersect) {
+        if ([] !== $intersect) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ forbidden }}', implode(', ', $intersect))
                 ->addViolation();

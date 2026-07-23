@@ -9,8 +9,9 @@ class LeadListMergeFiltersEvent extends CommonEvent
     /**
      * @param mixed[] $filters
      */
-    public function __construct(private array $filters)
-    {
+    public function __construct(
+        private array $filters,
+    ) {
     }
 
     /**

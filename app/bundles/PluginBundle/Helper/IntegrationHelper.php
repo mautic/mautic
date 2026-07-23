@@ -413,7 +413,7 @@ class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -516,7 +516,7 @@ class IntegrationHelper
 
                 // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/{$integration}:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }
@@ -536,7 +536,7 @@ class IntegrationHelper
         $identifier      = (is_array($identifierField)) ? [] : false;
         $matchFound      = false;
 
-        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound): void {
+        $findMatch = function ($f, array $fields) use (&$identifierField, &$identifier, &$matchFound): void {
             if (is_array($identifier)) {
                 // there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {

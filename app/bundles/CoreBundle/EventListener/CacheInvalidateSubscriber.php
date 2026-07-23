@@ -59,7 +59,7 @@ class CacheInvalidateSubscriber
 
         $namespacesToDelete = $entity->getCacheNamespacesToDelete();
 
-        if (!$namespacesToDelete) {
+        if ([] === $namespacesToDelete) {
             return;
         }
 

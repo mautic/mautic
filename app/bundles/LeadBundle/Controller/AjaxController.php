@@ -34,18 +34,34 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;
 
+    private LeadModel $leadModel;
+
+    private FieldModel $leadFieldModel;
+
+    private EmailModel $emailModel;
+
+    #[Required]
+    public function autowireLeadAjaxController(
+        LeadModel $leadModel,
+        FieldModel $leadFieldModel,
+        EmailModel $emailModel,
+    ): void {
+        $this->leadModel = $leadModel;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->emailModel = $emailModel;
+    }
+
     public function userListAction(Request $request): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadModel = $this->getModel('lead.lead');
-        \assert($leadModel instanceof LeadModel);
-        $results   = $leadModel->getLookupResults('user', $filter);
+        $results   = $this->leadModel->getLookupResults('user', $filter);
         $dataArray = [];
         foreach ($results as $r) {
             $name        = $r['firstName'].' '.$r['lastName'];
@@ -176,9 +192,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
+            $lead  = $this->leadModel->getEntity($leadId);
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields        = $lead->getFields();
@@ -232,9 +246,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
+            $lead  = $this->leadModel->getEntity($leadId);
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
@@ -272,7 +284,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $list) {
                 $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
-                $leadModel->$class($lead, $list);
+                $leadModel->{$class}($lead, $list);
                 $dataArray['success'] = 1;
             }
         }
@@ -353,7 +365,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $company) {
                 $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
-                $companyModel->$class($company, $lead);
+                $companyModel->{$class}($company, $lead);
                 $dataArray['success'] = 1;
             }
         }
@@ -434,9 +446,8 @@ class AjaxController extends CommonAjaxController
             $session    = $request->getSession();
             $search     = $session->get('mautic.lead.filter', '');
             $filter     = ['string' => $search, 'force' => []];
-            $translator = $this->translator;
-            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+            $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+            $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
             $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
             $session->set('mautic.lead.indexmode', $indexMode);
@@ -444,7 +455,7 @@ class AjaxController extends CommonAjaxController
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
             if ('list' != $indexMode) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'][] = "!$anonymous";
+                $filter['force'][] = "!{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
@@ -470,8 +481,7 @@ class AjaxController extends CommonAjaxController
                 $maxLeadId = $model->getRepository()->getMaxLeadId();
 
                 // We need the EmailRepository to check if a lead is flagged as do not contact
-                /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-                $emailRepo          = $this->getModel('email')->getRepository();
+                $emailRepo          = $this->emailModel->getRepository();
                 $indexMode          = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->render(
@@ -587,6 +597,9 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
+    /**
+     * @deprecated since Mautic 7.2, will be removed in 8.0 with no replacement.
+     */
     public function addLeadUtmTagsAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $utmTags = $request->request->get('utmtags');
@@ -598,7 +611,7 @@ class AjaxController extends CommonAjaxController
                 if (!is_numeric($utmTag)) {
                     // New tag
                     $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmTag(InputHelper::clean($utmTag));
+                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
                     $newUtmTags[] = $utmTagEntity;
                 }
             }
@@ -649,7 +662,8 @@ class AjaxController extends CommonAjaxController
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
         $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
-        $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
+
+        $leadField = $this->leadFieldModel->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
             $options       = null;

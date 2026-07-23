@@ -26,6 +26,8 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -44,12 +46,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
+#[CoversClass(RestrictionHelper::class)]
 final class RestrictionHelperTest extends TypeTestCase
 {
     private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $restrictedFields = [
         'monitored_email' => [
             'EmailBundle_bounces',
@@ -59,7 +63,9 @@ final class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
@@ -140,7 +146,7 @@ final class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are removed from the config')]
+    #[TestDox('Test that the restricted fields are removed from the config')]
     public function testRestrictedFieldsAreRemoved(): void
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
@@ -169,7 +175,7 @@ final class RestrictionHelperTest extends TypeTestCase
         $this->assertTrue($unsubscribes->has('host'));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the restricted fields are masked')]
+    #[TestDox('Test that the restricted fields are masked')]
     public function testRestrictedFieldsAreMasked(): void
     {
         $this->displayMode = RestrictionHelper::MODE_MASK;
@@ -197,13 +203,15 @@ final class RestrictionHelperTest extends TypeTestCase
         );
     }
 
-    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    /**
+     * @return array<int, PreloadedExtension|ValidatorExtension>
+     */
     protected function getExtensions(): array
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
 
         $validator = $this->createMock(ValidatorInterface::class);
@@ -214,16 +222,10 @@ final class RestrictionHelperTest extends TypeTestCase
             ->method('getMetadataFor')
             ->willReturn(new ClassMetadata(Form::class));
 
-        $imapHelper = $this->createMock(Mailbox::class);
-
         // Register monitored email listeners
         $dispatcher = new EventDispatcher();
-        $bouncer    = $this->createMock(Bounce::class);
-        $dispatcher->addSubscriber(new ProcessBounceSubscriber($bouncer));
-
-        $unsubscriber = $this->createMock(Unsubscribe::class);
-        $looper       = $this->createMock(FeedbackLoop::class);
-        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createStub(CoreParametersHelper::class)));
+        $dispatcher->addSubscriber(new ProcessBounceSubscriber($this->createStub(Bounce::class)));
+        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($this->createStub(Unsubscribe::class), $this->createStub(FeedbackLoop::class), $this->createStub(CoreParametersHelper::class)));
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
@@ -250,7 +252,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
                     new PreferenceCenterListType($pageModelMock, $this->createStub(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
-                    new ConfigMonitoredMailboxesType($imapHelper),
+                    new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),
                     new ConfigType($restrictionHelper, $escapeTransformer),
                 ],
                 []

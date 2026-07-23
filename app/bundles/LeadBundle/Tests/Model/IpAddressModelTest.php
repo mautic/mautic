@@ -31,8 +31,7 @@ final class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $logger               = $this->createMock(LoggerInterface::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $logger);
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class), $this->createStub(\Mautic\CoreBundle\Entity\IpAddressRepository::class));
     }
 
     /**

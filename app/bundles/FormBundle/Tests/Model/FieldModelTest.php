@@ -24,10 +24,10 @@ final class FieldModelTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
 
-        $platform = new class {
+        $platform = new class() {
             public function getReservedKeywordsList(): object
             {
-                return new class {
+                return new class() {
                     public function isKeyword(): bool
                     {
                         return false;
@@ -58,10 +58,11 @@ final class FieldModelTest extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(RequestStack::class),
-            $schemaHelper
+            $schemaHelper,
+            $this->createStub(\Mautic\FormBundle\Entity\FieldRepository::class) // $fieldRepository
         );
 
-        $entityManager->expects($this->any())
+        $entityManager
             ->method('getConnection')
             ->willReturn($connection);
 

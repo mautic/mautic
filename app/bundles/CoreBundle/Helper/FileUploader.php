@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected array $imageMimes = [
         'image/gif',
         'image/jpeg',
@@ -22,7 +24,9 @@ class FileUploader
         'image/svg+xml',
     ];
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected array $imageExtensions = [
         'jpg',
         'jpeg',
@@ -57,7 +61,7 @@ class FileUploader
                 throw new FileUploadException($this->translator->trans('mautic.core.fileuploader.upload_error'));
             }
         } catch (FilePathException $e) {
-            throw new FileUploadException($e->getMessage());
+            throw new FileUploadException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

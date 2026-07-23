@@ -45,10 +45,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * Generate's default client list.
-     *
-     * @param int $page
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
             $this->throwAccessDenied();
@@ -187,10 +185,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param mixed $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             $this->throwAccessDenied();
@@ -261,7 +257,8 @@ class ClientController extends AbstractStandardFormController
                         ],
                     ]
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $client->getId(), true);
             }
         }
@@ -324,7 +321,8 @@ class ClientController extends AbstractStandardFormController
                     ]
                 )
             );
-        } elseif ($this->clientModel->isLocked($client)) {
+        }
+        if ($this->clientModel->isLocked($client)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }

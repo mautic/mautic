@@ -155,7 +155,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
         $this->helper->applyDefaults($email);
 
-        $this->assertNull($email->getPreferenceCenter());
+        $this->assertNotInstanceOf(Page::class, $email->getPreferenceCenter());
         $this->assertEmpty($email->getUtmTags());
     }
 
@@ -176,7 +176,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
         $this->helper->applyDefaults($email);
 
-        $this->assertNull($email->getPreferenceCenter());
+        $this->assertNotInstanceOf(Page::class, $email->getPreferenceCenter());
     }
 
     public function testPreservesPreExistingChanges(): void

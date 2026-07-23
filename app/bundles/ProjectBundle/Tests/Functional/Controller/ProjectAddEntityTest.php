@@ -9,6 +9,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
@@ -50,7 +52,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString('entityType=email', $content);
+        $this->assertStringContainsString('entityType=email', (string) $content);
     }
 
     public function testSelectEntityTypeActionNotFound(): void
@@ -71,10 +73,10 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Should contain the form with proper structure
-        $this->assertStringContainsString('name="project_add_entity"', $content);
-        $this->assertStringContainsString('project_add_entity[entityType]', $content);
-        $this->assertStringContainsString('project_add_entity[projectId]', $content);
-        $this->assertStringContainsString('project_add_entity[entityIds][]', $content);
+        $this->assertStringContainsString('name="project_add_entity"', (string) $content);
+        $this->assertStringContainsString('project_add_entity[entityType]', (string) $content);
+        $this->assertStringContainsString('project_add_entity[projectId]', (string) $content);
+        $this->assertStringContainsString('project_add_entity[entityIds][]', (string) $content);
     }
 
     public function testAddEntityActionPostWithValidData(): void
@@ -92,8 +94,8 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $content  = $response->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($this->testProject->getName(), $content);
-        $this->assertStringContainsString($this->testEmail->getName(), $content);
+        $this->assertStringContainsString($this->testProject->getName(), (string) $content);
+        $this->assertStringContainsString($this->testEmail->getName(), (string) $content);
     }
 
     public function testAddEntityActionPostWithEmptyData(): void
@@ -139,7 +141,7 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         // Check for error message in flashes
         $content = $response->getContent();
-        $this->assertStringContainsString('Invalid entity type', $content);
+        $this->assertStringContainsString('Invalid entity type', (string) $content);
     }
 
     public function testAddEntityActionNotFound(): void
@@ -159,16 +161,16 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    private function createAndLoginUser(): \Mautic\UserBundle\Entity\User
+    private function createAndLoginUser(): User
     {
         // Create non-admin role
-        $role = new \Mautic\UserBundle\Entity\Role();
+        $role = new Role();
         $role->setName('Test Role');
         $role->setIsAdmin(false);
         $this->em->persist($role);
 
         // Create non-admin user
-        $user = new \Mautic\UserBundle\Entity\User();
+        $user = new User();
         $user->setFirstName('Test');
         $user->setLastName('User');
         $user->setUsername('testuser');

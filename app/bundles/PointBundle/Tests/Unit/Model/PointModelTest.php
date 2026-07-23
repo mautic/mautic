@@ -37,45 +37,39 @@ final class PointModelTest extends TestCase
 
     private LeadModel&MockObject $leadModel;
 
-    private EntityManager&MockObject $em;
-
     private CorePermissions&MockObject $security;
 
     private EventDispatcherInterface&MockObject $dispatcher;
 
     private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
 
+    private PointRepository&MockObject $pointRepositoryMock;
+
     private PointModel $pointModel;
 
     protected function setUp(): void
     {
-        $requestStack               = $this->createMock(RequestStack::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $contactTracker             = $this->createMock(ContactTracker::class);
-        $this->em                   = $this->createMock(EntityManager::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $router                     = $this->createMock(RouterInterface::class);
         $this->translator           = $this->createStub(Translator::class);
-        $userHelper                 = $this->createMock(UserHelper::class);
-        $mauticLogger               = $this->createMock(LoggerInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $pointGroupModel            = $this->createMock(PointGroupModel::class);
+        $this->pointRepositoryMock      = $this->createMock(PointRepository::class);
         $this->pointModel           = new PointModel(
-            $requestStack,
+            $this->createStub(RequestStack::class),
             $this->ipLookupHelper,
             $this->leadModel,
-            $contactTracker,
-            $this->em,
+            $this->createStub(ContactTracker::class),
+            $this->createStub(EntityManager::class),
             $this->security,
             $this->dispatcher,
-            $router,
+            $this->createStub(RouterInterface::class),
             $this->translator,
-            $userHelper,
-            $mauticLogger,
-            $coreParametersHelper,
-            $pointGroupModel,
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(PointGroupModel::class),
+            $this->pointRepositoryMock,
         );
     }
 
@@ -107,12 +101,6 @@ final class PointModelTest extends TestCase
             );
         $eventDetails = $this->createStub(Hit::class);
 
-        $repository = $this->createMock(PointRepository::class);
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with(Point::class)
-            ->willReturn($repository);
-
         $pointActionHelper = $this->createMock(PointActionHelper::class);
         $pointActionHelper->expects($this->once())
             ->method('validateUrlHit')
@@ -137,24 +125,24 @@ final class PointModelTest extends TestCase
         $point->method('getDelta')->willReturn($pointDelta);
         $point->method('getGroup')->willReturn($pointGroup);
 
-        $repository->expects($this->once())
+        $this->pointRepositoryMock->expects($this->once())
             ->method('getPublishedByType')
             ->with($type)
             ->willReturn([$point]);
-        $repository->expects($this->once())
+        $this->pointRepositoryMock->expects($this->once())
             ->method('getCompletedLeadActions')
             ->willReturn([]);
-        $repository->expects(self::never())
+        $this->pointRepositoryMock->expects($this->never())
             ->method('saveEntities');
-        $repository->expects(self::never())
+        $this->pointRepositoryMock->expects($this->never())
             ->method('detachEntities');
 
-        $this->dispatcher->expects(self::exactly(2))
+        $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (Event $event, string $eventName) use ($pointActionHelper, $type, $lead, $point): Event {
                 if (PointEvents::POINT_ON_BUILD === $eventName) {
-                    self::assertInstanceOf(PointBuilderEvent::class, $event);
-                    self::assertEquals(new PointBuilderEvent($this->translator), $event);
+                    $this->assertInstanceOf(PointBuilderEvent::class, $event);
+                    $this->assertEquals(new PointBuilderEvent($this->translator), $event);
                     $event->addAction(
                         $type,
                         [
@@ -172,7 +160,7 @@ final class PointModelTest extends TestCase
 
                 if (PointEvents::POINT_ON_ACTION === $eventName) {
                     $pointActionEvent = new PointActionEvent($point, $lead);
-                    self::assertEquals($pointActionEvent, $event);
+                    $this->assertEquals($pointActionEvent, $event);
 
                     return $pointActionEvent;
                 }

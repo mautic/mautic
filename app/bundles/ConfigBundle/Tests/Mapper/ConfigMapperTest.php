@@ -7,12 +7,16 @@ namespace Mautic\ConfigBundle\Tests\Mapper;
 use Mautic\ConfigBundle\Exception\BadFormConfigException;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(BadFormConfigException::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(ConfigMapper::class)]
+#[CoversClass(BadFormConfigException::class)]
+#[CoversClass(ConfigMapper::class)]
 final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
@@ -92,7 +96,9 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $config = [
         'db_host'         => 'dbhost',
         'db_user'         => 'dbuser',
@@ -138,7 +144,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Exception should be thrown if parameters key is not found in a form config')]
+    #[TestDox('Exception should be thrown if parameters key is not found in a form config')]
     public function testExceptionIsThrownOnBadFormConfig(): void
     {
         $this->expectException(BadFormConfigException::class);
@@ -158,7 +164,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         $mapper->bindFormConfigsWithRealValues($forms);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be bound when local config has no values')]
+    #[TestDox('Defaults should be bound when local config has no values')]
     public function testParametersAreBoundToDefaults(): void
     {
         $parameterHelper = $this->createStub(CoreParametersHelper::class);
@@ -170,7 +176,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->forms, $processedForms);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be merged with local config values')]
+    #[TestDox('Defaults should be merged with local config values')]
     public function testParametersAreBoundToDefaultsWithLocalConfig(): void
     {
         $parameterHelper = $this->createMock(CoreParametersHelper::class);
@@ -230,7 +236,7 @@ final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($forms, $processedForms);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be merged with local config values but restricted fields should be removed')]
+    #[TestDox('Defaults should be merged with local config values but restricted fields should be removed')]
     public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied(): void
     {
         $parameterHelper = $this->createMock(CoreParametersHelper::class);

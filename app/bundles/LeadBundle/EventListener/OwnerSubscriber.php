@@ -7,6 +7,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,6 +19,9 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     private string $ownerFieldSprintf = '{ownerfield=%s}';
 
+    /**
+     * @var array<int, mixed>|null
+     */
     private ?array $owners = null;
 
     public function __construct(
@@ -34,6 +38,7 @@ class OwnerSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_DISPLAY  => ['onEmailDisplay', 0],
             SmsEvents::ON_SMS_TOKENS_BUILD => ['onSmsTokensBuild', 0],
             SmsEvents::TOKEN_REPLACEMENT   => ['onSmsTokenReplacement', 0],
+            UrlTokenReplaceEvent::class    => ['onUrlTokenReplace', 0],
         ];
     }
 
@@ -67,6 +72,16 @@ class OwnerSubscriber implements EventSubscriberInterface
         }
         $ownerTokens = $this->getOwnerTokens($contact, $event->getContent());
         $content     = str_replace(array_keys($ownerTokens), $ownerTokens, $event->getContent());
+        $event->setContent($content);
+    }
+
+    public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
+    {
+        $contact             = $event->getLead()->getProfileFields();
+        $contact['owner_id'] = $event->getLead()->getOwner()?->getId();
+        $ownerTokens         = $this->getOwnerTokens($contact, $event->getContent());
+        $content             = str_replace(array_keys($ownerTokens), $ownerTokens, $event->getContent());
+
         $event->setContent($content);
     }
 
@@ -137,9 +152,9 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array|null
+     * @return mixed[]|null
      */
-    private function getOwner($ownerId)
+    private function getOwner(int $ownerId)
     {
         if (!isset($this->owners[$ownerId])) {
             $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);
@@ -149,11 +164,11 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array<int|string> $contact
+     * @param array<int|string>|null $contact
      *
      * @return array|string[]
      */
-    private function getOwnerTokens($contact, string $content): array
+    private function getOwnerTokens(?array $contact, string $content): array
     {
         if (empty($contact['owner_id'])) {
             return $this->getEmptyTokens();

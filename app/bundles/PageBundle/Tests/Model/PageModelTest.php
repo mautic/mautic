@@ -170,10 +170,12 @@ final class PageModelTest extends PageTestAbstract
             ->willReturn(null);
 
         $result = $pageModel->hitPage($redirect, new Request());
-        self::assertFalse($result);
+        $this->assertFalse($result);
     }
 
-    /** @param array<string, string> $query */
+    /**
+     * @param array<string, string> $query
+     */
     private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
@@ -183,12 +185,14 @@ final class PageModelTest extends PageTestAbstract
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
             if (str_contains($key, 'utm_')) {
-                $this->assertNotFalse(strpos($value, (string) $key), sprintf('%s not found in %s', $key, $value));
+                $this->assertStringContainsString((string) $key, $value, sprintf('%s not found in %s', $key, $value));
             }
         }
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getQueryParams(): array
     {
         $utm = [

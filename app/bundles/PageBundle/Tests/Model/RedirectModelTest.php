@@ -38,7 +38,7 @@ final class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertStringContainsString('http://some-url.com', $url);
+        $this->assertStringContainsString('http://some-url.com', (string) $url);
     }
 
     public function testRedirectGenerationEvent(): void
@@ -64,7 +64,8 @@ final class RedirectModelTest extends PageTestAbstract
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $shortener
+            $shortener,
+            $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class), // $redirectRepository
         );
 
         $redirect = new Redirect();

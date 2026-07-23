@@ -15,7 +15,7 @@ class DateExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('dateToText', $this->toText(...), ['is_safe' => ['all']]),
@@ -65,12 +65,10 @@ class DateExtension extends AbstractExtension
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }

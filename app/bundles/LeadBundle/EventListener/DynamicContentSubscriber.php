@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $segmentRepository)
-    {
+    public function __construct(
+        private LeadListRepository $segmentRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

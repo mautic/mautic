@@ -77,10 +77,9 @@ class TwitterCommandHelper
     /**
      * Processes a list of tweets and creates / updates leads in Mautic.
      *
-     * @param array      $statusList
      * @param Monitoring $monitor
      */
-    public function createLeadsFromStatuses($statusList, $monitor): int
+    public function createLeadsFromStatuses(array $statusList, $monitor): int
     {
         $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
 
@@ -198,7 +197,7 @@ class TwitterCommandHelper
         foreach ($statusList as $status) {
             $handle = strtolower($status['user']['screen_name']);
 
-            /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
+            /** @var Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
                 $lastActive              = new \DateTime($status['created_at']);
@@ -342,7 +341,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
+        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
         $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);
@@ -353,7 +352,7 @@ class TwitterCommandHelper
      *
      * @param Monitoring $monitor
      */
-    private function incrementPostCount($monitor, $tweet): void
+    private function incrementPostCount($monitor, array $tweet): void
     {
         $date = new \DateTime($tweet['created_at']);
 

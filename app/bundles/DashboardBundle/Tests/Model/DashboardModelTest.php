@@ -16,7 +16,6 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -55,6 +54,7 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(\Mautic\DashboardBundle\Entity\WidgetRepository::class), // $widgetRepository
         );
     }
 
@@ -78,15 +78,9 @@ final class DashboardModelTest extends TestCase
 
         $filter = $this->model->getDefaultFilter();
 
-        Assert::assertSame(
-            $dateFrom->format(\DateTimeInterface::ATOM),
-            $filter['dateFrom']->format(\DateTimeInterface::ATOM)
-        );
+        $this->assertSame($dateFrom->format(\DateTimeInterface::ATOM), $filter['dateFrom']->format(\DateTimeInterface::ATOM));
 
-        Assert::assertSame(
-            $dateTo->format(\DateTimeInterface::ATOM),
-            $filter['dateTo']->format(\DateTimeInterface::ATOM)
-        );
+        $this->assertSame($dateTo->format(\DateTimeInterface::ATOM), $filter['dateTo']->format(\DateTimeInterface::ATOM));
     }
 
     public function testPopulateWidgetContentCatchesExceptionAndSetsGenericErrorMessage(): void
@@ -130,11 +124,12 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $logger,
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(\Mautic\DashboardBundle\Entity\WidgetRepository::class), // $widgetRepository
         );
 
         // Pass timezone to skip userHelper->getUser()->getTimezone()
         $model->populateWidgetContent($widget, ['timezone' => 'UTC']);
 
-        Assert::assertSame('mautic.dashboard.widget.load.failed', $widget->getErrorMessage());
+        $this->assertSame('mautic.dashboard.widget.load.failed', $widget->getErrorMessage());
     }
 }

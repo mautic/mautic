@@ -34,7 +34,7 @@ final class EventModelFunctionalTest extends MauticMysqlTestCase
             $this->em->persist($event);
             $this->em->flush();
 
-            if (0 == $item % 2) {
+            if (0 === $item % 2) {
                 $currentEvents[$event->getId()] = $event;
             } else {
                 $deletedEvents[] = [

@@ -39,7 +39,7 @@ class SysinfoModel
      */
     public function getPhpInfo()
     {
-        if (!is_null($this->phpInfo)) {
+        if (null !== $this->phpInfo) {
             return $this->phpInfo;
         }
 
@@ -62,7 +62,7 @@ class SysinfoModel
             // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
-            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
+            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => PHP_VERSION]);
         } else {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.missing');
         }
@@ -93,7 +93,7 @@ class SysinfoModel
      */
     public function getFolders()
     {
-        if (!is_null($this->folders)) {
+        if (null !== $this->folders) {
             return $this->folders;
         }
 

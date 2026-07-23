@@ -10,11 +10,12 @@ use Twig\TwigFunction;
 
 final class ThemesExtension extends AbstractExtension
 {
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('getTextOnBrandColor', $this->getTextOnBrandColor(...)),

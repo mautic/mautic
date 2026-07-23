@@ -49,8 +49,8 @@ class FocusSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Check and hijack the form's generate link if the ID has mf- in it
+    /**
+     * Check and hijack the form's generate link if the ID has mf- in it.
      */
     public function onKernelRequest(RequestEvent $event): void
     {

@@ -116,10 +116,10 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ($current != $val) {
             $this->changes[$prop] = [$current, $val];
         }
@@ -223,7 +223,7 @@ class Client extends BaseClient
     /**
      * Add Authorization Grant Type.
      */
-    public function addGrantType(string $grantType): Client
+    public function addGrantType(string $grantType): self
     {
         $this->allowedGrantTypes[] = $grantType;
 

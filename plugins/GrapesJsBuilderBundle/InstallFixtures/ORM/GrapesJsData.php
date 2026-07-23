@@ -14,8 +14,9 @@ use Mautic\PluginBundle\Entity\Plugin;
 
 class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public static function getGroups(): array

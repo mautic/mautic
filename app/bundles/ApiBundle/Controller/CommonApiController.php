@@ -405,6 +405,10 @@ class CommonApiController extends FetchCommonApiController
         return $parameters;
     }
 
+    /**
+     * @param mixed[] $errors
+     * @param mixed[] $entities
+     */
     protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
     {
         $this->inBatchMode = true;
@@ -634,7 +638,7 @@ class CommonApiController extends FetchCommonApiController
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
-                throw new \UnexpectedValueException("Category $categoryId does not exist");
+                throw new \UnexpectedValueException("Category {$categoryId} does not exist");
             }
 
             $entity->setCategory($category);

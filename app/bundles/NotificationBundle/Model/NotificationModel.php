@@ -16,7 +16,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Entity\Stat;
+use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
@@ -49,24 +51,20 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly NotificationRepository $notificationRepository,
+        private readonly StatRepository $statRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): NotificationRepository
     {
-        return $this->em->getRepository(Notification::class);
+        return $this->notificationRepository;
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getPermissionBase(): string
@@ -216,10 +214,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 

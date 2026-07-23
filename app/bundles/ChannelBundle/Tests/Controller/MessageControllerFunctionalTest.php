@@ -7,7 +7,6 @@ namespace Mautic\ChannelBundle\Tests\Controller;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 
 final class MessageControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -33,6 +32,7 @@ final class MessageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedMessage = $this->em->find(Message::class, $message->getId());
-        Assert::assertSame($project->getId(), $savedMessage->getProjects()->first()->getId());
+        $this->assertInstanceOf(Message::class, $savedMessage);
+        $this->assertSame($project->getId(), $savedMessage->getProjects()->first()->getId());
     }
 }

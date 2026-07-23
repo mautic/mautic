@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PageHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -21,13 +22,12 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->session              = $this->createMock(SessionInterface::class);
         $requestStack               = $this->createMock(RequestStack::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $this->pageHelper           = new PageHelper($requestStack, $coreParametersHelper, 'mautic.test', 0);
+        $this->pageHelper           = new PageHelper($requestStack, $this->createStub(CoreParametersHelper::class), 'mautic.test', 0);
 
         $requestStack->method('getSession')->willReturn($this->session);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('PageProvider')]
+    #[DataProvider('PageProvider')]
     public function testCountPage(int $count, int $limit, int $page): void
     {
         $this->session->expects($this->once())
@@ -38,23 +38,23 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
-    public static function pageProvider(): array
+    /**
+     * @return \Iterator<int, array{int, int, int}>
+     */
+    public static function pageProvider(): \Iterator
     {
-        return [
-            [0, 10, 1],
-            [1, 10, 1],
-            [5, 10, 1],
-            [10, 10, 1],
-            [11, 10, 2],
-            [20, 10, 2],
-            [21, 10, 3],
-            [15, 15, 1],
-            [16, 15, 2],
-        ];
+        yield [0, 10, 1];
+        yield [1, 10, 1];
+        yield [5, 10, 1];
+        yield [10, 10, 1];
+        yield [11, 10, 2];
+        yield [20, 10, 2];
+        yield [21, 10, 3];
+        yield [15, 15, 1];
+        yield [16, 15, 2];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('startProvider')]
+    #[DataProvider('startProvider')]
     public function testCountStart(int $page, int $limit, int $start): void
     {
         $this->session->expects($this->once())
@@ -65,14 +65,14 @@ final class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    /** @return array<int, array{0: int, 1: int, 2: int}> */
-    public static function startProvider(): array
+    /**
+     * @return \Iterator<int, array{int, int, int}>
+     */
+    public static function startProvider(): \Iterator
     {
-        return [
-            [0, 10, 1],
-            [1, 10, 1],
-            [10, 10, 1],
-            [11, 10, 2],
-        ];
+        yield [0, 10, 1];
+        yield [1, 10, 1];
+        yield [10, 10, 1];
+        yield [11, 10, 2];
     }
 }

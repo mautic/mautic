@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -60,16 +59,12 @@ final class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($company, $idMap[$company->getEmail()]);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail()]);
+            });
 
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
@@ -93,10 +88,10 @@ final class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -112,16 +107,12 @@ final class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setValue($company, $idMap[$company->getEmail() ?? '']);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail() ?? '']);
+            });
 
         $this->repository->expects($this->exactly(3))
             ->method('detachEntity');
@@ -146,13 +137,13 @@ final class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
                 case 4:
-                    Assert::assertSame(129, $objectMapping->getInternalObjectId());
+                    $this->assertSame(129, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -189,7 +180,7 @@ final class CompanyObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
     }
@@ -202,7 +193,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->with(1)
             ->willReturn($company);
 
-        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($company, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
@@ -211,7 +202,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Company::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testSetFieldValues(): void
@@ -230,7 +221,7 @@ final class CompanyObjectHelperTest extends TestCase
 
         $objectMappings = $this->getObjectHelper()->update([], []);
 
-        Assert::assertSame([], $objectMappings);
+        $this->assertSame([], $objectMappings);
     }
 
     private function getObjectHelper(): CompanyObjectHelper
