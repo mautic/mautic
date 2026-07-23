@@ -6,8 +6,9 @@ namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
+use Twig\Extension\AbstractExtension;
 
-class FormExtension
+class FormExtension extends AbstractExtension
 {
     /**
      * @param array<string> $v

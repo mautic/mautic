@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Twig\Extension\AbstractExtension;
 
-class AssetExtension
+class AssetExtension extends AbstractExtension
 {
     public function __construct(
         protected AssetsHelper $assetsHelper,

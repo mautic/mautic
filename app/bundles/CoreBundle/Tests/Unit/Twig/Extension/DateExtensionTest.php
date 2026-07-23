@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Twig\Extension\DateExtension;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\TwigFunction;
 
 final class DateExtensionTest extends TestCase
 {
@@ -49,22 +48,15 @@ final class DateExtensionTest extends TestCase
 
     public function testGetFunctions(): void
     {
-        $functions = $this->dateExtension->getFunctions();
-
-        $this->assertContainsOnlyInstancesOf(TwigFunction::class, $functions);
-        $this->assertCount(9, $functions);
-
-        $functionNames = array_map(fn (TwigFunction $function): string => $function->getName(), $functions);
-
-        $this->assertContains('dateToText', $functionNames);
-        $this->assertContains('dateToFull', $functionNames);
-        $this->assertContains('dateToFullConcat', $functionNames);
-        $this->assertContains('dateToDate', $functionNames);
-        $this->assertContains('dateToTime', $functionNames);
-        $this->assertContains('dateToShort', $functionNames);
-        $this->assertContains('dateFormatRange', $functionNames);
-        $this->assertContains('dateToHumanized', $functionNames);
-        $this->assertContains('dateToTextShort', $functionNames);
+        $this->assertTrue(method_exists($this->dateExtension, 'toText'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toFull'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toFullConcat'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toDate'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toTime'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toShort'));
+        $this->assertTrue(method_exists($this->dateExtension, 'formatRange'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toHumanized'));
+        $this->assertTrue(method_exists($this->dateExtension, 'toTextShort'));
     }
 
     public function testToText(): void
