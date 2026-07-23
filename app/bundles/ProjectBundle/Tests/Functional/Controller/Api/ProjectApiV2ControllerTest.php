@@ -131,7 +131,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
         $this->assertSame(['key' => 'value'], $content['properties']);
 
         $persistedProject = $this->getProjectByName('API V2 Project 3');
-        $this->assertNotNull($persistedProject);
+        $this->assertInstanceOf(Project::class, $persistedProject);
         $this->assertCount(3, $this->getAllProjects());
     }
 
@@ -193,7 +193,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
         $deletedProject = $this->em->getRepository(Project::class)->find($projectId);
-        $this->assertNull($deletedProject, 'Project should be deleted from database');
+        $this->assertNotInstanceOf(Project::class, $deletedProject, 'Project should be deleted from database');
 
         $this->assertCount(1, $this->getAllProjects());
     }
@@ -262,7 +262,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
     {
         $project = $this->getProjectByName($name);
 
-        $this->assertNotNull($project);
+        $this->assertInstanceOf(Project::class, $project);
         $projectId = $project->getId();
 
         $this->assertIsInt($projectId);
@@ -288,9 +288,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
     {
         $projects = $this->em->getRepository(Project::class)->findAll();
 
-        foreach ($projects as $project) {
-            $this->assertInstanceOf(Project::class, $project);
-        }
+        $this->assertContainsOnlyInstancesOf(Project::class, $projects);
 
         return $projects;
     }

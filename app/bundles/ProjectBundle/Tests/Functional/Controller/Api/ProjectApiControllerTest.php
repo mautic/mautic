@@ -59,7 +59,7 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $this->assertCount(3, $this->em->getRepository(Project::class)->findAll());
-        $this->assertNotNull($this->em->getRepository(Project::class)->findOneBy(['name' => 'Project 3']));
+        $this->assertInstanceOf(Project::class, $this->em->getRepository(Project::class)->findOneBy(['name' => 'Project 3']));
     }
 
     public function testUpdateProject(): void
@@ -72,9 +72,10 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $updatedProject = $this->em->getRepository(Project::class)->find($projectId);
+        $this->assertInstanceOf(Project::class, $updatedProject);
 
-        $this->assertEquals('Project 1', $updatedProject->getName());
-        $this->assertEquals('Updated First Project', $updatedProject->getDescription(), 'The project should be updated');
+        $this->assertSame('Project 1', $updatedProject->getName());
+        $this->assertSame('Updated First Project', $updatedProject->getDescription(), 'The project should be updated');
     }
 
     public function testDeleteProject(): void
@@ -86,7 +87,7 @@ final class ProjectApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $this->assertCount(1, $this->em->getRepository(Project::class)->findAll());
-        $this->assertNull($this->em->getRepository(Project::class)->find($projectId));
+        $this->assertNotInstanceOf(Project::class, $this->em->getRepository(Project::class)->find($projectId));
     }
 
     public function testBulkDeleteProjects(): void
