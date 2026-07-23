@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class FullContactController extends FormController
+final class FullContactController extends FormController
 {
     private CompanyModel $companyModel;
 

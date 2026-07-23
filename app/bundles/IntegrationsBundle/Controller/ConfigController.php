@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class ConfigController extends AbstractFormController
+final class ConfigController extends AbstractFormController
 {
     /**
      * @var BasicIntegration|ConfigFormInterface
