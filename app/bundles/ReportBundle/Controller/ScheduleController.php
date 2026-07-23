@@ -17,11 +17,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 class ScheduleController extends CommonAjaxController
 {
     private ReportModel $reportModel;
+    private ScheduleModel $scheduleModel;
 
     #[Required]
-    public function autowireScheduleController(ReportModel $reportModel): void
+    public function autowireScheduleController(ReportModel $reportModel, ScheduleModel $scheduleModel): void
     {
-        $this->reportModel = $reportModel;
+        $this->reportModel   = $reportModel;
+        $this->scheduleModel = $scheduleModel;
     }
 
     public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
@@ -86,8 +88,7 @@ class ScheduleController extends CommonAjaxController
 
     public function exportAction(int $reportId): JsonResponse
     {
-        $model    = $this->getModel('report');
-        $report   = $model->getEntity($reportId);
+        $report   = $this->reportModel->getEntity($reportId);
         $security = $this->security;
 
         if (empty($report)) {
@@ -111,11 +112,9 @@ class ScheduleController extends CommonAjaxController
         $options['dynamicFilters']       = $dynamicFilters;
         $options['email_to_send_report'] = $this->user->getEmail();
 
-        $scheduleModel = $this->getModel('report.schedule_model');
-        \assert($scheduleModel instanceof ScheduleModel);
         $scheduler = new Scheduler($report, new \DateTime());
         $scheduler->setData($options);
-        $scheduleModel->saveEntity($scheduler);
+        $this->scheduleModel->saveEntity($scheduler);
 
         if ($this->dispatcher->hasListeners(ReportEvents::REPORT_SCHEDULE_EXPORT)) {
             $event = new ReportEvent($report);

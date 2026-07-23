@@ -47,7 +47,7 @@ class ReportExporter
             $this->reportExportOptions->setData($scheduledData);
             $this->reportExportOptions->setDateFrom(new \DateTime($scheduledData['dateFrom']));
             $this->reportExportOptions->setDateTo(new \DateTime($scheduledData['dateTo']));
-        } elseif (!is_null($scheduler->getScheduleDate())) {
+        } else {
             $dateTo = clone $scheduler->getScheduleDate();
             $dateTo->setTime(0, 0, 0);
 
