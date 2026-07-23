@@ -68,7 +68,7 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param ?int $id
+     * @param mixed $id
      */
     public function getEntity($id = null): ?object
     {
