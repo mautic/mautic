@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ReportController extends FormController
+final class ReportController extends FormController
 {
     private ReportModel $reportModel;
 
@@ -155,12 +155,7 @@ class ReportController extends FormController
         return $this->newAction($request, $entity);
     }
 
-    /**
-     * Deletes the entity.
-     *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
-     */
-    public function deleteAction(Request $request, int $objectId)
+    public function deleteAction(Request $request, int $objectId): bool|Response
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -292,7 +287,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, int $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
     {
         $entity  = $this->reportModel->getEntity($objectId);
         $session = $request->getSession();

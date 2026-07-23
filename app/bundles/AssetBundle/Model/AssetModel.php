@@ -166,8 +166,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->emailRepository;
-                    if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
                 }

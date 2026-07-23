@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected ListModel $listModel;
+    private ListModel $listModel;
 
     private string $prefix;
 

@@ -68,9 +68,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->availableSearchFields = $fields;
     }
 
-    /**
-     * Sets trigger model.
-     */
     public function setTriggerModel(TriggerModel $triggerModel): void
     {
         $this->triggerModel = $triggerModel;

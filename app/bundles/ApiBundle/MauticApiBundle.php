@@ -3,6 +3,7 @@
 namespace Mautic\ApiBundle;
 
 use Mautic\ApiBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -12,6 +13,6 @@ class MauticApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new SerializerPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new SerializerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

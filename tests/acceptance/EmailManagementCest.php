@@ -43,10 +43,14 @@ class EmailManagementCest
         $this->verifyAllEmailsBelongTo($I, $newCategoryName);
     }
 
-    public function selectAllEmails(AcceptanceTester $I): void
+    private function selectAllEmails(AcceptanceTester $I): void
     {
         $I->waitForElementClickable(EmailsPage::SELECT_ALL_CHECKBOX);
         $I->click(EmailsPage::SELECT_ALL_CHECKBOX);
+        $I->waitForJS(
+            "return document.querySelectorAll('input.list-checkbox:not(:checked)').length === 0;",
+            10
+        );
         $I->seeCheckboxIsChecked(EmailsPage::SELECT_ALL_CHECKBOX);
     }
 
