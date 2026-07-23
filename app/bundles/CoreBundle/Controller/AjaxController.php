@@ -156,17 +156,16 @@ class AjaxController extends CommonController
         $model      = InputHelper::clean($request->query->get('model'));
         $commands   = $this->getModel($model)->getCommandList();
         $dataArray  = [];
-        $translator = $this->translator;
         foreach ($commands as $k => $c) {
             if (is_array($c)) {
                 foreach ($c as $subc) {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
-                    $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
+                    $dataArray[$command.$this->translator->trans($subc)] = ['value' => $command.$this->translator->trans($subc)];
                 }
             } else {
-                $command = $translator->trans($c);
+                $command = $this->translator->trans($c);
                 $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
@@ -180,7 +179,6 @@ class AjaxController extends CommonController
     public function globalCommandListAction(SearchCommandListInterface $searchCommandList): JsonResponse
     {
         $allCommands = $searchCommandList->getList();
-        $translator  = $this->translator;
         $dataArray   = [];
         $dupChecker  = [];
         foreach ($allCommands as $commands) {
@@ -189,18 +187,18 @@ class AjaxController extends CommonController
             // $dataArray[$header] = array();
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
-                        $subcommand = $command.$translator->trans($subc);
+                        $subcommand = $command.$this->translator->trans($subc);
                         if (!in_array($subcommand, $dupChecker)) {
                             $dataArray[]  = ['value' => $subcommand];
                             $dupChecker[] = $subcommand;
                         }
                     }
                 } else {
-                    $command = $translator->trans($k);
+                    $command = $this->translator->trans($k);
                     $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {

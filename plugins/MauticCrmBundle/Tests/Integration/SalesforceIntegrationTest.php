@@ -32,24 +32,24 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var array<string, int>
      */
-    protected array $maxInvocations = [];
+    private array $maxInvocations = [];
 
-    protected ?string $specialSfCase = null;
-
-    /**
-     * @var array<int, mixed>
-     */
-    protected array $persistedIntegrationEntities = [];
+    private ?string $specialSfCase = null;
 
     /**
      * @var array<int, mixed>
      */
-    protected array $returnedSfEntities = [];
+    private array $persistedIntegrationEntities = [];
+
+    /**
+     * @var array<int, mixed>
+     */
+    private array $returnedSfEntities = [];
 
     /**
      * @var array<int|string, mixed>
      */
-    protected array $mauticContacts = [
+    private array $mauticContacts = [
         'Contact' => [],
         'Lead'    => [],
     ];
@@ -57,7 +57,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var list<string>
      */
-    protected array $sfObjects = [
+    private array $sfObjects = [
         'Lead',
         'Contact',
         'company',
@@ -66,37 +66,37 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var list<string>
      */
-    protected array $sfMockMethods = [
+    private array $sfMockMethods = [
         'makeRequest',
     ];
 
     /**
      * @var list<string>
      */
-    protected array $sfMockResetMethods = [
+    private array $sfMockResetMethods = [
         'makeRequest',
     ];
 
     /**
      * @var list<string>
      */
-    protected array $sfMockResetObjects = [
+    private array $sfMockResetObjects = [
         'Lead',
         'Contact',
         'company',
     ];
 
-    protected int $idCounter = 1;
+    private int $idCounter = 1;
 
     /**
      * @var array<string, int>
      */
-    protected array $leadsUpdatedCounter = [
+    private array $leadsUpdatedCounter = [
         'Lead'    => 0,
         'Contact' => 0,
     ];
 
-    protected int $leadsCreatedCounter = 0;
+    private int $leadsCreatedCounter = 0;
 
     protected function setUp(): void
     {

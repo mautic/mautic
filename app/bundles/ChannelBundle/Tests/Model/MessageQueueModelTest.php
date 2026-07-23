@@ -28,27 +28,24 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     public const DATE = '2019-07-07 15:00:00';
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueue;
+    private MessageQueueModel $messageQueue;
 
-    protected MessageQueue $message;
+    private MessageQueue $message;
 
     /**
      * @var MockObject&LeadModel
      */
-    protected MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject&EntityManagerInterface
      */
-    protected MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&MessageQueueRepository
      */
-    protected MockObject $messageQueueRepository;
+    private MockObject $messageQueueRepository;
 
     protected function setUp(): void
     {
