@@ -4,6 +4,7 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -51,13 +52,13 @@ class ScheduleController extends CommonAjaxController
      */
     public function nowAction($reportId): JsonResponse
     {
-        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
-        if (empty($report)) {
+        if (!$report instanceof Report) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash(Response::HTTP_NOT_FOUND);
