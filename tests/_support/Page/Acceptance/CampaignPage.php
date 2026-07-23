@@ -2,7 +2,7 @@
 
 namespace Page\Acceptance;
 
-class CampaignPage
+final class CampaignPage
 {
     public static $URL                  = 's/campaigns/view/1';
     public static $contactsTab          = '//ul[contains(@class, "nav-tabs")]/li/a[@href="#leads-container"]';

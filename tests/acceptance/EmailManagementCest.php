@@ -6,7 +6,7 @@ use Page\Acceptance\EmailsPage;
 use Step\Acceptance\EmailStep;
 use Step\Acceptance\SegmentStep;
 
-class EmailManagementCest
+final class EmailManagementCest
 {
     public const ADMIN_PASSWORD = 'Maut1cR0cks!';
     public const ADMIN_USER     = 'admin';

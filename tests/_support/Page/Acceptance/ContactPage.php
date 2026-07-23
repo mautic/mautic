@@ -2,7 +2,7 @@
 
 namespace Page\Acceptance;
 
-class ContactPage
+final class ContactPage
 {
     public static $URL = '/s/contacts';
 
