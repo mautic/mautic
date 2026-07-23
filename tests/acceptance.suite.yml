@@ -10,7 +10,7 @@ modules:
         port: 4444
         window_size: maximize
         capabilities:
-          chromeOptions:
+          "goog:chromeOptions":
             args:
               - "--ignore-certificate-errors"
               - "--disable-dev-shm-usage"
