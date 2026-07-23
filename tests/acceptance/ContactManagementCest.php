@@ -115,6 +115,7 @@ class ContactManagementCest
         $I->see($contactName);
 
         // Click on the edit button
+        $I->waitForElementClickable(ContactPage::$editButton, 30);
         $I->click(ContactPage::$editButton);
 
         // Wait for the edit form to be visible
