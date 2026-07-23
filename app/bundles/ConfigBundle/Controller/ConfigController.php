@@ -33,8 +33,7 @@ class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -74,7 +73,7 @@ class ConfigController extends FormController
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -120,7 +119,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
@@ -189,8 +188,7 @@ class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -226,8 +224,7 @@ class ConfigController extends FormController
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();

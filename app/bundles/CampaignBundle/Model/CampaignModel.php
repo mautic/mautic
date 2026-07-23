@@ -76,10 +76,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
     public function getRepository(): CampaignRepository
     {
-        $repo = $this->campaignRepository;
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->campaignRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->campaignRepository;
     }
 
     public function getEventRepository(): EventRepository
@@ -769,7 +768,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string   $root
      * @param int      $order
      */
-    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1)
+    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
@@ -877,7 +876,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
-        $statRepo            = $this->statRepository;
         $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
         if ($entity->isEmailCampaign()) {
@@ -889,7 +887,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 $emailIds[] = $event->getChannelId();
             }
 
-            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
+            $emailStats            = $this->statRepository->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
             $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {

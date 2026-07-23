@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -219,8 +220,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function __construct()
     {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
         $this->initializeProjects();
     }
 

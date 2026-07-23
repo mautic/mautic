@@ -15,10 +15,12 @@ use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class CompanyController extends FormController
 {
@@ -28,11 +30,11 @@ class CompanyController extends FormController
 
     private CompanyModel $companyModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireCompanyController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
     ): void {

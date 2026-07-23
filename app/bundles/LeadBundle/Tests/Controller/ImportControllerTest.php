@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -66,7 +67,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
+    #[DataProvider('validateDataProvider')]
     public function testImportMappingAndImport(string $skipIfExist, string $expectedName): void
     {
         $this->createLead('john@doe.email', 'Johny');

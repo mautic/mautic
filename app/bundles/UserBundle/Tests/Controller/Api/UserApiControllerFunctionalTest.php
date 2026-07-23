@@ -9,6 +9,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -136,7 +137,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('passwordProvider')]
+    #[DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
         $role = $this->getRole(self::ADMIN_ROLE);
@@ -207,7 +208,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @param array<string, mixed> $userData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('userCreateDataProvider')]
+    #[DataProvider('userCreateDataProvider')]
     public function testCreateUserViaApiPlatform(array $userData, int $expectedStatusCode): void
     {
         // Create a role first

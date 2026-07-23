@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
@@ -259,7 +260,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($contacts as $contact) {
             $args['lead'] = $this->contactRepository->getEntity($contact->getId());
 
-            $event      = new CampaignExecutionEvent($args, true); // @phpstan-ignore new.deprecated
+            $event      = new CampaignExecutionEvent($args, true);
             $dispatcher = static::getContainer()->get('event_dispatcher');
             $result     = $dispatcher->dispatch(
                 $event,
@@ -1056,7 +1057,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        $event           = new CampaignExecutionEvent($args, false, $log); // @phpstan-ignore new.deprecated
+        $event           = new CampaignExecutionEvent($args, false, $log);
         $eventDispatcher = static::getContainer()->get('event_dispatcher');
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 
@@ -1076,7 +1077,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaign->addLead($lead->getId(), $campaignLead);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
+    #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
         if (!$this->isPostgresqlPlatform()) {

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -100,7 +101,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
+    #[DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -159,7 +160,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
+    #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $user = $this->getUser(self::ADMIN_USER);

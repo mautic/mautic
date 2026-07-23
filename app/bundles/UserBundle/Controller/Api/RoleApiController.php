@@ -45,7 +45,7 @@ class RoleApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         if (isset($parameters['rawPermissions'])) {
             $this->model->setRolePermissions($entity, $parameters['rawPermissions']);

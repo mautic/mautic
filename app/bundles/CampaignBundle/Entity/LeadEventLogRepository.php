@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadEventLog>
@@ -155,7 +156,7 @@ class LeadEventLogRepository extends CommonRepository
         $leadIps = [];
 
         $connection = $this->_em->getConnection();
-        $query      = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($connection);
+        $query      = new QueryBuilder($connection);
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {

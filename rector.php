@@ -38,8 +38,8 @@ return RectorConfig::configure()
         // other objects
         CommonRepository::class,
         Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
@@ -53,6 +53,10 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
+        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -68,6 +72,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+        // to be fixed in dev-main
+        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
+            '*Command.php',
+        ],
+
         // skip as might be overriden by 3rd party controllers
         ResponseReturnTypeControllerActionRector::class => [
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
@@ -77,16 +86,6 @@ return RectorConfig::configure()
         ],
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
-        ],
-
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
-            // a getRepository() override
-            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
-            // list lead vs lead list diff
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
@@ -100,7 +99,6 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -115,8 +113,6 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',

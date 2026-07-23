@@ -5,23 +5,26 @@ namespace MauticPlugin\MauticClearbitBundle\Controller;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticClearbitBundle\Form\Type\BatchLookupType;
 use MauticPlugin\MauticClearbitBundle\Form\Type\LookupType;
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class ClearbitController extends FormController
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireClearbitController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;

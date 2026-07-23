@@ -24,7 +24,7 @@ final class ContactFiltersEvaluateEvent extends Event
 
     public function isMatch(): bool
     {
-        return $this->isEvaluated() && $this->isMatched;
+        return $this->isEvaluated && $this->isMatched;
     }
 
     public function isEvaluated(): bool

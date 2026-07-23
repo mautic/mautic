@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,7 +16,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
 
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
+    #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
     public function testCreatingCustomFieldIndexableAndSearchable(int $isIndex, string $expectedValue): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');

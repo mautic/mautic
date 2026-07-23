@@ -20,6 +20,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -430,7 +431,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('formTypeDataProvider')]
+    #[DataProvider('formTypeDataProvider')]
     public function testAddContactToCampaignByForm(?string $formType): void
     {
         // Create the test form via API.
@@ -753,7 +754,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formFieldValuesMappingDataProvider')]
+    #[DataProvider('formFieldValuesMappingDataProvider')]
     public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
         $formPayload = [
@@ -1026,7 +1027,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formCustomFieldsMappingDataProvider')]
+    #[DataProvider('formCustomFieldsMappingDataProvider')]
     public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
     {
         // Create new contact custom field
@@ -1215,7 +1216,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('htmlFieldSubmissionDataProvider')]
+    #[DataProvider('htmlFieldSubmissionDataProvider')]
     public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
     {
         // Create form with freehtml and email fields

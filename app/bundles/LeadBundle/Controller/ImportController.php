@@ -67,7 +67,6 @@ class ImportController extends FormController
         CorePermissions $security,
         private readonly ImportModel $importModel,
     ) {
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -190,8 +189,6 @@ class ImportController extends FormController
      */
     public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {
-        $dispatcher = $this->dispatcher;
-
         try {
             $initEvent = $this->dispatchImportOnInit();
         } catch (AccessDeniedException $e) {
@@ -238,7 +235,7 @@ class ImportController extends FormController
                 $form = $this->formFactory->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
-                $mappingEvent = $dispatcher->dispatch(
+                $mappingEvent = $this->dispatcher->dispatch(
                     new ImportMappingEvent($request->get('object')),
                     LeadEvents::IMPORT_ON_FIELD_MAPPING
                 );
@@ -396,7 +393,7 @@ class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($request->get('object'), $form);
 
-                    $dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
+                    $this->dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
 
                     if ($validateEvent->hasErrors()) {
                         break;

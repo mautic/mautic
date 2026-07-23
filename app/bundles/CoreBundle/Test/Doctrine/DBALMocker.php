@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 
 class DBALMocker
 {
@@ -34,7 +35,7 @@ class DBALMocker
     ];
 
     public function __construct(
-        protected \PHPUnit\Framework\TestCase $testCase,
+        protected TestCase $testCase,
     ) {
     }
 

@@ -92,17 +92,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     private array $leadChangeLists = [];
 
-    /**
-     * @return LeadListRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadListRepository
     {
-        $repo = $this->leadListRepository;
+        $this->leadListRepository->setDispatcher($this->dispatcher);
+        $this->leadListRepository->setTranslator($this->translator);
 
-        $repo->setDispatcher($this->dispatcher);
-        $repo->setTranslator($this->translator);
-
-        return $repo;
+        return $this->leadListRepository;
     }
 
     /**
@@ -878,7 +873,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Batch sleep according to settings.
      */
-    protected function batchSleep()
+    protected function batchSleep(): void
     {
         $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
         if (false === $leadSleepTime) {
