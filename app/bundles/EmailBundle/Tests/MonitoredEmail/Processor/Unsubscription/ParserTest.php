@@ -9,9 +9,10 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 
 #[CoversClass(Parser::class)]
-#[CoversClass(\Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail::class)]
+#[CoversClass(UnsubscribedEmail::class)]
 final class ParserTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Test that an email is found inside a feedback report')]

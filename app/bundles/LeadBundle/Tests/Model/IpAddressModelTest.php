@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\IpAddressModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 
 final class IpAddressModelTest extends TestCase
 {
@@ -31,7 +32,7 @@ final class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class), $this->createStub(\Mautic\CoreBundle\Entity\IpAddressRepository::class));
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class), $this->createStub(IpAddressRepository::class));
     }
 
     /**

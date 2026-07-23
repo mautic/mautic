@@ -31,6 +31,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\LeadBundle\Model\ListModel;
 
 final class EmailControllerTest extends TestCase
 {
@@ -123,8 +126,8 @@ final class EmailControllerTest extends TestCase
         );
         $this->controller->setContainer($this->containerMock);
         $this->controller->autowireEmailController(
-            $this->createStub(\Mautic\LeadBundle\Model\ListModel::class),
-            $this->createStub(\Mautic\CoreBundle\Model\AuditLogModel::class),
+            $this->createStub(ListModel::class),
+            $this->createStub(AuditLogModel::class),
             $this->modelMock
         );
         $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
@@ -227,7 +230,7 @@ final class EmailControllerTest extends TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with(\Mautic\EmailBundle\Form\Type\ExampleSendType::class,
+            ->with(ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [

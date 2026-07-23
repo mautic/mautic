@@ -8,6 +8,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 class FormBuilderEvent extends Event
 {
@@ -126,7 +127,7 @@ class FormBuilderEvent extends Event
         if (isset($field['valueFilter'])
             && (!is_string($field['valueFilter'])
                 || !is_callable(
-                    [\Mautic\CoreBundle\Helper\InputHelper::class, $field['valueFilter']]
+                    [InputHelper::class, $field['valueFilter']]
                 ))
         ) {
             $callbacks = ['valueFilter'];

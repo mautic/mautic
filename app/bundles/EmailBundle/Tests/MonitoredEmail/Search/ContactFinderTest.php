@@ -13,10 +13,12 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
+use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 
 #[CoversClass(ContactFinder::class)]
-#[CoversClass(\Mautic\EmailBundle\MonitoredEmail\Search\Result::class)]
-#[CoversClass(\Mautic\EmailBundle\MonitoredEmail\Processor\Address::class)]
+#[CoversClass(Result::class)]
+#[CoversClass(Address::class)]
 final class ContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Contact should be found via contact email address')]

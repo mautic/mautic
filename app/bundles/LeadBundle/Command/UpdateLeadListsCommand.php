@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: UpdateLeadListsCommand::NAME,
@@ -84,7 +85,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $excludeSegments       = $input->getOption('exclude');
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -97,7 +98,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
 
             // Track already rebuilt lists to avoid rebuilding them multiple times
@@ -161,7 +162,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**

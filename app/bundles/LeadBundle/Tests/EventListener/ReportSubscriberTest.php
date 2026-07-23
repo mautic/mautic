@@ -31,6 +31,8 @@ use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 
 final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -242,7 +244,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'           => 'Send email',
                             'description'     => 'Send the selected email to the contact.',
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
-                            'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
+                            'formType'        => EmailSendType::class,
                             'formTypeOptions' => [
                                 'update_select'    => 'campaignevent_properties_email',
                                 'with_email_types' => true,
@@ -257,7 +259,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'                  => 'Clicks email',
                             'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                             'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                            'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
+                            'formType'               => EmailClickDecisionType::class,
                             'connectionRestrictions' => [
                                 'source' => [
                                     'action' => [

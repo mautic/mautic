@@ -31,6 +31,7 @@ use Mautic\SmsBundle\SmsEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Mautic\SmsBundle\Entity\Sms;
 
 final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,7 +64,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                             'form.submit',
                         ],
                         'lookupFormType'             => 'sms_list',
-                        'repository'                 => \Mautic\SmsBundle\Entity\Sms::class,
+                        'repository'                 => Sms::class,
                     ],
                 ]
             );

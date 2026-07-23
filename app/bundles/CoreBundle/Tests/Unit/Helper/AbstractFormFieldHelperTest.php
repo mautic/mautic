@@ -8,12 +8,16 @@ use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
+use Mautic\CoreBundle\Helper\ListParser\BarListParser;
+use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
+use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
-#[CoversClass(\Mautic\CoreBundle\Helper\ListParser\BarListParser::class)]
-#[CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
-#[CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
-#[CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
+#[CoversClass(BarListParser::class)]
+#[CoversClass(JsonListParser::class)]
+#[CoversClass(ValueListParser::class)]
+#[CoversClass(ArrayListParser::class)]
 final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('The string is parsed correctly into a choice array')]

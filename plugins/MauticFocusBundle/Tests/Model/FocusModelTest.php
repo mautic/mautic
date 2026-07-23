@@ -23,6 +23,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 
 final class FocusModelTest extends TestCase
 {
@@ -58,8 +60,8 @@ final class FocusModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class), // $focusRepository
-            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class), // $statRepository
+            $this->createStub(FocusRepository::class), // $focusRepository
+            $this->createStub(StatRepository::class), // $statRepository
         );
         $focus = [
             'form' => 'xxx',

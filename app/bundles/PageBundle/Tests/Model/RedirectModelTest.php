@@ -18,6 +18,7 @@ use Mautic\PageBundle\Tests\PageTestAbstract;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Mautic\PageBundle\Entity\RedirectRepository;
 
 final class RedirectModelTest extends PageTestAbstract
 {
@@ -65,7 +66,7 @@ final class RedirectModelTest extends PageTestAbstract
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $shortener,
-            $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class), // $redirectRepository
+            $this->createStub(RedirectRepository::class), // $redirectRepository
         );
 
         $redirect = new Redirect();

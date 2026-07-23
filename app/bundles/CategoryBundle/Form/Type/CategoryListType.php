@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CategoryBundle\Entity\Category;
 
 /**
  * @extends AbstractType<mixed>
@@ -29,7 +30,7 @@ class CategoryListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (true === $options['return_entity']) {
-            $transformer = new IdToEntityModelTransformer($this->em, \Mautic\CategoryBundle\Entity\Category::class, 'id');
+            $transformer = new IdToEntityModelTransformer($this->em, Category::class, 'id');
             $builder->addModelTransformer($transformer);
         }
     }

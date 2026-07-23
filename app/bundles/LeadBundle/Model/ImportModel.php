@@ -33,6 +33,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @extends FormModel<Import>
@@ -142,7 +143,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed', ['%reason%' =>  $import->getStatusInfo()]),
                     'ri-download-line',
                     null,
-                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                    $this->em->getReference(User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -244,7 +245,7 @@ class ImportModel extends FormModel
                 $this->generateLink($import, $this->translator->trans('mautic.lead.import.completed')),
                 'ri-download-line',
                 null,
-                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                $this->em->getReference(User::class, $import->getCreatedBy())
             );
         }
     }

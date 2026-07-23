@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Doctrine\DBAL\Connection;
 
 final class ContactSegmentFilterTest extends TestCase
 {
@@ -191,7 +192,7 @@ final class ContactSegmentFilterTest extends TestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilder = new QueryBuilder($this->createStub(\Doctrine\DBAL\Connection::class));
+        $queryBuilder = new QueryBuilder($this->createStub(Connection::class));
 
         $this->filterQueryBuilder->expects($this->once())
             ->method('applyQuery')

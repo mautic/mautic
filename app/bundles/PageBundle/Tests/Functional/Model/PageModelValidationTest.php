@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\PageBundle\Entity\Hit;
 
 final class PageModelValidationTest extends MauticMysqlTestCase
 {
@@ -46,7 +47,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        $this->assertInstanceOf(\Mautic\PageBundle\Entity\Hit::class, $pageHit, 'page hit should not be empty');
+        $this->assertInstanceOf(Hit::class, $pageHit, 'page hit should not be empty');
     }
 
     public function testPageHitWhenRequiredValuesValidationFails(): void
@@ -69,7 +70,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
 
         // Verify no Hit was persisted due to validation failure
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        $this->assertNotInstanceOf(\Mautic\PageBundle\Entity\Hit::class, $pageHit, 'page hit should not be persisted when validation fails');
+        $this->assertNotInstanceOf(Hit::class, $pageHit, 'page hit should not be persisted when validation fails');
     }
 
     /**

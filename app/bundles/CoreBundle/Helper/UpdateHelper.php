@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Helper class for fetching update data.
@@ -225,9 +226,9 @@ class UpdateHelper
             );
 
             $options = [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
-                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::HEADERS         => [
+                RequestOptions::FORM_PARAMS     => $data,
+                RequestOptions::CONNECT_TIMEOUT => 10,
+                RequestOptions::HEADERS         => [
                     'Accept' => '*/*',
                 ],
             ];

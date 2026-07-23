@@ -46,6 +46,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
@@ -1916,7 +1917,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->em->getRepository(User::class)->getEntities(
                     [
                         'filter' => [
                             'force' => [

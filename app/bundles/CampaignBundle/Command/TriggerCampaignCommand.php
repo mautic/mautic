@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: 'mautic:campaigns:trigger',
@@ -213,7 +214,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
@@ -222,7 +223,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
         try {
             // Specific campaign;

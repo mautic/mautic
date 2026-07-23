@@ -23,15 +23,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\UserBundle\ApiPlatform\UserProcessor;
 
 #[ApiResource(
     shortName: 'User',
     operations: [
         new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
-        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: UserProcessor::class),
         new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown', object)"),
-        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: UserProcessor::class),
         new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown', object)"),
     ],
     normalizationContext: [

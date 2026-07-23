@@ -21,6 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 
 abstract class StandardImportTestHelper extends CommonMocks
 {
@@ -156,7 +157,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                    [LeadEventLog::class, $logRepository],
                     [Import::class, $importRepository],
                 ]
             );

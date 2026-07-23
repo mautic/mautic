@@ -16,6 +16,7 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
+use Mautic\CoreBundle\Entity\AuditLog;
 
 final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
@@ -780,7 +781,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->willReturnMap(
                 [
                     [IntegrationEntity::class, $integrationEntityRepository],
-                    [\Mautic\CoreBundle\Entity\AuditLog::class, $auditLogRepo],
+                    [AuditLog::class, $auditLogRepo],
                 ]
             );
 

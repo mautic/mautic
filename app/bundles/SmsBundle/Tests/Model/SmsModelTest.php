@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -86,7 +87,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper,
             $this->smsRepository, // $smsRepository
             $this->createStub(StatRepository::class), // $statRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
         );
     }
 
@@ -170,7 +171,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->coreParametersHelper,
                 $this->createStub(SmsRepository::class),
                 $this->createStub(StatRepository::class),
-                $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class),
+                $this->createStub(DoNotContactRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
             ->getMock();

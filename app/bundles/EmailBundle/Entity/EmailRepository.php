@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * @extends CommonRepository<Email>
@@ -315,8 +316,8 @@ class EmailRepository extends CommonRepository
         if ($threadId && $maxThreads) {
             if ($threadId <= $maxThreads) {
                 $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
-                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 

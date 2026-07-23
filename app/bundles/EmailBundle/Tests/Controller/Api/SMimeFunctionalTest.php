@@ -13,6 +13,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 
 final class SMimeFunctionalTest extends MauticMysqlTestCase
 {
@@ -120,7 +121,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $privateKeyContent = file_get_contents($privateKeyPath);
 
         // Encrypt it using the EncryptionHelper
-        $encryptionHelper = $this->getContainer()->get(\Mautic\CoreBundle\Helper\EncryptionHelper::class);
+        $encryptionHelper = $this->getContainer()->get(EncryptionHelper::class);
         $encryptedContent = $encryptionHelper->encrypt($privateKeyContent);
 
         // Write the encrypted content to .pem.enc file

@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 
 final class EventModelTest extends TestCase
 {
@@ -52,8 +54,8 @@ final class EventModelTest extends TestCase
 
         $this->eventModel->autowireEventModel(
             $this->eventRepositoryMock,
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class),
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class)
         );
     }
 

@@ -25,6 +25,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class FieldModelTest extends MauticMysqlTestCase
 {
@@ -212,7 +213,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -253,7 +254,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }

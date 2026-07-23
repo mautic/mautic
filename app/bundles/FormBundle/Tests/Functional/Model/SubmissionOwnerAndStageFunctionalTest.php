@@ -14,6 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\LeadBundle\Entity\Lead;
 
 final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 {
@@ -100,7 +101,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         $submission = $submissions[0];
         $contact    = $submission->getLead();
 
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact, "Contact was not created for test: {$testName}");
+        $this->assertInstanceOf(Lead::class, $contact, "Contact was not created for test: {$testName}");
         $this->assertSame($contactEmail, $contact->getEmail());
 
         if ($expectedOwnerId) {

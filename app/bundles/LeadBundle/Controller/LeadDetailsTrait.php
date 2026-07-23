@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\Attribute\Required;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 
 trait LeadDetailsTrait
 {
@@ -367,7 +368,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [

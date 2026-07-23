@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 
 final class ListModelTest extends TestCase
 {
@@ -76,7 +77,7 @@ final class ListModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->leadListRepositoryMock,
-            $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class), // $listLeadRepository
+            $this->createStub(ListLeadRepository::class), // $listLeadRepository
         );
     }
 
@@ -123,7 +124,7 @@ final class ListModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(LeadListRepository::class),
-                $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class)])
+                $this->createStub(ListLeadRepository::class)])
             ->onlyMethods([])
             ->getMock();
 

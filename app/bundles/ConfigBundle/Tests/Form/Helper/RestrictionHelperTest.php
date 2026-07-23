@@ -42,6 +42,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Entity\PageRepository;
 
 /**
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
@@ -231,7 +233,7 @@ final class RestrictionHelperTest extends TypeTestCase
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
         $escapeTransformer = new EscapeTransformer([]);
 
-        $pageRepoMock = $this->createMock(\Mautic\PageBundle\Entity\PageRepository::class);
+        $pageRepoMock = $this->createMock(PageRepository::class);
         $pageRepoMock->method('getPageList')->willReturn([]);
         $pageModelMock = $this->createMock(PageModel::class);
         $pageModelMock->method('getRepository')->willReturn($pageRepoMock);
@@ -250,7 +252,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
                     new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
-                    new PreferenceCenterListType($pageModelMock, $this->createStub(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
+                    new PreferenceCenterListType($pageModelMock, $this->createStub(CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),
                     new ConfigType($restrictionHelper, $escapeTransformer),

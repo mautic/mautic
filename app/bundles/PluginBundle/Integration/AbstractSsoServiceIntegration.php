@@ -7,6 +7,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Used by SSO auth plugins that use OAuth2, etc means of logins.
@@ -60,7 +61,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
-            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL // absolute
+            UrlGeneratorInterface::ABSOLUTE_URL // absolute
         );
     }
 

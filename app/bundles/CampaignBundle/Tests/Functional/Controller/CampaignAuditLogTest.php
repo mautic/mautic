@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CampaignBundle\Entity\Campaign;
 
 final class CampaignAuditLogTest extends MauticMysqlTestCase
 {
@@ -95,7 +96,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $event         = $this->em->find(Event::class, $eventId);
         $this->assertInstanceOf(Event::class, $event);
         $event->setName('2 contact points after 1 day');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
         $campaign->addEvent($eventId, $event);
         $campaignModel->saveEntity($campaign);
         $this->em->clear();

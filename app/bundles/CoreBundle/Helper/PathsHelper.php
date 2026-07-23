@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Composer\Autoload\ClassLoader;
 
 class PathsHelper
 {
@@ -133,7 +134,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }

@@ -29,6 +29,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 
 /**
  * @method HubspotApi getApiHelper()
@@ -603,7 +604,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+                $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
                 $integrationEntity     = (empty($integrationId)) ?
                     $this->createIntegrationEntity(

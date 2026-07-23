@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\Language\Installer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Helper class for managing Mautic's installed languages.
@@ -150,7 +151,7 @@ class LanguageHelper
         try {
             $data = $this->client->get(
                 $this->coreParametersHelper->get('translations_list_url'),
-                [\GuzzleHttp\RequestOptions::TIMEOUT => 10]
+                [RequestOptions::TIMEOUT => 10]
             );
             $manifest  = json_decode($data->getBody(), true);
             $languages = [];

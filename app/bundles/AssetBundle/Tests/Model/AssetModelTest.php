@@ -34,6 +34,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\AssetBundle\Entity\DownloadRepository;
+use Mautic\EmailBundle\Entity\EmailRepository;
 
 final class AssetModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -116,9 +118,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
-            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->createStub(EmailRepository::class), // $emailRepository
             $this->assetRepository,
-            $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class), // $downloadRepository
+            $this->createStub(DownloadRepository::class), // $downloadRepository
         );
     }
 
@@ -315,9 +317,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
-                $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class),
+                $this->createStub(EmailRepository::class),
                 $this->createStub(AssetRepository::class),
-                $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class),
+                $this->createStub(DownloadRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Form\Type\ConfigType;
 use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\LeadBundle\Entity\Lead;
 
 class SmsHelper
 {
@@ -32,7 +33,7 @@ class SmsHelper
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
         /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
+        $repo = $this->em->getRepository(Lead::class);
 
         $args = [
             'filter' => [

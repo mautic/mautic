@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * CLI Command to send a scheduled broadcast.
@@ -126,12 +127,12 @@ EOT
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
         }
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
@@ -181,6 +182,6 @@ EOT
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

@@ -12,8 +12,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 
-#[CoversClass(\Mautic\CoreBundle\Helper\AbstractFormFieldHelper::class)]
+#[CoversClass(AbstractFormFieldHelper::class)]
 final class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     #[TestDox('Ensure that an array value is flattened before saving')]

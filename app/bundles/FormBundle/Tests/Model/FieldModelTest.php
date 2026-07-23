@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\FormBundle\Entity\FieldRepository;
 
 final class FieldModelTest extends TestCase
 {
@@ -59,7 +60,7 @@ final class FieldModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(RequestStack::class),
             $schemaHelper,
-            $this->createStub(\Mautic\FormBundle\Entity\FieldRepository::class) // $fieldRepository
+            $this->createStub(FieldRepository::class) // $fieldRepository
         );
 
         $entityManager

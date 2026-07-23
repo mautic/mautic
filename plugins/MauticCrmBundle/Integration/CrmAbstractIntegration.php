@@ -9,6 +9,8 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
+use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @template TApiHelper of CrmApi
@@ -241,7 +243,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 ++$page;
 
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
-                $entityToNotDetach = [Integration::class, \Mautic\PluginBundle\Entity\Plugin::class];
+                $entityToNotDetach = [Integration::class, Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
                     if (!in_array($name, $entityToNotDetach, true)) {
@@ -437,7 +439,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
             && 'updateOwner' == $config['updateOwner'][0]
         ) {
-            if ($mauticUser = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy(['email' => $data['owner_email']])) {
+            if ($mauticUser = $this->em->getRepository(User::class)->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
         }

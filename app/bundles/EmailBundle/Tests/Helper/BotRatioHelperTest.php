@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use DeviceDetector\DeviceDetector;
 
 final class BotRatioHelperTest extends TestCase
 {
@@ -28,7 +29,7 @@ final class BotRatioHelperTest extends TestCase
         float $botHelperBotRatioThreshold,
         bool $isBot,
     ): void {
-        $deviceDetectorMock = $this->createMock(\DeviceDetector\DeviceDetector::class);
+        $deviceDetectorMock = $this->createMock(DeviceDetector::class);
         $deviceDetectorMock->method('parse');
         $deviceDetectorMock->method('isBot')->willReturn(false);
 

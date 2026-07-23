@@ -42,6 +42,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\LeadList;
 
 /**
  * @extends AbstractType<Email>
@@ -304,7 +307,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\FormBundle\Entity\Form::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Form::class, 'id');
         $builder->add(
             $builder->create(
                 'unsubscribeForm',
@@ -467,7 +470,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -521,7 +524,7 @@ class EmailType extends AbstractType
 
         $transformer = new IdToEntityModelTransformer(
             $this->em,
-            \Mautic\AssetBundle\Entity\Asset::class,
+            Asset::class,
             'id',
             true
         );

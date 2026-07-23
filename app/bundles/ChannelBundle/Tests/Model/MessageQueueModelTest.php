@@ -20,6 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 
 final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -65,7 +66,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->messageQueueRepository,
-            $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class) // $frequencyRuleRepository
+            $this->createStub(FrequencyRuleRepository::class) // $frequencyRuleRepository
         );
 
         $message      = new MessageQueue();

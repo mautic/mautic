@@ -25,6 +25,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Generator\UrlGenerator;
+use Mautic\WebhookBundle\Entity\EventRepository;
+use Mautic\WebhookBundle\Entity\LogRepository;
 
 final class WebhookModelTest extends TestCase
 {
@@ -394,8 +396,8 @@ final class WebhookModelTest extends TestCase
             $this->createStub(WebhookService::class),
             $this->webhookRepository, // $webhookRepository
             $this->webhookQueueRepository, // $webhookQueueRepository
-            $this->createStub(\Mautic\WebhookBundle\Entity\EventRepository::class), // $eventRepository
-            $this->createStub(\Mautic\WebhookBundle\Entity\LogRepository::class), // $logRepository
+            $this->createStub(EventRepository::class), // $eventRepository
+            $this->createStub(LogRepository::class), // $logRepository
         );
 
         return $model;

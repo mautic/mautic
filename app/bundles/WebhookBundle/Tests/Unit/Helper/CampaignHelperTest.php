@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use GuzzleHttp\RequestOptions;
 
 final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -68,8 +69,8 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with($expectedUrl, [
-                \GuzzleHttp\RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -83,9 +84,9 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
-                \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
+                RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT     => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -98,13 +99,13 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::HEADERS => [
+                RequestOptions::HEADERS => [
                     'test'         => 'tee',
                     'company'      => 'Mautic',
                     'content-type' => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::BODY    => json_encode(
+                RequestOptions::TIMEOUT => 10,
+                RequestOptions::BODY    => json_encode(
                     ['test' => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']
                 ),
             ])

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
+use Mautic\LeadBundle\Entity\Lead;
 
 final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {
@@ -93,7 +94,7 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->willReturn($this->baseColumns);
 
         $mockWithTrait->method('getClassName')
-            ->willReturn(\Mautic\LeadBundle\Entity\Lead::class);
+            ->willReturn(Lead::class);
 
         $mockWithTrait->method('getFieldGroups')
             ->willReturn($this->fieldGroups);
@@ -159,7 +160,7 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->willReturn($this->baseColumns);
 
         $mockWithTrait->method('getClassName')
-            ->willReturn(\Mautic\LeadBundle\Entity\Lead::class);
+            ->willReturn(Lead::class);
 
         $mockWithTrait->method('getFieldGroups')
             ->willReturn($this->fieldGroups);

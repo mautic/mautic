@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\UserBundle\Entity\Role;
 
 final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
@@ -396,7 +397,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()

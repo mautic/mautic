@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 
 final class SyncCommandTest extends TestCase
 {
@@ -65,7 +66,7 @@ final class SyncCommandTest extends TestCase
             ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
-                $this->assertNotInstanceOf(\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
+                $this->assertNotInstanceOf(ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
                 $this->assertTrue($inputOptionsDAO->pullIsEnabled());
                 $this->assertFalse($inputOptionsDAO->pushIsEnabled());
 

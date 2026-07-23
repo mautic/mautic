@@ -43,6 +43,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
+use Mautic\LeadBundle\Entity\LeadList;
 
 class MailHelper
 {
@@ -1706,7 +1707,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->entityManager->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
+                $stat->setList($this->entityManager->getReference(LeadList::class, $listId));
             } catch (ORMException) {
                 // keep IDE happy
             }

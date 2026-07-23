@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 /**
  * Contract test: every ownership-scoped item operation in every API v2 resource
@@ -26,7 +27,7 @@ final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
         // IpAddress is a pure audit log with no owner or parent entity,
         // so ownership-scoped security expressions on it remain permission-bit-only.
         $knownNoOwnerClasses = [
-            \Mautic\CoreBundle\Entity\IpAddress::class,
+            IpAddress::class,
         ];
 
         /** @var ResourceNameCollectionFactoryInterface $nameFactory */

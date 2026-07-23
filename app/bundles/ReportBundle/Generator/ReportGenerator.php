@@ -11,10 +11,11 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Mautic\ReportBundle\Builder\ReportBuilderInterface;
 
 class ReportGenerator
 {
-    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
+    private string $validInterface = ReportBuilderInterface::class;
 
     private ?string $contentTemplate = null;
 

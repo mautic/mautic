@@ -9,6 +9,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\FormBundle\Helper\PointActionHelper;
 
 class PointSubscriber implements EventSubscriberInterface
 {
@@ -31,7 +32,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.form.point.action',
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
-            'callback'    => [\Mautic\FormBundle\Helper\PointActionHelper::class, 'validateFormSubmit'],
+            'callback'    => [PointActionHelper::class, 'validateFormSubmit'],
             'formType'    => PointActionFormSubmitType::class,
         ];
 

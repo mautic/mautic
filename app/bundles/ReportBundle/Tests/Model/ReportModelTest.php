@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Mautic\ReportBundle\Entity\ReportRepository;
 
 final class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,7 +65,7 @@ final class ReportModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(RequestStack::class),
-            $this->createStub(\Mautic\ReportBundle\Entity\ReportRepository::class), // $reportRepository
+            $this->createStub(ReportRepository::class), // $reportRepository
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

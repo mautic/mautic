@@ -7,6 +7,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: 'mautic:fake:command'
@@ -17,7 +18,7 @@ class FakeModeratedCommand extends ModeratedCommand
     {
         $this->checkRunStatus($input, $output);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     public function forceCompleteRun(): void

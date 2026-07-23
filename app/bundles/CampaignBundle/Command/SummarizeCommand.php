@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: SummarizeCommand::NAME,
@@ -65,7 +66,7 @@ class SummarizeCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $batchLimit = (int) $input->getOption('batch-limit');
@@ -80,6 +81,6 @@ class SummarizeCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

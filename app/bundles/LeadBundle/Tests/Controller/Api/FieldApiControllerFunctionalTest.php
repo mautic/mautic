@@ -15,9 +15,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 
-#[CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
-#[CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
+#[CoversClass(FieldApiController::class)]
+#[CoversClass(CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

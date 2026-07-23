@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 /**
  * @extends AbstractType<array<mixed>>
@@ -98,7 +99,7 @@ class MonitoringType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => \MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
+            'data_class' => Monitoring::class,
         ]);
 
         // allow network types to be sent through - list

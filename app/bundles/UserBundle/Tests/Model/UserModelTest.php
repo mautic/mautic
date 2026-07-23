@@ -27,6 +27,9 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\UserInviteRepository;
 
 final class UserModelTest extends TestCase
 {
@@ -90,7 +93,7 @@ final class UserModelTest extends TestCase
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
-        $this->userInviteRepository = $this->createMock(\Mautic\UserBundle\Entity\UserInviteRepository::class);
+        $this->userInviteRepository = $this->createMock(UserInviteRepository::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->userModel = new UserModel(
@@ -106,8 +109,8 @@ final class UserModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->twig,
             $this->userRepository,
-            $this->createStub(\Mautic\UserBundle\Entity\PermissionRepository::class),
-            $this->createStub(\Mautic\UserBundle\Entity\RoleRepository::class),
+            $this->createStub(PermissionRepository::class),
+            $this->createStub(RoleRepository::class),
             $this->userInviteRepository,
         );
     }

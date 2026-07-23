@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * CLI Command to purge old data per settings.
@@ -91,7 +92,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
         $daysOld       = $input->getOption('days-old');
         $dryRun        = (bool) $input->getOption('dry-run');
@@ -100,7 +101,7 @@ EOT
 
         if (empty($daysOld) && empty($gdpr)) {
             // Safety catch; bail
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         if (!empty($gdpr)) {
@@ -118,7 +119,7 @@ EOT
             if (!$helper->ask($input, $output, $question)) {
                 $this->completeRun();
 
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
+                return Command::SUCCESS;
             }
         }
 
@@ -151,7 +152,7 @@ EOT
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**

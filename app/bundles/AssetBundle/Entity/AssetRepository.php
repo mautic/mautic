@@ -9,6 +9,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Doctrine\DBAL\ArrayParameterType;
 
 /**
  * @extends CommonRepository<Asset>
@@ -190,7 +191,7 @@ class AssetRepository extends CommonRepository
         $q->select('sum(a.size) as total_size')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
             ->where('a.id IN (:assetIds)')
-            ->setParameter('assetIds', $assets, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('assetIds', $assets, ArrayParameterType::INTEGER);
 
         $result = $q->executeQuery()->fetchAllAssociative();
 

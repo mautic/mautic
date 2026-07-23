@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
+use Mautic\AssetBundle\Helper\PointActionHelper;
 
 final class CampaignBuilderEventTest extends CampaignTestAbstract
 {
@@ -106,7 +107,7 @@ final class CampaignBuilderEventTest extends CampaignTestAbstract
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
+            'callback'    => [PointActionHelper::class, 'validateAssetDownload'],
             'formType'    => PointActionAssetDownloadType::class,
         ];
         $event = $this->initEvent();

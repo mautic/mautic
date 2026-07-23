@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\UserBundle\Entity\User;
 
 class PreAuthorizationEventListener
 {
@@ -56,6 +57,6 @@ class PreAuthorizationEventListener
      */
     protected function getUser(OAuthEvent $event)
     {
-        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUserIdentifier());
+        return $this->em->getRepository(User::class)->findOneByUsername($event->getUser()->getUserIdentifier());
     }
 }

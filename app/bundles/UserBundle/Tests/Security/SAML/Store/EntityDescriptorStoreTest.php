@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use LightSaml\Model\Metadata\EntityDescriptor;
 
 final class EntityDescriptorStoreTest extends TestCase
 {
@@ -33,7 +34,7 @@ final class EntityDescriptorStoreTest extends TestCase
 
         $descriptor = $store->get('foobar');
 
-        $this->assertNotInstanceOf(\LightSaml\Model\Metadata\EntityDescriptor::class, $descriptor);
+        $this->assertNotInstanceOf(EntityDescriptor::class, $descriptor);
     }
 
     public function testHasReturnsFalseIfSamlIsDisabled(): void

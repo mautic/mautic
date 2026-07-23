@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Composer\Autoload\ClassLoader;
 
 final class CredentialsStoreTest extends TestCase
 {
@@ -22,7 +23,7 @@ final class CredentialsStoreTest extends TestCase
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->cacheDir             = dirname((new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 3);
+        $this->cacheDir             = dirname((new \ReflectionClass(ClassLoader::class))->getFileName(), 3);
     }
 
     public function testEmptyArrayReturnedIfEntityIdsDoNotMatch(): void

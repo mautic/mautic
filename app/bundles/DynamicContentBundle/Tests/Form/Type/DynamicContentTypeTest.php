@@ -22,6 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 
 final class DynamicContentTypeTest extends TestCase
 {
@@ -95,7 +96,7 @@ final class DynamicContentTypeTest extends TestCase
                     $this->assertSame('filters', $parameters[0]);
                     $this->assertSame(CollectionType::class, $parameters[1]);
                     $this->assertSame([
-                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
+                        'entry_type'     => DwcEntryFiltersType::class,
                         'entry_options'  => [
                             'countries'    => FormFieldHelper::getCountryChoices(),
                             'regions'      => FormFieldHelper::getRegionChoices(),

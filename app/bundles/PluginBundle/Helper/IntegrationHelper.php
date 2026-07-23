@@ -16,6 +16,7 @@ use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
+use Mautic\LeadBundle\Entity\Lead;
 
 class IntegrationHelper
 {
@@ -454,7 +455,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+                $this->em->getRepository(Lead::class)->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -486,7 +487,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         return $socialCache;
     }

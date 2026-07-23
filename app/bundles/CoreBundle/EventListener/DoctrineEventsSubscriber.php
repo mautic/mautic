@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 #[AsDoctrineListener(Events::loadClassMetadata)]
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
@@ -72,7 +73,7 @@ class DoctrineEventsSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
+                if (ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];

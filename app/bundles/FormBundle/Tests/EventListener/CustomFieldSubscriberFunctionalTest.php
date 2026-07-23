@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\FormBundle\Collector\FieldCollector;
 
 final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -47,7 +48,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('select option[value="option3"]'), 'Option 3 should be present');
         $this->assertCount(1, $crawler->filter('select option[value="option4"]'), 'Option 4 should be present');
 
-        $fieldCollector = $this->getContainer()->get(\Mautic\FormBundle\Collector\FieldCollector::class);
+        $fieldCollector = $this->getContainer()->get(FieldCollector::class);
         $fieldCollector->reset(); // clear field cache to ensure fresh data. Happens naturally between requests in real usage.
 
         // Step 4: Edit custom field and remove one option

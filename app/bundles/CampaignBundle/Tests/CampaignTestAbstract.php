@@ -22,6 +22,11 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\EmailBundle\Entity\StatRepository;
 
 abstract class CampaignTestAbstract extends TestCase
 {
@@ -86,11 +91,11 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\EventRepository::class), // $eventRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadRepository::class), // $leadRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\StatRepository::class), // $statRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
+            $this->createStub(EventRepository::class), // $eventRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(StatRepository::class), // $statRepository
         );
     }
 }

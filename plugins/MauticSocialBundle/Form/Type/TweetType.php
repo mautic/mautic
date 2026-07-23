@@ -17,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\PageBundle\Entity\Page;
 
 /**
  * @extends AbstractType<Tweet>
@@ -86,7 +88,7 @@ class TweetType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Asset::class, 'id');
         $builder->add(
             $builder->create(
                 'asset',
@@ -104,7 +106,7 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',

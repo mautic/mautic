@@ -25,6 +25,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PointBundle\Entity\TriggerRepository;
 
 final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -58,9 +60,9 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\PointBundle\Entity\TriggerRepository::class), // $triggerRepository
+            $this->createStub(TriggerRepository::class), // $triggerRepository
             $this->triggerEventRepository,
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
         // reset private property cachedEvents in TriggerModel instance

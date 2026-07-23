@@ -35,6 +35,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\LeadBundle\Entity\LeadField;
 
 final class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -559,7 +560,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
         $firstnameField = $fieldModel->getEntity(2);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $firstnameField);
+        $this->assertInstanceOf(LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 

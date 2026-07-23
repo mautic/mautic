@@ -9,6 +9,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\AssetBundle\Helper\PointActionHelper;
 
 class PointSubscriber implements EventSubscriberInterface
 {
@@ -31,7 +32,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
+            'callback'    => [PointActionHelper::class, 'validateAssetDownload'],
             'formType'    => PointActionAssetDownloadType::class,
         ];
 

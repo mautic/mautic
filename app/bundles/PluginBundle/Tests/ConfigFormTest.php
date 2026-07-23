@@ -19,6 +19,8 @@ use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 
 final class ConfigFormTest extends KernelTestCase
 {
@@ -149,8 +151,8 @@ final class ConfigFormTest extends KernelTestCase
                 ->willReturnMap(
                     [
                         [Plugin::class, $pluginRepository],
-                        [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
-                        [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        [Integration::class, $integrationRepository],
+                        [IntegrationEntity::class, $integrationEntityRepository],
                     ]
                 );
 

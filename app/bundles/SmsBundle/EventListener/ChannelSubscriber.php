@@ -10,6 +10,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\SmsBundle\Entity\Sms;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
@@ -39,7 +40,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => SmsListType::class,
-                        'repository'     => \Mautic\SmsBundle\Entity\Sms::class,
+                        'repository'     => Sms::class,
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
                     ReportModel::CHANNEL_FEATURE => [

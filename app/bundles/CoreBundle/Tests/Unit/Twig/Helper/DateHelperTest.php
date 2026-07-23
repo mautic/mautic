@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 final class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -109,7 +110,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
         // Create a mock for DateTimeHelper
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
@@ -170,7 +171,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Create a mock for DateTimeHelper to return 'today'
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
@@ -189,7 +190,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Create a mock for DateTimeHelper to return false (not today/yesterday)
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn(false);

@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Console\Command\Command;
 
 #[AsCommand(
     name: 'mautic:messages:send',
@@ -70,7 +71,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
@@ -94,6 +95,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

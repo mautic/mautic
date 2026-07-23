@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Doctrine\DBAL\Result;
 
 final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -95,7 +96,7 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
                 static $callCount = 0;
                 ++$callCount;
-                $result = $this->createMock(\Doctrine\DBAL\Result::class);
+                $result = $this->createMock(Result::class);
                 $result->method('fetchAllAssociative')->willReturn(match ($callCount) {
                     1       => [['id' => 765]],
                     3       => [['id' => 764]],

@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use GuzzleHttp\RequestOptions;
 
 final class UpdateHelperTest extends TestCase
 {
@@ -306,11 +307,11 @@ final class UpdateHelperTest extends TestCase
                 $statsUrl,
                 $this->callback(
                     function (array $options): true {
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::FORM_PARAMS, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::CONNECT_TIMEOUT, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::HEADERS, $options);
+                        $this->assertArrayHasKey(RequestOptions::FORM_PARAMS, $options);
+                        $this->assertArrayHasKey(RequestOptions::CONNECT_TIMEOUT, $options);
+                        $this->assertArrayHasKey(RequestOptions::HEADERS, $options);
                         // We need to send an Accept header to the stats server or we'll get 500 errors
-                        $this->assertEquals(['Accept' => '*/*'], $options[\GuzzleHttp\RequestOptions::HEADERS]);
+                        $this->assertEquals(['Accept' => '*/*'], $options[RequestOptions::HEADERS]);
 
                         return true;
                     }

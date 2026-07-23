@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Doctrine\ORM\Query;
 
 /**
  * @extends CommonRepository<Campaign>
@@ -667,7 +668,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('id', $id)
             ->andWhere('e.channelId IS NOT NULL')
             ->getQuery()
-            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->setHydrationMode(Query::HYDRATE_ARRAY)
             ->getResult();
 
         $return = [];

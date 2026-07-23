@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 
 final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestCase
 {
@@ -108,7 +109,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
 
         // Assert
         $this->em->refresh($childNotification);
-        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\TranslationEntityInterface::class, $childNotification->getTranslationParent());
+        $this->assertNotInstanceOf(TranslationEntityInterface::class, $childNotification->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void

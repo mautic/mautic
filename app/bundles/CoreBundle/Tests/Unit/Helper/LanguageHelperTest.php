@@ -14,6 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use GuzzleHttp\RequestOptions;
 
 final class LanguageHelperTest extends TestCase
 {
@@ -99,7 +100,7 @@ final class LanguageHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with('https://languages.test', [
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn($response);
 

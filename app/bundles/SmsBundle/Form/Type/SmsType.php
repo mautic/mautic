@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Mautic\LeadBundle\Entity\LeadList;
 
 /**
  * @extends AbstractType<Sms>
@@ -118,7 +119,7 @@ class SmsType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         // add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',

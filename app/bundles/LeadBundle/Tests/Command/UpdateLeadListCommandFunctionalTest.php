@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Command\Command;
+use Mautic\LeadBundle\Model\CompanyModel;
 
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -489,8 +490,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -583,8 +584,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
