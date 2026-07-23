@@ -21,7 +21,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:broadcasts:send',
-    description: 'Process contacts pending to receive a channel broadcast.'
+    description: 'Process contacts pending to receive a channel broadcast.',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
+
+<info>php %command.full_name% --channel=email --id=3</info>
+TXT
 )]
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
@@ -37,13 +42,6 @@ class SendChannelBroadcastCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
-
-<info>php %command.full_name% --channel=email --id=3</info>
-EOT
-            )
             ->setDefinition(
                 [
                     new InputOption(
