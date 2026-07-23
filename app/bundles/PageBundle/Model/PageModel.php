@@ -132,10 +132,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): PageRepository
     {
-        $repo = $this->pageRepository;
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->pageRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->pageRepository;
     }
 
     public function getHitRepository(): HitRepository
@@ -544,8 +543,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->emailRepository;
-                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
             }
@@ -1086,8 +1084,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->utmTagRepository;
-            $repo->saveEntity($utmTags);
+            $this->utmTagRepository->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
         }

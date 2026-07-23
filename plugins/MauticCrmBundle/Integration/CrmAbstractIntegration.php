@@ -353,7 +353,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         // Find unique identifier fields used by the integration
-        $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
         $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
@@ -410,7 +409,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
@@ -451,7 +450,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 null,
                 $this->getDisplayName()
             ));
-            $leadModel->saveEntity($lead, false);
+            $this->leadModel->saveEntity($lead, false);
         }
 
         return $lead;

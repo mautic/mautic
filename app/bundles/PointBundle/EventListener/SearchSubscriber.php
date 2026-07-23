@@ -81,8 +81,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
-        $security = $this->security;
-        if ($security->isGranted('point:points:view')) {
+        if ($this->security->isGranted('point:points:view')) {
             $event->addCommands(
                 'mautic.point.actions.header.index',
                 $this->pointModel->getCommandList()

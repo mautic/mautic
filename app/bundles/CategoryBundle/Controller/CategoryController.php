@@ -165,10 +165,9 @@ class CategoryController extends AbstractFormController
 
         $categoryTypes = ['category' => $this->translator->trans('mautic.core.select')];
 
-        $dispatcher = $this->dispatcher;
-        if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
+        if ($this->dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryTypesEvent();
-            $dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
+            $this->dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
