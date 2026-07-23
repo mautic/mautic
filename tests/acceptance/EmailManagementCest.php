@@ -43,7 +43,7 @@ class EmailManagementCest
         $this->verifyAllEmailsBelongTo($I, $newCategoryName);
     }
 
-    public function selectAllEmails(AcceptanceTester $I): void
+    private function selectAllEmails(AcceptanceTester $I): void
     {
         $I->waitForElementClickable(EmailsPage::SELECT_ALL_CHECKBOX);
         $I->click(EmailsPage::SELECT_ALL_CHECKBOX);
