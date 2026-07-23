@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class DashboardController extends AbstractFormController
+final class DashboardController extends AbstractFormController
 {
     private DashboardModel $dashboardModel;
 

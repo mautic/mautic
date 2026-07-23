@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AppCallbackController extends CommonController
+final class AppCallbackController extends CommonController
 {
     private NotificationModel $notificationModel;
 
