@@ -5,10 +5,10 @@ namespace Mautic\SmsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\SmsBundle\Entity\Stat;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\SmsBundle\Entity\Stat;
 
 class LeadSubscriber implements EventSubscriberInterface
 {

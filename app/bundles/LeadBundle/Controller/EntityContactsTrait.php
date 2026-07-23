@@ -3,9 +3,9 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\LeadBundle\Entity\DoNotContact;
 
 trait EntityContactsTrait
 {

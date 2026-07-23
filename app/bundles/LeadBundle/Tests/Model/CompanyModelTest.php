@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
@@ -12,7 +13,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
-use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 final class CompanyModelTest extends \PHPUnit\Framework\TestCase

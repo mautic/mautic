@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
-use Mautic\LeadBundle\Entity\Lead;
 
 final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {

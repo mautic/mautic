@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
+use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
-use Knp\Menu\ItemInterface;
 
 final class MenuExtensionTest extends AbstractMauticTestCase
 {

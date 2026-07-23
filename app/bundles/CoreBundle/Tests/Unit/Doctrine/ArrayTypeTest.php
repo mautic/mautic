@@ -3,10 +3,10 @@
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Types\Type;
-use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
 class ExampleClassWithPrivateProperty
 {

@@ -7,10 +7,10 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\SmsBundle\Entity\Sms;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {

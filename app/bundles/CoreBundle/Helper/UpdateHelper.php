@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
@@ -13,7 +14,6 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
-use GuzzleHttp\RequestOptions;
 
 /**
  * Helper class for fetching update data.

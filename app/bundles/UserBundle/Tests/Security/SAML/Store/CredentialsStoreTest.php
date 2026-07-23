@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
+use Composer\Autoload\ClassLoader;
 use LightSaml\Credential\X509Credential;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Security\SAML\Store\CredentialsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Composer\Autoload\ClassLoader;
 
 final class CredentialsStoreTest extends TestCase
 {

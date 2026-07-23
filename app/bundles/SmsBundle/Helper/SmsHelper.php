@@ -7,13 +7,13 @@ use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Form\Type\ConfigType;
 use Mautic\SmsBundle\Model\SmsModel;
-use Mautic\LeadBundle\Entity\Lead;
 
 class SmsHelper
 {

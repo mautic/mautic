@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 
 final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestCase
 {

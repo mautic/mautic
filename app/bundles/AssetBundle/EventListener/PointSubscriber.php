@@ -5,11 +5,11 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
+use Mautic\AssetBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\AssetBundle\Helper\PointActionHelper;
 
 class PointSubscriber implements EventSubscriberInterface
 {

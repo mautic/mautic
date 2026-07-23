@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 
 final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 {

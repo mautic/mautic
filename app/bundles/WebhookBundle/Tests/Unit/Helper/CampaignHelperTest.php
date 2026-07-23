@@ -7,6 +7,7 @@ namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
@@ -15,7 +16,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use GuzzleHttp\RequestOptions;
 
 final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {

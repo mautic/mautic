@@ -9,12 +9,12 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\EventListener\PointSubscriber;
+use Mautic\PageBundle\Form\Type\PointActionPageHitType;
+use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use PHPUnit\Framework\TestCase;
-use Mautic\PageBundle\Form\Type\PointActionPageHitType;
-use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 
 final class PointSubscriberTest extends TestCase
 {

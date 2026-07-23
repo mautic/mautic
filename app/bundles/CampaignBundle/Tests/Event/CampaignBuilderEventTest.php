@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
+use Mautic\AssetBundle\Helper\PointActionHelper;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
-use Mautic\AssetBundle\Helper\PointActionHelper;
 
 final class CampaignBuilderEventTest extends CampaignTestAbstract
 {

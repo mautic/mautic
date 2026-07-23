@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -13,7 +14,6 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
 
 final class SMimeFunctionalTest extends MauticMysqlTestCase
 {

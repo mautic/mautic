@@ -7,8 +7,8 @@ namespace Mautic\PageBundle\Tests\Functional\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Request;
 
 final class PageHitCookieTest extends MauticMysqlTestCase
 {

@@ -3,8 +3,8 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
 class EventHelper
 {

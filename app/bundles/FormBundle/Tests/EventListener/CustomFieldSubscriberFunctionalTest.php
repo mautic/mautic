@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Collector\FieldCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\FormBundle\Collector\FieldCollector;
 
 final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
 {

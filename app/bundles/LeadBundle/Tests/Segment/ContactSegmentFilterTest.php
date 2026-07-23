@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
@@ -15,7 +16,6 @@ use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Doctrine\DBAL\Connection;
 
 final class ContactSegmentFilterTest extends TestCase
 {

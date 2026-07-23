@@ -13,6 +13,8 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,8 +25,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
-use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
-use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 
 final class FocusModelTest extends TestCase
 {

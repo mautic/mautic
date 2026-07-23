@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Knp\Menu\MenuItem;
+use Mautic\CoreBundle\Menu\MenuRenderer;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,8 +13,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Knp\Menu\MenuItem;
-use Mautic\CoreBundle\Menu\MenuRenderer;
 
 final class ServicePass implements CompilerPassInterface
 {

@@ -4,8 +4,8 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Page>

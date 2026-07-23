@@ -3,10 +3,12 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PageListType;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use Symfony\Component\Form\AbstractType;
@@ -17,8 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Mautic\AssetBundle\Entity\Asset;
-use Mautic\PageBundle\Entity\Page;
 
 /**
  * @extends AbstractType<Tweet>

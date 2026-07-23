@@ -9,6 +9,7 @@ use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -22,7 +23,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 
 final class DynamicContentTypeTest extends TestCase
 {

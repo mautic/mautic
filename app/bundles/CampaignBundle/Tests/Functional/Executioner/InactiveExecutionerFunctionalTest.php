@@ -10,10 +10,10 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Mautic\CampaignBundle\Executioner\Result\Counter;
 
 /**
  * Functional tests for decision event redirection scenarios.

@@ -4,6 +4,7 @@ namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -11,7 +12,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use GuzzleHttp\RequestOptions;
 
 class CampaignHelper
 {

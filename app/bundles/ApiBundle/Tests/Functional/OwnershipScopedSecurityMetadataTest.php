@@ -9,8 +9,8 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 /**
  * Contract test: every ownership-scoped item operation in every API v2 resource

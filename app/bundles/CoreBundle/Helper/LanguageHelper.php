@@ -3,11 +3,11 @@
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use GuzzleHttp\RequestOptions;
 
 /**
  * Helper class for managing Mautic's installed languages.

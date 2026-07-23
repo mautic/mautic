@@ -6,9 +6,9 @@ use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\UserBundle\Entity\User;
 
 class PreAuthorizationEventListener
 {

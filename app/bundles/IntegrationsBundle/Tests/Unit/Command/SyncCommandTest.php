@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -14,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
-use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 
 final class SyncCommandTest extends TestCase
 {

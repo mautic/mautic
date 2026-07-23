@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Exception;
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -13,6 +14,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\UserBundle\Entity\Role;
@@ -31,8 +33,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 
 /**
  * @extends CrmAbstractIntegration<SalesforceApi>

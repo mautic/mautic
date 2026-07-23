@@ -12,6 +12,8 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
@@ -31,8 +33,6 @@ use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
-use Mautic\EmailBundle\Form\Type\EmailSendType;
 
 final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {

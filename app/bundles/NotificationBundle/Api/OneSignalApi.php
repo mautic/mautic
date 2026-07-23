@@ -2,11 +2,11 @@
 
 namespace Mautic\NotificationBundle\Api;
 
+use GuzzleHttp\RequestOptions;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingAppIDException;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\RequestOptions;
 
 class OneSignalApi extends AbstractNotificationApi
 {

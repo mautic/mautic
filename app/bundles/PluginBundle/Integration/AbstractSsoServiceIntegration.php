@@ -6,8 +6,8 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Used by SSO auth plugins that use OAuth2, etc means of logins.

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use GuzzleHttp\Handler\MockHandler;
+use Mautic\CoreBundle\Test\Guzzle\ClientFactory;
 use Mautic\CoreBundle\Test\PhpUnitConfigCommand;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use GuzzleHttp\Handler\MockHandler;
-use Mautic\CoreBundle\Test\Guzzle\ClientFactory;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

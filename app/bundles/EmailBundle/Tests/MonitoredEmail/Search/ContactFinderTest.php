@@ -7,14 +7,14 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Search;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
+use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
-use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 
 #[CoversClass(ContactFinder::class)]
 #[CoversClass(Result::class)]

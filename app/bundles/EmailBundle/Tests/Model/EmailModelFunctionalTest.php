@@ -10,6 +10,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -28,7 +29,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {

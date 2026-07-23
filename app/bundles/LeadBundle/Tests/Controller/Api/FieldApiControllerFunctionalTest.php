@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
@@ -15,8 +17,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\LeadBundle\Controller\Api\FieldApiController;
-use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 
 #[CoversClass(FieldApiController::class)]
 #[CoversClass(CreateCustomFieldCommand::class)]

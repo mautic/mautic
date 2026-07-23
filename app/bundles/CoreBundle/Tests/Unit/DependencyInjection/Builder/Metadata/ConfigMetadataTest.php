@@ -6,9 +6,9 @@ namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
 final class ConfigMetadataTest extends TestCase
 {

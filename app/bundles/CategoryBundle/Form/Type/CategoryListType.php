@@ -3,6 +3,7 @@
 namespace Mautic\CategoryBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -12,7 +13,6 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Mautic\CategoryBundle\Entity\Category;
 
 /**
  * @extends AbstractType<mixed>

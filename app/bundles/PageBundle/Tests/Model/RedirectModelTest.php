@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
@@ -18,7 +19,6 @@ use Mautic\PageBundle\Tests\PageTestAbstract;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Mautic\PageBundle\Entity\RedirectRepository;
 
 final class RedirectModelTest extends PageTestAbstract
 {

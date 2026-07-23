@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle;
 
 use Mautic\InstallBundle\DependencyInjection\Compiler\InstallCommandPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 class MauticInstallBundle extends Bundle
 {

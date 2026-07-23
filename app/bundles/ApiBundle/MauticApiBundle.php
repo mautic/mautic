@@ -3,9 +3,9 @@
 namespace Mautic\ApiBundle;
 
 use Mautic\ApiBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 class MauticApiBundle extends Bundle
 {

@@ -7,10 +7,10 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
  * @template TApiHelper of CrmApi

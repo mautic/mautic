@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
+use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 
 #[CoversClass(DateWeekLast::class)]
 final class DateWeekThisTest extends \PHPUnit\Framework\TestCase

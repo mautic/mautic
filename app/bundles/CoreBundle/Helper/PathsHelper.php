@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Loader\ParameterLoader;
 use Composer\Autoload\ClassLoader;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class PathsHelper
 {

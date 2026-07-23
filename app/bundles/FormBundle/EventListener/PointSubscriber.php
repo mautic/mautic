@@ -5,11 +5,11 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\FormBundle\Helper\PointActionHelper;
 
 class PointSubscriber implements EventSubscriberInterface
 {

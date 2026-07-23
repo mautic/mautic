@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder;
+use Mautic\CoreBundle\MauticCoreBundle;
 use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
+use MauticPlugin\MauticFocusBundle\MauticFocusBundle;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\TestCase;
-use MauticPlugin\MauticFocusBundle\MauticFocusBundle;
-use Mautic\CoreBundle\MauticCoreBundle;
 
 final class BundleMetadataBuilderTest extends TestCase
 {

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -16,7 +17,6 @@ use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
-use Mautic\LeadBundle\Entity\Lead;
 
 class IntegrationHelper
 {
@@ -394,12 +394,12 @@ class IntegrationHelper
     /**
      * Get the user's social profile data from cache or integrations if indicated.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $fields
-     * @param bool                           $refresh
-     * @param string                         $specificIntegration
-     * @param bool                           $persistLead
-     * @param bool                           $returnSettings
+     * @param Lead   $lead
+     * @param array  $fields
+     * @param bool   $refresh
+     * @param string $specificIntegration
+     * @param bool   $persistLead
+     * @param bool   $returnSettings
      *
      * @return array
      */

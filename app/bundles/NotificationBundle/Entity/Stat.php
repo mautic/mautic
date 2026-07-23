@@ -29,7 +29,7 @@ class Stat
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
+     * @var LeadList|null
      */
     private $list;
 
@@ -301,7 +301,7 @@ class Stat
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadList|null
+     * @return LeadList|null
      */
     public function getList()
     {

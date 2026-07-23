@@ -11,10 +11,10 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\PageBundle\Entity\Hit;
 
 final class PageModelValidationTest extends MauticMysqlTestCase
 {
