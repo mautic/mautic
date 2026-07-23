@@ -23,6 +23,8 @@ return RectorConfig::configure()
         deadCode: true,
         typeDeclarations: true,
         phpunitCodeQuality: true,
+        phpunitMockToStub: true,
+        phpunitNarrowAsserts: true,
     )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
@@ -61,6 +63,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
     ])
     ->reportUnusedSkips()
+    ->withComposerBased(phpunit: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
@@ -123,7 +126,7 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         // will be fixed
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+        // Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
 
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
