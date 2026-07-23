@@ -350,6 +350,7 @@ class ContactManagementCest
         $I->click(ContactPage::$addToTheFollowing);
         $I->click(ContactPage::$adminUser);
         $I->click(ContactPage::$changeOwnerModalSaveButton);
+        $I->ensureNotificationAppears('2 contacts affected');
 
         // Verify that the owner of the first and second contacts has been changed
         $contact->verifyOwner(1);
