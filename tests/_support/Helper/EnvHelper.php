@@ -34,9 +34,9 @@ final class EnvHelper extends Module
             return false;
         }
 
-        (new Dotenv())->load($this->envLocalPath);
+        $envVariables = (new Dotenv())->parse(file_get_contents($this->envLocalPath));
 
-        return 'test' === ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null);
+        return 'test' === ($envVariables['APP_ENV'] ?? null);
     }
 
     private function backupLocalEnv(): void
