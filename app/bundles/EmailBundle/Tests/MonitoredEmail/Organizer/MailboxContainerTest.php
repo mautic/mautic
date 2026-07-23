@@ -17,7 +17,7 @@ final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    protected array $config = [
+    private array $config = [
         'imap_path' => 'path',
         'user'      => 'user',
         'host'      => 'host',

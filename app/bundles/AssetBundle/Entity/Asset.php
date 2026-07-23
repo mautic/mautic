@@ -352,9 +352,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * Sets file.
-     */
     public function setFile(?File $file = null): void
     {
         $this->file = $file;

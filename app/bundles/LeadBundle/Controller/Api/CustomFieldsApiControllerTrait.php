@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait CustomFieldsApiControllerTrait
 {
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     /**
      * @var mixed[]

@@ -43,11 +43,10 @@ class JsController extends CommonController
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
-        $dispatcher = $this->dispatcher;
-        $event      = new BuildJsEvent($this->getJsHeader(), $kernelDebug, $acceptedScopes);
+        $event = new BuildJsEvent($this->getJsHeader(), $kernelDebug, $acceptedScopes);
 
-        if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
+        if ($this->dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
         return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);
