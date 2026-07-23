@@ -20,7 +20,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly DynamicContentModel $dynamicContentModel,
-        protected CacheProvider $cache,
+        private CacheProvider $cache,
         private readonly EventDispatcherInterface $dispatcher,
     ) {
     }

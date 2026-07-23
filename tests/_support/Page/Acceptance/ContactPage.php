@@ -94,7 +94,7 @@ final class ContactPage
     /**
      * @var \AcceptanceTester;
      */
-    protected $acceptanceTester;
+    private $acceptanceTester;
 
     public function __construct(\AcceptanceTester $I)
     {

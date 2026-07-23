@@ -783,7 +783,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    protected function getFields(Lead $lead): array
+    private function getFields(Lead $lead): array
     {
         if (!$this->fields) {
             $contactFields = $lead->getFields(true);

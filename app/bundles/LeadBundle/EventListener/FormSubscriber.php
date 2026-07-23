@@ -33,10 +33,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ContactTracker $contactTracker,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadFieldRepository $leadFieldRepository,
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadFieldRepository $leadFieldRepository,
         private readonly PointGroupModel $groupModel,
         private readonly DoNotContact $doNotContact,
         private readonly FieldModel $leadFieldModel,

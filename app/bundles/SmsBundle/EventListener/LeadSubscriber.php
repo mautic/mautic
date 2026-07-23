@@ -35,7 +35,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->addSmsEvents($event, 'failed');
     }
 
-    protected function addSmsEvents(LeadTimelineEvent $event, $state): void
+    private function addSmsEvents(LeadTimelineEvent $event, $state): void
     {
         // Set available event types
         $eventTypeKey  = 'sms.'.$state;

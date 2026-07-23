@@ -47,7 +47,7 @@ final class ReportNormalizeSubscriber implements EventSubscriberInterface
     /**
      * @param array<string> $columns
      */
-    protected function useContactOrCompanyColumn(array $columns): bool
+    private function useContactOrCompanyColumn(array $columns): bool
     {
         foreach ($columns as $column) {
             if (str_starts_with($column, 'l.') || str_starts_with($column, 'comp.')) {

@@ -23,7 +23,7 @@ final class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly AssetModel $assetModel,
-        protected TranslatorInterface $translator,
+        private TranslatorInterface $translator,
         private readonly AnalyticsHelper $analyticsHelper,
         private readonly AssetsHelper $assetsHelper,
         private readonly ThemeHelperInterface $themeHelper,

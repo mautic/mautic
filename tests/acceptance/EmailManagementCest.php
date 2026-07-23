@@ -62,7 +62,7 @@ final class EmailManagementCest
         $I->click(EmailsPage::CHANGE_CATEGORY_ACTION);
     }
 
-    protected function verifyAllEmailsBelongTo(AcceptanceTester $I, string $firstCategoryName): void
+    private function verifyAllEmailsBelongTo(AcceptanceTester $I, string $firstCategoryName): void
     {
         $I->waitForElementVisible('span.label-category');
         $categories = $I->grabMultiple('span.label-category');

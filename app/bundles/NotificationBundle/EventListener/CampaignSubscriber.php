@@ -40,7 +40,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      *
      * @var int
      */
-    protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
+    private const MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
