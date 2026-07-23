@@ -3,10 +3,12 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PageListType;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use Symfony\Component\Form\AbstractType;
@@ -86,7 +88,7 @@ class TweetType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Asset::class, 'id');
         $builder->add(
             $builder->create(
                 'asset',
@@ -104,7 +106,7 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',

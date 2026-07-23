@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -524,7 +525,7 @@ final class TagController extends FormController
                 ]);
 
                 $form = $this->formFactory->create(
-                    \MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType::class,
+                    TagMergeType::class,
                     [],
                     [
                         'action'      => $action,

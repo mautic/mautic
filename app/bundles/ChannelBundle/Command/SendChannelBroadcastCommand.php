@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -126,12 +127,12 @@ EOT
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
         }
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
@@ -181,6 +182,6 @@ EOT
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }
