@@ -15,7 +15,7 @@ final class NoNullableServiceInConstructorRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new NoNullableServiceInConstructorRule();
+        return new NoNullableServiceInConstructorRule($this->createReflectionProvider());
     }
 
     public function testRule(): void
@@ -35,5 +35,35 @@ final class NoNullableServiceInConstructorRuleTest extends RuleTestCase
     public function testSkipNullableScalarAndArray(): void
     {
         $this->analyse([__DIR__.'/Fixture/NullableScalarConstructor.php'], []);
+    }
+
+    public function testSkipNullableThrowable(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/NullableExceptionConstructor.php'], []);
+    }
+
+    public function testSkipAnonymousClass(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/NullableServiceAnonymousClass.php'], []);
+    }
+
+    public function testSkipNullableDateTime(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/NullableDateTimeConstructor.php'], []);
+    }
+
+    public function testSkipClassInDataHolderNamespace(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/Entity/NullableServiceInEntity.php'], []);
+    }
+
+    public function testSkipNullableWhenSiblingParamHasSameType(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/DuplicateTypeConstructor.php'], []);
+    }
+
+    public function testSkipBadgeClass(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/NullableServiceInBadge.php'], []);
     }
 }
