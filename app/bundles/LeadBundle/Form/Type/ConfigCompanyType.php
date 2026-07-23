@@ -62,7 +62,7 @@ class ConfigCompanyType extends AbstractType
                     'expanded'    => false,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'data' => array_flip($orderColumns),
