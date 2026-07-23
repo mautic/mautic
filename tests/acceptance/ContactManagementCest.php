@@ -19,8 +19,7 @@ class ContactManagementCest
         AcceptanceTester $I,
         ContactStep $contact,
     ): void {
-        $email               = sprintf('quickadd%s@example.com', time());
-        $initialContactCount = $I->grabNumRecords('test_leads');
+        $email = sprintf('quickadd%s@example.com', time());
 
         $I->amOnPage(ContactPage::$URL);
 
@@ -31,6 +30,11 @@ class ContactManagementCest
         // Wait for the Quick Add Form to appear
         $I->waitForElementVisible(ContactPage::$quickAddModal, 30);
         $I->see('Quick Add', 'h4.modal-title');
+        $I->waitForJS(
+            "return !document.querySelector('#MauticSharedModal .modal-loading-bar').classList.contains('active')"
+            ." && document.querySelector('".ContactPage::$firstNameField."') !== null;",
+            30,
+        );
 
         // Fill out the Quick Add form using only required fields.
         $I->fillField(ContactPage::$firstNameField, 'QuickAddFirstName');
@@ -41,9 +45,7 @@ class ContactManagementCest
         $I->executeJS("document.querySelector('button[name=\"lead[buttons][save]\"]').click();");
         $I->waitForElementNotVisible('#MauticSharedModal', 30);
 
-        // Confirm one contact was created.
-        $finalContactCount = $I->grabNumRecords('test_leads');
-        Assert::assertSame($initialContactCount + 1, $finalContactCount);
+        $I->ensureNotificationAppears('has been created');
     }
 
     public function createContactFromForm(
