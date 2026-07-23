@@ -57,8 +57,11 @@ return RectorConfig::configure()
         // symfony
         Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
+
+        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
     ])
     ->reportUnusedSkips()
+    // ->withComposerBased(symfony: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
