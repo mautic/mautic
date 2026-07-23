@@ -44,11 +44,9 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
     public function getRepository(): GrapesJsBuilderRepository
     {
-        $repository = $this->grapesJsBuilderRepository;
+        $this->grapesJsBuilderRepository->setTranslator($this->translator);
 
-        $repository->setTranslator($this->translator);
-
-        return $repository;
+        return $this->grapesJsBuilderRepository;
     }
 
     /**
