@@ -59,7 +59,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
 
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
-        \Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
     ])
     ->reportUnusedSkips()
     // ->withComposerBased(symfony: true)
@@ -79,6 +79,11 @@ return RectorConfig::configure()
         // to be fixed in dev-main
         Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
             '*Command.php',
+        ],
+
+        // special override case, fixed in rector dev-main
+        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Twig/Extension/OverrideIncludeExtension.php',
         ],
 
         // skip as might be overriden by 3rd party controllers

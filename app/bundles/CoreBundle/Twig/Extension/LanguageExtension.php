@@ -5,8 +5,6 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Intl\Languages;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
 
 class LanguageExtension
 {

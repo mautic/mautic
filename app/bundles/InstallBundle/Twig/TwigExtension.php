@@ -2,9 +2,6 @@
 
 namespace Mautic\InstallBundle\Twig;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
-
 /**
  * TwigExtension class.
  */

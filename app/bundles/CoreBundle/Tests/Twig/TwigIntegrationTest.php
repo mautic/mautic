@@ -22,7 +22,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
     use TwigIntegrationTestTrait;
 
     /**
-     * @return ExtensionInterface[]
+     * @return ExtensionInterface[]|object[]
      */
     public function getExtensions(): array
     {
