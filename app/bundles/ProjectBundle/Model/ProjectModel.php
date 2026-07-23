@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
