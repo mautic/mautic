@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ClientController extends AbstractStandardFormController
+final class ClientController extends AbstractStandardFormController
 {
     public function __construct(
         private readonly ClientModel $clientModel,

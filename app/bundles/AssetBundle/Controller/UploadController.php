@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UploadController extends DropzoneController
+final class UploadController extends DropzoneController
 {
     private TranslatorInterface $translator;
 
