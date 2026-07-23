@@ -18,22 +18,19 @@ final class Version20211209022550 extends AbstractMauticMigration
     {
         $roleModel = $this->container->get(RoleModel::class);
 
-        // Get all non admin roles.
-        $roles = $roleModel->getEntities([
-            'orderBy'       => 'r.id',
-            'orderByDir'    => 'ASC',
-            'filter'        => [
-                'where' => [
-                    [
-                        'col'  => 'r.isAdmin',
-                        'expr' => 'eq',
-                        'val'  => 0,
-                    ],
-                ],
-            ],
-            'hydration_mode' => Query::HYDRATE_OBJECT,
-            'iterable_mode'  => true,
-        ]);
+        // Build custom query to force OBJECT hydration
+        $qb = $roleModel->getRepository()->createQueryBuilder('r');
+
+        // Get all non admin roles
+        $qb->where($qb->expr()->eq('r.isAdmin', ':isAdmin'))
+            ->setParameter('isAdmin', 0)
+            ->orderBy('r.id', 'ASC');
+
+        $query = $qb->getQuery();
+        $query->setHint(Query::HINT_REFRESH, true);          // Force refresh / full hydration
+        $query->setHydrationMode(Query::HYDRATE_OBJECT);     // Explicitly force object
+
+        $roles = $query->getResult();
 
         /** @var Role $role */
         foreach ($roles as $role) {
