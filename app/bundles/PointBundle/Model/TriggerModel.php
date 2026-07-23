@@ -117,8 +117,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
 
-            $leadRepository = $this->leadRepository;
-
             foreach ($events as $event) {
                 $args = [
                     'filter' => [
@@ -139,7 +137,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                         'value'  => $entity->getPoints(),
                     ];
                 } else {
-                    $args['qb'] = $leadRepository->getEntitiesDbalQueryBuilder()
+                    $args['qb'] = $this->leadRepository->getEntitiesDbalQueryBuilder()
                         ->leftJoin('l', MAUTIC_TABLE_PREFIX.GroupContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
                     $args['filter']['force'][] = [
                         'column' => 'pls.score',

@@ -18,7 +18,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, array<string, int|string>>
      */
-    protected array $mailboxes = [
+    private array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',
             'host'              => 'mail.test.com',

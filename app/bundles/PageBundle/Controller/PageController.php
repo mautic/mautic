@@ -107,12 +107,10 @@ class PageController extends FormController
             ];
         }
 
-        $translator = $this->translator;
-
         // do not list variants in the main list
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
-        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
+        $langSearchCommand = $this->translator->trans('mautic.core.searchcommand.lang');
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
