@@ -6,7 +6,7 @@ namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 use Symfony\Contracts\Service\Attribute\Required;
 
-class CollidingAutowireController
+final class CollidingAutowireController
 {
     #[Required]
     public function autowire(SomeModel $someModel): void
