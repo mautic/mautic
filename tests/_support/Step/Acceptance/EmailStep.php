@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\EmailsPage;
 
-class EmailStep extends \AcceptanceTester
+final class EmailStep extends \AcceptanceTester
 {
     /**
      * Create segment email with the given name.
