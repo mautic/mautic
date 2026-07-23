@@ -195,6 +195,10 @@ parameters:
 		-
 			message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
 			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
+		# intentional, as overrides the property
+		-
+			identifier: symplify.noJustPropertyAssign
+			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
@@ -207,28 +211,11 @@ parameters:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 
-services:
-	-
-		class: Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-		tags:
-			- phpstan.rules.rule
-	-
-		class: Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
-		tags:
-			- phpstan.rules.rule
-	-
-		class: Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
-		tags:
-			- phpstan.rules.rule
-	-
-		class: Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
-		tags:
-			- phpstan.rules.rule
-	-
-		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
-		tags:
-			- phpstan.rules.rule
-	-
-		class: Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
-		tags:
-			- phpstan.rules.rule
+rules:
+	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
+	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+	- Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
+	- Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
+	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
+	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
+	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
