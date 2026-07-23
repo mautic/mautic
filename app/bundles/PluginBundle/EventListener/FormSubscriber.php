@@ -8,7 +8,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final class FormSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 

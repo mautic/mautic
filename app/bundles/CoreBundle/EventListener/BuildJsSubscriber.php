@@ -6,7 +6,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final class BuildJsSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
