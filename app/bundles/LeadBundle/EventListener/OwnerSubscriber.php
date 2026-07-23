@@ -204,10 +204,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
         return $tokens;
     }
 
-    /**
-     * @return array|string|string[]
-     */
-    private function getOwnerColumnNormalized(string $ownerColumn): string|array
+    private function getOwnerColumnNormalized(string $ownerColumn): string
     {
         return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
     }

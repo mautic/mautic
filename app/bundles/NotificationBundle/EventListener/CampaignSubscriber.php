@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var string
@@ -40,7 +40,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      *
      * @var int
      */
-    private const MAX_PLAYER_IDS_PER_REQUEST = 2000;
+    protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
