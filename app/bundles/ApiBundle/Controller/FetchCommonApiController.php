@@ -608,8 +608,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * Returns an error.
-     *
      * @param array<mixed> $details
      *
      * @return Response|array<string, array<mixed>|int|string|null>

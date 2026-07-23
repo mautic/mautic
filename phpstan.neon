@@ -228,3 +228,7 @@ services:
 		class: Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 		tags:
 			- phpstan.rules.rule
+	-
+		class: Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+		tags:
+			- phpstan.rules.rule

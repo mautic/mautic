@@ -12,10 +12,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fixture;
+    private FormFieldHelper $fixture;
 
     protected function setUp(): void
     {
