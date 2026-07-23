@@ -22,6 +22,8 @@ class AcceptanceTester extends Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
+    public const TIMEOUT = 30;
+
     public function login(string $name = 'admin', string $password = 'Maut1cR0cks!'): void
     {
         $I = $this;
