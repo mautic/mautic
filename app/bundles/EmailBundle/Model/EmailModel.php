@@ -730,9 +730,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $statRepo = $this->getStatRepository();
 
-        $dncRepo = $this->doNotContactRepository;
-
-        $trackableRepo = $this->trackableRepository;
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 
@@ -740,9 +737,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
             $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
             $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
-            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
-            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
+            $clickCounts        = $this->trackableRepository->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
+            $unsubscribedCounts = $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
+            $bouncedCounts      = $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
                 $sentCount         = $sentCounts[$l->getId()] ?? 0;
@@ -774,9 +771,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $statRepo->getSentCount($emailIds, null, $query),
                 $statRepo->getReadCount($emailIds, null, $query),
                 $statRepo->getFailedCount($emailIds, null, $query),
-                $trackableRepo->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id'),
-                $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query),
-                $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query),
+                $this->trackableRepository->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id'),
+                $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query),
+                $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query),
             ];
 
             if ($listCount > 1) {
@@ -1063,10 +1060,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $statRepo = $this->getStatRepository();
 
-        $dncRepo = $this->doNotContactRepository;
-
         $failedCount    = (int) $statRepo->getFailedCount($emailIds);
-        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
+        $bouncedCount   = (int) $this->doNotContactRepository->getCount('email', $emailIds, DoNotContact::BOUNCED);
         $sentCount      = (int) $email->getSentCount($includeVariants);
         $deliveredCount = $sentCount - $failedCount - $bouncedCount;
 
@@ -1795,14 +1790,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function removeDoNotContact($email): void
     {
-        $leadRepo = $this->leadRepository;
-        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
+        $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
 
         /** @var Lead[] $leads */
         $leads = [];
 
         foreach ($leadId as $lead) {
-            $leads[] = $leadRepo->getEntity($lead['id']);
+            $leads[] = $this->leadRepository->getEntity($lead['id']);
         }
 
         foreach ($leads as $lead) {
@@ -1816,10 +1810,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', $flush = true, $leadId = null): array
     {
-        $leadRepo = $this->leadRepository;
-
         if (null === $leadId) {
-            $leadId = (array) $leadRepo->getLeadByEmail($email, true);
+            $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
         } elseif (!is_array($leadId)) {
             $leadId = [$leadId];
         }
@@ -2144,10 +2136,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getUpcomingEmails($limit = 10, $canViewOthers = true): array
     {
-        $leadEventLogRepository = $this->leadEventLogRepository;
-        $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
+        $this->leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $leadEventLogRepository->getUpcomingEvents(
+        return $this->leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',
                 'limit'         => $limit,

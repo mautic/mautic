@@ -11,7 +11,7 @@ final class CategoryTypeEntityEvent extends CommonEvent
     /**
      * @var array<mixed>
      */
-    protected array $types = [];
+    private array $types = [];
 
     /**
      * Returns the array of Category Type Entity.

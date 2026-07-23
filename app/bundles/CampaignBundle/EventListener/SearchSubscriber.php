@@ -45,8 +45,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
-        $security = $this->security;
-        if ($security->isGranted('campaign:campaigns:view')) {
+        if ($this->security->isGranted('campaign:campaigns:view')) {
             $event->addCommands(
                 'mautic.campaign.campaigns',
                 $this->campaignModel->getCommandList()

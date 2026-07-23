@@ -79,14 +79,13 @@ class IpAddressModel
      */
     public function deleteUnusedIpAddresses(int $limit): int
     {
-        $ipAddressRepo = $this->ipAddressRepository;
-        $ipIds         = $ipAddressRepo->getUnusedIpAddressesIds($limit);
+        $ipIds = $this->ipAddressRepository->getUnusedIpAddressesIds($limit);
 
         $chunkedIds = array_chunk($ipIds, self::DELETE_SIZE);
         $count      = 0;
 
         foreach ($chunkedIds as $ids) {
-            $count += $ipAddressRepo->deleteUnusedIpAddresses($ids);
+            $count += $this->ipAddressRepository->deleteUnusedIpAddresses($ids);
 
             // Use sleep to recover from any potential table locks.
             usleep(50000);
