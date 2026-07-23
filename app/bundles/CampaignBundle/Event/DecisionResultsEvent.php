@@ -14,9 +14,9 @@ class DecisionResultsEvent extends Event
      * @param ArrayCollection<int, LeadEventLog> $eventLogs
      */
     public function __construct(
-        private AbstractEventAccessor $eventConfig,
-        private ArrayCollection $eventLogs,
-        private EvaluatedContacts $evaluatedContacts,
+        private readonly AbstractEventAccessor $eventConfig,
+        private readonly ArrayCollection $eventLogs,
+        private readonly EvaluatedContacts $evaluatedContacts,
     ) {
     }
 
@@ -26,7 +26,7 @@ class DecisionResultsEvent extends Event
     }
 
     /**
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLogs(): ArrayCollection
     {

@@ -14,9 +14,9 @@ use Symfony\Component\Routing\RouterInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Translator $translator,
-        private RouterInterface $router,
-        private FocusModel $focusModel,
+        private readonly Translator $translator,
+        private readonly RouterInterface $router,
+        private readonly FocusModel $focusModel,
     ) {
     }
 

@@ -26,14 +26,14 @@ use Symfony\Component\Security\Http\SecurityEvents;
 class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private MenuHelper $menuHelper,
-        private UserHelper $userHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private AuthorizationCheckerInterface $securityContext,
-        private UserModel $userModel,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
+        private readonly BundleHelper $bundleHelper,
+        private readonly MenuHelper $menuHelper,
+        private readonly UserHelper $userHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuthorizationCheckerInterface $securityContext,
+        private readonly UserModel $userModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -176,7 +176,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
                         foreach (['name', 'path', 'controller'] as $required) {
                             if (empty($details[$required])) {
-                                throw new \InvalidArgumentException("$bundle.$name must have $required defined");
+                                throw new \InvalidArgumentException("{$bundle}.{$name} must have {$required} defined");
                             }
                         }
 
@@ -245,7 +245,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
+    private function addRouteToCollection(RouteCollection $collection, string $type, string $name, array $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];

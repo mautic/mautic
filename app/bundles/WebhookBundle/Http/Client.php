@@ -12,9 +12,9 @@ use Psr\Http\Message\ResponseInterface;
 class Client
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private GuzzleClient $httpClient,
-        private PrivateAddressChecker $privateAddressChecker,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly GuzzleClient $httpClient,
+        private readonly PrivateAddressChecker $privateAddressChecker,
     ) {
     }
 

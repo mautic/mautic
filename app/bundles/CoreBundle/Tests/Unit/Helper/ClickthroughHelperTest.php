@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\Serializer::class)]
-class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(\Mautic\CoreBundle\Helper\Serializer::class)]
+final class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testEncodingCanBeDecoded(): void
     {
         $array = ['foo' => 'bar'];
 
-        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
+        $this->assertSame($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }
 
     public function testObjectInArrayIsDetectedOrIgnored(): void
@@ -35,6 +38,6 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
     {
         $array = [];
 
-        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(''));
+        $this->assertSame($array, ClickthroughHelper::decodeArrayFromUrl(''));
     }
 }

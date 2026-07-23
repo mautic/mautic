@@ -87,7 +87,7 @@ class SubmitActionRepostType extends AbstractType
                 $alias,
                 TextType::class,
                 [
-                    'label'      => $label." ($alias)",
+                    'label'      => $label." ({$alias})",
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',

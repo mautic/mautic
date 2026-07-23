@@ -25,8 +25,8 @@ class DeduplicateCommand extends Command
     public const NAME = 'mautic:contacts:deduplicate';
 
     public function __construct(
-        private ContactDeduper $contactDeduper,
-        private ParameterBagInterface $params,
+        private readonly ContactDeduper $contactDeduper,
+        private readonly ParameterBagInterface $params,
     ) {
         parent::__construct();
     }

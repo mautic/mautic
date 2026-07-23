@@ -11,12 +11,24 @@ use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<Summary>
  */
 class SummaryModel extends AbstractCommonModel
 {
+    private LeadEventLogRepository $leadEventLogRepository;
+
+    private SummaryRepository $summaryRepository;
+
+    #[Required]
+    public function autowireSummaryModel(SummaryRepository $summaryRepository, LeadEventLogRepository $leadEventLogRepository): void
+    {
+        $this->summaryRepository = $summaryRepository;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+    }
+
     private array $logData = [];
 
     /**
@@ -60,7 +72,7 @@ class SummaryModel extends AbstractCommonModel
 
     public function getRepository(): SummaryRepository
     {
-        return $this->em->getRepository(Summary::class);
+        return $this->summaryRepository;
     }
 
     public function getPermissionBase(): string
@@ -131,7 +143,7 @@ class SummaryModel extends AbstractCommonModel
 
     public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     /**

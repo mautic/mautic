@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -142,7 +143,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @param array<string, mixed> $companyData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('companyCreateDataProvider')]
+    #[DataProvider('companyCreateDataProvider')]
     public function testCreateCompanyViaApiPlatform(array $companyData, int $expectedStatusCode): void
     {
         $this->client->request(
@@ -182,23 +183,21 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{companyData: array<string, mixed>, expectedStatusCode: int}>
+     * @return \Iterator<string, array{companyData: array<string, mixed>, expectedStatusCode: int}>
      */
-    public static function companyCreateDataProvider(): array
+    public static function companyCreateDataProvider(): \Iterator
     {
-        return [
-            'valid company with all fields' => [
-                'companyData' => [
-                    'score'       => 0,
-                    'socialCache' => [],
-                    'city'        => 'Boston',
-                    'state'       => 'Massachusetts',
-                    'country'     => 'United States',
-                    'name'        => 'Mautic',
-                    'industry'    => 'Software',
-                ],
-                'expectedStatusCode' => Response::HTTP_CREATED,
+        yield 'valid company with all fields' => [
+            'companyData' => [
+                'score'       => 0,
+                'socialCache' => [],
+                'city'        => 'Boston',
+                'state'       => 'Massachusetts',
+                'country'     => 'United States',
+                'name'        => 'Mautic',
+                'industry'    => 'Software',
             ],
+            'expectedStatusCode' => Response::HTTP_CREATED,
         ];
     }
 
@@ -281,6 +280,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $company = $this->getCompanyRepository()->find($company->getId());
+        $this->assertInstanceOf(Company::class, $company);
         $this->asserttrue($company->isDeleted());
     }
 
@@ -293,7 +293,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company = $this->getCompanyRepository()->find($companyId);
-        $this->assertNull($company);
+        $this->assertNotInstanceOf(Company::class, $company);
     }
 
     public function testDeleteCompaniesInBatchInHttpRequest(): void
@@ -314,9 +314,9 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company1 = $this->getCompanyRepository()->find($companyId1);
-        $this->assertNull($company1);
+        $this->assertNotInstanceOf(Company::class, $company1);
         $company2 = $this->getCompanyRepository()->find($companyId2);
-        $this->assertNull($company2);
+        $this->assertNotInstanceOf(Company::class, $company2);
     }
 
     public function testDeleteCompaniesInBatch(): void
@@ -334,8 +334,10 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company1 = $this->getCompanyRepository()->find($company1->getId());
+        $this->assertInstanceOf(Company::class, $company1);
         $this->asserttrue($company1->isDeleted());
         $company2 = $this->getCompanyRepository()->find($company2->getId());
+        $this->assertInstanceOf(Company::class, $company2);
         $this->asserttrue($company2->isDeleted());
     }
 
@@ -420,7 +422,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $fieldRepository   = $this->em->getRepository(LeadField::class);
         $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
-        \assert($companyEmailField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $companyEmailField);
         $companyEmailField->setIsUniqueIdentifer(true);
         $this->em->persist($companyEmailField);
         $this->em->flush();

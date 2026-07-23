@@ -70,17 +70,4 @@ final class MauticSsoFactory extends AbstractFactory implements AuthenticatorFac
     {
         return 'form';
     }
-
-    /**
-     * @param array<mixed> $config
-     */
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
-    {
-        throw new \Exception('The old authentication system is not supported with mautic-sso.');
-    }
-
-    protected function getListenerId(): string
-    {
-        throw new \Exception('The old authentication system is not supported with mautic-sso.');
-    }
 }

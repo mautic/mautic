@@ -27,8 +27,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private EmailModel $emailModel,
+        private readonly RequestStack $requestStack,
+        private readonly EmailModel $emailModel,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -37,21 +37,16 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return GrapesJsBuilderRepository
-     */
-    public function getRepository()
+    public function getRepository(): GrapesJsBuilderRepository
     {
-        /** @var GrapesJsBuilderRepository $repository */
-        $repository = $this->em->getRepository(GrapesJsBuilder::class);
+        $this->grapesJsBuilderRepository->setTranslator($this->translator);
 
-        $repository->setTranslator($this->translator);
-
-        return $repository;
+        return $this->grapesJsBuilderRepository;
     }
 
     /**

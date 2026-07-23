@@ -15,11 +15,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ReportExporter
 {
     public function __construct(
-        private ScheduleModel $schedulerModel,
-        private ReportDataAdapter $reportDataAdapter,
-        private ReportExportOptions $reportExportOptions,
-        private ReportFileWriter $reportFileWriter,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly ScheduleModel $schedulerModel,
+        private readonly ReportDataAdapter $reportDataAdapter,
+        private readonly ReportExportOptions $reportExportOptions,
+        private readonly ReportFileWriter $reportFileWriter,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

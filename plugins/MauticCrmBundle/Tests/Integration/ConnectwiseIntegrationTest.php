@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseIntegration::class)]
-class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
+#[CoversClass(ConnectwiseIntegration::class)]
+final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
+    #[TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfRecordsAreFetched(): void
     {
         $this->reset();
@@ -22,7 +26,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getContacts')
             ->willReturnCallback(
-                fn () => $this->generateData(2)
+                fn (): array => $this->generateData(2)
             );
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
@@ -41,7 +45,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $integration->getRecords([], 'Contact');
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
+    #[TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
         $this->reset();
@@ -51,10 +55,10 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getCampaignMembers')
             ->willReturnCallback(
-                fn () => $this->generateData(2)
+                fn (): array => $this->generateData(2)
             );
 
-        $integrationEntityModel = $this->createMock(IntegrationEntityModel::class);
+        $integrationEntityModel = $this->createStub(IntegrationEntityModel::class);
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->setConstructorArgs([

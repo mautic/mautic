@@ -19,10 +19,10 @@ class BuilderSubscriber implements EventSubscriberInterface
     private string $assetToken = '{assetlink=(.*?)}';
 
     public function __construct(
-        private CorePermissions $security,
-        private TokenHelper $tokenHelper,
-        private ContactTracker $contactTracker,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly CorePermissions $security,
+        private readonly TokenHelper $tokenHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 
@@ -48,7 +48,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }

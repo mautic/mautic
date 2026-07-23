@@ -38,15 +38,14 @@ class TriggerApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private ?RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        TriggerModel $triggerModel,
+        private readonly TriggerEventModel $triggerEventModel,
     ) {
-        $triggerModel = $modelFactory->getModel('point.trigger');
-        \assert($triggerModel instanceof TriggerModel);
-
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';
@@ -65,8 +64,6 @@ class TriggerApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();
-        $triggerEventModel = $this->getModel('point.triggerevent');
-        \assert($triggerEventModel instanceof TriggerEventModel);
 
         $isNew             = false;
 
@@ -90,9 +87,9 @@ class TriggerApiController extends CommonApiController
                 if (empty($eventParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $eventParams['id']  = 'new'.hash('sha1', uniqid((string) mt_rand()));
-                    $triggerEventEntity = $triggerEventModel->getEntity();
+                    $triggerEventEntity = $this->triggerEventModel->getEntity();
                 } else {
-                    $triggerEventEntity  = $triggerEventModel->getEntity($eventParams['id']);
+                    $triggerEventEntity  = $this->triggerEventModel->getEntity($eventParams['id']);
                     $requestTriggerIds[] = $eventParams['id'];
                 }
 
@@ -103,7 +100,7 @@ class TriggerApiController extends CommonApiController
                 $triggerEventForm = $this->createTriggerEventEntityForm($triggerEventEntity);
                 $triggerEventForm->submit($eventParams, 'PATCH' !== $method);
 
-                if (!($triggerEventForm->isSubmitted() && $triggerEventForm->isValid())) {
+                if (!$triggerEventForm->isSubmitted() || !$triggerEventForm->isValid()) {
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
@@ -129,10 +126,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm(TriggerEvent $entity): FormInterface
     {
-        $triggerEventModel = $this->getModel('point.triggerevent');
-        \assert($triggerEventModel instanceof TriggerEventModel);
-
-        return $triggerEventModel->createForm(
+        return $this->triggerEventModel->createForm(
             $entity,
             $this->formFactory,
             null,
@@ -145,10 +139,8 @@ class TriggerApiController extends CommonApiController
 
     /**
      * Return array of available point trigger event types.
-     *
-     * @return Response
      */
-    public function getPointTriggerEventTypesAction()
+    public function getPointTriggerEventTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
             return $this->accessDenied();
@@ -170,10 +162,8 @@ class TriggerApiController extends CommonApiController
      * Delete events from a point trigger.
      *
      * @param int $triggerId
-     *
-     * @return Response
      */
-    public function deletePointTriggerEventsAction($triggerId)
+    public function deletePointTriggerEventsAction($triggerId): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -36,7 +38,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PageTestAbstract extends TestCase
+abstract class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
 
@@ -47,7 +49,7 @@ class PageTestAbstract extends TestCase
     /**
      * @var Router|MockObject
      */
-    protected $router;
+    protected ?MockObject $router = null;
 
     protected CorePermissions&MockObject $security;
 
@@ -59,31 +61,19 @@ class PageTestAbstract extends TestCase
 
     protected function setUp(): void
     {
-        $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
+        $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand(), true));
     }
 
     protected function getPageModel(bool $transliterationEnabled = true, bool $validatePageHitRequiredData = true): PageModel
     {
-        $cookieHelper = $this->createMock(CookieHelper::class);
-
         $this->router = $this->createMock(Router::class);
 
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
-        $leadModel = $this->createMock(LeadModel::class);
-
-        $leadFieldModel = $this->createMock(FieldModel::class);
-
         $redirectModel = $this->getRedirectModel();
 
         $this->companyModel = $this->createMock(CompanyModel::class);
-
-        $trackableModel = $this->createMock(TrackableModel::class);
-
-        $dispatcher = $this->createMock(EventDispatcher::class);
-
-        $translator = $this->createMock(Translator::class);
 
         $entityManager = $this->createMock(EntityManager::class);
 
@@ -92,9 +82,6 @@ class PageTestAbstract extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $hitRepository = $this->createMock(HitRepository::class);
-        $userHelper    = $this->createMock(UserHelper::class);
-
-        $messageBus = $this->createMock(MessageBus::class);
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
@@ -104,13 +91,11 @@ class PageTestAbstract extends TestCase
         $lead->setId(self::$mockId);
         $lead->setFirstname(self::$mockName);
 
-        $contactTracker->expects($this
-            ->any())
+        $contactTracker
             ->method('getContact')
             ->willReturn($lead);
 
-        $entityManager->expects($this
-            ->any())
+        $entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -119,7 +104,7 @@ class PageTestAbstract extends TestCase
                 ]
             );
 
-        $coreParametersHelper->expects($this->any())
+        $coreParametersHelper
             ->method('get')
             ->with($this->anything())
             ->willReturnCallback(function ($parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {
@@ -131,72 +116,70 @@ class PageTestAbstract extends TestCase
                     return $validatePageHitRequiredData;
                 }
             });
-
-        $deviceTrackerMock           = $this->createMock(DeviceTracker::class);
-        $statRepositoryMock          = $this->createMock(StatRepository::class);
-        $botRatioHelperMock          = $this->createMock(BotRatioHelper::class);
         $validatorMock               = $this->createMock(ValidatorInterface::class);
 
         $validatorMock->method('validate')
             ->willReturn(new ConstraintViolationList());
 
-        $pageModel = new PageModel(
-            $cookieHelper,
+        return new PageModel(
+            $this->createStub(CookieHelper::class),
             $this->ipLookupHelper,
-            $leadModel,
-            $leadFieldModel,
+            $this->createStub(LeadModel::class),
+            $this->createStub(FieldModel::class),
             $redirectModel,
-            $trackableModel,
-            $messageBus,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(MessageBus::class),
             $this->companyModel,
-            $deviceTrackerMock,
+            $this->createStub(DeviceTracker::class),
             $contactTracker,
             $coreParametersHelper,
             $this->contactRequestHelper,
+            $this->createStub(\Mautic\CoreBundle\Model\AbTest\VariantConverterService::class),
             $entityManager,
             $this->security = $this->createMock(CorePermissions::class),
-            $dispatcher,
+            $this->createStub(EventDispatcher::class),
             $this->router,
-            $translator,
-            $userHelper,
-            $this->createMock(LoggerInterface::class),
-            $statRepositoryMock,
-            $botRatioHelperMock,
-            $validatorMock
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(StatRepository::class),
+            $this->createStub(BotRatioHelper::class),
+            $validatorMock,
+            $this->createStub(PageRepository::class), // $pageRepository
+            $this->createStub(HitRepository::class), // $hitRepository
+            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class), // $utmTagRepository
         );
-
-        return $pageModel;
     }
 
     /**
      * @return RedirectModel
      */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): MockObject
     {
         $shortener = $this->createMock(Shortener::class);
 
         $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
                 $shortener,
+                $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class),
             ])
             ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirect = $this->createMock(\Mautic\PageBundle\Entity\Redirect::class);
-
-        $mockRedirectModel->expects($this->any())
+        $mockRedirectModel
             ->method('createRedirectEntity')
-            ->willReturn($mockRedirect);
+            ->willReturn($this->createStub(\Mautic\PageBundle\Entity\Redirect::class));
 
-        $mockRedirectModel->expects($this->any())
+        $mockRedirectModel
             ->method('generateRedirectUrl')
             ->willReturn('http://some-url.com');
 

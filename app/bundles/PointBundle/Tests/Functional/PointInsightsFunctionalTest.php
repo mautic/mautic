@@ -13,7 +13,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Model\PointGroupModel;
 
-class PointInsightsFunctionalTest extends MauticMysqlTestCase
+final class PointInsightsFunctionalTest extends MauticMysqlTestCase
 {
     private const GROUP_A_SUFFIX = ' (Group A)';
 
@@ -47,6 +47,7 @@ class PointInsightsFunctionalTest extends MauticMysqlTestCase
         $contact = $leadModel->getEntity($contact->getId());
 
         $expectedValue = $groupA->getId().self::GROUP_A_SUFFIX;
+        $this->assertInstanceOf(Lead::class, $contact);
         $this->assertEquals($expectedValue, $contact->getFieldValue($customField->getAlias()));
     }
 

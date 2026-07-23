@@ -18,8 +18,9 @@ class ScheduleModel extends FormModel
     private SchedulerRepository $schedulerRepository;
 
     public function __construct(
-        private EntityManager $entityManager,
-        private SchedulerPlanner $schedulerPlanner,
+        private readonly EntityManager $entityManager,
+        private readonly SchedulerPlanner $schedulerPlanner,
+        private readonly SchedulerRepository $schedulerRepository,
     ) {
         /** @var SchedulerRepository $schedulerRepository */
         $schedulerRepository       = $entityManager->getRepository(Scheduler::class);

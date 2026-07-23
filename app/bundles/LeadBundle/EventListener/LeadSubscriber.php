@@ -340,7 +340,7 @@ class LeadSubscriber implements EventSubscriberInterface
             $name = $this->translator->trans($label);
             $event->addEventType($type, $name);
 
-            if (!$event->isApplicable($type) || ('lead.utmtagsadded' != $type && !empty($filters['search']))) {
+            if (!$event->isApplicable($type) || ('lead.utmtagsadded' !== $type && !empty($filters['search']))) {
                 continue;
             }
 

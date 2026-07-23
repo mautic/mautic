@@ -15,7 +15,7 @@ class DoctrineSubscriber
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]
-        private Logger $logger,
+        private readonly Logger $logger,
     ) {
     }
 
@@ -40,7 +40,7 @@ class DoctrineSubscriber
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.is_index, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                    ->where("f.object = '$object'")
+                    ->where("f.object = '{$object}'")
                     ->orderBy('f.field_order', 'ASC')
                     ->executeQuery()
                     ->fetchAllAssociative();

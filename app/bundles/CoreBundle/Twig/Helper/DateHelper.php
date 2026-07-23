@@ -13,6 +13,9 @@ final class DateHelper
      */
     private array $formats;
 
+    /**
+     * @api cannot be readonly, as changed in tests via reflection
+     */
     private DateTimeHelper $helper;
 
     /**
@@ -26,8 +29,8 @@ final class DateHelper
         $dateShortFormat,
         $dateOnlyFormat,
         $timeOnlyFormat,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
@@ -41,12 +44,10 @@ final class DateHelper
 
     /**
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    private function format(string $type, $datetime, $timezone, $fromFormat)
+    private function format(string $type, $datetime, string $timezone, ?string $fromFormat)
     {
         if (empty($datetime)) {
             return '';
@@ -62,12 +63,10 @@ final class DateHelper
      * Returns full date. eg. October 8, 2014 21:19.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toFull($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFull($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('datetime', $datetime, $timezone, $fromFormat);
     }
@@ -76,12 +75,10 @@ final class DateHelper
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
@@ -94,12 +91,10 @@ final class DateHelper
      * Returns short date format eg Sun, Oct 8.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toShort($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toShort($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('short', $datetime, $timezone, $fromFormat);
     }
@@ -108,12 +103,10 @@ final class DateHelper
      * Returns date only e.g. 2014-08-09.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toDate($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('date', $datetime, $timezone, $fromFormat);
     }
@@ -122,12 +115,10 @@ final class DateHelper
      * Returns time only e.g. 21:19.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toTime($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('time', $datetime, $timezone, $fromFormat);
     }
@@ -136,11 +127,9 @@ final class DateHelper
      * Returns date/time like Today, 10:00 AM.
      *
      * @param string|int<min, -1>|int<1, max>|\DateTime $datetime
-     * @param string                                    $timezone
-     * @param string                                    $fromFormat
      * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
-    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
+    public function toText($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';

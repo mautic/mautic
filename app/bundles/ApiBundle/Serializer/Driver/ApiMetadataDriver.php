@@ -52,10 +52,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the root (base key).
-     *
-     * @return $this
      */
-    public function setRoot($root)
+    public function setRoot($root): static
     {
         $this->metadata->xmlRootName = $root;
 
@@ -64,10 +62,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set prefix for the List and Details groups.
-     *
-     * @return $this
      */
-    public function setGroupPrefix(string $name)
+    public function setGroupPrefix(string $name): static
     {
         $this->groupPrefix = $name;
 
@@ -76,10 +72,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the default version for the properties if different than 1.0.
-     *
-     * @return $this
      */
-    public function setDefaultVersion(string $version)
+    public function setDefaultVersion(string $version): static
     {
         $this->defaultVersion = $version;
 
@@ -88,10 +82,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create a new property.
-     *
-     * @return $this
      */
-    public function createProperty($name)
+    public function createProperty($name): static
     {
         if (!isset($this->properties[$name])) {
             $this->properties[$name] = new PropertyMetadata($this->metadata->name, $name);
@@ -106,10 +98,8 @@ class ApiMetadataDriver implements DriverInterface
      * Add property and set default version and Details group.
      *
      * @param bool $useGetter
-     *
-     * @return $this
      */
-    public function addProperty($name, $serializedName = null, $useGetter = false)
+    public function addProperty($name, $serializedName = null, $useGetter = false): static
     {
         if (empty($name)) {
             return $this;
@@ -138,10 +128,8 @@ class ApiMetadataDriver implements DriverInterface
      *
      * @param bool|false $addToListGroup
      * @param bool|false $useGetter
-     *
-     * @return $this
      */
-    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false)
+    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false): static
     {
         foreach ($properties as $prop) {
             if (!empty($prop)) {
@@ -162,20 +150,15 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create properties and add to the List group.
-     *
-     * @return $this
      */
-    public function addListProperties(array $properties)
+    public function addListProperties(array $properties): static
     {
         $this->addProperties($properties, true);
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSinceVersion($version, $property = null)
+    public function setSinceVersion($version, $property = null): static
     {
         if (null === $property) {
             $property = $this->getCurrentPropertyName();
@@ -186,10 +169,7 @@ class ApiMetadataDriver implements DriverInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setUntilVersion($version, $property = null)
+    public function setUntilVersion($version, $property = null): static
     {
         if (null === $property) {
             $property = $this->getCurrentPropertyName();
@@ -200,10 +180,7 @@ class ApiMetadataDriver implements DriverInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSerializedName($name, $property = null)
+    public function setSerializedName($name, $property = null): static
     {
         if (null === $property) {
             $property = $this->getCurrentPropertyName();
@@ -216,10 +193,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the groups a property belongs to.
-     *
-     * @return $this
      */
-    public function setGroups($groups, $property = null)
+    public function setGroups($groups, $property = null): static
     {
         if (!is_array($groups)) {
             $groups = [$groups];
@@ -238,10 +213,8 @@ class ApiMetadataDriver implements DriverInterface
      * Add a group the property belongs to.
      *
      * @param mixed $property
-     *
-     * @return $this
      */
-    public function addGroup($group, $property = null)
+    public function addGroup($group, $property = null): static
     {
         if (true === $property) {
             foreach ($this->properties as $prop => $metadata) {
@@ -260,10 +233,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Add property to the List group.
-     *
-     * @return $this
      */
-    public function inListGroup()
+    public function inListGroup(): static
     {
         $this->properties[$this->currentPropertyName]->groups[] =
             $this->groupPrefix.'List';
@@ -273,10 +244,8 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set max depth for the property if an association.
-     *
-     * @return $this
      */
-    public function setMaxDepth($depth, $property = null)
+    public function setMaxDepth($depth, $property = null): static
     {
         if (null === $property) {
             $property = $this->getCurrentPropertyName();

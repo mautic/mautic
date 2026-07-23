@@ -90,7 +90,7 @@ class ContactManagementCest
 
         // Wait for the edit form to be visible
         $I->waitForElementVisible(ContactPage::$editForm, 30);
-        $I->see("Edit $contactName");
+        $I->see("Edit {$contactName}");
 
         // Close the edit form (No changes are made)
         $I->click(ContactPage::$cancelButton);
@@ -117,7 +117,7 @@ class ContactManagementCest
 
         // Wait for the edit form to be visible
         $I->waitForElementVisible(ContactPage::$editForm, 30);
-        $I->see("Edit $contactName");
+        $I->see("Edit {$contactName}");
 
         // Edit the first and last names
         $I->fillField(ContactPage::$firstNameField, 'Edited-First-Name');
@@ -149,8 +149,8 @@ class ContactManagementCest
         $I->click(ContactPage::$ConfirmDelete);
 
         // Wait for the delete confirmation message
-        $I->waitForText("$contactName has been deleted!", 30);
-        $I->see("$contactName has been deleted!");
+        $I->waitForText("{$contactName} has been deleted!", 30);
+        $I->see("{$contactName} has been deleted!");
     }
 
     public function deleteContactFromProfile(
@@ -189,8 +189,8 @@ class ContactManagementCest
         $I->click(ContactPage::$ConfirmDelete);
 
         // Wait for the delete confirmation message
-        $I->waitForText("$contactName has been deleted!", 30);
-        $I->see("$contactName has been deleted!");
+        $I->waitForText("{$contactName} has been deleted!", 30);
+        $I->see("{$contactName} has been deleted!");
     }
 
     public function batchDeleteContacts(
@@ -373,8 +373,8 @@ class ContactManagementCest
         $I->wait(5); // Wait for search results to load
 
         // Verify that the first and second contacts are not in the segment
-        $I->dontsee("$contactName1");
-        $I->dontsee("$contactName2");
+        $I->dontsee("{$contactName1}");
+        $I->dontsee("{$contactName2}");
 
         // Clear the search bar
         $I->click(ContactPage::$clearSearch);
@@ -411,8 +411,8 @@ class ContactManagementCest
         $I->wait(5);
 
         // Verify that the selected contacts are now in the 'segment-test-3' segment
-        $I->see("$contactName1");
-        $I->see("$contactName2");
+        $I->see("{$contactName1}");
+        $I->see("{$contactName2}");
 
         // Clear the search bar
         $I->click(ContactPage::$clearSearch);
@@ -452,8 +452,8 @@ class ContactManagementCest
         $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
         $I->wait(5); // Wait for search results to load
         // Verify that the first and second contacts are not in the segment
-        $I->dontsee("$contactName1");
-        $I->dontsee("$contactName2");
+        $I->dontsee("{$contactName1}");
+        $I->dontsee("{$contactName2}");
 
         // Clear the search bar
         $I->click(ContactPage::$clearSearch);

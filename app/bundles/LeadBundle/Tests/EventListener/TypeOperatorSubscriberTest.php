@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -28,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
 
@@ -48,16 +49,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $emailModel;
 
     /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
-    /**
-     * @var MockObject&StageRepository
-     */
-    private MockObject $stageRepository;
-
-    /**
      * @var MockObject&CategoryModel
      */
     private MockObject $categoryModel;
@@ -68,14 +59,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $assetModel;
 
     /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&FormInterface<FormInterface<mixed>>
+     * @var MockObject&FormInterface
      */
     private MockObject $form;
+
+    private ?string $defaultUploadDir = null;
 
     private TypeOperatorSubscriber $subscriber;
 
@@ -83,29 +71,57 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
+        $this->defaultUploadDir    = $_ENV['MAUTIC_UPLOAD_DIR'] ?? null;
+        $_ENV['MAUTIC_UPLOAD_DIR'] = $this->defaultUploadDir ?? sys_get_temp_dir();
+
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->listModel       = $this->createMock(ListModel::class);
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
-        $this->stageModel      = $this->createMock(StageModel::class);
-        $this->stageRepository = $this->createMock(StageRepository::class);
+        $stageModel            = $this->createMock(StageModel::class);
+        $stageRepository = new class() extends StageRepository {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @param array<string, mixed> $parameters
+             *
+             * @return array<int, array{label: string, value: int}>
+             */
+            public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
+            {
+                return [['label' => 'Stage D', 'value' => 55]];
+            }
+        };
         $this->categoryModel   = $this->createMock(CategoryModel::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
         $this->form            = $this->createMock(FormInterface::class);
         $this->subscriber      = new TypeOperatorSubscriber(
             $this->leadModel,
             $this->listModel,
             $this->campaignModel,
             $this->emailModel,
-            $this->stageModel,
+            $stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $this->translator
+            $translator
         );
 
-        $this->stageModel->method('getRepository')->willReturn($this->stageRepository);
-        $this->translator->method('trans')->willReturnArgument(0);
+        $stageModel->method('getRepository')->willReturn($stageRepository);
+        $translator->method('trans')->willReturnArgument(0);
+    }
+
+    protected function tearDown(): void
+    {
+        if (null === $this->defaultUploadDir) {
+            unset($_ENV['MAUTIC_UPLOAD_DIR']);
+        } else {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = $this->defaultUploadDir;
+        }
+
+        parent::tearDown();
     }
 
     public function testOnTypeOperatorsCollect(): void
@@ -148,10 +164,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->once())
             ->method('getTagList')
             ->willReturn([['label' => 'Tag C', 'value' => 44]]);
-
-        $this->stageRepository->expects($this->once())
-            ->method('getSimpleList')
-            ->willReturn([['label' => 'Stage D', 'value' => 55]]);
 
         $this->categoryModel->expects($this->once())
             ->method('getLookupResults')
@@ -281,11 +293,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher  = $this->exactly(2);
 
         $this->form->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(
                             [
@@ -303,7 +315,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(['class' => 'form-control'], $options['attr']);
                     };
@@ -333,11 +345,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher  = $this->exactly(2);
 
         $this->form->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(
                             [
@@ -356,7 +368,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(['class' => 'form-control'], $options['attr']);
                     };

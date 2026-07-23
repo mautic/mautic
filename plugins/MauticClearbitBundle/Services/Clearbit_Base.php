@@ -65,10 +65,8 @@ class Clearbit_Base
 
     /**
      * @param string $id
-     *
-     * @return object
      */
-    public function setWebhookId($id = null)
+    public function setWebhookId($id = null): static
     {
         $this->_webhookId = $id;
 
@@ -76,11 +74,9 @@ class Clearbit_Base
     }
 
     /**
-     * @param array $params
-     *
      * @return object
      */
-    protected function _execute($params = [])
+    protected function _execute(array $params = [])
     {
         $this->_wait_for_rate_limit();
 

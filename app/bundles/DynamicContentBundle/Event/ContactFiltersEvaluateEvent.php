@@ -17,14 +17,14 @@ final class ContactFiltersEvaluateEvent extends Event
      * @param mixed[] $filters
      */
     public function __construct(
-        private array $filters,
+        private readonly array $filters,
         private Lead $contact,
     ) {
     }
 
     public function isMatch(): bool
     {
-        return $this->isEvaluated() && $this->isMatched;
+        return $this->isEvaluated && $this->isMatched;
     }
 
     public function isEvaluated(): bool
@@ -32,7 +32,7 @@ final class ContactFiltersEvaluateEvent extends Event
         return $this->isEvaluated;
     }
 
-    public function setIsEvaluated(bool $evaluated): ContactFiltersEvaluateEvent
+    public function setIsEvaluated(bool $evaluated): self
     {
         $this->isEvaluated = $evaluated;
 
@@ -44,7 +44,7 @@ final class ContactFiltersEvaluateEvent extends Event
         return $this->contact;
     }
 
-    public function setContact(Lead $contact): ContactFiltersEvaluateEvent
+    public function setContact(Lead $contact): self
     {
         $this->contact = $contact;
 
@@ -64,7 +64,7 @@ final class ContactFiltersEvaluateEvent extends Event
         return $this->isMatched;
     }
 
-    public function setIsMatched(bool $isMatched): ContactFiltersEvaluateEvent
+    public function setIsMatched(bool $isMatched): self
     {
         $this->isMatched = $isMatched;
 

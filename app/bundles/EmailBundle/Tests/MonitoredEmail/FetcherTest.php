@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -7,13 +9,17 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
-class FetcherTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(Fetcher::class)]
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, int|string>> */
-    protected array $mailboxes = [
+    /**
+     * @var array<string, array<string, int|string>>
+     */
+    private array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',
             'host'              => 'mail.test.com',
@@ -49,13 +55,13 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
+    #[TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
     public function testMessagesAreFetchedAndEventDispatched(): void
     {
         $mailbox = $this->createMock(Mailbox::class);
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                fn ($mailbox) => $this->mailboxes[$mailbox]
+                fn ($mailbox): array => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);
@@ -68,7 +74,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->willReturn($event);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
         $fetcher = new Fetcher($mailbox, $dispatcher, $translator);
         $fetcher->setMailboxes(array_keys($this->mailboxes))

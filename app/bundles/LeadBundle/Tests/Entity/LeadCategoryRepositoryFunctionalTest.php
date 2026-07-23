@@ -8,19 +8,21 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
+final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,

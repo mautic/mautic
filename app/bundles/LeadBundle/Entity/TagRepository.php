@@ -13,8 +13,8 @@ class TagRepository extends CommonRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param Tag  $entity
+     * @param bool $flush  true by default; use false if persisting in batches
      */
     public function deleteEntity($entity, $flush = true): void
     {
@@ -78,7 +78,7 @@ class TagRepository extends CommonRepository
         $tags = $this->removeMinusFromTags($tags);
         $qb   = $this->createQueryBuilder('t', 't.tag');
 
-        if ($tags) {
+        if ([] !== $tags) {
             $qb->where(
                 $qb->expr()->in('t.tag', ':tags')
             )
@@ -143,8 +143,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Add tags to leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -156,8 +154,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Update tags in leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -195,8 +191,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Remove tags from leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -8,8 +10,9 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
+use PHPUnit\Framework\Exception;
 
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
@@ -18,7 +21,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $matcher   = $this->exactly(2);
 
         $repo->expects($matcher)
-            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
+            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
@@ -57,7 +60,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $matcher   = $this->exactly(4);
 
         $repo->expects($matcher)
-            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
+            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
@@ -168,18 +171,20 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');
 
         // The query to fetch unknown members should be the 2 Leads not returned by at(0)
-        $this->assertEquals(
+        $this->assertSame(
             "SELECT Test, Id from Lead where Id in ('00Qf100000YjYv4EAF','00Qf100000YjYv9EAF') and ConvertedContactId = NULL",
             $fetcher->getQueryForUnknownObjects(['Test'], Lead::OBJECT)
         );
 
         // The query to fetch unknown members should be the 2 Contacts not returned by at(1)
-        $this->assertEquals(
+        $this->assertSame(
             "SELECT Test, Id from Contact where Id in ('00Qf100000YjYvTEAV','00Qf100000X1NR5EAN')",
             $fetcher->getQueryForUnknownObjects(['Test'], Contact::OBJECT)
         );
@@ -187,16 +192,13 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         // Should include all but the two we are already tracking as campaign members
         $unknown = $fetcher->getUnknownCampaignMembers();
 
-        $this->assertEquals(
+        $this->assertSame(
             [2, 3, 5, 6, 7, 8, 9, 10],
             $unknown
         );
     }
 
-    /**
-     * @return Organizer
-     */
-    private function getOrgnanizer()
+    private function getOrgnanizer(): Organizer
     {
         $records = [
             [

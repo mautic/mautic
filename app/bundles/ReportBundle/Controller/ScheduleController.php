@@ -8,12 +8,22 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class ScheduleController extends CommonAjaxController
 {
+    private ReportModel $reportModel;
+
+    #[Required]
+    public function autowireScheduleController(ReportModel $reportModel): void
+    {
+        $this->reportModel = $reportModel;
+    }
+
     public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {
         $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
@@ -39,11 +49,8 @@ class ScheduleController extends CommonAjaxController
      */
     public function nowAction($reportId): JsonResponse
     {
-        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
-        $model = $this->getModel('report');
-
         /** @var \Mautic\ReportBundle\Entity\Report $report */
-        $report = $model->getEntity($reportId);
+        $report = $this->reportModel->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
@@ -67,7 +74,7 @@ class ScheduleController extends CommonAjaxController
         }
 
         $report->setAsScheduledNow($this->user->getEmail());
-        $model->saveEntity($report);
+        $this->reportModel->saveEntity($report);
 
         $this->addFlashMessage(
             'mautic.report.scheduled.to.now',

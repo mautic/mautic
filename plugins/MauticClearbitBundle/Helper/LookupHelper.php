@@ -41,7 +41,6 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -80,7 +79,6 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -88,7 +86,6 @@ class LookupHelper
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
-                        /* @var Router $router */
                         $clearbit->setWebhookId($webhookId);
                         $res = $clearbit->lookupByDomain($parse['host']);
                         // Prevent from filling up the cache
@@ -110,11 +107,16 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid, $type)
+    /**
+     * @return array{notify: mixed, entity: mixed}|false
+     */
+    public function validateRequest($oid, $type): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -144,10 +146,8 @@ class LookupHelper
 
     /**
      * @param bool $person
-     *
-     * @return bool|Clearbit_Company|Clearbit_Person
      */
-    protected function getClearbit($person = true)
+    protected function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;

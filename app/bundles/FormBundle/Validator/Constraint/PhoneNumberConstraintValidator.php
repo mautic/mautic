@@ -17,7 +17,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && (!is_object($value) || !method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -42,8 +42,6 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * Add a violation.
-     *
      * @param string|PhoneNumber $value      the value that should be validated
      * @param Constraint         $constraint the constraint for the validation
      */

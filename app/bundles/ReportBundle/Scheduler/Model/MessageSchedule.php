@@ -9,8 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MessageSchedule
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private UrlGeneratorInterface $router,
+        private readonly TranslatorInterface $translator,
+        private readonly UrlGeneratorInterface $router,
     ) {
     }
 

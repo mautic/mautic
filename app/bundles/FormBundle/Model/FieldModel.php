@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -38,8 +40,9 @@ class FieldModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
-        private ColumnSchemaHelper $columnSchemaHelper,
+        private readonly RequestStack $requestStack,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly FieldRepository $fieldRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -54,9 +57,9 @@ class FieldModel extends CommonFormModel
      * @param string|null         $action
      * @param array               $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -65,12 +68,9 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    /**
-     * @return \Mautic\FormBundle\Entity\FieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): FieldRepository
     {
-        return $this->em->getRepository(Field::class);
+        return $this->fieldRepository;
     }
 
     public function getPermissionBase(): string

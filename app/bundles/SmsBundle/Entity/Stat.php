@@ -166,10 +166,7 @@ class Stat
         return $this->sms;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setSms(Sms $sms)
+    public function setSms(Sms $sms): static
     {
         $this->sms = $sms;
 
@@ -184,10 +181,7 @@ class Stat
         return $this->lead;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -202,10 +196,7 @@ class Stat
         return $this->list;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setList(LeadList $list)
+    public function setList(LeadList $list): static
     {
         $this->list = $list;
 
@@ -220,10 +211,7 @@ class Stat
         return $this->ipAddress;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -240,10 +228,8 @@ class Stat
 
     /**
      * @param \DateTime $dateSent
-     *
-     * @return Stat
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): static
     {
         $this->dateSent = $dateSent;
 
@@ -260,10 +246,8 @@ class Stat
 
     /**
      * @param string $trackingHash
-     *
-     * @return Stat
      */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash($trackingHash): static
     {
         $this->trackingHash = $trackingHash;
 
@@ -280,10 +264,8 @@ class Stat
 
     /**
      * @param string $source
-     *
-     * @return Stat
      */
-    public function setSource($source)
+    public function setSource($source): static
     {
         $this->source = $source;
 
@@ -300,10 +282,8 @@ class Stat
 
     /**
      * @param int $sourceId
-     *
-     * @return Stat
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): static
     {
         $this->sourceId = $sourceId;
 
@@ -318,10 +298,7 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setTokens(array $tokens)
+    public function setTokens(array $tokens): static
     {
         $this->tokens = $tokens;
 
@@ -330,10 +307,8 @@ class Stat
 
     /**
      * @param bool $isFailed
-     *
-     * @return Stat
      */
-    public function setIsFailed($isFailed)
+    public function setIsFailed($isFailed): static
     {
         $this->isFailed = $isFailed;
 
@@ -358,10 +333,8 @@ class Stat
 
     /**
      * @param array $details
-     *
-     * @return Stat
      */
-    public function setDetails($details)
+    public function setDetails($details): static
     {
         $this->details = $details;
 
@@ -371,10 +344,8 @@ class Stat
     /**
      * @param string $type
      * @param string $detail
-     *
-     * @return Stat
      */
-    public function addDetail($type, $detail)
+    public function addDetail($type, $detail): static
     {
         $this->details[$type][] = $detail;
 

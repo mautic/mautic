@@ -6,7 +6,7 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportDataEvent extends AbstractReportEvent
 {
-    private int $totalResults;
+    private readonly int $totalResults;
 
     public function __construct(
         Report $report,

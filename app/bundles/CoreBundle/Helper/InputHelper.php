@@ -141,9 +141,11 @@ class InputHelper
             }
 
             return $value;
-        } elseif (null === $value) {
+        }
+        if (null === $value) {
             return $value;
-        } elseif (is_string($mask) && method_exists(self::class, $mask)) {
+        }
+        if (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
         }
 
@@ -155,9 +157,9 @@ class InputHelper
      *
      * @param bool|false $urldecode
      *
-     * @return mixed|string
+     * @return false|string|mixed[]
      */
-    public static function clean($value, $urldecode = false)
+    public static function clean(mixed $value, $urldecode = false): array|string|false
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
@@ -165,7 +167,8 @@ class InputHelper
             }
 
             return $value;
-        } elseif ($urldecode) {
+        }
+        if ($urldecode) {
             $value = urldecode($value);
         }
 
@@ -214,13 +217,8 @@ class InputHelper
     /**
      * Returns a satnitized string which can be used in a file system.
      * Attaches the file extension if provided.
-     *
-     * @param string $value
-     * @param string $extension
-     *
-     * @return string
      */
-    public static function filename($value, $extension = null)
+    public static function filename(string $value, ?string $extension = null): string
     {
         $value = str_replace(' ', '_', $value);
 
@@ -258,10 +256,8 @@ class InputHelper
      * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      * @param bool|false         $ignoreFragment
-     *
-     * @return mixed|string
      */
-    public static function url($value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], $ignoreFragment = false)
+    public static function url(?string $value, $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], $ignoreFragment = false): string|false
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -340,11 +336,9 @@ class InputHelper
     /**
      * Returns a clean array.
      *
-     * @param bool|false $urldecode
-     *
-     * @return array|mixed|string
+     * @return mixed[]
      */
-    public static function cleanArray($value, $urldecode = false)
+    public static function cleanArray($value, bool $urldecode = false): array
     {
         $value = self::clean($value, $urldecode);
 
@@ -422,7 +416,7 @@ class InputHelper
 
             // Was a doctype found?
             if ($doctypeFound && false === $hasUnicode) {
-                $value = "$doctype[0]$value";
+                $value = "{$doctype[0]}{$value}";
             }
 
             if ($cdataCount) {
@@ -591,7 +585,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn ($tag): string => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn (string $tag): string => "<{$tag}>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }

@@ -15,8 +15,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $model,
-        private RequestStack $requestStack,
+        private readonly ListModel $model,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -68,6 +68,6 @@ class CircularDependencyValidator extends ConstraintValidator
 
     private function flatten(array $array): array
     {
-        return array_unique(array_reduce($array, 'array_merge', []));
+        return array_unique(array_reduce($array, array_merge(...), []));
     }
 }

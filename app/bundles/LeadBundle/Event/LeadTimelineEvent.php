@@ -201,7 +201,7 @@ class LeadTimelineEvent extends Event
             return [];
         }
 
-        $events = call_user_func_array('array_merge', array_values($this->events));
+        $events = call_user_func_array(array_merge(...), array_values($this->events));
 
         foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {
@@ -214,7 +214,7 @@ class LeadTimelineEvent extends Event
         if (!empty($this->orderBy)) {
             usort(
                 $events,
-                function ($a, $b) {
+                function (array $a, array $b) {
                     switch ($this->orderBy[0]) {
                         case 'eventLabel':
                             $aLabel = '';
@@ -252,10 +252,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get the max number of pages for pagination.
-     *
-     * @return float|int
      */
-    public function getMaxPage()
+    public function getMaxPage(): int|float
     {
         if (!$this->totalEvents) {
             return 1;
@@ -467,7 +465,7 @@ class LeadTimelineEvent extends Event
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
      */
-    public function subtractFromCounter($eventType, $count = 1): void
+    public function subtractFromCounter(string $eventType, $count = 1): void
     {
         $this->totalEvents[$eventType] -= $count;
     }

@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CommonRepository extends ServiceEntityRepository
 {
     /**
-     * @phpstan-param class-string<T>|null $entityFQCN
+     * @param class-string<T>|null $entityFQCN
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
@@ -67,10 +67,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $lastUsedParameterId = 0;
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $expressionBuilder;
+    private ?ExpressionBuilder $expressionBuilder = null;
 
     /**
      * @param string $alias
@@ -81,8 +78,8 @@ class CommonRepository extends ServiceEntityRepository
     public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-                  ->select('count(e.id) as aliascount')
-                  ->where('e.alias = :alias');
+            ->select('count(e.id) as aliascount')
+            ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
         if (!empty($entity) && $entity->getId()) {
@@ -161,7 +158,7 @@ class CommonRepository extends ServiceEntityRepository
 
                 $method = 'set'.ucfirst($property);
                 if (method_exists($entity, $method)) {
-                    $entity->$method($v);
+                    $entity->{$method}($v);
                 }
 
                 unset($data[$dbCol]);
@@ -215,7 +212,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param mixed $entity
+     * @param object $entity
      */
     public function detachEntity($entity): void
     {
@@ -244,7 +241,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias())
-                      ->setParameter('alias', $alias);
+                ->setParameter('alias', $alias);
 
             $expr = $q->expr()->andX(
                 $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
@@ -255,7 +252,7 @@ class CommonRepository extends ServiceEntityRepository
             if (null !== $catAlias) {
                 if (isset($metadata->associationMappings['category'])) {
                     $q->leftJoin($this->getTableAlias().'.category', 'category')
-                      ->setParameter('catAlias', $catAlias);
+                        ->setParameter('catAlias', $catAlias);
 
                     $expr->add(
                         $q->expr()->eq('category.alias', ':catAlias')
@@ -421,7 +418,7 @@ class CommonRepository extends ServiceEntityRepository
                 $q = $this->createQueryBuilder($this->getTableAlias());
                 $this->buildSelectClause($q, $id['select']);
                 $q->where($this->getTableAlias().'.id = :id')
-                ->setParameter('id', (int) $id['id']);
+                    ->setParameter('id', (int) $id['id']);
                 $entity = $q->getQuery()->getSingleResult();
             } else {
                 $entity = $this->find((int) $id);
@@ -572,25 +569,25 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $expr = $q->expr()->andX(
-            $q->expr()->eq("$alias.$pub", ':true'),
+            $q->expr()->eq("{$alias}.{$pub}", ':true'),
             $q->expr()->orX(
-                $q->expr()->isNull("$alias.$pubDown"),
-                $q->expr()->gte("$alias.$pubDown", ':now')
+                $q->expr()->isNull("{$alias}.{$pubDown}"),
+                $q->expr()->gte("{$alias}.{$pubDown}", ':now')
             )
         );
 
         if ($allowNullForPublishedUp) {
             $expr->add(
                 $q->expr()->orX(
-                    $q->expr()->isNull("$alias.$pubUp"),
-                    $q->expr()->lte("$alias.$pubUp", ':now')
+                    $q->expr()->isNull("{$alias}.{$pubUp}"),
+                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
                 )
             );
         } else {
             $expr->add(
                 $q->expr()->andX(
-                    $q->expr()->isNotNull("$alias.$pubUp"),
-                    $q->expr()->lte("$alias.$pubUp", ':now')
+                    $q->expr()->isNotNull("{$alias}.{$pubUp}"),
+                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
                 )
             );
         }
@@ -633,9 +630,9 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $q->resetQueryPart('select')
-          ->select($selectString)
-          ->setFirstResult($start)
-          ->setMaxResults($limit);
+            ->select($selectString)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
 
         $this->buildOrderByClauseFromArray($q, $order);
 
@@ -708,9 +705,9 @@ class CommonRepository extends ServiceEntityRepository
             $labelColumn = $reflection->hasMethod('getTitle') ? 'title' : 'name';
         }
 
-        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
-          ->from($tableName, $alias)
-          ->orderBy($prefix.$labelColumn);
+        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", {$extraColumns}" : ''))
+            ->from($tableName, $alias)
+            ->orderBy($prefix.$labelColumn);
 
         if (null !== $expr && $expr->count()) {
             $q->where($expr);
@@ -725,7 +722,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->andWhere(
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
-              ->setParameter('true', true, 'boolean');
+                ->setParameter('true', true, 'boolean');
         }
 
         // Non Deleted Only
@@ -798,7 +795,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Persist an array of entities.
      *
-     * @param array|ArrayCollection $entities
+     * @template TObject of object
+     *
+     * @param TObject[]|ArrayCollection<int, TObject> $entities
      */
     public function saveEntities($entities): void
     {
@@ -890,7 +889,7 @@ class CommonRepository extends ServiceEntityRepository
             $idGetter  = "get{$idCol}";
             $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
             $columns[] = $column;
-            $values[]  = $assocEntity->$idGetter();
+            $values[]  = $assocEntity->{$idGetter}();
             $types[]   = Types::STRING;
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
@@ -1072,17 +1071,17 @@ class CommonRepository extends ServiceEntityRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
             $expr->add(
-                $q->expr()->$exprFunc($column, ":$unique")
+                $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
         }
 
         return [
             $expr,
-            ["$unique" => $string],
+            ["{$unique}" => $string],
         ];
     }
 
@@ -1119,7 +1118,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if (!$filter->strict) {
             if (!str_contains($string, '%')) {
-                $string = "%$string%";
+                $string = "%{$string}%";
             }
         }
 
@@ -1139,10 +1138,10 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->$exprFunc($col, ":$unique")
+                $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
         }
 
@@ -1152,7 +1151,7 @@ class CommonRepository extends ServiceEntityRepository
 
         return [
             $expr,
-            ["$unique" => $string],
+            ["{$unique}" => $string],
         ];
     }
 
@@ -1185,8 +1184,8 @@ class CommonRepository extends ServiceEntityRepository
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
-                    $q->expr()->isNull("$prefix.category"),
-                    $q->expr()->eq("$prefix.category", $q->expr()->literal(''))
+                    $q->expr()->isNull("{$prefix}.category"),
+                    $q->expr()->eq("{$prefix}.category", $q->expr()->literal(''))
                 );
                 $returnParameter = false;
                 break;
@@ -1238,11 +1237,11 @@ class CommonRepository extends ServiceEntityRepository
             $string = $filter->string;
             if (!$filter->strict) {
                 if (!str_contains($string, '%')) {
-                    $string = "$string%";
+                    $string = "{$string}%";
                 }
             }
 
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -1302,7 +1301,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
 
                 $joinType = ($hasNullable) ? 'leftJoin' : 'join';
-                $q->$joinType($alias, $targetTable, $property, implode(' AND ', $joinColumns));
+                $q->{$joinType}($alias, $targetTable, $property, implode(' AND ', $joinColumns));
                 $joinAdded = true;
             }
         }
@@ -1336,7 +1335,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-              ->setMaxResults($limit);
+                ->setMaxResults($limit);
         }
     }
 
@@ -1417,7 +1416,7 @@ class CommonRepository extends ServiceEntityRepository
             foreach ($selects as $alias => $columns) {
                 if ($isOrm) {
                     if ($columns = array_intersect($columns, $ormColumns)) {
-                        $columns    = array_map([$this, 'sanitize'], $columns);
+                        $columns    = array_map($this->sanitize(...), $columns);
                         $partials[] = 'partial '.$alias.'.{'.implode(',', $columns).'}';
                     }
                 } else {
@@ -1429,7 +1428,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
             }
 
-            if ($partials) {
+            if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {
@@ -1474,7 +1473,7 @@ class CommonRepository extends ServiceEntityRepository
         $queryExpression              = $q->expr()->andX();
 
         if (isset($args['ids'])) {
-            $ids   = array_map('intval', $args['ids']);
+            $ids   = array_map(intval(...), $args['ids']);
             $param = $this->generateRandomParameterName();
             // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $queryExpression->add(
@@ -1487,7 +1486,7 @@ class CommonRepository extends ServiceEntityRepository
             $queryExpression->add(
                 $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], ':'.$param)
             );
-            $q->setParameter($param, array_map('strval', $args['ownedBy'][1]), ArrayParameterType::STRING);
+            $q->setParameter($param, array_map(strval(...), $args['ownedBy'][1]), ArrayParameterType::STRING);
         }
 
         if (!empty($filter)) {
@@ -1699,7 +1698,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function getIdsExpr(&$q, $filter)
     {
-        if ($ids = array_map('intval', explode(',', $filter->string))) {
+        if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
             $q->setParameter($parameterName, $ids, ArrayParameterType::INTEGER);
 

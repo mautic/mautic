@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -11,21 +13,18 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MaintenanceSubscriber $subscriber;
 
     protected function setUp(): void
     {
-        $connection          = $this->createMock(Connection::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
-        $translator          = $this->createMock(TranslatorInterface::class);
-        $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
+        $this->subscriber    = new MaintenanceSubscriber($this->createStub(Connection::class), $this->createStub(UserTokenRepositoryInterface::class), $this->createStub(TranslatorInterface::class));
     }
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
             $this->subscriber->getSubscribedEvents()
         );
@@ -93,7 +92,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $qb
             ->expects($this->exactly(4))
             ->method('executeQuery')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
                 static $callCount = 0;
                 ++$callCount;
                 $result = $this->createMock(\Doctrine\DBAL\Result::class);
@@ -120,7 +119,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($qb);
 
         $translator          = $this->createMock(TranslatorInterface::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
+        $userTokenRepository = $this->createStub(UserTokenRepositoryInterface::class);
         $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
 
         $translator

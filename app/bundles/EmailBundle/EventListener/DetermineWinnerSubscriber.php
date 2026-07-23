@@ -14,8 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -44,9 +44,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $counts = $repo->getOpenedRates($ids, $startDate);
-
-            $translator = $this->translator;
+            $counts = $repo->getOpenedRates($ids, $startDate, $parent->getVariantEndDate());
 
             if ($counts) {
                 $rates      = $support      = $data      = [];
@@ -61,8 +59,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         : $children[$id]->getName();
                     $support['labels'][]                                            = $name.' ('.$stats['readRate'].'%)';
                     $rates[$id]                                                     = $stats['readRate'];
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][] = $stats['readCount'];
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]   = $stats['totalCount'];
+                    $data[$this->translator->trans('mautic.email.abtest.label.opened')][] = $stats['readCount'];
+                    $data[$this->translator->trans('mautic.email.abtest.label.sent')][]   = $stats['totalCount'];
                     $hasResults[]                                                   = $id;
                 }
 
@@ -70,8 +68,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     // make sure that parent and published children are included
                     $support['labels'][] = $parent->getName().' (0%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
-                    $data[$translator->trans('mautic.email.abtest.label.sent')][]   = 0;
+                    $data[$this->translator->trans('mautic.email.abtest.label.opened')][] = 0;
+                    $data[$this->translator->trans('mautic.email.abtest.label.sent')][]   = 0;
                 }
 
                 foreach ($children as $c) {
@@ -79,8 +77,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         if (!in_array($c->getId(), $hasResults)) {
                             // make sure that parent and published children are included
                             $support['labels'][]                                            = $c->getName().' (0%)';
-                            $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
-                            $data[$translator->trans('mautic.email.abtest.label.sent')][]   = 0;
+                            $data[$this->translator->trans('mautic.email.abtest.label.opened')][] = 0;
+                            $data[$this->translator->trans('mautic.email.abtest.label.sent')][]   = 0;
                         }
                     }
                 }
@@ -140,10 +138,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
             // get their bounce rates
-            $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate);
-            $sentCounts         = $emailRepo->getSentCounts($ids, $startDate);
+            $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate, 200, $parent->getVariantEndDate());
+            $sentCounts         = $emailRepo->getSentCounts($ids, $startDate, $parent->getVariantEndDate());
 
-            $translator = $this->translator;
             if ($clickthroughCounts) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
@@ -162,8 +159,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $name                = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
                     $support['labels'][] = $name.' ('.$rates[$id].'%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]     = $count;
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]           = $sentCounts[$id];
+                    $data[$this->translator->trans('mautic.email.abtest.label.clickthrough')][]     = $count;
+                    $data[$this->translator->trans('mautic.email.abtest.label.opened')][]           = $sentCounts[$id];
                     $hasResults[]                                                             = $id;
                 }
 
@@ -171,8 +168,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     // make sure that parent and published children are included
                     $support['labels'][] = $parent->getName().' (0%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]       = 0;
+                    $data[$this->translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
+                    $data[$this->translator->trans('mautic.email.abtest.label.opened')][]       = 0;
                 }
 
                 foreach ($children as $c) {
@@ -180,8 +177,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         if (!in_array($c->getId(), $hasResults)) {
                             // make sure that parent and published children are included
                             $support['labels'][]                                                  = $c->getName().' (0%)';
-                            $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
-                            $data[$translator->trans('mautic.email.abtest.label.opened')][]       = 0;
+                            $data[$this->translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
+                            $data[$this->translator->trans('mautic.email.abtest.label.opened')][]       = 0;
                         }
                     }
                 }

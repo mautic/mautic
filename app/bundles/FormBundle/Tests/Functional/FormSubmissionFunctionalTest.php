@@ -98,6 +98,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
                 'lead'  => $lead->getId(),
             ]
         );
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 
