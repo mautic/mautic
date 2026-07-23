@@ -15,7 +15,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ListModel&MockObject
      */
-    protected MockObject $fixture;
+    private MockObject $fixture;
 
     protected function setUp(): void
     {

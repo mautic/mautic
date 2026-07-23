@@ -1125,15 +1125,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Set owner
-        $userRepo = $this->userRepository;
-        \assert($userRepo instanceof UserRepository);
-
         $user = null;
         if (!empty($data['ownerbyemail'])) {
-            $user = $userRepo->findOneBy(['email' => $data['ownerbyemail']]);
+            $user = $this->userRepository->findOneBy(['email' => $data['ownerbyemail']]);
         } elseif (!empty($data['ownerbyid'])) {
-            $user = $userRepo->find($data['ownerbyid']);
+            $user = $this->userRepository->find($data['ownerbyid']);
         }
 
         if ($user instanceof User) {
@@ -1190,8 +1186,6 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Validates a field value.
-     *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
     protected function validateFieldValue(Field $field, $value)

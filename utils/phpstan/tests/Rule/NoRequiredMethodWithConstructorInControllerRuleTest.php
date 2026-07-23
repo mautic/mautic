@@ -23,7 +23,7 @@ final class NoRequiredMethodWithConstructorInControllerRuleTest extends RuleTest
         $this->analyse([__DIR__.'/Fixture/ConstructorAndAutowireController.php'], [
             [
                 'Method "autowireConstructorAndAutowireController()" has the #[Required] attribute, but "ConstructorAndAutowireController" defines its own constructor. Move the dependency to the constructor and drop the method.',
-                14,
+                16,
             ],
         ]);
 
