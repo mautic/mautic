@@ -31,6 +31,7 @@ final class Version20211209022550 extends AbstractMauticMigration
                     ],
                 ],
             ],
+            'hydration_mode' => Query::HYDRATE_OBJECT,
             'iterable_mode'  => true,
         ]);
 
