@@ -59,6 +59,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
 
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
+        \Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
     ])
     ->reportUnusedSkips()
     // ->withComposerBased(symfony: true)

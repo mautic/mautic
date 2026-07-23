@@ -7,15 +7,9 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
-final class PurifyExtension extends AbstractExtension
+final class PurifyExtension
 {
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('purify_allow_target_blank', $this->purifyAllowTargetBlank(...), ['is_safe' => ['html']]),
-        ];
-    }
-
+    #[\Twig\Attribute\AsTwigFilter(name: 'purify_allow_target_blank', isSafe: ['html'])]
     public function purifyAllowTargetBlank(?string $html): string
     {
         $config = \HTMLPurifier_Config::createDefault();

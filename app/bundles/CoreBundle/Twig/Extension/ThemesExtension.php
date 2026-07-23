@@ -6,10 +6,10 @@ namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class ThemesExtension
+final readonly class ThemesExtension
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

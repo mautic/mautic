@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Extension\CoreExtension;
 
-final class OverrideIncludeExtension
+final readonly class OverrideIncludeExtension
 {
     public function __construct(
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly RequestStack $requestStack,
+        private EventDispatcherInterface $eventDispatcher,
+        private RequestStack $requestStack,
     ) {
     }
 
