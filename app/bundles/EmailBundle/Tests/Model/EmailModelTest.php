@@ -402,6 +402,19 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
+<<<<<<< HEAD
+=======
+        //        $this->entityManager->expects($this->atLeast(3))
+        //            ->method('getRepository')
+        //            ->willReturnMap(
+        //                [
+        //                    [FrequencyRule::class, $this->frequencyRepository],
+        //                    [Email::class, $this->emailRepository],
+        //                    [Stat::class, $this->statRepository],
+        //                ]
+        //            );
+
+>>>>>>> 4d502c0e3b (at least)
         $this->companyRepository->method('getCompaniesForContacts')
             ->willReturn([]);
 
@@ -535,6 +548,19 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
+<<<<<<< HEAD
+=======
+        //
+        //        $this->entityManager->expects($this->atLeast(3))
+        //            ->method('getRepository')
+        //            ->willReturnMap(
+        //                [
+        //                    [FrequencyRule::class, $this->frequencyRepository],
+        //                    [Email::class, $this->emailRepository],
+        //                    [Stat::class, $this->statRepository],
+        //                ]
+        //            );
+>>>>>>> 4d502c0e3b (at least)
 
         $this->companyRepository->method('getCompaniesForContacts')
             ->willReturn([]);
@@ -586,6 +612,19 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([1 => 'someone@domain.com']);
 
+<<<<<<< HEAD
+=======
+        //        $this->entityManager->expects($this->atLeast(3))
+        //            ->method('getRepository')
+        //            ->willReturnMap(
+        //                [
+        //                    [Email::class, $this->emailRepository],
+        //                    [Stat::class, $this->statRepository],
+        //                    [FrequencyRule::class, $this->frequencyRepository],
+        //                ]
+        //            );
+
+>>>>>>> 4d502c0e3b (at least)
         // If it makes it to the point of calling getContactCompanies then DNC failed
         $this->companyModel->expects($this->exactly(0))
             ->method('getRepository');
@@ -715,6 +754,17 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
+<<<<<<< HEAD
+=======
+        //        $this->entityManager->expects($this->atLeast(4))
+        //            ->method('getRepository')
+        //            ->willReturnMap([
+        //                [Email::class, $this->emailRepository],
+        //                [Stat::class, $this->statRepository],
+        //                [FrequencyRule::class, $this->frequencyRepository],
+        //                [MessageQueue::class, $this->createStub(MessageQueueRepository::class)],
+        //            ]);
+>>>>>>> 4d502c0e3b (at least)
         $leadEntity = (new Lead())
             ->setEmail('someone@domain.com');
 
