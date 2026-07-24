@@ -65,13 +65,18 @@ class SummaryRepository extends CommonRepository
     /**
      * Get the oldest triggered time for back-filling historical data.
      */
-    public function getOldestTriggeredDate(): ?\DateTimeInterface
+    public function getOldestTriggeredDate(?int $campaignId = null): ?\DateTimeInterface
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cs.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
+
+        if (null !== $campaignId) {
+            $qb->where('cs.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId, \PDO::PARAM_INT);
+        }
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
