@@ -16,14 +16,25 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadCategoryRepository;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\MergeRecordRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -38,8 +49,11 @@ use Mautic\LeadBundle\Tests\Fixtures\Model\LeadModelStub;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -98,7 +112,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $stagesChangeLogRepositoryMock;
 
     /**
-     * @var MockObject&\Mautic\StageBundle\Entity\StageRepository
+     * @var MockObject&StageRepository
      */
     private MockObject $stageRepositoryMock;
 
@@ -139,7 +153,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadRepositoryMock               = $this->createMock(LeadRepository::class);
         $this->companyLeadRepositoryMock        = $this->createMock(CompanyLeadRepository::class);
         $this->stagesChangeLogRepositoryMock    = $this->createMock(StagesChangeLogRepository::class);
-        $this->stageRepositoryMock              = $this->createMock(\Mautic\StageBundle\Entity\StageRepository::class);
+        $this->stageRepositoryMock              = $this->createMock(StageRepository::class);
         $this->userHelperMock                   = $this->createMock(UserHelper::class);
         $this->dispatcherMock                   = $this->createMock(EventDispatcherInterface::class);
         $this->entityManagerMock                = $this->createMock(EntityManager::class);
@@ -170,22 +184,22 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelperMock,
             $this->createStub(LoggerInterface::class),
             $this->leadRepositoryMock,
-            $this->createStub(\Mautic\LeadBundle\Entity\TagRepository::class), // $tagRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class), // $pointsChangeLogRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class), // $utmTagRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class), // $leadDeviceRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class), // $frequencyRuleRepository
+            $this->createStub(TagRepository::class), // $tagRepository
+            $this->createStub(PointsChangeLogRepository::class), // $pointsChangeLogRepository
+            $this->createStub(UtmTagRepository::class), // $utmTagRepository
+            $this->createStub(LeadDeviceRepository::class), // $leadDeviceRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(FrequencyRuleRepository::class), // $frequencyRuleRepository
             $this->stagesChangeLogRepositoryMock,
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class), // $leadCategoryRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\MergeRecordRepository::class), // $mergeRecordRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class), // $leadListRepository
-            $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class), // $groupContactScoreRepository
+            $this->createStub(LeadCategoryRepository::class), // $leadCategoryRepository
+            $this->createStub(MergeRecordRepository::class), // $mergeRecordRepository
+            $this->createStub(LeadListRepository::class), // $leadListRepository
+            $this->createStub(GroupContactScoreRepository::class), // $groupContactScoreRepository
             $this->stageRepositoryMock,
-            $this->createStub(\Mautic\UserBundle\Entity\UserRepository::class), // $userRepository
+            $this->createStub(UserRepository::class), // $userRepository
             $this->companyLeadRepositoryMock,
-            $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class), // $doNotContactRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\StatRepository::class), // $statRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(StatRepository::class), // $statRepository
         );
 
         $this->setSecurity($this->leadModel);
@@ -641,7 +655,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $action = 'post_batch_save';
 
         // Lead Model that provides access to dispatchBatchEvent
-        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(\Mautic\LeadBundle\Entity\TagRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\UtmTagRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\LeadEventLogRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\MergeRecordRepository::class), $this->createStub(\Mautic\LeadBundle\Entity\LeadListRepository::class), $this->createStub(\Mautic\PointBundle\Entity\GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(\Mautic\UserBundle\Entity\UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class), $this->createStub(\Mautic\EmailBundle\Entity\StatRepository::class)) extends LeadModel {
+        $leadModel = new class($this->requestStack, $this->createStub(IpLookupHelper::class), $this->createStub(PathsHelper::class), $this->createStub(IntegrationHelper::class), $this->fieldModelMock, $this->fieldsWithUniqueIdentifier, $this->createStub(ListModel::class), $this->createStub(FormFactory::class), $this->companyModelMock, $this->createStub(CategoryModel::class), $this->channelListHelperMock, $this->coreParametersHelperMock, $this->emailValidatorMock, $this->createStub(UserProvider::class), $this->createStub(ContactTracker::class), $this->createStub(DeviceTracker::class), $this->createStub(IpAddressModel::class), $this->entityManagerMock, $this->createStub(CorePermissions::class), $this->dispatcherMock, $this->createStub(UrlGeneratorInterface::class), $this->translator, $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->leadRepositoryMock, $this->createStub(TagRepository::class), $this->createStub(PointsChangeLogRepository::class), $this->createStub(UtmTagRepository::class), $this->createStub(LeadDeviceRepository::class), $this->createStub(LeadEventLogRepository::class), $this->createStub(FrequencyRuleRepository::class), $this->stagesChangeLogRepositoryMock, $this->createStub(LeadCategoryRepository::class), $this->createStub(MergeRecordRepository::class), $this->createStub(LeadListRepository::class), $this->createStub(GroupContactScoreRepository::class), $this->stageRepositoryMock, $this->createStub(UserRepository::class), $this->companyLeadRepositoryMock, $this->createStub(DoNotContactRepository::class), $this->createStub(StatRepository::class)) extends LeadModel {
             /**
              * @param array<mixed> $leads
              */

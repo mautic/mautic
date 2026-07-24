@@ -29,6 +29,7 @@ return ECSConfig::configure()
     ])
     ->withRules([
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
     ])
     ->withPreparedSets(
         comments: true,

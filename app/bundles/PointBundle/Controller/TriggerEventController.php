@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerEventController extends CommonFormController
+final class TriggerEventController extends CommonFormController
 {
     private TriggerModel $triggerModel;
 

@@ -79,16 +79,11 @@ class LeadType extends AbstractType
                     ],
                     'mapped'      => false,
                     'constraints' => [
-                        new File(
-                            [
-                                'mimeTypes' => [
-                                    'image/gif',
-                                    'image/jpeg',
-                                    'image/png',
-                                ],
-                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
-                            ]
-                        ),
+                        new File(mimeTypes: [
+                            'image/gif',
+                            'image/jpeg',
+                            'image/png',
+                        ], mimeTypesMessage: 'mautic.lead.avatar.types_invalid'),
                     ],
                 ]
             );

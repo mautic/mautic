@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class EmailsPage
+final class EmailsPage
 {
     public const URL                         = '/s/emails';
     public const NEW_BUTTON                  = 'a#new';

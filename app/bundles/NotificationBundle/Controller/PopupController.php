@@ -9,7 +9,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 
-class PopupController extends CommonController
+final class PopupController extends CommonController
 {
     public function indexAction(AssetsHelper $assetsHelper): Response
     {

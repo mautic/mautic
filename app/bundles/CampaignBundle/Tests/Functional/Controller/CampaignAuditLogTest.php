@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -95,7 +96,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $event         = $this->em->find(Event::class, $eventId);
         $this->assertInstanceOf(Event::class, $event);
         $event->setName('2 contact points after 1 day');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
         $campaign->addEvent($eventId, $event);
         $campaignModel->saveEntity($campaign);
         $this->em->clear();

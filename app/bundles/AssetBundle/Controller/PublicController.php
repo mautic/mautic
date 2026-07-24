@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
     /**
      * Handles public download of assets by slug.
@@ -94,7 +94,7 @@ class PublicController extends AbstractFormController
      *
      * @throws ORMException
      */
-    private function remoteRedirectResponse(AssetModel $model, Asset $entity, Request $request): Response
+    private function remoteRedirectResponse(AssetModel $model, Asset $entity, Request $request): RedirectResponse
     {
         $model->trackDownload($entity, $request);
 
