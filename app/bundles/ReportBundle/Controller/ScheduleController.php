@@ -15,9 +15,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ScheduleController extends CommonAjaxController
+final class ScheduleController extends CommonAjaxController
 {
     private ReportModel $reportModel;
+
     private ScheduleModel $scheduleModel;
 
     #[Required]
