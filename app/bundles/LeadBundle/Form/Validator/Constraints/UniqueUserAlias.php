@@ -16,7 +16,7 @@ final class UniqueUserAlias extends Constraint
         return 'uniqueleadlist';
     }
 
-    public function getTargets(): string|array
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
@@ -26,7 +26,7 @@ final class UniqueUserAlias extends Constraint
         return ['field'];
     }
 
-    public function getDefaultOption(): ?string
+    public function getDefaultOption(): string
     {
         return 'field';
     }

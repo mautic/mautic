@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class ButtonGroupType extends AbstractType
 {
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
  */
 final class ConfigFileType extends AbstractType
 {
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return FileType::class;
     }

@@ -35,7 +35,7 @@ final class PreferenceChannelsType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

@@ -59,7 +59,7 @@ final class PageListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

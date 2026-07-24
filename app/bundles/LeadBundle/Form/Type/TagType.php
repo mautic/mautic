@@ -56,7 +56,7 @@ final class TagType extends AbstractType
         return 'lead_tag';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityType::class;
     }

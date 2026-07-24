@@ -17,24 +17,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var array
-     */
-    private $selected = [];
+    private array $selected = [];
 
-    /**
-     * @var array
-     */
-    private $choices = [];
+    private array $choices = [];
 
     /**
      * @param ModelFactory<object>               $modelFactory
      * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
-        private ModelFactory $modelFactory,
-        private TranslatorInterface $translator,
-        private Connection $connection,
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
         private $options = [],
     ) {
         if (is_array($options)) {
@@ -85,11 +79,10 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * @param array|null $data
-     * @param bool       $includeNew
      *
      * @return array
      */
-    private function getChoices($data = null, $includeNew = false)
+    private function getChoices($data = null, bool $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
@@ -189,7 +182,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    private function fetchChoices($modelName, $data = [])
+    private function fetchChoices($modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];

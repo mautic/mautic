@@ -38,7 +38,7 @@ final class LeadCategoryType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

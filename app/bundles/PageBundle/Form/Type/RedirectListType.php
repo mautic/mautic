@@ -37,7 +37,7 @@ final class RedirectListType extends AbstractType
         $resolver->setDefined(['feature']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

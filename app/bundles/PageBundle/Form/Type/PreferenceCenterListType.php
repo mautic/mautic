@@ -57,7 +57,7 @@ final class PreferenceCenterListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

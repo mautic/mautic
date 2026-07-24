@@ -44,7 +44,7 @@ final class CategoryBundlesType extends AbstractType
         return 'category_bundles_form';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
