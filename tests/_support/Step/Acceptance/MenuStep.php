@@ -18,9 +18,9 @@ class MenuStep extends \AcceptanceTester
     {
         $I = $this;
         $I->click(MenuPage::$POINTS);
-        $I->waitForElementClickable(MenuPage::$MANAGE_GROUPS_ID, 10);
+        $I->waitForElementClickable(MenuPage::$MANAGE_GROUPS_ID, self::TIMEOUT);
         $I->click(MenuPage::$MANAGE_GROUPS);
-        $I->waitForElementVisible(MenuPage::$ACTIVE_NAV_GROUP, 10);
+        $I->waitForElementVisible(MenuPage::$ACTIVE_NAV_GROUP, self::TIMEOUT);
         $I->seeElement(MenuPage::$ACTIVE_NAV_GROUP);
     }
 }

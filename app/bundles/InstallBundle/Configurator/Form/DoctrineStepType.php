@@ -43,9 +43,7 @@ class DoctrineStepType extends AbstractType
                 ],
                 'constraints'       => [
                     new Choice(
-                        [
-                            'callback' => '\Mautic\InstallBundle\Configurator\Step\DoctrineStep::getDriverKeys',
-                        ]
+                        callback: '\Mautic\InstallBundle\Configurator\Step\DoctrineStep::getDriverKeys'
                     ),
                 ],
             ]

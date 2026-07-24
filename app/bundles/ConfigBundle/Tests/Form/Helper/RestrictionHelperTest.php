@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
@@ -24,6 +25,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -231,7 +233,7 @@ final class RestrictionHelperTest extends TypeTestCase
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
         $escapeTransformer = new EscapeTransformer([]);
 
-        $pageRepoMock = $this->createMock(\Mautic\PageBundle\Entity\PageRepository::class);
+        $pageRepoMock = $this->createMock(PageRepository::class);
         $pageRepoMock->method('getPageList')->willReturn([]);
         $pageModelMock = $this->createMock(PageModel::class);
         $pageModelMock->method('getRepository')->willReturn($pageRepoMock);
@@ -250,7 +252,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
                     new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
-                    new PreferenceCenterListType($pageModelMock, $this->createStub(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
+                    new PreferenceCenterListType($pageModelMock, $this->createStub(CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),
                     new ConfigType($restrictionHelper, $escapeTransformer),
