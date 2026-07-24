@@ -8,7 +8,7 @@ use PHPUnit\Framework\Assert;
 use Step\Acceptance\CampaignStep;
 use Step\Acceptance\ContactStep;
 
-class ContactManagementCest
+final class ContactManagementCest
 {
     public function _before(AcceptanceTester $I): void
     {

@@ -31,9 +31,7 @@ class ConfigType extends AbstractType
             'placeholder' => false,
             'constraints' => [
                 new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ],
         ]);

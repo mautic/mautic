@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class EventController extends CommonFormController
+final class EventController extends CommonFormController
 {
     /**
      * @var string[]
@@ -352,9 +352,6 @@ class EventController extends CommonFormController
         return new JsonResponse($passthroughVars);
     }
 
-    /**
-     * Deletes the entity.
-     */
     public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
@@ -416,9 +413,6 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    /**
-     * Undeletes the entity.
-     */
     public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');

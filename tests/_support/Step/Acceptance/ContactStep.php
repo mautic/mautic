@@ -5,7 +5,7 @@ namespace Step\Acceptance;
 use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\ContactPage;
 
-class ContactStep extends \AcceptanceTester
+final class ContactStep extends \AcceptanceTester
 {
     /**
      * Fill out the contact form with the provided details.

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 
-class JsController extends CommonController
+final class JsController extends CommonController
 {
     public function indexAction(
         #[Autowire(param: 'kernel.debug')]

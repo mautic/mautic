@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -99,7 +100,7 @@ final class LanguageHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with('https://languages.test', [
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn($response);
 

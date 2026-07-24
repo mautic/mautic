@@ -30,16 +30,16 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ContactTracker $contactTracker,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadFieldRepository $leadFieldRepository,
-        private readonly PointGroupModel $groupModel,
-        private readonly DoNotContact $doNotContact,
-        private readonly FieldModel $leadFieldModel,
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadFieldRepository $leadFieldRepository,
+        private PointGroupModel $groupModel,
+        private DoNotContact $doNotContact,
+        private FieldModel $leadFieldModel,
     ) {
     }
 

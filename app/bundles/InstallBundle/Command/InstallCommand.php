@@ -22,7 +22,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 #[AsCommand(
     name: InstallCommand::COMMAND,
-    description: 'Installs Mautic'
+    description: 'Installs Mautic',
+    help: <<<'TXT'
+This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
+TXT
 )]
 class InstallCommand extends Command
 {
@@ -41,7 +44,6 @@ class InstallCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,

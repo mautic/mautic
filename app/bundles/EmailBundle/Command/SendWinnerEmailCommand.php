@@ -19,7 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Sends email to winner variant after predetermined amount of time.
  */
 #[AsCommand(
-    name: self::COMMAND_NAME
+    name: self::COMMAND_NAME,
+    help: <<<'TXT'
+The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of time
+
+<info>php %command.full_name%</info>
+TXT
 )]
 final class SendWinnerEmailCommand extends ModeratedCommand
 {
@@ -38,13 +43,7 @@ final class SendWinnerEmailCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.')
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of time
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.');
 
         parent::configure();
     }

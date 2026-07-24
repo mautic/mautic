@@ -18,7 +18,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
+final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
     private readonly TokenStorageInterface $tokenStorage;
 

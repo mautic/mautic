@@ -11,12 +11,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly NotificationHelper $notificationHelper,
-        private readonly IntegrationHelper $integrationHelper,
-        private readonly RouterInterface $router,
+        private NotificationHelper $notificationHelper,
+        private IntegrationHelper $integrationHelper,
+        private RouterInterface $router,
     ) {
     }
 

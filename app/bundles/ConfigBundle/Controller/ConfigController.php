@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ConfigController extends FormController
+final class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.

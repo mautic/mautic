@@ -12,16 +12,16 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
 
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
     public function __construct(
-        private readonly Connection $db,
-        private readonly CompanyReportData $companyReportData,
-        private readonly StatRepository $statRepository,
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
     ) {
     }
 
