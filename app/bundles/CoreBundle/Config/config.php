@@ -661,8 +661,8 @@ return [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
                     'mautic.http.client',
-                    '%kernel.cache_dir%',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [

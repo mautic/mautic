@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -76,7 +77,7 @@ final class ListModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->leadListRepositoryMock,
-            $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class), // $listLeadRepository
+            $this->createStub(ListLeadRepository::class), // $listLeadRepository
         );
     }
 
@@ -123,7 +124,7 @@ final class ListModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(LeadListRepository::class),
-                $this->createStub(\Mautic\LeadBundle\Entity\ListLeadRepository::class)])
+                $this->createStub(ListLeadRepository::class)])
             ->onlyMethods([])
             ->getMock();
 

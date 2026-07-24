@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FileController extends AjaxController
+final class FileController extends AjaxController
 {
     public const EDITOR_CKEDITOR = 'ckeditor';
 
@@ -103,7 +103,7 @@ class FileController extends AjaxController
      *
      * @return string
      */
-    public function getMediaAbsolutePath(PathsHelper $pathsHelper)
+    public function getMediaAbsolutePath(PathsHelper $pathsHelper): string|false
     {
         $mediaDir = realpath($pathsHelper->getSystemPath('images', true));
 

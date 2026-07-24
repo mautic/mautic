@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -50,7 +51,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter, new BufferedOutput());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
@@ -79,7 +80,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter); // Quiet mode - no output
+        $this->assertInstanceOf(Counter::class, $counter); // Quiet mode - no output
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
@@ -101,7 +102,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(2, $counter->getTotalEvaluated());
     }
@@ -125,7 +126,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Both events should be evaluated since they are due for execution
         $this->assertEquals(2, $counter->getTotalEvaluated());
@@ -186,8 +187,8 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         // Process logs one by one to avoid race condition in rotation calculation
         $counter1 = $this->scheduledExecutioner->executeByIds([$log1->getId()]);
         $counter2 = $this->scheduledExecutioner->executeByIds([$log2->getId()]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter1);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter2);
+        $this->assertInstanceOf(Counter::class, $counter1);
+        $this->assertInstanceOf(Counter::class, $counter2);
 
         $totalEvaluated = $counter1->getTotalEvaluated() + $counter2->getTotalEvaluated();
 
@@ -272,7 +273,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(2, $counter->getTotalEvaluated());
     }
@@ -294,7 +295,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -314,7 +315,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log->getId()]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Event should be evaluated since it's not deleted and campaign is published
         $this->assertEquals(1, $counter->getTotalEvaluated());

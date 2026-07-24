@@ -125,6 +125,7 @@ final class DateHelperTest extends TestCase
         // Create a DateTime object for "now"
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
+        // Create a mock for DateTimeHelper
         $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
@@ -288,6 +289,7 @@ final class DateHelperTest extends TestCase
     {
         $this->setDefaultLocalTimezone('UTC');
 
+        // Create a mock for DateTimeHelper to return 'today'
         $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
@@ -305,6 +307,7 @@ final class DateHelperTest extends TestCase
     {
         $this->setDefaultLocalTimezone('UTC');
 
+        // Create a mock for DateTimeHelper to return false (not today/yesterday)
         $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
