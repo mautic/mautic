@@ -17,8 +17,6 @@ final class Version20230311195347 extends AbstractMauticMigration
         $columnName = 'integration';
         $value      = 'Pipedrive';
 
-        $connection = $this->connection;
-
         // delete in consistent order (oldest first)
         $sql = "DELETE FROM {$tableName}
             WHERE {$columnName} = :value
@@ -35,7 +33,7 @@ final class Version20230311195347 extends AbstractMauticMigration
         $rowCount = self::BATCH_SIZE;  // initial non-zero value to enter the loop
 
         while ($rowCount > 0) {
-            $rowCount = $connection->executeStatement($sql, ['value' => $value]);
+            $rowCount = $this->connection->executeStatement($sql, ['value' => $value]);
         }
     }
 }
