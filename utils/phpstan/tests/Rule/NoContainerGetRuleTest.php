@@ -22,16 +22,19 @@ final class NoContainerGetRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/ContainerGetService.php'], [
             [
-                'Do not fetch a service via $container->get(...). Inject the service as a typed constructor property instead.',
-                14,
+                'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
+                18,
             ],
             [
-                'Do not fetch a service via $this->get(...). Inject the service as a typed constructor property instead.',
-                19,
+                'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
+                23,
             ],
         ]);
 
-        // unrelated ArrayCollection->get() must be skipped
+        // ArrayCollection->get() and an own get() method must be skipped
         $this->analyse([__DIR__.'/Fixture/AllowedGetService.php'], []);
+
+        // a scoped ServiceLocator is an allowed, explicit set of services
+        $this->analyse([__DIR__.'/Fixture/ServiceLocatorGetService.php'], []);
     }
 }

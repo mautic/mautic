@@ -6,21 +6,20 @@ namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 use Psr\Container\ContainerInterface;
 
-// both container fetches must be reported
+// container fetch must be reported
 class ContainerGetService
 {
+    public function __construct(private ContainerInterface $container)
+    {
+    }
+
+    public function viaProperty(): void
+    {
+        $this->container->get('mautic.helper.something');
+    }
+
     public function viaLocalContainer(ContainerInterface $container): void
     {
         $container->get('mautic.helper.something');
-    }
-
-    public function viaThis(): void
-    {
-        $this->get('mautic.helper.something');
-    }
-
-    public function get(string $id): object
-    {
-        return new \stdClass();
     }
 }
