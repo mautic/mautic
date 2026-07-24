@@ -145,10 +145,7 @@ class Action implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['action'],
-        ]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action']));
     }
 
     private function isChanged(string $prop, mixed $val): void

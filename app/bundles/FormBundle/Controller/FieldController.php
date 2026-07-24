@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FieldController extends CommonFormController
+final class FieldController extends CommonFormController
 {
     public function __construct(
         private readonly FormModel $formModel,

@@ -36,7 +36,7 @@ class TweetSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.integration.Twitter.send.selecttweet.notblank']
+                        message: 'mautic.integration.Twitter.send.selecttweet.notblank'
                     ),
                 ],
             ]
