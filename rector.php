@@ -12,6 +12,7 @@ use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerAc
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -61,6 +62,9 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
+
+        // DI
+        ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
