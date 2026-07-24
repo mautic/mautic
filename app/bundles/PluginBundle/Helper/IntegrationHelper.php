@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -393,12 +394,12 @@ class IntegrationHelper
     /**
      * Get the user's social profile data from cache or integrations if indicated.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $fields
-     * @param bool                           $refresh
-     * @param string                         $specificIntegration
-     * @param bool                           $persistLead
-     * @param bool                           $returnSettings
+     * @param Lead   $lead
+     * @param array  $fields
+     * @param bool   $refresh
+     * @param string $specificIntegration
+     * @param bool   $persistLead
+     * @param bool   $returnSettings
      *
      * @return array
      */
@@ -454,7 +455,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+                $this->em->getRepository(Lead::class)->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -486,7 +487,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         return $socialCache;
     }

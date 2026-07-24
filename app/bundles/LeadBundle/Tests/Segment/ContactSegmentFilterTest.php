@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
@@ -191,7 +192,7 @@ final class ContactSegmentFilterTest extends TestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilder = new QueryBuilder($this->createStub(\Doctrine\DBAL\Connection::class));
+        $queryBuilder = new QueryBuilder($this->createStub(Connection::class));
 
         $this->filterQueryBuilder->expects($this->once())
             ->method('applyQuery')

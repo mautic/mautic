@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -59,7 +60,7 @@ final class FieldModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(RequestStack::class),
             $schemaHelper,
-            $this->createStub(\Mautic\FormBundle\Entity\FieldRepository::class) // $fieldRepository
+            $this->createStub(FieldRepository::class) // $fieldRepository
         );
 
         $entityManager

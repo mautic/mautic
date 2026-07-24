@@ -25,12 +25,7 @@ class PointActionType extends AbstractType
                 'scale'       => 0,
                 'data'        => $options['data']['points'] ?? 0,
                 'constraints' => [
-                    new NotEqualTo(
-                        [
-                            'value'   => '0',
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotEqualTo(value: '0', message: 'mautic.core.value.required'),
                 ],
             ]
         );

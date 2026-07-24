@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class PluginController extends FormController
+final class PluginController extends FormController
 {
     private PluginModel $pluginModel;
 

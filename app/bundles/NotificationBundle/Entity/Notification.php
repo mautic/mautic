@@ -253,27 +253,21 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'heading',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.heading.required',
-                ]
+                message: 'mautic.core.heading.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'message',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.message.required',
-                ]
+                message: 'mautic.core.message.required'
             )
         );
 
@@ -291,9 +285,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
                                 ]
                             ),
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
+                                message: 'mautic.lead.lists.required'
                             ),
                         ]
                     );
