@@ -6,7 +6,7 @@ use Codeception\Module;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Process\Process;
 
-class DbHelper extends Module
+final class DbHelper extends Module
 {
     private bool $databasePrepared = false;
     private array $dbConfig;

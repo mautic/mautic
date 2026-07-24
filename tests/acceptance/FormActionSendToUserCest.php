@@ -3,7 +3,7 @@
 use Page\Acceptance\FormPage;
 use Step\Acceptance\FormStep;
 
-class FormActionSendToUserCest
+final class FormActionSendToUserCest
 {
     public function _before(AcceptanceTester $I): void
     {
