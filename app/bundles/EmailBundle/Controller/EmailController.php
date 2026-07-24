@@ -448,6 +448,8 @@ final class EmailController extends FormController
                             'email:emails:deleteother',
                             'email:emails:publishown',
                             'email:emails:publishother',
+                            'lead:lists:viewown',
+                            'lead:lists:viewother',
                         ],
                         'RETURN_ARRAY'
                     ),
