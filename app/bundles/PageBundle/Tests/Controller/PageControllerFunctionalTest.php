@@ -38,6 +38,22 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Test Html', (string) $response->getContent());
     }
 
+    public function testPageUrlActions(): void
+    {
+        $page     = $this->createPage();
+        $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/pages/view/%d', $page->getId()));
+        $urlPanel = $crawler->filter('.col-md-3.bdr-l > .panel')->first();
+        $urlInput = $urlPanel->filter('.input-group input[readonly]');
+        $openLink = $urlPanel->filter('a[target="_blank"]');
+
+        $this->assertSame('Landing page URL', $urlPanel->filter('.panel-title')->text());
+        $this->assertCount(1, $urlInput);
+        $this->assertCount(1, $openLink);
+        $this->assertSame($urlInput->attr('value'), $openLink->attr('href'));
+        $this->assertSame('noopener noreferrer', $openLink->attr('rel'));
+        $this->assertCount(1, $openLink->filter('.ri-external-link-line'));
+    }
+
     private function createSegment(): LeadList
     {
         $segment = new LeadList();

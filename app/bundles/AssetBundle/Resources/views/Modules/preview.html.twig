@@ -88,15 +88,18 @@
 {% elseif variant == 'dialog' %}
     {% set modalId = 'asset-dialog-preview-modal-' ~ activeAsset.id|default('new') %}
     {% if isPreviewable %}
-        {% include '@MauticCore/Components/tile.html.twig' with {
-            type: 'mini',
-            href: '#',
-            title: 'mautic.asset.open_preview',
-            icon: 'ri-rectangle-line',
-            attributes: {
-                'data-toggle': 'modal',
-                'data-target': '#' ~ modalId
-            }
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [{
+                href: '#',
+                label: 'mautic.asset.open_preview',
+                variant: 'link',
+                icon: 'ri-rectangle-line',
+                attributes: {
+                    class: 'mt-sm',
+                    'data-toggle': 'modal',
+                    'data-target': '#' ~ modalId
+                }
+            }]
         } %}
     {% endif %}
 

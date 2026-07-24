@@ -264,16 +264,30 @@
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel-heading">
+                  <label class="panel-title" for="page-url">{{ 'mautic.page.url'|trans }}</label>
+              </div>
               <div class="panel-body pt-xs">
-                  {% include '@MauticCore/Components/card.html.twig' with {
-                      type: 'link',
-                      href: pageUrl,
-                      ctaType: 'new tab',
-                      heading: 'mautic.core.open_link',
-                      attributes: {
-                          'target': '_blank'
-                      }
-                  } %}
+                  <div class="input-group">
+                      <input id="page-url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                             readonly value="{{ pageUrl }}"/>
+                      <span class="input-group-btn">
+                          {% include '@MauticCore/Helper/button.html.twig' with {
+                              buttons: [{
+                                  href: pageUrl,
+                                  icon: 'ri-external-link-line',
+                                  icon_only: true,
+                                  tooltip_placement: 'left',
+                                  label: 'mautic.core.open_link',
+                                  variant: 'ghost',
+                                  attributes: {
+                                      target: '_blank',
+                                      rel: 'noopener noreferrer'
+                                  }
+                              }]
+                          } %}
+                      </span>
+                  </div>
               </div>
           </div>
           {% endif %}

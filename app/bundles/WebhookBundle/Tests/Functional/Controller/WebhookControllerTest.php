@@ -26,6 +26,16 @@ final class WebhookControllerTest extends MauticMysqlTestCase
 
         $logList = $crawler->filter('.table.table-responsive > tbody > tr')->count();
         $this->assertSame(Webhook::LOGS_DISPLAY_LIMIT, $logList);
+
+        $urlPanel    = $crawler->filter('.col-md-3.bdr-l > .panel')->first();
+        $urlInput    = $urlPanel->filter('.input-group input[readonly]');
+        $copyButton = $urlPanel->filter('button[data-copy]');
+
+        $this->assertSame('Webhook URL', $urlPanel->filter('.panel-title')->text());
+        $this->assertCount(1, $urlInput);
+        $this->assertCount(1, $copyButton);
+        $this->assertSame($urlInput->attr('value'), $copyButton->attr('data-copy'));
+        $this->assertCount(1, $copyButton->filter('.ri-file-copy-line'));
     }
 
     private function createWebhook(string $name, string $url, string $secret): Webhook

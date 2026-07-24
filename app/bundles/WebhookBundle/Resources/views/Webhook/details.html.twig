@@ -126,11 +126,14 @@
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [
                                 {
-                                    label: 'mautic.core.open_link',
+                                    label: 'mautic.webhook.webhook_url.copy',
                                     variant: 'ghost',
                                     icon_only: true,
-                                    icon: 'ri-external-link-line',
-                                    onclick: 'window.open("' ~ item.getWebhookUrl()|escape('html_attr') ~ '", "_blank");',
+                                    icon: 'ri-file-copy-line',
+                                    attributes: {
+                                        'data-copy': item.getWebhookUrl()|escape('html_attr'),
+                                        type: 'button'
+                                    }
                                 }
                             ]
                         } %}

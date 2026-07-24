@@ -223,16 +223,29 @@
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
         <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <label class="panel-title" for="asset-url">{{ 'mautic.asset.asset.url'|trans }}</label>
+            </div>
             <div class="panel-body pt-xs">
-                {% include '@MauticCore/Components/card.html.twig' with {
-                type: 'link',
-                href: assetDownloadUrl,
-                ctaType: 'external',
-                heading: 'mautic.core.open_link',
-                attributes: {
-                    'target': '_blank'
-                }
-            } %}
+                <div class="input-group">
+                    <input id="asset-url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                           readonly value="{{ assetDownloadUrl }}"/>
+                    <span class="input-group-btn">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                icon: 'ri-file-copy-line',
+                                icon_only: true,
+                                tooltip_placement: 'left',
+                                label: 'mautic.core.copy_download_link',
+                                variant: 'ghost',
+                                attributes: {
+                                    'data-copy': assetDownloadUrl|escape('html_attr'),
+                                    type: 'button'
+                                }
+                            }]
+                        } %}
+                    </span>
+                </div>
             {{- include('@MauticAsset/Modules/preview.html.twig',
             {
                 'variant': 'dialog',
