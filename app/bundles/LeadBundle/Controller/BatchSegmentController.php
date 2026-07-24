@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchSegmentController extends AbstractFormController
+final class BatchSegmentController extends AbstractFormController
 {
     public function __construct(
         private readonly SegmentActionModel $segmentActionModel,

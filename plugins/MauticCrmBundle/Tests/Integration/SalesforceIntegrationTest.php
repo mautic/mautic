@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -780,7 +781,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->willReturnMap(
                 [
                     [IntegrationEntity::class, $integrationEntityRepository],
-                    [\Mautic\CoreBundle\Entity\AuditLog::class, $auditLogRepo],
+                    [AuditLog::class, $auditLogRepo],
                 ]
             );
 

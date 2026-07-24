@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private AssetModel $assetModel;
 

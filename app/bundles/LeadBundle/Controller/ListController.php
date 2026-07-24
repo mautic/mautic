@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ListController extends FormController
+final class ListController extends FormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;

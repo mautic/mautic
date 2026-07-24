@@ -31,9 +31,7 @@ class MergeType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
