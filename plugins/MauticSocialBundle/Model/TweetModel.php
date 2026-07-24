@@ -54,7 +54,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $filter = '';
                 }
 
-                $tweetRepo = $this->getRepository();
+                $tweetRepo = $this->tweetRepository;
                 $tweetRepo->setCurrentUser($this->userHelper->getUser());
                 $entities = $tweetRepo->getTweetList(
                     $filter,
@@ -86,7 +86,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      */
     public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
-        $statRepo = $this->getStatRepository();
+        $statRepo = $this->tweetStatRepository;
 
         // Update failed tweet
         $stat = $statRepo->findOneBy(

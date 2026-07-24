@@ -235,7 +235,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $isUnique = $trackingNewlyGenerated;
         } elseif (!empty($trackingId)) {
             // Determine if this is a unique download
-            $isUnique = $this->getDownloadRepository()->isUniqueDownload($asset->getId(), $trackingId);
+            $isUnique = $this->downloadRepository->isUniqueDownload($asset->getId(), $trackingId);
         }
 
         $download->setTrackingId($trackingId);
@@ -243,7 +243,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         if (empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
+            $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
         // check for existing IP
@@ -283,7 +283,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
-        $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
+        $this->assetRepository->upDownloadCount($id, $increaseBy, $unique);
     }
 
     public function getRepository(): AssetRepository
@@ -385,7 +385,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $request   = $this->requestStack->getCurrentRequest();
-                $repo      = $this->getRepository();
+                $repo      = $this->assetRepository;
                 $repo->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
                 if ('mautic_segment_action' === $request->get('_route')
@@ -473,7 +473,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             return 0;
         }
 
-        $repo = $this->getRepository();
+        $repo = $this->assetRepository;
         $size = $repo->getAssetSize($assets);
 
         if ($size) {

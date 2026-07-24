@@ -208,6 +208,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->getRepository()->getStages($user);
+        return $this->stageRepository->getStages($user);
     }
 }

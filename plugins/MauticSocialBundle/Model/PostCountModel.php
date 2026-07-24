@@ -26,7 +26,7 @@ class PostCountModel extends AbstractCommonModel
     public function getEntity($id = null): ?PostCount
     {
         if (null !== $id) {
-            $repo = $this->getRepository();
+            $repo = $this->postCountRepository;
             if (method_exists($repo, 'getEntity')) {
                 return $repo->getEntity($id);
             }
@@ -51,8 +51,8 @@ class PostCountModel extends AbstractCommonModel
     public function updatePostCount($monitor, \DateTime $postDate): bool
     {
         // query the db for posts on this date
-        $q    = $this->getRepository()->createQueryBuilder($this->getRepository()->getTableAlias());
-        $expr = $q->expr()->eq($this->getRepository()->getTableAlias().'.postDate', ':date');
+        $q    = $this->postCountRepository->createQueryBuilder($this->postCountRepository->getTableAlias());
+        $expr = $q->expr()->eq($this->postCountRepository->getTableAlias().'.postDate', ':date');
 
         $q->setParameter('date', $postDate, 'date');
         $q->where($expr);
@@ -61,7 +61,7 @@ class PostCountModel extends AbstractCommonModel
         // ignore paginator so we can use the array later
         $args['ignore_paginator'] = true;
 
-        $postCountsRepository = $this->getRepository();
+        $postCountsRepository = $this->postCountRepository;
 
         // get any existing records
         $postCounts = $postCountsRepository->getEntities($args);

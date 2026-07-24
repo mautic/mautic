@@ -112,7 +112,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         // should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
             $events      = $entity->getEvents();
-            $repo        = $this->getEventRepository();
+            $repo        = $this->triggerEventRepository;
             $persist     = [];
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
@@ -321,7 +321,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (!$force) {
             // get a list of events that has already been performed on this lead
-            $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
+            $appliedEvents = $this->triggerEventRepository->getLeadTriggeredEvents($lead->getId());
 
             // if it's already been done, then skip it
             if (isset($appliedEvents[$event['id']])) {
@@ -343,7 +343,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             return $this->invokeCallback($event, $lead, $settings);
         }
         /** @var TriggerEvent $triggerEvent */
-        $triggerEvent = $this->getEventRepository()->find($event['id']);
+        $triggerEvent = $this->triggerEventRepository->find($event['id']);
 
         $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
 
@@ -389,7 +389,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
-        $repo         = $this->getEventRepository();
+        $repo         = $this->triggerEventRepository;
         $events       = $repo->getPublishedByPointTotal($points);
         $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());
         $events       = array_merge($events, $groupEvents);
@@ -409,7 +409,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
                 if ($this->triggerEvent($event, $lead, true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
-                    $log->setEvent($triggerEvent = $this->getEventRepository()->find($event['id']));
+                    $log->setEvent($triggerEvent = $this->triggerEventRepository->find($event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
                     $persist[] = $log;
@@ -417,8 +417,8 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             }
 
             if (!empty($persist)) {
-                $this->getEventRepository()->saveEntities($persist);
-                $this->getEventRepository()->detachEntities($persist);
+                $this->triggerEventRepository->saveEntities($persist);
+                $this->triggerEventRepository->detachEntities($persist);
             }
         }
     }
@@ -431,7 +431,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     public function getColorForLeadPoints($points)
     {
         if (!$this->triggers) {
-            $this->triggers = $this->getRepository()->getTriggerColors();
+            $this->triggers = $this->triggerRepository->getTriggerColors();
         }
 
         foreach ($this->triggers as $trigger) {

@@ -223,7 +223,7 @@ class WebhookModel extends FormModel
      */
     public function getEventWebooksByType($type)
     {
-        return $this->getEventRepository()->getEntitiesByEventType($type);
+        return $this->eventRepository->getEntitiesByEventType($type);
     }
 
     public function queueWebhooksByType($type, $payload, array $groups = []): void
@@ -248,7 +248,7 @@ class WebhookModel extends FormModel
 
             if (self::COMMAND_PROCESS === $this->queueMode) {
                 // Queue to the database to process later
-                $this->getQueueRepository()->saveEntity($queue);
+                $this->webhookQueueRepository->saveEntity($queue);
             } else {
                 // Immediately process
                 $this->processWebhook($webhook, $queue);
@@ -304,7 +304,7 @@ class WebhookModel extends FormModel
 
         $start            = microtime(true);
         $logged           = false;
-        $webhookQueueRepo = $this->getQueueRepository();
+        $webhookQueueRepo = $this->webhookQueueRepository;
 
         try {
             $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
@@ -390,7 +390,7 @@ class WebhookModel extends FormModel
      */
     public function isSick(Webhook $webhook): bool
     {
-        $successRadio = $this->getLogRepository()->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
+        $successRadio = $this->logRepository->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
 
         // If there are no log rows yet, consider it healthy
         if (null === $successRadio) {
@@ -450,7 +450,7 @@ class WebhookModel extends FormModel
         }
 
         if (!$this->coreParametersHelper->get('clean_webhook_logs_in_background')) {
-            $this->getLogRepository()->removeLimitExceedLogs($webhook->getId(), $this->logMax);
+            $this->logRepository->removeLimitExceedLogs($webhook->getId(), $this->logMax);
         }
 
         $log = new Log();
@@ -534,7 +534,7 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        $queueRepo = $this->getQueueRepository();
+        $queueRepo = $this->webhookQueueRepository;
 
         $webhookRetryTime = (new \DateTimeImmutable())
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))

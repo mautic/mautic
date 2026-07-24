@@ -189,7 +189,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        $repo            = $this->getRepository();
+        $repo            = $this->pointRepository;
         $availablePoints = $repo->getPublishedByType($type);
         if (empty($availablePoints)) {
             return;
@@ -301,8 +301,8 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-            $this->getRepository()->detachEntities($persist);
+            $this->pointRepository->saveEntities($persist);
+            $this->pointRepository->detachEntities($persist);
         }
 
         if ($hasLeadPointChanges) {

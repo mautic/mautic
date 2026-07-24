@@ -143,7 +143,7 @@ class MessageQueueModel extends FormModel
 
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if (!empty($this->getRepository()->findMessage($channel, $channelId, $leadId))) {
+            if (!empty($this->messageQueueRepository->findMessage($channel, $channelId, $leadId))) {
                 continue;
             }
 
@@ -167,7 +167,7 @@ class MessageQueueModel extends FormModel
 
         if ([] !== $messageQueues) {
             $this->saveEntities($messageQueues);
-            $messageQueueRepository = $this->getRepository();
+            $messageQueueRepository = $this->messageQueueRepository;
             $messageQueueRepository->detachEntities($messageQueues);
         }
 
@@ -180,7 +180,7 @@ class MessageQueueModel extends FormModel
         $processStarted = new \DateTime();
         $counter        = 0;
 
-        foreach ($this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId) as $queue) {
+        foreach ($this->messageQueueRepository->getQueuedMessages($limit, $processStarted, $channel, $channelId) as $queue) {
             $counter += $this->processMessageQueue($queue);
             $event   = $queue->getEvent();
 
@@ -287,7 +287,7 @@ class MessageQueueModel extends FormModel
     public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
-            $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
+            $message = $this->messageQueueRepository->findMessage($channel, $channelId, $leadId);
             $persist = true;
         }
 
@@ -313,7 +313,7 @@ class MessageQueueModel extends FormModel
 
     public function getQueuedChannelCount($channel, ?array $channelIds = []): int
     {
-        return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
+        return $this->messageQueueRepository->getQueuedChannelCount($channel, $channelIds);
     }
 
     /**
