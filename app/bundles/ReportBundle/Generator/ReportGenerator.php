@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Generator;
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Builder\ReportBuilderInterface;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 
 class ReportGenerator
 {
-    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
+    private string $validInterface = ReportBuilderInterface::class;
 
     private ?string $contentTemplate = null;
 

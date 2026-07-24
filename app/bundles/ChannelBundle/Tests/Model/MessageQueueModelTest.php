@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -65,7 +66,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->messageQueueRepository,
-            $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class) // $frequencyRuleRepository
+            $this->createStub(FrequencyRuleRepository::class) // $frequencyRuleRepository
         );
 
         $message      = new MessageQueue();

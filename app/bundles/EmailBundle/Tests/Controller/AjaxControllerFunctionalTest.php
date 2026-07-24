@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -99,7 +100,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
         $this->assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
     }

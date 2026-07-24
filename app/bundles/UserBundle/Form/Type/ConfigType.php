@@ -56,12 +56,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain', 'text/xml', 'application/xml'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain', 'text/xml', 'application/xml'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );
@@ -78,12 +73,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );
@@ -100,12 +90,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );
