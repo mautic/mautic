@@ -9,7 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string|int|float|array<string|int|float>>|string|int|float, array<string|int|float|array<string|int|float>>|string|int|float>
  */
-class EscapeTransformer implements DataTransformerInterface
+final class EscapeTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]

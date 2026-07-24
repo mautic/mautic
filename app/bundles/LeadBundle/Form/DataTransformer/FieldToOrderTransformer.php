@@ -9,7 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<LeadField|null, int|null>
  */
-class FieldToOrderTransformer implements DataTransformerInterface
+final class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
         private readonly LeadFieldRepository $leadFieldRepository,

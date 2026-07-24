@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Tag>
  */
-class TagType extends AbstractType
+final class TagType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,

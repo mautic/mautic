@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class PreferenceChannelsType extends AbstractType
+final class PreferenceChannelsType extends AbstractType
 {
     public function __construct(
         private readonly LeadModel $leadModel,

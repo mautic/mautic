@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class UniqueCustomField extends Constraint
+final class UniqueCustomField extends Constraint
 {
     public string $message = 'mautic.lead.field.unique.is_used';
 

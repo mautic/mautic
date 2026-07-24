@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormListType extends AbstractType
+final class FormListType extends AbstractType
 {
     private readonly bool $viewOther;
 

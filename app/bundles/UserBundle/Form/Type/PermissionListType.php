@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PermissionListType extends AbstractType
+final class PermissionListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

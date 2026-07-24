@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class StageActionListType extends AbstractType
+final class StageActionListType extends AbstractType
 {
     public function __construct(
         private readonly StageModel $model,

@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentListType extends AbstractType
+final class DynamicContentListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

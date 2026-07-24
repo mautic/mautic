@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
-class UniqueUserAlias extends Constraint
+final class UniqueUserAlias extends Constraint
 {
     public $message = 'This alias is already in use.';
 

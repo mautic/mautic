@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-class UniqueUserAliasValidator extends ConstraintValidator
+final class UniqueUserAliasValidator extends ConstraintValidator
 {
     /**
      * @var LeadListRepository

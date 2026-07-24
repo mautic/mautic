@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PageListType extends AbstractType
+final class PageListType extends AbstractType
 {
     private readonly bool $canViewOther;
 

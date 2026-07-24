@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ActivityListType extends AbstractType
+final class ActivityListType extends AbstractType
 {
     public function __construct(
         private readonly LeadModel $leadModel,

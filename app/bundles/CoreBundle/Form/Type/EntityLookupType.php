@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EntityLookupType extends AbstractType
+final class EntityLookupType extends AbstractType
 {
     /**
      * @var EntityLookupChoiceLoader[]

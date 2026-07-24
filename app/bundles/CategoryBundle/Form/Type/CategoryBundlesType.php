@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CategoryBundlesType extends AbstractType
+final class CategoryBundlesType extends AbstractType
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,

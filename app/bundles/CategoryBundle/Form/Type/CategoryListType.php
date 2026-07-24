@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CategoryListType extends AbstractType
+final class CategoryListType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,

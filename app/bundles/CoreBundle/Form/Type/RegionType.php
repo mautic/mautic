@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class RegionType extends AbstractType
+final class RegionType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

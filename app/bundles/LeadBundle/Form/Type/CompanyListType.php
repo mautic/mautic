@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CompanyListType extends AbstractType
+final class CompanyListType extends AbstractType
 {
     public const DEFAULT_LIMIT = 100;
 

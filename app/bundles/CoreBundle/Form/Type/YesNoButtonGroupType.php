@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class YesNoButtonGroupType extends AbstractType
+final class YesNoButtonGroupType extends AbstractType
 {
     public function getParent(): ?string
     {

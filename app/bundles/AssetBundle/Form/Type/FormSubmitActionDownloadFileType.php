@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormSubmitActionDownloadFileType extends AbstractType
+final class FormSubmitActionDownloadFileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityLookupChoiceLoader implements ChoiceLoaderInterface
+final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
     /**
      * @var array

@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadListType extends AbstractType
+final class LeadListType extends AbstractType
 {
     public function __construct(
         private readonly ListModel $segmentModel,

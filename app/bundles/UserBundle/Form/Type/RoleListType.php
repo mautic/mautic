@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class RoleListType extends AbstractType
+final class RoleListType extends AbstractType
 {
     public function __construct(
         private readonly RoleModel $roleModel,

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicListType extends AbstractType
+final class DynamicListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
