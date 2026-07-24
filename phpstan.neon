@@ -224,4 +224,8 @@ rules:
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+<<<<<<< HEAD
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+=======
+	- Utils\PHPStan\Rule\NoContainerGetRule
+>>>>>>> 98fb0512f7 ([phpstan] add custom rule to avoid container->get global calls with strings)
