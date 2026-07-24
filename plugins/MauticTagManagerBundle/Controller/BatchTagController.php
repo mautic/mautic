@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class BatchTagController extends AbstractFormController
+final class BatchTagController extends AbstractFormController
 {
     private TagModel $tagModel;
 

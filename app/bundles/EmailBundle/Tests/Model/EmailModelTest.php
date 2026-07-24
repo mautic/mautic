@@ -7,6 +7,9 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,15 +23,18 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
+use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
@@ -37,17 +43,20 @@ use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
+use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -277,16 +286,16 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
             $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
             $this->createStub(TrackableRepository::class), // $trackableRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -399,7 +408,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [FrequencyRule::class, $this->frequencyRepository],
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
                 ]
@@ -543,7 +552,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [FrequencyRule::class, $this->frequencyRepository],
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
                 ]
@@ -605,7 +614,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 [
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [FrequencyRule::class, $this->frequencyRepository],
                 ]
             );
 
@@ -651,16 +660,16 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
             $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
             $this->createStub(TrackableRepository::class), // $trackableRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $contacts = [
@@ -689,7 +698,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                    [FrequencyRule::class, $this->frequencyRepository],
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
                 ]
@@ -754,8 +763,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 [
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
-                    [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createStub(MessageQueueRepository::class)],
+                    [FrequencyRule::class, $this->frequencyRepository],
+                    [MessageQueue::class, $this->createStub(MessageQueueRepository::class)],
                 ]
             );
         $leadEntity = (new Lead())
@@ -812,16 +821,16 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->emailStatModel,
             $this->botRatioHelperMock,
             $this->abTestSettingsServiceMock,
-            $this->createStub(\Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class),
+            $this->createStub(EmailVariantConverterService::class),
             $this->emailRepository, // $emailRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\CopyRepository::class), // $copyRepository
-            $this->createStub(\Mautic\EmailBundle\Entity\StatDeviceRepository::class), // $statDeviceRepository
+            $this->createStub(CopyRepository::class), // $copyRepository
+            $this->createStub(StatDeviceRepository::class), // $statDeviceRepository
             $this->leadDeviceRepository, // $leadDeviceRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class), // $campaignRepository
+            $this->createStub(CampaignRepository::class), // $campaignRepository
             $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
             $this->createStub(TrackableRepository::class), // $trackableRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
+            $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
         );
 
         $this->emailEntity->method('getId')
@@ -1049,7 +1058,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 [
                     [Stat::class, $this->statRepository],
                     [DoNotContactEntity::class, $doNotContactRepo],
-                    [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
+                    [Trackable::class, $trackableRepo],
                 ]
             );
 

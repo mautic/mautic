@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookController extends FormController
+final class WebhookController extends FormController
 {
     use CategoryListFiltersTrait;
 

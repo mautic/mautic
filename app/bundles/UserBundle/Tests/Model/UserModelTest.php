@@ -11,9 +11,12 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
+use Mautic\UserBundle\Entity\UserInviteRepository;
 use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
@@ -90,7 +93,7 @@ final class UserModelTest extends TestCase
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
-        $this->userInviteRepository = $this->createMock(\Mautic\UserBundle\Entity\UserInviteRepository::class);
+        $this->userInviteRepository = $this->createMock(UserInviteRepository::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->userModel = new UserModel(
@@ -106,8 +109,8 @@ final class UserModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->twig,
             $this->userRepository,
-            $this->createStub(\Mautic\UserBundle\Entity\PermissionRepository::class),
-            $this->createStub(\Mautic\UserBundle\Entity\RoleRepository::class),
+            $this->createStub(PermissionRepository::class),
+            $this->createStub(RoleRepository::class),
             $this->userInviteRepository,
         );
     }

@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FocusController extends AbstractStandardFormController
+final class FocusController extends AbstractStandardFormController
 {
     use CategoryListFiltersTrait;
 
@@ -256,10 +256,7 @@ class FocusController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return array
-     */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()

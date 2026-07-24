@@ -120,7 +120,7 @@ class ConfigType extends AbstractType
      */
     private function greaterThanOrEqualConstraint(int|float $value): array
     {
-        return [new GreaterThanOrEqual(['value' => $value])];
+        return [new GreaterThanOrEqual(value: $value)];
     }
 
     public function getBlockPrefix(): string

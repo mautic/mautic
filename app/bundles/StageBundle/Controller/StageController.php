@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class StageController extends AbstractFormController
+final class StageController extends AbstractFormController
 {
     use CategoryListFiltersTrait;
 

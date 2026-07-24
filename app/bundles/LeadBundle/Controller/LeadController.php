@@ -63,7 +63,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class LeadController extends FormController
+final class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
@@ -507,10 +507,8 @@ class LeadController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage): Response
     {
         $lead  = $this->leadModel->getEntity();
 
@@ -678,10 +676,8 @@ class LeadController extends FormController
      * Generates edit form.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 
@@ -881,10 +877,8 @@ class LeadController extends FormController
 
     /**
      * Generates merge form and action.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
+    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId): Response
     {
         $mainLead = $this->leadModel->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
@@ -2308,7 +2302,7 @@ class LeadController extends FormController
     /**
      * @param array<mixed> $permissions
      */
-    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): Response
+    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): JsonResponse
     {
         $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
