@@ -92,7 +92,7 @@ class ScheduleController extends CommonAjaxController
         $report   = $this->reportModel->getEntity($reportId);
         $security = $this->security;
 
-        if (empty($report)) {
+        if (!$report instanceof Report) {
             $this->addFlash('mautic.report.notfound', ['%id%' => $reportId]);
 
             return $this->flushFlash(Response::HTTP_NOT_FOUND);
