@@ -307,33 +307,17 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['form'],
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['form']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_message.notblank',
-            'groups'  => ['messageRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => ['urlRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired']));
 
         $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_hideform.notblank',
-            'groups'  => ['hideformRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired']));
 
-        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
-            'value'   => 0,
-            'message' => 'mautic.form.form.progressive_profiling_limit.error',
-            'groups'  => ['progressiveProfilingLimit'],
-        ]));
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan(value: 0, message: 'mautic.form.form.progressive_profiling_limit.error', groups: ['progressiveProfilingLimit']));
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array

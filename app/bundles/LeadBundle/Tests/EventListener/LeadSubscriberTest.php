@@ -125,7 +125,8 @@ final class LeadSubscriberTest extends CommonMocks
             $this->leadListRepository,
             $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
-            $this->companyLeadRepository
+            $this->companyLeadRepository,
+            $this->createStub(ModelFactory::class),
         );
 
         $subscriber->onLeadPostSave(new LeadEvent($lead));

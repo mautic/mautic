@@ -9,6 +9,7 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -18,6 +19,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -116,9 +118,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
-            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->createStub(EmailRepository::class), // $emailRepository
             $this->assetRepository,
-            $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class), // $downloadRepository
+            $this->createStub(DownloadRepository::class), // $downloadRepository
         );
     }
 
@@ -315,9 +317,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
-                $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class),
+                $this->createStub(EmailRepository::class),
                 $this->createStub(AssetRepository::class),
-                $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class),
+                $this->createStub(DownloadRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();
