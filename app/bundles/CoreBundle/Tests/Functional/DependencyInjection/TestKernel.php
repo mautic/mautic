@@ -16,10 +16,25 @@ final class TestKernel extends \AppTestKernel
         // pin the platform version, so Doctrine does not open a connection to detect it
         \defined('MAUTIC_DB_SERVER_VERSION') || \define('MAUTIC_DB_SERVER_VERSION', '8.4');
 
+        // the phpunit.xml.dist config is not used when a single test file is run, so make the environment explicit
+        \defined('IS_PHPUNIT') || \define('IS_PHPUNIT', true);
+        $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = 'test';
+
         // the container is compiled once, so the env variables have to be loaded on every boot
         EnvLoader::load();
 
         parent::__construct('test', false);
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        // HTMLPurifier warns about its missing cache directory, that is only created by a cache warmer on container compilation
+        $htmlPurifierCacheDir = $this->getCacheDir().'/htmlpurifier';
+        if (!is_dir($htmlPurifierCacheDir)) {
+            mkdir($htmlPurifierCacheDir, 0777, true);
+        }
     }
 
     /**
