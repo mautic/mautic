@@ -31,7 +31,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
+use Twig\Environment;
 
 class CommonController extends AbstractController implements MauticController
 {
@@ -43,13 +45,25 @@ class CommonController extends AbstractController implements MauticController
 
     private NotificationModel $notificationModel;
 
+    protected RouterInterface $router;
+
+    protected HttpKernelInterface $httpKernel;
+
+    protected Environment $twig;
+
     #[Required]
     public function autowireCommonController(
         PageModel $pageModel,
         NotificationModel $notificationModel,
+        RouterInterface $router,
+        HttpKernelInterface $httpKernel,
+        Environment $twig,
     ): void {
         $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
+        $this->router = $router;
+        $this->httpKernel = $httpKernel;
+        $this->twig = $twig;
     }
 
     /**
@@ -368,7 +382,7 @@ class CommonController extends AbstractController implements MauticController
             $ajaxRouteName = false;
 
             try {
-                $routeParams   = $this->container->get('router')->match($routePath);
+                $routeParams   = $this->router->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
                 $request->attributes->set('ajaxRoute',

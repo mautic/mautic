@@ -77,7 +77,7 @@ final class ExceptionController extends CommonController
         }
 
         $template   = "@MauticCore/{$layout}/{$code}.html.twig";
-        if (!$this->container->get('twig')->getLoader()->exists($template)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
