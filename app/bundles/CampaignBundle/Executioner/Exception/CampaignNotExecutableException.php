@@ -2,6 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Exception;
 
-class CampaignNotExecutableException extends \Exception
+final class CampaignNotExecutableException extends \Exception
 {
 }

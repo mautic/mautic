@@ -2,6 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Exception;
 
-class SegmentNotFoundException extends \Exception
+final class SegmentNotFoundException extends \Exception
 {
 }
