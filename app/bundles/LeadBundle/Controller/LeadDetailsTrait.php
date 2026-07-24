@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -367,7 +368,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [

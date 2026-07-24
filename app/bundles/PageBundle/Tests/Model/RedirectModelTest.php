@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
@@ -65,7 +66,7 @@ final class RedirectModelTest extends PageTestAbstract
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $shortener,
-            $this->createStub(\Mautic\PageBundle\Entity\RedirectRepository::class), // $redirectRepository
+            $this->createStub(RedirectRepository::class), // $redirectRepository
         );
 
         $redirect = new Redirect();

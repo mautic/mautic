@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
     private UserModel $userModel;
 
