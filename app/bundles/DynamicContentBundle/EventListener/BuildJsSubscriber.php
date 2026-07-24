@@ -98,6 +98,7 @@ MauticJS.initializeForms = function(content) {
         // if doesn't exist
         if (typeof MauticSDK == 'undefined') {
             if (typeof MauticSDKLoaded == 'undefined') {
+                window.MauticSDKLoaded = true;
                 MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
 
                 // check initialize form library

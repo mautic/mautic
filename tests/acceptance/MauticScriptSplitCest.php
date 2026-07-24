@@ -260,6 +260,35 @@ JS);
         $I->assertSame([], $state['cookieAccess']);
     }
 
+    public function essentialScriptLoadsFormSdkOnceForRepeatedInitialization(\AcceptanceTester $I): void
+    {
+        $scriptUrl = $this->getMauticUrl($I).'/mautic-essential.js';
+        $this->loadScripts($I, [$scriptUrl]);
+
+        $result = $I->executeJS(<<<'JS'
+var sdkWasUndefined = typeof MauticSDK === 'undefined';
+var markerWasUndefined = typeof MauticSDKLoaded === 'undefined';
+MauticJS.initializeForms('mauticform_wrapper');
+MauticJS.initializeForms('mauticform_wrapper');
+
+return {
+    sdkWasUndefined: sdkWasUndefined,
+    markerWasUndefined: markerWasUndefined,
+    loadingMarker: window.MauticSDKLoaded === true,
+    scriptCount: Array.from(document.scripts).filter(function (script) {
+        return script.src && new URL(script.src).pathname.endsWith('/media/js/mautic-form.js');
+    }).length
+};
+JS);
+
+        $I->assertTrue($result['sdkWasUndefined']);
+        $I->assertTrue($result['markerWasUndefined']);
+        $I->assertTrue($result['loadingMarker']);
+        $I->assertSame(1, $result['scriptCount']);
+        $I->waitForJS("return typeof MauticSDK !== 'undefined'", 10);
+        $I->assertSame([], $I->executeJS('return window.mauticScriptErrors;'));
+    }
+
     public function essentialThenTrackingRequestsDwcOnce(\AcceptanceTester $I): void
     {
         // After consent (essential + tracking loaded together), DWC fallback should
