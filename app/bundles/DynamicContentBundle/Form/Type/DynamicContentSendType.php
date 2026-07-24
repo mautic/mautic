@@ -36,7 +36,7 @@ class DynamicContentSendType extends AbstractType
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.core.value.required']),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );

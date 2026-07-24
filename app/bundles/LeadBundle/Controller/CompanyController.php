@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class CompanyController extends FormController
+final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
@@ -979,10 +979,8 @@ class CompanyController extends FormController
 
     /**
      * Company Merge function.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, $objectId)
+    public function mergeAction(Request $request, $objectId): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(

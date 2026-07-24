@@ -221,9 +221,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $metadata->addPropertyConstraint(
             'name',
             new Assert\NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
