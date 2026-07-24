@@ -12914,3 +12914,501 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php
+		-
+			message: '#^Entity manager must not fetch the "MauticPlugin\\MauticSocialBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticSocialBundle/Helper/TwitterCommandHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticSocialBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\ApiBundle\\Entity\\oAuth2\\AccessToken" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/UserBundle/Security/Authentication/Token/Permissions/TokenPermissions.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\AssetBundle\\Entity\\Asset" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/AssetBundle/EventListener/AssetImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\AssetBundle\\Entity\\Download" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/AssetBundle/EventListener/DetermineWinnerSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Campaign" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CampaignBundle/Controller/CampaignController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Campaign" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/CampaignBundle/EventListener/CampaignImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Event" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 7
+			path: app/bundles/CampaignBundle/EventListener/CampaignEventImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CampaignBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\LeadEventLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CampaignBundle/Controller/CampaignController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\LeadEventLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/CampaignBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Summary" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CampaignBundle/Controller/CampaignController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CategoryBundle\\Entity\\Category" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CategoryBundle\\Entity\\Category" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategoryData.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\AuditLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\AuditLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\FormEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\IpAddress" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\IpAddress" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/Helper/IpLookupHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\DynamicContentBundle\\Entity\\DynamicContent" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Copy" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/Helper/MailHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Email" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/EmailBundle/EventListener/EmailImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Email" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/Controller/LeadController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Stat" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/EmailBundle/EventListener/DetermineWinnerSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Stat" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\StatDevice" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Action" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/FormBundle/EventListener/ActionImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Field" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/FormBundle/EventListener/FieldImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Form" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/EmailImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Form" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/FormBundle/EventListener/ActionImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Form" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/FormBundle/EventListener/FieldImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Form" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/FormBundle/EventListener/FormImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Submission" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/FormBundle/Model/SubmissionResultLoader.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Company" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\CompanyLead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\DoNotContact" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/Controller/AjaxController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\DoNotContact" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/LeadBundle/Controller/LeadController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\DoNotContact" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/Controller/LeadController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/NotificationBundle/Controller/AppCallbackController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PluginBundle/Helper/EventHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/SmsBundle/Helper/SmsHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadDevice" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadEventLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadField" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/LeadBundle/EventListener/CustomFieldImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadField" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/Form/Type/FieldType.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadList" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadList" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/LeadBundle/EventListener/SegmentImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadList" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/Segment/Query/ContactSegmentQueryBuilder.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadNote" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\ListLead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\PointsChangeLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\UtmTag" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\NotificationBundle\\Entity\\Notification" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/NotificationBundle/Controller/AppCallbackController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Hit" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/DashboardBundle/Controller/AjaxController.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Hit" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/DetermineWinnerSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Hit" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PageBundle/Helper/PointActionHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Page" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/EmailImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Page" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/PageBundle/EventListener/PageImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Redirect" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PageBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Trackable" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PageBundle/EventListener/StatsSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\Integration" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 4
+			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 3
+			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 5
+			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 7
+			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 4
+			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\PointBundle\\Entity\\Group" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 2
+			path: app/bundles/PointBundle/EventListener/GroupImportExportSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\ReportBundle\\Entity\\Scheduler" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/ReportBundle/Scheduler/Model/SchedulerPlanner.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\SmsBundle\\Entity\\Stat" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/SmsBundle/EventListener/LeadSubscriber.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\StageBundle\\Entity\\Stage" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\Role" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/InstallBundle/Install/InstallService.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+
