@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class RoleController extends FormController
+final class RoleController extends FormController
 {
     private RoleModel $roleModel;
 

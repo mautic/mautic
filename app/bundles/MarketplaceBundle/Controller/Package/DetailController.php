@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class DetailController extends CommonController
+final class DetailController extends CommonController
 {
     public function __construct(
         private readonly PackageModel $packageModel,
