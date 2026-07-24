@@ -52,10 +52,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     // @phpstan-ignore-next-line method.childReturnType
     public function getRepository(): CategoryRepository
     {
-        $repository = $this->categoryRepository;
-        \assert($repository instanceof CategoryRepository);
-
-        return $repository;
+        return $this->categoryRepository;
     }
 
     public function getNameGetter(): string

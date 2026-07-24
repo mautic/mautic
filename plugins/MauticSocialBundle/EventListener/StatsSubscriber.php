@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {

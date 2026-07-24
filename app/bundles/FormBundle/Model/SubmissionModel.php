@@ -1115,15 +1115,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Set owner
-        $userRepo = $this->userRepository;
-        \assert($userRepo instanceof UserRepository);
-
         $user = null;
         if (!empty($data['ownerbyemail'])) {
-            $user = $userRepo->findOneBy(['email' => $data['ownerbyemail']]);
+            $user = $this->userRepository->findOneBy(['email' => $data['ownerbyemail']]);
         } elseif (!empty($data['ownerbyid'])) {
-            $user = $userRepo->find($data['ownerbyid']);
+            $user = $this->userRepository->find($data['ownerbyid']);
         }
 
         if ($user instanceof User) {

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private AssetModel $assetModel;
 
@@ -46,9 +46,8 @@ class AjaxController extends CommonAjaxController
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
-        $dispatcher = $this->dispatcher;
         $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
-        if (!$dispatcher->hasListeners($name)) {
+        if (!$this->dispatcher->hasListeners($name)) {
             return $this->sendJsonResponse(['success' => 0]);
         }
 
@@ -56,7 +55,7 @@ class AjaxController extends CommonAjaxController
         $integration = $integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);
-        $dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event, $name);
 
         if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse([

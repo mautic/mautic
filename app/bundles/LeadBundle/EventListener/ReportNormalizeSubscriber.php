@@ -8,10 +8,10 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportNormalizeSubscriber implements EventSubscriberInterface
+final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
+        private FieldModel $fieldModel,
     ) {
     }
 
@@ -47,7 +47,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
     /**
      * @param array<string> $columns
      */
-    protected function useContactOrCompanyColumn(array $columns): bool
+    private function useContactOrCompanyColumn(array $columns): bool
     {
         foreach ($columns as $column) {
             if (str_starts_with($column, 'l.') || str_starts_with($column, 'comp.')) {
