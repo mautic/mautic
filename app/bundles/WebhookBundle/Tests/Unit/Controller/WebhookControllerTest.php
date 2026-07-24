@@ -50,7 +50,7 @@ final class WebhookControllerTest extends TestCase
 {
     public function testIndexViewArgumentsIncludeListFilters(): void
     {
-        $controller = new TestableWebhookController(
+        $controller = new WebhookController(
             $this->createStub(FormFactoryInterface::class),
             $this->createStub(FormFieldHelper::class),
             $this->createStub(ManagerRegistry::class),
@@ -73,7 +73,7 @@ final class WebhookControllerTest extends TestCase
                 ],
             ],
         ];
-        $controller->setListFiltersForTest($listFilters);
+        (new \ReflectionProperty(WebhookController::class, 'listFilters'))->setValue($controller, $listFilters);
 
         $args = [
             'viewParameters' => [
@@ -310,16 +310,5 @@ final class WebhookControllerTest extends TestCase
     {
         yield 'New' => [true];
         yield 'Update' => [false];
-    }
-}
-
-final class TestableWebhookController extends WebhookController
-{
-    /**
-     * @param array<string, mixed> $listFilters
-     */
-    public function setListFiltersForTest(array $listFilters): void
-    {
-        $this->listFilters = $listFilters;
     }
 }
