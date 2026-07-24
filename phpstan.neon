@@ -224,3 +224,4 @@ rules:
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
