@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomTemplateEvent extends AbstractCustomRequestEvent
+final class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
     protected string $template;
 

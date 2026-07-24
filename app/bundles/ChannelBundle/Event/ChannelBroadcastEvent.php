@@ -5,7 +5,7 @@ namespace Mautic\ChannelBundle\Event;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ChannelBroadcastEvent extends Event
+final class ChannelBroadcastEvent extends Event
 {
     /**
      * Number of contacts successfully processed and/or failed per channel.
