@@ -16,12 +16,12 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly DynamicContentModel $dynamicContentModel,
-        protected CacheProvider $cache,
-        private readonly EventDispatcherInterface $dispatcher,
+        private DynamicContentModel $dynamicContentModel,
+        private CacheProvider $cache,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

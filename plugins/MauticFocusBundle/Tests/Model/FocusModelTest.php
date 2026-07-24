@@ -13,6 +13,8 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,8 +60,8 @@ final class FocusModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class), // $focusRepository
-            $this->createStub(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class), // $statRepository
+            $this->createStub(FocusRepository::class), // $focusRepository
+            $this->createStub(StatRepository::class), // $statRepository
         );
         $focus = [
             'form' => 'xxx',

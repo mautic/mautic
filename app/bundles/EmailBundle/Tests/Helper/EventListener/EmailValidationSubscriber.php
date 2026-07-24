@@ -6,7 +6,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailValidationSubscriber implements EventSubscriberInterface
+final class EmailValidationSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

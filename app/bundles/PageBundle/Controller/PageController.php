@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class PageController extends FormController
+final class PageController extends FormController
 {
     use FormErrorMessagesTrait;
 

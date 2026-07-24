@@ -114,7 +114,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         if (!$this->repoSetup) {
             $this->repoSetup = true;
-            $this->companyRepository->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
             $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 

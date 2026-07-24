@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -142,7 +143,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed', ['%reason%' =>  $import->getStatusInfo()]),
                     'ri-download-line',
                     null,
-                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                    $this->em->getReference(User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -244,7 +245,7 @@ class ImportModel extends FormModel
                 $this->generateLink($import, $this->translator->trans('mautic.lead.import.completed')),
                 'ri-download-line',
                 null,
-                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                $this->em->getReference(User::class, $import->getCreatedBy())
             );
         }
     }
