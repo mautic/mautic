@@ -189,8 +189,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        $repo            = $this->pointRepository;
-        $availablePoints = $repo->getPublishedByType($type);
+        $availablePoints = $this->pointRepository->getPublishedByType($type);
         if (empty($availablePoints)) {
             return;
         }
@@ -209,7 +208,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         $availableActions = $this->getPointActions();
 
         // get a list of actions that has already been performed on this lead
-        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
+        $completedActions = $this->pointRepository->getCompletedLeadActions($type, $lead->getId());
 
         $persist = [];
         /** @var Point $action */

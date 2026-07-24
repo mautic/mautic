@@ -126,8 +126,7 @@ class RedirectModel extends FormModel
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);
 
-        $repo     = $this->redirectRepository;
-        $redirect = $repo->findOneBy(['url' => $url]);
+        $redirect = $this->redirectRepository->findOneBy(['url' => $url]);
 
         if (null == $redirect) {
             $redirect = $this->createRedirectEntity($url);

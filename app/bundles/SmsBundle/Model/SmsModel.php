@@ -362,9 +362,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         if ([] !== $sentCount) {
-            $repo = $this->smsRepository;
             foreach ($sentCount as $id => $count) {
-                $repo->upCount($id, 'sent', $count);
+                $this->smsRepository->upCount($id, 'sent', $count);
             }
         }
 

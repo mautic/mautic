@@ -36,9 +36,7 @@ class IntegrationEntityModel extends FormModel
             return [];
         }
 
-        $integrationEntityRepo = $this->integrationEntityRepository;
-
-        return $integrationEntityRepo->getIntegrationsEntityId(
+        return $this->integrationEntityRepository->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
@@ -84,9 +82,8 @@ class IntegrationEntityModel extends FormModel
         if (!$formattedRecords = $this->formatListOfContacts($mauticContactIds)) {
             return [];
         }
-        $integrationEntityRepo = $this->integrationEntityRepository;
 
-        return $integrationEntityRepo->getIntegrationsEntityId(
+        return $this->integrationEntityRepository->getIntegrationsEntityId(
             $integrationName,
             null,
             $internalObject,

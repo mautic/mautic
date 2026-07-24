@@ -105,16 +105,14 @@ class TrackableModel extends AbstractCommonModel
 
         $redirect = $trackable->getRedirect();
 
-        $redirectModel = $this->redirectModel;
-
-        $trackedUrl = $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+        $trackedUrl = $this->redirectModel->generateRedirectUrl($redirect, $clickthrough);
 
         if ([] !== $utmTags) {
-            $trackedUrl = $redirectModel->applyUtmTags($trackedUrl, $utmTags);
+            $trackedUrl = $this->redirectModel->applyUtmTags($trackedUrl, $utmTags);
         }
 
         if ($shortenUrl) {
-            $trackedUrl = $redirectModel->shortenUrl($trackedUrl);
+            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
         }
 
         return $trackedUrl;

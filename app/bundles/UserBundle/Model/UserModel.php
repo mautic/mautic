@@ -16,7 +16,6 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
 use Mautic\UserBundle\Entity\UserInviteRepository;
-use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
@@ -515,11 +514,6 @@ class UserModel extends FormModel implements GlobalSearchInterface
             'selector' => $selector,
             'verifier' => $verifier,
         ];
-    }
-
-    private function getUserInviteRepository(): UserInviteRepositoryInterface
-    {
-        return $this->userInviteRepository;
     }
 
     private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void

@@ -566,8 +566,7 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo  = $this->stagesChangeLogRepository;
-            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageId   = $this->stagesChangeLogRepository->getCurrentLeadStage($lead->getId());
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
                 /** @var Stage|null $currentStage */

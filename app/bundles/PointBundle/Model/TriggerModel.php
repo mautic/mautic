@@ -112,7 +112,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         // should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
             $events      = $entity->getEvents();
-            $repo        = $this->triggerEventRepository;
+
             $persist     = [];
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
             $pointGroup  = $entity->getGroup();
@@ -153,7 +153,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
                 if (!$isNew) {
                     // get a list of leads that has already had this event applied
-                    $leadIds = $repo->getLeadsForEvent($event->getId());
+                    $leadIds = $this->triggerEventRepository->getLeadsForEvent($event->getId());
                     if (!empty($leadIds)) {
                         $args['filter']['force'][] = [
                             'column' => 'l.id',
@@ -181,7 +181,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             }
 
             if (!empty($persist)) {
-                $repo->saveEntities($persist);
+                $this->triggerEventRepository->saveEntities($persist);
             }
         }
     }
@@ -389,14 +389,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
-        $repo         = $this->triggerEventRepository;
-        $events       = $repo->getPublishedByPointTotal($points);
-        $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());
+        $events       = $this->triggerEventRepository->getPublishedByPointTotal($points);
+        $groupEvents  = $this->triggerEventRepository->getPublishedByGroupScore($lead->getGroupScores());
         $events       = array_merge($events, $groupEvents);
 
         if (!empty($events)) {
             // get a list of actions that has already been applied to this lead
-            $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
+            $appliedEvents = $this->triggerEventRepository->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
             $persist       = [];
 

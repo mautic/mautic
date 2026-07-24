@@ -693,8 +693,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // move all leads from secondary company to main company
-        $companyLeadRepo = $this->companyLeadRepository;
-        $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
+        $secCompanyLeads = $this->companyLeadRepository->getCompanyLeads($secCompanyId);
 
         foreach ($secCompanyLeads as $lead) {
             $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);

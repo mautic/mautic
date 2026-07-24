@@ -1396,13 +1396,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        $emailRepo = $this->emailRepository;
-
         // get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
 
         if (!$ignoreDNC) {
-            $dnc = $emailRepo->getDoNotEmailList($leadIds);
+            $dnc = $this->emailRepository->getDoNotEmailList($leadIds);
 
             foreach ($dnc as $removeMeId => $removeMeEmail) {
                 if ($dncAsError) {
@@ -2159,9 +2157,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $results = [];
         switch ($type) {
             case 'email':
-                $emailRepo = $this->emailRepository;
-                $emailRepo->setCurrentUser($this->userHelper->getUser());
-                $emails = $emailRepo->getEmailList(
+                $this->emailRepository->setCurrentUser($this->userHelper->getUser());
+                $emails = $this->emailRepository->getEmailList(
                     $filter,
                     $limit,
                     $start,

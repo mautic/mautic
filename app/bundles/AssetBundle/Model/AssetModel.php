@@ -385,15 +385,14 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $request   = $this->requestStack->getCurrentRequest();
-                $repo      = $this->assetRepository;
-                $repo->setCurrentUser($this->userHelper->getUser());
+                $this->assetRepository->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
                 if ('mautic_segment_action' === $request->get('_route')
                     && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
                 ) {
                     $limit = 0;
                 }
-                $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
+                $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
                 $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
@@ -473,8 +472,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             return 0;
         }
 
-        $repo = $this->assetRepository;
-        $size = $repo->getAssetSize($assets);
+        $size = $this->assetRepository->getAssetSize($assets);
 
         if ($size) {
             $size = Asset::convertBytesToHumanReadable($size);
