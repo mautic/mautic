@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ScheduleController extends CommonAjaxController
+final class ScheduleController extends CommonAjaxController
 {
     private ReportModel $reportModel;
 
@@ -47,7 +47,6 @@ class ScheduleController extends CommonAjaxController
         /** @var \Mautic\ReportBundle\Entity\Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (empty($report)) {

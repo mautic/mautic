@@ -32,7 +32,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
@@ -59,12 +59,10 @@ class LeadSubscriber implements EventSubscriberInterface
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
-        ?ModelFactory $modelFactory = null,
+        ModelFactory $modelFactory,
         private $isTest = false,
     ) {
-        if ($modelFactory) {
-            $this->setModelFactory($modelFactory);
-        }
+        $this->setModelFactory($modelFactory);
     }
 
     public static function getSubscribedEvents(): array

@@ -12,15 +12,15 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CompanySubscriber implements EventSubscriberInterface
+final readonly class CompanySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly EntityManager $entityManager,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly CompanyLeadRepository $companyLeadRepository,
-        private readonly CompanyModel $companyModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private EntityManager $entityManager,
+        private CoreParametersHelper $coreParametersHelper,
+        private CompanyLeadRepository $companyLeadRepository,
+        private CompanyModel $companyModel,
     ) {
     }
 

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 
-class JsController extends CommonController
+final class JsController extends CommonController
 {
     public function indexAction(
         #[Autowire(param: 'kernel.debug')]
@@ -16,11 +16,10 @@ class JsController extends CommonController
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
-        $dispatcher = $this->dispatcher;
-        $event      = new BuildJsEvent($this->getJsHeader(), $kernelDebug);
+        $event = new BuildJsEvent($this->getJsHeader(), $kernelDebug);
 
-        if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
+        if ($this->dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
         return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);

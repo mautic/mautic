@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class RoleController extends FormController
+final class RoleController extends FormController
 {
     private const PERMISSION_VIEW = 'user:roles:view';
 
@@ -449,7 +449,6 @@ class RoleController extends FormController
     private function getPermissionsConfig(Entity\Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
-        $translator        = $this->translator;
         $permissionRepo    = $this->doctrine->getRepository(Entity\Permission::class);
         \assert($permissionRepo instanceof PermissionRepository);
 
@@ -465,7 +464,7 @@ class RoleController extends FormController
 
             if ($object->isEnabled()) {
                 $bundle = $object->getName();
-                $label  = $translator->trans("mautic.{$bundle}.permissions.header");
+                $label  = $this->translator->trans("mautic.{$bundle}.permissions.header");
 
                 // convert the permission bits from the db into readable names
                 $data = $object->convertBitsToPermissionNames($permissionsArray);

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GeneratedColumnSubscriber implements EventSubscriberInterface
+final class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

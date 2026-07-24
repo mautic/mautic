@@ -791,9 +791,7 @@ class FieldModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        $contactRepository = $this->leadRepository;
-
-        return $contactRepository->getValueList($type, $filter, $limit);
+        return $this->leadRepository->getValueList($type, $filter, $limit);
     }
 
     /**
