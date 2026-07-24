@@ -20,22 +20,22 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @var array
      */
-    protected $selected = [];
+    private $selected = [];
 
     /**
      * @var array
      */
-    protected $choices = [];
+    private $choices = [];
 
     /**
      * @param ModelFactory<object>               $modelFactory
      * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
-        protected ModelFactory $modelFactory,
-        protected TranslatorInterface $translator,
-        protected Connection $connection,
-        protected $options = [],
+        private ModelFactory $modelFactory,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private $options = [],
     ) {
         if (is_array($options)) {
             $options = (new OptionsResolver())->setDefaults($options);
@@ -89,7 +89,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * @return array
      */
-    protected function getChoices($data = null, $includeNew = false)
+    private function getChoices($data = null, $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
@@ -153,7 +153,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array
      */
-    protected function prepareChoices($choices)
+    private function prepareChoices($choices)
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -189,7 +189,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    protected function fetchChoices($modelName, $data = [])
+    private function fetchChoices($modelName, $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
@@ -244,7 +244,7 @@ final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    protected function formatChoices(array &$choices): void
+    private function formatChoices(array &$choices): void
     {
         $firstKey = array_key_first($choices);
 
