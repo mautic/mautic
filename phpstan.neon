@@ -225,8 +225,5 @@ rules:
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
-<<<<<<< HEAD
 	#- Utils\PHPStan\Rule\NoContainerGetRule
-=======
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
->>>>>>> ae19446fe3 ([phpstan] add rule to forbid entity manager getRepository() with entity class constant)
