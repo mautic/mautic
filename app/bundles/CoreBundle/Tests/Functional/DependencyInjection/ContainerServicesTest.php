@@ -6,11 +6,24 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 final class ContainerServicesTest extends TestCase
 {
+    /**
+     * Snapshots of how many controllers, commands and event subscribers the container holds.
+     * Bump them when such a service is added or removed.
+     */
+    private const EXPECTED_CONTROLLER_COUNT = 155;
+
+    private const EXPECTED_COMMAND_COUNT = 195;
+
+    private const EXPECTED_EVENT_SUBSCRIBER_COUNT = 368;
+
     /**
      * Services that cannot be created in a test environment, or that are broken on purpose to keep this test green.
      *
@@ -78,19 +91,41 @@ final class ContainerServicesTest extends TestCase
 
         $failedServiceIds = [];
 
+        // the same service can be registered under an alias too, so keep them unique per instance
+        $controllers      = [];
+        $commands         = [];
+        $eventSubscribers = [];
+
         foreach ($serviceIds as $serviceId) {
             if (in_array($serviceId, self::SKIPPED_SERVICE_IDS, true)) {
                 continue;
             }
 
             try {
-                $testContainer->get($serviceId);
+                $service = $testContainer->get($serviceId);
             } catch (\Throwable $throwable) {
                 $failedServiceIds[] = sprintf('%s: %s', $serviceId, $throwable->getMessage());
+                continue;
+            }
+
+            if ($service instanceof AbstractController) {
+                $controllers[spl_object_id($service)] = $serviceId;
+            }
+
+            if ($service instanceof Command) {
+                $commands[spl_object_id($service)] = $serviceId;
+            }
+
+            if ($service instanceof EventSubscriberInterface) {
+                $eventSubscribers[spl_object_id($service)] = $serviceId;
             }
         }
 
         $this->assertSame([], $failedServiceIds);
+
+        $this->assertCount(self::EXPECTED_CONTROLLER_COUNT, $controllers);
+        $this->assertCount(self::EXPECTED_COMMAND_COUNT, $commands);
+        $this->assertCount(self::EXPECTED_EVENT_SUBSCRIBER_COUNT, $eventSubscribers);
 
         $kernel->shutdown();
     }
