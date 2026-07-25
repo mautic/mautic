@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ClearbitController extends FormController
+final class ClearbitController extends FormController
 {
     private CompanyModel $companyModel;
 

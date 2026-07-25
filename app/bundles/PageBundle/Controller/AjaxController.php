@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
 

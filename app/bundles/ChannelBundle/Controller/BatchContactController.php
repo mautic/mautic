@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchContactController extends AbstractFormController
+final class BatchContactController extends AbstractFormController
 {
     public function __construct(
         private readonly ChannelActionModel $channelActionModel,

@@ -411,11 +411,9 @@ class SubmissionModel extends CommonFormModel
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
-        $submissionRepository = $this->getRepository();
-
         // deleting form submission record in form results table
         try {
-            $submissionRepository->deleteFormResultsTableRecord($submission);
+            $this->submissionRepository->deleteFormResultsTableRecord($submission);
         } catch (\Exception $e) {
             $this->logger->error($e);
         }
@@ -431,11 +429,9 @@ class SubmissionModel extends CommonFormModel
     public function deleteEntities($ids): array
     {
         if (!empty($ids)) {
-            $submissionRepository = $this->getRepository();
-
             // deleting form submission record in form results table
             try {
-                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+                $this->submissionRepository->batchDeleteFormResultsTableRecord($ids);
             } catch (\Exception $e) {
                 $this->logger->error($e);
             }
@@ -451,7 +447,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->getRepository()->getEntities($args);
+        return $this->submissionRepository->getEntities($args);
     }
 
     /**
@@ -461,7 +457,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntitiesByPage(array $args = []): array
     {
-        return $this->getRepository()->getEntitiesByPage($args);
+        return $this->submissionRepository->getEntitiesByPage($args);
     }
 
     /**
@@ -1115,15 +1111,11 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // Set owner
-        $userRepo = $this->userRepository;
-        \assert($userRepo instanceof UserRepository);
-
         $user = null;
         if (!empty($data['ownerbyemail'])) {
-            $user = $userRepo->findOneBy(['email' => $data['ownerbyemail']]);
+            $user = $this->userRepository->findOneBy(['email' => $data['ownerbyemail']]);
         } elseif (!empty($data['ownerbyid'])) {
-            $user = $userRepo->find($data['ownerbyid']);
+            $user = $this->userRepository->find($data['ownerbyid']);
         }
 
         if ($user instanceof User) {

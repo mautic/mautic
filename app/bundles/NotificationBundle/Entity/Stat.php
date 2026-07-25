@@ -7,6 +7,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
@@ -28,7 +29,7 @@ class Stat
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
+     * @var LeadList|null
      */
     private $list;
 
@@ -114,7 +115,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -300,7 +301,7 @@ class Stat
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadList|null
+     * @return LeadList|null
      */
     public function getList()
     {
