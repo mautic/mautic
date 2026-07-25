@@ -68,6 +68,14 @@ final class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private LeadRepository $leadRepository;
+
     private NoteModel $noteModel;
 
     private CampaignModel $campaignModel;
@@ -97,6 +105,10 @@ final class LeadController extends FormController
         NoteModel $noteModel,
         FieldModel $leadFieldModel,
         UserModel $userModel,
+        LeadRepository $leadRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -107,6 +119,10 @@ final class LeadController extends FormController
         $this->noteModel = $noteModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->userModel = $userModel;
+        $this->leadRepository = $leadRepository;
+        $this->companyRepository = $companyRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -245,7 +261,7 @@ final class LeadController extends FormController
         }
 
         // Get the max ID of the latest lead added
-        $maxLeadId = $this->leadModel->getRepository()->getMaxLeadId();
+        $maxLeadId = $this->leadRepository->getMaxLeadId();
 
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
@@ -402,7 +418,7 @@ final class LeadController extends FormController
             );
         }
 
-        $this->leadModel->getRepository()->refetchEntity($lead);
+        $this->leadRepository->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -430,7 +446,7 @@ final class LeadController extends FormController
         $fields            = $lead->getFields();
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        $companiesRepo = $this->companyModel->getRepository();
+        $companiesRepo = $this->companyRepository;
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
@@ -453,7 +469,7 @@ final class LeadController extends FormController
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
+        $lists = $this->leadListRepository->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -1911,7 +1927,7 @@ final class LeadController extends FormController
                 ]
             );
         }
-        $users = $this->userModel->getRepository()->getUserList('', 0);
+        $users = $this->userRepository->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];

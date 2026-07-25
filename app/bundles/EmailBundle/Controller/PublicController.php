@@ -43,6 +43,8 @@ final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+
     private EmailModel $emailModel;
 
     private LeadModel $leadModel;
@@ -51,9 +53,11 @@ final class PublicController extends CommonFormController
     public function autowirePublicController(
         LeadModel $leadModel,
         EmailModel $emailModel,
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
+        $this->leadRepository = $leadRepository;
     }
 
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
@@ -185,8 +189,7 @@ final class PublicController extends CommonFormController
                 // share the same session/device and the contact is known.
                 $successSessionName .= ".{$lead->getId()}";
             } elseif (empty($stat)) {
-                $leadRepo = $leadModel->getRepository();
-                $contacts = $leadRepo->getContactsByEmail($urlEmail);
+                $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
                 $lead     = null;
                 if (is_array($contacts) && count($contacts) > 0) {
                     $lead  = array_pop($contacts);
@@ -506,7 +509,7 @@ final class PublicController extends CommonFormController
         if ($contactId) {
             // We have one from request parameter
             /** @var LeadModel $leadModel */
-            $contact = $leadModel->getRepository()->getLead($contactId);
+            $contact = $this->leadRepository->getLead($contactId);
             $contact = $model->enrichedContactWithCompanies($contact);
         } else {
             // Make fake contact.
@@ -607,7 +610,7 @@ final class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails    = explode(';', $query['email']);
-        $repo = $this->leadModel->getRepository();
+        $repo = $this->leadRepository;
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);

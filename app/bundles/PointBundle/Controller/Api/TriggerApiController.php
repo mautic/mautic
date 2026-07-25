@@ -45,6 +45,7 @@ class TriggerApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         TriggerModel $triggerModel,
         private readonly TriggerEventModel $triggerEventModel,
+        private readonly \Mautic\PointBundle\Entity\TriggerRepository $triggerRepository,
     ) {
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
@@ -75,7 +76,7 @@ class TriggerApiController extends CommonApiController
 
             // Save the entitz first to get the ID.
             // Using the repository function to not trigger the listeners twice.
-            $this->model->getRepository()->saveEntity($entity);
+            $this->triggerRepository->saveEntity($entity);
         }
 
         $requestTriggerIds = [];
