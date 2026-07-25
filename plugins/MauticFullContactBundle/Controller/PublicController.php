@@ -2,31 +2,35 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        NotificationModel $notificationModel,
         UserModel $userModel,
     ): void {
         $this->leadModel = $leadModel;

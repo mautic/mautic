@@ -13,6 +13,7 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\RedirectModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageModelTest extends MauticMysqlTestCase
@@ -92,7 +93,7 @@ final class PageModelTest extends MauticMysqlTestCase
         return $result;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
+    #[DataProvider('pageHitBotScenariosProvider')]
     public function testItNotRegistersPageHitsFromBot(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();
@@ -177,7 +178,7 @@ final class PageModelTest extends MauticMysqlTestCase
         yield 'Permanently blocked User Agent' => ['test_hash_bot_ratio_10', '-80 second', 'MSNBOT', self::IP_NOT_IN_ANY_BLOCK_LIST2, false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
+    #[DataProvider('pageHitBotScenariosProvider')]
     public function testRedirect(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();

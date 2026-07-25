@@ -15,7 +15,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,18 +39,18 @@ class PluginModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private readonly \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository,
-        private readonly \Mautic\PluginBundle\Entity\IntegrationEntityRepository $integrationEntityRepository,
+        private readonly PluginRepository $pluginRepository,
+        private readonly IntegrationEntityRepository $integrationEntityRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PluginBundle\Entity\PluginRepository
+    public function getRepository(): PluginRepository
     {
         return $this->pluginRepository;
     }
 
-    public function getIntegrationEntityRepository(): \Mautic\PluginBundle\Entity\IntegrationEntityRepository
+    public function getIntegrationEntityRepository(): IntegrationEntityRepository
     {
         return $this->integrationEntityRepository;
     }

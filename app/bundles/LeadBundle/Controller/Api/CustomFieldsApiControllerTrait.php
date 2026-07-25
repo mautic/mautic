@@ -12,10 +12,11 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait CustomFieldsApiControllerTrait
 {
-    private ?RequestStack $requestStack = null;
+    private RequestStack $requestStack;
 
     /**
      * @var mixed[]
@@ -208,7 +209,7 @@ trait CustomFieldsApiControllerTrait
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function setRequestStack(
         RequestStack $requestStack,
     ): void {

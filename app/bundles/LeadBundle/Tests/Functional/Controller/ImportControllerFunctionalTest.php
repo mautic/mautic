@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -79,7 +80,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         yield [true,  '4 lines were processed, 2 items created, 1 items updated, 1 items ignored'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataImportCSV')]
+    #[DataProvider('dataImportCSV')]
     public function testImportCSV(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV();
@@ -181,7 +182,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         yield [true,  '7 lines were processed, 1 items created, 1 items updated, 5 items ignored'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataImportWithInvalidDates')]
+    #[DataProvider('dataImportWithInvalidDates')]
     public function testImportWithInvalidDates(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV([

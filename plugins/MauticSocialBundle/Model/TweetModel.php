@@ -13,8 +13,10 @@ use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Tweet>
@@ -27,7 +29,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     private TweetRepository $tweetRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
     {
         $this->tweetRepository = $tweetRepository;
@@ -52,9 +54,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $filter = '';
                 }
 
-                $tweetRepo = $this->getRepository();
-                $tweetRepo->setCurrentUser($this->userHelper->getUser());
-                $entities = $tweetRepo->getTweetList(
+                $this->tweetRepository->setCurrentUser($this->userHelper->getUser());
+                $entities = $this->tweetRepository->getTweetList(
                     $filter,
                     $limit,
                     $start,
@@ -84,10 +85,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      */
     public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
-        $statRepo = $this->getStatRepository();
-
         // Update failed tweet
-        $stat = $statRepo->findOneBy(
+        $stat = $this->tweetStatRepository->findOneBy(
             [
                 'lead'     => $lead->getId(),
                 'tweet'    => $tweet->getId(),
@@ -126,7 +125,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $stat->setIsFailed(true);
         }
 
-        $statRepo->saveEntity($stat);
+        $this->tweetStatRepository->saveEntity($stat);
 
         return $this;
     }
@@ -135,7 +134,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet        $entity
      * @param array<mixed> $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);

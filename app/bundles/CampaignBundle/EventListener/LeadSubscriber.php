@@ -18,14 +18,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EventCollector $eventCollector,
-        private readonly TranslatorInterface $translator,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly RouterInterface $router,
-        private readonly EventRepository $eventRepository,
+        private EventCollector $eventCollector,
+        private TranslatorInterface $translator,
+        private EntityManagerInterface $entityManager,
+        private RouterInterface $router,
+        private EventRepository $eventRepository,
     ) {
     }
 

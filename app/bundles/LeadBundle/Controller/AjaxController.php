@@ -34,8 +34,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;
@@ -46,7 +47,7 @@ class AjaxController extends CommonAjaxController
 
     private EmailModel $emailModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireLeadAjaxController(
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
@@ -445,9 +446,8 @@ class AjaxController extends CommonAjaxController
             $session    = $request->getSession();
             $search     = $session->get('mautic.lead.filter', '');
             $filter     = ['string' => $search, 'force' => []];
-            $translator = $this->translator;
-            $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-            $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+            $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+            $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
             $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
             $session->set('mautic.lead.indexmode', $indexMode);

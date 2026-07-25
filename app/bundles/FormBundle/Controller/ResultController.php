@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+final class ResultController extends CommonFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -58,7 +58,6 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -241,7 +240,7 @@ class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 

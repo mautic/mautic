@@ -9,6 +9,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
@@ -159,16 +161,16 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    private function createAndLoginUser(): \Mautic\UserBundle\Entity\User
+    private function createAndLoginUser(): User
     {
         // Create non-admin role
-        $role = new \Mautic\UserBundle\Entity\Role();
+        $role = new Role();
         $role->setName('Test Role');
         $role->setIsAdmin(false);
         $this->em->persist($role);
 
         // Create non-admin user
-        $user = new \Mautic\UserBundle\Entity\User();
+        $user = new User();
         $user->setFirstName('Test');
         $user->setLastName('User');
         $user->setUsername('testuser');

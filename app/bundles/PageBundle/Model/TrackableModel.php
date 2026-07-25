@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
@@ -71,12 +72,12 @@ class TrackableModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly TrackableRepository $trackableRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
+    public function getRepository(): TrackableRepository
     {
         return $this->trackableRepository;
     }
@@ -104,16 +105,14 @@ class TrackableModel extends AbstractCommonModel
 
         $redirect = $trackable->getRedirect();
 
-        $redirectModel = $this->getRedirectModel();
-
-        $trackedUrl = $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+        $trackedUrl = $this->redirectModel->generateRedirectUrl($redirect, $clickthrough);
 
         if ([] !== $utmTags) {
-            $trackedUrl = $redirectModel->applyUtmTags($trackedUrl, $utmTags);
+            $trackedUrl = $this->redirectModel->applyUtmTags($trackedUrl, $utmTags);
         }
 
         if ($shortenUrl) {
-            $trackedUrl = $redirectModel->shortenUrl($trackedUrl);
+            $trackedUrl = $this->redirectModel->shortenUrl($trackedUrl);
         }
 
         return $trackedUrl;
@@ -133,11 +132,11 @@ class TrackableModel extends AbstractCommonModel
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);
 
-        $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
+        $trackable = $this->trackableRepository->findByUrl($url, $channel, $channelId);
         if (null == $trackable) {
             $trackable = $this->createTrackableEntity($url, $channel, $channelId);
-            $this->getRepository()->saveEntity($trackable->getRedirect());
-            $this->getRepository()->saveEntity($trackable);
+            $this->trackableRepository->saveEntity($trackable->getRedirect());
+            $this->trackableRepository->saveEntity($trackable);
         }
 
         return $trackable;
@@ -154,7 +153,7 @@ class TrackableModel extends AbstractCommonModel
             array_values($urls)
         );
 
-        $trackables = $this->getRepository()->findByUrls(
+        $trackables = $this->trackableRepository->findByUrls(
             $uniqueUrls,
             $channel,
             $channelId
@@ -195,10 +194,10 @@ class TrackableModel extends AbstractCommonModel
 
         // Save new entities
         if (count($newRedirects)) {
-            $this->getRepository()->saveEntities($newRedirects);
+            $this->trackableRepository->saveEntities($newRedirects);
         }
         if (count($newTrackables)) {
-            $this->getRepository()->saveEntities($newTrackables);
+            $this->trackableRepository->saveEntities($newTrackables);
         }
 
         unset($trackables, $newRedirects, $newTrackables, $byUrl);
@@ -213,7 +212,7 @@ class TrackableModel extends AbstractCommonModel
      */
     public function getTrackableList($channel, $channelId): array
     {
-        return $this->getRepository()->findByChannel($channel, $channelId);
+        return $this->trackableRepository->findByChannel($channel, $channelId);
     }
 
     /**
@@ -402,7 +401,7 @@ class TrackableModel extends AbstractCommonModel
 
     protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
-        $redirect = $this->getRedirectModel()->createRedirectEntity($url);
+        $redirect = $this->redirectModel->createRedirectEntity($url);
 
         $trackable = new Trackable();
         $trackable->setChannel($channel)
@@ -627,7 +626,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Simple redirects
-        return $this->getRedirectModel()->getRedirectsByUrls($trackableUrls);
+        return $this->redirectModel->getRedirectsByUrls($trackableUrls);
     }
 
     /**

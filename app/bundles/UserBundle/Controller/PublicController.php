@@ -14,12 +14,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         UserModel $userModel,
     ): void {

@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class MessageController extends AbstractStandardFormController
+final class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 

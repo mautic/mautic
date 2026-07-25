@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FieldController extends CommonFormController
+final class FieldController extends CommonFormController
 {
     public function __construct(
         private readonly FormModel $formModel,
@@ -48,7 +48,6 @@ class FieldController extends CommonFormController
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

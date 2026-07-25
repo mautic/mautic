@@ -35,10 +35,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
@@ -46,7 +47,7 @@ class PublicController extends CommonFormController
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         LeadModel $leadModel,
         EmailModel $emailModel,
@@ -310,7 +311,7 @@ class PublicController extends CommonFormController
     {
         $request->attributes->set('unsubscribe_all', 1);
 
-        return $this->forward(static::class.'::unsubscribeAction', [
+        return $this->forward(self::class.'::unsubscribeAction', [
             'request'    => $request,
             'idHash'     => $idHash,
             'urlEmail'   => $urlEmail,
@@ -674,7 +675,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead(string $email, $repo): ?Lead
+    private function createLead(string $email, \Mautic\LeadBundle\Entity\LeadRepository $repo): ?array
     {
         $lead  = $this->leadModel->getEntity();
         // set custom field values

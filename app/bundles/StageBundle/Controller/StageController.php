@@ -13,12 +13,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class StageController extends AbstractFormController
+final class StageController extends AbstractFormController
 {
     private StageModel $stageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireStageController(
         StageModel $stageModel,
     ): void {

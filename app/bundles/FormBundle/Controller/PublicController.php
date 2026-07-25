@@ -22,14 +22,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
     private SubmissionModel $submissionModel;
 
     private FormModel $formModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         FormModel $formModel,
         SubmissionModel $submissionModel,

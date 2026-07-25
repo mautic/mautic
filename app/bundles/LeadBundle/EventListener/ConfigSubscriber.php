@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Form\Type\ConfigType;
 use Mautic\LeadBundle\Form\Type\SegmentConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

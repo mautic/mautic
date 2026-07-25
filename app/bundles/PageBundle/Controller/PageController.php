@@ -25,14 +25,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PageController extends FormController
+final class PageController extends FormController
 {
     use FormErrorMessagesTrait;
 
     private PageModel $pageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePageController(PageModel $pageModel): void
     {
         $this->pageModel = $pageModel;
@@ -104,12 +105,10 @@ class PageController extends FormController
             ];
         }
 
-        $translator = $this->translator;
-
         // do not list variants in the main list
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
-        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
+        $langSearchCommand = $this->translator->trans('mautic.core.searchcommand.lang');
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
