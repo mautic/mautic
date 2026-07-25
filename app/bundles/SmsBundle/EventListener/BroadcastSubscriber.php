@@ -7,10 +7,10 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\SmsBundle\Broadcast\BroadcastExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly BroadcastExecutioner $broadcastExecutioner,
+        private BroadcastExecutioner $broadcastExecutioner,
     ) {
     }
 

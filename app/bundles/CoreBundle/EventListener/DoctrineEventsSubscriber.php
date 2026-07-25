@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\SequenceGenerator;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsDoctrineListener(Events::loadClassMetadata)]
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
-class DoctrineEventsSubscriber
+final class DoctrineEventsSubscriber
 {
     private array $deprecatedEntityTables = [];
 
@@ -36,7 +37,7 @@ class DoctrineEventsSubscriber
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata */
+        /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy.
@@ -72,7 +73,7 @@ class DoctrineEventsSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
+                if (ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];

@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -149,8 +151,8 @@ final class ConfigFormTest extends KernelTestCase
                 ->willReturnMap(
                     [
                         [Plugin::class, $pluginRepository],
-                        [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
-                        [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        [Integration::class, $integrationRepository],
+                        [IntegrationEntity::class, $integrationEntityRepository],
                     ]
                 );
 

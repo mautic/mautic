@@ -63,16 +63,15 @@ class CommonController extends AbstractController implements MauticController
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         private FlashBag $flashBag,
-        private ?RequestStack $requestStack,
-        protected ?CorePermissions $security,
+        private RequestStack $requestStack,
+        protected CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-
+        $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             throw new \RuntimeException('Request is not set.');
         }

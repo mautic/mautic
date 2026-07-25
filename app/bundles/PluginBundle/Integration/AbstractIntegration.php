@@ -34,6 +34,7 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -75,7 +76,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
@@ -336,7 +337,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function mergeApiKeys($mergeKeys, $withKeys = [], $return = false)
     {
-        $settings = $this->settings;
         if (empty($withKeys)) {
             $withKeys = $this->keys;
         }
@@ -359,10 +359,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
             return $this->keys;
         }
-        $this->encryptAndSetApiKeys($withKeys, $settings);
+        $this->encryptAndSetApiKeys($withKeys, $this->settings);
 
         // reset for events that depend on rebuilding auth objects
-        $this->setIntegrationSettings($settings);
+        $this->setIntegrationSettings($this->settings);
     }
 
     /**
@@ -403,9 +403,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         static $decryptedKeys = [];
 
-        if (!$entity) {
-            $entity = $this->settings;
-        }
+        $entity = $entity ?: $this->settings;
 
         $keys = $entity->getApiKeys();
 
@@ -1692,7 +1690,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
 
@@ -1715,7 +1712,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
@@ -1750,7 +1747,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     null,
                     $this->getDisplayName()
                 ));
-                $leadModel->saveEntity($lead, false);
+                $this->leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
                 $this->logger->warning($exception->getMessage());
 
@@ -1918,11 +1915,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
     {
-        $logger = $this->logger;
-
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->em->getRepository(User::class)->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1986,7 +1981,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $this->logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**

@@ -132,10 +132,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     public function getRepository(): PageRepository
     {
-        $repo = $this->pageRepository;
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->pageRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->pageRepository;
     }
 
     public function getHitRepository(): HitRepository
@@ -544,8 +543,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->emailRepository;
-                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
             }
@@ -609,12 +607,12 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $lastHit = $request->cookies->get('mautic_referer_id');
         if (!empty($lastHit) && is_numeric($lastHit)) {
             // Update the last hit with the date/time the user left
-            $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
+            $this->hitRepository->updateHitDateLeft((int) $lastHit);
         }
 
         // Check if this is a unique page hit
         $trackingId = $hit->getTrackingId();
-        $isUnique   = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
+        $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
         if (!empty($page)) {
             if ($page instanceof Page) {
@@ -776,7 +774,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
-        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
+        return $this->hitRepository->getBounces($page->getId(), $fromDate);
     }
 
     /**
@@ -909,7 +907,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
-        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
         $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
@@ -1086,8 +1084,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->utmTagRepository;
-            $repo->saveEntity($utmTags);
+            $this->utmTagRepository->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
         }
