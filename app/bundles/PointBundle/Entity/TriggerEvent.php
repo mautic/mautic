@@ -318,6 +318,6 @@ class TriggerEvent implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getTrigger()->getCreatedBy();
+        return $this->trigger->getCreatedBy();
     }
 }
