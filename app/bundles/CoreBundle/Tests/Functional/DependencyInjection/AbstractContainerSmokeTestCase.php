@@ -6,26 +6,13 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
-final class ContainerServicesTest extends TestCase
+abstract class AbstractContainerSmokeTestCase extends TestCase
 {
     /**
-     * Snapshots of how many controllers, commands and event subscribers the container holds.
-     * Bump them when such a service is added or removed.
-     */
-    private const EXPECTED_CONTROLLER_COUNT = 155;
-
-    private const EXPECTED_COMMAND_COUNT = 195;
-
-    private const EXPECTED_EVENT_SUBSCRIBER_COUNT = 368;
-
-    /**
-     * Services that cannot be created in a test environment, or that are broken on purpose to keep this test green.
+     * Services that cannot be created in a test environment, or that are broken on purpose to keep these tests green.
      *
      * @var string[]
      */
@@ -68,14 +55,11 @@ final class ContainerServicesTest extends TestCase
         'oneup_uploader.controller.dropzone.class',
     ];
 
-    public function testEveryServiceCanBeCreated(): void
+    /**
+     * @return string[][]
+     */
+    private function resolveServiceIds(Container $container): array
     {
-        $kernel = new TestKernel();
-        $kernel->boot();
-
-        /** @var Container $container */
-        $container = $kernel->getContainer();
-
         /** @var ServiceProviderInterface $privateServiceLocator */
         $privateServiceLocator = $container->get('test.private_services_locator');
 
@@ -83,18 +67,39 @@ final class ContainerServicesTest extends TestCase
             ...$container->getServiceIds(),
             ...array_keys($privateServiceLocator->getProvidedServices()),
         ]);
+
         sort($serviceIds);
+
+        return $serviceIds;
+    }
+
+    private function buildContainer(): Container
+    {
+        $kernel = new TestKernel();
+        $kernel->boot();
+
+        /** @var Container $container */
+        $container = $kernel->getContainer();
+
+        return $container;
+    }
+
+    /**
+     * Creates every service in the container, unique per instance, as the same service can be registered under an alias too.
+     *
+     * @return array<int, object>
+     */
+    protected function createAllServices(): array
+    {
+        $container = $this->buildContainer();
+        $serviceIds = $this->resolveServiceIds($container);
 
         // the test container resolves private services as well
         /** @var ContainerInterface $testContainer */
         $testContainer = $container->get('test.service_container');
 
+        $services         = [];
         $failedServiceIds = [];
-
-        // the same service can be registered under an alias too, so keep them unique per instance
-        $controllers      = [];
-        $commands         = [];
-        $eventSubscribers = [];
 
         foreach ($serviceIds as $serviceId) {
             if (in_array($serviceId, self::SKIPPED_SERVICE_IDS, true)) {
@@ -108,25 +113,13 @@ final class ContainerServicesTest extends TestCase
                 continue;
             }
 
-            if ($service instanceof AbstractController) {
-                $controllers[spl_object_id($service)] = $serviceId;
-            }
-
-            if ($service instanceof Command) {
-                $commands[spl_object_id($service)] = $serviceId;
-            }
-
-            if ($service instanceof EventSubscriberInterface) {
-                $eventSubscribers[spl_object_id($service)] = $serviceId;
+            if (is_object($service)) {
+                $services[spl_object_id($service)] = $service;
             }
         }
 
         $this->assertSame([], $failedServiceIds);
 
-        $this->assertCount(self::EXPECTED_CONTROLLER_COUNT, $controllers);
-        $this->assertCount(self::EXPECTED_COMMAND_COUNT, $commands);
-        $this->assertCount(self::EXPECTED_EVENT_SUBSCRIBER_COUNT, $eventSubscribers);
-
-        $kernel->shutdown();
+        return $services;
     }
 }
