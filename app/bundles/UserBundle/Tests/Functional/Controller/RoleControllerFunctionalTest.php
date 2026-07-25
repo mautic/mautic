@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -65,6 +67,9 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $role = new Role();
         $role->setName('Original Role');
         $role->setDescription('Original Description');
+        $role->setRawPermissions([
+            'user:roles' => ['view', 'edit'],
+        ]);
 
         $this->em->persist($role);
         $this->em->flush();
@@ -87,6 +92,63 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
         $rolesAfterCount = $this->em->getRepository(Role::class)->count([]);
         $this->assertSame($rolesBefore + 1, $rolesAfterCount);
+
+        $clonedRole = $this->em->getRepository(Role::class)->findOneBy(['name' => $newName]);
+        $this->assertInstanceOf(Role::class, $clonedRole);
+        $this->assertSame($role->getRawPermissions(), $clonedRole->getRawPermissions());
+    }
+
+    public function testCloneRoleActionReturnsToTheListWhenCancelled(): void
+    {
+        $role = new Role();
+        $role->setName('Role not cloned');
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
+        $cancelButton = $crawler->selectButton('role[buttons][cancel]');
+
+        $this->client->submit($cancelButton->form());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($rolesBefore, $this->em->getRepository(Role::class)->count([]));
+    }
+
+    public function testCloneRoleActionReportsMissingRole(): void
+    {
+        $missingRoleId = 999999;
+
+        $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$missingRoleId);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString(
+            sprintf('Role not found with an ID of <strong>%d</strong>.', $missingRoleId),
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testCloneRoleActionRequiresCreatePermission(): void
+    {
+        $role = new Role();
+        $role->setName('Role viewer');
+
+        $permission = new Permission();
+        $permission->setBundle('user');
+        $permission->setName('roles');
+        $permission->setRole($role);
+        $permission->setBitwise(4);
+
+        $user = $this->createUser('role_viewer', $role);
+        $this->em->persist($role);
+        $this->em->persist($permission);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testIndexActionCanSortByUserCount(): void
