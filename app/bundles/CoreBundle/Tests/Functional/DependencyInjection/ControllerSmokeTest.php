@@ -13,11 +13,10 @@ final class ControllerSmokeTest extends AbstractContainerSmokeTestCase
 
     public function testAllControllersCanBeCreated(): void
     {
-        // vendor controllers are out of scope, and not all Mautic controllers extend the Symfony one
+        // not all Mautic controllers extend the Symfony one, so match the class name
         $controllers = array_filter(
             $this->createAllServices(),
-            static fn (object $service): bool => str_ends_with($service::class, 'Controller')
-                && (str_starts_with($service::class, 'Mautic\\') || str_starts_with($service::class, 'MauticPlugin\\'))
+            fn (object $service): bool => str_ends_with($service::class, 'Controller') && $this->isLocalService($service)
         );
 
         $this->assertGreaterThanOrEqual(self::MINIMAL_CONTROLLER_COUNT, count($controllers));

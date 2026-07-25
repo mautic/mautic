@@ -122,4 +122,12 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
 
         return $services;
     }
+
+    /**
+     * Vendor services are out of scope, only the Mautic ones are.
+     */
+    protected function isLocalService(object $service): bool
+    {
+        return str_starts_with($service::class, 'Mautic\\') || str_starts_with($service::class, 'MauticPlugin\\');
+    }
 }
