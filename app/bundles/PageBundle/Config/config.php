@@ -74,7 +74,7 @@ return [
             'items' => [
                 'mautic.page.pages' => [
                     'route'    => 'mautic_page_index',
-                    'access'   => ['page:pages:viewown', 'page:pages:viewother'],
+                    'access'   => ['page:pages:viewown', 'page:pages:viewsamerole', 'page:pages:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 100,
                 ],

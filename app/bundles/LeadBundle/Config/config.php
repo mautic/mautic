@@ -290,7 +290,7 @@ return [
             'items' => [
                 'mautic.lead.leads' => [
                     'iconClass' => 'ri-user-6-fill',
-                    'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
+                    'access'    => ['lead:leads:viewown', 'lead:leads:viewsamerole', 'lead:leads:viewother'],
                     'route'     => 'mautic_contact_index',
                     'priority'  => 80,
                 ],
@@ -302,7 +302,7 @@ return [
                 ],
                 'mautic.lead.list.menu.index' => [
                     'iconClass' => 'ri-pie-chart-fill',
-                    'access'    => ['lead:lists:viewown', 'lead:lists:viewother'],
+                    'access'    => ['lead:lists:viewown', 'lead:lists:viewsamerole', 'lead:lists:viewother'],
                     'route'     => 'mautic_segment_index',
                     'priority'  => 70,
                 ],

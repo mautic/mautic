@@ -28,6 +28,7 @@ use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\UserBundle\Entity\User;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -752,9 +753,26 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     public function getReportsWithGraphs(): array
     {
-        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
+        return $this->reportRepository->findReportsWithGraphs($this->getReportOwnerFilter());
+    }
 
-        return $this->reportRepository->findReportsWithGraphs($ownedBy);
+    /**
+     * @return int|int[]|null
+     */
+    private function getReportOwnerFilter(): int|array|null
+    {
+        if ($this->security->isGranted('report:reports:viewother')) {
+            return null;
+        }
+
+        $user = $this->userHelper->getUser();
+        if (!is_object($user) || !$this->security->isGranted('report:reports:viewsamerole') || null === $user->getRole()) {
+            return is_object($user) ? $user->getId() : 0;
+        }
+
+        $userIds = $this->em->getRepository(User::class)->findUserIdsByRole($user->getRole()->getId());
+
+        return $userIds ?: $user->getId();
     }
 
     /**

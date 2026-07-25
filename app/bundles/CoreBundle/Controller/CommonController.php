@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,7 +38,11 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    protected ?\Mautic\UserBundle\Entity\User $user;
+    private const VIEW_SAME_ROLE_SUFFIX = ':viewsamerole';
+
+    private const VIEW_OTHER_SUFFIX     = ':viewother';
+
+    protected ?User $user;
 
     private PageModel $pageModel;
 
@@ -736,5 +741,156 @@ class CommonController extends AbstractController implements MauticController
     protected function getDefaultOrderDirection()
     {
         return 'ASC';
+    }
+
+    /**
+     * Helper: add role-based filtering to entity lists.
+     * - If view-other is granted, does nothing.
+     * - Else if view-same-role is granted, limits to users of the current role.
+     * - Else limits to current user.
+     * Always writes into 'where' so role constraints are not ignored when other where clauses exist.
+     *
+     * @param array<string, mixed>             $filter
+     * @param array<string, bool>              $permissions
+     * @param array<int, array<string, mixed>> $extraOrConditions
+     */
+    protected function addRoleBasedFilter(array &$filter, array $permissions, string $viewOtherKey, ?string $viewSameRoleKey, string $column, array $extraOrConditions = []): void
+    {
+        if (!empty($permissions[$viewOtherKey])) {
+            return;
+        }
+
+        $orConditions = $this->getRoleBasedOrConditions(
+            $this->getRoleBasedUserIds($permissions, $viewSameRoleKey),
+            $column
+        );
+
+        if ([] !== $extraOrConditions) {
+            $orConditions = array_merge($orConditions, $extraOrConditions);
+        }
+
+        $this->appendRoleBasedWhere($filter, $orConditions);
+    }
+
+    /**
+     * @param array<string, bool> $permissions
+     *
+     * @return array<int, int|string>
+     */
+    private function getRoleBasedUserIds(array $permissions, ?string $viewSameRoleKey): array
+    {
+        $targetUserIds = [$this->user->getId()];
+
+        if ($this->canViewSameRole($permissions, $viewSameRoleKey)) {
+            $ids = $this->doctrine->getRepository(User::class)->findUserIdsByRole($this->user->getRole()->getId());
+            if ($ids) {
+                $targetUserIds = $ids;
+            }
+        }
+
+        return $targetUserIds;
+    }
+
+    /**
+     * @param array<string, bool> $permissions
+     */
+    private function canViewSameRole(array $permissions, ?string $viewSameRoleKey): bool
+    {
+        return null !== $viewSameRoleKey
+            && !empty($permissions[$viewSameRoleKey])
+            && null !== $this->user->getRole();
+    }
+
+    /**
+     * @param array<int, int|string> $targetUserIds
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getRoleBasedOrConditions(array $targetUserIds, string $column): array
+    {
+        if (count($targetUserIds) > 1) {
+            return [['column' => $column, 'expr' => 'in', 'value' => implode(',', $targetUserIds)]];
+        }
+
+        return [['column' => $column, 'expr' => 'eq', 'value' => reset($targetUserIds)]];
+    }
+
+    /**
+     * @param array<string, mixed>             $filter
+     * @param array<int, array<string, mixed>> $orConditions
+     */
+    private function appendRoleBasedWhere(array &$filter, array $orConditions): void
+    {
+        if (!isset($filter['where'])) {
+            $filter['where'] = [];
+        }
+
+        if (1 === count($orConditions)) {
+            $filter['where'][] = $orConditions[0];
+        } else {
+            $filter['where'][] = ['expr' => 'orX', 'val' => $orConditions];
+        }
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    protected function getStandardPermissions(string $base, bool $includePublish = true): array
+    {
+        return (array) $this->security->isGranted($this->getStandardPermissionKeys($base, $includePublish), 'RETURN_ARRAY', null, true);
+    }
+
+    /**
+     * @param array<string, bool> $permissions
+     */
+    protected function hasStandardViewPermission(array $permissions, string $base): bool
+    {
+        return !empty($permissions[$base.':viewown'])
+            || !empty($permissions[$base.self::VIEW_SAME_ROLE_SUFFIX])
+            || !empty($permissions[$base.self::VIEW_OTHER_SUFFIX]);
+    }
+
+    /**
+     * @param array<string, mixed>             $filter
+     * @param array<string, bool>              $permissions
+     * @param array<int, array<string, mixed>> $extraOrConditions
+     */
+    protected function addStandardRoleBasedFilter(array &$filter, array $permissions, string $base, string $column, array $extraOrConditions = []): void
+    {
+        $this->addRoleBasedFilter($filter, $permissions, $base.self::VIEW_OTHER_SUFFIX, $base.self::VIEW_SAME_ROLE_SUFFIX, $column, $extraOrConditions);
+    }
+
+    /**
+     * Helper: build standard permission keys for a resource base.
+     *
+     * @return string[]
+     */
+    protected function getStandardPermissionKeys(string $base, bool $includePublish = true): array
+    {
+        $keys = [
+            $base.':viewown',
+            $base.self::VIEW_SAME_ROLE_SUFFIX,
+            $base.self::VIEW_OTHER_SUFFIX,
+            $base.':create',
+            // aggregate keys used by templates
+            $base.':edit',
+            $base.':delete',
+            $base.':publish',
+            // scoped keys
+            $base.':editown',
+            $base.':editsamerole',
+            $base.':editother',
+            $base.':deleteown',
+            $base.':deletesamerole',
+            $base.':deleteother',
+        ];
+
+        if ($includePublish) {
+            $keys[] = $base.':publishown';
+            $keys[] = $base.':publishsamerole';
+            $keys[] = $base.':publishother';
+        }
+
+        return $keys;
     }
 }

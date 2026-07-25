@@ -175,6 +175,19 @@ class UserRepository extends CommonRepository
     }
 
     /**
+     * @return int[]
+     */
+    public function findUserIdsByRole(int $roleId): array
+    {
+        $q = $this->createQueryBuilder('u')
+            ->select('u.id')
+            ->where('IDENTITY(u.role) = :roleId')
+            ->setParameter('roleId', $roleId);
+
+        return array_map(intval(...), array_column($q->getQuery()->getScalarResult(), 'id'));
+    }
+
+    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start

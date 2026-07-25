@@ -107,7 +107,7 @@ return [
             'items' => [
                 'mautic.email.emails' => [
                     'route'    => 'mautic_email_index',
-                    'access'   => ['email:emails:viewown', 'email:emails:viewother'],
+                    'access'   => ['email:emails:viewown', 'email:emails:viewsamerole', 'email:emails:viewother'],
                     'parent'   => 'mautic.core.channels',
                     'priority' => 100,
                 ],

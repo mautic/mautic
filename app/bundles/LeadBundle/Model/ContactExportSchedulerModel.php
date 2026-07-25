@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -46,6 +47,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly ContactExportSchedulerRepository $contactExportSchedulerRepository,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -88,21 +90,22 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         } else {
             if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
-                $filter['force'] = [
-                    [
-                        'column' => 'l.dateIdentified',
-                        'expr'   => 'isNotNull',
-                    ],
+                $filter['force'][] = [
+                    'column' => 'l.dateIdentified',
+                    'expr'   => 'isNotNull',
                 ];
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                // Show only owner's contacts.
-                $filter['force'] = [
-                    [
-                        'column' => 'l.owner',
-                        'expr'   => 'eq',
-                    ],
+                $ownerIds          = $this->getAllowedOwnerIds($permissions);
+                $filter['force'][] = count($ownerIds) > 1 ? [
+                    'column' => 'l.owner_id',
+                    'expr'   => 'in',
+                    'value'  => $ownerIds,
+                ] : [
+                    'column' => 'l.owner_id',
+                    'expr'   => 'eq',
+                    'value'  => reset($ownerIds),
                 ];
             }
         }
@@ -116,6 +119,27 @@ class ContactExportSchedulerModel extends AbstractCommonModel
             'withTotalCount' => true,
             'fileType'       => $fileType,
         ];
+    }
+
+    /**
+     * @param array<mixed> $permissions
+     *
+     * @return int[]
+     */
+    private function getAllowedOwnerIds(array $permissions): array
+    {
+        $user = $this->userHelper->getUser();
+        if (!is_object($user)) {
+            return [0];
+        }
+
+        if (empty($permissions['lead:leads:viewsamerole']) || null === $user->getRole()) {
+            return [(int) $user->getId()];
+        }
+
+        $userIds = $this->userRepository->findUserIdsByRole((int) $user->getRole()->getId());
+
+        return $userIds ?: [(int) $user->getId()];
     }
 
     /**

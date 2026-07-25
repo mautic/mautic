@@ -72,9 +72,9 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], item.createdBy),
+                                    'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], item.createdBy, permissions['report:reports:editsamerole']|default(false)),
                                     'clone': permissions['report:reports:create'],
-                                    'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], item.createdBy, permissions['report:reports:deletesamerole']|default(false)),
                                 },
                                 'routeBase': 'report',
                                 'langVar': 'report.report',

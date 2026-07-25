@@ -491,6 +491,7 @@ return [
                     'mautic.helper.core_parameters',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
+                    'mautic.user.repository',
                 ],
             ],
             'mautic.page.helper.factory' => [

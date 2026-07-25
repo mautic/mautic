@@ -33,6 +33,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    private const PERMISSION_VIEW_OWN   = 'form:forms:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'form:forms:viewother';
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -57,22 +61,10 @@ class FormController extends CommonFormController
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'form:forms:viewown',
-                'form:forms:viewother',
-                'form:forms:create',
-                'form:forms:editown',
-                'form:forms:editother',
-                'form:forms:deleteown',
-                'form:forms:deleteother',
-                'form:forms:publishown',
-                'form:forms:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'form:forms';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['form:forms:viewown'] && !$permissions['form:forms:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -87,9 +79,7 @@ class FormController extends CommonFormController
         $filter     = ['string' => $search, 'force' => []];
         $session->set('mautic.form.filter', $search);
 
-        if (!$permissions['form:forms:viewother']) {
-            $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'f.createdBy');
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
@@ -184,8 +174,8 @@ class FormController extends CommonFormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'form:forms:viewown',
-            'form:forms:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $activeForm->getCreatedBy()
         )
         ) {
@@ -194,13 +184,16 @@ class FormController extends CommonFormController
 
         $permissions = $this->security->isGranted(
             [
-                'form:forms:viewown',
-                'form:forms:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
+                'form:forms:viewsamerole',
                 'form:forms:create',
                 'form:forms:editown',
                 'form:forms:editother',
+                'form:forms:editsamerole',
                 'form:forms:deleteown',
                 'form:forms:deleteother',
+                'form:forms:deletesamerole',
                 'form:forms:publishown',
                 'form:forms:publishother',
             ],
@@ -846,8 +839,8 @@ class FormController extends CommonFormController
         if (null != $entity) {
             if (!$this->security->isGranted('form:forms:create')
                 || !$this->security->hasEntityAccess(
-                    'form:forms:viewown',
-                    'form:forms:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {

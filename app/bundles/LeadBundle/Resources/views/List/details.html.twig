@@ -23,7 +23,7 @@
     'item': list,
     'customButtons': customButtons|default([]),
     'templateButtons': {
-        'close': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], list.createdBy),
+        'close': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], list.createdBy, permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_SAME_ROLE')]|default(false)),
     },
     'routeBase': 'segment',
     'targetLabel': 'mautic.lead.lead.lists'|trans
@@ -39,8 +39,8 @@
             'item': list,
             'customButtons': customButtons|default([]),
             'templateButtons': {
-                'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], list.createdBy),
-                'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], list.createdBy),
+                'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], list.createdBy, permissions['lead:lists:editsamerole']|default(false)),
+                'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], list.createdBy, permissions['lead:lists:deletesamerole']|default(false)),
                 'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]
             },
             'routeBase': 'segment',

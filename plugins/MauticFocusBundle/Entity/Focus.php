@@ -44,6 +44,8 @@ class Focus extends FormEntity implements UuidInterface
     use UuidTrait;
     use ProjectTrait;
 
+    public const ENTITY_NAME = 'focus';
+
     /**
      * @var int
      */

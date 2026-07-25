@@ -40,7 +40,7 @@ return [
         'main' => [
             'mautic.channel.messages' => [
                 'route'    => 'mautic_message_index',
-                'access'   => ['channel:messages:viewown', 'channel:messages:viewother'],
+                'access'   => ['channel:messages:viewown', 'channel:messages:viewsamerole', 'channel:messages:viewother'],
                 'parent'   => 'mautic.core.channels',
                 'priority' => 110,
             ],

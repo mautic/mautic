@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -100,6 +101,8 @@ class ReportRepository extends CommonRepository
     }
 
     /**
+     * @param int|int[]|null $ownedBy
+     *
      * @return mixed[]
      */
     public function findReportsWithGraphs($ownedBy = null): array
@@ -117,10 +120,21 @@ class ReportRepository extends CommonRepository
             );
         $qb->setParameter('true', true, 'boolean');
 
-        if ($ownedBy) {
+        if (is_array($ownedBy)) {
+            $ownerIds = array_values(array_filter($ownedBy));
+
+            if (1 === count($ownerIds)) {
+                $qb->andWhere($qb->expr()->eq('r.created_by', ':ownerId'));
+                $qb->setParameter('ownerId', reset($ownerIds));
+            } elseif ([] !== $ownerIds) {
+                $qb->andWhere($qb->expr()->in('r.created_by', ':ownerIds'));
+                $qb->setParameter('ownerIds', $ownerIds, ArrayParameterType::INTEGER);
+            }
+        } elseif ($ownedBy) {
             $qb->andWhere(
-                $qb->expr()->eq('r.created_by', (int) $ownedBy)
+                $qb->expr()->eq('r.created_by', ':ownerId')
             );
+            $qb->setParameter('ownerId', (int) $ownedBy);
         }
 
         $qb->orderBy('r.name');

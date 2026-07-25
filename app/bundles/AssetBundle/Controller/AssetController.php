@@ -17,6 +17,10 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
+    private const PERMISSION_VIEW_OWN   = 'asset:assets:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'asset:assets:viewother';
+
     private AuditLogModel $auditLogModel;
 
     #[Required]
@@ -28,19 +32,10 @@ final class AssetController extends FormController
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
-        $permissions = $this->security->isGranted([
-            'asset:assets:viewown',
-            'asset:assets:viewother',
-            'asset:assets:create',
-            'asset:assets:editown',
-            'asset:assets:editother',
-            'asset:assets:deleteown',
-            'asset:assets:deleteother',
-            'asset:assets:publishown',
-            'asset:assets:publishother',
-        ], 'RETURN_ARRAY');
+        $permissionBase = 'asset:assets';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['asset:assets:viewown'] && !$permissions['asset:assets:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -62,10 +57,7 @@ final class AssetController extends FormController
 
         $filter = ['string' => $search, 'force' => []];
 
-        if (!$permissions['asset:assets:viewother']) {
-            $filter['force'][] =
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'a.createdBy');
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
@@ -181,18 +173,8 @@ final class AssetController extends FormController
             'viewParameters' => [
                 'activeAsset' => $activeAsset,
                 'tmpl'        => $tmpl,
-                'permissions' => $this->security->isGranted([
-                    'asset:assets:viewown',
-                    'asset:assets:viewother',
-                    'asset:assets:create',
-                    'asset:assets:editown',
-                    'asset:assets:editother',
-                    'asset:assets:deleteown',
-                    'asset:assets:deleteother',
-                    'asset:assets:publishown',
-                    'asset:assets:publishother',
-                ], 'RETURN_ARRAY'),
-                'stats' => [
+                'permissions' => $this->getStandardPermissions('asset:assets'),
+                'stats'       => [
                     'downloads' => [
                         'total'     => $activeAsset->getDownloadCount(),
                         'unique'    => $activeAsset->getUniqueDownloadCount(),
@@ -227,7 +209,7 @@ final class AssetController extends FormController
     {
         $activeAsset = $model->getEntity($objectId);
 
-        if (null === $activeAsset || !$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+        if (null === $activeAsset || !$this->security->hasEntityAccess(self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $activeAsset->getCreatedBy())) {
             return $this->modalAccessDenied();
         }
 
@@ -456,7 +438,7 @@ final class AssetController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+            self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $entity->getCreatedBy()
         )
         ) {
             $this->throwAccessDenied();
@@ -571,7 +553,7 @@ final class AssetController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('asset:assets:create')
                 || !$this->security->hasEntityAccess(
-                    'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+                    self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();

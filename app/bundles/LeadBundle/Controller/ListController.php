@@ -68,6 +68,7 @@ final class ListController extends FormController
         // set some permissions
         $permissionsToCheck = [
             LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_SAME_ROLE,
             LeadPermissions::LISTS_VIEW_OTHER,
             LeadPermissions::LISTS_EDIT_OWN,
             LeadPermissions::LISTS_EDIT_OTHER,
@@ -108,13 +109,15 @@ final class ListController extends FormController
         $tableAlias = $this->listModel->getRepository()->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-            $filter['where'][] = [
-                'expr' => 'orX',
-                'val'  => [
-                    ['column' => $tableAlias.'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
+            $this->addStandardRoleBasedFilter(
+                $filter,
+                $permissions,
+                'lead:lists',
+                $tableAlias.'.createdBy',
+                [
                     ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
-                ],
-            ];
+                ]
+            );
         }
 
         $filter['force'][]   = ['column' => $tableAlias.'.deleted', 'expr' => 'isNull'];
@@ -763,7 +766,8 @@ final class ListController extends FormController
         if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
-            $list->getCreatedBy()
+            $list->getCreatedBy(),
+            LeadPermissions::LISTS_VIEW_SAME_ROLE
         )
         ) {
             $this->throwAccessDenied();

@@ -75,8 +75,8 @@
                         {% set edit = securityHasEntityAccess(
                             permissions['email:emails:editown'],
                             permissions['email:emails:editother'],
-                            item.getCreatedBy()
-                        ) %}
+                            item.getCreatedBy(),
+                            permissions['email:emails:editsamerole']|default(false)) %}
 
                         {% set sendButton = {
                             'attr': {
@@ -120,8 +120,8 @@
                                 'delete' : securityHasEntityAccess(
                                     permissions['email:emails:deleteown'],
                                     permissions['email:emails:deleteother'],
-                                    item.getCreatedBy()
-                                ),
+                                    item.getCreatedBy(),
+                                    permissions['email:emails:deletesamerole']|default(false)),
                                 'abtest' : ((not hasVariants) and edit and permissions['email:emails:create']),
                             },
                             'routeBase'     : 'email',

@@ -1,6 +1,6 @@
 <td class="col-company-value-name">
     <div>
-        {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy) %}
+        {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy, permissions['lead:leads:editsamerole']|default(false)) %}
             <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                 {% if fields.core.companyname is defined %}
                     {{ fields.core.companyname.value|purify }}

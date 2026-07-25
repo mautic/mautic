@@ -31,7 +31,7 @@ return [
             'items' => [
                 'mautic.webhook.webhooks' => [
                     'id'        => 'mautic_webhook_root',
-                    'access'    => ['webhook:webhooks:viewown', 'webhook:webhooks:viewother'],
+                    'access'    => ['webhook:webhooks:viewown', 'webhook:webhooks:viewsamerole', 'webhook:webhooks:viewother'],
                     'route'     => 'mautic_webhook_index',
                     'parent'    => 'mautic.core.integrations',
                     'iconClass' => 'ri-webhook-fill',

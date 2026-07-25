@@ -132,7 +132,7 @@ return [
             'items' => [
                 'mautic.form.forms' => [
                     'route'    => 'mautic_form_index',
-                    'access'   => ['form:forms:viewown', 'form:forms:viewother'],
+                    'access'   => ['form:forms:viewown', 'form:forms:viewsamerole', 'form:forms:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 200,
                 ],

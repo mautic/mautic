@@ -20,7 +20,7 @@
     {
         'item'            : notification,
         'templateButtons' : {
-            'close' : securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy),
+            'close' : securityHasEntityAccess(permissions['notification:mobile_notifications:viewown'], permissions['notification:mobile_notifications:viewother'], notification.createdBy, permissions['notification:mobile_notifications:viewsamerole']|default(false)),
         },
         'routeBase'       : 'mobile_notification',
         'targetLabel'     : 'mautic.notification.mobile_notifications'|trans
@@ -33,7 +33,7 @@
     {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': notification,
             'templateButtons': {
-                'edit': securityHasEntityAccess(permissions['notification:mobile_notifications:editown'], permissions['notification:mobile_notifications:editother'], notification.createdBy),
+                'edit': securityHasEntityAccess(permissions['notification:mobile_notifications:editown'], permissions['notification:mobile_notifications:editother'], notification.createdBy, permissions['notification:mobile_notifications:editsamerole']|default(false)),
                 'delete': permissions['notification:mobile_notifications:create'],
             },
             'routeBase': 'mobile_notification',

@@ -56,9 +56,9 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], item.createdBy),
+                                    'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], item.createdBy, permissions['dynamiccontent:dynamiccontents:editsamerole']|default(false)),
                                     'clone': permissions['dynamiccontent:dynamiccontents:create'],
-                                    'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], item.createdBy, permissions['dynamiccontent:dynamiccontents:deletesamerole']|default(false)),
                                 },
                                 'routeBase': 'dynamicContent',
                                 'nameGetter': 'getName',

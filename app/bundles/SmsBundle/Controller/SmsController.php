@@ -22,6 +22,12 @@ final class SmsController extends FormController
 {
     use EntityContactsTrait;
 
+    private const PERMISSION_VIEW_OWN   = 'sms:smses:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'sms:smses:viewother';
+
+    private const PERMISSION_VIEW_SAME_ROLE = 'sms:smses:viewsamerole';
+
     private AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
@@ -41,22 +47,10 @@ final class SmsController extends FormController
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
     {
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'sms:smses:viewown',
-                'sms:smses:viewother',
-                'sms:smses:create',
-                'sms:smses:editown',
-                'sms:smses:editother',
-                'sms:smses:deleteown',
-                'sms:smses:deleteother',
-                'sms:smses:publishown',
-                'sms:smses:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'sms:smses';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['sms:smses:viewown'] && !$permissions['sms:smses:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -76,14 +70,7 @@ final class SmsController extends FormController
 
         $filter = ['string' => $search];
 
-        if (!$permissions['sms:smses:viewother']) {
-            $filter['force'][] =
-                [
-                    'column' => 'e.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->user->getId(),
-                ];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'e.createdBy');
 
         // Not to include translations
         $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
@@ -179,8 +166,8 @@ final class SmsController extends FormController
             ]);
         }
         if (!$this->security->hasEntityAccess(
-            'sms:smses:viewown',
-            'sms:smses:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $sms->getCreatedBy()
         )
         ) {
@@ -218,13 +205,16 @@ final class SmsController extends FormController
                 'logs'        => $logs,
                 'isEmbedded'  => $request->get('isEmbedded') ?: false,
                 'permissions' => $security->isGranted([
-                    'sms:smses:viewown',
-                    'sms:smses:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
+                    self::PERMISSION_VIEW_SAME_ROLE,
                     'sms:smses:create',
                     'sms:smses:editown',
                     'sms:smses:editother',
+                    'sms:smses:editsamerole',
                     'sms:smses:deleteown',
                     'sms:smses:deleteother',
+                    'sms:smses:deletesamerole',
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
@@ -427,8 +417,8 @@ final class SmsController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'sms:smses:viewown',
-            'sms:smses:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $entity->getCreatedBy()
         )
         ) {
@@ -559,8 +549,8 @@ final class SmsController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('sms:smses:create')
                 || !$this->security->hasEntityAccess(
-                    'sms:smses:viewown',
-                    'sms:smses:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -669,8 +659,8 @@ final class SmsController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'sms:smses:viewown',
-                    'sms:smses:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {
@@ -709,7 +699,12 @@ final class SmsController extends FormController
         $sms      = $this->smsModel->getEntity($objectId);
         $security = $this->security;
 
-        if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
+        if (null !== $sms && $security->hasEntityAccess(
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
+            $sms->getCreatedBy(),
+            self::PERMISSION_VIEW_SAME_ROLE,
+        )) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,
