@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {

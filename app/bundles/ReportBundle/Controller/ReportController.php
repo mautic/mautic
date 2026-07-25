@@ -868,7 +868,6 @@ final class ReportController extends FormController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (empty($report)) {

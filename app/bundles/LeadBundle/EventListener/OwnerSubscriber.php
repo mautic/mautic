@@ -13,7 +13,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OwnerSubscriber implements EventSubscriberInterface
+final class OwnerSubscriber implements EventSubscriberInterface
 {
     private const OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
@@ -204,10 +204,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         return $tokens;
     }
 
-    /**
-     * @return array|string|string[]
-     */
-    protected function getOwnerColumnNormalized(string $ownerColumn): string|array
+    private function getOwnerColumnNormalized(string $ownerColumn): string
     {
         return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
     }

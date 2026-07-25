@@ -31,7 +31,7 @@ class ExceptionListener extends ErrorListener
     public function __construct(
         protected Router $router,
         string|object|array|null $controller,
-        ?LoggerInterface $logger = null,
+        LoggerInterface $logger,
     ) {
         parent::__construct($controller, $logger);
     }

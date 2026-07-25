@@ -15,12 +15,12 @@ use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly StageModel $stageModel,
-        private readonly TranslatorInterface $translator,
+        private LeadModel $leadModel,
+        private StageModel $stageModel,
+        private TranslatorInterface $translator,
     ) {
     }
 

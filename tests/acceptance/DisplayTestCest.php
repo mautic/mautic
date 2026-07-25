@@ -4,7 +4,7 @@ namespace Acceptance;
 
 use Page\Acceptance\EmailsPage;
 
-class DisplayTestCest
+final class DisplayTestCest
 {
     public function _before(\AcceptanceTester $I): void
     {

@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).

@@ -18,12 +18,12 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PointModel $pointModel,
-        private readonly EntityManager $entityManager,
-        private readonly PointEventHelper $pointEventHelper,
+        private PointModel $pointModel,
+        private EntityManager $entityManager,
+        private PointEventHelper $pointEventHelper,
     ) {
     }
 
