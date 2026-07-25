@@ -83,7 +83,7 @@ class InsightModel extends CommonFormModel
 
     public function executePointInsights(Lead $contact, Group $changedGroup): void
     {
-        $insights = $this->getRepository()->findBy([
+        $insights = $this->pointInsightRepository->findBy([
             'isPublished'   => true,
             'insightType'   => PointInsight::INSIGHT_TYPE_COMPARE_POINT_GROUPS,
             'insightAction' => PointInsight::INSIGHT_ACTION_SET_CUSTOM_FIELD,

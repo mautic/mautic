@@ -928,7 +928,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getPublishDown()
     {
-        if ($this->isSegmentEmail() && !$this->isContinueSending()) {
+        if ($this->isSegmentEmail() && !$this->continueSending) {
             return null;
         }
 
@@ -1317,12 +1317,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isBackgroundSending(): bool
     {
-        return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+        return $this->isPublished() && !empty($this->publishUp) && ($this->publishUp < new \DateTime());
     }
 
     public function isSegmentEmail(): bool
     {
-        return 'list' === $this->getEmailType();
+        return 'list' === $this->emailType;
     }
 
     private function listsChangedAdd(string $property, ?int $id): void
@@ -1349,12 +1349,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function hasDraft(): bool
     {
-        return null !== $this->getDraft();
+        return null !== $this->draft;
     }
 
     public function getDraftContent(): ?string
     {
-        return $this->getDraft()?->getHtml();
+        return $this->draft?->getHtml();
     }
 
     /**
@@ -1425,11 +1425,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             case 'published':
             case 'unpublished':
                 if ($this->isSegmentEmail() && $this->getIsPublished()) {
-                    if (!$this->isContinueSending() && !$this->getPendingCount() && $this->getSentCount(true)) {
+                    if (!$this->continueSending && !$this->pendingCount && $this->getSentCount(true)) {
                         return 'sent';
                     }
 
-                    if ($this->getPendingCount()) {
+                    if ($this->pendingCount) {
                         return 'sending';
                     }
                 }
@@ -1441,7 +1441,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function shouldCheckForUnpublishEmail(): bool
     {
-        if ($this->isContinueSending()) {
+        if ($this->continueSending) {
             return false;
         }
 

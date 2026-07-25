@@ -165,7 +165,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $grapesJsBuilderRepository ?? $this->createMock(GrapesJsBuilderRepository::class), // $grapesJsBuilderRepository
+            $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class), // $grapesJsBuilderRepository
         );
     }
 }
