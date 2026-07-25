@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class NoteController extends FormController
+final class NoteController extends FormController
 {
     use LeadAccessTrait;
 

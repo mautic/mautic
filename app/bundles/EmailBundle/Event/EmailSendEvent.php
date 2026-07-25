@@ -278,7 +278,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function shouldAppendClickthrough(): bool
     {
-        return !$this->isInternalSend() && null === $this->getEmail();
+        return !$this->internalSend && null === $this->getEmail();
     }
 
     /**

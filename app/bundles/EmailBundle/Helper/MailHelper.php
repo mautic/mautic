@@ -27,6 +27,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
@@ -545,7 +546,7 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
-                $email = $this->getEmail();
+                $email = $this->email;
 
                 if (!empty($metadatum['from'])) {
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
@@ -1319,7 +1320,7 @@ class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $email               = $this->getEmail();
+        $email               = $this->email;
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
         if (!$email
             || $email->getSendToDnc()
@@ -1360,7 +1361,7 @@ class MailHelper
     private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
-            $lead    = $this->getLead();
+            $lead    = $this->lead;
             $toEmail = null;
             if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
                 $toEmail = $lead['email'];
@@ -1706,7 +1707,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->entityManager->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
+                $stat->setList($this->entityManager->getReference(LeadList::class, $listId));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1961,7 +1962,7 @@ class MailHelper
 
     private function setFromForSingleMessage(): void
     {
-        $email = $this->getEmail();
+        $email = $this->email;
 
         if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
             if (!isset($this->lead['owner_id'])) {

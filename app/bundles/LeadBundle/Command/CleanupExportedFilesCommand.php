@@ -13,7 +13,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: self::COMMAND_NAME, description: 'Remove contact export cache files from `contacts_export` directory if file is older than the week/7 days')]
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Remove contact export cache files from `contacts_export` directory if file is older than the week/7 days'
+)]
 class CleanupExportedFilesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:contacts:cleanup_exported_files';

@@ -13,12 +13,12 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class RequestSubscriber implements EventSubscriberInterface
+final readonly class RequestSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CsrfTokenManagerInterface $tokenManager,
-        private readonly TranslatorInterface $translator,
-        private readonly Environment $twig,
+        private CsrfTokenManagerInterface $tokenManager,
+        private TranslatorInterface $translator,
+        private Environment $twig,
     ) {
     }
 

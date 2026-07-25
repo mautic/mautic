@@ -14,7 +14,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: self::COMMAND_NAME, description: 'Hard-delete segment(s) and all its references.')]
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Hard-delete segment(s) and all its references.'
+)]
 class DeleteLeadListsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:segment:delete';

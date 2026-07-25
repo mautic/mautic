@@ -231,11 +231,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
         $metadata->addPropertyConstraint('content', new NoNesting());
 
-        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.type.required']));
-        $metadata->addPropertyConstraint('type', new Choice(['choices' => (new TypeList())->getChoices()]));
+        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
+        $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
 
         $metadata->addConstraint(new SlotNameType());
 
@@ -247,9 +247,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                         $dwc->getSlotName(),
                         [
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.dynamicContent.slot_name.notblank',
-                                ]
+                                message: 'mautic.dynamicContent.slot_name.notblank'
                             ),
                         ]
                     );
@@ -261,12 +259,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     $violations = $validator->validate(
                         $dwc->getFilters(),
                         [
-                            new Count(
-                                [
-                                    'minMessage' => 'mautic.dynamicContent.filter.options.empty',
-                                    'min'        => 1,
-                                ]
-                            ),
+                            new Count(minMessage: 'mautic.dynamicContent.filter.options.empty', min: 1),
                         ]
                     );
                     foreach ($violations as $violation) {
@@ -506,7 +499,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function cleanSlotName(): void
     {
-        if ($this->getIsCampaignBased()) {
+        if ($this->isCampaignBased) {
             $this->setSlotName('');
         }
     }

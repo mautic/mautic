@@ -34,6 +34,7 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -75,7 +76,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
@@ -1916,7 +1917,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->em->getRepository(User::class)->getEntities(
                     [
                         'filter' => [
                             'force' => [

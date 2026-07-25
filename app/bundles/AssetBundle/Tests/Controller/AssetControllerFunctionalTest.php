@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
@@ -428,7 +429,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()

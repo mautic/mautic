@@ -91,17 +91,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     private array $leadChangeLists = [];
 
-    /**
-     * @return LeadListRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadListRepository
     {
-        $repo = $this->leadListRepository;
+        $this->leadListRepository->setDispatcher($this->dispatcher);
+        $this->leadListRepository->setTranslator($this->translator);
 
-        $repo->setDispatcher($this->dispatcher);
-        $repo->setTranslator($this->translator);
-
-        return $repo;
+        return $this->leadListRepository;
     }
 
     /**
@@ -672,7 +667,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             if (-1 == $searchListLead) {
                 $listLead = null;
             } elseif ($searchListLead) {
-                $listLead = $this->getListLeadRepository()->findOneBy(
+                $listLead = $this->listLeadRepository->findOneBy(
                     [
                         'lead' => $lead,
                         'list' => $this->leadChangeLists[$listId],
@@ -808,7 +803,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
 
             $listLead = (!$skipFindOne) ?
-                $this->getListLeadRepository()->findOneBy([
+                $this->listLeadRepository->findOneBy([
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$listId],
                 ]) :
@@ -851,8 +846,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->getListLeadRepository()->detachEntities($persistLists);
-        $this->getListLeadRepository()->detachEntities($deleteLists);
+        $this->listLeadRepository->detachEntities($persistLists);
+        $this->listLeadRepository->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -871,7 +866,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function removeLeadsByListId(int $listId): void
     {
-        $this->getListLeadRepository()->removeLeadsByListId($listId);
+        $this->listLeadRepository->removeLeadsByListId($listId);
     }
 
     /**

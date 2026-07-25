@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AssetController extends FormController
+final class AssetController extends FormController
 {
     private const PERMISSION_VIEW_OWN   = 'asset:assets:viewown';
 

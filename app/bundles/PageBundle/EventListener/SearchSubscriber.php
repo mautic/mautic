@@ -12,12 +12,12 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PageModel $pageModel,
-        private readonly CorePermissions $security,
-        private readonly GlobalSearch $globalSearch,
+        private PageModel $pageModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
     ) {
     }
 

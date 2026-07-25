@@ -15,7 +15,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[AsCommand(name: self::COMMAND_NAME, description: 'Export entity data.')]
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Export entity data.'
+)]
 final class EntityExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:entity:export';

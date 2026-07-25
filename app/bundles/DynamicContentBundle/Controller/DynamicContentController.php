@@ -9,13 +9,11 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentController extends FormController
+final class DynamicContentController extends FormController
 {
     private const PERMISSION_VIEW_OWN   = 'dynamiccontent:dynamiccontents:viewown';
 
@@ -119,7 +117,7 @@ class DynamicContentController extends FormController
         );
     }
 
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             $this->throwAccessDenied();
@@ -229,10 +227,8 @@ class DynamicContentController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
         $page   = $request->getSession()->get('mautic.dynamicContent.page', 1);
@@ -421,10 +417,7 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse|Response
-     */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
 

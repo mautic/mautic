@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class CacheController extends CommonController
+final class CacheController extends CommonController
 {
     public function __construct(
         private readonly Config $config,

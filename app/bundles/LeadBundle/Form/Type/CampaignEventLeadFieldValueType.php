@@ -50,7 +50,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -155,7 +155,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'required'    => true,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'auto_initialize' => false,
@@ -192,7 +192,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'attr'        => $attr,
                         'constraints' => ($supportsValue) ? [
                             new NotBlank(
-                                ['message' => 'mautic.core.value.required']
+                                message: 'mautic.core.value.required'
                             ),
                         ] : [],
                     ]

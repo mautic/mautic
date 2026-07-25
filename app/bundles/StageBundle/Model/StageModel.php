@@ -193,11 +193,9 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
                 ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
-            $changeLogRepo = $this->stagesChangeLogRepository;
-            $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->stagesChangeLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
-            $leadStageLogRepo = $this->leadStageLogRepository;
-            $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->leadStageLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
             $this->deleteEntity($secondaryStage);
         });
@@ -210,6 +208,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->getRepository()->getStages($user);
+        return $this->stageRepository->getStages($user);
     }
 }

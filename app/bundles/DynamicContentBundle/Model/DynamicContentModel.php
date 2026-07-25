@@ -55,12 +55,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     public function getRepository(): DynamicContentRepository
     {
-        $repo = $this->dynamicContentRepository;
+        $this->dynamicContentRepository->setTranslator($this->translator);
+        $this->dynamicContentRepository->setCurrentUser($this->userHelper->getUser());
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
-
-        return $repo;
+        return $this->dynamicContentRepository;
     }
 
     public function getStatRepository(): StatRepository
@@ -207,7 +205,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDynamicContent($dynamicContent);
         $stat->setSource($source);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }

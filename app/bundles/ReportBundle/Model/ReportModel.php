@@ -753,7 +753,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     public function getReportsWithGraphs(): array
     {
-        return $this->getRepository()->findReportsWithGraphs($this->getReportOwnerFilter());
+        return $this->reportRepository->findReportsWithGraphs($this->getReportOwnerFilter());
     }
 
     /**

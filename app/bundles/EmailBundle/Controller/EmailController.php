@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class EmailController extends FormController
+final class EmailController extends FormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
@@ -441,6 +441,8 @@ class EmailController extends FormController
                             'email:emails:deletesamerole',
                             'email:emails:publishown',
                             'email:emails:publishother',
+                            'lead:lists:viewown',
+                            'lead:lists:viewother',
                         ],
                         'RETURN_ARRAY'
                     ),
@@ -487,8 +489,6 @@ class EmailController extends FormController
      * Generates new form and processes post data.
      *
      * @param Email $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(
         Request $request,
@@ -498,7 +498,7 @@ class EmailController extends FormController
         EmailModel $model,
         ThemeHelper $themeHelper,
         $entity = null,
-    ) {
+    ): Response {
         if (!$entity instanceof Email) {
             $entity = $model->getEntity();
         }
@@ -656,8 +656,6 @@ class EmailController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
         Request $request,
@@ -669,7 +667,7 @@ class EmailController extends FormController
         $objectId,
         $ignorePost = false,
         $forceTypeSelection = false,
-    ) {
+    ): Response {
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
         $session = $request->getSession();
@@ -1014,7 +1012,7 @@ class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
-                            return $this->forward(static::class.'::editAction', [
+                            return $this->forward(self::class.'::editAction', [
                                 'objectId'   => $entity->getId(),
                                 'ignorePost' => true,
                             ]);
@@ -1293,9 +1291,6 @@ class EmailController extends FormController
         ));
     }
 
-    /**
-     * Create an AB test.
-     */
     public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
     {
         $entity = $model->getEntity($objectId);
@@ -1328,10 +1323,8 @@ class EmailController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return array|Response
      */
-    public function winnerAction(Request $request, $objectId)
+    public function winnerAction(Request $request, $objectId): Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.email', 1);

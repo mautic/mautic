@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ListController extends FormController
+final class ListController extends FormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
@@ -850,7 +850,7 @@ class ListController extends FormController
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
 
-        $sourceLists = $this->getListModel()->getSourceLists();
+        $sourceLists = $this->listModel->getSourceLists();
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
