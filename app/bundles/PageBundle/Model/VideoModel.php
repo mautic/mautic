@@ -63,7 +63,7 @@ class VideoModel extends FormModel
      */
     public function getHitForLeadByGuid(Lead $lead, $guid)
     {
-        return $this->getHitRepository()->getHitForLeadByGuid($lead, $guid);
+        return $this->videoHitRepository->getHitForLeadByGuid($lead, $guid);
     }
 
     /**

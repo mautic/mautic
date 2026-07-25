@@ -119,7 +119,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
-            $this->getRepository()->saveEntity($entity, false);
+            $this->smsRepository->saveEntity($entity, false);
 
             if ($dispatchEvent) {
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -361,22 +361,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ([] !== $sentCount) {
-            $repo = $this->getRepository();
-            foreach ($sentCount as $id => $count) {
-                $repo->upCount($id, 'sent', $count);
-            }
+        foreach ($sentCount as $id => $count) {
+            $this->smsRepository->upCount($id, 'sent', $count);
         }
 
         if (count($stats)) {
-            $this->getStatRepository()->saveEntities($stats);
+            $this->statRepository->saveEntities($stats);
 
             foreach ($stats as $stat) {
                 if (!$stat->isFailed()) {
                     $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
                 }
 
-                $this->getRepository()->detachEntity($stat);
+                $this->smsRepository->detachEntity($stat);
             }
         }
 
@@ -405,7 +402,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
 
         if ($persist) {
-            $this->getStatRepository()->saveEntity($stat);
+            $this->statRepository->saveEntity($stat);
         }
 
         return $stat;
@@ -511,7 +508,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      */
     public function getSmsStatus($idHash)
     {
-        return $this->getStatRepository()->getSmsStatus($idHash);
+        return $this->statRepository->getSmsStatus($idHash);
     }
 
     /**
@@ -521,7 +518,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      */
     public function getSmsStatByLeadId($smsId, $leadId)
     {
-        return $this->getStatRepository()->findBy(
+        return $this->statRepository->findBy(
             [
                 'sms'  => (int) $smsId,
                 'lead' => (int) $leadId,
@@ -550,7 +547,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         switch ($type) {
             case 'sms':
             case SmsType::class:
-                $entities = $this->getRepository()->getSmsList(
+                $entities = $this->smsRepository->getSmsList(
                     $filter,
                     $limit,
                     $start,

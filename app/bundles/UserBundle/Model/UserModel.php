@@ -16,7 +16,6 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
 use Mautic\UserBundle\Entity\UserInviteRepository;
-use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
@@ -98,7 +97,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
     {
-        return $this->getRepository()->getUserList($search, $limit, $start, $permissionLimiter);
+        return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }
 
     /**
@@ -160,7 +159,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     {
         $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
-        return $this->getRepository()->findOneBy(
+        return $this->userRepository->findOneBy(
             [
                 'role'        => $adminRole,
                 'isPublished' => true,
@@ -384,7 +383,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
         $user->setPreferences($preferences);
 
-        $this->getRepository()->saveEntity($user);
+        $this->userRepository->saveEntity($user);
     }
 
     /**
@@ -405,12 +404,12 @@ class UserModel extends FormModel implements GlobalSearchInterface
      */
     public function getOwnerListChoices(): array
     {
-        return $this->getRepository()->getOwnerListChoices();
+        return $this->userRepository->getOwnerListChoices();
     }
 
     public function hasUserWithEmail(string $email): bool
     {
-        return null !== $this->getRepository()->findOneBy(['email' => $email]);
+        return null !== $this->userRepository->findOneBy(['email' => $email]);
     }
 
     public function createInvite(string $email, Role $role): UserInvite
@@ -421,7 +420,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
             ->setTokenSelector($inviteToken['selector'])
             ->setTokenVerifierHash(password_hash($inviteToken['verifier'], PASSWORD_DEFAULT))
             ->setExpiration((new \DateTime())->add(new \DateInterval('PT48H')));
-        $this->getUserInviteRepository()->revokeOutstandingInvites($email);
+        $this->userInviteRepository->revokeOutstandingInvites($email);
         $this->em->persist($invite);
         $this->em->flush();
 
@@ -449,7 +448,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
             return null;
         }
 
-        $invite = $this->getUserInviteRepository()->findOneByTokenSelector($inviteToken['selector']);
+        $invite = $this->userInviteRepository->findOneByTokenSelector($inviteToken['selector']);
         if (null === $invite) {
             $this->logInvalidInvite('token selector was not found', null, $inviteToken['selector']);
 
@@ -515,11 +514,6 @@ class UserModel extends FormModel implements GlobalSearchInterface
             'selector' => $selector,
             'verifier' => $verifier,
         ];
-    }
-
-    private function getUserInviteRepository(): UserInviteRepositoryInterface
-    {
-        return $this->userInviteRepository;
     }
 
     private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void
