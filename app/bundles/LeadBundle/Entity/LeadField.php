@@ -425,7 +425,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function getName()
     {
-        return $this->getLabel();
+        return $this->label;
     }
 
     /**
@@ -493,7 +493,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isRequired()
     {
-        return $this->getIsRequired();
+        return $this->isRequired;
     }
 
     /**
@@ -521,7 +521,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isFixed()
     {
-        return $this->getIsFixed();
+        return $this->isFixed;
     }
 
     /**
@@ -629,7 +629,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isVisible()
     {
-        return $this->getIsVisible();
+        return $this->isVisible;
     }
 
     public function setIsShortVisible(?bool $isShortVisible): self
@@ -656,7 +656,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isShortVisible()
     {
-        return $this->getIsShortVisible();
+        return $this->isShortVisible;
     }
 
     /**
@@ -692,7 +692,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function getIsUniqueIdentifier()
     {
-        return $this->getIsUniqueIdentifer();
+        return $this->isUniqueIdentifer;
     }
 
     /**
@@ -750,7 +750,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isListable()
     {
-        return $this->getIsListable();
+        return $this->isListable;
     }
 
     /**
@@ -795,7 +795,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function isNew(): bool
     {
-        return !(bool) $this->getId();
+        return !(bool) $this->id;
     }
 
     public function getColumnIsNotCreated(): bool
@@ -829,7 +829,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function disablePublishChange(): bool
     {
-        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated() || $this->getColumnIsNotRemoved();
+        return 'email' === $this->alias || $this->columnIsNotCreated || $this->columnIsNotRemoved;
     }
 
     public function getOriginalIsPublishedValue(): bool

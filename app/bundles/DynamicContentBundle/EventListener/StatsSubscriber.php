@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\DynamicContentBundle\Entity\Stat;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
