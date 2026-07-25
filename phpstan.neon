@@ -225,3 +225,4 @@ rules:
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+	#- Utils\PHPStan\Rule\NoContainerGetRule

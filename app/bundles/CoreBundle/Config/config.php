@@ -786,7 +786,7 @@ return [
                 'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
                 'arguments' => [
                     'translator',
-                    'service_container',
+                    'kernel',
                 ],
                 'tag' => 'mautic.update_step',
             ],
