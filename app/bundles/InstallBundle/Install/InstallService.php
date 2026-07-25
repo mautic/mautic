@@ -368,12 +368,10 @@ class InstallService
      */
     public function createAdminUserStep(array $data): array
     {
-        $entityManager = $this->entityManager;
-
         // ensure the username and email are unique
         try {
             /** @var User $existingUser */
-            $existingUser = $entityManager->getRepository(User::class)->find(1);
+            $existingUser = $this->entityManager->getRepository(User::class)->find(1);
         } catch (\Exception) {
             $existingUser = null;
         }
@@ -412,7 +410,7 @@ class InstallService
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint             = new Assert\Length(min: 6);
         $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
         $validations[] = $this->validator->validate($data['email'], $emailConstraint);
@@ -429,17 +427,15 @@ class InstallService
             return $messages;
         }
 
-        $hasher = $this->hasher;
-
         $user->setFirstName(InputHelper::clean($data['firstname']));
         $user->setLastName(InputHelper::clean($data['lastname']));
         $user->setUsername(InputHelper::clean($data['username']));
         $user->setEmail(InputHelper::email($data['email']));
-        $user->setPassword($hasher->hashPassword($user, $data['password']));
+        $user->setPassword($this->hasher->hashPassword($user, $data['password']));
 
         $adminRole = null;
         try {
-            $adminRole = $entityManager->getReference(Role::class, 1);
+            $adminRole = $this->entityManager->getReference(Role::class, 1);
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',
@@ -452,8 +448,8 @@ class InstallService
             $user->setRole($adminRole);
 
             try {
-                $entityManager->persist($user);
-                $entityManager->flush();
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
             } catch (\Exception $exception) {
                 $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.creating.user',

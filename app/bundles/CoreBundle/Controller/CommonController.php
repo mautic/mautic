@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -39,12 +41,12 @@ class CommonController extends AbstractController implements MauticController
 
     private PageModel $pageModel;
 
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
+    private NotificationModel $notificationModel;
 
     #[Required]
     public function autowireCommonController(
         PageModel $pageModel,
-        \Mautic\CoreBundle\Model\NotificationModel $notificationModel,
+        NotificationModel $notificationModel,
     ): void {
         $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
@@ -61,16 +63,15 @@ class CommonController extends AbstractController implements MauticController
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         private FlashBag $flashBag,
-        private ?RequestStack $requestStack,
-        protected ?CorePermissions $security,
+        private RequestStack $requestStack,
+        protected CorePermissions $security,
     ) {
         $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-
+        $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             throw new \RuntimeException('Request is not set.');
         }
@@ -153,7 +154,7 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
      *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
      */
-    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
+    protected function getModel($modelNameKey): MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }

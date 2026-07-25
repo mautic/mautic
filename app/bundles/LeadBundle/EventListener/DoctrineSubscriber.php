@@ -11,11 +11,11 @@ use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
-class DoctrineSubscriber
+final readonly class DoctrineSubscriber
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]
-        private readonly Logger $logger,
+        private Logger $logger,
     ) {
     }
 

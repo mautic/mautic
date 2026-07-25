@@ -6,10 +6,11 @@ namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DynamicContentProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void
     {
         $projectOne   = $this->createProject('Project One');

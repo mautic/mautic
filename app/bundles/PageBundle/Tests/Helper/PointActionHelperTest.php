@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Helper\PointActionHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -42,7 +43,7 @@ final class PointActionHelperTest extends TestCase
     /**
      * @param array<string, mixed> $action
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlHitsActionDataProvider')]
+    #[DataProvider('urlHitsActionDataProvider')]
     public function testValidateUrlPageHitsAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
@@ -109,7 +110,7 @@ final class PointActionHelperTest extends TestCase
     /**
      * @param array<string, mixed> $action
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('returnWithinActionDataProvider')]
+    #[DataProvider('returnWithinActionDataProvider')]
     public function testValidateUrlReturnWithinAction(array $action, bool $expectedResult): void
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');

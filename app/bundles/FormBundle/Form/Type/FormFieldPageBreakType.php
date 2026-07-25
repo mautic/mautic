@@ -32,7 +32,7 @@ class FormFieldPageBreakType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
                 'empty_data' => $this->translator->trans('mautic.core.continue'),

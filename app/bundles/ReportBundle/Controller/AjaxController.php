@@ -4,13 +4,15 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private ReportModel $reportModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireReportAjaxController(ReportModel $reportModel): void
     {
         $this->reportModel = $reportModel;
@@ -19,7 +21,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get updated data for context.
      */
-    public function getSourceDataAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getSourceDataAction(Request $request): JsonResponse
     {
         $context = $request->get('context');
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
@@ -108,7 +109,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidDsn')]
+    #[DataProvider('dataInvalidDsn')]
     public function testInvalidDsn(array $data, string $expectedMessage): void
     {
         // request config edit page

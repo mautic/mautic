@@ -35,24 +35,29 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
+
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         LeadModel $leadModel,
         EmailModel $emailModel,
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
+        $this->leadRepository = $leadRepository;
     }
 
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
@@ -184,8 +189,7 @@ class PublicController extends CommonFormController
                 // share the same session/device and the contact is known.
                 $successSessionName .= ".{$lead->getId()}";
             } elseif (empty($stat)) {
-                $leadRepo = $leadModel->getRepository();
-                $contacts = $leadRepo->getContactsByEmail($urlEmail);
+                $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
                 $lead     = null;
                 if (is_array($contacts) && count($contacts) > 0) {
                     $lead  = array_pop($contacts);
@@ -310,7 +314,7 @@ class PublicController extends CommonFormController
     {
         $request->attributes->set('unsubscribe_all', 1);
 
-        return $this->forward(static::class.'::unsubscribeAction', [
+        return $this->forward(self::class.'::unsubscribeAction', [
             'request'    => $request,
             'idHash'     => $idHash,
             'urlEmail'   => $urlEmail,
@@ -505,7 +509,7 @@ class PublicController extends CommonFormController
         if ($contactId) {
             // We have one from request parameter
             /** @var LeadModel $leadModel */
-            $contact = $leadModel->getRepository()->getLead($contactId);
+            $contact = $this->leadRepository->getLead($contactId);
             $contact = $model->enrichedContactWithCompanies($contact);
         } else {
             // Make fake contact.
@@ -606,12 +610,11 @@ class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails    = explode(';', $query['email']);
-        $repo = $this->leadModel->getRepository();
 
         foreach ($emails as $email) {
-            $lead = $repo->getLeadByEmail($email);
+            $lead = $this->leadRepository->getLeadByEmail($email);
             if (null === $lead) {
-                $lead = $this->createLead($email, $repo);
+                $lead = $this->createLead($email);
                 if (null === $lead) {
                     continue;
                 }
@@ -674,7 +677,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead(string $email, $repo): ?Lead
+    private function createLead(string $email): ?array
     {
         $lead  = $this->leadModel->getEntity();
         // set custom field values
@@ -684,7 +687,7 @@ class PublicController extends CommonFormController
         $this->leadModel->saveEntity($lead);
 
         // return entity
-        return $repo->getLeadByEmail($email);
+        return $this->leadRepository->getLeadByEmail($email);
     }
 
     public function getUnsubscribeMessage(string $idHash, $model, $stat, TranslatorInterface $translator): string

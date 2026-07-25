@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -171,7 +172,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSegmentCloneUserPermissions')]
+    #[DataProvider('dataSegmentCloneUserPermissions')]
     public function testSegmentCloningOwnedSegmentWithDifferentPermissions(string $name, int $perm, int $expected): void
     {
         $user = $this->createUser(
@@ -311,17 +312,16 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testEditSegmentWhileLock(): void
     {
-        $segmentA = $this->segmentA;
-        $segmentA->setCheckedOut(new \DateTime());
-        $segmentA->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentA);
+        $this->segmentA->setCheckedOut(new \DateTime());
+        $this->segmentA->setCheckedOutBy($this->userOne);
+        $this->em->persist($this->segmentA);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segmentA->getId());
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        // As $segmentA is locked, so it will redirect user to its view page.
-        $this->assertStringContainsString('/s/segments/view/'.$segmentA->getId(), $this->client->getRequest()->getRequestUri());
+        // As $this->segmentA is locked, so it will redirect user to its view page.
+        $this->assertStringContainsString('/s/segments/view/'.$this->segmentA->getId(), $this->client->getRequest()->getRequestUri());
     }
 
     public function testDeleteSegmentWithoutPermission(): void

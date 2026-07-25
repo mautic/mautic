@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
@@ -324,7 +325,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testAssetUploadPathTraversal(): void
     {
-        $client    = $this->client;
         $container = $this->getContainer();
 
         // Get CSRF token
@@ -344,7 +344,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         );
 
         $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
-        $client->request(
+
+        $this->client->request(
             'POST',
             '/s/_uploader/asset/upload',
             ['tempId' => '../../'.$tmpDir],
@@ -355,7 +356,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             ]
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
 
         // Assert response is successful
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -396,7 +397,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()

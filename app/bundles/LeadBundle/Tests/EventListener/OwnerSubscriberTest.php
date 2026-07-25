@@ -42,7 +42,7 @@ final class OwnerSubscriberTest extends TestCase
     /**
      * @var array<int, array<string, int|string|null>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',

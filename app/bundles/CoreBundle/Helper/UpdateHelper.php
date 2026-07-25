@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
@@ -225,9 +226,9 @@ class UpdateHelper
             );
 
             $options = [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
-                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::HEADERS         => [
+                RequestOptions::FORM_PARAMS     => $data,
+                RequestOptions::CONNECT_TIMEOUT => 10,
+                RequestOptions::HEADERS         => [
                     'Accept' => '*/*',
                 ],
             ];

@@ -6,7 +6,6 @@ namespace Mautic\ReportBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
-use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
@@ -38,12 +37,11 @@ final class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->schedulerPlanner    = $this->createMock(SchedulerPlanner::class);
 
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Scheduler::class)
-            ->willReturn($this->schedulerRepository);
-
-        $this->scheduleModel = new ScheduleModel($this->entityManager, $this->schedulerPlanner);
+        $this->scheduleModel = new ScheduleModel(
+            $this->entityManager,
+            $this->schedulerPlanner,
+            $this->schedulerRepository,
+        );
     }
 
     public function testGetScheduledReportsForExport(): void

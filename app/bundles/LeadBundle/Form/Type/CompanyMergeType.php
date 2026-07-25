@@ -27,7 +27,7 @@ class CompanyMergeType extends AbstractType
                 'model_lookup_method' => $options['model_lookup_method'],
                 'constraints'         => [
                     new NotBlank(
-                        ['message' => 'mautic.company.choosecompany.notblank']
+                        message: 'mautic.company.choosecompany.notblank'
                     ),
                 ],
             ]

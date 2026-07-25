@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -32,6 +34,17 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
+    private StatRepository $statRepository;
+
+    private DynamicContentRepository $dynamicContentRepository;
+
+    #[Required]
+    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, StatRepository $statRepository): void
+    {
+        $this->dynamicContentRepository = $dynamicContentRepository;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * Retrieve the permissions base.
      */
@@ -42,18 +55,15 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     public function getRepository(): DynamicContentRepository
     {
-        /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository(DynamicContent::class);
+        $this->dynamicContentRepository->setTranslator($this->translator);
+        $this->dynamicContentRepository->setCurrentUser($this->userHelper->getUser());
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
-
-        return $repo;
+        return $this->dynamicContentRepository;
     }
 
-    public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**
@@ -195,7 +205,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDynamicContent($dynamicContent);
         $stat->setSource($source);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }

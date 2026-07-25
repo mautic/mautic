@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormEvents;
 /**
  * Clean data before persisting to DB.
  */
-class CleanFormSubscriber implements EventSubscriberInterface
+final class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
      * @param string|mixed[] $masks

@@ -8,16 +8,17 @@ use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class BatchTagController extends AbstractFormController
+final class BatchTagController extends AbstractFormController
 {
-    private TagModel $tagModel;
+    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireBatchTagController(
-        TagModel $tagModel,
+        TagModel $tagModel, \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
-        $this->tagModel = $tagModel;
+        $this->tagRepository = $tagRepository;
     }
 
     public function indexAction(): Response
@@ -88,11 +89,11 @@ class BatchTagController extends AbstractFormController
         }
 
         if (!empty($tagsToAdd)) {
-            $this->tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+            $this->tagRepository->addTagsToLeads($ids, $tagsToAdd);
         }
 
         if (!empty($tagsToRemove)) {
-            $this->tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+            $this->tagRepository->removeTagsFromLeads($ids, $tagsToRemove);
         }
 
         $this->addFlashMessage('mautic.lead.batch_leads_affected', [

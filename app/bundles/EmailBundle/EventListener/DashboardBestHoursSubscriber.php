@@ -8,7 +8,7 @@ use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSub
 use Mautic\EmailBundle\Form\Type\DashboardBestHoursWidgetType;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class DashboardBestHoursSubscriber extends MainDashboardSubscriber
+final class DashboardBestHoursSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
