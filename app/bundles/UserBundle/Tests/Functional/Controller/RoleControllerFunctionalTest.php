@@ -68,10 +68,17 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $role->setName('Original Role');
         $role->setDescription('Original Description');
         $role->setRawPermissions([
-            'user:roles' => ['view', 'edit'],
+            'stale' => [],
         ]);
 
+        $permission = new Permission();
+        $permission->setBundle('user');
+        $permission->setName('roles');
+        $permission->setRole($role);
+        $permission->setBitwise(20);
+
         $this->em->persist($role);
+        $this->em->persist($permission);
         $this->em->flush();
 
         $rolesBefore = $this->em->getRepository(Role::class)->count([]);
@@ -95,7 +102,26 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
         $clonedRole = $this->em->getRepository(Role::class)->findOneBy(['name' => $newName]);
         $this->assertInstanceOf(Role::class, $clonedRole);
-        $this->assertSame($role->getRawPermissions(), $clonedRole->getRawPermissions());
+        $this->assertSame(['view', 'edit'], $clonedRole->getRawPermissions()['user:roles']);
+    }
+
+    public function testCloneRoleActionRendersInvalidFormAgain(): void
+    {
+        $role = new Role();
+        $role->setName('Role with invalid clone');
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
+        $form        = $crawler->selectButton('role[buttons][apply]')->form();
+        $form[self::ROLE_NAME_FIELD]->setValue('');
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($rolesBefore, $this->em->getRepository(Role::class)->count([]));
+        $this->assertGreaterThan(0, $this->client->getCrawler()->selectButton('role[buttons][apply]')->count());
     }
 
     public function testCloneRoleActionReturnsToTheListWhenCancelled(): void
@@ -130,25 +156,37 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCloneRoleActionRequiresCreatePermission(): void
     {
-        $role = new Role();
-        $role->setName('Role viewer');
-
-        $permission = new Permission();
-        $permission->setBundle('user');
-        $permission->setName('roles');
-        $permission->setRole($role);
-        $permission->setBitwise(4);
-
-        $user = $this->createUser('role_viewer', $role);
-        $this->em->persist($role);
-        $this->em->persist($permission);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $this->loginUser($user);
+        $role = $this->loginRoleViewer('clone_role_viewer');
         $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testDeleteRoleActionRequiresDeletePermission(): void
+    {
+        $role = $this->loginRoleViewer('delete_role_viewer');
+
+        $this->client->request(Request::METHOD_GET, '/s/roles/delete/'.$role->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testBatchDeleteRoleActionChecksDeletePermission(): void
+    {
+        $this->loginRoleViewer('batch_delete_role_viewer');
+
+        $targetRole = new Role();
+        $targetRole->setName('Role not batch deleted');
+        $this->em->persist($targetRole);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/roles/batchDelete/0?ids='.rawurlencode((string) json_encode([$targetRole->getId()]))
+        );
+
+        $this->assertResponseIsSuccessful();
+        $this->assertInstanceOf(Role::class, $this->em->getRepository(Role::class)->find($targetRole->getId()));
     }
 
     public function testIndexActionCanSortByUserCount(): void
@@ -200,5 +238,27 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         return $user;
+    }
+
+    private function loginRoleViewer(string $username): Role
+    {
+        $role = new Role();
+        $role->setName('Role viewer '.$username);
+
+        $permission = new Permission();
+        $permission->setBundle('user');
+        $permission->setName('roles');
+        $permission->setRole($role);
+        $permission->setBitwise(4);
+
+        $user = $this->createUser($username, $role);
+        $this->em->persist($role);
+        $this->em->persist($permission);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $this->loginUser($user);
+
+        return $role;
     }
 }
