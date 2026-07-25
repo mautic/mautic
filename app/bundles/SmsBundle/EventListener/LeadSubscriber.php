@@ -2,10 +2,9 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -15,7 +14,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private RouterInterface $router,
-        private EntityManager $em,
+        private StatRepository $statRepository,
     ) {
     }
 
@@ -48,11 +47,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository(Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
+        $stats                 = $this->statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);

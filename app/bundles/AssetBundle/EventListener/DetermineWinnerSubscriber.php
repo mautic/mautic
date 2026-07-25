@@ -2,9 +2,8 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private DownloadRepository $downloadRepository,
         private TranslatorInterface $translator,
     ) {
     }
@@ -30,7 +29,6 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
-        $repo       = $this->em->getRepository(Download::class);
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
@@ -50,7 +48,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
 
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate) {
-            $counts = ('page' === $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
+            $counts = ('page' === $type) ? $this->downloadRepository->getDownloadCountsByPage($ids, $startDate) : $this->downloadRepository->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
             if ($counts) {
                 $downloads  = $support  = $data  = [];
