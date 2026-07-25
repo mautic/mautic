@@ -56,7 +56,7 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
     ];
 
     /**
-     * @return string[][]
+     * @return string[]
      */
     private function resolveServiceIds(Container $container): array
     {
