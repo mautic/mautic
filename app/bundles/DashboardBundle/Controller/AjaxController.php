@@ -75,8 +75,8 @@ final class AjaxController extends CommonAjaxController
     public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
-        $repo = $this->widgetRepository;
-        $repo->updateOrdering(array_flip($data), $this->user->getId());
+
+        $this->widgetRepository->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
         return $this->sendJsonResponse($dataArray);

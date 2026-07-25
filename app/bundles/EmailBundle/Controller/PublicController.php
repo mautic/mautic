@@ -610,12 +610,11 @@ final class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails    = explode(';', $query['email']);
-        $repo = $this->leadRepository;
 
         foreach ($emails as $email) {
-            $lead = $repo->getLeadByEmail($email);
+            $lead = $this->leadRepository->getLeadByEmail($email);
             if (null === $lead) {
-                $lead = $this->createLead($email, $repo);
+                $lead = $this->createLead($email);
                 if (null === $lead) {
                     continue;
                 }
@@ -678,7 +677,7 @@ final class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead(string $email, \Mautic\LeadBundle\Entity\LeadRepository $repo): ?array
+    private function createLead(string $email): ?array
     {
         $lead  = $this->leadModel->getEntity();
         // set custom field values
@@ -688,7 +687,7 @@ final class PublicController extends CommonFormController
         $this->leadModel->saveEntity($lead);
 
         // return entity
-        return $repo->getLeadByEmail($email);
+        return $this->leadRepository->getLeadByEmail($email);
     }
 
     public function getUnsubscribeMessage(string $idHash, $model, $stat, TranslatorInterface $translator): string

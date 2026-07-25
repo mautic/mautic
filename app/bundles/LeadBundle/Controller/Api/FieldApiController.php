@@ -68,8 +68,7 @@ class FieldApiController extends CommonApiController
             $this->fieldObject = 'lead';
         }
 
-        $repo                = $this->leadFieldRepository;
-        $tableAlias          = $repo->getTableAlias();
+        $tableAlias          = $this->leadFieldRepository->getTableAlias();
         $this->listFilters[] = [
             'column' => $tableAlias.'.object',
             'expr'   => 'eq',

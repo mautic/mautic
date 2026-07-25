@@ -336,8 +336,7 @@ final class UserController extends FormController
 
         $userActivity       = $this->auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
-        $roleRepository     = $this->roleRepository;
-        $roles              = $roleRepository->getEntities();
+        $roles              = $this->roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);

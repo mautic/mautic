@@ -47,29 +47,19 @@ final class AjaxController extends CommonAjaxController
 
     private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    #[Required]
-    public function autowireAjaxController(\Mautic\LeadBundle\Entity\LeadRepository $leadRepository, \Mautic\EmailBundle\Entity\EmailRepository $emailRepository, \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository): void
-    {
-        $this->leadRepository = $leadRepository;
-        $this->emailRepository = $emailRepository;
-        $this->leadFieldRepository = $leadFieldRepository;
-    }
-
     private LeadModel $leadModel;
-
-    private FieldModel $leadFieldModel;
-
-    private EmailModel $emailModel;
 
     #[Required]
     public function autowireLeadAjaxController(
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        EmailModel $emailModel,
     ): void {
         $this->leadModel = $leadModel;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->emailModel = $emailModel;
+        $this->leadRepository = $leadRepository;
+        $this->emailRepository = $emailRepository;
+        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -112,12 +102,11 @@ final class AjaxController extends CommonAjaxController
         $dataArray = ['items' => []];
 
         if ($field && $value) {
-            $repo                       = $this->leadRepository;
-            $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
+            $leads                      = $this->leadRepository->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
             foreach ($leads as $lead) {
-                $fields = $repo->getFieldValues($lead->getId());
+                $fields = $this->leadRepository->getFieldValues($lead->getId());
                 $lead->setFields($fields);
                 $name = $lead->getName();
 
@@ -495,14 +484,13 @@ final class AjaxController extends CommonAjaxController
                 $maxLeadId = $this->leadRepository->getMaxLeadId();
 
                 // We need the EmailRepository to check if a lead is flagged as do not contact
-                $emailRepo          = $this->emailRepository;
                 $indexMode          = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->render(
                     "@MauticLead/Lead/{$template}.html.twig",
                     [
                         'items'         => $results['results'],
-                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
+                        'noContactList' => $this->emailRepository->getDoNotEmailList(array_keys($results['results'])),
                         'permissions'   => $permissions,
                         'security'      => $this->security,
                         'highlight'     => true,
