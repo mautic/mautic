@@ -717,7 +717,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             return false;
         }
 
-        $thisUser = $this->getId().$this->getUserIdentifier().$this->getPassword();
+        $thisUser = $this->id.$this->getUserIdentifier().$this->password;
         $thatUser = $user->getId().$user->getUserIdentifier().$user->getPassword();
 
         return $thisUser === $thatUser;

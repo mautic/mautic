@@ -375,7 +375,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPrimaryIdentifier()
     {
-        if ($name = $this->getName()) {
+        if ($name = $this->name) {
             return $name;
         }
         if (!empty($this->fields['core']['companyemail']['value'])) {
@@ -405,7 +405,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPermissionUser()
     {
-        return $this->getOwner() ?? $this->getCreatedBy();
+        return $this->owner ?? $this->getCreatedBy();
     }
 
     /**

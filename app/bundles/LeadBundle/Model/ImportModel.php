@@ -69,7 +69,7 @@ class ImportModel extends FormModel
      */
     public function getImportToProcess(): ?Import
     {
-        $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
+        $result = $this->importRepository->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 
         if (isset($result[0]) && $result[0] instanceof Import) {
             return $result[0];
@@ -84,7 +84,7 @@ class ImportModel extends FormModel
     public function checkParallelImportLimit(): bool
     {
         $parallelImportLimit = $this->getParallelImportLimit();
-        $importsInProgress   = $this->getRepository()->countImportsInProgress();
+        $importsInProgress   = $this->importRepository->countImportsInProgress();
 
         return $importsInProgress < $parallelImportLimit;
     }
@@ -121,7 +121,7 @@ class ImportModel extends FormModel
     public function setGhostImportsAsFailed()
     {
         $ghostDelay = 2;
-        $imports    = $this->getRepository()->getGhostImports($ghostDelay, 5);
+        $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
         if (empty($imports)) {
             return null;
@@ -376,7 +376,7 @@ class ImportModel extends FormModel
 
             // Save Import entity once per batch so the user could see the progress
             if (0 === $batchSize && $import->isBackgroundProcess()) {
-                $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
+                $isPublished = $this->importRepository->getValue($import->getId(), 'is_published');
 
                 if (!$isPublished) {
                     $import->setStatus($import::STOPPED);
@@ -404,7 +404,7 @@ class ImportModel extends FormModel
             }
         }
 
-        $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
+        $isPublished = (bool) $this->importRepository->getValue($import->getId(), 'is_published');
         if ($isPublished && $import->getLastLineImported() < $import->getLineCount()) {
             $import->setStatus($import::DELAYED);
             $this->saveEntity($import);
@@ -544,7 +544,7 @@ class ImportModel extends FormModel
             return null;
         }
 
-        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
+        return $this->leadEventLogRepository->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
     public function getRepository(): ImportRepository

@@ -91,15 +91,15 @@ class EventModel extends FormModel
         }
 
         if ([] !== $deletedKeys) {
-            $this->getRepository()->nullEventRelationships($deletedKeys);
-            $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
+            $this->eventRepository->nullEventRelationships($deletedKeys);
+            $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);
         }
     }
 
     public function deleteEventsByCampaignId(int $campaignId): void
     {
-        $eventIds = $this->getRepository()->getCampaignEventIds($campaignId);
+        $eventIds = $this->eventRepository->getCampaignEventIds($campaignId);
         $this->deleteEventsByEventIds($eventIds);
     }
 
@@ -109,7 +109,7 @@ class EventModel extends FormModel
     public function deleteEventsByEventIds(array $eventIds): void
     {
         $deletedData = array_map(fn (string $id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
-        $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
+        $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
         $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }
 

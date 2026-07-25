@@ -117,7 +117,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         if (!$this->repoSetup) {
             $this->repoSetup = true;
-            $this->companyRepository->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
             $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
@@ -351,7 +350,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 continue;
             }
 
-            $companyLead = $this->getCompanyLeadRepository()->findOneBy(
+            $companyLead = $this->companyLeadRepository->findOneBy(
                 [
                     'lead'    => $lead,
                     'company' => $companyLeadAdd[$companyId],
@@ -380,7 +379,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($persistCompany)) {
-            $this->getCompanyLeadRepository()->saveEntities($persistCompany);
+            $this->companyLeadRepository->saveEntities($persistCompany);
         }
 
         if (!empty($companyName)) {
@@ -405,7 +404,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->getCompanyLeadRepository()->detachEntities($persistCompany);
+        $this->companyLeadRepository->detachEntities($persistCompany);
 
         return $contactAdded;
     }
@@ -470,7 +469,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
 
             /** @var CompanyLead $companyLead */
-            $companyLead = $this->getCompanyLeadRepository()->findOneBy(
+            $companyLead = $this->companyLeadRepository->findOneBy(
                 [
                     'lead'    => $lead,
                     'company' => $companyLeadRemove[$companyId],
@@ -495,7 +494,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($deleteCompanyLead)) {
-            $this->getCompanyLeadRepository()->deleteEntities($deleteCompanyLead);
+            $this->companyLeadRepository->deleteEntities($deleteCompanyLead);
         }
 
         if ($primaryRemoved) {
@@ -505,7 +504,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->getCompanyLeadRepository()->detachEntities($deleteCompanyLead);
+        $this->companyLeadRepository->detachEntities($deleteCompanyLead);
 
         if (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE)) {
             foreach ($dispatchEvents as $companyId) {
@@ -863,8 +862,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // move all leads from secondary company to main company
-        $companyLeadRepo = $this->getCompanyLeadRepository();
-        $secCompanyLeads = $companyLeadRepo->getCompanyLeads($secCompanyId);
+        $secCompanyLeads = $this->companyLeadRepository->getCompanyLeads($secCompanyId);
 
         foreach ($secCompanyLeads as $lead) {
             $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);
@@ -1111,13 +1109,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $companyLead        = null;
 
         // Find another company to make primary if applicable
-        $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        $leadCompanies = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
         if (count($leadCompanies)) {
             $newPrimaryArray   = reset($leadCompanies);
             $newPrimaryCompany = $this->em->getReference(Company::class, $newPrimaryArray['company_id']);
 
             /** @var CompanyLead $companyLead */
-            $companyLead = $this->getCompanyLeadRepository()->findOneBy(
+            $companyLead = $this->companyLeadRepository->findOneBy(
                 [
                     'lead'    => $lead,
                     'company' => $newPrimaryCompany,
@@ -1125,7 +1123,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             $companyLead->setPrimary(true);
-            $this->getCompanyLeadRepository()->saveEntity($companyLead);
+            $this->companyLeadRepository->saveEntity($companyLead);
 
             $primaryCompanyName = $newPrimaryArray['companyname'];
         }
@@ -1135,7 +1133,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $this->leadRepository->saveEntity($lead);
 
         if (null !== $companyLead) {
-            $this->getCompanyLeadRepository()->detachEntity($companyLead);
+            $this->companyLeadRepository->detachEntity($companyLead);
         }
     }
 
@@ -1180,7 +1178,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     public function changePrimaryCompanyToLatest(int $companyId): void
     {
-        while ($companyLeads = $this->getCompanyLeadRepository()->findBy(['company' => $companyId, 'primary' => 1], [], CompanyLeadRepository::BATCH_SIZE, 0)) {
+        while ($companyLeads = $this->companyLeadRepository->findBy(['company' => $companyId, 'primary' => 1], [], CompanyLeadRepository::BATCH_SIZE, 0)) {
             foreach ($companyLeads as $companyLead) {
                 $this->removeLeadFromCompany($companyLead->getCompany(), $companyLead->getlead());
             }

@@ -250,6 +250,6 @@ class Channel extends CommonEntity implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getMessage()->getCreatedBy();
+        return $this->message->getCreatedBy();
     }
 }
