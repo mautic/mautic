@@ -65,7 +65,10 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
         // DI
-        ConfigServiceToAutowiredServiceRector::class,
+        // ConfigServiceToAutowiredServiceRector::class,
+        // applied on:
+        // * email-bundle
+
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()

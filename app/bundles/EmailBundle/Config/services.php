@@ -29,18 +29,25 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set('mautic.di.env_processor.mailerdsn', Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class)->tag('container.env_var_processor');
     $services->set('mautic.message.search.contact', Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class);
-    $services->set('mautic.message.processor.unsubscribe', Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
-    $services->set('mautic.message.processor.feedbackloop', Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
+
+    $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
+    $services->alias('mautic.message.processor.unsubscribe', Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
+
+    $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
+    $services->alias('mautic.message.processor.feedbackloop', Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
+
     $services->set('mautic.validator.email', Mautic\EmailBundle\Helper\EmailValidator::class);
     $services->set('mautic.email.fetcher', Mautic\EmailBundle\MonitoredEmail\Fetcher::class);
     $services->set('mautic.email.helper.stats_collection', Mautic\EmailBundle\Helper\StatsCollectionHelper::class);
     $services->set('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
+
     $services->set('mautic.email.stats.helper_bounced', Mautic\EmailBundle\Stats\Helper\BouncedHelper::class)->tag('mautic.email_stat_helper');
     $services->set('mautic.email.stats.helper_clicked', Mautic\EmailBundle\Stats\Helper\ClickedHelper::class)->tag('mautic.email_stat_helper');
     $services->set('mautic.email.stats.helper_failed', Mautic\EmailBundle\Stats\Helper\FailedHelper::class)->tag('mautic.email_stat_helper');
     $services->set('mautic.email.stats.helper_opened', Mautic\EmailBundle\Stats\Helper\OpenedHelper::class)->tag('mautic.email_stat_helper');
     $services->set('mautic.email.stats.helper_sent', Mautic\EmailBundle\Stats\Helper\SentHelper::class)->tag('mautic.email_stat_helper');
     $services->set('mautic.email.stats.helper_unsubscribed', Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class)->tag('mautic.email_stat_helper');
+
     $services->set('mautic.email.validator.multiple_emails_valid_validator', Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.email.validator.email_or_token_list_validator', Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class)->tag('validator.constraint_validator');
 
