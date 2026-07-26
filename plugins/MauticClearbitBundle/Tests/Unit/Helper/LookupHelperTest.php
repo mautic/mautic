@@ -23,9 +23,9 @@ final class LookupHelperTest extends TestCase
 {
     private MockObject&IntegrationsHelper $integrationsHelper;
 
-    private MockObject&UserHelper $userHelper;
+    private \PHPUnit\Framework\MockObject\Stub&UserHelper $userHelper;
 
-    private MockObject&LoggerInterface $logger;
+    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
 
     private MockObject&LeadModel $leadModel;
 
@@ -36,8 +36,8 @@ final class LookupHelperTest extends TestCase
         parent::setUp();
 
         $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
-        $this->userHelper         = $this->createMock(UserHelper::class);
-        $this->logger             = $this->createMock(LoggerInterface::class);
+        $this->userHelper         = $this->createStub(UserHelper::class);
+        $this->logger             = $this->createStub(LoggerInterface::class);
         $this->leadModel          = $this->createMock(LeadModel::class);
         $this->companyModel       = $this->createMock(CompanyModel::class);
     }
