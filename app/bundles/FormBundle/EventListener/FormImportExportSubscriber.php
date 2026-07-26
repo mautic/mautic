@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,6 +27,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FormRepository $formRepository,
         private FormModel $formModel,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
@@ -119,7 +121,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $formData) {
-            $form  = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $formData['uuid']]);
+            $form  = $this->formRepository->findOneBy(['uuid' => $formData['uuid']]);
             $isNew = !$form;
 
             $form ??= new Form();
@@ -159,7 +161,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Form::class)->find($id);
+            $entity = $this->formRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

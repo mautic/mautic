@@ -226,3 +226,4 @@ rules:
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
 	#- Utils\PHPStan\Rule\NoContainerGetRule
+	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
