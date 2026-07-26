@@ -85,9 +85,6 @@ final class SearchSubscriberTest extends TestCase
         $contactRepository->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($connection));
 
-        $leadModel->method('getRepository')
-            ->willReturn($contactRepository);
-
         $translator
             ->method('trans')
             ->willReturnCallback(function (string $key): ?string {
@@ -102,7 +99,8 @@ final class SearchSubscriberTest extends TestCase
             $translator,
             $security,
             $twig,
-            $globalSearch
+            $globalSearch,
+            $contactRepository
         );
 
         $dispatcher = new EventDispatcher();
