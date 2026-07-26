@@ -32,6 +32,8 @@ final class ListController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
     private ListModel $listModel;
 
     private LeadModel $leadModel;
@@ -40,9 +42,11 @@ final class ListController extends FormController
     public function autowireListController(
         LeadModel $leadModel,
         ListModel $listModel,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
+        $this->leadListRepository = $leadListRepository;
     }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
@@ -105,7 +109,7 @@ final class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $this->listModel->getRepository()->getTableAlias();
+        $tableAlias = $this->leadListRepository->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -799,7 +803,7 @@ final class ListController extends FormController
                 'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
-                'segmentCount'       => $listModel->getRepository()->getLeadCount($list->getId()),
+                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
                 'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,

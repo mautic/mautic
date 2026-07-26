@@ -29,6 +29,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         private readonly TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -123,7 +124,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     'force' => [
                         [
                             'expr'   => 'notIn',
-                            'column' => $this->listModel->getRepository()->getTableAlias().'.id',
+                            'column' => $this->leadListRepository->getTableAlias().'.id',
                             'value'  => $excludeSegments,
                         ],
                     ],
