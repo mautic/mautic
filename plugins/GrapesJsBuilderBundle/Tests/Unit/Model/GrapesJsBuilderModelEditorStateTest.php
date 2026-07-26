@@ -46,7 +46,6 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(false);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
         $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
@@ -58,7 +57,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createStub(EntityManager::class);
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager, $grapesRepository);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, $grapesRepository, $emailRepository);
 
         $email = new Email();
         $email->setContent(['existing' => true]);
@@ -91,13 +90,12 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(true);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->never())->method('getRepository');
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, null, $emailRepository);
 
         $model->addOrEditEntity(new Email());
     }
@@ -153,6 +151,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         EmailModel $emailModel,
         EntityManager $entityManager,
         ?GrapesJsBuilderRepository $grapesJsBuilderRepository = null,
+        ?EmailRepository $emailRepository = null,
     ): GrapesJsBuilderModel {
         return new GrapesJsBuilderModel(
             $requestStack,
@@ -166,6 +165,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
             $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class), // $grapesJsBuilderRepository
+            $emailRepository ?? $this->createStub(EmailRepository::class), // $emailRepository
         );
     }
 }

@@ -391,7 +391,6 @@ final class ReportSubscriber implements EventSubscriberInterface
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
-        $companyRepo  = $this->companyRepository;
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
@@ -577,7 +576,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.lead.table.pie.company.country':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companycountry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companycountry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -606,7 +605,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $event->setGraph($g, $data);
                     break;
                 case 'mautic.lead.graph.pie.companies.industry':
-                    $counts       = $companyRepo->getCompaniesByGroup($queryBuilder, 'companyindustry');
+                    $counts       = $this->companyRepository->getCompaniesByGroup($queryBuilder, 'companyindustry');
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
@@ -638,7 +637,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $limit  = 10;
                     $offset = 0;
 
-                    $items                  = $companyRepo->getMostCompanies($queryBuilder, $limit, $offset);
+                    $items                  = $this->companyRepository->getMostCompanies($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

@@ -288,16 +288,13 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
-                $trackableRepository = $this->trackableRepository;
-                $redirectRepository  = $this->redirectRepository;
-
                 if ($trackable instanceof Trackable) {
-                    $trackableRepository->detachEntity($trackable);
-                    $redirectRepository->detachEntity($trackable->getRedirect());
-                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                    $this->trackableRepository->detachEntity($trackable);
+                    $this->redirectRepository->detachEntity($trackable->getRedirect());
+                    $this->trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
                 } else {
-                    $redirectRepository->detachEntity($trackable);
-                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                    $this->redirectRepository->detachEntity($trackable);
+                    $this->trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
         }

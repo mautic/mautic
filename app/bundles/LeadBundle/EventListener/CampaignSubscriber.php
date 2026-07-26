@@ -513,8 +513,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $tagRepo = $this->leadModel->getTagRepository();
             $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
-            $listRepo = $this->leadListRepository;
-            $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+            $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
         } elseif ($event->checkContext('lead.stages')) {
             $result   = $this->leadRepository->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
