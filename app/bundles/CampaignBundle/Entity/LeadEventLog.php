@@ -115,6 +115,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
             ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
+            ->addIndex(['campaign_id', 'lead_id', 'rotation'], 'campaign_log_campaign_lead_rotation')
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
