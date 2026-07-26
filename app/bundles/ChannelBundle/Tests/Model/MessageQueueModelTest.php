@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -28,27 +29,24 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     public const DATE = '2019-07-07 15:00:00';
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueue;
+    private MessageQueueModel $messageQueue;
 
-    protected MessageQueue $message;
+    private MessageQueue $message;
 
     /**
      * @var MockObject&LeadModel
      */
-    protected MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject&EntityManagerInterface
      */
-    protected MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&MessageQueueRepository
      */
-    protected MockObject $messageQueueRepository;
+    private MockObject $messageQueueRepository;
 
     protected function setUp(): void
     {
@@ -68,7 +66,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->messageQueueRepository,
-            $this->createStub(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class) // $frequencyRuleRepository
+            $this->createStub(FrequencyRuleRepository::class) // $frequencyRuleRepository
         );
 
         $message      = new MessageQueue();

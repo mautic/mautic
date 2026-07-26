@@ -13,6 +13,7 @@ use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadg
 use Mautic\UserBundle\Security\Authenticator\SsoAuthenticator;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Mautic\UserBundle\UserEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class SsoAuthenticatorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideIsPost')]
+    #[DataProvider('provideIsPost')]
     public function testIsPost(string $method, bool $isPost, bool $expected): void
     {
         $path              = '/path';
@@ -79,7 +80,7 @@ final class SsoAuthenticatorTest extends TestCase
         yield 'is POST and not POST only' => [Request::METHOD_POST, false, true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideCheckPath')]
+    #[DataProvider('provideCheckPath')]
     public function testCheckPath(bool $expected): void
     {
         $path              = '/path';
@@ -119,7 +120,7 @@ final class SsoAuthenticatorTest extends TestCase
         yield 'Is not correct path' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormOnly')]
+    #[DataProvider('provideFormOnly')]
     public function testFormOnly(string $mimeType, bool $isForm, bool $expected): void
     {
         $path              = '/path';
@@ -163,7 +164,7 @@ final class SsoAuthenticatorTest extends TestCase
         yield 'is form and not form only' => ['application/x-www-form-urlencoded', false, true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideRequestIntegrationParameter')]
+    #[DataProvider('provideRequestIntegrationParameter')]
     public function testHasRequestIntegrationParameter(?bool $addToPost, bool $isPost, bool $expected): void
     {
         $path              = '/path';
@@ -213,7 +214,7 @@ final class SsoAuthenticatorTest extends TestCase
         yield 'has no POST or GET parameter and is not POST only' => [null, false, false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEnableCsrf')]
+    #[DataProvider('provideEnableCsrf')]
     public function testBadges(bool $enableCsrf): void
     {
         $username          = 'mautic';

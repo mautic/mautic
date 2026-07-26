@@ -41,7 +41,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportController extends FormController
+final class ImportController extends FormController
 {
     // Steps of the import
     public const STEP_UPLOAD_CSV      = 1;
@@ -66,6 +66,7 @@ class ImportController extends FormController
         private readonly RequestStack $requestStack,
         CorePermissions $security,
         private readonly ImportModel $importModel,
+        private readonly \Mautic\LeadBundle\Entity\ImportRepository $importRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -98,7 +99,7 @@ class ImportController extends FormController
         $object = $this->requestStack->getSession()->get('mautic.import.object');
 
         $filter['force'][] = [
-            'column' => $this->importModel->getRepository()->getTableAlias().'.object',
+            'column' => $this->importRepository->getTableAlias().'.object',
             'expr'   => 'eq',
             'value'  => $object,
         ];
@@ -189,8 +190,6 @@ class ImportController extends FormController
      */
     public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {
-        $dispatcher = $this->dispatcher;
-
         try {
             $initEvent = $this->dispatchImportOnInit();
         } catch (AccessDeniedException $e) {
@@ -237,7 +236,7 @@ class ImportController extends FormController
                 $form = $this->formFactory->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
-                $mappingEvent = $dispatcher->dispatch(
+                $mappingEvent = $this->dispatcher->dispatch(
                     new ImportMappingEvent($request->get('object')),
                     LeadEvents::IMPORT_ON_FIELD_MAPPING
                 );
@@ -395,7 +394,7 @@ class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($request->get('object'), $form);
 
-                    $dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
+                    $this->dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
 
                     if ($validateEvent->hasErrors()) {
                         break;
@@ -713,7 +712,7 @@ class ImportController extends FormController
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
-    protected function getPermissionBase(): ?string
+    protected function getPermissionBase(): string
     {
         return $this->importModel->getPermissionBase();
     }

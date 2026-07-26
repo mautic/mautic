@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\FieldList;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,7 +34,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed[]> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetFieldsProperties')]
+    #[DataProvider('dataForGetFieldsProperties')]
     public function testGetFieldsProperties(array $filters, int $expectedCount): void
     {
         /** @var FieldModel $fieldModel */
@@ -211,7 +213,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
@@ -252,7 +254,7 @@ final class FieldModelTest extends MauticMysqlTestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $this->createStub(\Mautic\LeadBundle\Entity\LeadRepository::class), // $leadRepository
+            $this->createStub(LeadRepository::class), // $leadRepository
         );
         $this->assertTrue($model->isUsedField($leadField));
     }

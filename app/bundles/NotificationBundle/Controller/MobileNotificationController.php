@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
@@ -13,18 +14,19 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class MobileNotificationController extends FormController
+final class MobileNotificationController extends FormController
 {
     use EntityContactsTrait;
 
     private NotificationModel $notificationModel;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireMobileNotificationController(
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
@@ -257,10 +259,8 @@ class MobileNotificationController extends FormController
      * Generates new form and processes post data.
      *
      * @param Notification $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null)
+    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
@@ -391,10 +391,8 @@ class MobileNotificationController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);

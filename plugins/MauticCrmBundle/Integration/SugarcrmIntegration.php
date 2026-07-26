@@ -925,9 +925,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ],
                 'label'             => 'mautic.sugarcrm.form.version',
                 'constraints'       => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
                 'required' => true,
             ]);
@@ -1480,7 +1478,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
+    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {

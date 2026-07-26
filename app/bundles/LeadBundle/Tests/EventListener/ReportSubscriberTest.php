@@ -12,6 +12,8 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
@@ -28,6 +30,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -241,7 +244,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'           => 'Send email',
                             'description'     => 'Send the selected email to the contact.',
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
-                            'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
+                            'formType'        => EmailSendType::class,
                             'formTypeOptions' => [
                                 'update_select'    => 'campaignevent_properties_email',
                                 'with_email_types' => true,
@@ -256,7 +259,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'                  => 'Clicks email',
                             'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                             'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                            'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
+                            'formType'               => EmailClickDecisionType::class,
                             'connectionRestrictions' => [
                                 'source' => [
                                     'action' => [
@@ -363,7 +366,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testOnReportBuilder(string $event): void
     {
         if ('companies' !== $event) {
@@ -834,7 +837,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $reportBuilderEvent->getTables());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testReportGenerate(string $context): void
     {
         $matcher = $this->any();
@@ -867,7 +870,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testonReportGraphGenerate(string $event): void
     {
         $this->reportGraphEventMock->expects($this->once())
@@ -939,7 +942,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGraphGenerate($this->reportGraphEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testOnReportDisplay(string $event): void
     {
         $this->reportBuilderEventMock

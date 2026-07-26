@@ -10,6 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -80,7 +81,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
                     return [['owner_id' => 2, 'id' => 2]];
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->never())
@@ -135,7 +136,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
                     return [];
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->exactly(2))

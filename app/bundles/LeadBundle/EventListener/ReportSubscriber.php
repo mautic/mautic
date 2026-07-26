@@ -23,7 +23,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_LEADS                     = 'leads';
 

@@ -2,8 +2,10 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Exception;
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -12,6 +14,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\UserBundle\Entity\Role;
@@ -728,13 +731,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (isset($personData['Id'])) {
                         /** @var IntegrationEntityRepository $integrationEntityRepo */
-                        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+                        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
                         $integrationEntity = (empty($integrationId))
                             ? $this->createIntegrationEntity($object, $personData['Id'], 'lead', $lead->getId(), [], false)
                             :
-                            $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
+                            $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
 
                         $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                         $integrationEntityRepo->saveEntity($integrationEntity);
@@ -806,13 +809,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if (isset($companyData['Id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
-                    $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+                    $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'company', $company->getId());
 
                     $integrationEntity = (empty($integrationId))
                         ? $this->createIntegrationEntity($object, $companyData['Id'], 'lead', $company->getId(), [], false)
                         :
-                        $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
+                        $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
 
                     $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                     $integrationEntityRepo->saveEntity($integrationEntity);
@@ -987,7 +990,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         sort($salesForceObjects);
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -1354,7 +1357,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->failureFetchingLeads = false;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $mixedFields           = $this->getIntegrationSettings()->getFeatureSettings();
 
         // Get the last time the campaign was synced to prevent resyncing the entire SF campaign
@@ -1496,7 +1499,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticData = [];
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
 
         $body   = [
             'Status' => $status,
@@ -1626,7 +1629,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } elseif (isset($trackedContacts['Contact'][$key])) {
                     // We already know this is a converted contact so just ignore it
                     $integrationEntity = $this->em->getReference(
-                        \Mautic\PluginBundle\Entity\IntegrationEntity::class,
+                        IntegrationEntity::class,
                         $lead['id']
                     );
                     $this->deleteIntegrationEntities[] = $integrationEntity;
@@ -2094,7 +2097,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticLeadFieldString,
         array $sfEntityRecords,
         $progress = null,
-    ) {
+    ): void {
         foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
             $skipObject = false;
             $syncLead   = false;
@@ -2128,7 +2131,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 // This is a converted lead so remove the Lead entity leaving the Contact entity
                 if (!empty($trackedContacts['Lead'][$key])) {
                     $this->deleteIntegrationEntities[] = $this->em->getReference(
-                        \Mautic\PluginBundle\Entity\IntegrationEntity::class,
+                        IntegrationEntity::class,
                         $trackedContacts['Lead'][$key]
                     );
                     $deleted                           = true;
@@ -2139,7 +2142,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     // This Lead is already a Contact but was not updated for whatever reason
                     if (!$deleted) {
                         $this->deleteIntegrationEntities[] = $this->em->getReference(
-                            \Mautic\PluginBundle\Entity\IntegrationEntity::class,
+                            IntegrationEntity::class,
                             $checkEmailsInSF[$key]['id']
                         );
                     }
@@ -2240,7 +2243,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array &$checkEmailsInSF,
         array &$processedLeads,
         array $objectFields,
-    ) {
+    ): void {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
                 if ($this->buildCompositeBody(
@@ -2272,7 +2275,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param int $totalCreated
      * @param int $totalErrored
      */
-    protected function makeCompositeRequest($mauticData, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0)
+    protected function makeCompositeRequest($mauticData, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): void
     {
         if (empty($mauticData)) {
             return;
@@ -2569,7 +2572,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         // get last modified date for donot contact in Mautic
-        $auditLogRepo        = $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class);
+        $auditLogRepo        = $this->em->getRepository(AuditLog::class);
         $filters['search']   = 'dnc_channel_status%'.$channel;
         $lastModifiedDNCDate = $auditLogRepo->getAuditLogsForLeads(array_flip($leadIds), $filters, ['dateAdded', 'DESC'], $params['start']);
         $trackedIds          = [];
@@ -2820,7 +2823,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array $objectFields,
         array $sfEntityRecords,
         $progress = null,
-    ) {
+    ): void {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
             $update      = false;
@@ -2909,7 +2912,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array &$checkCompaniesInSF,
         array &$processedCompanies,
         array $objectFields,
-    ) {
+    ): void {
         foreach ($checkCompaniesInSF as $key => $company) {
             if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
                 if ($this->buildCompositeBody(
@@ -2977,7 +2980,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $toDate,
         &$totalCount,
         $progress = null,
-    ) {
+    ): void {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $entitiesToCreate      = $integrationEntityRepo->findLeadsToCreate(
             'Salesforce',
@@ -3029,7 +3032,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             foreach ($resultsById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && 1 == $record['IsDeleted']) {
                     if ($foundKey = array_search($record['Id'], $searchForIds)) {
-                        $integrationEntity = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $checkIdsInSF[$foundKey]['id']);
+                        $integrationEntity = $this->em->getReference(IntegrationEntity::class, $checkIdsInSF[$foundKey]['id']);
                         $integrationEntity->setInternalEntity('company-deleted');
                         $this->persistIntegrationEntities[] = $integrationEntity;
                         unset($checkIdsInSF[$foundKey]);
@@ -3078,7 +3081,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    public function getEntityManager(): \Doctrine\ORM\EntityManager
+    public function getEntityManager(): EntityManager
     {
         return $this->em;
     }

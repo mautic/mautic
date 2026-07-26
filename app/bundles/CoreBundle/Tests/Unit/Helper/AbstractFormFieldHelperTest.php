@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
+use Mautic\CoreBundle\Helper\ListParser\BarListParser;
+use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
+use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(AbstractFormFieldHelper::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\BarListParser::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
+#[CoversClass(AbstractFormFieldHelper::class)]
+#[CoversClass(BarListParser::class)]
+#[CoversClass(JsonListParser::class)]
+#[CoversClass(ValueListParser::class)]
+#[CoversClass(ArrayListParser::class)]
 final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -26,7 +33,7 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testBarLabelValueFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -39,7 +46,7 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testJsonEncodedFormatConvertedToArray(): void
     {
         $this->assertEquals(
@@ -52,13 +59,13 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testSingleSelectedValueDoesNotGoIntoJson(): void
     {
         $this->assertEquals(['1' => '1'], AbstractFormFieldHelper::parseList('1'));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testLabelValuePairsAreFlattened(): void
     {
         $this->assertEquals(
@@ -90,7 +97,7 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
      * @param mixed[] $inputOptions
      * @param mixed[] $expectedOptions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideChoices')]
+    #[DataProvider('provideChoices')]
     public function testParseList(array $inputOptions, array $expectedOptions): void
     {
         $this->assertEquals($expectedOptions, AbstractFormFieldHelper::parseList($inputOptions));
@@ -174,7 +181,7 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
+    #[TestDox('The string is parsed correctly into a choice array')]
     public function testLabelValuePairsAreFlattenedWithOptGroup(): void
     {
         $array['optGroup1'] = [

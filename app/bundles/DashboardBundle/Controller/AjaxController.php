@@ -11,15 +11,21 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
+    private \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository;
+
     private DashboardModel $dashboardModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireDashboardAjaxController(DashboardModel $dashboardModel): void
-    {
+    #[Required]
+    public function autowireDashboardAjaxController(
+        \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository,
+        DashboardModel $dashboardModel,
+    ): void {
         $this->dashboardModel = $dashboardModel;
+        $this->widgetRepository = $widgetRepository;
     }
 
     /**
@@ -69,8 +75,8 @@ class AjaxController extends CommonAjaxController
     public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
-        $repo = $this->dashboardModel->getRepository();
-        $repo->updateOrdering(array_flip($data), $this->user->getId());
+
+        $this->widgetRepository->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
         return $this->sendJsonResponse($dataArray);

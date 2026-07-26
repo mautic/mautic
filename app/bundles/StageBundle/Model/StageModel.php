@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
@@ -23,6 +24,7 @@ use Mautic\StageBundle\StageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -42,14 +44,14 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         Translator $translator,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StageRepository $stageRepository,
         private readonly StagesChangeLogRepository $stagesChangeLogRepository,
         private readonly LeadStageLogRepository $leadStageLogRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
+    public function getRepository(): StageRepository
     {
         return $this->stageRepository;
     }
@@ -62,7 +64,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -191,11 +193,9 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
                 ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
-            $changeLogRepo = $this->stagesChangeLogRepository;
-            $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->stagesChangeLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
-            $leadStageLogRepo = $this->leadStageLogRepository;
-            $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
+            $this->leadStageLogRepository->updateStage($secondaryStageId, $primaryStageId);
 
             $this->deleteEntity($secondaryStage);
         });
@@ -208,6 +208,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->getRepository()->getStages($user);
+        return $this->stageRepository->getStages($user);
     }
 }

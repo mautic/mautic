@@ -25,23 +25,28 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ListController extends FormController
+final class ListController extends FormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
+
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
 
     private ListModel $listModel;
 
     private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireListController(
         LeadModel $leadModel,
         ListModel $listModel,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
+        $this->leadListRepository = $leadListRepository;
     }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
@@ -104,7 +109,7 @@ class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $this->listModel->getRepository()->getTableAlias();
+        $tableAlias = $this->leadListRepository->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -798,7 +803,7 @@ class ListController extends FormController
                 'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
-                'segmentCount'       => $listModel->getRepository()->getLeadCount($list->getId()),
+                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
                 'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
@@ -845,7 +850,7 @@ class ListController extends FormController
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
 
-        $sourceLists = $this->getListModel()->getSourceLists();
+        $sourceLists = $this->listModel->getSourceLists();
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),

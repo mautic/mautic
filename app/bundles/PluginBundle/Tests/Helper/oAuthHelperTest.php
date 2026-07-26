@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Helper;
 
 use Mautic\PluginBundle\Helper\oAuthHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class oAuthHelperTest extends TestCase
@@ -12,7 +13,7 @@ final class oAuthHelperTest extends TestCase
     /**
      * @param array<int, string> $headers
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForHashSensitiveHeaderData')]
+    #[DataProvider('dataForHashSensitiveHeaderData')]
     public function testHashSensitiveHeaderData(string $authorization, array $headers): void
     {
         $hashedHeaders = oAuthHelper::sanitizeHeaderData($headers);

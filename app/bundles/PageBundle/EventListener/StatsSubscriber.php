@@ -10,7 +10,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\VideoHit;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
