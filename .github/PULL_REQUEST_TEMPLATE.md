@@ -10,6 +10,12 @@ c = future major release
 * a.b for any bug fixes (e.g. 5.2, 6.0)
 * c.x for any bug fixes, features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 7.x) -->
 
+<!-- 📄 DOCUMENTATION REVIEW REQUIRED:
+
+After you open this PR, Promptless automatically creates a documentation PR and leaves a comment here with the link. Once your code PR merges, review the documentation PR, request changes if needed, and approve it promptly.
+
+See "Reviewing documentation PRs from Promptless" in the community handbook for more details: https://contribute.mautic.org/en/latest/contributing/developer.html#reviewing-documentation-prs-from-promptless -->
+
 | Q                                      | A
 | -------------------------------------- | ---
 | Bug fix? (use the a.b branch)          | ✔️❌ <!-- Use emojis to indicate positive (green) or negative (red) for each item in the table. -->
