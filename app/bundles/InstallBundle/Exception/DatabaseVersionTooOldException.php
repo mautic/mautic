@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Exception;
 
-class DatabaseVersionTooOldException extends \Exception
+final class DatabaseVersionTooOldException extends \Exception
 {
     public function __construct(
         private readonly string $currentVersion,
