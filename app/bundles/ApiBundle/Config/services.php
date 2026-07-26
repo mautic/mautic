@@ -24,6 +24,7 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
+    $services->set('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
 
     $services->alias(AuthorizeFormHandler::class, 'fos_oauth_server.authorize.form.handler.default');
 
