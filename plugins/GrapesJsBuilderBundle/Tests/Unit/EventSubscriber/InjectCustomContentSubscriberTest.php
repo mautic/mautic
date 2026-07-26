@@ -26,11 +26,6 @@ final class InjectCustomContentSubscriberTest extends TestCase
     private MockObject $config;
 
     /**
-     * @var MockObject&GrapesJsBuilderModel
-     */
-    private MockObject $model;
-
-    /**
      * @var MockObject&Environment
      */
     private MockObject $twig;
@@ -48,7 +43,6 @@ final class InjectCustomContentSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->config                    = $this->createMock(Config::class);
-        $this->model                     = $this->createMock(GrapesJsBuilderModel::class);
         $this->twig                      = $this->createMock(Environment::class);
         $this->router                    = $this->createMock(RouterInterface::class);
         $this->grapesJsBuilderRepository = $this->createMock(GrapesJsBuilderRepository::class);
@@ -60,7 +54,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
         $requestStack->push(new Request());
         $this->config->method('isPublished')->willReturn(false);
 
-        $subscriber = new InjectCustomContentSubscriber($this->config, $this->model, $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
+        $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
 
         $this->twig->expects($this->never())->method('render');
@@ -89,7 +83,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
             ->with('@GrapesJsBuilder/Setting/fields.html.twig', ['customMjml' => '<mjml>request</mjml>'])
             ->willReturn('<div>ok</div>');
 
-        $subscriber = new InjectCustomContentSubscriber($this->config, $this->model, $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
+        $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
 
         $subscriber->injectViewCustomContent($event);
@@ -114,7 +108,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
             ->with('@GrapesJsBuilder/Setting/fields.html.twig', ['customMjml' => '<mjml>stored</mjml>'])
             ->willReturn('<div>stored</div>');
 
-        $subscriber = new InjectCustomContentSubscriber($this->config, $this->model, $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
+        $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'email.settings.advanced', ['email' => new Email()]);
 
         $subscriber->injectViewCustomContent($event);
@@ -149,7 +143,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
             )
             ->willReturn('<script>vars</script>');
 
-        $subscriber = new InjectCustomContentSubscriber($this->config, $this->model, $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
+        $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
         $event      = new CustomContentEvent('view', 'page.header.left');
 
         $subscriber->injectViewCustomContent($event);

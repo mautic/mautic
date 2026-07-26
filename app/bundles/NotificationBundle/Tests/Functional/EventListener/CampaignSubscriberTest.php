@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Entity\Notification;
-use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
 use PHPUnit\Framework\Assert;
@@ -415,7 +414,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(static::getContainer()->get('mautic.helper.integration'), static::getContainer()->get('mautic.notification.model.notification'), static::getContainer()->get('mautic.notification.api'), static::getContainer()->get('event_dispatcher'), static::getContainer()->get('mautic.lead.model.dnc'), static::getContainer()->get('translator'), static::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
+        $subscriber = new class(static::getContainer()->get('mautic.helper.integration'), static::getContainer()->get('mautic.notification.model.notification'), static::getContainer()->get('mautic.notification.api'), static::getContainer()->get('event_dispatcher'), static::getContainer()->get('mautic.lead.model.dnc'), static::getContainer()->get('translator')) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
