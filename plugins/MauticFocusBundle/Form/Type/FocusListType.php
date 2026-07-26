@@ -17,9 +17,9 @@ final class FocusListType extends AbstractType
     private readonly FocusRepository $repo;
 
     public function __construct(
-        protected FocusModel $focusModel,
+        protected FocusModel $focusModel, private readonly \MauticPlugin\MauticFocusBundle\Entity\FocusRepository $focusRepository,
     ) {
-        $this->repo       = $this->focusModel->getRepository();
+        $this->repo       = $this->focusRepository;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

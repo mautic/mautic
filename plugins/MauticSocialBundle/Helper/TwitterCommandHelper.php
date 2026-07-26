@@ -31,12 +31,13 @@ class TwitterCommandHelper
 
     public function __construct(
         private readonly LeadModel $leadModel,
-        private readonly FieldModel $fieldModel,
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
         private readonly EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
@@ -81,7 +82,7 @@ class TwitterCommandHelper
      */
     public function createLeadsFromStatuses(array $statusList, $monitor): int
     {
-        $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
+        $leadField = $this->leadFieldRepository->findOneBy(['alias' => $this->twitterHandleField]);
 
         if (!$leadField) {
             // Field has been deleted or something
@@ -99,7 +100,7 @@ class TwitterCommandHelper
         // Get a list of existing leads to tone down on queries
         $usersByHandles    = [];
         $usersByName       = ['firstnames' => [], 'lastnames' => []];
-        $expr              = $this->leadModel->getRepository()->createQueryBuilder('f')->expr();
+        $expr              = $this->leadRepository->createQueryBuilder('f')->expr();
         $monitorProperties = $monitor->getProperties();
 
         if (!array_key_exists('checknames', $monitorProperties)) {
@@ -130,7 +131,7 @@ class TwitterCommandHelper
         unset($expr);
 
         if (!empty($usersByHandles)) {
-            $leads = $this->leadModel->getRepository()->getEntities(
+            $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -158,7 +159,7 @@ class TwitterCommandHelper
         if ($monitorProperties['checknames']) {
             // Fetch existing contacts who have an unknown twitter
             // handle in Mautic but are found during monitoring.
-            $leadsByName = $this->leadModel->getRepository()->getEntities(
+            $leadsByName = $this->leadRepository->getEntities(
                 [
                     'filter' => [
                         'force' => [
