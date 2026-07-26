@@ -46,6 +46,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $this->notificationRepository = $notificationRepository;
     }
+
     /**
      * @var string []
      */
