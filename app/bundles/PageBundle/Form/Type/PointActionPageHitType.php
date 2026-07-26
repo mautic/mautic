@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PointActionPageHitType extends AbstractType
+final class PointActionPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

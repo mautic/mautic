@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<GroupListType>
  */
-class GroupListType extends AbstractType
+final class GroupListType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,

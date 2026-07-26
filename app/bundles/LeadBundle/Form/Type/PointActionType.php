@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 /**
  * @extends AbstractType<mixed>
  */
-class PointActionType extends AbstractType
+final class PointActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
