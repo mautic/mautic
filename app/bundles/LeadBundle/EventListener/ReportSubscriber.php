@@ -3,12 +3,10 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -68,13 +66,13 @@ final class ReportSubscriber implements EventSubscriberInterface
         private readonly LeadModel $leadModel,
         private readonly FieldModel $fieldModel,
         private readonly StageModel $stageModel,
-        private readonly CampaignModel $campaignModel,
         private readonly EventCollector $eventCollector,
-        private readonly CompanyModel $companyModel,
         private readonly CompanyReportData $companyReportData,
         private readonly FieldsBuilder $fieldsBuilder,
         private readonly Translator $translator,
         private readonly DncReportService $dncReportService,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
     ) {
     }
 
@@ -393,7 +391,7 @@ final class ReportSubscriber implements EventSubscriberInterface
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
-        $companyRepo  = $this->companyModel->getRepository();
+        $companyRepo  = $this->companyRepository;
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
@@ -867,7 +865,7 @@ final class ReportSubscriber implements EventSubscriberInterface
         unset($channelActions, $channels);
 
         // Setup available channels
-        $campaigns                  = $this->campaignModel->getRepository()->getSimpleList();
+        $campaigns                  = $this->campaignRepository->getSimpleList();
         $filters['log.campaign_id'] = [
             'label' => 'mautic.lead.report.attribution.filter.campaign',
             'type'  => 'select',

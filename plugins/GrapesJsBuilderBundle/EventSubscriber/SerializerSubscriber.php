@@ -11,7 +11,6 @@ use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
-use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 
 final readonly class SerializerSubscriber implements EventSubscriberInterface
 {

@@ -40,6 +40,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class SalesforceIntegration extends CrmAbstractIntegration
 {
     private \Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository;
+
     #[\Symfony\Contracts\Service\Attribute\Required]
     public function autowireSalesforceIntegration(\Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository): void
     {

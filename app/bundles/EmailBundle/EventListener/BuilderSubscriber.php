@@ -35,6 +35,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly TranslatorInterface $translator,
         private readonly MailHashHelper $mailHash,
         private readonly FromEmailHelper $fromEmailHelper,
+        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
     ) {
     }
 
@@ -286,8 +288,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
-                $trackableRepository = $this->pageTrackableModel->getRepository();
-                $redirectRepository  = $this->pageRedirectModel->getRepository();
+                $trackableRepository = $this->trackableRepository;
+                $redirectRepository  = $this->redirectRepository;
 
                 if ($trackable instanceof Trackable) {
                     $trackableRepository->detachEntity($trackable);

@@ -45,6 +45,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
         private TranslatorInterface $translator,
+        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
     ) {
     }
 
@@ -393,7 +394,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     private function getStageChoices(): array
     {
-        return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
+        return $this->makeChoices($this->stageRepository->getSimpleList(), 'label', 'value');
     }
 
     /**

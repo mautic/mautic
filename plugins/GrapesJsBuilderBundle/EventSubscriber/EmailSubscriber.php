@@ -7,7 +7,6 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
-use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

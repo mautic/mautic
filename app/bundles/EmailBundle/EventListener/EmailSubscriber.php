@@ -36,6 +36,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ) {
     }
 
@@ -58,7 +59,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
         if ($email->isVariant()) {
-            $this->emailModel->getRepository()->cloneFromParentToVariant($email);
+            $this->emailRepository->cloneFromParentToVariant($email);
         }
     }
 

@@ -49,6 +49,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private readonly EventDispatcherInterface $dispatcher,
         private readonly DoNotContactModel $doNotContact,
         private readonly TranslatorInterface $translator,
+        private readonly \Mautic\NotificationBundle\Entity\NotificationRepository $notificationRepository,
     ) {
     }
 
@@ -265,7 +266,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->notificationModel->createStatEntry($notification, $log->getLead(), 'campaign.event', $event->getEvent()->getId());
-        $this->notificationModel->getRepository()->upCount($notification->getId());
+        $this->notificationRepository->upCount($notification->getId());
 
         $result = [
             'status'  => 'mautic.notification.timeline.status.delivered',

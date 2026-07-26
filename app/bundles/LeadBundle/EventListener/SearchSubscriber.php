@@ -37,8 +37,9 @@ final class SearchSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private Environment $twig,
         private GlobalSearch $globalSearch,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
-        $this->leadRepo        = $leadModel->getRepository();
+        $this->leadRepo        = $this->leadRepository;
     }
 
     public static function getSubscribedEvents(): array

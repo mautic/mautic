@@ -34,6 +34,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
     ) {
     }
 
@@ -128,7 +129,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
-            $formRepository = $this->formModel->getRepository();
+            $formRepository = $this->formRepository;
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();

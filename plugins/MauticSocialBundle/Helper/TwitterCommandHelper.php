@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
