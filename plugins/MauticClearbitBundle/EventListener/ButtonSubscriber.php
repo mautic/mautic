@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $helper,
+        private IntegrationsHelper $integrationsHelper,
         private TranslatorInterface $translator,
         private RouterInterface $router,
     ) {
