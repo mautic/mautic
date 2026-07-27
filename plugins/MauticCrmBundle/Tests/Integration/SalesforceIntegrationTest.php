@@ -970,6 +970,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->getMock();
 
         $this->autowireIntegrationRepositories($sf);
+
         $sf->autowireSalesforceIntegration(
             $this->createMock(RoleRepository::class),
             $this->auditLogRepository,

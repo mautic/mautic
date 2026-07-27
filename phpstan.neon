@@ -190,12 +190,6 @@ parameters:
 			message: '#Parameter (.*?) of method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::createTagModifyResponse\(\) expects MauticPlugin\\MauticTagManagerBundle\\Entity\\Tag, Mautic\\LeadBundle\\Entity\\Tag given#'
 			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
-		# false positive
-		-
-			message: '#Call to private method getRepository\(\) of class Mautic\\AssetBundle\\Model\\AssetModel#'
-			paths:
-				- app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
-				- app/bundles/CoreBundle/Controller/AjaxController.php
 		-
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
