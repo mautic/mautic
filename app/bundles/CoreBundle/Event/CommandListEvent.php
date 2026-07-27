@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CommandListEvent extends Event
+final class CommandListEvent extends Event
 {
     /**
      * @var array

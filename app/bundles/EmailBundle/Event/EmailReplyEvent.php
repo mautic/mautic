@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EmailReplyEvent extends Event
+final class EmailReplyEvent extends Event
 {
     private readonly ?Email $email;
 
