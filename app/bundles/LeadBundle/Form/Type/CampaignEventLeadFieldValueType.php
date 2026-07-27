@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadFieldValueType extends AbstractType
+final class CampaignEventLeadFieldValueType extends AbstractType
 {
     public function __construct(
         protected Translator $translator,

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
@@ -11,7 +11,7 @@ class SegmentCampaignShare
     public function __construct(
         private readonly CampaignModel $campaignModel,
         private readonly CacheStorageHelper $cacheStorageHelper,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

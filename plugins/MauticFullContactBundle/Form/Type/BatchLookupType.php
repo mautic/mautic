@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class BatchLookupType extends AbstractType
+final class BatchLookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

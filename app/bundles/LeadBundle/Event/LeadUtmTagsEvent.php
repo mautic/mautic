@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeadUtmTagsEvent extends CommonEvent
+final class LeadUtmTagsEvent extends CommonEvent
 {
     /**
      * @param mixed[] $utmtags

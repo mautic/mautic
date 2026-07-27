@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldHTMLType extends AbstractType
+final class FormFieldHTMLType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

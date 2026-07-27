@@ -22,7 +22,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -41,10 +40,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private ListModel $listModel,
         private CampaignModel $campaignModel,
         private EmailModel $emailModel,
-        private StageModel $stageModel,
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
         private TranslatorInterface $translator,
+        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
     ) {
     }
 
@@ -393,7 +392,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     private function getStageChoices(): array
     {
-        return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
+        return $this->makeChoices($this->stageRepository->getSimpleList(), 'label', 'value');
     }
 
     /**

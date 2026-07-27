@@ -9490,12 +9490,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Method Mautic\\SmsBundle\\EventListener\\LeadSubscriber\:\:addSmsEvents\(\) has parameter \$state with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/EventListener/LeadSubscriber.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\EventListener\\ReplySubscriber\:\:addEvents\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12914,3 +12908,4 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php
+
