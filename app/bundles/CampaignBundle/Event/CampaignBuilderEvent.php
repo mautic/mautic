@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignBuilderEvent extends Event
+final class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 

@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class CircularDependency extends Constraint
+final class CircularDependency extends Constraint
 {
     public $message;
 

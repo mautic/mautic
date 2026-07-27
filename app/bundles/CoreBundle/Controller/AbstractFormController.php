@@ -233,7 +233,7 @@ abstract class AbstractFormController extends CommonController
         $vars['returnUrl'] = $returnUrl;
 
         $urlMatcher  = explode('/s/', $returnUrl);
-        $actionRoute = $this->container->get('router')->match('/s/'.$urlMatcher[1]);
+        $actionRoute = $this->router->match('/s/'.$urlMatcher[1]);
         $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 

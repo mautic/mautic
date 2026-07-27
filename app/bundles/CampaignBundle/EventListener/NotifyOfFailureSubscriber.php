@@ -7,10 +7,10 @@ use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class NotifyOfFailureSubscriber implements EventSubscriberInterface
+final readonly class NotifyOfFailureSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly NotificationHelper $notificationHelper,
+        private NotificationHelper $notificationHelper,
     ) {
     }
 

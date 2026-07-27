@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<Lead>
@@ -30,7 +31,30 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
+    private CompanyRepository $companyRepository;
+
+    private FrequencyRuleRepository $frequencyRuleRepository;
+
     private static LeadFieldRepository $leadFieldRepository;
+
+    private LeadListRepository $leadListRepository;
+
+    private DoNotContactRepository $doNotContactRepository;
+
+    #[Required]
+    public function autowireLeadRepository(
+        CompanyRepository $companyRepository,
+        FrequencyRuleRepository $frequencyRuleRepository,
+        LeadFieldRepository $leadFieldRepository,
+        LeadListRepository $leadListRepository,
+        DoNotContactRepository $doNotContactRepository,
+    ): void {
+        $this->companyRepository = $companyRepository;
+        $this->frequencyRuleRepository = $frequencyRuleRepository;
+        self::$leadFieldRepository = $leadFieldRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->doNotContactRepository = $doNotContactRepository;
+    }
 
     /**
      * @var EventDispatcherInterface
@@ -80,11 +104,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
     {
         $this->listLeadRepository = $listLeadRepository;
-    }
-
-    public function setLeadFieldRepository(LeadFieldRepository $leadFieldRepository): void
-    {
-        self::$leadFieldRepository = $leadFieldRepository;
     }
 
     public static function getLeadFieldRepository(): LeadFieldRepository
@@ -427,7 +446,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($entity instanceof Lead) {
             $id        = $entity->getId();
-            $companies = $this->getEntityManager()->getRepository(Company::class)->getCompaniesForContacts([$id]);
+            $companies = $this->companyRepository->getCompaniesForContacts([$id]);
 
             if (!empty($companies[$id])) {
                 $primary = null;
@@ -480,17 +499,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
-                $companies = $this->getEntityManager()->getRepository(Company::class)->getCompaniesForContacts($contactIds);
+                $companies = $this->companyRepository->getCompaniesForContacts($contactIds);
             }
 
             if ($withPreferences) {
-                /** @var FrequencyRuleRepository $frequencyRepo */
-                $frequencyRepo  = $this->getEntityManager()->getRepository(FrequencyRule::class);
-                $frequencyRules = $frequencyRepo->getFrequencyRules(null, $contactIds);
-
-                /** @var DoNotContactRepository $dncRepository */
-                $dncRepository = $this->getEntityManager()->getRepository(DoNotContact::class);
-                $dncRules      = $dncRepository->getChannelList(null, $contactIds);
+                $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules(null, $contactIds);
+                $dncRules = $this->doNotContactRepository->getChannelList(null, $contactIds);
             }
 
             foreach ($contactIds as $id) {
@@ -681,7 +695,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
+        $customFields       = $this->getSearchableFieldAliases(self::$leadFieldRepository, 'lead');
         $availableForSearch = array_map(fn (string $alias): string => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
@@ -886,7 +900,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $imploder = [];
 
                 foreach ($prateek as $value) {
-                    $list       = $this->getEntityManager()->getRepository(LeadList::class)->findOneByAlias($value);
+                    $list       = $this->leadListRepository->findOneByAlias($value);
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 

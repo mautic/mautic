@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PluginInstallEvent extends Event
+final class PluginInstallEvent extends Event
 {
     /**
      * @param array<class-string, ClassMetadata>|null $metadata

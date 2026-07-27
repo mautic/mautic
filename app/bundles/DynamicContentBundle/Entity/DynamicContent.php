@@ -499,7 +499,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function cleanSlotName(): void
     {
-        if ($this->getIsCampaignBased()) {
+        if ($this->isCampaignBased) {
             $this->setSlotName('');
         }
     }

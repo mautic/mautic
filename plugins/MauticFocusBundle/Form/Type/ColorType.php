@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class ColorType extends AbstractType
+final class ColorType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

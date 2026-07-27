@@ -32,6 +32,8 @@ final class ListController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
     private ListModel $listModel;
 
     private LeadModel $leadModel;
@@ -40,9 +42,11 @@ final class ListController extends FormController
     public function autowireListController(
         LeadModel $leadModel,
         ListModel $listModel,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
+        $this->leadListRepository = $leadListRepository;
     }
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
@@ -105,7 +109,7 @@ final class ListController extends FormController
         ];
 
         $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $tableAlias = $this->listModel->getRepository()->getTableAlias();
+        $tableAlias = $this->leadListRepository->getTableAlias();
 
         if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
             $filter['where'][] = [
@@ -794,19 +798,19 @@ final class ListController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'logs'                      => $logs,
-                'usageStats'                => $segmentDependencies->getChannelsIds($list->getId()),
-                'campaignStats'             => $segmentCampaignShare->getCampaignList($list->getId()),
-                'stats'                     => $segmentContactsLineChartData,
-                'list'                      => $list,
-                'segmentCount'              => $listModel->getRepository()->getLeadCount($list->getId()),
-                'activeSegmentCount'        => $listModel->getActiveSegmentContactCount($list->getId()),
-                'manuallyAddedSegmentCount' => $listModel->getRepository()->getManuallyAddedLeadCount($list->getId()),
-                'filterAddedSegmentCount'   => $listModel->getRepository()->getFilterAddedLeadCount($list->getId()),
-                'permissions'               => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
-                'security'                  => $this->security,
-                'dateRangeForm'             => $dateRangeForm->createView(),
-                'events'                    => [
+                'logs'               => $logs,
+                'usageStats'         => $segmentDependencies->getChannelsIds($list->getId()),
+                'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
+                'stats'              => $segmentContactsLineChartData,
+                'list'               => $list,
+                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
+                'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
+                'manuallyAddedSegmentCount' => $this->leadListRepository->getManuallyAddedLeadCount($list->getId()),
+                'filterAddedSegmentCount'   => $this->leadListRepository->getFilterAddedLeadCount($list->getId()),
+                'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
+                'security'           => $this->security,
+                'dateRangeForm'      => $dateRangeForm->createView(),
+                'events'             => [
                     'filters' => $filters,
                     'types'   => [
                         'manually_added'   => $this->translator->trans('mautic.segment.contact.manually.added'),
@@ -848,7 +852,7 @@ final class ListController extends FormController
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
 
-        $sourceLists = $this->getListModel()->getSourceLists();
+        $sourceLists = $this->listModel->getSourceLists();
         $listFilters = [
             'filters' => [
                 'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),

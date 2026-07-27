@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignListType extends AbstractType
+final class CampaignListType extends AbstractType
 {
     private readonly bool $canViewOther;
 
@@ -55,7 +55,7 @@ class CampaignListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

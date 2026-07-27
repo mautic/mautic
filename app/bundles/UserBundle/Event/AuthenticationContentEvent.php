@@ -5,7 +5,7 @@ namespace Mautic\UserBundle\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class AuthenticationContentEvent extends Event
+final class AuthenticationContentEvent extends Event
 {
     /**
      * @var array

@@ -6,7 +6,7 @@ namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SomeAutowireService
+final class SomeAutowireService
 {
     #[Required]
     public function setSomeModel(SomeModel $someModel): void

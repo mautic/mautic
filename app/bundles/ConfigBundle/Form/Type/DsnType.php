@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array>
  */
-class DsnType extends AbstractType
+final class DsnType extends AbstractType
 {
     public function __construct(
         private readonly DsnTransformerFactory $dsnTransformerFactory,
