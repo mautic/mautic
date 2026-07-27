@@ -17,7 +17,7 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -47,12 +47,9 @@ class NotificationModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    private function getSession(): Session
+    private function getSession(): SessionInterface
     {
-        $session = $this->requestStack->getSession();
-        \assert($session instanceof Session);
-
-        return $session;
+        return $this->requestStack->getSession();
     }
 
     /**

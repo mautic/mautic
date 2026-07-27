@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
@@ -38,7 +38,7 @@ abstract class SocialIntegration extends AbstractIntegration
         CacheStorageHelper $cacheStorageHelper,
         EntityManager $entityManager,
         RequestStack $requestStack,
-        Router $router,
+        RouterInterface $router,
         Translator $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
