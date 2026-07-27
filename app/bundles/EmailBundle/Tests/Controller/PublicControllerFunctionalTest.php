@@ -115,7 +115,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        $this->em->clear(Page::class);
+        $this->em->clear();
 
         $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());

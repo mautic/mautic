@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -35,7 +35,7 @@ TXT
 class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly LeadRepository $leadRepository,
         private readonly MaxMindDoNotSellList $doNotSellList,
     ) {
