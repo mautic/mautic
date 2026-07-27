@@ -40,7 +40,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<DynamicContent>
  */
-class DynamicContentType extends AbstractType
+final class DynamicContentType extends AbstractType
 {
     /**
      * @var mixed[]

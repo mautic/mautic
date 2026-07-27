@@ -6,7 +6,7 @@ namespace Mautic\PluginBundle\Form\Constraint;
 
 use Symfony\Component\Validator\Constraint;
 
-class CanPublish extends Constraint
+final class CanPublish extends Constraint
 {
     public string $message =  'mautic.lead_list.not_allowed_plugin_publish';
 

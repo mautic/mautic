@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * @param string $authUrl

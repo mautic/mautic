@@ -18,7 +18,6 @@ final class UploadController extends DropzoneController
         $request  = $this->getRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
-        $this->autowireUploadController($this->container->get('translator'));
 
         if (!empty($files)) {
             foreach ($files as $file) {

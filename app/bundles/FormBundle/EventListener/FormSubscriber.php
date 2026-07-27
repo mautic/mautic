@@ -23,17 +23,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
-    private readonly MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
-        private readonly LanguageHelper $languageHelper,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }

@@ -13,11 +13,11 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormValidationSubscriber implements EventSubscriberInterface
+final readonly class FormValidationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

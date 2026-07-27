@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Sms>
  */
-class SmsType extends AbstractType
+final class SmsType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,

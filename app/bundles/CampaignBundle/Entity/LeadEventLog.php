@@ -509,7 +509,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        $log = $this->getFailedLog();
+        $log = $this->failedLog;
 
         return !empty($log);
     }
