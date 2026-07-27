@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -83,6 +83,11 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         // Step 2: Admin user.
         $submitButton = $crawler->selectButton('install_user_step[buttons][next]');
+        $this->assertGreaterThan(
+            0,
+            $submitButton->count(),
+            'DB step did not advance to user step.'.PHP_EOL.$this->formatInstallerFailureMessage($crawler)
+        );
         $form         = $submitButton->form();
 
         $form['install_user_step[username]']->setValue('admin');
@@ -127,5 +132,47 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         $details = $crawler->filter('#minorDetails ul')->html();
         $this->assertStringNotContainsString($expectedMemoryMessage, $details);
+    }
+
+    private function formatInstallerFailureMessage(Crawler $crawler): string
+    {
+        $html = (string) $this->client->getResponse()->getContent();
+
+        $errors = [];
+
+        // Symfony / form field errors
+        $crawler->filter('.has-error .help-block, .text-danger, .alert-danger, .form-error, .help-block.error')
+            ->each(static function (Crawler $node) use (&$errors): void {
+                $text = trim($node->text(''));
+                if ('' !== $text) {
+                    $errors[] = $text;
+                }
+            });
+
+        // Generic flash / alert messages
+        $crawler->filter('.alert, .flash-message, [role="alert"]')
+            ->each(static function (Crawler $node) use (&$errors): void {
+                $text = trim($node->text(''));
+                if ('' !== $text) {
+                    $errors[] = $text;
+                }
+            });
+
+        $errors = array_values(array_unique($errors));
+
+        $parts = [
+            'Installer step button "install_user_step[buttons][next]" not found.',
+            'HTTP status: '.$this->client->getResponse()->getStatusCode(),
+        ];
+
+        if ([] !== $errors) {
+            $parts[] = 'Messages:'.PHP_EOL.'- '.implode(PHP_EOL.'- ', $errors);
+        }
+
+        // Keep response snippet bounded for CI logs
+        $snippet = preg_replace('/\s+/', ' ', strip_tags($html)) ?? $html;
+        $parts[] = 'Body snippet: '.mb_substr(trim($snippet), 0, 2000);
+
+        return implode(PHP_EOL, $parts);
     }
 }
