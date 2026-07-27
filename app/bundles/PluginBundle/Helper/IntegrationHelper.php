@@ -381,15 +381,13 @@ class IntegrationHelper
 
     /**
      * Get array of integration entities.
-     *
-     * @return mixed
      */
-    public function getIntegrationSettings()
+    public function getIntegrationSettings(): array
     {
         return $this->integrationRepository->getIntegrations();
     }
 
-    public function getCoreIntegrationSettings()
+    public function getCoreIntegrationSettings(): array
     {
         return $this->integrationRepository->getCoreIntegrations();
     }

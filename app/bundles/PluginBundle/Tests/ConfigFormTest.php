@@ -144,8 +144,6 @@ final class ConfigFormTest extends KernelTestCase
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
         $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
 
-        $integrationRepository = $this->createMock(IntegrationRepository::class);
-
         $entityManager->expects($this->exactly(2))
                 ->method('getRepository')
                 ->willReturnMap(
@@ -174,8 +172,8 @@ final class ConfigFormTest extends KernelTestCase
             $coreParametersHelper,
             $this->createStub(Environment::class),
             $pluginModel,
-            $integrationRepository,
-            $this->createMock(LeadRepository::class)
+            $this->createStub(IntegrationRepository::class),
+            $this->createStub(LeadRepository::class)
         );
     }
 }

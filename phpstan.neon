@@ -36,6 +36,10 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# CRM integrations share a legacy entity-manager based flow - to be refactored later
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			path: plugins/MauticCrmBundle/Integration/*
 		# ReportGenerator keeps a nullable form factory for its lazy build flow
 		-
 			identifier: mautic.noNullableServiceInConstructor
