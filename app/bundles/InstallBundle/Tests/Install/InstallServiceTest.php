@@ -39,11 +39,6 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private MockObject $pathsHelper;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
      * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
@@ -67,7 +62,6 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->configurator         = $this->createMock(Configurator::class);
         $this->cacheHelper          = $this->createMock(CacheHelper::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
         $this->userRepository       = $this->createMock(UserRepository::class);
@@ -76,7 +70,7 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->configurator,
             $this->cacheHelper,
             $this->pathsHelper,
-            $this->entityManager,
+            $this->createStub(EntityManager::class),
             $this->translator,
             $this->createStub(KernelInterface::class),
             $this->validator,

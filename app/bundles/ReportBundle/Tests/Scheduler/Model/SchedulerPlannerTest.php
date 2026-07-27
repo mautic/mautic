@@ -102,7 +102,7 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $schedulerRepository = $this->createMock(SchedulerRepository::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createStub(EntityManager::class);
 
         $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager, $schedulerRepository);
 

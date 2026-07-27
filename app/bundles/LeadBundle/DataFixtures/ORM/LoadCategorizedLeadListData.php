@@ -13,8 +13,8 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private LeadListRepository $leadListRepository,
-        private CategoryRepository $categoryRepository,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
     }
 

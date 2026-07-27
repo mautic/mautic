@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private CategoryRepository $categoryRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
     }
 
