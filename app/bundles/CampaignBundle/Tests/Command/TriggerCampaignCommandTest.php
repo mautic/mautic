@@ -35,7 +35,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = static::getContainer()->get(SegmentCountCacheHelper::class);
     }
 
     public function beforeTearDown(): void

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -87,7 +88,10 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = static::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
     }
 
     /**
