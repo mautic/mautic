@@ -136,8 +136,6 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
     private function formatInstallerFailureMessage(Crawler $crawler): string
     {
-        $html = (string) $this->client->getResponse()->getContent();
-
         $errors = [];
 
         // Symfony / form field errors
@@ -160,18 +158,11 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         $errors = array_values(array_unique($errors));
 
-        $parts = [
-            'Installer step button "install_user_step[buttons][next]" not found.',
-            'HTTP status: '.$this->client->getResponse()->getStatusCode(),
-        ];
+        $parts = [];
 
         if ([] !== $errors) {
-            $parts[] = 'Messages:'.PHP_EOL.'- '.implode(PHP_EOL.'- ', $errors);
+            $parts[] = 'Messages:'.PHP_EOL.implode(PHP_EOL, $errors);
         }
-
-        // Keep response snippet bounded for CI logs
-        $snippet = preg_replace('/\s+/', ' ', strip_tags($html)) ?? $html;
-        $parts[] = 'Body snippet: '.mb_substr(trim($snippet), 0, 2000);
 
         return implode(PHP_EOL, $parts);
     }

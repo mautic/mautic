@@ -31,7 +31,7 @@ jobs:
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
           - php-versions: '8.6'
-            db-types: 'mysql:9.5' # 'mysql:9.4'
+            db-types: 'mysql:9.4' # 'mysql:9.7'
             experimental: true
           - php-versions: '8.6'
             db-types: 'mariadb:13.0-rc' # 'mariadb:12.3'
@@ -180,7 +180,7 @@ jobs:
           - php-versions: '8.5'
             postgres-versions: '18'
           - php-versions: '8.6'
-            postgres-versions: '19beta2' # '19beta2-alpine'
+            postgres-versions: '19beta2-alpine' # '19beta2-alpine'
             experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
@@ -234,7 +234,7 @@ jobs:
 
       - name: Install PostgreSQL client
         run: |
-          # 1. Extract major version number (e.g., '19beta1-alpine' -> '19')
+          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
           VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
 
           sudo apt-get update
