@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AuthenticationIntegrationPass implements CompilerPassInterface
+final class AuthenticationIntegrationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

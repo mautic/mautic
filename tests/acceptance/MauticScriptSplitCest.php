@@ -10,7 +10,9 @@ final class MauticScriptSplitCest
 
     private bool $corsConfigExisted = false;
 
-    /** @var array<string, mixed>|null */
+    /**
+     * @var array<string, mixed>|null
+     */
     private ?array $corsConfigParameters = null;
 
     public function _before(\AcceptanceTester $I): void

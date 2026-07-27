@@ -41,6 +41,8 @@ final class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+
     private EmailModel $emailModel;
 
     private ListModel $listModel;
@@ -52,10 +54,12 @@ final class EmailController extends FormController
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
+        $this->leadRepository = $leadRepository;
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -1760,7 +1764,7 @@ final class EmailController extends FormController
 
                 if ($previewForContactId) {
                     // We have one from request parameter
-                    $fields = $leadModel->getRepository()->getLead($previewForContactId);
+                    $fields = $this->leadRepository->getLead($previewForContactId);
                     $fields = $model->enrichedContactWithCompanies($fields);
                 }
 

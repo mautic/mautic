@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicListType extends AbstractType
+final class DynamicListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -95,7 +95,7 @@ class DynamicListType extends AbstractType
         return 'dynamiclist';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return CollectionType::class;
     }

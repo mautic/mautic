@@ -6,7 +6,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class RouteEvent extends Event
+final class RouteEvent extends Event
 {
     protected RouteCollection $collection;
 

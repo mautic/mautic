@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -28,7 +28,7 @@ class DeviceModel extends FormModel
 {
     public function __construct(
         private readonly LeadDeviceRepository $leadDeviceRepository,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
