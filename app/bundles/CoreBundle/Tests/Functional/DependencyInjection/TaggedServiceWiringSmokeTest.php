@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
 use Mautic\CoreBundle\Shortener\Shortener;
-use Psr\Container\ContainerInterface;
 
 /**
  * These services used to collect their tagged services through compiler passes and now use #[AutowireIterator].
@@ -34,12 +33,12 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
 
     public function testTaggedServicesAreCollectedByTheConstructor(): void
     {
-        /** @var ContainerInterface $testContainer */
-        $testContainer = $this->buildContainer()->get('test.service_container');
+        $container = $this->buildContainer();
 
         $collectedServiceCounts = [];
         foreach (array_keys(self::EXPECTED_COLLECTED_SERVICE_COUNTS) as $serviceId) {
-            $collectedServiceCounts[$serviceId] = $this->countCollectedServices($testContainer->get($serviceId));
+            $service = $container->get($serviceId);
+            $collectedServiceCounts[$serviceId] = $this->countCollectedServices($service);
         }
 
         $this->assertSame(self::EXPECTED_COLLECTED_SERVICE_COUNTS, $collectedServiceCounts);

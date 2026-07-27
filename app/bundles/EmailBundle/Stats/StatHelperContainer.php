@@ -13,7 +13,6 @@ class StatHelperContainer
      */
     private array $helpers = [];
 
-<<<<<<< HEAD
     public function __construct(
         #[AutowireIterator(tag: 'mautic.email_stat_helper')]
         iterable $helpersIterator,
@@ -21,23 +20,6 @@ class StatHelperContainer
         foreach ($helpersIterator as $helper) {
             $this->helpers[$helper->getName()] = $helper;
         }
-=======
-    /**
-     * @param iterable<StatHelperInterface> $statHelpers
-     */
-    public function __construct(
-        #[AutowireIterator('mautic.email_stat_helper')]
-        iterable $statHelpers = [],
-    ) {
-        foreach ($statHelpers as $statHelper) {
-            $this->addHelper($statHelper);
-        }
-    }
-
-    private function addHelper(StatHelperInterface $helper): void
-    {
-        $this->helpers[$helper->getName()] = $helper;
->>>>>>> bcbf4a0307 ([di] flip compiler pass to #[AutowireIterator])
     }
 
     /**
