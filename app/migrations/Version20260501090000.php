@@ -17,7 +17,6 @@ final class Version20260501090000 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $rolesTable       = $this->getPrefixedTableName();
-        $permissionsTable = $this->prefix.'permissions';
 
         $rows = $this->connection->executeQuery(
             sprintf('SELECT id, readable_permissions FROM %s WHERE is_admin != 1', $rolesTable)
@@ -46,7 +45,7 @@ final class Version20260501090000 extends AbstractMauticMigration
                 ['id'                   => $roleId]
             );
 
-            $this->upsertNotesPermission($permissionsTable, $roleId, $this->getBitwise($mappedPerms));
+            $this->upsertNotesPermission($roleId, $this->getBitwise($mappedPerms));
             ++$updatedRoles;
         }
 
@@ -112,7 +111,7 @@ final class Version20260501090000 extends AbstractMauticMigration
         return $bitwise;
     }
 
-    private function upsertNotesPermission(string $table, int $roleId, int $bitwise): void
+    private function upsertNotesPermission(int $roleId, int $bitwise): void
     {
         /** @var EntityManagerInterface $em */
         $em = $this->container->get('doctrine.orm.entity_manager');
