@@ -547,6 +547,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
+                    'mautic.lead.repository.lead_list',
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [
