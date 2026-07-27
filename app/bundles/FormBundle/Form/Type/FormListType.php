@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormListType extends AbstractType
+final class FormListType extends AbstractType
 {
     private readonly bool $viewOther;
 
@@ -61,7 +61,7 @@ class FormListType extends AbstractType
         $resolver->setDefined(['form_type', 'top_level', 'ignore_ids']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

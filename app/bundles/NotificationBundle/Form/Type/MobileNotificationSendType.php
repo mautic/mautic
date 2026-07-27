@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MobileNotificationSendType extends AbstractType
+final class MobileNotificationSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router,

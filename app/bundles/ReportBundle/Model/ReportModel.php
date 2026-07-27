@@ -754,7 +754,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
-        return $this->getRepository()->findReportsWithGraphs($ownedBy);
+        return $this->reportRepository->findReportsWithGraphs($ownedBy);
     }
 
     /**

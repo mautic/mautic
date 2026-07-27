@@ -50,6 +50,7 @@ class FormApiController extends CommonApiController
         private readonly FormModel $formModel,
         private readonly FieldModel $fieldModel,
         private readonly ActionModel $actionModel,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
     ) {
         $this->model            = $formModel;
         $this->entityClass      = Form::class;
@@ -147,7 +148,7 @@ class FormApiController extends CommonApiController
 
             // Save the form first to get the form ID.
             // Using the repository function to not trigger the listeners twice.
-            $this->model->getRepository()->saveEntity($entity);
+            $this->formRepository->saveEntity($entity);
         }
 
         $formId             = $entity->getId();
@@ -265,7 +266,7 @@ class FormApiController extends CommonApiController
 
             // Save the form first and new actions so that new fields are available to actions.
             // Using the repository function to not trigger the listeners twice.
-            $this->model->getRepository()->saveEntity($entity);
+            $this->formRepository->saveEntity($entity);
             $this->model->setActions($entity, $actions);
         }
 

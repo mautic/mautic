@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -125,11 +126,14 @@ final class EmailControllerTest extends TestCase
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
+
         $this->controller->autowireEmailController(
             $this->createStub(ListModel::class),
             $this->createStub(AuditLogModel::class),
-            $this->modelMock
+            $this->modelMock,
+            $this->createStub(LeadRepository::class)
         );
+
         $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
     }
 

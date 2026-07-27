@@ -23,17 +23,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class CoreSubscriber implements EventSubscriberInterface
+final readonly class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly BundleHelper $bundleHelper,
-        private readonly MenuHelper $menuHelper,
-        private readonly UserHelper $userHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly AuthorizationCheckerInterface $securityContext,
-        private readonly UserModel $userModel,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly RequestStack $requestStack,
+        private BundleHelper $bundleHelper,
+        private MenuHelper $menuHelper,
+        private UserHelper $userHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuthorizationCheckerInterface $securityContext,
+        private UserModel $userModel,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
     ) {
     }
 

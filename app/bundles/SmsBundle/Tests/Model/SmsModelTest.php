@@ -154,6 +154,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $lead2->setMobile('+123456790');
         $lead2->setId(2);
 
+        $smsRepo = $this->createMock(SmsRepository::class);
+
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)
             ->setConstructorArgs([
@@ -169,14 +171,12 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
-                $this->createStub(SmsRepository::class),
+                $smsRepo,
                 $this->createStub(StatRepository::class),
                 $this->createStub(DoNotContactRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
             ->getMock();
-        $smsModel->method('getRepository')
-            ->willReturn($smsRepo = $this->createMock(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
             ->willReturn($this->createStub(StatRepository::class));

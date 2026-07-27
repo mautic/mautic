@@ -511,7 +511,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     public function getPostActionProperty(): ?string
     {
-        if ('return' === $this->getPostAction()) {
+        if ('return' === $this->postAction) {
             return null;
         }
 
@@ -596,7 +596,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     public function getFieldAliases(): array
     {
         $aliases = [];
-        $fields  = $this->getFields();
+        $fields  = $this->fields;
 
         if ($fields) {
             foreach ($fields as $field) {
@@ -621,7 +621,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
                     'mappedObject' => $field->getMappedObject(),
                     'mappedField'  => $field->getMappedField(),
                 ],
-                $this->getFields()->getValues(),
+                $this->fields->getValues(),
             ),
             fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
@@ -667,7 +667,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
         return array_values(
             array_filter(
                 array_unique(
-                    $this->getFields()->map(
+                    $this->fields->map(
                         fn (Field $field): ?string => $field->getMappedObject(),
                     )->toArray(),
                 ),
@@ -809,7 +809,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
      */
     public function isInKioskMode()
     {
-        return $this->getInKioskMode();
+        return $this->inKioskMode;
     }
 
     /**
@@ -917,8 +917,8 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if (false === $this->getInKioskMode()) {
-            if ('' != $this->getProgressiveProfilingLimit()) {
+        if (false === $this->inKioskMode) {
+            if ('' != $this->progressiveProfilingLimit) {
                 $this->usesProgressiveProfiling = true;
 
                 return $this->usesProgressiveProfiling;

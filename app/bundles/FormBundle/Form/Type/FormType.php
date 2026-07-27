@@ -31,7 +31,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Form>
  */
-class FormType extends AbstractType
+final class FormType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $security,

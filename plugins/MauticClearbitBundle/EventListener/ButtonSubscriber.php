@@ -11,12 +11,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IntegrationHelper $helper,
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
+        private IntegrationHelper $helper,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
     ) {
     }
 

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TestPass implements CompilerPassInterface
+final class TestPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

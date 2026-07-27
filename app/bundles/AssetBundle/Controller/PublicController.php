@@ -17,6 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PublicController extends AbstractFormController
 {
+    private \Mautic\AssetBundle\Entity\AssetRepository $assetRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowirePublicController(\Mautic\AssetBundle\Entity\AssetRepository $assetRepository): void
+    {
+        $this->assetRepository = $assetRepository;
+    }
+
     /**
      * Handles public download of assets by slug.
      *
@@ -32,7 +40,7 @@ final class PublicController extends AbstractFormController
         string $slug,
     ): Response {
         try {
-            $entity = $model->getRepository()->findOneByUuid($slug);
+            $entity = $this->assetRepository->findOneByUuid($slug);
         } catch (NonUniqueResultException|EntityNotFoundException) {
             /**
              * Legacy slug lookup fallback.

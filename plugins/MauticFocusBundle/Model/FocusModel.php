@@ -310,7 +310,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ->setTypeId($typeId)
             ->setLead($lead);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }
@@ -403,17 +403,17 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     public function getViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getViewsCount($focus->getId());
+        return $this->statRepository->getViewsCount($focus->getId());
     }
 
     public function getUniqueViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getUniqueViewsCount($focus->getId());
+        return $this->statRepository->getUniqueViewsCount($focus->getId());
     }
 
     public function getClickThroughCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getClickThroughCount($focus->getId());
+        return $this->statRepository->getClickThroughCount($focus->getId());
     }
 
     private function generateTrackableUrl(Focus $focus, ?Lead $lead = null): ?string

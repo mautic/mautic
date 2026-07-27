@@ -54,9 +54,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $filter = '';
                 }
 
-                $tweetRepo = $this->getRepository();
-                $tweetRepo->setCurrentUser($this->userHelper->getUser());
-                $entities = $tweetRepo->getTweetList(
+                $this->tweetRepository->setCurrentUser($this->userHelper->getUser());
+                $entities = $this->tweetRepository->getTweetList(
                     $filter,
                     $limit,
                     $start,
@@ -86,10 +85,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      */
     public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
-        $statRepo = $this->getStatRepository();
-
         // Update failed tweet
-        $stat = $statRepo->findOneBy(
+        $stat = $this->tweetStatRepository->findOneBy(
             [
                 'lead'     => $lead->getId(),
                 'tweet'    => $tweet->getId(),
@@ -128,7 +125,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $stat->setIsFailed(true);
         }
 
-        $statRepo->saveEntity($stat);
+        $this->tweetStatRepository->saveEntity($stat);
 
         return $this;
     }
