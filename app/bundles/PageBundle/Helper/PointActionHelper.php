@@ -2,14 +2,13 @@
 
 namespace Mautic\PageBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly HitRepository $hitRepository,
     ) {
     }
 
@@ -45,7 +44,7 @@ class PointActionHelper
             return false;
         }
 
-        $hitRepository = $this->entityManager->getRepository(Hit::class);
+        $hitRepository = $this->hitRepository;
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 

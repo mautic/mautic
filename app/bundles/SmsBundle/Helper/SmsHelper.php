@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
@@ -18,7 +17,7 @@ use Mautic\SmsBundle\Model\SmsModel;
 class SmsHelper
 {
     public function __construct(
-        protected EntityManagerInterface $em,
+        protected LeadRepository $leadRepository,
         protected LeadModel $leadModel,
         protected PhoneNumberHelper $phoneNumberHelper,
         protected SmsModel $smsModel,
@@ -32,8 +31,7 @@ class SmsHelper
     {
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
-        /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(Lead::class);
+        $repo = $this->leadRepository;
 
         $args = [
             'filter' => [
