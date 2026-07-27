@@ -15,9 +15,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ProfileController extends FormController
+final class ProfileController extends FormController
 {
+    private UserModel $userModel;
+
+    #[Required]
+    public function autowireProfileController(
+        UserModel $userModel,
+    ): void {
+        $this->userModel = $userModel;
+    }
+
     /**
      * Generate's account profile.
      */
@@ -27,8 +37,6 @@ class ProfileController extends FormController
         // get current user
         $me = $tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
-        /** @var UserModel $model */
-        $model = $this->getModel('user');
 
         // set some permissions
         $permissions = [
@@ -42,7 +50,7 @@ class ProfileController extends FormController
         ];
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $this->formFactory, $action, ['in_profile' => true]);
+        $form   = $this->userModel->createForm($me, $this->formFactory, $action, ['in_profile' => true]);
 
         $overrides = [];
 
@@ -152,7 +160,7 @@ class ProfileController extends FormController
             // check to see if the password needs to be rehashed
             $formUser              = $request->request->all()['user'] ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $overrides['password'] = $model->checkNewPassword($me, $hasher, $submittedPassword);
+            $overrides['password'] = $this->userModel->checkNewPassword($me, $hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
@@ -161,7 +169,7 @@ class ProfileController extends FormController
                     }
 
                     // form is valid so process the data
-                    $model->saveEntity($me);
+                    $this->userModel->saveEntity($me);
 
                     // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();
@@ -172,7 +180,7 @@ class ProfileController extends FormController
                         // If there is an error, we need to reset the user's locale to the default
                         if ($fetchLanguage['error']) {
                             $me->setLocale(null);
-                            $model->saveEntity($me);
+                            $this->userModel->saveEntity($me);
                             $message     = 'mautic.core.could.not.set.language';
                             $messageVars = [];
 

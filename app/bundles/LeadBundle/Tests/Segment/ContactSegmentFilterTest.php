@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
@@ -12,6 +13,7 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -190,7 +192,7 @@ final class ContactSegmentFilterTest extends TestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilder = new QueryBuilder($this->createStub(\Doctrine\DBAL\Connection::class));
+        $queryBuilder = new QueryBuilder($this->createStub(Connection::class));
 
         $this->filterQueryBuilder->expects($this->once())
             ->method('applyQuery')
@@ -406,7 +408,7 @@ final class ContactSegmentFilterTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataDoesColumnSupportEmptyValue')]
+    #[DataProvider('dataDoesColumnSupportEmptyValue')]
     public function testDoesColumnSupportEmptyValue(string $type, bool $doesColumnSupportEmptyValue): void
     {
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => $type]);

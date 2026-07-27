@@ -42,6 +42,7 @@ class NotificationModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly RequestStack $requestStack,
+        private readonly NotificationRepository $notificationRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -64,7 +65,7 @@ class NotificationModel extends FormModel
 
     public function getRepository(): NotificationRepository
     {
-        return $this->em->getRepository(Notification::class);
+        return $this->notificationRepository;
     }
 
     /**
@@ -129,7 +130,7 @@ class NotificationModel extends FormModel
      */
     public function markAllRead(): void
     {
-        $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
+        $this->notificationRepository->markAllReadForUser($this->userHelper->getUser()->getId());
     }
 
     /**
@@ -140,7 +141,7 @@ class NotificationModel extends FormModel
      */
     public function clearNotification($id, $limit = null): void
     {
-        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
+        $this->notificationRepository->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }
 
     /**
@@ -158,7 +159,7 @@ class NotificationModel extends FormModel
         $showNewIndicator = false;
         $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
 
-        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead, null, $limit);
+        $notifications = $this->notificationRepository->getNotifications($userId, $afterId, $includeRead, null, $limit);
 
         // determine if the new message indicator should be shown
         foreach ($notifications as $n) {
@@ -213,6 +214,6 @@ class NotificationModel extends FormModel
 
     private function isDuplicate(int $userId, string $deduplicate, ?\DateTime $from = null): bool
     {
-        return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
+        return $this->notificationRepository->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
     }
 }

@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,7 +81,7 @@ trait AjaxLookupControllerTrait
      *
      * @return AbstractCommonModel<object>
      */
-    abstract protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface;
+    abstract protected function getModel($modelNameKey): MauticModelInterface;
 
     /**
      * Get's the content of error page.

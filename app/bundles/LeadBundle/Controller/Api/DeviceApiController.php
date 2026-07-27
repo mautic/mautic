@@ -28,11 +28,8 @@ class DeviceApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, DeviceModel $leadDeviceModel)
     {
-        $leadDeviceModel = $modelFactory->getModel('lead.device');
-        \assert($leadDeviceModel instanceof DeviceModel);
-
         $this->model           = $leadDeviceModel;
         $this->entityClass     = LeadDevice::class;
         $this->entityNameOne   = 'device';

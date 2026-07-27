@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -30,6 +31,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use ApiTestUserTrait;
     use CreateTestEntitiesTrait;
 
     protected function setUp(): void
@@ -1463,6 +1465,54 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey($contact2->getId(), $response['contacts']);
         $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
         $this->assertArrayNotHasKey($contact1->getId(), $response['contacts']);
+    }
+
+    public function testGetContactNotesActionReturnsOkForUserWithNoteViewPermissions(): void
+    {
+        $owner = $this->createApiUserWithPermissions([
+            'lead:leads' => ['viewown', 'viewother'],
+            'lead:notes' => ['viewown', 'viewother'],
+        ], 'Lead API Notes Role');
+
+        $contact = $this->createContactWithNote($owner, 'contact-notes-ok@test.com');
+
+        $this->authenticateApiUser($owner);
+        $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+    }
+
+    public function testGetContactNotesActionReturnsForbiddenWithoutNoteViewPermissions(): void
+    {
+        $owner = $this->createApiUserWithPermissions([
+            'lead:leads' => ['viewown', 'viewother'],
+        ], 'Lead API Notes Role');
+
+        $contact = $this->createContactWithNote($owner, 'contact-notes-denied@test.com');
+
+        $this->authenticateApiUser($owner);
+        $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());
+    }
+
+    private function createContactWithNote(User $owner, string $email, string $text = 'Contact note'): Lead
+    {
+        $contact = new Lead();
+        $contact->setEmail($email);
+        $contact->setOwner($owner);
+        $this->em->persist($contact);
+
+        $note = new LeadNote();
+        $note->setLead($contact);
+        $note->setText($text);
+        $note->setCreatedBy($owner);
+        $this->em->persist($note);
+        $this->em->flush();
+
+        return $contact;
     }
 
     private function addContactToCampaign(Lead $contact, Campaign $campaign, bool $manuallyRemoved = false): void

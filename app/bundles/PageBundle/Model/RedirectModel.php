@@ -33,13 +33,14 @@ class RedirectModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly Shortener $shortener,
+        private readonly RedirectRepository $redirectRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): RedirectRepository
     {
-        return $this->em->getRepository(Redirect::class);
+        return $this->redirectRepository;
     }
 
     /**
@@ -47,7 +48,7 @@ class RedirectModel extends FormModel
      */
     public function getRedirectById($identifier)
     {
-        return $this->getRepository()->findOneBy(['redirectId' => $identifier]);
+        return $this->redirectRepository->findOneBy(['redirectId' => $identifier]);
     }
 
     /**
@@ -125,8 +126,7 @@ class RedirectModel extends FormModel
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);
 
-        $repo     = $this->getRepository();
-        $redirect = $repo->findOneBy(['url' => $url]);
+        $redirect = $this->redirectRepository->findOneBy(['url' => $url]);
 
         if (null == $redirect) {
             $redirect = $this->createRedirectEntity($url);
@@ -143,7 +143,7 @@ class RedirectModel extends FormModel
     public function getRedirectsByUrls(array $urls)
     {
         /** @var array<Redirect> $redirects */
-        $redirects   = $this->getRepository()->findByUrls(array_values($urls));
+        $redirects   = $this->redirectRepository->findByUrls(array_values($urls));
         $newEntities = [];
 
         /** @var array<string, Redirect> $return */
@@ -172,7 +172,7 @@ class RedirectModel extends FormModel
 
         // Save new entities
         if (count($newEntities)) {
-            $this->getRepository()->saveEntities($newEntities);
+            $this->redirectRepository->saveEntities($newEntities);
         }
 
         unset($redirects, $newEntities, $byUrl);

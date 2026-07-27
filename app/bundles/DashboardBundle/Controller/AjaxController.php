@@ -11,9 +11,23 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
+    private \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository;
+
+    private DashboardModel $dashboardModel;
+
+    #[Required]
+    public function autowireDashboardAjaxController(
+        \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository,
+        DashboardModel $dashboardModel,
+    ): void {
+        $this->dashboardModel = $dashboardModel;
+        $this->widgetRepository = $widgetRepository;
+    }
+
     /**
      * Count how many visitors are currently viewing a page.
      */
@@ -61,10 +75,8 @@ class AjaxController extends CommonAjaxController
     public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
-        $dashboardModel = $this->getModel('dashboard');
-        \assert($dashboardModel instanceof DashboardModel);
-        $repo = $dashboardModel->getRepository();
-        $repo->updateOrdering(array_flip($data), $this->user->getId());
+
+        $this->widgetRepository->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
         return $this->sendJsonResponse($dataArray);
@@ -77,17 +89,9 @@ class AjaxController extends CommonAjaxController
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];
-
-        // @todo: build permissions
-        // if (!$this->security->isGranted('dashobard:widgets:delete')) {
-        //     return $this->accessDenied();
-        // }
-
-        /** @var DashboardModel $model */
-        $model  = $this->getModel('dashboard');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->dashboardModel->getEntity($objectId);
         if ($entity) {
-            $model->deleteEntity($entity);
+            $this->dashboardModel->deleteEntity($entity);
             $name                 = $entity->getName();
             $dataArray['success'] = 1;
         }

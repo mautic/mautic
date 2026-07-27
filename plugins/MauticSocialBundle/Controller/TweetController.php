@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TweetController extends FormController
+final class TweetController extends FormController
 {
     protected function getModelName(): string
     {
@@ -116,10 +116,8 @@ class TweetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }

@@ -12,7 +12,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber implements EventSubscriberInterface
 {
     private string $existingMjml = '';
 
