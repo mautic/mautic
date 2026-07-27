@@ -22,12 +22,7 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Scheduler::class)
-            ->willReturn($schedulerRepository);
-
-        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager);
+        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager, $schedulerRepository);
 
         $report = new Report();
 
@@ -74,12 +69,7 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Scheduler::class)
-            ->willReturn($schedulerRepository);
-
-        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager);
+        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager, $schedulerRepository);
 
         $report = new Report();
 
@@ -114,12 +104,7 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Scheduler::class)
-            ->willReturn($schedulerRepository);
-
-        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager);
+        $schedulerPlanner = new SchedulerPlanner($dateBuilder, $entityManager, $schedulerRepository);
 
         $report = new Report();
 
