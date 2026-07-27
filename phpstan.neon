@@ -52,6 +52,16 @@ parameters:
 		-
 			identifier: mautic.noEntityManagerGetRepository
 			path: app/bundles/UserBundle/Security/Authentication/Token/Permissions/TokenPermissions.php
+		# rest of the entity manager repository fetches - to be handled in a next PR
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			paths:
+				- app/bundles/FormBundle/Model/SubmissionResultLoader.php
+				- app/bundles/InstallBundle/Install/InstallService.php
+				- app/bundles/LeadBundle/DataFixtures/ORM/*
+				- app/bundles/LeadBundle/Form/Type/FieldType.php
+				- app/bundles/LeadBundle/Segment/Query/ContactSegmentQueryBuilder.php
+				- app/bundles/ReportBundle/Scheduler/Model/SchedulerPlanner.php
 		# ReportGenerator keeps a nullable form factory for its lazy build flow
 		-
 			identifier: mautic.noNullableServiceInConstructor

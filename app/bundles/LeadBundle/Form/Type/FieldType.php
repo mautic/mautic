@@ -52,7 +52,6 @@ final class FieldType extends AbstractType
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
-        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -436,6 +435,9 @@ final class FieldType extends AbstractType
         };
 
         $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
+            /** @var LeadFieldRepository $leadFieldRepository */
+            $leadFieldRepository = $this->em->getRepository(LeadField::class);
+
             $options = [
                 'label'         => 'mautic.core.order.field',
                 'class'         => LeadField::class,

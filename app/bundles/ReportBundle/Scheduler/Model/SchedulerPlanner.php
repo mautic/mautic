@@ -11,11 +11,16 @@ use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
 class SchedulerPlanner
 {
+    /**
+     * @var SchedulerRepository
+     */
+    private readonly \Doctrine\ORM\EntityRepository $schedulerRepository;
+
     public function __construct(
         private readonly DateBuilder $dateBuilder,
         private readonly EntityManagerInterface $entityManager,
-        private readonly SchedulerRepository $schedulerRepository,
     ) {
+        $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
     public function computeScheduler(Report $report): void

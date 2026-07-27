@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -33,7 +32,6 @@ class ContactSegmentQueryBuilder
         private EntityManagerInterface $entityManager,
         private RandomParameterName $randomParameterName,
         private EventDispatcherInterface $dispatcher,
-        private LeadListRepository $leadListRepository,
     ) {
     }
 
@@ -281,7 +279,7 @@ class ContactSegmentQueryBuilder
      */
     private function getSegmentEdges($segmentId): array
     {
-        $segment = $this->leadListRepository->find($segmentId);
+        $segment = $this->entityManager->getRepository(LeadList::class)->find($segmentId);
         if (null === $segment) {
             return [];
         }

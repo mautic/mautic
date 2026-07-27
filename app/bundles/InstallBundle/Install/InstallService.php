@@ -22,7 +22,6 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -52,7 +51,6 @@ class InstallService
         private readonly ValidatorInterface $validator,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly FixturesLoaderInterface $fixturesLoader,
-        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -373,7 +371,7 @@ class InstallService
         // ensure the username and email are unique
         try {
             /** @var User $existingUser */
-            $existingUser = $this->userRepository->find(1);
+            $existingUser = $this->entityManager->getRepository(User::class)->find(1);
         } catch (\Exception) {
             $existingUser = null;
         }

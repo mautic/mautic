@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -9,7 +10,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 class SubmissionResultLoader implements MauticModelInterface
 {
     public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -25,6 +26,6 @@ class SubmissionResultLoader implements MauticModelInterface
 
     private function getRepository(): SubmissionRepository
     {
-        return $this->submissionRepository;
+        return $this->entityManager->getRepository(Submission::class);
     }
 }
