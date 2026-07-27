@@ -5,8 +5,9 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Exception;
-use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -17,7 +18,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Fetcher;
@@ -33,17 +34,27 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CrmAbstractIntegration<SalesforceApi>
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
-    private \Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository;
+    private RoleRepository $roleRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireSalesforceIntegration(\Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository): void
-    {
+    private AuditLogRepository $auditLogRepository;
+
+    private NotificationRepository $notificationRepository;
+
+    #[Required]
+    public function autowireSalesforceIntegration(
+        RoleRepository $roleRepository,
+        AuditLogRepository $auditLogRepository,
+        NotificationRepository $notificationRepository,
+    ): void {
+        $this->roleRepository         = $roleRepository;
+        $this->auditLogRepository     = $auditLogRepository;
         $this->notificationRepository = $notificationRepository;
     }
 
@@ -739,7 +750,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (isset($personData['Id'])) {
                         /** @var IntegrationEntityRepository $integrationEntityRepo */
-                        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+                        $integrationEntityRepo = $this->getIntegrationEntityRepository();
                         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
                         $integrationEntity = (empty($integrationId))
@@ -817,7 +828,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if (isset($companyData['Id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
-                    $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+                    $integrationEntityRepo = $this->getIntegrationEntityRepository();
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'company', $company->getId());
 
                     $integrationEntity = (empty($integrationId))
@@ -953,10 +964,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     private function getAdminUsers(): array
     {
-        $userRepository = $this->em->getRepository(User::class);
-        $adminRole      = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 
-        return $userRepository->findBy(
+        return $this->userRepository->findBy(
             [
                 'role'        => $adminRole,
                 'isPublished' => true,
@@ -998,7 +1008,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         sort($salesForceObjects);
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -1365,7 +1375,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->failureFetchingLeads = false;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $mixedFields           = $this->getIntegrationSettings()->getFeatureSettings();
 
         // Get the last time the campaign was synced to prevent resyncing the entire SF campaign
@@ -1507,7 +1517,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticData = [];
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
         $body   = [
             'Status' => $status,
@@ -2580,9 +2590,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         // get last modified date for donot contact in Mautic
-        $auditLogRepo        = $this->em->getRepository(AuditLog::class);
         $filters['search']   = 'dnc_channel_status%'.$channel;
-        $lastModifiedDNCDate = $auditLogRepo->getAuditLogsForLeads(array_flip($leadIds), $filters, ['dateAdded', 'DESC'], $params['start']);
+        $lastModifiedDNCDate = $this->auditLogRepository->getAuditLogsForLeads(array_flip($leadIds), $filters, ['dateAdded', 'DESC'], $params['start']);
         $trackedIds          = [];
         foreach ($historySF['records'] as $sfModifiedDNC) {
             // if we have no history in Mautic, then update the Mautic record

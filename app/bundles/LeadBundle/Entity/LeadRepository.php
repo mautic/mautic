@@ -977,7 +977,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->where(
                         $q->expr()->and(
                             $q->expr()->eq('fsub.lead_id', 'l.id'),
-                            $q->expr()->eq('ffrm.alias', ":$unique")
+                            $q->expr()->eq('ffrm.alias', ":{$unique}")
                         )
                     );
                 $filter->strict = true;

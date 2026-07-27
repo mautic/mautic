@@ -463,7 +463,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if ([] !== $integrationEntities) {
-                    $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->getIntegrationEntityRepository()->saveEntities($integrationEntities);
                     $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
@@ -536,7 +536,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
             $this->getName(),
             $object,
@@ -613,7 +613,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->getIntegrationEntityRepository()->saveEntities($integrationEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
@@ -912,7 +912,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         if ([] !== $persistEntities) {
-            $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
+            $this->getIntegrationEntityRepository()->saveEntities($persistEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
         }

@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -30,6 +31,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -37,6 +39,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
+    private CompanyRepository $companyRepository;
+
+    #[Required]
+    public function autowireSugarcrmIntegration(CompanyRepository $companyRepository): void
+    {
+        $this->companyRepository = $companyRepository;
+    }
+
     /**
      * @var string[]
      */
@@ -466,7 +476,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -706,8 +716,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $entity = null;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
-        $companyRepo           = $this->em->getRepository(Company::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
@@ -845,10 +854,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             );
                             if (isset($integrationCompanyEntity)) {
                                 $companyId = $integrationCompanyEntity->getInternalEntityId();
-                                $company   = $companyRepo->find($companyId);
+                                $company   = $this->companyRepository->find($companyId);
 
                                 $this->companyModel->addLeadToCompany($company, $entity);
-                                $companyRepo->detachEntity($company);
+                                $this->companyRepository->detachEntity($company);
                                 $this->em->detach($entity);
                             }
                         }
@@ -899,7 +908,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->getIntegrationEntityRepository()->saveEntities($integrationEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             }
             unset($data);
@@ -1038,7 +1047,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         // Check if lead has alredy been synched
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         // Check if it is a sugar CRM alredy synched lead
         $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', $object, 'lead', $lead->getId());
         if (empty($integrationId)) {
@@ -1169,7 +1178,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
         $config                  = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo   = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo   = $this->getIntegrationEntityRepository();
         $mauticData              = $leadsToUpdate              = $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
@@ -1459,7 +1468,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getSugarLeadId($lead)
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         // try searching for lead as this has been changed before in updated done to the plugin
         $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
 
@@ -1605,7 +1614,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             if ([] !== $persistEntities) {
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
+                $this->getIntegrationEntityRepository()->saveEntities($persistEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 unset($persistEntities);
             }

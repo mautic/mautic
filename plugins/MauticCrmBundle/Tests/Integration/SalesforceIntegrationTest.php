@@ -718,17 +718,15 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected function setMocks(): void
     {
-        $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
-
         // we need insight into the entities persisted
-        $integrationEntityRepository->method('saveEntities')
+        $this->integrationEntityRepository->method('saveEntities')
             ->willReturnCallback(
                 function (): void {
                     $this->persistedIntegrationEntities = array_merge($this->persistedIntegrationEntities, func_get_arg(0));
                 }
             );
 
-        $integrationEntityRepository
+        $this->integrationEntityRepository
             ->expects($spy = $this->any())
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
@@ -777,10 +775,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
-        $this->em->expects($this->atLeastOnce())->method('getRepository')
+        $this->em->method('getRepository')
             ->willReturnMap(
                 [
-                    [IntegrationEntity::class, $integrationEntityRepository],
                     [AuditLog::class, $auditLogRepo],
                 ]
             );
@@ -972,6 +969,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();
+
+        $this->autowireIntegrationRepositories($sf);
 
         $sf->method('makeRequest')
             ->willReturnCallback(
