@@ -64,7 +64,7 @@ return [
                     'mautic.social.model.monitoring',
                     'mautic.social.model.postcount',
                     'translator',
-                    'doctrine.orm.entity_manager',
+                    'mautic.social.repository.lead',
                     'mautic.helper.core_parameters',
                     'mautic.lead.repository.field',
                     'mautic.lead.repository.lead',
