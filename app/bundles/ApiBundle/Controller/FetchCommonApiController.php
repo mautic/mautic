@@ -217,8 +217,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $this->customSelectRequested = true;
         }
 
-        $where = $this->getWhereFromRequest($request);
-        if ($where) {
+        if ($where = $this->getWhereFromRequest($request)) {
             $args['filter']['where'] = $where;
         }
 
@@ -762,7 +761,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * Child controllers can override this when "own" is not equivalent to "created by".
      *
-     * @return array<array<string, mixed>>
+     * @return array<int, array{
+     *     column?: string,
+     *     expr?: string,
+     *     value?: int|null,
+     *     group?: array<int, array<int, array{
+     *         column: string,
+     *         expr: string,
+     *         value?: int|null,
+     *     }>>,
+     * }>
      */
     protected function getOwnEntityListFilters(string $tableAlias, User $user): array
     {
