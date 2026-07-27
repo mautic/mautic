@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class FieldAliasKeywordValidator extends ConstraintValidator
+final class FieldAliasKeywordValidator extends ConstraintValidator
 {
     public const RESTRICTED_ALIASES = [
         'contact_id',

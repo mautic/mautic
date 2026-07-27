@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Lead>
  */
-class LeadType extends AbstractType
+final class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 

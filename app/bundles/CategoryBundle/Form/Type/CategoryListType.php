@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CategoryListType extends AbstractType
+final class CategoryListType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,
@@ -78,7 +78,7 @@ class CategoryListType extends AbstractType
         return 'category';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

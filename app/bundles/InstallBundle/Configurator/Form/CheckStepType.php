@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CheckStepType extends AbstractType
+final class CheckStepType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

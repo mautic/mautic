@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class TelType extends AbstractType
+final class TelType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -18,7 +18,7 @@ class TelType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return TextType::class;
     }

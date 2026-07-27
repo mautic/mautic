@@ -654,12 +654,12 @@ class Asset extends FormEntity implements UuidInterface
 
     public function setFileNameFromRemote(): void
     {
-        $fileName = basename($this->getRemotePath());
+        $fileName = basename($this->remotePath);
 
         $this->setOriginalFileName($fileName);
 
         // set the asset title as original file name if title is missing
-        if (null === $this->getTitle()) {
+        if (null === $this->title) {
             $this->setTitle($fileName);
         }
     }
@@ -668,7 +668,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->getTitle()) {
+            if (null === $this->title) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
@@ -680,7 +680,7 @@ class Asset extends FormEntity implements UuidInterface
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
-        } elseif ($this->isRemote() && null !== $this->getRemotePath()) {
+        } elseif ($this->isRemote() && null !== $this->remotePath) {
             $this->setFileNameFromRemote();
         }
     }
@@ -847,7 +847,7 @@ class Asset extends FormEntity implements UuidInterface
         }
 
         if ($this->isRemote()) {
-            return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
+            return pathinfo(parse_url($this->remotePath, PHP_URL_PATH), PATHINFO_EXTENSION);
         }
 
         if (null === $this->loadFile()) {
@@ -1073,7 +1073,7 @@ class Asset extends FormEntity implements UuidInterface
      */
     public function getFilePath()
     {
-        return $this->isRemote() ? $this->getRemotePath() : $this->getAbsolutePath();
+        return $this->isRemote() ? $this->remotePath : $this->getAbsolutePath();
     }
 
     /**

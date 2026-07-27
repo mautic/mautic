@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<string, mixed>|null>
  */
-class FocusListType extends AbstractType
+final class FocusListType extends AbstractType
 {
     private readonly FocusRepository $repo;
 
@@ -51,7 +51,7 @@ class FocusListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

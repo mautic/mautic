@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldFileType extends AbstractType
+final class FormFieldFileType extends AbstractType
 {
     public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
 

@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Event;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ReportScheduleSendEvent extends Event
+final class ReportScheduleSendEvent extends Event
 {
     /**
      * @param string $file
