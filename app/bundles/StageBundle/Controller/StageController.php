@@ -21,13 +21,16 @@ final class StageController extends AbstractFormController
 {
     use CategoryListFiltersTrait;
 
+    private \Mautic\StageBundle\Entity\StageRepository $stageRepository;
+
     private StageModel $stageModel;
 
     #[Required]
     public function autowireStageController(
-        StageModel $stageModel,
+        StageModel $stageModel, \Mautic\StageBundle\Entity\StageRepository $stageRepository,
     ): void {
-        $this->stageModel = $stageModel;
+        $this->stageModel      = $stageModel;
+        $this->stageRepository = $stageRepository;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
@@ -212,7 +215,7 @@ final class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
+        $stageWeights = $this->stageRepository->getStageWeights();
 
         return $this->delegateView(
             [
@@ -365,7 +368,7 @@ final class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
-        $stageWeights = $this->stageModel->getRepository()->getStageWeights();
+        $stageWeights = $this->stageRepository->getStageWeights();
 
         return $this->delegateView(
             [
@@ -443,7 +446,7 @@ final class StageController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        $stages = $model->getRepository()->getStages(false, (string) $secondaryStage->getId());
+        $stages = $this->stageRepository->getStages(false, (string) $secondaryStage->getId());
         $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
         $form   = $formFactory->create(StageMergeType::class, [], ['stages' => $stages, 'action' => $action]);
 

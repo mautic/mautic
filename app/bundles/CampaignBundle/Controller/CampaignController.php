@@ -118,6 +118,7 @@ class CampaignController extends AbstractStandardFormController
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
         private CategoryModel $categoryModel,
+        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -350,7 +351,7 @@ class CampaignController extends AbstractStandardFormController
             $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $hasCampaignLeads = $this->campaignModel->getRepository()->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
+        $hasCampaignLeads = $this->campaignRepository->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
@@ -784,7 +785,7 @@ class CampaignController extends AbstractStandardFormController
             $this->setCampaignSources($isClone);
             $this->campaignModel->setLeadSources($entity, $this->campaignElements['campaignSources'], []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
-            $this->campaignModel->getRepository()->saveEntity($entity);
+            $this->campaignRepository->saveEntity($entity);
             // Set as new so that timestamps are still hydrated
             $entity->setNew();
             $this->sessionId = $entity->getId();

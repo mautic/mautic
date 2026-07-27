@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ChangeOwnerType extends AbstractType
+final class ChangeOwnerType extends AbstractType
 {
     public function __construct(
         private readonly UserModel $userModel,

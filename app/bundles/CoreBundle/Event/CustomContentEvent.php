@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CustomContentEvent extends Event
+final class CustomContentEvent extends Event
 {
     /**
      * @var array

@@ -66,6 +66,7 @@ final class ImportController extends FormController
         private readonly RequestStack $requestStack,
         CorePermissions $security,
         private readonly ImportModel $importModel,
+        private readonly \Mautic\LeadBundle\Entity\ImportRepository $importRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -98,7 +99,7 @@ final class ImportController extends FormController
         $object = $this->requestStack->getSession()->get('mautic.import.object');
 
         $filter['force'][] = [
-            'column' => $this->importModel->getRepository()->getTableAlias().'.object',
+            'column' => $this->importRepository->getTableAlias().'.object',
             'expr'   => 'eq',
             'value'  => $object,
         ];

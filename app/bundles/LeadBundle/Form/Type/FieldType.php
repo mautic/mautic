@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<LeadField>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     /**
      * @var string[]
