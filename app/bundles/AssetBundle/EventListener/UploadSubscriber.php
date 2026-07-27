@@ -13,12 +13,12 @@ use Oneup\UploaderBundle\UploadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class UploadSubscriber implements EventSubscriberInterface
+final readonly class UploadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly AssetModel $assetModel,
-        private readonly FileUploadValidator $fileUploadValidator,
+        private CoreParametersHelper $coreParametersHelper,
+        private AssetModel $assetModel,
+        private FileUploadValidator $fileUploadValidator,
     ) {
     }
 

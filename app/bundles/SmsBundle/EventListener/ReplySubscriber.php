@@ -13,7 +13,7 @@ use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReplySubscriber implements EventSubscriberInterface
+final class ReplySubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 

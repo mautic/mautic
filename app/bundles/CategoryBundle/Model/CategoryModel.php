@@ -82,15 +82,14 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
-        $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
-        $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+        $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+            $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
             ++$aliasTag;
         }
         if ($testAlias !== $alias) {
@@ -187,7 +186,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             return $this->categoriesByBundleCache[$key];
         }
 
-        $result = $this->getRepository()->getCategoryList($type, $filter, $limit, $start);
+        $result = $this->categoryRepository->getCategoryList($type, $filter, $limit, $start);
 
         if (!isset($options['for_lookup'])) {
             return $this->categoriesByBundleCache[$key] = $result;

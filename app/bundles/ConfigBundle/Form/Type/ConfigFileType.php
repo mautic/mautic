@@ -8,9 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigFileType extends AbstractType
+final class ConfigFileType extends AbstractType
 {
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return FileType::class;
     }

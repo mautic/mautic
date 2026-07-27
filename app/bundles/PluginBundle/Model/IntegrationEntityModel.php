@@ -36,9 +36,7 @@ class IntegrationEntityModel extends FormModel
             return [];
         }
 
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
-
-        return $integrationEntityRepo->getIntegrationsEntityId(
+        return $this->integrationEntityRepository->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
@@ -84,9 +82,8 @@ class IntegrationEntityModel extends FormModel
         if (!$formattedRecords = $this->formatListOfContacts($mauticContactIds)) {
             return [];
         }
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
-        return $integrationEntityRepo->getIntegrationsEntityId(
+        return $this->integrationEntityRepository->getIntegrationsEntityId(
             $integrationName,
             null,
             $internalObject,
@@ -107,7 +104,7 @@ class IntegrationEntityModel extends FormModel
      */
     public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime)
     {
-        $entity = $this->getIntegrationEntityRepository()->find($id);
+        $entity = $this->integrationEntityRepository->find($id);
         if ($entity) {
             $entity->setLastSyncDate($dateTime);
         }

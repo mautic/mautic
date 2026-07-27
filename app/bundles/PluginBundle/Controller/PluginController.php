@@ -22,12 +22,15 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PluginController extends FormController
 {
+    private \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository;
+
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginController(PluginModel $pluginModel): void
+    public function autowirePluginController(PluginModel $pluginModel, \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository): void
     {
         $this->pluginModel = $pluginModel;
+        $this->pluginRepository = $pluginRepository;
     }
 
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
@@ -366,7 +369,7 @@ final class PluginController extends FormController
             $this->throwAccessDenied();
         }
 
-        $bundle = $this->pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginRepository->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]
