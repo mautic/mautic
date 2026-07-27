@@ -10,6 +10,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\MauticClearbitBundle\Integration\Support\ConfigSupport;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\Routing\RouterInterface;
 
 final class ConfigControllerTest extends MauticMysqlTestCase
 {
@@ -34,7 +35,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->configRoute = static::getContainer()->get('router')->generate('mautic_plugin_config', ['name' => 'Clearbit']);
+        $this->configRoute = static::getContainer()->get(RouterInterface::class)->generate('mautic_plugin_config', ['name' => 'Clearbit']);
     }
 
     public function testSavedIntegrationIsPublishedAndApiKeyIsEncryptedAtRest(): void
@@ -54,7 +55,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var IntegrationsHelper $integrationsHelper */
-        $integrationsHelper = static::getContainer()->get('mautic.integrations.helper');
+        $integrationsHelper = static::getContainer()->get(IntegrationsHelper::class);
         /** @var ConfigSupport $configSupport */
         $configSupport = static::getContainer()->get(ConfigSupport::class);
         $decrypted     = $integrationsHelper->getIntegrationConfiguration($configSupport);

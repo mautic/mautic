@@ -20,6 +20,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 final class ConfigFormTest extends KernelTestCase
@@ -57,7 +58,7 @@ final class ConfigFormTest extends KernelTestCase
     public function testOauth(): void
     {
         $connectWiseHeader = ['appcookie' => 'rookie'];
-        self::getContainer()->get('event_dispatcher')->addListener(
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
             function (PluginIntegrationKeyEvent $event) use ($connectWiseHeader): PluginIntegrationKeyEvent {
                 $event->setKeys($connectWiseHeader);

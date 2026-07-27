@@ -21,7 +21,7 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
     public function testGetAuditLogsForSingleLead(array $filters, int $expectedCount): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         $contact = new Lead();
         $contact->setEmail('john@doe.com');

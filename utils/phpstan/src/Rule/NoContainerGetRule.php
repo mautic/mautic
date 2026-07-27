@@ -22,7 +22,10 @@ use PHPStan\Type\TypeCombinator;
  * Pulling a service out of the container by name hides the dependency from static analysis and returns an
  * untyped object. Inject the service through the constructor as a typed property instead. A scoped
  * ServiceLocator is allowed, because it is an explicit, typed set of services rather than the whole container.
- * Tests and migrations bootstrap services outside the DI graph, so those files are skipped.
+ * Migrations bootstrap services outside the DI graph, so those files are skipped.
+ *
+ * Tests do need to fetch services from the container, so there the call is allowed - but only with a class
+ * constant, e.g. get(PathsHelper::class), which gives a typed service instead of an untyped object.
  *
  * @implements Rule<MethodCall>
  */
@@ -32,6 +35,16 @@ final class NoContainerGetRule implements Rule
      * @var string
      */
     private const GET_METHOD = 'get';
+
+    /**
+     * @var string
+     */
+    private const ERROR_MESSAGE = 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.';
+
+    /**
+     * @var string
+     */
+    private const TEST_ERROR_MESSAGE = 'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.';
 
     /**
      * @var string
@@ -58,7 +71,7 @@ final class NoContainerGetRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if ($this->isExemptFile($scope->getFile())) {
+        if (str_contains($scope->getFile(), '/migrations/')) {
             return [];
         }
 
@@ -78,9 +91,14 @@ final class NoContainerGetRule implements Rule
             return [];
         }
 
-        $ruleError = RuleErrorBuilder::message(
-            'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.'
-        )
+        $isTestFile = $this->isTestFile($scope->getFile());
+
+        // in tests fetching from the container is fine, as long as it is by a class constant
+        if ($isTestFile && !$node->getArgs()[0]->value instanceof String_) {
+            return [];
+        }
+
+        $ruleError = RuleErrorBuilder::message($isTestFile ? self::TEST_ERROR_MESSAGE : self::ERROR_MESSAGE)
             ->identifier('mautic.noContainerGet')
             ->build();
 
@@ -128,10 +146,9 @@ final class NoContainerGetRule implements Rule
         return false;
     }
 
-    private function isExemptFile(string $file): bool
+    private function isTestFile(string $file): bool
     {
         return str_contains($file, '/Tests/')
-            || str_contains($file, '/migrations/')
             || str_ends_with($file, 'Test.php')
             || str_ends_with($file, 'TestCase.php');
     }
