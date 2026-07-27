@@ -255,6 +255,7 @@ class MailHelper
         private readonly RedirectModel $redirectModel,
         private readonly SMimeHelper $sMimeHelper,
         private readonly EmailStatModel $emailStatModel,
+        private readonly CopyRepository $copyRepository,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -1721,21 +1722,18 @@ class MailHelper
 
         $stat->setTokens($this->getTokens());
 
-        $emailCopyRepository = $this->entityManager->getRepository(Copy::class);
-        \assert($emailCopyRepository instanceof CopyRepository);
-
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = $emailExists ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
             $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
-            $copy        = $emailCopyRepository->findByHash($hash);
+            $copy        = $this->copyRepository->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
                 $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
-                if (!$emailCopyRepository->saveCopy($hash, $this->subject, $contentToPersist, $this->plainText)) {
+                if (!$this->copyRepository->saveCopy($hash, $this->subject, $contentToPersist, $this->plainText)) {
                     // Try one more time to find the ID in case there was overlap when creating
-                    $copy = $emailCopyRepository->findByHash($hash);
+                    $copy = $this->copyRepository->findByHash($hash);
                 } else {
                     $copyCreated = true;
                 }

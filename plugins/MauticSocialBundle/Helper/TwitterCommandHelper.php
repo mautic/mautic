@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -33,7 +32,7 @@ class TwitterCommandHelper
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
-        private readonly EntityManagerInterface $em,
+        private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
         private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
         private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
@@ -341,10 +340,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
-
-        $monitorRepository->saveEntity($monitorLead);
+        $this->monitorLeadRepository->saveEntity($monitorLead);
     }
 
     /**

@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
@@ -48,6 +50,8 @@ class IntegrationHelper
         protected CoreParametersHelper $coreParametersHelper,
         protected Environment $twig,
         protected PluginModel $pluginModel,
+        private readonly IntegrationRepository $integrationRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -75,7 +79,7 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository(Integration::class);
+            $integrationRepo = $this->integrationRepository;
             // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -383,12 +387,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository(Integration::class)->getIntegrations();
+        return $this->integrationRepository->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository(Integration::class)->getCoreIntegrations();
+        return $this->integrationRepository->getCoreIntegrations();
     }
 
     /**
@@ -455,7 +459,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository(Lead::class)->saveEntity($lead);
+                $this->leadRepository->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -487,7 +491,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository(Lead::class)->saveEntity($lead);
+        $this->leadRepository->saveEntity($lead);
 
         return $socialCache;
     }

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\PluginBundle\Entity\Integration;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -146,12 +146,11 @@ final class ConfigFormTest extends KernelTestCase
 
         $integrationRepository = $this->createMock(IntegrationRepository::class);
 
-        $entityManager->expects($this->exactly(3))
+        $entityManager->expects($this->exactly(2))
                 ->method('getRepository')
                 ->willReturnMap(
                     [
                         [Plugin::class, $pluginRepository],
-                        [Integration::class, $integrationRepository],
                         [IntegrationEntity::class, $integrationEntityRepository],
                     ]
                 );
@@ -174,7 +173,9 @@ final class ConfigFormTest extends KernelTestCase
             $bundleHelper,
             $coreParametersHelper,
             $this->createStub(Environment::class),
-            $pluginModel
+            $pluginModel,
+            $integrationRepository,
+            $this->createMock(LeadRepository::class)
         );
     }
 }
