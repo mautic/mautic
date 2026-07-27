@@ -486,15 +486,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         }
     }
 
-    $el.find('a.remove-selected').on('click', function() {
-        mQuery(this).closest('.panel').animate(
-            {'opacity': 0},
-            'fast',
-            function () {
-                mQuery(this).remove();
-            }
-        );
-    });
+    Mautic.initRemoveEvents($el.find('button.remove-selected'), mQuery);
 
     $el.find('select[data-mautic="available_filters"]').on('change', function() {
         var $this = mQuery(this);
@@ -682,7 +674,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     activeDynamicContentFilterContainer.append(prototype);
 
-    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"), mQuery);
+    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("button.remove-selected"), mQuery);
 
     var filter = '#' + filterIdBase + '_filter';
 
