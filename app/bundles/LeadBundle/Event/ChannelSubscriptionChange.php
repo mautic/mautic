@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ChannelSubscriptionChange extends Event
+final class ChannelSubscriptionChange extends Event
 {
     /**
      * @param string $channel

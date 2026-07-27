@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class MauticApiBundle extends Bundle
+final class MauticApiBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
     {

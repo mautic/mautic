@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigFormType extends AbstractType
+final class ConfigFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

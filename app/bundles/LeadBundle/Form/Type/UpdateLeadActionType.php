@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UpdateLeadActionType extends AbstractType
+final class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tweet>
  */
-class TweetType extends AbstractType
+final class TweetType extends AbstractType
 {
     public function __construct(
         protected EntityManager $em,

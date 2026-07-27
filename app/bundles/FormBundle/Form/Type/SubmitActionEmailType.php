@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionEmailType extends AbstractType
+final class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
     use ToBcBccFieldsTrait;

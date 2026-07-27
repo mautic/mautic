@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadImportFieldType extends AbstractType
+final class LeadImportFieldType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

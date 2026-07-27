@@ -12,13 +12,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class BatchTagController extends AbstractFormController
 {
-    private TagModel $tagModel;
+    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
 
     #[Required]
     public function autowireBatchTagController(
-        TagModel $tagModel,
+        TagModel $tagModel, \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
-        $this->tagModel = $tagModel;
+        $this->tagRepository = $tagRepository;
     }
 
     private const OBJECT_TYPE_COMPANY = 'company';
@@ -106,11 +106,11 @@ final class BatchTagController extends AbstractFormController
         }
 
         if (!empty($tagsToAdd)) {
-            $this->tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+            $this->tagRepository->addTagsToLeads($ids, $tagsToAdd);
         }
 
         if (!empty($tagsToRemove)) {
-            $this->tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+            $this->tagRepository->removeTagsFromLeads($ids, $tagsToRemove);
         }
 
         $this->addFlashMessage('mautic.lead.batch_leads_affected', [

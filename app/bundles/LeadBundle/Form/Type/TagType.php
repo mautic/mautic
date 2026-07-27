@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Tag>
  */
-class TagType extends AbstractType
+final class TagType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $em,
@@ -56,7 +56,7 @@ class TagType extends AbstractType
         return 'lead_tag';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityType::class;
     }
