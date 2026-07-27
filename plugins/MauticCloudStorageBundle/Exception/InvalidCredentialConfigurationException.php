@@ -2,6 +2,6 @@
 
 namespace MauticPlugin\MauticCloudStorageBundle\Exception;
 
-class InvalidCredentialConfigurationException extends \RuntimeException
+final class InvalidCredentialConfigurationException extends \RuntimeException
 {
 }

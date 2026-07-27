@@ -188,11 +188,22 @@ parameters:
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
 
+		# the concrete Form is created by the form factory, not autowired
+		-
+			identifier: mautic.preferInterfaceInConstructor
+			path: app/bundles/ApiBundle/Controller/oAuth2/AuthorizeController.php
+
 		# not useful, rather pedantic from phsptan-* extensions
 		-
 			identifier: argument.templateType
 			path: app/bundles/CoreBundle/Helper/CookieHelper.php
 			count: 1
+		# repository is resolved from a dynamic entity class name
+		-
+			identifier: argument.templateType
+			paths:
+				- app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
+				- app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
 		-
 			message: '#Method PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker::willReturnOnConsecutiveCalls\(\) invoked with unpacked array with possibly string key#'
 			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolverTest.php
@@ -225,3 +236,6 @@ rules:
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+	#- Utils\PHPStan\Rule\NoContainerGetRule
+	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
+	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule

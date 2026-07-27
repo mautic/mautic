@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -48,7 +48,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         private readonly ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -189,8 +189,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        $repo            = $this->getRepository();
-        $availablePoints = $repo->getPublishedByType($type);
+        $availablePoints = $this->pointRepository->getPublishedByType($type);
         if (empty($availablePoints)) {
             return;
         }
@@ -209,7 +208,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         $availableActions = $this->getPointActions();
 
         // get a list of actions that has already been performed on this lead
-        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
+        $completedActions = $this->pointRepository->getCompletedLeadActions($type, $lead->getId());
 
         $persist = [];
         /** @var Point $action */
@@ -301,8 +300,8 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-            $this->getRepository()->detachEntities($persist);
+            $this->pointRepository->saveEntities($persist);
+            $this->pointRepository->detachEntities($persist);
         }
 
         if ($hasLeadPointChanges) {

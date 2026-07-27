@@ -6,7 +6,7 @@ use Gaufrette\Adapter;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class RemoteAssetBrowseEvent extends CommonEvent
+final class RemoteAssetBrowseEvent extends CommonEvent
 {
     private ?Adapter $adapter       = null;
 

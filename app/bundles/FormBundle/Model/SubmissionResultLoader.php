@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -10,7 +10,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 class SubmissionResultLoader implements MauticModelInterface
 {
     public function __construct(
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

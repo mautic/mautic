@@ -205,7 +205,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDynamicContent($dynamicContent);
         $stat->setSource($source);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }

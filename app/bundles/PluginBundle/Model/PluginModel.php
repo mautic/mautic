@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,7 +32,7 @@ class PluginModel extends FormModel
         private readonly FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
         private readonly BundleHelper $bundleHelper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

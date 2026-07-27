@@ -3,7 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -105,7 +105,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
         private VariantConverterService $variantConverterService,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -607,12 +607,12 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $lastHit = $request->cookies->get('mautic_referer_id');
         if (!empty($lastHit) && is_numeric($lastHit)) {
             // Update the last hit with the date/time the user left
-            $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
+            $this->hitRepository->updateHitDateLeft((int) $lastHit);
         }
 
         // Check if this is a unique page hit
         $trackingId = $hit->getTrackingId();
-        $isUnique   = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
+        $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
         if (!empty($page)) {
             if ($page instanceof Page) {
@@ -774,7 +774,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
-        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
+        return $this->hitRepository->getBounces($page->getId(), $fromDate);
     }
 
     /**
@@ -907,7 +907,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
-        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
         $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
