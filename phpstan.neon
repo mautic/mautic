@@ -37,6 +37,32 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# CRM integrations share a legacy entity-manager based flow - to be refactored later
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			path: plugins/MauticCrmBundle/Integration/*
+		# deprecated base class with 29 subclasses - constructor cannot be extended without touching all of them
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
+		# generic base model, the repository is resolved per entity type of the child model
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
+		# AccessToken has no dedicated repository class to inject
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			path: app/bundles/UserBundle/Security/Authentication/Token/Permissions/TokenPermissions.php
+		# rest of the entity manager repository fetches - to be handled in a next PR
+		-
+			identifier: mautic.noEntityManagerGetRepository
+			paths:
+				- app/bundles/FormBundle/Model/SubmissionResultLoader.php
+				- app/bundles/InstallBundle/Install/InstallService.php
+				- app/bundles/LeadBundle/DataFixtures/ORM/*
+				- app/bundles/LeadBundle/Form/Type/FieldType.php
+				- app/bundles/LeadBundle/Segment/Query/ContactSegmentQueryBuilder.php
+				- app/bundles/ReportBundle/Scheduler/Model/SchedulerPlanner.php
 		# ReportGenerator keeps a nullable form factory for its lazy build flow
 		-
 			identifier: mautic.noNullableServiceInConstructor
@@ -240,3 +266,4 @@ rules:
 	#- Utils\PHPStan\Rule\NoContainerGetRule
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
+	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
