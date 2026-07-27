@@ -31,6 +31,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
+    private const EXISTS_EXPRESSION     = 'EXISTS';
+
+    private const NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
+
     private CompanyRepository $companyRepository;
 
     private FrequencyRuleRepository $frequencyRuleRepository;
@@ -743,6 +747,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $eqExpr   = $operators['='][$exprType];
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
+
+        $formSearchCommand = $this->translator->trans('mautic.lead.lead.searchcommand.form');
+        if ($command === $this->translator->trans('mautic.lead.lead.searchcommand.form', [], null, 'en_US')) {
+            $command = $formSearchCommand;
+        }
+
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -798,7 +808,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
+                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
@@ -952,8 +962,27 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
                     $returnParameter = true;
                 }
-                $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
+                $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
                 $filter->strict = true;
+                break;
+            case $formSearchCommand:
+                if (empty($string)) {
+                    $expr = $q->expr()->eq(1, 0);
+                    break;
+                }
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fsub')
+                    ->innerJoin('fsub', MAUTIC_TABLE_PREFIX.'forms', 'ffrm', 'fsub.form_id = ffrm.id')
+                    ->where(
+                        $q->expr()->and(
+                            $q->expr()->eq('fsub.lead_id', 'l.id'),
+                            $q->expr()->eq('ffrm.alias', ":$unique")
+                        )
+                    );
+                $filter->strict = true;
+                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
+                $q->setParameter($unique, $string);
                 break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
@@ -1018,6 +1047,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
             'mautic.lead.lead.searchcommand.dnc',
+            'mautic.lead.lead.searchcommand.form',
         ];
 
         if (!empty($this->availableSearchFields)) {
@@ -1463,5 +1493,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('alias', $alias)
             ->executeQuery()
             ->fetchFirstColumn();
+    }
+
+    private function getExistsExpression(bool $isNegated): string
+    {
+        return $isNegated ? self::NOT_EXISTS_EXPRESSION : self::EXISTS_EXPRESSION;
     }
 }
