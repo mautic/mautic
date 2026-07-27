@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\DependencyInjection\Compiler\TestPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class IntegrationsBundle extends AbstractPluginBundle
+final class IntegrationsBundle extends AbstractPluginBundle
 {
     public function build(ContainerBuilder $container): void
     {
