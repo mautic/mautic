@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ShortenerServicePass implements CompilerPassInterface
+final class ShortenerServicePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

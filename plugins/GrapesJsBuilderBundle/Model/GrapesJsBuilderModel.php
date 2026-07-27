@@ -38,6 +38,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
         private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -104,7 +105,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         }
 
         $entity->setCustomHtml($customHtml);
-        $this->emailModel->getRepository()->saveEntity($entity);
+        $this->emailRepository->saveEntity($entity);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class PointsChangeEvent extends CommonEvent
+final class PointsChangeEvent extends CommonEvent
 {
     protected int $old;
 
