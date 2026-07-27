@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
@@ -612,10 +611,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
 
             if (!empty($leadData['vid'])) {
-                /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->getIntegrationEntityRepository();
-                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity     = (empty($integrationId)) ?
+                $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
+                $integrationEntity = (empty($integrationId)) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],
@@ -623,10 +620,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $lead->getId(),
                         [],
                         false
-                    ) : $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                    ) : $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
 
                 $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                $this->getIntegrationEntityRepository()->saveEntity($integrationEntity);
+                $this->integrationEntityRepository->saveEntity($integrationEntity);
                 $this->em->detach($integrationEntity);
             }
 

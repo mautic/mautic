@@ -2231,26 +2231,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $this->mauticDuplicates = [];
         }
 
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
-            $integrationEntityRepo->saveEntities($leadsToSync);
-            $integrationEntityRepo->deleteEntity($leadsToSync);
+            $this->integrationEntityRepository->saveEntities($leadsToSync);
+            $this->integrationEntityRepository->deleteEntity($leadsToSync);
             $leadsToSync = [];
         }
 
         // Persist updated entities if applicable
         if ($this->persistIntegrationEntities) {
-            $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
+            $this->integrationEntityRepository->saveEntities($this->persistIntegrationEntities);
             $this->persistIntegrationEntities = [];
         }
 
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ($this->deleteIntegrationEntities) {
-            $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+            $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
             $this->deleteIntegrationEntities = [];
         }
-        $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+        $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
             if ($error instanceof \Exception) {
@@ -2269,8 +2268,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
     {
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
+        $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
             $integrationEntity,
             $internalEntity,
@@ -2305,8 +2303,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $integrationEntityRepo->saveEntities($integrationEntities);
-        $integrationEntityRepo->detachEntities($integrationEntities);
+        $this->integrationEntityRepository->saveEntities($integrationEntities);
+        $this->integrationEntityRepository->detachEntities($integrationEntities);
     }
 
     /**
