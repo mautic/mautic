@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
-use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
@@ -15,6 +15,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
+use Mautic\UserBundle\Entity\RoleRepository;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -33,6 +34,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var array<string, int>
      */
+    /**
+     * @var MockObject&AuditLogRepository
+     */
+    private MockObject $auditLogRepository;
+
     private array $maxInvocations = [];
 
     private ?string $specialSfCase = null;
@@ -718,6 +724,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected function setMocks(): void
     {
+        $this->auditLogRepository = $this->createMock(AuditLogRepository::class);
+
         // we need insight into the entities persisted
         $this->integrationEntityRepository->method('saveEntities')
             ->willReturnCallback(
@@ -744,9 +752,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     return $this->getLeadsToUpdate('Lead', 2, 2, 'Lead')['Lead'];
                 }
             );
-        $auditLogRepo = $this->createMock(AuditLogRepository::class);
-
-        $auditLogRepo
+        $this->auditLogRepository
             ->method('getAuditLogsForLeads')
             ->willReturn(
                 [
@@ -772,13 +778,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         'dateAdded' => new \DateTime('2017-10-16 15:00:36.000000', new \DateTimeZone('UTC')),
                         'ipAddress' => '127.0.0.1',
                     ],
-                ]
-            );
-
-        $this->em->method('getRepository')
-            ->willReturnMap(
-                [
-                    [AuditLog::class, $auditLogRepo],
                 ]
             );
 
@@ -971,6 +970,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->getMock();
 
         $this->autowireIntegrationRepositories($sf);
+        $sf->autowireSalesforceIntegration(
+            $this->createMock(RoleRepository::class),
+            $this->auditLogRepository,
+            $this->createMock(NotificationRepository::class)
+        );
 
         $sf->method('makeRequest')
             ->willReturnCallback(
