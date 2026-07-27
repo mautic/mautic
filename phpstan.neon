@@ -239,3 +239,4 @@ rules:
 	#- Utils\PHPStan\Rule\NoContainerGetRule
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
+	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule

@@ -1946,7 +1946,7 @@ class MailHelper
     private function setDefaultFrom(AddressDTO $systemFrom): void
     {
         $this->systemFrom = $systemFrom;
-        $this->from       = $this->systemFrom;
+        $this->from       = $systemFrom;
     }
 
     private function setDefaultReplyTo(?string $systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
