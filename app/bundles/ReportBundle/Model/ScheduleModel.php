@@ -3,13 +3,17 @@
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class ScheduleModel
+/**
+ * @extends FormModel<Scheduler>
+ */
+class ScheduleModel extends FormModel
 {
     public function __construct(
         private readonly EntityManager $entityManager,
@@ -34,9 +38,9 @@ class ScheduleModel
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }
 
-    public function reportWasScheduled(Report $report): void
+    public function reportWasScheduled(Report $report, bool $scheduleNextDownloadJob = true): void
     {
-        $this->schedulerPlanner->computeScheduler($report);
+        $this->schedulerPlanner->computeScheduler($report, $scheduleNextDownloadJob);
     }
 
     public function turnOffScheduler(Report $report): void

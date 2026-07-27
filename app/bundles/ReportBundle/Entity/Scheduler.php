@@ -8,16 +8,23 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class Scheduler
 {
+    public const TABLE_NAME = 'reports_schedulers';
+
     /**
      * @var int
      */
     private $id;
 
+    /**
+     * @var array<mixed>
+     */
+    private array $data = [];
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('reports_schedulers')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(SchedulerRepository::class);
 
         $builder->addId();
@@ -29,6 +36,10 @@ class Scheduler
         $builder->createField('scheduleDate', Types::DATETIME_MUTABLE)
             ->columnName('schedule_date')
             ->nullable(false)
+            ->build();
+
+        $builder->createField('data', Types::JSON)
+            ->columnName('data')
             ->build();
     }
 
@@ -54,5 +65,23 @@ class Scheduler
     public function getScheduleDate(): \DateTimeInterface
     {
         return $this->scheduleDate;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public function setData(array $data): Scheduler
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getData(): array
+    {
+        return $this->data;
     }
 }

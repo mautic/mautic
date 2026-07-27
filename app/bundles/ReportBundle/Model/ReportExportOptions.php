@@ -23,6 +23,11 @@ class ReportExportOptions
      */
     private $dateTo;
 
+    /**
+     * @var array<mixed>
+     */
+    private array $data = [];
+
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->batchSize = $coreParametersHelper->get('report_export_batch_size');
@@ -90,5 +95,21 @@ class ReportExportOptions
     public function setDateTo($dateTo): void
     {
         $this->dateTo = $dateTo;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public function setData(array $data): void
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getData(): array
+    {
+        return $this->data;
     }
 }
