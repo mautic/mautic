@@ -18,8 +18,9 @@ final class FocusListType extends AbstractType
 
     public function __construct(
         protected FocusModel $focusModel,
+        private readonly FocusRepository $focusRepository,
     ) {
-        $this->repo       = $this->focusModel->getRepository();
+        $this->repo       = $this->focusRepository;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

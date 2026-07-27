@@ -39,6 +39,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
+    private \Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireSalesforceIntegration(\Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository): void
+    {
+        $this->notificationRepository = $notificationRepository;
+    }
+
     /**
      * @var string []
      */
@@ -921,7 +929,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     array_flip(['type', 'isRead', 'header', 'message', 'user'])
                 );
 
-                $exists = $this->getNotificationModel()->getRepository()->findOneBy($search);
+                $exists = $this->notificationRepository->findOneBy($search);
 
                 if ($exists) {
                     continue;
@@ -934,8 +942,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $persistEntities[] = $notification;
         }
 
-        $this->getNotificationModel()->getRepository()->saveEntities($persistEntities);
-        $this->getNotificationModel()->getRepository()->detachEntities($persistEntities);
+        $this->notificationRepository->saveEntities($persistEntities);
+        $this->notificationRepository->detachEntities($persistEntities);
     }
 
     /**
