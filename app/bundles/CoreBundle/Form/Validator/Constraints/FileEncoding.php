@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class FileEncoding extends Constraint
+final class FileEncoding extends Constraint
 {
     public $encodingFormatMessage = 'mautic.core.invalid_file_encoding';
 

@@ -251,7 +251,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      */
     public function isAdmin()
     {
-        return $this->getIsAdmin();
+        return $this->isAdmin;
     }
 
     /**

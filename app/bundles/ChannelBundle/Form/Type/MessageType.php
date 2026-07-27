@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
-class MessageType extends AbstractFormStandardType
+final class MessageType extends AbstractFormStandardType
 {
     public function __construct(
         protected MessageModel $model,

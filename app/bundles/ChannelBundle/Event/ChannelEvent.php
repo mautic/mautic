@@ -5,7 +5,7 @@ namespace Mautic\ChannelBundle\Event;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class ChannelEvent extends CommonEvent
+final class ChannelEvent extends CommonEvent
 {
     /**
      * @var array

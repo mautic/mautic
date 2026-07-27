@@ -5,7 +5,7 @@ namespace Mautic\NotificationBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class NotificationSendEvent extends CommonEvent
+final class NotificationSendEvent extends CommonEvent
 {
     /**
      * @param string $message

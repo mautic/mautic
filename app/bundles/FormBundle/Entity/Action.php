@@ -290,6 +290,6 @@ class Action implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getForm()?->getCreatedBy();
+        return $this->form?->getCreatedBy();
     }
 }

@@ -49,7 +49,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Email>
  */
-class EmailType extends AbstractType
+final class EmailType extends AbstractType
 {
     private readonly bool $isDraftEnabled;
 

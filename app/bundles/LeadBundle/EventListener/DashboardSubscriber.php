@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
