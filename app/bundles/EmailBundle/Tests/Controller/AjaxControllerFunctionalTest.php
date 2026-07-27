@@ -271,7 +271,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Email Subject');
         $email->setEmailType('template');
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         $payload = [
             'action'     => 'email:getLookupChoiceList',

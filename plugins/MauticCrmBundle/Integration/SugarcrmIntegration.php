@@ -1117,7 +1117,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                     $integrationEntity->setLastSyncDate(new \DateTime());
                     $this->em->persist($integrationEntity);
-                    $this->em->flush($integrationEntity);
+                    $this->em->flush();
                 }
 
                 return true;

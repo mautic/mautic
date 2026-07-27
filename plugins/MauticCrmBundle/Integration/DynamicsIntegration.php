@@ -342,7 +342,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $integrationEntity->setInternalEntityId($lead->getId());
                     $integrationEntity->setLastSyncDate(new \DateTime());
                     $this->em->persist($integrationEntity);
-                    $this->em->flush($integrationEntity);
+                    $this->em->flush();
 
                     return $id;
                 }
