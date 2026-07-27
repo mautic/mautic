@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     public const TYPE_RECENT_ACTIVITY = 'recent.activity';
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // the model is fetched by string - must be reported
-class GetModelByStringController
+final class GetModelByStringController
 {
     public function indexAction(): void
     {

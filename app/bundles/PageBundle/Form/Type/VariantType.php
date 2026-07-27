@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class VariantType extends AbstractType
+final class VariantType extends AbstractType
 {
     public function __construct(
         private readonly PageModel $pageModel,

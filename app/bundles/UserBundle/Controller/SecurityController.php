@@ -40,7 +40,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         Translator $translator,
         FlashBag $flashBag,
         RequestStack $requestStack,
-        ?CorePermissions $security,
+        CorePermissions $security,
         private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);

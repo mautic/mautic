@@ -331,13 +331,13 @@ class Widget extends FormEntity
     public function toArray(): array
     {
         return [
-            'name'     => $this->getName(),
-            'width'    => $this->getWidth(),
-            'height'   => $this->getHeight(),
-            'ordering' => $this->getOrdering(),
-            'type'     => $this->getType(),
-            'params'   => $this->getParams(),
-            'template' => $this->getTemplate(),
+            'name'     => $this->name,
+            'width'    => $this->width,
+            'height'   => $this->height,
+            'ordering' => $this->ordering,
+            'type'     => $this->type,
+            'params'   => $this->params,
+            'template' => $this->template,
         ];
     }
 }

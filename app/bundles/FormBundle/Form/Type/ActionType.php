@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ActionType extends AbstractType
+final class ActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

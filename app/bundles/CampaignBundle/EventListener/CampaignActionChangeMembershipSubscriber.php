@@ -14,12 +14,12 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MembershipManager $membershipManager,
-        private readonly CampaignModel $campaignModel,
-        private readonly InfiniteLoopValidator $infiniteLoopValidator,
+        private MembershipManager $membershipManager,
+        private CampaignModel $campaignModel,
+        private InfiniteLoopValidator $infiniteLoopValidator,
     ) {
     }
 

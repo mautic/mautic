@@ -8,11 +8,11 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AssetsHelper $assetsHelper,
-        private readonly IntegrationHelper $integrationHelper,
+        private AssetsHelper $assetsHelper,
+        private IntegrationHelper $integrationHelper,
     ) {
     }
 

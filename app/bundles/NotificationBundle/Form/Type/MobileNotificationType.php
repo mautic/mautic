@@ -27,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Notification>
  */
-class MobileNotificationType extends AbstractType
+final class MobileNotificationType extends AbstractType
 {
     public function __construct(
         private readonly EntityManager $entityManager,

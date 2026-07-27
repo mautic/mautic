@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Company>
  */
-class CompanyType extends AbstractType
+final class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
