@@ -30,35 +30,14 @@ final class PreferInterfaceInConstructorRuleTest extends RuleTestCase
                 14,
             ],
         ]);
-    }
 
-    public function testSkipInterfaceType(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/InterfaceConstructor.php'], []);
-    }
-
-    public function testSkipClassWithoutSameNamedInterface(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/ClassWithoutInterfaceConstructor.php'], []);
-    }
-
-    public function testSkipSession(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/SessionConstructor.php'], []);
-    }
-
-    public function testSkipClassOutsideSymfonyAndDoctrine(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/NonVendorConstructor.php'], []);
-    }
-
-    public function testSkipGuzzleClient(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/GuzzleClientConstructor.php'], []);
-    }
-
-    public function testSkipConfigLoader(): void
-    {
-        $this->analyse([__DIR__.'/Fixture/ConfigLoaderConstructor.php'], []);
+        $this->analyse([
+            __DIR__.'/Fixture/InterfaceConstructor.php',
+            __DIR__.'/Fixture/ClassWithoutInterfaceConstructor.php',
+            __DIR__.'/Fixture/SessionConstructor.php',
+            __DIR__.'/Fixture/NonVendorConstructor.php',
+            __DIR__.'/Fixture/GuzzleClientConstructor.php',
+            __DIR__.'/Fixture/ConfigLoaderConstructor.php',
+        ], []);
     }
 }

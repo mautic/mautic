@@ -31,7 +31,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $model->setFieldValues($lead, $data, false, true, true);
         $model->saveEntity($lead);
 
-        $this->em->clear();
+        $this->em->getUnitOfWork()->clear(Lead::class);
 
         $lead = $model->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
@@ -62,7 +62,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $model->setFieldValues($lead, $data, false, true, true);
         $model->saveEntity($lead);
 
-        $this->em->clear();
+        $this->em->getUnitOfWork()->clear(Lead::class);
 
         $lead = $model->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
@@ -88,7 +88,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $leadModel->setFieldValues($lead, $data, false, true, true);
         $leadModel->saveEntity($lead);
 
-        $this->em->clear();
+        $this->em->getUnitOfWork()->clear(Lead::class);
 
         $triggerA      = $this->createTrigger('Group A Trigger (should trigger)', 5, null, true);
         $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);

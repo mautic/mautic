@@ -42,6 +42,8 @@ final class PreferInterfaceInConstructorRule implements Rule
         'Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
         // route loading relies on the concrete Loader
         'Symfony\\Component\\Config\\Loader\\LoaderInterface',
+        // only the concrete TransportFactory is aliased as a service, see MessengerBundle/Config/services.php
+        'Symfony\\Component\\Messenger\\Transport\\TransportFactoryInterface',
     ];
 
     public function __construct(
