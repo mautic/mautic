@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
