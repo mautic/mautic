@@ -17,13 +17,9 @@ final class ShortenerTest extends TestCase
      */
     private MockObject $coreParametersHelper;
 
-    private Shortener $shortener;
-
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $this->shortener = new Shortener($this->coreParametersHelper);
     }
 
     public function testAddService(): void
@@ -31,9 +27,9 @@ final class ShortenerTest extends TestCase
         /** @var ShortenerServiceInterface|MockObject $service */
         $service = $this->createStub(ShortenerServiceInterface::class);
 
-        $this->shortener->addService($service);
+        $shortener = new Shortener($this->coreParametersHelper, [$service]);
 
-        $this->assertSame([$service::class => $service], $this->shortener->getServices());
+        $this->assertSame([$service::class => $service], $shortener->getServices());
     }
 
     public function testGetService(): void
@@ -46,16 +42,18 @@ final class ShortenerTest extends TestCase
             ->method('get')
             ->willReturn($service::class);
 
-        $this->shortener->addService($service);
+        $shortener = new Shortener($this->coreParametersHelper, [$service]);
 
-        $this->assertSame($service, $this->shortener->getService());
+        $this->assertSame($service, $shortener->getService());
     }
 
     public function testGetServiceThrowsException(): void
     {
+        $shortener = new Shortener($this->coreParametersHelper);
+
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->shortener->getService();
+        $shortener->getService();
     }
 
     public function testShortenUrl(): void
@@ -76,9 +74,9 @@ final class ShortenerTest extends TestCase
             ->method('get')
             ->willReturn($service::class);
 
-        $this->shortener->addService($service);
+        $shortener = new Shortener($this->coreParametersHelper, [$service]);
 
-        $this->assertSame($shortUrl, $this->shortener->shortenUrl($url));
+        $this->assertSame($shortUrl, $shortener->shortenUrl($url));
     }
 
     public function testGetEnabledServices(): void
@@ -117,9 +115,8 @@ final class ShortenerTest extends TestCase
             }
         };
 
-        $this->shortener->addService($enabledService);
-        $this->shortener->addService($disabledService);
+        $shortener = new Shortener($this->coreParametersHelper, [$enabledService, $disabledService]);
 
-        $this->assertSame([$enabledService::class => $enabledService], $this->shortener->getEnabledServices());
+        $this->assertSame([$enabledService::class => $enabledService], $shortener->getEnabledServices());
     }
 }
