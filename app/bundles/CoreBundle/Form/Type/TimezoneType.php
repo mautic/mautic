@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class TimezoneType extends AbstractType
+final class TimezoneType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -24,7 +24,7 @@ class TimezoneType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

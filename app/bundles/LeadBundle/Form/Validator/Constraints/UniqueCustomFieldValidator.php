@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class UniqueCustomFieldValidator extends ConstraintValidator
+final class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly LeadModel $leadModel,
