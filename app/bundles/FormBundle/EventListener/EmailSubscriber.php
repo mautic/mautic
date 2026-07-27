@@ -7,7 +7,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

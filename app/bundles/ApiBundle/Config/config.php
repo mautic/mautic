@@ -68,6 +68,7 @@ return [
                 'class'     => Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.user.repository',
                     'mautic.security',
                     'translator',
                 ],

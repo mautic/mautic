@@ -96,7 +96,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
         $kernel->method('getContainer')
             ->willReturn($container);
 
-        $this->step = new UpdateSchemaStep($this->translator, $container);
+        $this->step = new UpdateSchemaStep($this->translator, $kernel);
     }
 
     public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void

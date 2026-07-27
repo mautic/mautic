@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PasswordResetConfirmType extends AbstractType
+final class PasswordResetConfirmType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

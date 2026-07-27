@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class StatHelperPass implements CompilerPassInterface
+final class StatHelperPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

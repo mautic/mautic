@@ -7,10 +7,10 @@ use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MessageSubscriber implements EventSubscriberInterface
+final readonly class MessageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AuditLogModel $auditLogModel,
+        private AuditLogModel $auditLogModel,
     ) {
     }
 
