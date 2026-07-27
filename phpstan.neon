@@ -226,6 +226,9 @@ parameters:
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 
+	scanDirectories:
+		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
+		- vendor/javer/sp-bundle/src
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
