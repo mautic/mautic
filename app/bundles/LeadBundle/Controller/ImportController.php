@@ -357,6 +357,16 @@ final class ImportController extends FormController
                                 $file->seek(PHP_INT_MAX);
                                 $linecount = $file->key();
 
+                                // Workaround for PHP8.6+ backward incompatibility
+                                // PHP 8.6+ counts a trailing newline as an extra empty line
+                                if (\PHP_VERSION_ID >= 80600 && $linecount > 0) {
+                                    $file->seek($linecount);
+                                    $last = $file->current();
+                                    if (false === $last || null === $last || '' === $last || "\0" === $last) {
+                                        --$linecount;
+                                    }
+                                }
+
                                 if (!empty($headers) && is_array($headers)) {
                                     $headers = CsvHelper::sanitizeHeaders($headers);
 

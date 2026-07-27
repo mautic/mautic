@@ -240,7 +240,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y curl ca-certificates gnupg lsb-release
 
-          # 2. Securely pull and dearmor the official PGDG signing key
+          # 2. Pull and dearmor the official PGDG signing key
           sudo mkdir -p /usr/share/keyrings
           curl -fSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
