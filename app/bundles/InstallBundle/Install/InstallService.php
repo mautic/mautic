@@ -6,7 +6,7 @@ namespace Mautic\InstallBundle\Install;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
@@ -45,7 +45,7 @@ class InstallService
         private readonly Configurator $configurator,
         private readonly CacheHelper $cacheHelper,
         protected PathsHelper $pathsHelper,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
         private readonly KernelInterface $kernel,
         private readonly ValidatorInterface $validator,

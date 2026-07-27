@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -28,7 +28,7 @@ class VideoModel extends FormModel
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

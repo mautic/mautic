@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -31,7 +31,7 @@ final class LeadListFilteringEvent extends CommonEvent
         protected $alias,
         protected $func,
         protected $queryBuilder,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;
         $this->isFilteringDone = false;

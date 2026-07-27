@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
@@ -46,7 +46,7 @@ class IpLookupHelper
 
     public function __construct(
         protected RequestStack $requestStack,
-        protected EntityManager $em,
+        protected EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper,
         private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         protected ?AbstractLookup $ipLookup = null,

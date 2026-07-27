@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -15,7 +15,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailModel $model,
-        private EntityManager $em,
+        private EntityManagerInterface $em,
         private TranslatorInterface $translator,
     ) {
     }

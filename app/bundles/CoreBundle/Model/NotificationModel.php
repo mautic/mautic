@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -34,7 +34,7 @@ class NotificationModel extends FormModel
         protected PathsHelper $pathsHelper,
         protected UpdateHelper $updateHelper,
         CoreParametersHelper $coreParametersHelper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

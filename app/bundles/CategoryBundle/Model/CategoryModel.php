@@ -2,7 +2,7 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -36,7 +36,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
 
     public function __construct(
         protected RequestStack $requestStack,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

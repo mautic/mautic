@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Notificator;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\MissingIdentifierField;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -21,7 +21,7 @@ class WebhookNotificationSender
     public function __construct(
         private readonly Environment $twig,
         private readonly NotificationModel $notificationModel,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly MailHelper $mailer,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly UserRepository $userRepository,

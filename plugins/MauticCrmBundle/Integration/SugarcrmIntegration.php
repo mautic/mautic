@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -56,7 +56,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RequestStack $requestStack,
         RouterInterface $router,
         TranslatorInterface $translator,

@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -36,7 +36,7 @@ abstract class SocialIntegration extends AbstractIntegration
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RequestStack $requestStack,
         RouterInterface $router,
         Translator $translator,

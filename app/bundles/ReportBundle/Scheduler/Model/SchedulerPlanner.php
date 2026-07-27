@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Scheduler\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
@@ -18,7 +18,7 @@ class SchedulerPlanner
 
     public function __construct(
         private readonly DateBuilder $dateBuilder,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
