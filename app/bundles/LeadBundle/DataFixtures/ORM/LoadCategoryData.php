@@ -11,10 +11,13 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 
 class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
+    public function __construct(
+        private readonly CategoryRepository $categoryRepo,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        /** @var CategoryRepository $categoryRepo */
-        $categoryRepo = $manager->getRepository(Category::class);
         $categories   = CsvHelper::csv_to_array(__DIR__.'/fakecategorydata.csv');
         foreach ($categories as $category) {
             $categoryEntity = new Category();
@@ -22,7 +25,7 @@ class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterfac
             $categoryEntity->setBundle($category['categorybundle']);
             $categoryEntity->setAlias($category['categoryalias']);
             $categoryEntity->setIsPublished($category['published']);
-            $categoryRepo->saveEntity($categoryEntity);
+            $this->categoryRepo->saveEntity($categoryEntity);
         }
     }
 
