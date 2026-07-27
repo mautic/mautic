@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailClickDecisionType extends AbstractType
+final class EmailClickDecisionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

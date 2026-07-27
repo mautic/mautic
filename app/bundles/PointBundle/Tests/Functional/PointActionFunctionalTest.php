@@ -51,7 +51,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->createEmailStat($lead, $email, $trackingHash);
         $pointAction = $this->createReadEmailAction(5, $group);
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
-        $this->em->clear(Lead::class);
+        $this->em->clear();
         $lead        = $leadModel->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
         $groupScore  = $lead->getGroupScores()->first();

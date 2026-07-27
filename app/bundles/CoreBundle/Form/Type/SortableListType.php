@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class SortableListType extends AbstractType
+final class SortableListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

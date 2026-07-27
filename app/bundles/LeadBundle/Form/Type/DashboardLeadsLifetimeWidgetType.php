@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardLeadsLifetimeWidgetType extends AbstractType
+final class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     public function __construct(
         private readonly ListModel $segmentModel,

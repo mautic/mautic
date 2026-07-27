@@ -9,7 +9,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
@@ -22,7 +22,7 @@ class SchemaHelper
     protected Connection $db;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -63,7 +63,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em): void
+    public function setEntityManager(EntityManagerInterface $em): void
     {
         $this->em = $em;
     }

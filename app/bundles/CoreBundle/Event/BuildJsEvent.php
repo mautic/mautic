@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use MatthiasMullie\Minify;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class BuildJsEvent extends Event
+final class BuildJsEvent extends Event
 {
     /**
      * @param bool           $debugMode

@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints\Choice;
  *
  * @extends AbstractType<mixed>
  */
-class DoctrineStepType extends AbstractType
+final class DoctrineStepType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

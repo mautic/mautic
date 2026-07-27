@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -99,7 +99,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        protected EntityManager $em,
+        protected EntityManagerInterface $em,
         protected RequestStack $requestStack,
         protected RouterInterface $router,
         protected TranslatorInterface $translator,

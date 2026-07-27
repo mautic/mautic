@@ -2,6 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Exception;
 
-class NotSchedulableException extends \Exception
+final class NotSchedulableException extends \Exception
 {
 }

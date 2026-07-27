@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class RecordNotFoundException extends RecordException
+final class RecordNotFoundException extends RecordException
 {
 }

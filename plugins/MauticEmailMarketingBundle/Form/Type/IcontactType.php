@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class IcontactType extends AbstractType
+final class IcontactType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,

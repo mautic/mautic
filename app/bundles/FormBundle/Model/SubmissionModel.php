@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -92,7 +92,7 @@ class SubmissionModel extends CommonFormModel
         private readonly ContactTracker $contactTracker,
         private readonly ContactMerger $contactMerger,
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

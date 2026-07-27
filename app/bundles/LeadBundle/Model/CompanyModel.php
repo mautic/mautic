@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Form\RequestTrait;
@@ -67,7 +67,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         protected FieldModel $leadFieldModel,
         protected EmailValidator $emailValidator,
         protected CompanyDeduper $companyDeduper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

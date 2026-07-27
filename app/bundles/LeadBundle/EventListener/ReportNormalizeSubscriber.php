@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -11,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -28,7 +27,7 @@ final readonly class ReportNormalizeSubscriber implements EventSubscriberInterfa
             return;
         }
 
-        $fields = $this->fieldModel->getRepository()->getFields();
+        $fields = $this->leadFieldRepository->getFields();
         $rows   = $event->getData();
         foreach ($rows as $key => $row) {
             foreach ($row as $alias => $value) {

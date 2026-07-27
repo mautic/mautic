@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
@@ -29,7 +29,7 @@ class ContactSegmentQueryBuilder
     private array $dependencyMap = [];
 
     public function __construct(
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private RandomParameterName $randomParameterName,
         private EventDispatcherInterface $dispatcher,
     ) {
