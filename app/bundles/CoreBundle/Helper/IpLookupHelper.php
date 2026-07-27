@@ -184,7 +184,7 @@ class IpLookupHelper
             }
 
             if ($saveIp) {
-                $repo->saveEntity($ipAddress);
+                $this->ipAddressRepository->saveEntity($ipAddress);
             }
 
             self::$ipAddresses[$ip] = $ipAddress;

@@ -31,8 +31,6 @@ class SmsHelper
     {
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
-        $repo = $this->leadRepository;
-
         $args = [
             'filter' => [
                 'force' => [
@@ -45,7 +43,7 @@ class SmsHelper
             ],
         ];
 
-        $leads = $repo->getEntities($args);
+        $leads = $this->leadRepository->getEntities($args);
 
         if (!empty($leads)) {
             $lead = array_shift($leads);
@@ -53,7 +51,7 @@ class SmsHelper
             // Try to find the lead based on the given phone number
             $args['filter']['force'][0]['column'] = 'phone';
 
-            $leads = $repo->getEntities($args);
+            $leads = $this->leadRepository->getEntities($args);
 
             if (!empty($leads)) {
                 $lead = array_shift($leads);

@@ -79,7 +79,6 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->integrationRepository;
             // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -209,7 +208,7 @@ class IntegrationHelper
 
             // Save newly found integrations
             if (!empty($newIntegrations)) {
-                $integrationRepo->saveEntities($newIntegrations);
+                $this->integrationRepository->saveEntities($newIntegrations);
                 unset($newIntegrations);
             }
         }

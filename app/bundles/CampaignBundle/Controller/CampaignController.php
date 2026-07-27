@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -110,7 +109,6 @@ class CampaignController extends AbstractStandardFormController
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
-        private EntityManagerInterface $em,
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
@@ -240,8 +238,7 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $repo = $this->campaignRepository;
-            $repo->setTranslator($this->translator);
+            $this->campaignRepository->setTranslator($this->translator);
 
             $args = [
                 'filter'           => $filter,
@@ -251,7 +248,7 @@ class CampaignController extends AbstractStandardFormController
             ];
 
             // Query campaigns
-            $campaigns = $repo->getEntities($args);
+            $campaigns = $this->campaignRepository->getEntities($args);
 
             // Get campaign IDs
             $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
