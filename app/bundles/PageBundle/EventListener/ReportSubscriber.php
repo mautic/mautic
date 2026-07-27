@@ -31,10 +31,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private HitRepository $hitRepository,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
-        private CompanyReportData $companyReportData,
-        private HitRepository $hitRepository,
-        private TranslatorInterface $translator,
-        private DncReportService $dncReportService,
         private VersionProvider $versionProvider,
     ) {
     }
