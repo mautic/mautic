@@ -41,12 +41,12 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.email.helper.stats_collection', Mautic\EmailBundle\Helper\StatsCollectionHelper::class);
     $services->set('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
-    $services->set('mautic.email.stats.helper_bounced', Mautic\EmailBundle\Stats\Helper\BouncedHelper::class)->tag('mautic.email_stat_helper');
-    $services->set('mautic.email.stats.helper_clicked', Mautic\EmailBundle\Stats\Helper\ClickedHelper::class)->tag('mautic.email_stat_helper');
-    $services->set('mautic.email.stats.helper_failed', Mautic\EmailBundle\Stats\Helper\FailedHelper::class)->tag('mautic.email_stat_helper');
-    $services->set('mautic.email.stats.helper_opened', Mautic\EmailBundle\Stats\Helper\OpenedHelper::class)->tag('mautic.email_stat_helper');
-    $services->set('mautic.email.stats.helper_sent', Mautic\EmailBundle\Stats\Helper\SentHelper::class)->tag('mautic.email_stat_helper');
-    $services->set('mautic.email.stats.helper_unsubscribed', Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class)->tag('mautic.email_stat_helper');
+    $services->set('mautic.email.stats.helper_bounced', Mautic\EmailBundle\Stats\Helper\BouncedHelper::class);
+    $services->set('mautic.email.stats.helper_clicked', Mautic\EmailBundle\Stats\Helper\ClickedHelper::class);
+    $services->set('mautic.email.stats.helper_failed', Mautic\EmailBundle\Stats\Helper\FailedHelper::class);
+    $services->set('mautic.email.stats.helper_opened', Mautic\EmailBundle\Stats\Helper\OpenedHelper::class);
+    $services->set('mautic.email.stats.helper_sent', Mautic\EmailBundle\Stats\Helper\SentHelper::class);
+    $services->set('mautic.email.stats.helper_unsubscribed', Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class);
 
     $services->set('mautic.email.validator.multiple_emails_valid_validator', Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.email.validator.email_or_token_list_validator', Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class)->tag('validator.constraint_validator');
