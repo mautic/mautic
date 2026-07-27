@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Field\Helper;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -29,7 +29,7 @@ class IndexHelper
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly IndexSchemaHelper $indexSchemaHelper,
+        private readonly IndexSchemaHelper $indexSchemaHelper
     ) {
     }
 
