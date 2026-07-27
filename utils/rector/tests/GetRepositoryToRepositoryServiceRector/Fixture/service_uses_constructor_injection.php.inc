@@ -24,6 +24,7 @@ final class ServiceUsesConstructorInjection
 namespace Utils\Rector\Tests\GetRepositoryToRepositoryServiceRector\Fixture;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\PageBundle\Entity\Hit;
 
 final class ServiceUsesConstructorInjection
 {

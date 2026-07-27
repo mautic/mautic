@@ -28,6 +28,7 @@ final class ReuseExistingAutowireMethod extends AbstractParentWithConstructor
 
 namespace Utils\Rector\Tests\GetRepositoryToRepositoryServiceRector\Fixture;
 
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Model\PageModel;
 use Utils\Rector\Tests\GetRepositoryToRepositoryServiceRector\Source\AbstractParentWithConstructor;
 
