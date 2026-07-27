@@ -39,6 +39,9 @@ final class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&Connection
+     */
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     private ReportSubscriber $subscriber;

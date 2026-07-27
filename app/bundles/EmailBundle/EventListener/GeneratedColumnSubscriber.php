@@ -11,10 +11,10 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class GeneratedColumnSubscriber implements EventSubscriberInterface
+final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {
     }
 

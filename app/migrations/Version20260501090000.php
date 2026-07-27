@@ -116,19 +116,26 @@ final class Version20260501090000 extends AbstractMauticMigration
     {
         /** @var EntityManagerInterface $em */
         $em = $this->container->get('doctrine.orm.entity_manager');
-        $repo = $em->getRepository(Permission::class);
-        $roleRepo = $em->getRepository(Role::class);
-        $role = $roleRepo->find($roleId);
 
-        $existing = $repo->findOneBy([
-            'role'   => $role,
-            'bundle' => 'lead',
-            'name'   => 'notes',
-        ]);
+        $role = $em->find(Role::class, $roleId);
+        if (null === $role) {
+            return;
+        }
 
-        if ($existing) {
+        $existing = $em->createQueryBuilder()
+            ->select('p')
+            ->from(Permission::class, 'p')
+            ->where('p.role = :role')
+            ->andWhere('p.bundle = :bundle')
+            ->andWhere('p.name = :name')
+            ->setParameter('role', $role)
+            ->setParameter('bundle', 'lead')
+            ->setParameter('name', 'notes')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($existing instanceof Permission) {
             $existing->setBitwise($bitwise);
-            $em->persist($existing);
         } else {
             $permission = new Permission();
             $permission->setRole($role);
