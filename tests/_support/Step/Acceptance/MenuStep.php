@@ -6,7 +6,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\MenuPage;
 
-class MenuStep extends \AcceptanceTester
+final class MenuStep extends \AcceptanceTester
 {
     public function loginAsAdmin($I): void
     {

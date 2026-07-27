@@ -7,7 +7,7 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {

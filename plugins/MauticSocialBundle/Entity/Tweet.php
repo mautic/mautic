@@ -324,7 +324,7 @@ class Tweet extends FormEntity
      */
     public function sentCountUp(): static
     {
-        $this->setSentCount($this->getSentCount() + 1);
+        $this->setSentCount($this->sentCount + 1);
 
         return $this;
     }

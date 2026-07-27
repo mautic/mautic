@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentLogReportSubscriber implements EventSubscriberInterface
+final readonly class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_LOG = 'segment.log';
 

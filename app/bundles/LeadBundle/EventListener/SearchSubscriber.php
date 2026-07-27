@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriber implements EventSubscriberInterface
+final class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
 

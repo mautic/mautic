@@ -18,13 +18,16 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
 {
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
     private UserModel $userModel;
 
     #[Required]
     public function autowirePublicController(
-        UserModel $userModel,
+        UserModel $userModel, \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->userModel = $userModel;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -41,7 +44,7 @@ final class PublicController extends FormController
             if ($isValid = $this->isFormValid($form)) {
                 // find the user
                 $data = $form->getData();
-                $user = $this->userModel->getRepository()->findByIdentifier($data['identifier']);
+                $user = $this->userRepository->findByIdentifier($data['identifier']);
 
                 /**
                  * Calculation of time to standardize fix response for vulnerability
@@ -110,7 +113,7 @@ final class PublicController extends FormController
     private function handlePasswordResetConfirm(Request $request, UserModel $model, UserPasswordHasherInterface $hasher, array $data): ?Response
     {
         $response = null;
-        $user     = $model->getRepository()->findByIdentifier($data['identifier']);
+        $user     = $this->userRepository->findByIdentifier($data['identifier']);
 
         if (null === $user) {
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GeneratedColumnSubscriber implements EventSubscriberInterface
+final class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Connection $connection,

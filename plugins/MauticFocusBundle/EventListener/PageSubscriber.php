@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber implements EventSubscriberInterface
 {
     private string $regex = '{focus=(.*?)}';
 

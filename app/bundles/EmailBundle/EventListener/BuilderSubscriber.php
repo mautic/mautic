@@ -20,7 +20,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>

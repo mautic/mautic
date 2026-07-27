@@ -39,8 +39,21 @@ class FieldApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, FieldModel $fieldModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        FieldModel $fieldModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+    ) {
         $request = $requestStack->getCurrentRequest();
         \assert(null !== $request);
 
@@ -55,8 +68,7 @@ class FieldApiController extends CommonApiController
             $this->fieldObject = 'lead';
         }
 
-        $repo                = $this->model->getRepository();
-        $tableAlias          = $repo->getTableAlias();
+        $tableAlias          = $this->leadFieldRepository->getTableAlias();
         $this->listFilters[] = [
             'column' => $tableAlias.'.object',
             'expr'   => 'eq',

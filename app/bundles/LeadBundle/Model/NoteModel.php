@@ -136,6 +136,6 @@ class NoteModel extends FormModel
         $noteType  = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
         $createdBy = $canViewOther ? null : $this->userHelper->getUser()?->getId();
 
-        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
+        return $this->leadNoteRepository->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
     }
 }

@@ -36,6 +36,10 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# ReportGenerator keeps a nullable form factory for its lazy build flow
+		-
+			identifier: mautic.noNullableServiceInConstructor
+			path: app/bundles/ReportBundle/Generator/ReportGenerator.php
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
 		-
@@ -219,3 +223,7 @@ rules:
 	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+	#- Utils\PHPStan\Rule\NoContainerGetRule
+	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule

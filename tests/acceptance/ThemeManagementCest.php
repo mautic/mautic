@@ -4,7 +4,7 @@ namespace Acceptance;
 
 use Page\Acceptance\ThemesPage;
 
-class ThemeManagementCest
+final class ThemeManagementCest
 {
     public function _before(\AcceptanceTester $I): void
     {

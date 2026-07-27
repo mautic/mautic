@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\FormPage;
 
-class FormStep extends \AcceptanceTester
+final class FormStep extends \AcceptanceTester
 {
     public function addFormMetaData(): void
     {

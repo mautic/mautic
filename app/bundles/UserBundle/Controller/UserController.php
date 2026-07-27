@@ -29,7 +29,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class UserController extends FormController
 {
-    private RoleModel $roleModel;
+    private \Mautic\UserBundle\Entity\RoleRepository $roleRepository;
+
+    private \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository;
 
     private UserModel $userModel;
 
@@ -40,10 +42,13 @@ final class UserController extends FormController
         UserModel $userModel,
         AuditLogModel $auditLogModel,
         RoleModel $roleModel,
+        \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository,
+        \Mautic\UserBundle\Entity\RoleRepository $roleRepository,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
-        $this->roleModel = $roleModel;
+        $this->auditLogRepository = $auditLogRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -326,12 +331,12 @@ final class UserController extends FormController
                 ],
             ]);
         }
+
         $oldEmail = $user->getEmail();
-        $auditLogRepository = $this->auditLogModel->getRepository();
-        $userActivity       = $auditLogRepository->getLogsForUser($user);
+
+        $userActivity       = $this->auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
-        $roleRepository     = $this->roleModel->getRepository();
-        $roles              = $roleRepository->getEntities();
+        $roles              = $this->roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
