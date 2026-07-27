@@ -160,9 +160,11 @@ final class EventModelTest extends TestCase
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])
             ->getMock();
 
-        $mockModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->eventRepositoryMock);
+        $mockModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class),
+        );
 
         $campaignEvents = ['1', '2', '3'];
 

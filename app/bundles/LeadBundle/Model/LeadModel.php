@@ -308,7 +308,7 @@ class LeadModel extends FormModel
 
         if (null === $entity) {
             // Check if this contact was merged into another and if so, return the new contact
-            if ($entity = $this->getMergeRecordRepository()->findMergedContact($id)) {
+            if ($entity = $this->mergeRecordRepository->findMergedContact($id)) {
                 // Hydrate fields with custom field data
                 $fields = $this->getRepository()->getFieldValues($entity->getId());
                 $entity->setFields($fields);
@@ -330,7 +330,7 @@ class LeadModel extends FormModel
         for ($i = 0; $i < count($contactIds); ++$i) {
             $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {
-                if ($entity = $this->getMergeRecordRepository()->findMergedContact($contactId)) {
+                if ($entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
                     $entity->setPreviousId($contactId);
 
                     if (isset($entities[$entity->getId()])) {
@@ -566,8 +566,7 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo  = $this->getStagesChangeLogRepository();
-            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageId   = $this->stagesChangeLogRepository->getCurrentLeadStage($lead->getId());
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
                 /** @var Stage|null $currentStage */
@@ -1102,7 +1101,7 @@ class LeadModel extends FormModel
         }
 
         // Add non associated categories relations as removed.
-        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+        $nonAssociatedCategories = $this->leadCategoryRepository->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
 
         $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
         if (!empty($unsubscribeNewCategories)) {
@@ -1134,7 +1133,7 @@ class LeadModel extends FormModel
             $dispatchEvent = false;
 
             /** @var ?LeadCategory $leadCategory */
-            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            $leadCategory = $this->leadCategoryRepository->findOneBy(['lead' => $lead, 'category' => $category]);
             if (null === $leadCategory) {
                 $dispatchEvent = true;
 
@@ -1162,7 +1161,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($results)) {
-            $this->getLeadCategoryRepository()->saveEntities($results);
+            $this->leadCategoryRepository->saveEntities($results);
         }
 
         return $results;
@@ -1176,7 +1175,7 @@ class LeadModel extends FormModel
         $unsubscribedCats = [];
         foreach ($categories as $key => $category) {
             /** @var LeadCategory $category */
-            $category     = $this->getLeadCategoryRepository()->getEntity($key);
+            $category     = $this->leadCategoryRepository->getEntity($key);
             $category->setManuallyRemoved(true);
             $category->setManuallyAdded(false);
             $category->setDateAdded(new \DateTime());
@@ -1189,7 +1188,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($unsubscribedCats)) {
-            $this->getLeadCategoryRepository()->saveEntities($unsubscribedCats);
+            $this->leadCategoryRepository->saveEntities($unsubscribedCats);
         }
     }
 
@@ -1199,7 +1198,7 @@ class LeadModel extends FormModel
         if (is_array($categories)) {
             foreach ($categories as $key => $category) {
                 /** @var LeadCategory $category */
-                $category     = $this->getLeadCategoryRepository()->getEntity($key);
+                $category     = $this->leadCategoryRepository->getEntity($key);
                 $deleteCats[] = $category;
 
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
@@ -1215,13 +1214,13 @@ class LeadModel extends FormModel
         }
 
         if (!empty($deleteCats)) {
-            $this->getLeadCategoryRepository()->deleteEntities($deleteCats);
+            $this->leadCategoryRepository->deleteEntities($deleteCats);
         }
     }
 
     public function getLeadCategories(Lead $lead): array
     {
-        $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
+        $leadCategories   = $this->leadCategoryRepository->getLeadCategories($lead);
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
             $leadCategoryList[$category['id']] = $category['category_id'];
@@ -1237,7 +1236,7 @@ class LeadModel extends FormModel
      */
     public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
     {
-        return $this->getLeadCategoryRepository()->getSubscribedAndNewCategoryIds($lead, $types);
+        return $this->leadCategoryRepository->getSubscribedAndNewCategoryIds($lead, $types);
     }
 
     /**
@@ -1245,7 +1244,7 @@ class LeadModel extends FormModel
      */
     public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
     {
-        $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
+        $leadCategories   = $this->leadCategoryRepository->getUnsubscribedLeadCategories($lead);
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
             $leadCategoryList[$category['id']] = $category['category_id'];
@@ -1594,7 +1593,7 @@ class LeadModel extends FormModel
                     );
                 } else {
                     $lead->addTag(
-                        $this->getTagRepository()->getTagByNameOrCreateNewOne($tag)
+                        $this->tagRepository->getTagByNameOrCreateNewOne($tag)
                     );
                 }
             }
@@ -1606,7 +1605,7 @@ class LeadModel extends FormModel
 
             // Delete orphaned tags
             if ($tagsDeleted && $removeOrphans) {
-                $this->getTagRepository()->deleteOrphans();
+                $this->tagRepository->deleteOrphans();
             }
         }
     }
@@ -1743,7 +1742,7 @@ class LeadModel extends FormModel
         $tags = array_filter($tags, fn (string $tag): bool => '' !== $tag);
 
         // See which tags already exist
-        $foundTags = $this->getTagRepository()->getTagsByName($tags);
+        $foundTags = $this->tagRepository->getTagsByName($tags);
         foreach ($tags as $tag) {
             if (str_starts_with($tag, '-')) {
                 // Tag to be removed
@@ -1783,7 +1782,7 @@ class LeadModel extends FormModel
             $removeTags = array_filter($removeTags, fn (string $tag): bool => '' !== $tag);
 
             // See which tags really exist
-            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+            $foundRemoveTags = $this->tagRepository->getTagsByName($removeTags);
 
             foreach ($removeTags as $tag) {
                 // Tag to be removed
@@ -1843,7 +1842,7 @@ class LeadModel extends FormModel
      */
     public function getTagList(): array
     {
-        return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
+        return $this->tagRepository->getSimpleList(null, [], 'tag', 'id');
     }
 
     /**
@@ -2224,7 +2223,7 @@ class LeadModel extends FormModel
      */
     public function getPreferredChannel(Lead $lead)
     {
-        $preferredChannel = $this->getFrequencyRuleRepository()->getPreferredChannel($lead->getId());
+        $preferredChannel = $this->frequencyRuleRepository->getPreferredChannel($lead->getId());
         if (!empty($preferredChannel)) {
             return $preferredChannel[0];
         }
@@ -2414,7 +2413,7 @@ class LeadModel extends FormModel
     public function removeTagFromLead(int $leadId, int $tagId): void
     {
         $lead = $this->getEntity($leadId);
-        $tag  = $this->getTagRepository()->find($tagId);
+        $tag  = $this->tagRepository->find($tagId);
 
         if ($lead && $tag) {
             $lead->removeTag($tag);

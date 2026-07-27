@@ -14,14 +14,14 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PointModel $pointModel,
-        private readonly TriggerModel $pointTriggerModel,
-        private readonly PointGroupModel $pointGroupModel,
-        private readonly CorePermissions $security,
-        private readonly GlobalSearch $globalSearch,
+        private PointModel $pointModel,
+        private TriggerModel $pointTriggerModel,
+        private PointGroupModel $pointGroupModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
     ) {
     }
 

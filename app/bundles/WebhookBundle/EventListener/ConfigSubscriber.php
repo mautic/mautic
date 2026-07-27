@@ -7,7 +7,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\WebhookBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

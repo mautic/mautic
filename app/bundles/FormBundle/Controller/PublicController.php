@@ -26,6 +26,10 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends CommonFormController
 {
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private \Mautic\FormBundle\Entity\FieldRepository $fieldRepository;
+
     private SubmissionModel $submissionModel;
 
     private FormModel $formModel;
@@ -34,9 +38,13 @@ final class PublicController extends CommonFormController
     public function autowirePublicController(
         FormModel $formModel,
         SubmissionModel $submissionModel,
+        \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
+        $this->fieldRepository = $fieldRepository;
+        $this->companyRepository = $companyRepository;
     }
 
     private array $tokens = [];
@@ -669,10 +677,10 @@ final class PublicController extends CommonFormController
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
+        if (!$this->fieldRepository->fieldExistsByFormAndType($formId, 'companyLookup')) {
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
+        return new JsonResponse($this->companyRepository->getCompanyLookupData($search));
     }
 }

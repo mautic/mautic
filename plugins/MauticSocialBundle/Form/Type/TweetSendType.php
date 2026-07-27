@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TweetSendType extends AbstractType
+final class TweetSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router,
