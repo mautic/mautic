@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
+use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 
 /**
  * Forbid service location via the container, e.g. $container->get('some.service').
@@ -67,6 +70,10 @@ final class NoContainerGetRule implements Rule
             return [];
         }
 
+        if (!$this->isStaticServiceName($node)) {
+            return [];
+        }
+
         if (!$this->isContainerCaller($scope->getType($node->var))) {
             return [];
         }
@@ -80,8 +87,33 @@ final class NoContainerGetRule implements Rule
         return [$ruleError];
     }
 
+    /**
+     * Only a hardcoded service name can be turned into a constructor dependency, e.g. get(SomeService::class) or
+     * get('mautic.helper.something'). A variable name is resolved at runtime, so there is nothing to inject.
+     */
+    private function isStaticServiceName(MethodCall $methodCall): bool
+    {
+        $args = $methodCall->getArgs();
+        if ([] === $args) {
+            return false;
+        }
+
+        $serviceNameExpr = $args[0]->value;
+
+        if ($serviceNameExpr instanceof String_) {
+            return true;
+        }
+
+        return $serviceNameExpr instanceof ClassConstFetch
+            && $serviceNameExpr->name instanceof Identifier
+            && 'class' === $serviceNameExpr->name->toLowerString();
+    }
+
     private function isContainerCaller(Type $callerType): bool
     {
+        // a getContainer() call can be typed as nullable, the null part is irrelevant here
+        $callerType = TypeCombinator::removeNull($callerType);
+
         // a scoped ServiceLocator is an allowed, explicit set of services
         if ((new ObjectType(self::SERVICE_LOCATOR_TYPE))->isSuperTypeOf($callerType)->yes()) {
             return false;
