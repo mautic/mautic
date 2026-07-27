@@ -82,6 +82,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly LeadRepository $leadRepository,
         private readonly UserRepository $userRepository,
+        private readonly TagRepository $tagRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -137,7 +138,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     public function getTagRepository(): TagRepository
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->tagRepository;
     }
 
     public function getPermissionBase(): string

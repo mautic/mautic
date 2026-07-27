@@ -4,7 +4,6 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\BatchTagType;
-use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +15,7 @@ final class BatchTagController extends AbstractFormController
 
     #[Required]
     public function autowireBatchTagController(
-        TagModel $tagModel, \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
+        \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
         $this->tagRepository = $tagRepository;
     }
@@ -91,11 +90,11 @@ final class BatchTagController extends AbstractFormController
     {
         if (self::OBJECT_TYPE_COMPANY === $objectType) {
             if (!empty($tagsToAdd)) {
-                $this->tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
+                $this->tagRepository->addTagsToCompanies($ids, $tagsToAdd);
             }
 
             if (!empty($tagsToRemove)) {
-                $this->tagModel->getRepository()->removeTagsFromCompanies($ids, $tagsToRemove);
+                $this->tagRepository->removeTagsFromCompanies($ids, $tagsToRemove);
             }
 
             $this->addFlashMessage('mautic.company.batch_companies_affected', [

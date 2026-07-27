@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\UserBundle\Entity\User;
 
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
@@ -30,9 +29,8 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);
 
-            $salesUser = $manager->getRepository(User::class)->findOneBy(['username' => 'sales']);
-            if ($salesUser instanceof User) {
-                $lead->setOwner($salesUser);
+            if ($this->hasReference('sales-user')) {
+                $lead->setOwner($this->getReference('sales-user'));
             }
 
             foreach ($l as $col => $val) {
