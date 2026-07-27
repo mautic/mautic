@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Event;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportQueryEvent extends AbstractReportEvent
+final class ReportQueryEvent extends AbstractReportEvent
 {
     private readonly int $totalResults;
 

@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class DecisionResultsEvent extends Event
+final class DecisionResultsEvent extends Event
 {
     /**
      * @param ArrayCollection<int, LeadEventLog> $eventLogs

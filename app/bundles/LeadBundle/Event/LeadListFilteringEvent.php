@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples.
  */
-class LeadListFilteringEvent extends CommonEvent
+final class LeadListFilteringEvent extends CommonEvent
 {
     protected bool $isFilteringDone;
 

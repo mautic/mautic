@@ -7,7 +7,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class FieldValueTransformer
+final class FieldValueTransformer
 {
     private array $contactFieldsToUpdate = [];
 

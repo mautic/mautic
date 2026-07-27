@@ -15,12 +15,17 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
 {
+    private \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository;
+
     private DashboardModel $dashboardModel;
 
     #[Required]
-    public function autowireDashboardAjaxController(DashboardModel $dashboardModel): void
-    {
+    public function autowireDashboardAjaxController(
+        \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository,
+        DashboardModel $dashboardModel,
+    ): void {
         $this->dashboardModel = $dashboardModel;
+        $this->widgetRepository = $widgetRepository;
     }
 
     /**
@@ -70,8 +75,8 @@ final class AjaxController extends CommonAjaxController
     public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
-        $repo = $this->dashboardModel->getRepository();
-        $repo->updateOrdering(array_flip($data), $this->user->getId());
+
+        $this->widgetRepository->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
         return $this->sendJsonResponse($dataArray);

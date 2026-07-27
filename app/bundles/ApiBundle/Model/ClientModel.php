@@ -142,7 +142,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
      */
     public function getUserClients(User $user)
     {
-        return $this->getRepository()->getUserClients($user);
+        return $this->clientRepository->getUserClients($user);
     }
 
     /**

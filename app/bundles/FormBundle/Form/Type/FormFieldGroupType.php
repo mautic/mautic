@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldGroupType extends AbstractType
+final class FormFieldGroupType extends AbstractType
 {
     use SortableListTrait;
 

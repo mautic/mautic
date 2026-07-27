@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     use FormFieldTrait;
 

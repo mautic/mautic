@@ -35,7 +35,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Page>
  */
-class PageType extends AbstractType
+final class PageType extends AbstractType
 {
     private readonly ?\Mautic\UserBundle\Entity\User $user;
 

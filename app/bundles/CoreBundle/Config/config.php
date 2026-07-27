@@ -36,6 +36,14 @@ return [
                 'path'       => '/mtc.js',
                 'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
+            'mautic_essential_js' => [
+                'path'       => '/mautic-essential.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::essentialAction',
+            ],
+            'mautic_tracking_js' => [
+                'path'       => '/mautic-tracking.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::trackingAction',
+            ],
             'mautic_base_index' => [
                 'path'       => '/',
                 'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
@@ -778,7 +786,7 @@ return [
                 'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
                 'arguments' => [
                     'translator',
-                    'service_container',
+                    'kernel',
                 ],
                 'tag' => 'mautic.update_step',
             ],

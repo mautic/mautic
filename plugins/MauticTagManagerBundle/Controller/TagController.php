@@ -22,6 +22,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class TagController extends FormController
 {
+    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
+
     private TagModel $leadTagModel;
 
     private TagManagerModel $tagManagerModel;
@@ -30,9 +32,11 @@ final class TagController extends FormController
     public function autowireTagController(
         TagModel $leadTagModel,
         TagManagerModel $tagManagerModel,
+        \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
         $this->leadTagModel = $leadTagModel;
         $this->tagManagerModel = $tagManagerModel;
+        $this->tagRepository = $tagRepository;
     }
 
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
@@ -127,7 +131,7 @@ final class TagController extends FormController
         $session->set('mautic.tagmanager.page', $page);
 
         $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
-        $tagsCount = (!empty($tagIds)) ? $this->tagManagerModel->getRepository()->countByLeads($tagIds) : [];
+        $tagsCount = (!empty($tagIds)) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
             'items'       => $items,
@@ -201,7 +205,7 @@ final class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $found = $model->getRepository()->countOccurrences($tag->getTag());
+                $found = $this->tagRepository->countOccurrences($tag->getTag());
                 if (0 !== $found) {
                     $valid = false;
                     $this->addFlashMessage('mautic.core.notice.updated', [
@@ -386,7 +390,7 @@ final class TagController extends FormController
 
     private function isTagUnique(Tag $tag): bool
     {
-        $existingTags = $this->tagManagerModel->getRepository()->getTagsByName([$tag->getTag()]);
+        $existingTags = $this->tagRepository->getTagsByName([$tag->getTag()]);
         foreach ($existingTags as $existingTag) {
             if ($existingTag->getId() != $tag->getId()) {
                 return false;
