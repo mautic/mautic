@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -18,7 +19,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
 {
     private const COUNTRY_UNITED_STATES = 'United States';
 
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject&TranslatorInterface $translator;
 
     protected function setUp(): void
     {
