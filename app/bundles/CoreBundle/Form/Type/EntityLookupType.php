@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EntityLookupType extends AbstractType
+final class EntityLookupType extends AbstractType
 {
     /**
      * @var EntityLookupChoiceLoader[]
@@ -93,7 +93,7 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

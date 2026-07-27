@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -42,7 +42,7 @@ class IntegrationHelper
 
     public function __construct(
         private readonly ContainerInterface $container,
-        protected EntityManager $em,
+        protected EntityManagerInterface $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,
         protected CoreParametersHelper $coreParametersHelper,

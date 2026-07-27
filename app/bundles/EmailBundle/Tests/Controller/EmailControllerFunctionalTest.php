@@ -1255,7 +1255,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler       = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");
@@ -1302,7 +1302,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");

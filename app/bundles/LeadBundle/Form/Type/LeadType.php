@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -25,14 +25,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Lead>
  */
-class LeadType extends AbstractType
+final class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }

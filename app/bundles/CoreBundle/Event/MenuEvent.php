@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MenuEvent extends Event
+final class MenuEvent extends Event
 {
     /**
      * @var array

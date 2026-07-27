@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class MessageSendType extends AbstractType
+final class MessageSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router,
