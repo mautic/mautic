@@ -238,8 +238,5 @@ rules:
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
 	#- Utils\PHPStan\Rule\NoContainerGetRule
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
-<<<<<<< HEAD
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
-=======
 	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
->>>>>>> 442b81822c (register rule in config)
