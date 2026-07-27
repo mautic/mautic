@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
