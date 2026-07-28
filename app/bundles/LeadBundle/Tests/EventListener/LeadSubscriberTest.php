@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -137,6 +138,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(UtmTagRepository::class),
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
         );
 
         $subscriber->onLeadPostSave(new LeadEvent($lead));
@@ -234,6 +236,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(UtmTagRepository::class),
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 
@@ -344,6 +347,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(UtmTagRepository::class),
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 
@@ -413,6 +417,7 @@ final class LeadSubscriberTest extends CommonMocks
             $this->createStub(UtmTagRepository::class),
             $this->createStub(DoNotContactRepository::class),
             $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 

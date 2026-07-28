@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -27,7 +28,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->inactiveExecutioner = self::getContainer()->get('mautic.campaign.executioner.inactive');
+        $this->inactiveExecutioner = self::getContainer()->get(TestInactiveExecutioner::class);
         $this->assertInstanceOf(InactiveExecutioner::class, $this->inactiveExecutioner);
     }
 

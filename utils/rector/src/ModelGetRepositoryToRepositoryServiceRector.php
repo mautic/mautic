@@ -27,8 +27,6 @@ use Rector\NodeManipulator\ClassDependencyManipulator;
 use Rector\PhpParser\AstResolver;
 use Rector\PostRector\ValueObject\PropertyMetadata;
 use Rector\Rector\AbstractRector;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 /**
  * Replaces the argument-less $model->getRepository() service locator with the concrete repository service.
@@ -74,23 +72,6 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
         private readonly ClassDependencyManipulator $classDependencyManipulator,
         private readonly NodeFinder $nodeFinder,
     ) {
-    }
-
-    public function getRuleDefinition(): RuleDefinition
-    {
-        return new RuleDefinition(
-            'Replace argument-less $model->getRepository() with the concrete repository service',
-            [
-                new CodeSample(
-                    <<<'CODE_SAMPLE'
-$form = $this->formModel->getRepository()->findOneById($id);
-CODE_SAMPLE,
-                    <<<'CODE_SAMPLE'
-$form = $this->formRepository->findOneById($id);
-CODE_SAMPLE
-                ),
-            ]
-        );
     }
 
     /**

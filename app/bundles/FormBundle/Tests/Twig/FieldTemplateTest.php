@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\Tests\Twig;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
+use Twig\Environment;
 
 final class FieldTemplateTest extends MauticMysqlTestCase
 {
@@ -94,7 +95,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderTextField(Field $field): string
     {
-        $twig     = $this->getContainer()->get('twig');
+        $twig     = $this->getContainer()->get(Environment::class);
         $template = $twig->load(self::TEXT_FIELD_TEMPLATE);
 
         return $template->render([

@@ -90,6 +90,7 @@ return [
                     'validator',
                     'security.password_hasher',
                     'mautic.doctrine.loader.mautic_fixtures_loader',
+                    'mautic.user.repository',
                 ],
             ],
         ],
