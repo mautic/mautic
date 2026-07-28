@@ -30,7 +30,7 @@ final class CorePermissionsTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         /** @var CorePermissions $permissions */
-        $permissions = self::getContainer()->get('mautic.security');
+        $permissions = self::getContainer()->get(CorePermissions::class);
         $this->assertInstanceOf(CorePermissions::class, $permissions);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));
 

@@ -279,6 +279,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -407,6 +408,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(RedirectModel::class),
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods([])
             ->getMock();
@@ -496,6 +498,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -615,6 +618,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->redirectModel,
                 $this->sMimeHelper,
                 $this->emailStatModel,
+                $this->createStub(CopyRepository::class),
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -728,6 +732,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             $this->redirectModel,
             $this->sMimeHelper,
             $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $dncModel       = $this->createStub(DoNotContact::class);
         $translator     = $this->createStub(TranslatorInterface::class);

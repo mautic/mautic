@@ -36,6 +36,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadControllerTest extends MauticMysqlTestCase
 {
@@ -262,7 +263,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -315,7 +316,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactG = $this->createContact('fifth@matching.email');
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         foreach ([$contactA, $contactB, $contactC, $contactE, $contactF, $contactG] as $contact) {
             $contactModel->setFieldValues($contact, ['preferred_locale' => 'en_GB'], true, false);
@@ -429,7 +430,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
 
         $this->assertSame([
             'start'  => 0,
@@ -538,7 +539,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = static::getContainer()->get('translator')->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -558,7 +559,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel     = self::getContainer()->get(FieldModel::class);
         $firstnameField = $fieldModel->getEntity(2);
         $this->assertInstanceOf(LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
@@ -878,9 +879,9 @@ EMAIL;
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get(CompanyModel::class);
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         // Create companies
         $company = (new Company())
@@ -921,7 +922,7 @@ EMAIL;
     public function testSetNullCompanyToContact(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         $company = new Company();
         $company->setName('Doe Corp');

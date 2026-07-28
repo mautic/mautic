@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class UnsubscriptionNotFound extends \Exception
+final class UnsubscriptionNotFound extends \Exception
 {
 }
