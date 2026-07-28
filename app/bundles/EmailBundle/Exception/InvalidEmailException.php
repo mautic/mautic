@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Exception;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
 
-class InvalidEmailException extends InvalidValueException
+final class InvalidEmailException extends InvalidValueException
 {
     public function __construct(
         protected string $emailAddress,

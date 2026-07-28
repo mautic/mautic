@@ -14,6 +14,12 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
+    public function __construct(
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
         $today = new \DateTime();
@@ -37,8 +43,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                 $lead->addUpdatedField($col, $val);
             }
 
-            $manager->persist($lead);
-            $manager->flush();
+            $this->leadRepository->saveEntity($lead);
 
             $this->setReference('lead-'.$count, $lead);
 
@@ -56,8 +61,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                     $companyLead->setCompany($managedCompany);
                     $companyLead->setDateAdded($today);
                     $companyLead->setPrimary(true);
-                    $manager->persist($companyLead);
-                    $manager->flush();
+                    $this->companyLeadRepository->saveEntity($companyLead);
                 }
             }
         }

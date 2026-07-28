@@ -21,7 +21,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
@@ -33,7 +33,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewMultiSelectField(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
@@ -66,7 +66,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testFieldDeleteValidationUsedInSegment(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel       = static::getContainer()->get(FieldModel::class);
         $field_first      = $this->createField('First');
         $fieldModel->saveEntity($field_first);
 

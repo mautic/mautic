@@ -16,12 +16,14 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -159,13 +161,15 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(IpLookupHelper::class),
             $this->mockLeadModel,
             $this->createStub(FieldModel::class),
-            $this->createStub(ListModel::class),
             $this->mockCompanyModel,
             $this->createStub(CampaignModel::class),
             $mockCoreParametersHelper,
             $this->doNotContact,
             $this->createStub(PointGroupModel::class),
-            $filterOperatorProvider
+            $filterOperatorProvider,
+            $this->createStub(LeadListRepository::class),
+            $this->createStub(LeadRepository::class),
+            $this->createStub(LeadFieldRepository::class)
         );
     }
 

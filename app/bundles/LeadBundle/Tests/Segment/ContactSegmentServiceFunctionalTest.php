@@ -70,7 +70,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         $this->loginAdminUser();
 
-        $this->contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
+        $this->contactSegmentService = static::getContainer()->get(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void

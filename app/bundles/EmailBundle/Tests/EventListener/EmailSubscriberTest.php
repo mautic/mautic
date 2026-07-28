@@ -11,7 +11,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
@@ -57,7 +59,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->createStub(IpLookupHelper::class), $this->createStub(AuditLogModel::class), $this->emailModel, $this->createStub(TranslatorInterface::class), $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($this->createStub(IpLookupHelper::class), $this->createStub(AuditLogModel::class), $this->emailModel, $this->createStub(TranslatorInterface::class), $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class), $this->createStub(EmailRepository::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -304,6 +306,7 @@ CONTENT,
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
 
         $email = new Email();

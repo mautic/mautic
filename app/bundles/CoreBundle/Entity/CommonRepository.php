@@ -1749,29 +1749,49 @@ class CommonRepository extends ServiceEntityRepository
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
-            if (isset($f->children)) {
-                [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
-            } else {
-                if (!empty($f->command)) {
-                    if ($this->isSupportedSearchCommand($f->command, $f->string)) {
-                        [$expr, $params] = $this->addSearchCommandWhereClause($qb, $f);
-                    } else {
-                        // treat the command:string as if its a single word
-                        $f->string       = $f->command.':'.$f->string;
-                        $f->not          = false;
-                        $f->strict       = true;
-                        [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
-                    }
-                } elseif ($f->string) {
-                    [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
-                }
-            }
+            [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
+
             if (!empty($params)) {
                 $parameters = array_merge($parameters, $params);
             }
 
             $this->appendExpression($expressions, $expr);
         }
+    }
+
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     *
+     * @return array{0: mixed, 1: array<mixed>}
+     */
+    private function getSearchFilterExpression($qb, \stdClass $filter): array
+    {
+        if ($filter->missingValue ?? false) {
+            return [$qb->expr()->eq(1, 0), []];
+        }
+
+        if (isset($filter->children)) {
+            return $this->addAdvancedSearchWhereClause($qb, $filter);
+        }
+
+        if (!empty($filter->command)) {
+            if ($this->isSupportedSearchCommand($filter->command, $filter->string)) {
+                return $this->addSearchCommandWhereClause($qb, $filter);
+            }
+
+            // treat the command:string as if its a single word
+            $filter->string = $filter->command.':'.$filter->string;
+            $filter->not    = false;
+            $filter->strict = true;
+
+            return $this->addCatchAllWhereClause($qb, $filter);
+        }
+
+        if ($filter->string) {
+            return $this->addCatchAllWhereClause($qb, $filter);
+        }
+
+        return [null, []];
     }
 
     /**

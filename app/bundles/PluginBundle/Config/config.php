@@ -70,6 +70,8 @@ return [
                     'mautic.helper.core_parameters',
                     'twig',
                     'mautic.plugin.model.plugin',
+                    'mautic.plugin.repository.integration',
+                    'mautic.lead.repository.lead',
                 ],
                 'lazy' => true,
             ],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -140,7 +140,7 @@ class LeadModel extends FormModel
         private ContactTracker $contactTracker,
         private DeviceTracker $deviceTracker,
         private IpAddressModel $ipAddressModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
