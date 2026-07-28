@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Twig\Extra\String\StringExtension;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -35,11 +36,13 @@ return function (ContainerConfigurator $configurator): void {
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
         'Cache/ResultCacheOptions.php',
+        'EncryptionHelper.php',
     ];
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
-        ->arg('$possibleCiphers', ...[
-            \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.cipher.openssl'),
+        ->args([
+            service(\Mautic\CoreBundle\Helper\CoreParametersHelper::class),
+            service('mautic.cipher.openssl'),
         ]);
 
     $services->load('Mautic\\CoreBundle\\', '../')
