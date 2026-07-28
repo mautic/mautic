@@ -19,6 +19,13 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.sms.helper.contact', Mautic\SmsBundle\Helper\ContactHelper::class);
+    $services->set('mautic.sms.helper.reply', Mautic\SmsBundle\Helper\ReplyHelper::class);
+    $services->set('mautic.sms.twilio.configuration', Mautic\SmsBundle\Integration\Twilio\Configuration::class);
+    $services->set('mautic.sms.twilio.callback', Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class)->tag('mautic.sms_callback_handler');
+    $services->set('mautic.sms.broadcast.executioner', Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class);
+    $services->set('mautic.sms.broadcast.query', Mautic\SmsBundle\Broadcast\BroadcastQuery::class);
+    $services->set('mautic.integration.twilio', Mautic\SmsBundle\Integration\TwilioIntegration::class);
 
     $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
     $services->alias('mautic.sms.repository.stat', Mautic\SmsBundle\Entity\StatRepository::class);
