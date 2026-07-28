@@ -394,9 +394,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.helper.update_checks' => [
-                'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
-            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -743,9 +740,6 @@ return [
             ],
 
             // Update steps
-            'mautic.update.step_provider' => [
-                'class' => Mautic\CoreBundle\Update\StepProvider::class,
-            ],
             'mautic.update.step.delete_cache' => [
                 'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
                 'arguments' => [
