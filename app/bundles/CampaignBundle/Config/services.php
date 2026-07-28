@@ -13,7 +13,7 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
-        'EventCollector',
+        'EventCollector/Accessor',
         'Executioner/ContactFinder/Limiter/ContactLimiter.php',
         'Executioner/Dispatcher/Exception',
         'Executioner/Scheduler/Mode/DAO',
@@ -31,7 +31,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.campaign.dispatcher.action', Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher::class);
     $services->set('mautic.campaign.dispatcher.condition', Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher::class);
     $services->set('mautic.campaign.dispatcher.decision', Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher::class);
-    $services->set('mautic.campaign.event_collector', Mautic\CampaignBundle\EventCollector\EventCollector::class);
     $services->set('mautic.campaign.scheduler.datetime', Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime::class);
     $services->set('mautic.campaign.scheduler.interval', Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class);
     $services->set('mautic.campaign.executioner.condition', Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class);
