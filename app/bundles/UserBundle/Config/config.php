@@ -141,12 +141,6 @@ return [
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.security.authentication_handler' => [
-                'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
-                'arguments' => [
-                    'router',
-                ],
-            ],
             'mautic.security.logout_handler' => [
                 'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
                 'tagArguments' => [
@@ -190,22 +184,6 @@ return [
                 ],
             ],
 
-            'mautic.security.saml.entity_descriptor_store' => [
-                'class'     => Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-                'tag'       => 'lightsaml.idp_entity_store',
-            ],
-
-            'mautic.security.saml.id_store' => [
-                'class'     => Mautic\UserBundle\Security\SAML\Store\IdStore::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'lightsaml.system.time_provider',
-                ],
-            ],
-
             'mautic.security.saml.username_mapper' => [
                 'class'     => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
                 'arguments' => [
@@ -226,17 +204,6 @@ return [
                     'mautic.user.model.user',
                     'security.password_hasher',
                     '%mautic.saml_idp_default_role%',
-                ],
-            ],
-            'mautic.security.user_token_setter' => [
-                'class'     => Mautic\UserBundle\Security\UserTokenSetter::class,
-                'arguments' => ['mautic.user.model.user', 'security.token_storage'],
-            ],
-            'mautic.user.model.user_token_service' => [
-                'class'     => Mautic\UserBundle\Model\UserToken\UserTokenService::class,
-                'arguments' => [
-                    'mautic.helper.random',
-                    'mautic.user.repository.user_token',
                 ],
             ],
         ],
