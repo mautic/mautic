@@ -24,6 +24,10 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.form.fixture.form', Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class, 'mautic.form.fixture.form');
+    $services->set('mautic.form.fixture.form_result', Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class, 'mautic.form.fixture.form_result');
     $services->set('mautic.form.collector.object', Mautic\FormBundle\Collector\ObjectCollector::class);
     $services->alias(Mautic\FormBundle\Collector\ObjectCollector::class, 'mautic.form.collector.object');
     $services->set('mautic.form.collector.field', Mautic\FormBundle\Collector\FieldCollector::class);
