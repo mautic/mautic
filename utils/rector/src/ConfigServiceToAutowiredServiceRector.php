@@ -18,12 +18,16 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Type;
 use Rector\PhpParser\Node\BetterNodeFinder;
 use Rector\PhpParser\Parser\SimplePhpParser;
+use Rector\PhpParser\Printer\BetterStandardPrinter;
 use Rector\Rector\AbstractRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Utils\Rector\ValueObject\ServiceDefinition;
@@ -45,9 +49,11 @@ use Utils\Rector\ValueObject\ServiceTag;
  * Definitions with "alias", "parent", "factory", ... are left in place,
  * as moving them would silently drop their configuration.
  *
- * The move takes 2 runs on purpose - the 1st one registers the service in services.php,
- * the 2nd one drops it from config.php. That way a service can never end up removed
- * from config.php without being registered in services.php first.
+ * Both sides of the move happen in a single run, triggered by config.php alone. The new $services->set() lines
+ * are written into services.php right here, as text, before the definitions are dropped from the config.php AST -
+ * a service can never end up removed from config.php without being registered in services.php first.
+ * Letting Rector print services.php instead would split the move over 2 runs, and the 2nd one would be
+ * served from cache, as config.php stays untouched in the 1st one.
  */
 final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 {
@@ -59,6 +65,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
     public function __construct(
         private readonly SimplePhpParser $simplePhpParser,
         private readonly BetterNodeFinder $betterNodeFinder,
+        private readonly BetterStandardPrinter $betterStandardPrinter,
         private readonly ReflectionProvider $reflectionProvider,
     ) {
     }
@@ -73,30 +80,27 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     public function refactor(Node $node): ?Node
     {
-        if (!$node instanceof Return_) {
+        if (!$node instanceof Return_ || !$node->expr instanceof Array_) {
             return null;
         }
 
-        if ($node->expr instanceof Array_) {
-            return $this->refactorConfigFile($node, $node->expr);
-        }
-
-        if ($node->expr instanceof Closure) {
-            return $this->refactorServicesFile($node, $node->expr);
-        }
-
-        return null;
+        return $this->refactorConfigFile($node, $node->expr);
     }
 
     private function refactorConfigFile(Return_ $return, Array_ $configArray): ?Return_
     {
-        // the service is only dropped here once services.php registers it, never in the same run;
-        // Rector prints file by file, so services.php might not be updated yet
-        $registeredServiceNames = $this->resolveRegisteredServiceNames(
-            dirname($this->getFile()->getFilePath()).'/services.php'
-        );
+        $servicesFilePath = dirname($this->getFile()->getFilePath()).'/services.php';
+        if (!file_exists($servicesFilePath)) {
+            return null;
+        }
 
-        if ([] === $registeredServiceNames) {
+        $servicesFileContent = file_get_contents($servicesFilePath);
+        if (!is_string($servicesFileContent)) {
+            return null;
+        }
+
+        $servicesClosure = $this->matchServicesClosure($servicesFileContent);
+        if (!$servicesClosure instanceof Closure) {
             return null;
         }
 
@@ -105,7 +109,99 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
+        $movableServices = $this->resolveMovableServices($servicesArray);
+        if ([] === $movableServices) {
+            return null;
+        }
+
+        $registeredServiceNames = $this->resolveRegisteredServiceNames($servicesClosure);
+
+        $setStmts = [];
+        foreach ($movableServices as [, , $serviceName, $serviceDefinition]) {
+            if (in_array($serviceName, $registeredServiceNames, true)) {
+                continue;
+            }
+
+            $setStmts[] = $this->createServiceSetStmt($serviceName, $serviceDefinition);
+        }
+
+        // the services must be registered in services.php first, or the move would drop them
+        if ([] !== $setStmts && !$this->registerServices($servicesFilePath, $servicesFileContent, $servicesClosure, $setStmts)) {
+            return null;
+        }
+
+        $changedGroupArrays = [];
+
+        foreach ($movableServices as [$groupArray, $key]) {
+            unset($groupArray->items[$key]);
+            $changedGroupArrays[spl_object_id($groupArray)] = $groupArray;
+        }
+
+        foreach ($changedGroupArrays as $changedGroupArray) {
+            $changedGroupArray->items = array_values($changedGroupArray->items);
+        }
+
+        $this->removeEmptyGroups($servicesArray, $changedGroupArrays);
+        $this->removeEmptyServices($configArray, $servicesArray);
+
+        return $return;
+    }
+
+    /**
+     * A group that lost its very last service, e.g. 'membership' => [], is of no use anymore.
+     *
+     * @param array<int, Array_> $changedGroupArrays
+     */
+    private function removeEmptyGroups(Array_ $servicesArray, array $changedGroupArrays): void
+    {
         $hasChanged = false;
+
+        foreach ($servicesArray->items as $key => $groupArrayItem) {
+            $groupArray = $groupArrayItem->value;
+            if (!$groupArray instanceof Array_) {
+                continue;
+            }
+
+            if ([] !== $groupArray->items || !isset($changedGroupArrays[spl_object_id($groupArray)])) {
+                continue;
+            }
+
+            unset($servicesArray->items[$key]);
+            $hasChanged = true;
+        }
+
+        if ($hasChanged) {
+            $servicesArray->items = array_values($servicesArray->items);
+        }
+    }
+
+    /**
+     * The whole 'services' key goes once its very last group is gone.
+     */
+    private function removeEmptyServices(Array_ $configArray, Array_ $servicesArray): void
+    {
+        if ([] !== $servicesArray->items) {
+            return;
+        }
+
+        foreach ($configArray->items as $key => $configArrayItem) {
+            if ($configArrayItem->value !== $servicesArray) {
+                continue;
+            }
+
+            unset($configArray->items[$key]);
+            $configArray->items = array_values($configArray->items);
+
+            return;
+        }
+    }
+
+    /**
+     * @return array<array{Array_, int|string, string, ServiceDefinition}> group array, item key, service name and definition
+     */
+    private function resolveMovableServices(Array_ $servicesArray): array
+    {
+        $movableServices = [];
 
         foreach ($servicesArray->items as $groupArrayItem) {
             $groupArray = $groupArrayItem->value;
@@ -113,88 +209,159 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 continue;
             }
 
-            $hasGroupChanged = false;
-
             foreach ($groupArray->items as $key => $serviceArrayItem) {
-                if (!$this->matchServiceDefinition($serviceArrayItem) instanceof ServiceDefinition) {
+                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem);
+                if (!$serviceDefinition instanceof ServiceDefinition) {
                     continue;
                 }
 
                 $serviceName = $serviceArrayItem->key;
-                if (!$serviceName instanceof String_ || !in_array($serviceName->value, $registeredServiceNames, true)) {
+                if (!$serviceName instanceof String_) {
                     continue;
                 }
 
-                unset($groupArray->items[$key]);
-                $hasGroupChanged = true;
-            }
-
-            if ($hasGroupChanged) {
-                $groupArray->items = array_values($groupArray->items);
-                $hasChanged = true;
+                $movableServices[] = [$groupArray, $key, $serviceName->value, $serviceDefinition];
             }
         }
 
-        if (!$hasChanged) {
+        return $movableServices;
+    }
+
+    /**
+     * Writes the new $services->set() lines into services.php as text, to keep the rest of the file formatting
+     * untouched. A dry run only checks that the write would be possible.
+     *
+     * @param Expression[] $setStmts
+     */
+    private function registerServices(string $servicesFilePath, string $servicesFileContent, Closure $servicesClosure, array $setStmts): bool
+    {
+        $updatedServicesFileContent = $this->createUpdatedServicesFileContent($servicesFileContent, $servicesClosure, $setStmts);
+        if (null === $updatedServicesFileContent) {
+            return false;
+        }
+
+        if ($this->isDryRun()) {
+            return true;
+        }
+
+        return false !== file_put_contents($servicesFilePath, $updatedServicesFileContent);
+    }
+
+    /**
+     * @param Expression[] $setStmts
+     *
+     * @return string|null null when there is no statement to append the new services to
+     */
+    private function createUpdatedServicesFileContent(string $servicesFileContent, Closure $servicesClosure, array $setStmts): ?string
+    {
+        $anchorStmt = $this->resolveAnchorStmt($servicesClosure);
+        if (!$anchorStmt instanceof Stmt) {
             return null;
         }
 
-        return $return;
+        $anchorEndPosition = $anchorStmt->getEndFilePos();
+        if ($anchorEndPosition < 0) {
+            return null;
+        }
+
+        $indentation   = $this->resolveIndentation($servicesFileContent, $anchorStmt->getStartFilePos());
+        $appendContent = '';
+
+        foreach ($setStmts as $setStmt) {
+            $appendContent .= "\n".$indentation.$this->betterStandardPrinter->print([$setStmt]);
+        }
+
+        return substr($servicesFileContent, 0, $anchorEndPosition + 1)
+            .$appendContent
+            .substr($servicesFileContent, $anchorEndPosition + 1);
     }
 
-    private function refactorServicesFile(Return_ $return, Closure $closure): ?Return_
+    /**
+     * The new services go right after the last $services->load(...) call, to keep them above aliases.
+     */
+    private function resolveAnchorStmt(Closure $closure): ?Stmt
     {
+        $anchorStmt = null;
+
+        foreach ($closure->stmts as $stmt) {
+            if (!$stmt instanceof Expression) {
+                continue;
+            }
+
+            $loadMethodCall = $this->betterNodeFinder->findFirst(
+                $stmt->expr,
+                fn (Node $node): bool => $node instanceof MethodCall && $this->isName($node->name, 'load')
+            );
+
+            if ($loadMethodCall instanceof MethodCall) {
+                $anchorStmt = $stmt;
+            }
+        }
+
+        if ($anchorStmt instanceof Stmt) {
+            return $anchorStmt;
+        }
+
+        // no load() call, the services still have to land inside the closure
+        $lastStmt = $closure->stmts[count($closure->stmts) - 1] ?? null;
+
+        return $lastStmt instanceof Stmt ? $lastStmt : null;
+    }
+
+    private function resolveIndentation(string $fileContent, int $startFilePos): string
+    {
+        if ($startFilePos < 0) {
+            return '';
+        }
+
+        $lineStartPosition = strrpos(substr($fileContent, 0, $startFilePos), "\n");
+        if (false === $lineStartPosition) {
+            return '';
+        }
+
+        $indentation = substr($fileContent, $lineStartPosition + 1, $startFilePos - $lineStartPosition - 1);
+
+        return '' === trim($indentation) ? $indentation : '';
+    }
+
+    /**
+     * The --dry-run option is mirrored to the parallel workers, so plain argv is enough to spot it.
+     */
+    private function isDryRun(): bool
+    {
+        $argv = (array) ($_SERVER['argv'] ?? []);
+
+        return in_array('--dry-run', $argv, true) || in_array('-n', $argv, true);
+    }
+
+    private function matchServicesClosure(string $servicesFileContent): ?Closure
+    {
+        $stmts = $this->simplePhpParser->parseString($servicesFileContent);
+
+        // the file is parsed on its own, so the "use" imports have to be resolved by hand
+        $nodeTraverser = new NodeTraverser(new NameResolver());
+        $stmts         = $nodeTraverser->traverse($stmts);
+
+        $return = $this->betterNodeFinder->findFirstInstanceOf($stmts, Return_::class);
+        if (!$return instanceof Return_ || !$return->expr instanceof Closure) {
+            return null;
+        }
+
+        $closure = $return->expr;
         if (!$this->isContainerConfiguratorClosure($closure)) {
             return null;
         }
 
-        $configFilePath = dirname($this->getFile()->getFilePath()).'/config.php';
-        if (!file_exists($configFilePath)) {
-            return null;
-        }
-
-        $serviceDefinitionsByName = $this->resolveMovableServices($configFilePath);
-        if ([] === $serviceDefinitionsByName) {
-            return null;
-        }
-
-        if (!$this->hasServicesVariable($closure)) {
-            return null;
-        }
-
-        $setStmts = [];
-
-        foreach ($serviceDefinitionsByName as $serviceName => $serviceDefinition) {
-            if ($this->hasServiceSet($closure, $serviceName)) {
-                continue;
-            }
-
-            $setStmts[] = $this->createServiceSetStmt($serviceName, $serviceDefinition);
-        }
-
-        if ([] === $setStmts) {
-            return null;
-        }
-
-        $insertPosition = $this->resolveInsertPosition($closure);
-        array_splice($closure->stmts, $insertPosition, 0, $setStmts);
-
-        return $return;
+        return $this->hasServicesVariable($closure) ? $closure : null;
     }
 
     /**
      * @return string[] service names already registered in services.php
      */
-    private function resolveRegisteredServiceNames(string $servicesFilePath): array
+    private function resolveRegisteredServiceNames(Closure $servicesClosure): array
     {
-        if (!file_exists($servicesFilePath)) {
-            return [];
-        }
-
-        $stmts = $this->simplePhpParser->parseFile($servicesFilePath);
-
         $setMethodCalls = $this->betterNodeFinder->find(
-            $stmts,
+            $servicesClosure->stmts,
             fn (Node $node): bool => $node instanceof MethodCall && $this->isName($node->name, 'set')
         );
 
@@ -214,49 +381,6 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         }
 
         return $serviceNames;
-    }
-
-    /**
-     * @return array<string, ServiceDefinition> service name to definition
-     */
-    private function resolveMovableServices(string $configFilePath): array
-    {
-        $stmts = $this->simplePhpParser->parseFile($configFilePath);
-
-        $return = $this->betterNodeFinder->findFirstInstanceOf($stmts, Return_::class);
-        if (!$return instanceof Return_ || !$return->expr instanceof Array_) {
-            return [];
-        }
-
-        $servicesArray = $this->matchArrayValueByKey($return->expr, 'services');
-        if (!$servicesArray instanceof Array_) {
-            return [];
-        }
-
-        $serviceDefinitionsByName = [];
-
-        foreach ($servicesArray->items as $groupArrayItem) {
-            $groupArray = $groupArrayItem->value;
-            if (!$groupArray instanceof Array_) {
-                continue;
-            }
-
-            foreach ($groupArray->items as $serviceArrayItem) {
-                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem);
-                if (!$serviceDefinition instanceof ServiceDefinition) {
-                    continue;
-                }
-
-                $serviceName = $serviceArrayItem->key;
-                if (!$serviceName instanceof String_) {
-                    continue;
-                }
-
-                $serviceDefinitionsByName[$serviceName->value] = $serviceDefinition;
-            }
-        }
-
-        return $serviceDefinitionsByName;
     }
 
     /**
@@ -494,26 +618,6 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         return $variable instanceof Variable;
     }
 
-    private function hasServiceSet(Closure $closure, string $serviceName): bool
-    {
-        $methodCall = $this->betterNodeFinder->findFirst(
-            $closure->stmts,
-            function (Node $node) use ($serviceName): bool {
-                if (!$node instanceof MethodCall || !$this->isName($node->name, 'set')) {
-                    return false;
-                }
-
-                $firstArg = $node->getArgs()[0] ?? null;
-
-                return $firstArg instanceof Arg
-                    && $firstArg->value instanceof String_
-                    && $firstArg->value->value === $serviceName;
-            }
-        );
-
-        return $methodCall instanceof MethodCall;
-    }
-
     private function createServiceSetStmt(string $serviceName, ServiceDefinition $serviceDefinition): Expression
     {
         $methodCall = new MethodCall(new Variable(self::SERVICES_VARIABLE_NAME), 'set', [
@@ -532,30 +636,5 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         }
 
         return new Expression($methodCall);
-    }
-
-    /**
-     * Puts the new services right after the last $services->load(...) call, to keep them above aliases.
-     */
-    private function resolveInsertPosition(Closure $closure): int
-    {
-        $insertPosition = count($closure->stmts);
-
-        foreach ($closure->stmts as $key => $stmt) {
-            if (!$stmt instanceof Expression) {
-                continue;
-            }
-
-            $loadMethodCall = $this->betterNodeFinder->findFirst(
-                $stmt->expr,
-                fn (Node $node): bool => $node instanceof MethodCall && $this->isName($node->name, 'load')
-            );
-
-            if ($loadMethodCall instanceof MethodCall) {
-                $insertPosition = $key + 1;
-            }
-        }
-
-        return $insertPosition;
     }
 }
