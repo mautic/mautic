@@ -113,6 +113,7 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
