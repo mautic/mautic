@@ -17,6 +17,8 @@ return function (ContainerConfigurator $configurator): void {
         'ProgressiveProfiling/DisplayManager.php',
     ];
 
+    $services->set(Mautic\FormBundle\Event\Service\FieldValueTransformer::class);
+
     $services->load('Mautic\\FormBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
@@ -36,8 +38,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\FormBundle\Helper\FormUploader::class, 'mautic.form.helper.form_uploader');
     $services->set('mautic.form.helper.token', Mautic\FormBundle\Helper\TokenHelper::class);
     $services->alias(Mautic\FormBundle\Helper\TokenHelper::class, 'mautic.form.helper.token');
-    $services->set('mautic.form.service.field.value.transformer', Mautic\FormBundle\Event\Service\FieldValueTransformer::class);
-    $services->alias(Mautic\FormBundle\Event\Service\FieldValueTransformer::class, 'mautic.form.service.field.value.transformer');
+
     $services->set('mautic.form.helper.properties.accessor', Mautic\FormBundle\Helper\PropertiesAccessor::class);
     $services->alias(Mautic\FormBundle\Helper\PropertiesAccessor::class, 'mautic.form.helper.properties.accessor');
     $services->set('mautic.form.validator.upload_field_validator', Mautic\FormBundle\Validator\UploadFieldValidator::class);
