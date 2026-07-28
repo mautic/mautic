@@ -168,7 +168,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     /**
      * @param list<string> $corsValidDomains
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('returnUrlTrustProvider')]
+    #[DataProvider('returnUrlTrustProvider')]
     public function testReturnUrlTrustValidation(string $returnUrl, array $corsValidDomains, string $expectedRedirectContains, ?string $expectedRedirectNotContains): void
     {
         $this->configParams['cors_valid_domains'] = $corsValidDomains;
