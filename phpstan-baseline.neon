@@ -385,24 +385,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Campaign" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\LeadEventLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CampaignBundle\\Entity\\Summary" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -2092,12 +2074,6 @@ parameters:
 			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
-
-		-
 			message: '#^Parameter \#2 \$id of method Mautic\\CoreBundle\\Model\\AuditLogModel\:\:getLogForObject\(\) expects int\|string, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2174,12 +2150,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Factory/IpLookupFactory.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$modelName with no type specified\.$#'
@@ -2576,12 +2546,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\IpAddress" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/CoreBundle/Helper/IpLookupHelper.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\IpLookupHelper\:\:getClientIpFromProxyList\(\) has no return type specified\.$#'
@@ -3122,12 +3086,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CoreBundle/Validator/FileUploadValidator.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Hit" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/DashboardBundle/Controller/AjaxController.php
 
 		-
 			message: '''
@@ -3776,12 +3734,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Helper/EmailValidator.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Copy" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:addCustomHeader\(\) has parameter \$name with no type specified\.$#'
@@ -4999,12 +4951,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\FormBundle\\Entity\\Submission" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/FormBundle/Model/SubmissionResultLoader.php
-
-		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -5153,12 +5099,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/InstallBundle/Helper/SchemaHelper.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
 
 		-
 			message: '#^Method Mautic\\InstallBundle\\Install\\InstallService\:\:saveConfiguration\(\) has parameter \$clearCache with no type specified\.$#'
@@ -5443,12 +5383,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\DoNotContact" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AjaxController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:\$dncChannels has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5479,24 +5413,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\EmailBundle\\Entity\\Email" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\DoNotContact" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 3
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Controller\\LeadController\:\:\$dncChannels has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5519,36 +5435,6 @@ parameters:
 			identifier: symplify.noJustPropertyAssign
 			count: 2
 			path: app/bundles/LeadBundle/Controller/NoteController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CategoryBundle\\Entity\\Category" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadList" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CategoryBundle\\Entity\\Category" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadCategoryData.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\CompanyLead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Deduplicate\\CompanyDeduper\:\:\$object has no type specified\.$#'
@@ -6811,22 +6697,10 @@ parameters:
 			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\CompanyType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadField" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/FieldType.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\LeadType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
@@ -7327,12 +7201,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/DateOptionAbstract.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\LeadList" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Query/ContactSegmentQueryBuilder.php
-
-		-
 			message: '#^Parameter \#2 \$leadId of class Mautic\\LeadBundle\\Event\\LeadListFilteringEvent constructor expects int, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -7535,18 +7403,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/NotificationBundle/Api/AbstractNotificationApi.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/AppCallbackController.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\NotificationBundle\\Entity\\Notification" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/AppCallbackController.php
 
 		-
 			message: '#^Instead of assigning service property to a variable, use the property directly$#'
@@ -8069,12 +7925,6 @@ parameters:
 			identifier: isset.offset
 			count: 1
 			path: app/bundles/PageBundle/Form/Type/AbTestPropertiesType.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PageBundle\\Entity\\Hit" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/PageBundle/Helper/PointActionHelper.php
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Helper\\PointActionHelper\:\:validatePageHit\(\) has parameter \$eventDetails with no type specified\.$#'
@@ -8719,12 +8569,6 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/Cleaner.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/PluginBundle/Helper/EventHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\EventHelper\:\:pushIt\(\) has parameter \$errors with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8749,26 +8593,8 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 2
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\Integration" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 3
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:clearIntegrationCache\(\) has parameter \$lead with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getCoreIntegrationSettings\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
@@ -8873,24 +8699,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 2
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:buildIntegrationEntities\(\) has no return type specified\.$#'
@@ -9526,12 +9334,6 @@ parameters:
 			path: app/bundles/ReportBundle/Scheduler/BuilderInterface.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\ReportBundle\\Entity\\Scheduler" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/ReportBundle/Scheduler/Model/SchedulerPlanner.php
-
-		-
 			message: '#^Method Mautic\\ReportBundle\\Scheduler\\Model\\SendSchedule\:\:send\(\) has parameter \$csvFilePath with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9740,12 +9542,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/SmsBundle/Helper/SmsHelper.php
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has no return type specified\.$#'
@@ -10126,12 +9922,6 @@ parameters:
 			path: app/bundles/UserBundle/Model/UserModel.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\ApiBundle\\Entity\\oAuth2\\AccessToken" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: app/bundles/UserBundle/Security/Authentication/Token/Permissions/TokenPermissions.php
-
-		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
 			identifier: argument.type
 			count: 2
@@ -10334,12 +10124,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Integration\\ClearbitIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticClearbitBundle/Integration/ClearbitIntegration.php
 
 		-
 			message: '#^Property MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Base\:\:\$_baseUri has no type specified\.$#'
@@ -10816,12 +10600,6 @@ parameters:
 			path: plugins/MauticCrmBundle/EventListener/LeadListSubscriber.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 4
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10964,18 +10742,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has no return type specified\.$#'
@@ -11206,12 +10972,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 3
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getBearerToken\(\) should return string but returns false\.$#'
 			identifier: return.type
 			count: 1
@@ -11258,18 +11018,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\StageBundle\\Entity\\Stage" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\HubspotIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
@@ -11384,30 +11132,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/Salesforce/Object/Lead.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\AuditLog" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 5
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\Role" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\UserBundle\\Entity\\User" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
@@ -11938,18 +11662,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\LeadBundle\\Entity\\Company" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 7
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:authCallback\(\) should return array but returns bool\|string\.$#'
 			identifier: return.type
 			count: 1
@@ -12176,12 +11888,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Entity manager must not fetch the "Mautic\\PluginBundle\\Entity\\IntegrationEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 4
-			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ZohoIntegration\:\:cleanPriorityFields\(\) has parameter \$fieldsToUpdate with no type specified\.$#'
@@ -12968,12 +12674,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticSocialBundle/Form/Type/SocialLoginType.php
-
-		-
-			message: '#^Entity manager must not fetch the "MauticPlugin\\MauticSocialBundle\\Entity\\Lead" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
-			count: 1
-			path: plugins/MauticSocialBundle/Helper/TwitterCommandHelper.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'

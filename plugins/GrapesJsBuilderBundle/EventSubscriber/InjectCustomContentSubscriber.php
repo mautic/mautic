@@ -24,6 +24,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
         private Environment $twig,
         private RequestStack $requestStack,
         private RouterInterface $router,
+        private readonly \MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 
@@ -60,7 +61,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
                 }
             }
 
-            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
+            $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
                 if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
                     $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(

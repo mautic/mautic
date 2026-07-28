@@ -6,7 +6,7 @@ return [
             'mautic.helper.sms' => [
                 'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.lead',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',

@@ -4,7 +4,7 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -85,7 +85,7 @@ final class DynamicContentType extends AbstractType
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         ListModel $listModel,
         private readonly TranslatorInterface $translator,
         private readonly LeadModel $leadModel,

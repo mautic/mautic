@@ -2,6 +2,6 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Exception;
 
-class NotImplementedException extends BaseException
+final class NotImplementedException extends BaseException
 {
 }
