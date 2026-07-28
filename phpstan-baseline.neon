@@ -12861,27 +12861,3 @@ parameters:
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
 
-		-
-			message: '#^Instead of assigning service property to a variable, use the property directly$#'
-			identifier: symplify.noJustPropertyAssign
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countByLeads\(\) has parameter \$tagIds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countOccurrences\(\) has parameter \$tag with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php
-
