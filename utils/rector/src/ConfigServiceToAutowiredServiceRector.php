@@ -16,6 +16,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\UnaryMinus;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\Int_;
@@ -644,10 +645,11 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 // the group tags its services on its own, so the moved one has to say the tag out loud
                 $groupDefaultTag = self::GROUP_DEFAULT_TAGS[$groupName] ?? null;
 
-                return null === $groupDefaultTag ? [] : [new ServiceTag($groupDefaultTag, new Array_([]))];
+                return null === $groupDefaultTag ? [] : [new ServiceTag(new String_($groupDefaultTag), new Array_([]))];
             }
 
-            if (!$tagValue instanceof String_) {
+            $tagName = $this->createTagNameExpr($tagValue);
+            if (!$tagName instanceof Expr) {
                 return null;
             }
 
@@ -656,14 +658,15 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 return null;
             }
 
-            return [new ServiceTag($tagValue->value, $tagArguments)];
+            return [new ServiceTag($tagName, $tagArguments)];
         }
 
         // "tags" pair with "tagArguments" by index, see ServicePass
         $serviceTags = [];
 
         foreach ($tagsValue->items as $key => $tagArrayItem) {
-            if (!$tagArrayItem->value instanceof String_) {
+            $tagName = $this->createTagNameExpr($tagArrayItem->value);
+            if (!$tagName instanceof Expr) {
                 return null;
             }
 
@@ -680,10 +683,31 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 return null;
             }
 
-            $serviceTags[] = new ServiceTag($tagArrayItem->value->value, $tagArguments);
+            $serviceTags[] = new ServiceTag($tagName, $tagArguments);
         }
 
         return $serviceTags;
+    }
+
+    /**
+     * A tag is named by a plain string or by a class constant, e.g. FixturesCompilerPass::FIXTURE_TAG.
+     */
+    private function createTagNameExpr(Node $tagValue): ?Expr
+    {
+        if ($tagValue instanceof String_) {
+            return new String_($tagValue->value);
+        }
+
+        if (!$tagValue instanceof ClassConstFetch || !$tagValue->class instanceof Name || !$tagValue->name instanceof Identifier) {
+            return null;
+        }
+
+        // the class name itself would be no tag name at all
+        if ($this->isName($tagValue->name, 'class')) {
+            return null;
+        }
+
+        return new ClassConstFetch(new Name($tagValue->class->toString()), $tagValue->name->toString());
     }
 
     /**
@@ -1030,7 +1054,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         }
 
         foreach ($serviceDefinition->getServiceTags() as $serviceTag) {
-            $args = [new Arg(new String_($serviceTag->getName()))];
+            $args = [new Arg($serviceTag->getName())];
 
             if ($serviceTag->hasArguments()) {
                 $args[] = new Arg($serviceTag->getArguments());

@@ -340,6 +340,33 @@ CODE_SAMPLE;
         );
     }
 
+    public function testMovesServiceWithClassConstantTag(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'fixtures' => [
+            'mautic.some.fixture' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'tag'   => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.fixture', ".self::AUTOWIRABLE_HELPER_CLASS.'::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);',
+            $this->readServicesFile()
+        );
+    }
+
     public function testMovesServiceWithGroupDefaultTag(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'
