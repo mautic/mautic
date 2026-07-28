@@ -28,6 +28,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private ThemeHelperInterface $themeHelper,
         private CoreParametersHelper $coreParametersHelper,
+        private readonly \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
     ) {
     }
 
@@ -73,7 +74,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $asset = $this->assetModel->getEntity($assetId);
         } elseif (null !== $categoryId) {
             try {
-                $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
+                $asset = $this->assetRepository->getLatestAssetForCategory($categoryId);
             } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }

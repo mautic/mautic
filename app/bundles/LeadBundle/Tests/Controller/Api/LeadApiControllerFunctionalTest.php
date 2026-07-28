@@ -166,7 +166,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ContactMerger $contactMerger */
-        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+        $contactMerger = static::getContainer()->get(ContactMerger::class);
 
         $contactMerger->merge($contact1, $contact2);
 
@@ -228,7 +228,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactId4Created = $response['contacts'][3]['id'];
 
         /** @var ContactMerger $contactMerger */
-        $contactMerger = static::getContainer()->get('mautic.lead.merger');
+        $contactMerger = static::getContainer()->get(ContactMerger::class);
 
         // Merge contact 102 into 101.
         $contactMerger->merge(

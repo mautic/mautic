@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -21,7 +21,7 @@ final class LeadImportFieldType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

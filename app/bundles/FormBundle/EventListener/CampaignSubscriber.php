@@ -14,16 +14,16 @@ use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FormModel $formModel,
-        private SubmissionModel $formSubmissionModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private FormFieldHelper $formFieldHelper,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
     ) {
     }
 
@@ -108,7 +108,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $operators = $this->formModel->getFilterExpressionFunctions();
-        $form      = $this->formModel->getRepository()->findOneById($event->getConfig()['form']);
+        $form      = $this->formRepository->findOneById($event->getConfig()['form']);
 
         if (!$form || !$form->getId()) {
             $event->setResult(false);
@@ -121,7 +121,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $filter = $this->formFieldHelper->getFieldFilter($field->getType());
         $value  = InputHelper::_($event->getConfig()['value'], $filter);
 
-        $result = $this->formSubmissionModel->getRepository()->compareValue(
+        $result = $this->submissionRepository->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
