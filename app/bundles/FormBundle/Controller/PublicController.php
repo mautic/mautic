@@ -144,8 +144,6 @@ final class PublicController extends CommonFormController
             if (null === $form) {
                 $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
-                \assert($form instanceof Form);
-
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();

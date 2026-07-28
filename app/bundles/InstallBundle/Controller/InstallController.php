@@ -75,7 +75,6 @@ final class InstallController extends CommonController
         }
 
         $step   = $this->configurator->getStep($index)[0];
-        \assert($step instanceof StepInterface);
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
