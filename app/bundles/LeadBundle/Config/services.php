@@ -30,6 +30,16 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.lead.fixture.company', Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class, 'mautic.lead.fixture.company');
+    $services->set('mautic.lead.fixture.contact', Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class, 'mautic.lead.fixture.contact');
+    $services->set('mautic.lead.fixture.segment', Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class, 'mautic.lead.fixture.segment');
+    $services->set('mautic.lead.fixture.category', Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class, 'mautic.lead.fixture.category');
+    $services->set('mautic.lead.fixture.categorizedleadlists', Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class, 'mautic.lead.fixture.categorizedleadlists');
     $services->set('mautic.lead.export_scheduled_audit_log_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerAuditLogSubscriber::class);
     $services->alias(Mautic\LeadBundle\EventListener\ContactExportSchedulerAuditLogSubscriber::class, 'mautic.lead.export_scheduled_audit_log_subscriber');
     $services->set('mautic.lead.export_scheduled_logger_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class);
