@@ -10,7 +10,8 @@ return function (ContainerConfigurator $configurator): void {
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public();
+        ->public()
+        ->bind(Monolog\Logger::class, \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
     $excludes = [
     ];
