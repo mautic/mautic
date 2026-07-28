@@ -41,6 +41,37 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.core.service.flashbag', Mautic\CoreBundle\Service\FlashBag::class);
+    $services->alias('mautic.core.service.bulk_notification', Mautic\CoreBundle\Service\BulkNotification::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\LogProcessor::class)->tag('monolog.processor');
+    $services->alias('mautic.core.service.log_processor', Mautic\CoreBundle\Monolog\LogProcessor::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class)
+        ->arg('$exceptionFormatter', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.monolog.fulltrace.formatter'));
+    $services->alias('mautic.monolog.handler', Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class);
+
+    $services->alias('mautic.route_loader', Mautic\CoreBundle\Loader\RouteLoader::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class);
+    $services->alias('mautic.di.env_processor.nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class);
+    $services->alias('mautic.di.env_processor.int_nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class);
+    $services->alias('mautic.di.env_processor.mauticconst', Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class);
+
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+
+    $services->get(Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
+    $services->alias('mautic.generated.columns.doctrine.listener', Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class);
+
+    $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
+        ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
