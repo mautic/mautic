@@ -21,6 +21,12 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+
+    $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)
+        ->arg('$coreParametersHelper', \Symfony\Component\DependencyInjection\Loader\Configurator\service(Mautic\CoreBundle\Helper\CoreParametersHelper::class));
+
+    $services->set('mautic.asset.upload.error.handler', Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
+
     $services->alias('mautic.asset.helper.token', Mautic\AssetBundle\Helper\TokenHelper::class);
     $services->alias('mautic.asset.model.asset', Mautic\AssetBundle\Model\AssetModel::class);
     $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
