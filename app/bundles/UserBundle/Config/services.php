@@ -85,6 +85,17 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
+
+    $services->set(Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
+    $services->alias('mautic.security.authentication_handler', Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
+
+    $services->set('mautic.security.saml.entity_descriptor_store', Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class)->tag('lightsaml.idp_entity_store');
+
+    $services->set('mautic.security.saml.id_store', Mautic\UserBundle\Security\SAML\Store\IdStore::class);
+
+    $services->set(Mautic\UserBundle\Security\UserTokenSetter::class);
+
+    $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
     // Decorate the form_login class to ensure no user enumeration can
     // happen via timing attacks.
     $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)
