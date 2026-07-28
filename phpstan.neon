@@ -67,6 +67,17 @@ parameters:
 		-
 			identifier: mautic.noNullableServiceInConstructor
 			path: app/bundles/ReportBundle/Generator/ReportGenerator.php
+		# these services have no class name alias in the container, so only the string name can fetch them
+		-
+			identifier: mautic.noContainerGet
+			paths:
+				- app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
+				- app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
+				- app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
+				- app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
+				- app/bundles/CoreBundle/Tests/Traits/LoggerTrait.php
+				- app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
+				- app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
 		-
@@ -242,6 +253,9 @@ parameters:
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 
+	scanDirectories:
+		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
+		- vendor/javer/sp-bundle/src
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -263,7 +277,7 @@ rules:
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
-	#- Utils\PHPStan\Rule\NoContainerGetRule
+	- Utils\PHPStan\Rule\NoContainerGetRule
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
 	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule

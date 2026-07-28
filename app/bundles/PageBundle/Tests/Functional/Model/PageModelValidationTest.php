@@ -24,7 +24,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     {
         $this->configParams['validate_page_hit_required_data'] = true;
         parent::setUp();
-        $this->pageHitRepository = self::getContainer()->get('mautic.page.repository.hit');
+        $this->pageHitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testPageHitWhenRequiredValuesValidationPass(): void

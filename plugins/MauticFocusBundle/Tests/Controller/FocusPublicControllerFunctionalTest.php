@@ -16,7 +16,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testGenerateFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = static::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focus->setStyle('bar');
         $focusModel->saveEntity($focus);
@@ -44,7 +44,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = static::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focus->setIsPublished(false);
         $focusModel->saveEntity($focus);

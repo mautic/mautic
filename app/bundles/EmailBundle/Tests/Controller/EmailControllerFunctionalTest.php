@@ -1652,7 +1652,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private function setPermission(Role $role, array $permissions): void
     {
         /** @var RoleModel $roleModel */
-        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel = $this->getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
