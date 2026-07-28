@@ -77,7 +77,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.generated.columns.doctrine.listener', Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
     $services->set('mautic.helper.update', Mautic\CoreBundle\Helper\UpdateHelper::class);
     $services->set('mautic.helper.update.release_parser', Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class);
-    $services->set('mautic.helper.encryption', Mautic\CoreBundle\Helper\EncryptionHelper::class);
     $services->set('mautic.helper.url', Mautic\CoreBundle\Helper\UrlHelper::class);
     $services->set('mautic.helper.composer', Mautic\CoreBundle\Helper\ComposerHelper::class);
     $services->set('mautic.helper.menu', Mautic\CoreBundle\Menu\MenuHelper::class);
