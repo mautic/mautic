@@ -57,6 +57,8 @@ use Utils\Rector\ValueObject\ServiceTag;
  * and anything else is a service reference. A "@=" expression keeps the whole definition in config.php.
  *
  * The tags are kept as ->tag() calls, "tags" pairing with "tagArguments" by index, just like ServicePass does.
+ * A service of a group ServicePass tags on its own, e.g. "permissions", is given that tag explicitly,
+ * see GROUP_DEFAULT_TAGS.
  *
  * Definitions with "alias", "parent", "factory", ... are left in place,
  * as moving them would silently drop their configuration.
@@ -88,6 +90,20 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      * @var string
      */
     private const CONFIGURATOR_NAMESPACE = 'Symfony\Component\DependencyInjection\Loader\Configurator';
+
+    /**
+     * The default tags ServicePass gives a whole group of services, in the tags the moved service would lose.
+     *
+     * The other groups keep their default tag through autoconfigure(), e.g. "events" tags every
+     * EventSubscriberInterface with "kernel.event_subscriber" on its own, and the "helpers" tag "twig.helper"
+     * is read by no compiler pass at all.
+     *
+     * @var array<string, string>
+     */
+    private const GROUP_DEFAULT_TAGS = [
+        'models'      => 'mautic.model',
+        'permissions' => 'mautic.permissions',
+    ];
 
     /**
      * @var string
@@ -262,8 +278,10 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 continue;
             }
 
+            $groupName = $groupArrayItem->key instanceof String_ ? $groupArrayItem->key->value : '';
+
             foreach ($groupArray->items as $key => $serviceArrayItem) {
-                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem);
+                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem, $groupName);
                 if (!$serviceDefinition instanceof ServiceDefinition) {
                     continue;
                 }
@@ -553,7 +571,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      * Matches a service definition made of a "class" key and optional "arguments", "tag", "tags" and "tagArguments",
      * e.g. ['class' => SomeService::class, 'arguments' => ['translator'], 'tag' => 'security.voter'].
      */
-    private function matchServiceDefinition(ArrayItem $arrayItem): ?ServiceDefinition
+    private function matchServiceDefinition(ArrayItem $arrayItem, string $groupName): ?ServiceDefinition
     {
         if (!$arrayItem->key instanceof String_) {
             return null;
@@ -595,7 +613,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        $serviceTags = $this->matchServiceTags($definitionArray);
+        $serviceTags = $this->matchServiceTags($definitionArray, $groupName);
         if (null === $serviceTags) {
             return null;
         }
@@ -606,7 +624,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
     /**
      * @return ServiceTag[]|null null when the tags cannot be turned into ->tag() calls
      */
-    private function matchServiceTags(Array_ $definitionArray): ?array
+    private function matchServiceTags(Array_ $definitionArray, string $groupName): ?array
     {
         $tagArgumentsValue = $this->matchArrayValueByKey($definitionArray, 'tagArguments');
         if (null !== $tagArgumentsValue && !$tagArgumentsValue instanceof Array_) {
@@ -619,7 +637,14 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         if (!$tagsValue instanceof Array_) {
             $tagValue = $this->matchArrayValueByKey($definitionArray, 'tag');
             if (null === $tagValue) {
-                return null !== $tagArgumentsValue ? null : [];
+                if (null !== $tagArgumentsValue) {
+                    return null;
+                }
+
+                // the group tags its services on its own, so the moved one has to say the tag out loud
+                $groupDefaultTag = self::GROUP_DEFAULT_TAGS[$groupName] ?? null;
+
+                return null === $groupDefaultTag ? [] : [new ServiceTag($groupDefaultTag, new Array_([]))];
             }
 
             if (!$tagValue instanceof String_) {

@@ -340,6 +340,33 @@ CODE_SAMPLE;
         );
     }
 
+    public function testMovesServiceWithGroupDefaultTag(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'permissions' => [
+            'mautic.some.permissions' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // ServicePass tags the whole "permissions" group, the moved service has to keep that tag
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.permissions', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('mautic.permissions');",
+            $this->readServicesFile()
+        );
+    }
+
     public function testKeepsFunctionImportsSorted(): void
     {
         $servicesFileContent = <<<'CODE_SAMPLE'
