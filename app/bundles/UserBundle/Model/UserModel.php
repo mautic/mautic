@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -46,7 +46,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function __construct(
         protected MailHelper $mailHelper,
         private readonly UserTokenServiceInterface $userTokenService,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

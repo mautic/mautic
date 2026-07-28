@@ -311,7 +311,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
-                    'doctrine.orm.entity_manager',
+                    'mautic.core.repository.ip_address',
                     'mautic.helper.core_parameters',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',

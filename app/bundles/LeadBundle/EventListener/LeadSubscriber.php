@@ -64,6 +64,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         private UtmTagRepository $utmTagRepository,
         private DoNotContactRepository $doNotContactRepository,
         ModelFactory $modelFactory,
+        private readonly \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository,
         private $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
@@ -381,7 +382,7 @@ final class LeadSubscriber implements EventSubscriberInterface
     private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $lead = $event->getLead();
-        $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
+        $rows = $this->auditLogRepository->getLeadIpLogs($lead, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             // Add to counter

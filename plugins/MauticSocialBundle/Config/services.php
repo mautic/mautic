@@ -20,6 +20,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticSocialBundle\\Entity\\', '../Entity/*Repository.php');
 
+    $services->alias('mautic.social.repository.lead', MauticPlugin\MauticSocialBundle\Entity\LeadRepository::class);
     $services->alias('mautic.social.model.monitoring', MauticPlugin\MauticSocialBundle\Model\MonitoringModel::class);
     $services->alias('mautic.social.model.postcount', MauticPlugin\MauticSocialBundle\Model\PostCountModel::class);
     $services->alias('mautic.social.model.tweet', MauticPlugin\MauticSocialBundle\Model\TweetModel::class);
