@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
-use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,9 +30,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         private UserHelper $userHelper,
         private CoreParametersHelper $coreParametersHelper,
         private AuthorizationCheckerInterface $securityContext,
-        private UserModel $userModel,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
+        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ) {
     }
 
@@ -67,7 +66,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             // mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
-                $this->userModel->getRepository()->setLastLogin($user);
+                $this->userRepository->setLastLogin($user);
 
                 // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
                 // firewall setting the known user

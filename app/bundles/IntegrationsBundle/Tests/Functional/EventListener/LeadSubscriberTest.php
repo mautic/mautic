@@ -22,7 +22,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->dispatcher            = static::getContainer()->get('event_dispatcher');
+        $this->dispatcher            = static::getContainer()->get(EventDispatcherInterface::class);
         $this->fieldChangeRepository = self::getContainer()->get(FieldChangeRepository::class);
 
         static::getContainer()->set(

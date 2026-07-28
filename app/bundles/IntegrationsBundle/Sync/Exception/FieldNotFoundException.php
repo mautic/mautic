@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Exception;
 
-class FieldNotFoundException extends \Exception
+final class FieldNotFoundException extends \Exception
 {
     /**
      * @param int             $code

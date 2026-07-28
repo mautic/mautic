@@ -115,6 +115,7 @@ return [
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',
+                    'mautic.report.repository.scheduler',
                 ],
             ],
             'mautic.report.model.send_schedule' => [

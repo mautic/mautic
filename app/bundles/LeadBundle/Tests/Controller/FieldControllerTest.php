@@ -137,7 +137,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(LeadField::class, $field);
 
         /** @var ColumnSchemaHelper $helper */
-        $helper = $this->getContainer()->get('mautic.schema.helper.column');
+        $helper = $this->getContainer()->get(ColumnSchemaHelper::class);
 
         // Table name to check the fields.
         $name         = 'leads';
