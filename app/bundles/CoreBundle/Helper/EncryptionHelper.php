@@ -21,7 +21,11 @@ class EncryptionHelper
         CoreParametersHelper $coreParametersHelper,
         ...$possibleCiphers,
     ) {
+        var_dump(count($possibleCiphers));
+
         foreach ($possibleCiphers as $possibleCipher) {
+            var_dump($possibleCipher::class);
+
             if (!$possibleCipher instanceof SymmetricCipherInterface) {
                 throw new \InvalidArgumentException($possibleCipher::class.' has to implement '.SymmetricCipherInterface::class);
             }
