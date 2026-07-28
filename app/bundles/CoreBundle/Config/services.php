@@ -41,6 +41,24 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.helper.user', Mautic\CoreBundle\Helper\UserHelper::class);
+    $services->alias('mautic.helper.ip_lookup', Mautic\CoreBundle\Helper\IpLookupHelper::class);
+    $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
+    $services->alias('mautic.helper.token_builder.factory', Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class);
+    $services->alias('mautic.helper.app_version', Mautic\CoreBundle\Helper\AppVersion::class);
+    $services->alias('mautic.helper.command', Mautic\CoreBundle\Helper\CommandHelper::class);
+
+    $services->alias('mautic.helper.menu', Mautic\CoreBundle\Menu\MenuHelper::class);
+    $services->alias('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
+    $services->alias('mautic.page.helper.factory', Mautic\CoreBundle\Factory\PageHelperFactory::class);
+
+    // Configurator (used in installer and managing global config)
+    $services->alias('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
+    $services->alias('mautic.form.list.validator.circular', Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class);
+    $services->alias('mautic.maxmind.doNotSellList', Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
+
+    $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
+    $services->alias('mautic.cipher.openssl', Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
