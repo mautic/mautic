@@ -2074,12 +2074,6 @@ parameters:
 			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
-
-		-
 			message: '#^Parameter \#2 \$id of method Mautic\\CoreBundle\\Model\\AuditLogModel\:\:getLogForObject\(\) expects int\|string, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2156,12 +2150,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Factory/IpLookupFactory.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$modelName with no type specified\.$#'
@@ -2882,6 +2870,12 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Menu/MenuHelper.php
+
+		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\FormEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Model\\AbstractCommonModel\:\:decodeArrayFromUrl\(\) has parameter \$string with no type specified\.$#'
@@ -6703,12 +6697,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\CompanyType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8611,12 +8599,6 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getCoreIntegrationSettings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getIconPath\(\) has parameter \$integration with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10142,12 +10124,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Integration\\ClearbitIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticClearbitBundle/Integration/ClearbitIntegration.php
 
 		-
 			message: '#^Property MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Base\:\:\$_baseUri has no type specified\.$#'

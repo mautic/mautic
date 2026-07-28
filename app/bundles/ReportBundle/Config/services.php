@@ -25,6 +25,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\ReportBundle\\Entity\\', '../Entity/*Repository.php');
 
+    $services->alias('mautic.report.repository.scheduler', Mautic\ReportBundle\Entity\SchedulerRepository::class);
+
     $services->alias('mautic.report.model.report', Mautic\ReportBundle\Model\ReportModel::class);
     $services->alias('mautic.report.model.csv_exporter', Mautic\ReportBundle\Model\CsvExporter::class);
     $services->alias('mautic.report.model.excel_exporter', Mautic\ReportBundle\Model\ExcelExporter::class);
