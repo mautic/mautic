@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -42,7 +42,7 @@ final class PageType extends AbstractType
     private readonly bool $canViewOther;
 
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,

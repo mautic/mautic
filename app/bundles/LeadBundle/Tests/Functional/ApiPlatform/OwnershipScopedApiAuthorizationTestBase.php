@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCase
@@ -22,7 +23,7 @@ abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCa
         $role->setIsAdmin(false);
 
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
 
         $user = new User();
@@ -32,7 +33,7 @@ abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCa
         $user->setLastName('User');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
 

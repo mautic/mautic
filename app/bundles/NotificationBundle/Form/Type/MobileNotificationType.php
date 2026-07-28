@@ -2,7 +2,7 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -30,7 +30,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class MobileNotificationType extends AbstractType
 {
     public function __construct(
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

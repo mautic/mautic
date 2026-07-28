@@ -2,7 +2,7 @@
 
 namespace Mautic\ApiBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
@@ -40,7 +40,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
 
     public function __construct(
         private readonly RequestStack $requestStack,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
