@@ -56,8 +56,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\LeadBundle\Validator\Constraints\LengthValidator::class, 'mautic.lead.validator.length');
     $services->set('mautic.lead.segment.stat.dependencies', Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class);
     $services->alias(Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class, 'mautic.lead.segment.stat.dependencies');
-    $services->set('mautic.lead.segment.stat.chart.query.factory', Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class);
-    $services->alias(Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class, 'mautic.lead.segment.stat.chart.query.factory');
+
+    $services->set(Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class);
+
     $services->set('mautic.lead.segment.stat.campaign.share', Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class);
     $services->alias(Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class, 'mautic.lead.segment.stat.campaign.share');
     $services->set('mautic.lead.columns.dictionary', Mautic\LeadBundle\Services\ContactColumnsDictionary::class);
