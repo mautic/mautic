@@ -672,8 +672,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
             $this->integrationEntityRepository->saveEntities($integrationEntities);
             $this->em->clear();
-
-            unset($this->integrationEntityRepository, $integrationEntities);
         }
 
         return $result;

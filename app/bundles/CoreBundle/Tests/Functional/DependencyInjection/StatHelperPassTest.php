@@ -22,7 +22,7 @@ final class StatHelperPassTest extends TestCase
         $kernel = new TestKernel();
         $kernel->boot();
 
-        $statHelperContainer = $kernel->getContainer()->get('mautic.email.stats.helper_container');
+        $statHelperContainer = $kernel->getContainer()->get(StatHelperContainer::class);
         $this->assertInstanceOf(StatHelperContainer::class, $statHelperContainer);
 
         $helpers = (new \ReflectionProperty(StatHelperContainer::class, 'helpers'))
