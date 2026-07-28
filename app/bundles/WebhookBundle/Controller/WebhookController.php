@@ -69,7 +69,6 @@ final class WebhookController extends FormController
         $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);
         $this->listFilters = $categoryFilters['filters'];
 
-        /** @phpstan-ignore-next-line Deprecated parent class is already used by this controller. */
         return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
     }
 

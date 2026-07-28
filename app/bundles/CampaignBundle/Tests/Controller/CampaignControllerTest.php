@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignControllerTest extends MauticMysqlTestCase
 {
@@ -142,7 +143,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/campaigns?filters=["form:1"]');
         $this->assertResponseIsSuccessful();
 
-        $categoryFilterPrefix = $this->getContainer()->get('translator')->trans('mautic.core.searchcommand.category');
+        $categoryFilterPrefix = $this->getContainer()->get(TranslatorInterface::class)->trans('mautic.core.searchcommand.category');
         $this->client->request('GET', '/s/campaigns?filters=["'.$categoryFilterPrefix.':test-category"]');
         $this->assertResponseIsSuccessful();
     }
