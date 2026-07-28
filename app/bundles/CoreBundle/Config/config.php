@@ -604,13 +604,6 @@ return [
                     ],
                 ],
             ],
-            'mautic.helper.encryption' => [
-                'class'     => Mautic\CoreBundle\Helper\EncryptionHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.cipher.openssl',
-                ],
-            ],
             'mautic.helper.url' => [
                 'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
             ],

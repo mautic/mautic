@@ -10,7 +10,7 @@ class EncryptionHelper
     /**
      * @var SymmetricCipherInterface[]
      */
-    private ?array $availableCiphers = null;
+    private array $availableCiphers = [];
 
     /**
      * @var string
@@ -19,10 +19,9 @@ class EncryptionHelper
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
+        ...$possibleCiphers,
     ) {
-        $nonCipherArgs = 1;
-        for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
-            $possibleCipher = func_get_arg($i);
+        foreach ($possibleCiphers as $possibleCipher) {
             if (!$possibleCipher instanceof SymmetricCipherInterface) {
                 throw new \InvalidArgumentException($possibleCipher::class.' has to implement '.SymmetricCipherInterface::class);
             }
@@ -32,7 +31,7 @@ class EncryptionHelper
             $this->availableCiphers[] = $possibleCipher;
         }
 
-        if (!$this->availableCiphers || 0 === count($this->availableCiphers)) {
+        if ([] === $this->availableCiphers) {
             throw new \RuntimeException('None of possible cryptography libraries is supported');
         }
 

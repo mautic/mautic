@@ -37,6 +37,11 @@ return function (ContainerConfigurator $configurator): void {
         'Cache/ResultCacheOptions.php',
     ];
 
+    $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
+        ->arg('$possibleCiphers', ...[
+            \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.cipher.openssl'),
+        ]);
+
     $services->load('Mautic\\CoreBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
