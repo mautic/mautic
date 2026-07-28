@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
@@ -16,6 +17,18 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CacheBundle\\', '../')
         ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+    $services->set('mautic.cache.adapter.filesystem', Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class)
+        ->arg('$prefix', param('mautic.cache_prefix'))
+        ->arg('$lifetime', param('mautic.cache_lifetime'))
+        ->arg('$directory', param('mautic.tmp_path'))
+        ->tag('mautic.cache.adapter');
+    $services->alias(Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class, 'mautic.cache.adapter.filesystem');
+    $services->set('mautic.cache.adapter.memcached', Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class)
+        ->arg('$servers', param('mautic.cache_adapter_memcached'))
+        ->arg('$namespace', param('mautic.cache_prefix'))
+        ->arg('$lifetime', param('mautic.cache_lifetime'))
+        ->tag('mautic.cache.adapter');
+    $services->alias(Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class, 'mautic.cache.adapter.memcached');
     $services->set('mautic.cache.clear_cache_subscriber', Mautic\CacheBundle\EventListener\CacheClearSubscriber::class)
         ->arg('$cacheProvider', service('mautic.cache.provider'))
         ->arg('$logger', service('monolog.logger.mautic'))
