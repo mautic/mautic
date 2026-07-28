@@ -26,9 +26,6 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.sms.callback_handler_container' => [
-                'class' => Mautic\SmsBundle\Callback\HandlerContainer::class,
-            ],
             'mautic.sms.helper.contact' => [
                 'class'     => Mautic\SmsBundle\Helper\ContactHelper::class,
                 'arguments' => [

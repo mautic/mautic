@@ -45,39 +45,6 @@ return [
             'mautic.integrations.helper.variable_expresser' => [
                 'class' => Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,
             ],
-            'mautic.integrations.helper' => [
-                'class'     => Mautic\IntegrationsBundle\Helper\IntegrationsHelper::class,
-                'arguments' => [
-                    'mautic.plugin.integrations.repository.integration',
-                    'mautic.integrations.service.encryption',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.integrations.helper.auth_integrations' => [
-                'class'     => Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
-                'arguments' => [
-                    'mautic.integrations.helper',
-                ],
-            ],
-            'mautic.integrations.helper.sync_integrations' => [
-                'class'     => Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
-                'arguments' => [
-                    'mautic.integrations.helper',
-                    'mautic.integrations.internal.object_provider',
-                ],
-            ],
-            'mautic.integrations.helper.config_integrations' => [
-                'class'     => Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
-                'arguments' => [
-                    'mautic.integrations.helper',
-                ],
-            ],
-            'mautic.integrations.helper.builder_integrations' => [
-                'class'     => Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class,
-                'arguments' => [
-                    'mautic.integrations.helper',
-                ],
-            ],
             'mautic.integrations.helper.field_validator' => [
                 'class'     => Mautic\IntegrationsBundle\Helper\FieldValidationHelper::class,
                 'arguments' => [
@@ -279,9 +246,6 @@ return [
                     'mautic.core.model.auditlog',
                     'doctrine.orm.entity_manager',
                 ],
-            ],
-            'mautic.integrations.sync.notification.handler_container' => [
-                'class' => Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class,
             ],
             'mautic.integrations.sync.notification.handler_company' => [
                 'class'     => Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class,

@@ -75,6 +75,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.message.processor.bounce', Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
     $services->alias('mautic.message.processor.replier', Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
     $services->alias('mautic.email.helper.stat', Mautic\EmailBundle\Stat\StatHelper::class);
+    $services->alias('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)
         ->arg('$includeDetails', '%mautic.webhook_email_details%');

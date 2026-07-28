@@ -67,6 +67,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
+    $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
+    $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 

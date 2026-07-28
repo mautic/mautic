@@ -120,8 +120,6 @@ return [
         ],
     ],
     'services' => [
-        'other' => [],
-        'validator' => [],
         'fixtures' => [
             'mautic.email.fixture.email' => [
                 'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
