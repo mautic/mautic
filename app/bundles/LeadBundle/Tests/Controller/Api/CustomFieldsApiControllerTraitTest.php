@@ -88,8 +88,9 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
 
             private string $entityNameOne = 'lead';
 
-            public function __construct(private object $model)
-            {
+            public function __construct(
+                private object $model,
+            ) {
             }
 
             public function getModel(?string $name): object
