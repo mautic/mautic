@@ -118,7 +118,7 @@ final class ImportCommandTest extends MauticMysqlTestCase
         $import->setProperties($properties);
 
         /** @var ImportModel $importModel */
-        $importModel = static::getContainer()->get('mautic.lead.model.import');
+        $importModel = static::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;

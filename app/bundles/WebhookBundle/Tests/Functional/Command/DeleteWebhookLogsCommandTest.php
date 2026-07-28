@@ -21,7 +21,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->configParams['webhook_log_max']                      = 5;
         parent::setUp();
 
-        $this->webhookModel = static::getContainer()->get('mautic.webhook.model.webhook');
+        $this->webhookModel = static::getContainer()->get(WebhookModel::class);
     }
 
     public function testRemoveLogInstantly(): void

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\FormBundle\Entity\FormRepository;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,7 @@ class DeleteOrphanFormResultsTableCommand extends Command
     private readonly Connection $conn;
 
     public function __construct(
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
         private readonly TranslatorInterface $translator,
         private readonly FormRepository $formRepository,

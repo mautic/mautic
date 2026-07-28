@@ -2,6 +2,6 @@
 
 namespace Mautic\SmsBundle\Exception;
 
-class CallbackHandlerNotFound extends \Exception
+final class CallbackHandlerNotFound extends \Exception
 {
 }

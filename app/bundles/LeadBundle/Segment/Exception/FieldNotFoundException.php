@@ -2,6 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Exception;
 
-class FieldNotFoundException extends \Exception
+final class FieldNotFoundException extends \Exception
 {
 }

@@ -2,6 +2,6 @@
 
 namespace Mautic\ReportBundle\Scheduler\Exception;
 
-class NoScheduleException extends \Exception
+final class NoScheduleException extends \Exception
 {
 }

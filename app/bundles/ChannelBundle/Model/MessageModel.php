@@ -2,7 +2,7 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
@@ -39,7 +39,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     public function __construct(
         protected ChannelListHelper $channelListHelper,
         protected CampaignModel $campaignModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

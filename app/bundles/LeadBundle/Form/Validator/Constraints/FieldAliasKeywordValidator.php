@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
@@ -35,7 +35,7 @@ final class FieldAliasKeywordValidator extends ConstraintValidator
     public function __construct(
         private readonly ListModel $listModel,
         private readonly FieldAliasHelper $aliasHelper,
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly TranslatorInterface $translator,
         private readonly ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
     ) {
