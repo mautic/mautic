@@ -21,6 +21,11 @@ use Utils\Rector\ConfigServiceToAutowiredServiceRector;
  */
 final class ConfigServiceToAutowiredServiceRectorTest extends AbstractLazyTestCase
 {
+    /**
+     * @var string
+     */
+    private const AUTOWIRABLE_HELPER_CLASS = 'Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper';
+
     private const CONFIG_WITH_CLASS_ONLY_SERVICE = <<<'CODE_SAMPLE'
 <?php
 
@@ -28,7 +33,7 @@ return [
     'services' => [
         'others' => [
             'mautic.some.helper' => [
-                'class' => SomeNamespace\SomeHelper::class,
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
             ],
             'mautic.some.wired_helper' => [
                 'class'     => SomeNamespace\SomeWiredHelper::class,
@@ -61,7 +66,7 @@ return function (\Symfony\Component\DependencyInjection\Loader\Configurator\Cont
 
     $services->load('SomeNamespace\\', '../');
 
-    $services->set('mautic.some.helper', SomeNamespace\SomeHelper::class);
+    $services->set('mautic.some.helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class);
 
     $services->alias('mautic.some.model', SomeNamespace\SomeModel::class);
 };
@@ -76,12 +81,17 @@ CODE_SAMPLE;
         // the container is shared between test cases, drop it to get a rule with a fresh file provider
         self::$rectorConfig = null;
 
+        // the rule only moves services the container knows how to autowire
+        putenv('MAUTIC_CONTAINER_XML='.__DIR__.'/Source/container.xml');
+
         $this->temporaryDirectory = sys_get_temp_dir().'/rector_config_service_test_'.uniqid();
         mkdir($this->temporaryDirectory, 0777, true);
     }
 
     protected function tearDown(): void
     {
+        putenv('MAUTIC_CONTAINER_XML');
+
         foreach (glob($this->temporaryDirectory.'/*.php') ?: [] as $filePath) {
             unlink($filePath);
         }
@@ -110,7 +120,8 @@ return function (\Symfony\Component\DependencyInjection\Loader\Configurator\Cont
     $services = $configurator->services();
 
     $services->load('SomeNamespace\\', '../');
-    $services->set('mautic.some.helper', SomeNamespace\SomeHelper::class);
+    $services->set('mautic.some.helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class);
+    $services->alias(Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class, 'mautic.some.helper');
 
     $services->alias('mautic.some.model', SomeNamespace\SomeModel::class);
 };
@@ -128,7 +139,7 @@ return [
     'services' => [
         'permissions' => [
             'mautic.some.helper' => [
-                'class' => SomeNamespace\SomeHelper::class,
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
             ],
         ],
         'others' => [
@@ -170,7 +181,7 @@ return [
     'services' => [
         'permissions' => [
             'mautic.some.helper' => [
-                'class' => SomeNamespace\SomeHelper::class,
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
             ],
         ],
     ],
@@ -209,7 +220,8 @@ return function (\Symfony\Component\DependencyInjection\Loader\Configurator\Cont
     $services = $configurator->services();
 
     $services->alias('mautic.some.model', SomeNamespace\SomeModel::class);
-    $services->set('mautic.some.helper', SomeNamespace\SomeHelper::class);
+    $services->set('mautic.some.helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class);
+    $services->alias(Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class, 'mautic.some.helper');
 };
 CODE_SAMPLE;
 
@@ -242,9 +254,35 @@ CODE_SAMPLE;
         $this->assertStringNotContainsString('mautic.some.autowirable_helper', $printedFileContent);
 
         $this->assertStringContainsString(
-            "\$services->set('mautic.some.autowirable_helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class);",
+            "\$services->set('mautic.some.autowirable_helper', ".self::AUTOWIRABLE_HELPER_CLASS.'::class);',
             $this->readServicesFile()
         );
+    }
+
+    public function testSkipServiceWithConstructorArgumentOutsideOfContainer(): void
+    {
+        // the container fixture knows no service of the "Monolog\Logger" type
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'others' => [
+            'mautic.some.logger_aware_helper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\LoggerAwareHelper::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertNull($this->refactorConfigFile($configFileContent));
+        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
     public function testSkipServiceWithScalarConstructorArgument(): void
@@ -295,6 +333,16 @@ CODE_SAMPLE;
         $this->createFile('services.php', self::SERVICES_FILE);
 
         $this->assertNull($this->refactorConfigFile($configFileContent));
+        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+    }
+
+    public function testSkipEverythingWithoutContainer(): void
+    {
+        putenv('MAUTIC_CONTAINER_XML='.$this->temporaryDirectory.'/no-container.xml');
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertNull($this->refactorConfigFile(self::CONFIG_WITH_CLASS_ONLY_SERVICE));
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
@@ -358,7 +406,7 @@ CODE_SAMPLE;
         $this->assertIsString($this->refactorConfigFile($configFileContent));
 
         $this->assertStringContainsString(
-            "\$services->set('mautic.some.voter', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class)->tag('security.voter');",
+            "\$services->set('mautic.some.voter', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('security.voter');",
             $this->readServicesFile()
         );
     }
@@ -468,7 +516,7 @@ return [
     'services' => [
         'others' => [
             'oneup_uploader.controller.dropzone.class' => [
-                'class' => SomeNamespace\UploadController::class,
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
             ],
         ],
     ],

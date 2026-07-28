@@ -62,6 +62,21 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      */
     private const SERVICES_VARIABLE_NAME = 'services';
 
+    /**
+     * @var string
+     */
+    private const CONTAINER_XML_ENV_NAME = 'MAUTIC_CONTAINER_XML';
+
+    /**
+     * @var string
+     */
+    private const DEFAULT_CONTAINER_XML_FILE_PATH = 'var/cache/test/AppKernelTestDebugContainer.xml';
+
+    /**
+     * @var array<string, true>|null
+     */
+    private ?array $containerServiceIds = null;
+
     public function __construct(
         private readonly SimplePhpParser $simplePhpParser,
         private readonly BetterNodeFinder $betterNodeFinder,
@@ -123,6 +138,12 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             }
 
             $setStmts[] = $this->createServiceSetStmt($serviceName, $serviceDefinition);
+
+            // ServicePass gives every config.php service an alias of its very class name,
+            // see Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass
+            if ($serviceName !== $serviceDefinition->getClassName()) {
+                $setStmts[] = $this->createServiceAliasStmt($serviceName, $serviceDefinition->getClassName());
+            }
         }
 
         // the services must be registered in services.php first, or the move would drop them
@@ -423,8 +444,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        // manual arguments are only dropped when autowiring can fill every constructor argument on its own
-        if (in_array('arguments', $definitionKeys, true) && !$this->isAutowirableClass($className->value)) {
+        // the moved service is autowired, so autowiring has to fill every constructor argument on its own
+        if (!$this->isAutowirableClass($className->value)) {
             return null;
         }
 
@@ -568,13 +589,72 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 continue;
             }
 
+            $parameterType = $parameterReflection->getType();
+
             // scalars, arrays and parameters like "%mautic.some_config%" have to stay wired by hand
-            if (!$parameterReflection->getType()->isObject()->yes()) {
+            if (!$parameterType->isObject()->yes()) {
+                return false;
+            }
+
+            // an object type alone is not enough, the container has to know a service of that very type,
+            // e.g. "Monolog\Logger" is no service, only "monolog.logger.mautic" is
+            foreach ($parameterType->getObjectClassNames() as $parameterClassName) {
+                if ($this->isKnownServiceId($parameterClassName)) {
+                    continue;
+                }
+
+                // named autowiring, e.g. "Psr\Log\LoggerInterface $mauticLogger"
+                if ($this->isKnownServiceId($parameterClassName.' $'.$parameterReflection->getName())) {
+                    continue;
+                }
+
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * The service ids of the container built before the move, see MAUTIC_CONTAINER_XML.
+     * Without that container the rule stays on the safe side and moves nothing.
+     */
+    private function isKnownServiceId(string $serviceId): bool
+    {
+        if (null === $this->containerServiceIds) {
+            $this->containerServiceIds = $this->resolveContainerServiceIds();
+        }
+
+        return isset($this->containerServiceIds[$serviceId]);
+    }
+
+    /**
+     * @return array<string, true>
+     */
+    private function resolveContainerServiceIds(): array
+    {
+        $containerFilePath = getenv(self::CONTAINER_XML_ENV_NAME);
+        if (!is_string($containerFilePath) || '' === $containerFilePath) {
+            $containerFilePath = self::DEFAULT_CONTAINER_XML_FILE_PATH;
+        }
+
+        if (!file_exists($containerFilePath)) {
+            return [];
+        }
+
+        $containerFileContent = file_get_contents($containerFilePath);
+        if (!is_string($containerFileContent)) {
+            return [];
+        }
+
+        preg_match_all('#<service id="(?<service_id>[^"]+)"#', $containerFileContent, $matches);
+
+        $serviceIds = [];
+        foreach ($matches['service_id'] as $serviceId) {
+            $serviceIds[htmlspecialchars_decode($serviceId, \ENT_QUOTES | \ENT_XML1)] = true;
+        }
+
+        return $serviceIds;
     }
 
     private function matchArrayValueByKey(Array_ $array, string $keyName): ?Node
@@ -634,6 +714,16 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
             $methodCall = new MethodCall($methodCall, 'tag', $args);
         }
+
+        return new Expression($methodCall);
+    }
+
+    private function createServiceAliasStmt(string $serviceName, string $className): Expression
+    {
+        $methodCall = new MethodCall(new Variable(self::SERVICES_VARIABLE_NAME), 'alias', [
+            new Arg(new ClassConstFetch(new Name($className), 'class')),
+            new Arg(new String_($serviceName)),
+        ]);
 
         return new Expression($methodCall);
     }
