@@ -271,12 +271,12 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         );
 
         $submissionRepository = $this->em->getRepository(Submission::class);
-        \assert($submissionRepository instanceof SubmissionRepository);
+        $this->assertInstanceOf(SubmissionRepository::class, $submissionRepository);
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
         $this->assertCount(1, $submissions);
-        $this->assertStringNotContainsString('attacker.com', $submissions[0]->getReferer());
+        $this->assertStringNotContainsString('attacker.com', (string) $submissions[0]->getReferer());
     }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
