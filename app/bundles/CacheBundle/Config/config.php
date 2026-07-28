@@ -10,16 +10,6 @@ return [
     ],
     'menu'     => [],
     'services' => [
-        'events'    => [
-            'mautic.cache.clear_cache_subscriber' => [
-                'class'     => Mautic\CacheBundle\EventListener\CacheClearSubscriber::class,
-                'tags'      => ['kernel.cache_clearer'],
-                'arguments' => [
-                    'mautic.cache.provider',
-                    'monolog.logger.mautic',
-                ],
-            ],
-        ],
         'other'     => [
             'mautic.cache.adapter.filesystem' => [
                 'class'     => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
