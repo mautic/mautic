@@ -41,6 +41,25 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
+    $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
+    $services->alias('mautic.helper.file_properties', Mautic\CoreBundle\Helper\FileProperties::class);
+    $services->alias('mautic.core.validator.file_upload', Mautic\CoreBundle\Validator\FileUploadValidator::class);
+    $services->alias('mautic.filesystem', Mautic\CoreBundle\Helper\Filesystem::class);
+
+    /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
+    $services->set('symfony.filesystem', Symfony\Component\Filesystem\Filesystem::class);
+    $services->alias(Symfony\Component\Filesystem\Filesystem::class, 'symfony.filesystem');
+
+    $services->set('symfony.finder', Symfony\Component\Finder\Finder::class);
+    $services->alias(Symfony\Component\Finder\Finder::class, 'symfony.finder');
+
+    $services->alias('mautic.helper.input_helper', Mautic\CoreBundle\Helper\InputHelper::class);
+    $services->alias('mautic.helper.trailing_slash', Mautic\CoreBundle\Helper\TrailingSlashHelper::class);
+    $services->alias('mautic.helper.url', Mautic\CoreBundle\Helper\UrlHelper::class);
+    $services->alias('mautic.helper.hash', Mautic\CoreBundle\Helper\HashHelper\HashHelper::class);
+    $services->alias('mautic.helper.random', Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class);
+    $services->alias('mautic.helper.phone_number', Mautic\CoreBundle\Helper\PhoneNumberHelper::class);
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 

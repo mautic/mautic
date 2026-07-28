@@ -337,35 +337,6 @@ return [
                     '%mautic.plugin.bundles%',
                 ],
             ],
-            'mautic.helper.phone_number' => [
-                'class' => Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
-            ],
-            'mautic.helper.input_helper' => [
-                'class' => Mautic\CoreBundle\Helper\InputHelper::class,
-            ],
-            'mautic.helper.file_uploader' => [
-                'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
-                'arguments' => [
-                    'mautic.helper.file_path_resolver',
-                    'translator',
-                ],
-            ],
-            'mautic.helper.file_path_resolver' => [
-                'class'     => Mautic\CoreBundle\Helper\FilePathResolver::class,
-                'arguments' => [
-                    'symfony.filesystem',
-                    'mautic.helper.input_helper',
-                ],
-            ],
-            'mautic.helper.file_properties' => [
-                'class' => Mautic\CoreBundle\Helper\FileProperties::class,
-            ],
-            'mautic.helper.trailing_slash' => [
-                'class'     => Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
             'mautic.helper.token_builder' => [
                 'class'     => Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
                 'arguments' => [
@@ -425,16 +396,6 @@ return [
                 'arguments' => [
                     '%kernel.environment%',
                 ],
-            ],
-            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
-            'symfony.filesystem' => [
-                'class' => Symfony\Component\Filesystem\Filesystem::class,
-            ],
-            'mautic.filesystem' => [
-                'class' => Mautic\CoreBundle\Helper\Filesystem::class,
-            ],
-            'symfony.finder' => [
-                'class' => Symfony\Component\Finder\Finder::class,
             ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
@@ -611,9 +572,6 @@ return [
                     'mautic.cipher.openssl',
                 ],
             ],
-            'mautic.helper.url' => [
-                'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
-            ],
             'mautic.helper.composer' => [
                 'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
                 'arguments' => [
@@ -630,12 +588,6 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
-            ],
-            'mautic.helper.hash' => [
-                'class' => Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
-            ],
-            'mautic.helper.random' => [
-                'class' => Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.helper.command' => [
                 'class'     => Mautic\CoreBundle\Helper\CommandHelper::class,
@@ -811,14 +763,6 @@ return [
                     'doctrine.orm.default_entity_manager',
                 ],
                 'tag' => 'mautic.update_check',
-            ],
-        ],
-        'validator' => [
-            'mautic.core.validator.file_upload' => [
-                'class'     => Mautic\CoreBundle\Validator\FileUploadValidator::class,
-                'arguments' => [
-                    'translator',
-                ],
             ],
         ],
     ],
