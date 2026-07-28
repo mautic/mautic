@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
