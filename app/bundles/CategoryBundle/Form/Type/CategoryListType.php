@@ -2,7 +2,7 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CategoryListType extends AbstractType
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly TranslatorInterface $translator,
         private readonly CategoryModel $model,
         private readonly RouterInterface $router,

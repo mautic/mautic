@@ -6,6 +6,6 @@ namespace Mautic\UserBundle\Exception;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-class WeakPasswordException extends AuthenticationException
+final class WeakPasswordException extends AuthenticationException
 {
 }

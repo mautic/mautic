@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class RecordNotPublishedException extends RecordException
+final class RecordNotPublishedException extends RecordException
 {
 }

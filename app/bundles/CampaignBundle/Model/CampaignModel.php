@@ -3,7 +3,7 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -57,7 +57,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private readonly MembershipBuilder $membershipBuilder,
         private readonly ContactTracker $contactTracker,
         private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

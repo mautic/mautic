@@ -2,7 +2,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
@@ -61,7 +61,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,
         private readonly ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
