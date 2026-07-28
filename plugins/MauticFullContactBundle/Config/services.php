@@ -18,4 +18,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticFullContactBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+    $services->set('mautic.integration.fullcontact', MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class);
+    $services->alias(MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class, 'mautic.integration.fullcontact');
 };
