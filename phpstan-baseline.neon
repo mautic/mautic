@@ -1558,15 +1558,21 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
-			count: 2
+			count: 1
+			path: app/bundles/CoreBundle/Entity/CommonRepository.php
+
+		-
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
@@ -3257,6 +3263,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/StatRepository.php
+
+		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Form\\Type\\DwcEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
@@ -7537,6 +7549,12 @@ parameters:
 			path: app/bundles/NotificationBundle/Event/NotificationSendEvent.php
 
 		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/NotificationBundle/EventListener/NotificationSubscriber.php
+
+		-
 			message: '#^Method Mautic\\NotificationBundle\\Helper\\NotificationHelper\:\:getHeaderScript\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -9542,6 +9560,12 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
+
+		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/SmsBundle/EventListener/SmsSubscriber.php
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has no return type specified\.$#'
