@@ -14,16 +14,20 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
-        UserModel $userModel,
+        UserModel $userModel, \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->userModel = $userModel;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -40,7 +44,7 @@ class PublicController extends FormController
             if ($isValid = $this->isFormValid($form)) {
                 // find the user
                 $data = $form->getData();
-                $user = $this->userModel->getRepository()->findByIdentifier($data['identifier']);
+                $user = $this->userRepository->findByIdentifier($data['identifier']);
 
                 /**
                  * Calculation of time to standardize fix response for vulnerability
@@ -109,7 +113,7 @@ class PublicController extends FormController
     private function handlePasswordResetConfirm(Request $request, UserModel $model, UserPasswordHasherInterface $hasher, array $data): ?Response
     {
         $response = null;
-        $user     = $model->getRepository()->findByIdentifier($data['identifier']);
+        $user     = $this->userRepository->findByIdentifier($data['identifier']);
 
         if (null === $user) {
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');

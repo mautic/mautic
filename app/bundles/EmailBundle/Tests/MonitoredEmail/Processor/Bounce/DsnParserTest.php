@@ -9,12 +9,15 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DsnParser::class)]
+#[CoversClass(DsnParser::class)]
 final class DsnParserTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that a BouncedEmail is returned from a dsn report')]
-    #[\PHPUnit\Framework\Attributes\DataProvider('bouncedEmailProvider')]
+    #[TestDox('Test that a BouncedEmail is returned from a dsn report')]
+    #[DataProvider('bouncedEmailProvider')]
     public function testBouncedEmailIsReturnedFromParsedDsnReport(
         string $dsnReport,
         string $expectedEmail,
@@ -178,7 +181,7 @@ DSN,
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown if a bounce cannot be found in a dsn report')]
+    #[TestDox('Test that an exception is thrown if a bounce cannot be found in a dsn report')]
     public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);

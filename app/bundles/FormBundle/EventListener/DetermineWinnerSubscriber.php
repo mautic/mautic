@@ -9,11 +9,11 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly TranslatorInterface $translator,
+        private SubmissionRepository $submissionRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 

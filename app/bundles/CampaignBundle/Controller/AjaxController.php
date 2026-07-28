@@ -4,6 +4,7 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -13,22 +14,18 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    private \Mautic\CampaignBundle\Model\EventLogModel $eventLogModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCampaignAjaxController(\Mautic\CampaignBundle\Model\EventLogModel $eventLogModel): void
-    {
-        $this->eventLogModel = $eventLogModel;
-    }
-
     public function __construct(
         private readonly DateHelper $dateHelper,
+        private readonly EventLogModel $eventLogModel,
+        private readonly LeadModel $leadModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -38,11 +35,12 @@ class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function updateConnectionsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function updateConnectionsAction(Request $request): JsonResponse
     {
         $session        = $request->getSession();
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
@@ -58,7 +56,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function updateScheduledCampaignEventAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function updateScheduledCampaignEventAction(Request $request): JsonResponse
     {
         $eventId      = (int) $request->request->get('eventId');
         $contactId    = (int) $request->request->get('contactId');
@@ -89,7 +87,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function cancelScheduledCampaignEventAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function cancelScheduledCampaignEventAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -104,7 +102,7 @@ class AjaxController extends CommonAjaxController
                     ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
                 );
                 $log->setMetadata($metadata);
-                $this->eventLogModel->getRepository()->saveEntity($log);
+                $this->leadEventLogRepository->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }
@@ -118,11 +116,11 @@ class AjaxController extends CommonAjaxController
      */
     protected function getContactEventLog($eventId, $contactId)
     {
-        $contact = $this->getModel('lead')->getEntity($contactId);
+        $contact = $this->leadModel->getEntity($contactId);
         if ($contact) {
             if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
                 /** @var LeadEventLog $log */
-                $log = $this->eventLogModel->getRepository()
+                $log = $this->leadEventLogRepository
                                 ->findOneBy(
                                     [
                                         'lead'  => $contactId,

@@ -35,8 +35,21 @@ class ListApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, ListModel $listModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        private ListModel $listModel,
+        private LeadModel $leadModel,
+    ) {
         $this->model            = $listModel;
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
@@ -119,9 +132,7 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction(): Response
     {
-        $listModel = $this->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-        $lists   = $listModel->getUserLists();
+        $lists   = $this->listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
@@ -156,9 +167,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->addToLists($leadId, $entity);
+        $this->leadModel->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -199,10 +208,7 @@ class ListApiController extends CommonApiController
             if ($contact instanceof Response) {
                 $responseDetail[$contactId] = ['success' => false];
             } else {
-                $leadModel = $this->getModel('lead');
-                \assert($leadModel instanceof LeadModel);
-                /** @var \Mautic\LeadBundle\Entity\Lead $contact */
-                $leadModel->addToLists($contact, $entity);
+                $this->leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }
         }
@@ -239,9 +245,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->removeFromLists($leadId, $entity);
+        $this->leadModel->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 

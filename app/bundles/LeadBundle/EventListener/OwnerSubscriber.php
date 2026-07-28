@@ -6,14 +6,13 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OwnerSubscriber implements EventSubscriberInterface
+final class OwnerSubscriber implements EventSubscriberInterface
 {
     private const OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
@@ -25,8 +24,8 @@ class OwnerSubscriber implements EventSubscriberInterface
     private ?array $owners = null;
 
     public function __construct(
-        private readonly LeadModel $leadModel,
         private readonly TranslatorInterface $translator,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
     }
 
@@ -157,7 +156,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getOwner(int $ownerId)
     {
         if (!isset($this->owners[$ownerId])) {
-            $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);
+            $this->owners[$ownerId] = $this->leadRepository->getLeadOwner($ownerId);
         }
 
         return $this->owners[$ownerId];
@@ -204,10 +203,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         return $tokens;
     }
 
-    /**
-     * @return array|string|string[]
-     */
-    protected function getOwnerColumnNormalized(string $ownerColumn): string|array
+    private function getOwnerColumnNormalized(string $ownerColumn): string
     {
         return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
     }

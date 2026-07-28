@@ -61,37 +61,6 @@ return [
                     'priority' => 0,
                 ],
             ],
-            'mautic.install.configurator.step.doctrine' => [
-                'class'     => Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
-                'arguments' => [
-                    'mautic.configurator',
-                ],
-                'tag'          => 'mautic.configurator.step',
-                'tagArguments' => [
-                    'priority' => 1,
-                ],
-            ],
-            'mautic.install.configurator.step.user' => [
-                'class'        => Mautic\InstallBundle\Configurator\Step\UserStep::class,
-                'tag'          => 'mautic.configurator.step',
-                'tagArguments' => [
-                    'priority' => 2,
-                ],
-            ],
-            'mautic.install.service' => [
-                'class'     => Mautic\InstallBundle\Install\InstallService::class,
-                'arguments' => [
-                    'mautic.configurator',
-                    'mautic.helper.cache',
-                    'mautic.helper.paths',
-                    'doctrine.orm.entity_manager',
-                    'translator',
-                    'kernel',
-                    'validator',
-                    'security.password_hasher',
-                    'mautic.doctrine.loader.mautic_fixtures_loader',
-                ],
-            ],
         ],
     ],
 ];

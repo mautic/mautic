@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentFilterEntryFiltersType extends AbstractType
+final class DynamicContentFilterEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 

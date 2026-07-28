@@ -12,6 +12,8 @@ use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerAc
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\ConfigServiceToAutowiredServiceRector;
+use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -23,6 +25,8 @@ return RectorConfig::configure()
         deadCode: true,
         typeDeclarations: true,
         phpunitCodeQuality: true,
+        phpunitMockToStub: true,
+        phpunitNarrowAsserts: true,
     )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
@@ -38,8 +42,8 @@ return RectorConfig::configure()
         // other objects
         CommonRepository::class,
         Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
-        Mautic\PluginBundle\Integration\AbstractIntegration::class,
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
@@ -53,8 +57,22 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
+        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
+
+        // DI
+        // ConfigServiceToAutowiredServiceRector::class,
+        // applied on:
+        // * email-bundle
+
+        // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
+    ->withComposerBased(phpunit: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
@@ -68,6 +86,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+        // to be fixed in dev-main
+        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
+            '*Command.php',
+        ],
+
         // skip as might be overriden by 3rd party controllers
         ResponseReturnTypeControllerActionRector::class => [
             __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
@@ -77,16 +100,6 @@ return RectorConfig::configure()
         ],
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
-        ],
-
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
-            // a getRepository() override
-            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
-            // list lead vs lead list diff
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
@@ -100,7 +113,7 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
+        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -110,26 +123,16 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
-
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-
-        // will be fixed
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
-        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

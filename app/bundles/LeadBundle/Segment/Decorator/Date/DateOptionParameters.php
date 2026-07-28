@@ -83,6 +83,6 @@ class DateOptionParameters
 
     private function setDateTimeHelper(TimezoneResolver $timezoneResolver): void
     {
-        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart);
     }
 }

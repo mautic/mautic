@@ -19,9 +19,9 @@ use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -61,11 +61,11 @@ class TriggerCampaignCommand extends ModeratedCommand
         private InactiveExecutioner $inactiveExecutioner,
         private LoggerInterface $logger,
         private FormatterHelper $formatterHelper,
-        private ListModel $listModel,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private ProcessSignalService $processSignalService,
+        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -213,7 +213,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
@@ -222,7 +222,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
         try {
             // Specific campaign;
@@ -416,7 +416,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             if ($updateSegmentCountInBackground) {
                 $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
             } else {
-                $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+                $totalLeadCount = $this->leadListRepository->getLeadCount($segmentId);
                 $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
             }
         }

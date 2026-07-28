@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
@@ -24,24 +25,30 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class UserController extends FormController
+final class UserController extends FormController
 {
-    private RoleModel $roleModel;
+    private \Mautic\UserBundle\Entity\RoleRepository $roleRepository;
+
+    private \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository;
 
     private UserModel $userModel;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private AuditLogModel $auditLogModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireUserController(
         UserModel $userModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
         RoleModel $roleModel,
+        \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository,
+        \Mautic\UserBundle\Entity\RoleRepository $roleRepository,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
-        $this->roleModel = $roleModel;
+        $this->auditLogRepository = $auditLogRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -68,7 +75,7 @@ class UserController extends FormController
         // do some default filtering
         $filter = ['string' => $search, 'force' => ''];
         $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $users  = $this->getModel('user.user')->getEntities(
+        $users  = $this->userModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -324,12 +331,12 @@ class UserController extends FormController
                 ],
             ]);
         }
+
         $oldEmail = $user->getEmail();
-        $auditLogRepository = $this->auditLogModel->getRepository();
-        $userActivity       = $auditLogRepository->getLogsForUser($user);
+
+        $userActivity       = $this->auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
-        $roleRepository     = $this->roleModel->getRepository();
-        $roles              = $roleRepository->getEntities();
+        $roles              = $this->roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
@@ -524,8 +531,7 @@ class UserController extends FormController
      */
     public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        $user  = $this->userModel->getEntity($objectId);
 
         // user not found
         if (null === $user) {

@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -15,7 +15,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -30,25 +32,27 @@ class PluginModel extends FormModel
         private readonly FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
         private readonly BundleHelper $bundleHelper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly PluginRepository $pluginRepository,
+        private readonly IntegrationEntityRepository $integrationEntityRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\PluginBundle\Entity\PluginRepository
+    public function getRepository(): PluginRepository
     {
-        return $this->em->getRepository(Plugin::class);
+        return $this->pluginRepository;
     }
 
-    public function getIntegrationEntityRepository()
+    public function getIntegrationEntityRepository(): IntegrationEntityRepository
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->integrationEntityRepository;
     }
 
     public function getPermissionBase(): string

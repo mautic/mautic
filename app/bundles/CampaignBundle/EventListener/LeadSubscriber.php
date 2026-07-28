@@ -2,11 +2,8 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -18,14 +15,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EventCollector $eventCollector,
-        private readonly TranslatorInterface $translator,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly RouterInterface $router,
-        private readonly EventRepository $eventRepository,
+        private EventCollector $eventCollector,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private EventRepository $eventRepository,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $campaignLeadRepository,
     ) {
     }
 
@@ -51,14 +49,8 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadMerge(LeadMergeEvent $event): void
     {
-        /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
-
-        /** @var LeadRepository $campaignLeadRepository */
-        $campaignLeadRepository = $this->entityManager->getRepository(CampaignLead::class);
-
-        $leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
-        $campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
     private function addTimelineEvents(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
@@ -71,12 +63,9 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
-
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = 'campaign.event' !== $eventTypeKey;
-        $logs                      = $leadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
+        $logs                      = $this->leadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->eventCollector->getEventsArray();
 
         // Add total number to counter

@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactGroupPointsType extends AbstractType
+final class ContactGroupPointsType extends AbstractType
 {
     private const SCORE_FIELD_PREFIX = 'score_group_';
 

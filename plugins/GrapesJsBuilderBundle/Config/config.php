@@ -41,26 +41,7 @@ return [
     ],
     'menu'        => [],
     'services'    => [
-        'other'        => [
-            // Provides access to configured API keys, settings, field mapping, etc
-            'grapesjsbuilder.config' => [
-                'class'     => MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
-                'arguments' => [
-                    'mautic.integrations.helper',
-                ],
-            ],
-        ],
         'sync'         => [],
-        'helpers'      => [
-            'grapesjsbuilder.helper.filemanager' => [
-                'class'     => MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
-                'arguments' => [
-                    'mautic.helper.file_uploader',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
-            ],
-        ],
     ],
     'parameters' => [
         'image_path_exclude'     => ['flags', 'mejs'], // exclude certain folders from showing in the image browser

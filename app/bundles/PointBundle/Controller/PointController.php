@@ -10,12 +10,13 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PointController extends AbstractFormController
+final class PointController extends AbstractFormController
 {
     private PointModel $pointModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePointController(PointModel $pointModel): void
     {
         $this->pointModel = $pointModel;
@@ -330,8 +331,6 @@ class PointController extends AbstractFormController
     }
 
     /**
-     * Clone an entity.
-     *
      * @param int $objectId
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response

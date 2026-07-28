@@ -11,12 +11,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class DynamicContentApiController extends CommonController
 {
     private PageModel $pageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireDynamicContentApiController(PageModel $pageModel): void
     {
         $this->pageModel = $pageModel;

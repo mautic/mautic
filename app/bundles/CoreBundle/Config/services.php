@@ -42,6 +42,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
+    $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
+
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
         ->autowire()
@@ -65,6 +67,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
+    $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
+    $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 

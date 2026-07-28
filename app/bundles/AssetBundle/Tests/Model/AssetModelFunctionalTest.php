@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Model;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -47,7 +48,7 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $expectedUrl = 'https://localhost/asset/'.$slug.$expectedQuery;
 
         /** @var AssetModel $assetModel */
-        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
+        $assetModel = static::getContainer()->get(AssetModel::class);
         $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, $absolute, $clickthrough, $stream);
 
@@ -118,7 +119,7 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1:the-alias', $asset->getSlug());
 
         /** @var AssetModel $assetModel */
-        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
+        $assetModel = static::getContainer()->get(AssetModel::class);
         $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
@@ -126,7 +127,7 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
 
     public function testGetAssetListRespectsCanViewOthersOption(): void
     {
-        $currentUserId = static::getContainer()->get('mautic.helper.user')->getUser()->getId();
+        $currentUserId = static::getContainer()->get(UserHelper::class)->getUser()->getId();
         $dateFrom      = new \DateTime('-1 day', new \DateTimeZone('UTC'));
         $dateTo        = new \DateTime('+1 day', new \DateTimeZone('UTC'));
 
@@ -159,7 +160,7 @@ final class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var AssetModel $assetModel */
-        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
+        $assetModel = static::getContainer()->get(AssetModel::class);
         $this->assertInstanceOf(AssetModel::class, $assetModel);
 
         $ownOnlyList = $assetModel->getAssetList(10, $dateFrom, $dateTo, [], ['canViewOthers' => false]);

@@ -29,27 +29,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+final class ResultController extends CommonFormController
 {
-    private SubmissionModel $submissionModel;
-
-    private SubmissionResultLoader $submissionResultLoader;
-
-    private FormModel $formModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireResultController(
-        FormModel $formModel,
-        SubmissionResultLoader $submissionResultLoader,
-        SubmissionModel $submissionModel,
-    ): void {
-        $this->formModel = $formModel;
-        $this->submissionResultLoader = $submissionResultLoader;
-        $this->submissionModel = $submissionModel;
-    }
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private readonly FormModel $formModel,
+        private readonly SubmissionResultLoader $submissionResultLoader,
+        private readonly SubmissionModel $submissionModel,
+    ) {
         $this->setStandardParameters(
             'form.submission', // model name
             'form:forms', // permission base
@@ -61,7 +58,6 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -121,7 +117,6 @@ class ResultController extends CommonFormController
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
-        $model      = $this->getModel('form.submission');
 
         if ($request->query->has('result')) {
             // Force ID
@@ -130,7 +125,7 @@ class ResultController extends CommonFormController
         }
 
         // get the results
-        $entities = $model->getEntities(
+        $entities = $this->submissionModel->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,
@@ -245,7 +240,7 @@ class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 
@@ -333,10 +328,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var SubmissionModel $model */
-        $model = $this->getModel('form.submission');
-
-        return $model->exportResults($format, $form, $args);
+        return $this->submissionModel->exportResults($format, $form, $args);
     }
 
     /**
@@ -458,8 +450,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = $parameters['objectId'] ?? 0;
-            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
+            $objectId = (int) ($parameters['objectId'] ?? 0);
+            $formId   = $parameters['formId'] ?? $request->query->getInt('formId', $objectId);
         }
 
         return $formId;

@@ -22,20 +22,29 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends CommonFormController
+final class PublicController extends CommonFormController
 {
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private \Mautic\FormBundle\Entity\FieldRepository $fieldRepository;
+
     private SubmissionModel $submissionModel;
 
     private FormModel $formModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
         FormModel $formModel,
         SubmissionModel $submissionModel,
+        \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
+        $this->fieldRepository = $fieldRepository;
+        $this->companyRepository = $companyRepository;
     }
 
     private array $tokens = [];
@@ -135,8 +144,6 @@ class PublicController extends CommonFormController
             if (null === $form) {
                 $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
-                \assert($form instanceof Form);
-
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();
@@ -668,10 +675,10 @@ class PublicController extends CommonFormController
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
+        if (!$this->fieldRepository->fieldExistsByFormAndType($formId, 'companyLookup')) {
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
+        return new JsonResponse($this->companyRepository->getCompanyLookupData($search));
     }
 }

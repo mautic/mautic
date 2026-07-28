@@ -48,7 +48,7 @@ final class InsightControllerTest extends MauticMysqlTestCase
     public function testInsightDeleteAction(): void
     {
         /** @var InsightModel $insightModel */
-        $insightModel = self::getContainer()->get('mautic.point.model.insight');
+        $insightModel = self::getContainer()->get(InsightModel::class);
 
         $insight = $this->createTestInsight();
         $this->em->flush();
@@ -72,7 +72,7 @@ final class InsightControllerTest extends MauticMysqlTestCase
     public function testInsightCloneAction(): void
     {
         /** @var InsightModel $insightModel */
-        $insightModel = self::getContainer()->get('mautic.point.model.insight');
+        $insightModel = self::getContainer()->get(InsightModel::class);
 
         $insightRepo = $insightModel->getRepository();
 
@@ -94,7 +94,7 @@ final class InsightControllerTest extends MauticMysqlTestCase
     public function testInsightBatchDeleteAction(): void
     {
         /** @var InsightModel $insightModel */
-        $insightModel = self::getContainer()->get('mautic.point.model.insight');
+        $insightModel = self::getContainer()->get(InsightModel::class);
 
         $insightRepo = $insightModel->getRepository();
 

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class FormSubmitActionUserEmailType extends AbstractType
+final class FormSubmitActionUserEmailType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -39,9 +39,7 @@ class FormSubmitActionUserEmailType extends AbstractType
                 ],
                 'required'    => true,
                 'constraints' => new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ]
         );

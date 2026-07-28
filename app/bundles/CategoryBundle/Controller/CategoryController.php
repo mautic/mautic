@@ -5,6 +5,7 @@ namespace Mautic\CategoryBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -20,16 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class CategoryController extends AbstractFormController
+final class CategoryController extends AbstractFormController
 {
-    private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireCategoryController(\Mautic\CategoryBundle\Model\CategoryModel $categoryModel): void
-    {
-        $this->categoryModel = $categoryModel;
-    }
-
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
@@ -41,6 +34,7 @@ class CategoryController extends AbstractFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly CategoryModel $categoryModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -53,7 +47,7 @@ class CategoryController extends AbstractFormController
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
-                static::class.'::'.$objectAction.'Action',
+                self::class.'::'.$objectAction.'Action',
                 [
                     'bundle'      => $bundle,
                     'objectId'    => $objectId,
@@ -67,14 +61,18 @@ class CategoryController extends AbstractFormController
     }
 
     /**
-     * @param int $page
+     * @param string $bundle
+     * @param int    $page
      */
     public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
-        $search = $request->query->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $request->query->get('bundle', $session->get('mautic.category.type', $bundle));
+        $categoryFilter = (string) $session->get('mautic.category.filter', '');
+        $search = $request->query->get('search', $categoryFilter);
+
+        $categoryType = (string) $session->get('mautic.category.type', $bundle);
+        $bundle = $request->query->get('bundle', $categoryType);
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
@@ -167,10 +165,9 @@ class CategoryController extends AbstractFormController
 
         $categoryTypes = ['category' => $this->translator->trans('mautic.core.select')];
 
-        $dispatcher = $this->dispatcher;
-        if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
+        if ($this->dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryTypesEvent();
-            $dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
+            $this->dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
@@ -300,7 +297,7 @@ class CategoryController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): JsonResponse|Response
+    public function editAction(Request $request, ?string $bundle, $objectId, $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $entity    = $this->categoryModel->getEntity($objectId);
@@ -440,7 +437,7 @@ class CategoryController extends AbstractFormController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $bundle, $objectId)
+    public function deleteAction(Request $request, ?string $bundle, $objectId)
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -506,10 +503,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @param string $bundle
      */
-    public function batchDeleteAction(Request $request, $bundle): Response
+    public function batchDeleteAction(Request $request, ?string $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);

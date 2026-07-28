@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
@@ -15,22 +16,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class MonitoringController extends FormController
+final class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
+    private \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository;
+
+    private AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
-        \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        AuditLogModel $auditLogModel,
+        \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
+        $this->postCountRepository = $postCountRepository;
     }
 
     /**
@@ -399,9 +405,6 @@ class MonitoringController extends FormController
 
         $session = $request->getSession();
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepo */
-        $postCountRepo = $this->getModel('social.postcount')->getRepository();
-
         $security         = $this->security;
         $monitoringEntity = $this->monitoringModel->getEntity($objectId);
 
@@ -450,7 +453,7 @@ class MonitoringController extends FormController
         $dateTo          = new \DateTime($dateRangeForm['date_to']->getData());
 
         $chart     = new LineChart(null, $dateFrom, $dateTo);
-        $leadStats = $postCountRepo->getLeadStatsPost(
+        $leadStats = $this->postCountRepository->getLeadStatsPost(
             $dateFrom,
             $dateTo,
             ['monitor_id' => $monitoringEntity->getId()]

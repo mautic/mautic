@@ -5,18 +5,20 @@ namespace Mautic\StageBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\StageBundle\Form\Type\StageActionType;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
+    private StageModel $stageModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireStageAjaxController(
-        \Mautic\StageBundle\Model\StageModel $stageModel,
+        StageModel $stageModel,
     ): void {
         $this->stageModel = $stageModel;
     }

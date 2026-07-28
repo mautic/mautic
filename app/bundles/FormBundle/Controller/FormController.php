@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -47,10 +48,11 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
         private readonly FormModel $formModel,
-        private readonly \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel,
+        private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
+        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
     ) {
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -93,7 +95,7 @@ class FormController extends CommonFormController
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
-        $forms      = $this->getModel('form.form')->getEntities(
+        $forms      = $this->formModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -242,7 +244,7 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $this->submissionModel->getRepository()->getSubmissionCounts($activeForm);
+        $submissionCounts = $this->submissionRepository->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
             [
@@ -333,7 +335,7 @@ class FormController extends CommonFormController
                             // Save the form first and new actions so that new fields are available to actions.
                             // Using the repository function to not trigger the listeners twice.
 
-                            $this->formModel->getRepository()->saveEntity($entity);
+                            $this->formRepository->saveEntity($entity);
 
                             // Only save actions that are not to be deleted
                             $actions = array_diff_key($modifiedActions, array_flip($deletedActions));
@@ -594,7 +596,7 @@ class FormController extends CommonFormController
                         // save the form first so that new fields are available to actions
                         // use the repository method to not trigger listeners twice
                         try {
-                            $this->formModel->getRepository()->saveEntity($entity);
+                            $this->formRepository->saveEntity($entity);
 
                             if (count($actions)) {
                                 // Now set and persist the actions
