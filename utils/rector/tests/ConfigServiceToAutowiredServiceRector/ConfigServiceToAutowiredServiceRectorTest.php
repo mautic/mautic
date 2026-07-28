@@ -26,6 +26,24 @@ final class ConfigServiceToAutowiredServiceRectorTest extends AbstractLazyTestCa
      */
     private const AUTOWIRABLE_HELPER_CLASS = 'Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper';
 
+    private const CONFIG_WITH_PARAMETER_AWARE_SERVICE = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'others' => [
+            'mautic.some.parameter_aware_helper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ParameterAwareHelper::class,
+                'arguments' => [
+                    'translator',
+                    '%mautic.some_secret%',
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
     private const CONFIG_WITH_CLASS_ONLY_SERVICE = <<<'CODE_SAMPLE'
 <?php
 
@@ -259,9 +277,9 @@ CODE_SAMPLE;
         );
     }
 
-    public function testSkipServiceWithConstructorArgumentOutsideOfContainer(): void
+    public function testMovesServiceWithConstructorArgumentOutsideOfContainer(): void
     {
-        // the container fixture knows no service of the "Monolog\Logger" type
+        // the container fixture knows no service of the "Monolog\Logger" type, so the argument has to be kept
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
 
@@ -281,11 +299,155 @@ CODE_SAMPLE;
 
         $this->createFile('services.php', self::SERVICES_FILE);
 
+        $printedFileContent = $this->refactorConfigFile($configFileContent);
+        $this->assertIsString($printedFileContent);
+        $this->assertStringNotContainsString('mautic.some.logger_aware_helper', $printedFileContent);
+
+        $servicesFileContent = $this->readServicesFile();
+
+        $this->assertStringContainsString(
+            "->arg('\$logger', service('monolog.logger.mautic'));",
+            $servicesFileContent
+        );
+
+        $this->assertStringContainsString(
+            'use function Symfony\Component\DependencyInjection\Loader\Configurator\service;',
+            $servicesFileContent
+        );
+    }
+
+    public function testMovesServiceWithScalarConstructorArgument(): void
+    {
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $printedFileContent = $this->refactorConfigFile(self::CONFIG_WITH_PARAMETER_AWARE_SERVICE);
+        $this->assertIsString($printedFileContent);
+        $this->assertStringNotContainsString('mautic.some.parameter_aware_helper', $printedFileContent);
+
+        $servicesFileContent = $this->readServicesFile();
+
+        // the autowirable "translator" is dropped, the parameter is not
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.parameter_aware_helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ParameterAwareHelper::class)
+        ->arg('$secret', param('mautic.some_secret'));
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $servicesFileContent);
+
+        $this->assertStringContainsString(
+            'use function Symfony\Component\DependencyInjection\Loader\Configurator\param;',
+            $servicesFileContent
+        );
+    }
+
+    public function testMovesServiceWithClassConstantTag(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'fixtures' => [
+            'mautic.some.fixture' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'tag'   => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.fixture', ".self::AUTOWIRABLE_HELPER_CLASS.'::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);',
+            $this->readServicesFile()
+        );
+    }
+
+    public function testMovesServiceWithGroupDefaultTag(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'permissions' => [
+            'mautic.some.permissions' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // ServicePass tags the whole "permissions" group, the moved service has to keep that tag
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.permissions', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('mautic.permissions');",
+            $this->readServicesFile()
+        );
+    }
+
+    public function testKeepsFunctionImportsSorted(): void
+    {
+        $servicesFileContent = <<<'CODE_SAMPLE'
+<?php
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+return function (ContainerConfigurator $configurator): void {
+    $services = $configurator->services();
+
+    $services->load('SomeNamespace\\', '../');
+};
+CODE_SAMPLE;
+
+        $this->createFile('services.php', $servicesFileContent);
+
+        $this->assertIsString($this->refactorConfigFile(self::CONFIG_WITH_PARAMETER_AWARE_SERVICE));
+
+        $expectedImports = <<<'CODE_SAMPLE'
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedImports, $this->readServicesFile());
+    }
+
+    public function testSkipServiceWithExpressionConstructorArgument(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'others' => [
+            'mautic.some.logger_aware_helper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\LoggerAwareHelper::class,
+                'arguments' => [
+                    '@=service("mautic.some.factory").getLogger()',
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
         $this->assertNull($this->refactorConfigFile($configFileContent));
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
-    public function testSkipServiceWithScalarConstructorArgument(): void
+    public function testSkipServiceWithoutArgumentToWireBy(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
@@ -294,11 +456,7 @@ return [
     'services' => [
         'others' => [
             'mautic.some.parameter_aware_helper' => [
-                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ParameterAwareHelper::class,
-                'arguments' => [
-                    'translator',
-                    '%mautic.some_secret%',
-                ],
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ParameterAwareHelper::class,
             ],
         ],
     ],

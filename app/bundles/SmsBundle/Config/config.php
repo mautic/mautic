@@ -18,14 +18,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.sms.transport_chain' => [
-                'class'     => Mautic\SmsBundle\Sms\TransportChain::class,
-                'arguments' => [
-                    '%mautic.sms_transport%',
-                    'mautic.helper.integration',
-                    'monolog.logger.mautic',
-                ],
-            ],
             'mautic.sms.twilio.transport' => [
                 'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
                 'arguments'    => [

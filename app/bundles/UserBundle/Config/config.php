@@ -154,25 +154,6 @@ return [
                 ],
             ],
 
-            // SAML
-            'mautic.security.saml.credential_store' => [
-                'class'     => Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    '%mautic.saml_idp_entity_id%',
-                ],
-                'tag'       => 'lightsaml.own_credential_store',
-            ],
-
-            'mautic.security.saml.trust_store' => [
-                'class'     => Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    '%mautic.saml_idp_entity_id%',
-                ],
-                'tag'       => 'lightsaml.trust_options_store',
-            ],
-
             'mautic.security.saml.entity_descriptor_provider' => [
                 'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
                 'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
@@ -193,17 +174,6 @@ return [
                         'firstname' => '%mautic.saml_idp_firstname_attribute%',
                         'lastname'  => '%mautic.saml_idp_lastname_attribute%',
                     ],
-                ],
-            ],
-
-            'mautic.security.saml.user_creator' => [
-                'class'     => Mautic\UserBundle\Security\SAML\User\UserCreator::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.security.saml.username_mapper',
-                    'mautic.user.model.user',
-                    'security.password_hasher',
-                    '%mautic.saml_idp_default_role%',
                 ],
             ],
         ],

@@ -20,20 +20,4 @@ return [
             ],
         ],
     ],
-
-    'services' => [
-        'others' => [
-            'mautic.plugin.fullcontact.lookup_helper' => [
-                'class'     => MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.helper.user',
-                    'monolog.logger.mautic',
-                    'router',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                ],
-            ],
-        ],
-    ],
 ];

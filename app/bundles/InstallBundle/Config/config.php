@@ -47,20 +47,5 @@ return [
                 'arguments' => [],
             ],
         ],
-        'other' => [
-            'mautic.install.configurator.step.check' => [
-                'class'     => Mautic\InstallBundle\Configurator\Step\CheckStep::class,
-                'arguments' => [
-                    'mautic.configurator',
-                    '%kernel.project_dir%',
-                    'request_stack',
-                    'mautic.cipher.openssl',
-                ],
-                'tag'          => 'mautic.configurator.step',
-                'tagArguments' => [
-                    'priority' => 0,
-                ],
-            ],
-        ],
     ],
 ];
