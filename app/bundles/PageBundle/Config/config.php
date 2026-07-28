@@ -89,15 +89,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.page.segment_tracking_subscriber' => [
-                'class'     => Mautic\PageBundle\EventListener\SegmentTrackingSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.repository.lead_list',
-                ],
-            ],
-        ],
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
                 'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
@@ -113,21 +104,6 @@ return [
                 'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page'],
-            ],
-        ],
-        'other' => [
-            'mautic.page.helper.token' => [
-                'class'     => Mautic\PageBundle\Helper\TokenHelper::class,
-                'arguments' => 'mautic.page.model.page',
-            ],
-            'mautic.page.helper.tracking' => [
-                'class'     => Mautic\PageBundle\Helper\TrackingHelper::class,
-                'arguments' => [
-                    'mautic.tracker.contact',
-                    'mautic.cache.provider',
-                    'mautic.helper.core_parameters',
-                    'request_stack',
-                ],
             ],
         ],
     ],
