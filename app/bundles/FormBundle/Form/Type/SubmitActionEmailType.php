@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionEmailType extends AbstractType
+final class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
@@ -51,7 +51,7 @@ class SubmitActionEmailType extends AbstractType
             $message = '';
 
             foreach ($fields as $token => $label) {
-                $message .= "<strong>$label</strong>: $token<br />";
+                $message .= "<strong>{$label}</strong>: {$token}<br />";
             }
         } else {
             $message = $options['data']['message'];

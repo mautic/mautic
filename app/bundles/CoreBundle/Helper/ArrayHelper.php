@@ -78,7 +78,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            fn ($value): bool => !is_null($value) && '' !== $value
+            fn ($value): bool => null !== $value && '' !== $value
         );
     }
 

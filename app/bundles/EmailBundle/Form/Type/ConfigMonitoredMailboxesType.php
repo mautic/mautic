@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Email;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigMonitoredMailboxesType extends AbstractType
+final class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(
         private readonly Mailbox $imapHelper,
@@ -43,9 +43,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 ],
                 'constraints' => [
                     new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                        ]
+                        message: 'mautic.core.email.required'
                     ),
                 ],
                 'required' => false,

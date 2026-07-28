@@ -36,4 +36,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.integrations.helper.company_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class);
     $services->alias('mautic.integrations.sync.data_exchange.mautic.field_helper', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class);
     $services->alias('mautic.integrations.helper.sync_mapping', Mautic\IntegrationsBundle\Sync\Helper\MappingHelper::class);
+    $services->alias('mautic.integrations.helper', Mautic\IntegrationsBundle\Helper\IntegrationsHelper::class);
+    $services->alias('mautic.integrations.helper.auth_integrations', Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper::class);
+    $services->alias('mautic.integrations.helper.sync_integrations', Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper::class);
+    $services->alias('mautic.integrations.helper.config_integrations', Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class);
+    $services->alias('mautic.integrations.helper.builder_integrations', Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class);
+    $services->alias('mautic.integrations.sync.notification.handler_container', Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class);
 };

@@ -6,7 +6,7 @@ return [
             'mautic.helper.sms' => [
                 'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.lead',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',
@@ -25,9 +25,6 @@ return [
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
-            ],
-            'mautic.sms.callback_handler_container' => [
-                'class' => Mautic\SmsBundle\Callback\HandlerContainer::class,
             ],
             'mautic.sms.helper.contact' => [
                 'class'     => Mautic\SmsBundle\Helper\ContactHelper::class,

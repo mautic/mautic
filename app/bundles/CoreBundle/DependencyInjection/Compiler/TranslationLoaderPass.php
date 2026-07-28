@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Translation\TranslatorLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class TranslationLoaderPass implements CompilerPassInterface
+final class TranslationLoaderPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

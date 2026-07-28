@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class PathsHelper
@@ -133,7 +134,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }
@@ -206,7 +207,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 

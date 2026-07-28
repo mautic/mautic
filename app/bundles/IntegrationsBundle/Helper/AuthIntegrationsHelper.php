@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Helper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use Mautic\PluginBundle\Entity\Integration;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class AuthIntegrationsHelper
 {
@@ -15,12 +16,20 @@ class AuthIntegrationsHelper
      */
     private array $integrations = [];
 
+    /**
+     * @param iterable<AuthenticationInterface> $integrations
+     */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
+        #[AutowireIterator('mautic.authentication_integration')]
+        iterable $integrations = [],
     ) {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
     }
 
-    public function addIntegration(AuthenticationInterface $integration): void
+    private function addIntegration(AuthenticationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -31,7 +40,7 @@ class AuthIntegrationsHelper
     public function getIntegration(string $integration): AuthenticationInterface
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.authentication_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.authentication_integration");
         }
 
         // Ensure the configuration is hydrated

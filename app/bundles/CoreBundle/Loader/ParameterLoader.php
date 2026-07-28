@@ -204,7 +204,8 @@ class ParameterLoader
 
         if (Path::isBasePath($rootDir, $localConfigFile)) {
             return $rootDir;
-        } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
+        }
+        if (Path::isBasePath($projectDir, $localConfigFile)) {
             return $projectDir;
         }
 

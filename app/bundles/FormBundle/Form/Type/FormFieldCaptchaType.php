@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldCaptchaType extends AbstractType
+final class FormFieldCaptchaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

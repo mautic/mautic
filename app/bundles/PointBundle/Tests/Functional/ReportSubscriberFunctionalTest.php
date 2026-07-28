@@ -165,7 +165,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
     private function createTestContactWithGroupPoints(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');

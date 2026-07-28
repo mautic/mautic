@@ -7,14 +7,18 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
+use Twig\Extension\EscaperExtension;
+use Twig\Runtime\EscaperRuntime;
 
 final class PublicControllerTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testGenerateActionWithContactTokenInLinkUrl(): void
     {
         $linkUrl = 'https://{contactfield=site_url}/tour';
@@ -50,18 +54,18 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $content = $this->client->getResponse()->getContent();
 
         $redirects = $this->em->getRepository(Redirect::class)->findAll();
-        Assert::assertCount(1, $redirects);
+        $this->assertCount(1, $redirects);
 
         /** @var Redirect $redirect */
         $redirect = reset($redirects);
-        Assert::assertSame($linkUrl, $redirect->getUrl());
+        $this->assertSame($linkUrl, $redirect->getUrl());
 
         $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $twig = $this->getContainer()->get('twig');
-        if (!$twig->hasExtension(\Twig\Extension\EscaperExtension::class)) {
-            $twig->addExtension(new \Twig\Extension\EscaperExtension());
+        $twig = $this->getContainer()->get(Environment::class);
+        if (!$twig->hasExtension(EscaperExtension::class)) {
+            $twig->addExtension(new EscaperExtension());
         }
-        $url = $twig->getRuntime(\Twig\Runtime\EscaperRuntime::class)->escape($url, 'js');
-        Assert::assertStringContainsString($url, $content);
+        $url = $twig->getRuntime(EscaperRuntime::class)->escape($url, 'js');
+        $this->assertStringContainsString($url, (string) $content);
     }
 }

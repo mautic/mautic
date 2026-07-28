@@ -55,12 +55,11 @@ class EmailSendEvent extends CommonEvent
     private array $errors = [];
 
     /**
-     * @param array $args
-     * @param bool  $isDynamicContentParsing
+     * @param bool $isDynamicContentParsing
      */
     public function __construct(
         private readonly ?MailHelper $helper = null,
-        $args = [],
+        array $args = [],
         private $isDynamicContentParsing = false,
     ) {
         $this->content     = $args['content'] ?? '';
@@ -279,7 +278,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function shouldAppendClickthrough(): bool
     {
-        return !$this->isInternalSend() && null === $this->getEmail();
+        return !$this->internalSend && null === $this->getEmail();
     }
 
     /**

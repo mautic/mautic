@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
@@ -36,9 +36,9 @@ abstract class SocialIntegration extends AbstractIntegration
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RequestStack $requestStack,
-        Router $router,
+        RouterInterface $router,
         Translator $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
@@ -249,7 +249,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return array|mixed|null
      */
-    protected function getContactAccessToken(&$socialCache)
+    protected function getContactAccessToken(array &$socialCache)
     {
         if (!$this->requestStack->getCurrentRequest()->hasSession()) {
             return null;

@@ -33,18 +33,20 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         // Schedule the first campaign event.
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
         $output        = $commandTester->getDisplay();
-        self::assertStringContainsString('150 total events were executed', $output);
+        $this->assertStringContainsString('150 total events were executed', $output);
 
         // Force the campaign failure events manually
         // Reload campaign to get the event
         $campaign    = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(Campaign::class, $campaign);
         $events      = $campaign->getEvents();
         $failedEvent = $events->first();
 
         $unpublishEvent = new NotifyOfUnpublishEvent($failedEvent);
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = static::getContainer()->get('event_dispatcher');
+        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
         $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
+        $this->assertInstanceOf(Campaign::class, $campaign);
 
         // Check for notifications - use a more general query
         $notifications = $this->em->getRepository(Notification::class)
@@ -54,7 +56,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
                     'message' => "{$campaign->getName()} / Send email to user",
                 ]
             );
-        self::assertCount(1, $notifications);
+        $this->assertCount(1, $notifications);
 
         // Let's try dispatching the event again and verify that we have a second notification
         // (verifying that notifications aren't deduplicated)
@@ -68,7 +70,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
             ]);
 
         // There should be exactly two notifications created (no deduplication)
-        self::assertCount(2, $notifications);
+        $this->assertCount(2, $notifications);
     }
 
     /**
@@ -88,7 +90,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/contacts/batch/new', $contacts);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
-        self::assertCount(150, $contacts);
+        $this->assertCount(150, $contacts);
         self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
 
         return $contacts;

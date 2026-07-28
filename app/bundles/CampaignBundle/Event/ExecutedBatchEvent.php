@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class ExecutedBatchEvent extends AbstractLogCollectionEvent
+final class ExecutedBatchEvent extends AbstractLogCollectionEvent
 {
     /**
      * @return ArrayCollection

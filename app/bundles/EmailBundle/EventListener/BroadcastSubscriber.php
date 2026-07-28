@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -11,12 +11,13 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $model,
-        private readonly EntityManager $em,
-        private readonly TranslatorInterface $translator,
+        private EmailModel $model,
+        private EntityManagerInterface $em,
+        private TranslatorInterface $translator,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ) {
     }
 
@@ -34,7 +35,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         }
 
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $emails = $this->model->getRepository()->getPublishedBroadcastsIterable($event->getId());
+        $emails = $this->emailRepository->getPublishedBroadcastsIterable($event->getId());
 
         foreach ($emails as $email) {
             // Reset per-email variables from event defaults
@@ -113,7 +114,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
     {
         if (!$emailEntity->getVariantSentCount(true)) {
             $dateTimeHelper = new DateTimeHelper();
-            $this->model->getRepository()->resetVariants(
+            $this->emailRepository->resetVariants(
                 $emailEntity->getRelatedEntityIds(),
                 $dateTimeHelper->toUtcString()
             );

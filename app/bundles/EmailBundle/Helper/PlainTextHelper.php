@@ -258,7 +258,7 @@ class PlainTextHelper
         return $preview;
     }
 
-    protected function convert()
+    protected function convert(): void
     {
         $this->linkList = [];
 
@@ -281,12 +281,12 @@ class PlainTextHelper
     /**
      * @phpstan-impure
      */
-    protected function converter(&$text)
+    protected function converter(&$text): void
     {
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, $text);
-        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
+        $text = preg_replace_callback($this->callbackSearch, $this->pregCallback(...), $text);
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
@@ -352,14 +352,15 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         }   // link_method defaults to inline
 
         return $display.' ['.$url.']';
     }
 
-    protected function convertPre(&$text)
+    protected function convertPre(&$text): void
     {
         // get the content of PRE element
         while (preg_match('/<pre[^>]*>(.*)<\/pre>/ismU', $text, $matches)) {
@@ -368,7 +369,7 @@ class PlainTextHelper
             // Run our defined tags search-and-replace with callback
             $this->preContent = preg_replace_callback(
                 $this->callbackSearch,
-                [$this, 'pregCallback'],
+                $this->pregCallback(...),
                 $this->preContent
             );
 
@@ -381,7 +382,7 @@ class PlainTextHelper
             // replace the content (use callback because content can contain $0 variable)
             $text = preg_replace_callback(
                 '/<pre[^>]*>.*<\/pre>/ismU',
-                [$this, 'pregPreCallback'],
+                $this->pregPreCallback(...),
                 $text,
                 1
             );
@@ -396,7 +397,7 @@ class PlainTextHelper
      *
      * @param string $text HTML content
      */
-    protected function convertBlockquotes(&$text)
+    protected function convertBlockquotes(&$text): void
     {
         if (preg_match_all('/<\/*blockquote[^>]*>/i', $text, $matches, PREG_OFFSET_CAPTURE)) {
             $start  = 0;
@@ -454,7 +455,7 @@ class PlainTextHelper
      *
      * @return string
      */
-    protected function pregCallback($matches)
+    protected function pregCallback(array $matches)
     {
         switch (strtolower($matches[1])) {
             case 'b':
@@ -537,7 +538,7 @@ class PlainTextHelper
      * @param string     $breakline
      * @param bool|false $cut
      */
-    private function linewrap(string $text, $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, int $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TimelineController extends CommonController
+final class TimelineController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, int $page = 1)
+    public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -63,7 +63,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginIndexAction(Request $request, $integration, int $page = 1)
+    public function pluginIndexAction(Request $request, $integration, int $page = 1): Response
     {
         $limit = 25;
         $leads = $this->checkAllAccess('view', $limit);
@@ -125,7 +125,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1)
+    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             return $this->notFound();
@@ -187,7 +187,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): array|Response
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -223,7 +223,7 @@ class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];

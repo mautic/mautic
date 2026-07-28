@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @deprecated 2.13.0; to be removed in 3.0
  */
-class CampaignDecisionEvent extends Event
+final class CampaignDecisionEvent extends Event
 {
     protected $decisionTriggered = false;
 
@@ -65,7 +65,8 @@ class CampaignDecisionEvent extends Event
     {
         if ($type) {
             return (!empty($this->eventSettings[$eventType][$type])) ? $this->eventSettings[$eventType][$type] : false;
-        } elseif ($eventType) {
+        }
+        if ($eventType) {
             return (!empty($this->eventSettings[$eventType])) ? $this->eventSettings[$eventType] : false;
         }
 

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class UserCreator implements UserCreatorInterface
@@ -27,7 +27,7 @@ class UserCreator implements UserCreatorInterface
         private readonly EntityManagerInterface $entityManager,
         private readonly UserMapper $userMapper,
         private readonly UserModel $userModel,
-        private readonly UserPasswordHasher $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         $defaultRole,
     ) {
         $this->defaultRole   = (int) $defaultRole;
@@ -62,7 +62,7 @@ class UserCreator implements UserCreatorInterface
         foreach ($this->requiredFields as $field) {
             $getter = 'get'.ucfirst($field);
 
-            if (!$user->$getter()) {
+            if (!$user->{$getter}()) {
                 throw new BadCredentialsException('User does not include required fields.');
             }
         }

@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConstantContactType extends AbstractType
+final class ConstantContactType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,

@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\LeadBundle\Entity\Lead;
 
-final class FixtureHelper
+final readonly class FixtureHelper
 {
     public function __construct(
         private EntityManagerInterface $em,

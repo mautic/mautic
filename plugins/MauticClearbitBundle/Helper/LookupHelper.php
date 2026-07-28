@@ -1,34 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticClearbitBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class LookupHelper
 {
-    /**
-     * @var bool|ClearbitIntegration
-     */
-    protected $integration;
+    protected ?ClearbitIntegration $integration = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
+        IntegrationsHelper $integrationsHelper,
         protected UserHelper $userHelper,
-        protected Logger $logger,
+        protected LoggerInterface $logger,
         protected LeadModel $leadModel,
         protected CompanyModel $companyModel,
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
+        try {
+            /** @var ClearbitIntegration $integration */
+            $integration       = $integrationsHelper->getIntegration('Clearbit');
+            $this->integration = $integration;
+        } catch (IntegrationNotFoundException) {
+            $this->integration = null;
+        }
     }
 
     /**
@@ -149,12 +155,12 @@ class LookupHelper
      */
     protected function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
     {
-        if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->integration->getIntegrationConfiguration()->getApiKeys();
 
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }

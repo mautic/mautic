@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomButtonEvent extends AbstractCustomRequestEvent
+final class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
      * @var array
@@ -115,7 +115,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Generate a button ID that can be overridden by other plugins.
      */
-    protected function generateButtonKey($button): string
+    protected function generateButtonKey(array $button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {

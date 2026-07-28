@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 
 class DBALMocker
 {
@@ -33,7 +34,7 @@ class DBALMocker
     ];
 
     public function __construct(
-        protected \PHPUnit\Framework\TestCase $testCase,
+        protected TestCase $testCase,
     ) {
     }
 
@@ -238,7 +239,7 @@ class DBALMocker
 
             $mock->expects(new AnyInvokedCount())
                 ->method('executeQuery')
-                ->willReturnCallback([$this, 'getMockResultStatement']);
+                ->willReturnCallback($this->getMockResultStatement(...));
 
             $this->mockQueryBuilder = $mock;
         }

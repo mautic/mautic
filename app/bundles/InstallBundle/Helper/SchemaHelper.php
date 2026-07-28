@@ -9,7 +9,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Release\ThisRelease;
@@ -20,7 +20,7 @@ class SchemaHelper
     protected Connection $db;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -62,7 +62,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em): void
+    public function setEntityManager(EntityManagerInterface $em): void
     {
         $this->em = $em;
     }
@@ -206,7 +206,7 @@ class SchemaHelper
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
+    protected function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -300,7 +300,7 @@ class SchemaHelper
         return $sql;
     }
 
-    protected function dropExistingSchema($tables, $mauticTables): array
+    protected function dropExistingSchema($tables, array $mauticTables): array
     {
         $sql = [];
 

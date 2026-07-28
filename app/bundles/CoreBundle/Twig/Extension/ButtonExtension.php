@@ -21,7 +21,7 @@ class ButtonExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),
@@ -145,7 +145,7 @@ class ButtonExtension extends AbstractExtension
                             'confirm' => [
                                 'message' => $this->translator->trans(
                                     'mautic.'.$langVar.'.form.confirmdelete',
-                                    ['%name%' => $item->$nameGetter().' ('.$item->getId().')']
+                                    ['%name%' => $item->{$nameGetter}().' ('.$item->getId().')']
                                 ),
                                 'confirmAction' => $this->router->generate(
                                     $actionRoute,

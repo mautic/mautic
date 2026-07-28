@@ -7,10 +7,11 @@ use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FocusModel $model,
+        private FocusModel $model,
+        private readonly \MauticPlugin\MauticFocusBundle\Entity\FocusRepository $focusRepository,
     ) {
     }
 
@@ -28,7 +29,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $form   = $event->getForm();
         $formId = $form->deletedId;
-        $foci   = $this->model->getRepository()->findByForm($formId);
+        $foci   = $this->focusRepository->findByForm($formId);
 
         if (empty($foci)) {
             return;

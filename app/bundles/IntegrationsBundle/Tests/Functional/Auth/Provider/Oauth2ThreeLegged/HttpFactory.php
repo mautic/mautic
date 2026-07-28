@@ -22,7 +22,7 @@ class HttpFactory extends OriginalHttpFactory implements AuthProviderInterface
 {
     private ClientInterface $client;
 
-    public static function factory(MockHandler $handler): HttpFactory
+    public static function factory(MockHandler $handler): self
     {
         $client              = new Client(['handler' => HandlerStack::create($handler)]);
         $httpFactory         = new self();

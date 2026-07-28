@@ -11,7 +11,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
@@ -28,7 +30,6 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -56,13 +57,9 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setup(): void
     {
         parent::setUp();
-
-        $ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $auditLogModel          = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
-        $translator             = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($ipLookupHelper, $auditLogModel, $this->emailModel, $translator, $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($this->createStub(IpLookupHelper::class), $this->createStub(AuditLogModel::class), $this->emailModel, $this->createStub(TranslatorInterface::class), $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class), $this->createStub(EmailRepository::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -74,12 +71,12 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onEmailResend($event);
 
-        Assert::assertFalse($event->shouldTryAgain());
+        $this->assertFalse($event->shouldTryAgain());
     }
 
     public function testOnEmailResendWithNoStat(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -96,12 +93,12 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onEmailResend($event);
 
-        Assert::assertFalse($event->shouldTryAgain());
+        $this->assertFalse($event->shouldTryAgain());
     }
 
     public function testOnEmailResendWithNoRetry(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -121,8 +118,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onEmailResend($event);
 
-        Assert::assertSame(1, $stat->getRetryCount());
-        Assert::assertTrue($event->shouldTryAgain());
+        $this->assertSame(1, $stat->getRetryCount());
+        $this->assertTrue($event->shouldTryAgain());
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void
@@ -168,7 +165,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWith4Retry(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -193,8 +190,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber->onEmailResend($event);
 
-        Assert::assertSame(5, $stat->getRetryCount());
-        Assert::assertFalse($event->shouldTryAgain());
+        $this->assertSame(5, $stat->getRetryCount());
+        $this->assertFalse($event->shouldTryAgain());
     }
 
     public function testOnEmailSendAddPreheaderText(): void
@@ -270,23 +267,11 @@ CONTENT,
 
     private function runPreheaderEvent(string $html, callable $assert): void
     {
-        /** @var MockObject&FromEmailHelper $fromEmailHelper */
-        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
-
         /** @var MockObject&CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        /** @var MockObject&Mailbox $mailbox */
-        $mailbox = $this->createMock(Mailbox::class);
-
-        /** @var MockObject&RouterInterface $router */
-        $router = $this->createMock(RouterInterface::class);
-
-        /** @var MockObject&Environment $twig */
-        $twig = $this->createMock(Environment::class);
-
         $themeHelper = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $coreParametersHelper->method('get')
@@ -304,13 +289,13 @@ CONTENT,
         $requestStack = new RequestStack();
         $mailHelper   = new MailHelper(
             $mailer,
-            $fromEmailHelper,
+            $this->createStub(FromEmailHelper::class),
             $coreParametersHelper,
-            $mailbox,
+            $this->createStub(Mailbox::class),
             new NullLogger(),
             new MailHashHelper($coreParametersHelper),
-            $router,
-            $twig,
+            $this->createStub(RouterInterface::class),
+            $this->createStub(Environment::class),
             $themeHelper,
             $this->createStub(PathsHelper::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -321,6 +306,7 @@ CONTENT,
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
 
         $email = new Email();

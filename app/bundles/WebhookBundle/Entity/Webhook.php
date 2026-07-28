@@ -198,27 +198,21 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
@@ -534,7 +528,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -555,7 +549,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->markedUnhealthyAt;
     }
 
-    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): Webhook
+    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): self
     {
         $this->isChanged('markedUnhealthyAt', $markedUnhealthyAt);
         $this->markedUnhealthyAt = $markedUnhealthyAt;

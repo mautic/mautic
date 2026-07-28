@@ -40,9 +40,9 @@ final readonly class MenuHelper
             $name  = trim($name);
             $value = trim($value);
             if ($name === $value) {
-                $string .= " $name";
+                $string .= " {$name}";
             } else {
-                $string .= " $name=\"$value\"";
+                $string .= " {$name}=\"{$value}\"";
             }
         }
 
@@ -54,7 +54,7 @@ final readonly class MenuHelper
      *
      * @param array<string, mixed> $options
      */
-    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options): void
+    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, array $options): void
     {
         $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);

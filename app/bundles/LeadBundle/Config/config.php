@@ -351,13 +351,6 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.lead.export_scheduled_notification_subscriber' => [
-                'class'     => Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.notification',
-                    'translator',
-                ],
-            ],
             'mautic.lead.contact_scheduled_export.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ContactScheduledExportSubscriber::class,
                 'arguments' => [
@@ -554,6 +547,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
+                    'mautic.lead.repository.lead_list',
                 ],
             ],
             'mautic.lead.model.lead_segment_service' => [
@@ -848,7 +842,7 @@ return [
             'mautic.lead.fixture.contact' => [
                 'class'     => Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class,
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.helper.core_parameters'],
+                'arguments' => ['mautic.lead.repository.lead', 'mautic.lead.repository.company_lead'],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,
@@ -858,10 +852,12 @@ return [
             'mautic.lead.fixture.category' => [
                 'class'     => Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.category.repository.category'],
             ],
             'mautic.lead.fixture.categorizedleadlists' => [
                 'class'     => Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class,
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.lead.repository.lead_list', 'mautic.category.repository.category'],
             ],
             'mautic.lead.fixture.test.page_hit' => [
                 'class'    => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
@@ -922,6 +918,7 @@ return [
         'segment_rebuild_time_warning'                                                          => 30,
         'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,
+        'contact_export_notify_admins'                                                          => true,
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_export_limit'                                                                  => 0,

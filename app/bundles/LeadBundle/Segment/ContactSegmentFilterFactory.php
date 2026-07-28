@@ -8,7 +8,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterFactory
@@ -22,7 +22,7 @@ class ContactSegmentFilterFactory
 
     public function __construct(
         private readonly TableSchemaColumnsCache $schemaCache,
-        private readonly Container $container,
+        private readonly ContainerInterface $container,
         private readonly DecoratorFactory $decoratorFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -131,7 +131,7 @@ class ContactSegmentFilterFactory
                 }
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
-                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
                     $previousFilter = array_pop($arrStacks[$previousKey]);
                     array_push($shrinkedFilters, $previousFilter);
                 }

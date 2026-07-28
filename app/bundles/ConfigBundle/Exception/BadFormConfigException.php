@@ -2,6 +2,6 @@
 
 namespace Mautic\ConfigBundle\Exception;
 
-class BadFormConfigException extends \Exception
+final class BadFormConfigException extends \Exception
 {
 }

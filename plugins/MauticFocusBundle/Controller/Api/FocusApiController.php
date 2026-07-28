@@ -28,11 +28,8 @@ class FocusApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, FocusModel $focusModel)
     {
-        $focusModel = $modelFactory->getModel('focus');
-        \assert($focusModel instanceof FocusModel);
-
         $this->model           = $focusModel;
         $this->entityClass     = Focus::class;
         $this->entityNameOne   = 'focus';
@@ -51,7 +48,7 @@ class FocusApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function generateJsAction($id)
+    public function generateJsAction($id): Response
     {
         $focus = $this->model->getEntity($id);
         $view  = $this->view(['js' => $this->model->generateJavascript($focus)], Response::HTTP_OK);
