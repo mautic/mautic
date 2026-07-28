@@ -8,10 +8,10 @@ use MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Config $config,
+        private Config $config,
     ) {
     }
 

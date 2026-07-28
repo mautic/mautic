@@ -334,11 +334,11 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         // A segment with filters requires rebuild if it was changed since the last build date, or was never built
-        if (null === $this->getLastBuiltDate()) {
+        if (null === $this->lastBuiltDate) {
             return true;
         }
 
-        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp();
+        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->lastBuiltDate->getTimestamp();
     }
 
     public function hasFilterTypeOf(string $type): bool
@@ -378,7 +378,7 @@ class LeadList extends FormEntity implements UuidInterface
      */
     public function isGlobal()
     {
-        return $this->getIsGlobal();
+        return $this->isGlobal;
     }
 
     /**

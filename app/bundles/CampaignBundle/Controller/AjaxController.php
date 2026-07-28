@@ -35,6 +35,7 @@ final class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -101,7 +102,7 @@ final class AjaxController extends CommonAjaxController
                     ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
                 );
                 $log->setMetadata($metadata);
-                $this->eventLogModel->getRepository()->saveEntity($log);
+                $this->leadEventLogRepository->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }
@@ -119,7 +120,7 @@ final class AjaxController extends CommonAjaxController
         if ($contact) {
             if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
                 /** @var LeadEventLog $log */
-                $log = $this->eventLogModel->getRepository()
+                $log = $this->leadEventLogRepository
                                 ->findOneBy(
                                     [
                                         'lead'  => $contactId,

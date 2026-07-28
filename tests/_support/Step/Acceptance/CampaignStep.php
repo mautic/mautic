@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\ContactPage;
 
-class CampaignStep extends \AcceptanceTester
+final class CampaignStep extends \AcceptanceTester
 {
     private const MODAL_SELECTOR = '#MauticSharedModal';
 

@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
-use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,17 +22,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class CoreSubscriber implements EventSubscriberInterface
+final readonly class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly BundleHelper $bundleHelper,
-        private readonly MenuHelper $menuHelper,
-        private readonly UserHelper $userHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly AuthorizationCheckerInterface $securityContext,
-        private readonly UserModel $userModel,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly RequestStack $requestStack,
+        private BundleHelper $bundleHelper,
+        private MenuHelper $menuHelper,
+        private UserHelper $userHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuthorizationCheckerInterface $securityContext,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
+        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ) {
     }
 
@@ -67,7 +66,7 @@ class CoreSubscriber implements EventSubscriberInterface
             // mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
-                $this->userModel->getRepository()->setLastLogin($user);
+                $this->userRepository->setLastLogin($user);
 
                 // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
                 // firewall setting the known user

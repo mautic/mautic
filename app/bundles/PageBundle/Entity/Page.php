@@ -807,12 +807,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function hasDraft(): bool
     {
-        return null !== $this->getDraft();
+        return null !== $this->draft;
     }
 
     public function getDraftContent(): ?string
     {
-        return $this->hasDraft() ? $this->getDraft()->getHtml() : null;
+        return $this->hasDraft() ? $this->draft->getHtml() : null;
     }
 
     public function getDraft(): ?PageDraft

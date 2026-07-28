@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class FacebookType extends AbstractType
+final class FacebookType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

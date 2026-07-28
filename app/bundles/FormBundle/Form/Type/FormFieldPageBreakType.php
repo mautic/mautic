@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldPageBreakType extends AbstractType
+final class FormFieldPageBreakType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

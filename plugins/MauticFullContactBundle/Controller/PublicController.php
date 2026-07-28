@@ -18,6 +18,10 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
 {
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+
     private CompanyModel $companyModel;
 
     private LeadModel $leadModel;
@@ -32,11 +36,15 @@ final class PublicController extends FormController
         CompanyModel $companyModel,
         NotificationModel $notificationModel,
         UserModel $userModel,
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
+        $this->leadRepository = $leadRepository;
+        $this->companyRepository = $companyRepository;
     }
 
     /**
@@ -207,7 +215,7 @@ final class PublicController extends FormController
             $lead->setSocialCache($socialCache);
 
             $this->leadModel->setFieldValues($lead, $data);
-            $this->leadModel->getRepository()->saveEntity($lead);
+            $this->leadRepository->saveEntity($lead);
 
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 if ($user = $this->userModel->getEntity($notify)) {
@@ -361,7 +369,7 @@ final class PublicController extends FormController
             $company->setSocialCache($socialCache);
 
             $this->companyModel->setFieldValues($company, $data);
-            $this->companyModel->getRepository()->saveEntity($company);
+            $this->companyRepository->saveEntity($company);
 
             if ($notify) {
                 if ($user = $this->userModel->getEntity($notify)) {

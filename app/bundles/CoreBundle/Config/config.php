@@ -36,6 +36,14 @@ return [
                 'path'       => '/mtc.js',
                 'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
+            'mautic_essential_js' => [
+                'path'       => '/mautic-essential.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::essentialAction',
+            ],
+            'mautic_tracking_js' => [
+                'path'       => '/mautic-tracking.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::trackingAction',
+            ],
             'mautic_base_index' => [
                 'path'       => '/',
                 'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
@@ -303,7 +311,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
-                    'doctrine.orm.entity_manager',
+                    'mautic.core.repository.ip_address',
                     'mautic.helper.core_parameters',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
@@ -385,9 +393,6 @@ return [
                     'mautic.native.connector',
                     'mautic.helper.core_parameters',
                 ],
-            ],
-            'mautic.helper.update_checks' => [
-                'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
             ],
         ],
         'menus' => [
@@ -661,8 +666,8 @@ return [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
                     'mautic.http.client',
-                    '%kernel.cache_dir%',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -735,9 +740,6 @@ return [
             ],
 
             // Update steps
-            'mautic.update.step_provider' => [
-                'class' => Mautic\CoreBundle\Update\StepProvider::class,
-            ],
             'mautic.update.step.delete_cache' => [
                 'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
                 'arguments' => [
@@ -778,7 +780,7 @@ return [
                 'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
                 'arguments' => [
                     'translator',
-                    'service_container',
+                    'kernel',
                 ],
                 'tag' => 'mautic.update_step',
             ],

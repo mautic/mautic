@@ -12,6 +12,8 @@ use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerAc
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+use Utils\Rector\ConfigServiceToAutowiredServiceRector;
+use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -23,6 +25,8 @@ return RectorConfig::configure()
         deadCode: true,
         typeDeclarations: true,
         phpunitCodeQuality: true,
+        phpunitMockToStub: true,
+        phpunitNarrowAsserts: true,
     )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
@@ -59,8 +63,16 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
+
+        // DI
+        // ConfigServiceToAutowiredServiceRector::class,
+        // applied on:
+        // * email-bundle
+
+        // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
+    ->withComposerBased(phpunit: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
@@ -121,13 +133,6 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-
-        // will be fixed
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-
-        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
-        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

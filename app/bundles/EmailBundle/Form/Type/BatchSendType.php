@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class BatchSendType extends AbstractType
+final class BatchSendType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -546,12 +546,12 @@ class FieldModel extends FormModel
     {
         $forceFilter = [
             [
-                'column' => $this->getRepository()->getTableAlias().'.object',
+                'column' => $this->leadFieldRepository->getTableAlias().'.object',
                 'expr'   => 'like',
                 'value'  => 'lead',
             ],
             [
-                'column' => $this->getRepository()->getTableAlias().'.dateAdded',
+                'column' => $this->leadFieldRepository->getTableAlias().'.dateAdded',
                 'expr'   => 'isNotNull',
             ],
         ];
@@ -737,7 +737,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
+        $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         $count  = 1;
         $order  = $entity->getOrder();
         $id     = $entity->getId();
@@ -769,7 +769,7 @@ class FieldModel extends FormModel
      */
     public function reorderFieldsByList(array $list, $start = 1): void
     {
-        $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
+        $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
                 $order = ((int) array_search($field->getId(), $list) + $start);
@@ -1018,7 +1018,7 @@ class FieldModel extends FormModel
 
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
-        return $this->getRepository()->findOneByAlias($alias);
+        return $this->leadFieldRepository->findOneByAlias($alias);
     }
 
     /**
@@ -1067,7 +1067,7 @@ class FieldModel extends FormModel
         $originalAlias = $alias;
         $i             = 1;
 
-        while ($this->getRepository()->findOneByAlias($alias)) {
+        while ($this->leadFieldRepository->findOneByAlias($alias)) {
             $alias = $originalAlias.'_'.$i;
             ++$i;
         }

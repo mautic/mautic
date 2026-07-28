@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class GenericStageActionType extends AbstractType
+final class GenericStageActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

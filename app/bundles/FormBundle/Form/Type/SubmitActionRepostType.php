@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\Url;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionRepostType extends AbstractType
+final class SubmitActionRepostType extends AbstractType
 {
     use FormFieldTrait;
 

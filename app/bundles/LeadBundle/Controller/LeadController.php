@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -68,6 +69,14 @@ final class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private LeadRepository $leadRepository;
+
     private NoteModel $noteModel;
 
     private CampaignModel $campaignModel;
@@ -86,6 +95,10 @@ final class LeadController extends FormController
 
     private UserModel $userModel;
 
+    private DoNotContactRepository $doNotContactRepository;
+
+    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+
     #[Required]
     public function autowireLeadController(
         LeadModel $leadModel,
@@ -97,6 +110,12 @@ final class LeadController extends FormController
         NoteModel $noteModel,
         FieldModel $leadFieldModel,
         UserModel $userModel,
+        LeadRepository $leadRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        DoNotContactRepository $doNotContactRepository,
+        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -107,6 +126,12 @@ final class LeadController extends FormController
         $this->noteModel = $noteModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->userModel = $userModel;
+        $this->leadRepository = $leadRepository;
+        $this->companyRepository = $companyRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->userRepository = $userRepository;
+        $this->doNotContactRepository = $doNotContactRepository;
+        $this->emailRepository = $emailRepository;
     }
 
     /**
@@ -245,7 +270,7 @@ final class LeadController extends FormController
         }
 
         // Get the max ID of the latest lead added
-        $maxLeadId = $this->leadModel->getRepository()->getMaxLeadId();
+        $maxLeadId = $this->leadRepository->getMaxLeadId();
 
         \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
@@ -402,7 +427,7 @@ final class LeadController extends FormController
             );
         }
 
-        $this->leadModel->getRepository()->refetchEntity($lead);
+        $this->leadRepository->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -430,8 +455,8 @@ final class LeadController extends FormController
         $fields            = $lead->getFields();
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        $companiesRepo = $this->companyModel->getRepository();
-        $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
+
+        $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
             if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
@@ -447,13 +472,13 @@ final class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
+        $lists = $this->leadListRepository->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -557,11 +582,8 @@ final class LeadController extends FormController
                         $userHelper->getUser()->getName()
                     ));
 
-                    /** @var LeadRepository $contactRepository */
-                    $contactRepository = $this->doctrine->getManager()->getRepository(Lead::class);
-
                     // Save here as we need the entity with an ID for the company code bellow.
-                    $contactRepository->saveEntity($lead);
+                    $this->leadRepository->saveEntity($lead);
 
                     if (!empty($companies)) {
                         $this->leadModel->modifyCompanies($lead, $companies);
@@ -1429,7 +1451,7 @@ final class LeadController extends FormController
         $leadFields = $emailModel->enrichedContactWithCompanies($leadFields);
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'email');
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
@@ -1454,7 +1476,7 @@ final class LeadController extends FormController
 
                     // Set the email entity template so the email configuration like preheader would apply.
                     if ($email['templates']) {
-                        $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                        $emailEntity = $this->emailRepository->find($email['templates']);
                     }
 
                     // Overwrite the mailer with the values from the form.
@@ -1911,7 +1933,7 @@ final class LeadController extends FormController
                 ]
             );
         }
-        $users = $this->userModel->getRepository()->getUserList('', 0);
+        $users = $this->userRepository->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];

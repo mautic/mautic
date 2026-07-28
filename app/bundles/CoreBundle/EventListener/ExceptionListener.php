@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
@@ -29,9 +29,9 @@ class ExceptionListener extends ErrorListener
      * @param string|object|mixed[]|null $controller
      */
     public function __construct(
-        protected Router $router,
+        protected RouterInterface $router,
         string|object|array|null $controller,
-        ?LoggerInterface $logger = null,
+        LoggerInterface $logger,
     ) {
         parent::__construct($controller, $logger);
     }

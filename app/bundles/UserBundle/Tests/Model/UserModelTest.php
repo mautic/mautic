@@ -80,6 +80,9 @@ final class UserModelTest extends TestCase
      */
     private MockObject $userInviteRepository;
 
+    /**
+     * @var MockObject&UserRepository
+     */
     private MockObject $userRepository;
 
     protected function setUp(): void

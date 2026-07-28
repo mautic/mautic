@@ -11,11 +11,11 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly WebhookModel $webhookModel,
-        private readonly bool $includeDetails,
+        private WebhookModel $webhookModel,
+        private bool $includeDetails,
     ) {
     }
 

@@ -195,7 +195,7 @@ class Client extends BaseClient
      */
     public function isAuthorizedClient(User $user)
     {
-        $users = $this->getUsers();
+        $users = $this->users;
 
         return $users->contains($user);
     }

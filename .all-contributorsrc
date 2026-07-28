@@ -1769,6 +1769,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "israeldatascience",
+      "name": "Israel ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/123495355?v=4",
+      "profile": "https://github.com/israeldatascience",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

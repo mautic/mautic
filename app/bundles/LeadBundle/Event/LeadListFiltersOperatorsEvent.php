@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersOperatorsEvent extends CommonEvent
+final class LeadListFiltersOperatorsEvent extends CommonEvent
 {
     /**
      * @deprecated to be removed in Mautic 3

@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -92,7 +92,7 @@ class SubmissionModel extends CommonFormModel
         private readonly ContactTracker $contactTracker,
         private readonly ContactMerger $contactMerger,
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -411,11 +411,9 @@ class SubmissionModel extends CommonFormModel
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
-        $submissionRepository = $this->getRepository();
-
         // deleting form submission record in form results table
         try {
-            $submissionRepository->deleteFormResultsTableRecord($submission);
+            $this->submissionRepository->deleteFormResultsTableRecord($submission);
         } catch (\Exception $e) {
             $this->logger->error($e);
         }
@@ -431,11 +429,9 @@ class SubmissionModel extends CommonFormModel
     public function deleteEntities($ids): array
     {
         if (!empty($ids)) {
-            $submissionRepository = $this->getRepository();
-
             // deleting form submission record in form results table
             try {
-                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+                $this->submissionRepository->batchDeleteFormResultsTableRecord($ids);
             } catch (\Exception $e) {
                 $this->logger->error($e);
             }
@@ -451,7 +447,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->getRepository()->getEntities($args);
+        return $this->submissionRepository->getEntities($args);
     }
 
     /**
@@ -461,7 +457,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function getEntitiesByPage(array $args = []): array
     {
-        return $this->getRepository()->getEntitiesByPage($args);
+        return $this->submissionRepository->getEntitiesByPage($args);
     }
 
     /**

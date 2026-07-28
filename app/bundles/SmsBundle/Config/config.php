@@ -6,7 +6,7 @@ return [
             'mautic.helper.sms' => [
                 'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.lead',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',
@@ -26,31 +26,6 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.sms.callback_handler_container' => [
-                'class' => Mautic\SmsBundle\Callback\HandlerContainer::class,
-            ],
-            'mautic.sms.helper.contact' => [
-                'class'     => Mautic\SmsBundle\Helper\ContactHelper::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'doctrine.dbal.default_connection',
-                    'mautic.helper.phone_number',
-                ],
-            ],
-            'mautic.sms.helper.reply' => [
-                'class'     => Mautic\SmsBundle\Helper\ReplyHelper::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'monolog.logger.mautic',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.sms.twilio.configuration' => [
-                'class'        => Mautic\SmsBundle\Integration\Twilio\Configuration::class,
-                'arguments'    => [
-                    'mautic.helper.integration',
-                ],
-            ],
             'mautic.sms.twilio.transport' => [
                 'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
                 'arguments'    => [
@@ -64,53 +39,6 @@ return [
                 'serviceAliases' => [
                     'sms_api',
                     'mautic.sms.api',
-                ],
-            ],
-            'mautic.sms.twilio.callback' => [
-                'class'     => Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class,
-                'arguments' => [
-                    'mautic.sms.helper.contact',
-                    'mautic.sms.twilio.configuration',
-                ],
-                'tag'   => 'mautic.sms_callback_handler',
-            ],
-            'mautic.sms.broadcast.executioner' => [
-                'class'        => Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
-                'arguments'    => [
-                    'mautic.sms.model.sms',
-                    'mautic.sms.broadcast.query',
-                    'translator',
-                    'mautic.lead.repository.lead',
-                ],
-            ],
-            'mautic.sms.broadcast.query' => [
-                'class'        => Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
-                'arguments'    => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.sms.model.sms',
-                ],
-            ],
-        ],
-        'integrations' => [
-            'mautic.integration.twilio' => [
-                'class'     => Mautic\SmsBundle\Integration\TwilioIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                    'mautic.lead.field.fields_with_unique_identifier',
                 ],
             ],
         ],

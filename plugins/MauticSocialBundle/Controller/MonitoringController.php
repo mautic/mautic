@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
-use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,21 +22,21 @@ final class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
+    private \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository;
+
     private AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
-
-    private PostCountModel $postCountModel;
 
     #[Required]
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
         AuditLogModel $auditLogModel,
-        PostCountModel $postCountModel,
+        \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
-        $this->postCountModel = $postCountModel;
+        $this->postCountRepository = $postCountRepository;
     }
 
     /**
@@ -406,8 +405,6 @@ final class MonitoringController extends FormController
 
         $session = $request->getSession();
 
-        $postCountRepo = $this->postCountModel->getRepository();
-
         $security         = $this->security;
         $monitoringEntity = $this->monitoringModel->getEntity($objectId);
 
@@ -456,7 +453,7 @@ final class MonitoringController extends FormController
         $dateTo          = new \DateTime($dateRangeForm['date_to']->getData());
 
         $chart     = new LineChart(null, $dateFrom, $dateTo);
-        $leadStats = $postCountRepo->getLeadStatsPost(
+        $leadStats = $this->postCountRepository->getLeadStatsPost(
             $dateFrom,
             $dateTo,
             ['monitor_id' => $monitoringEntity->getId()]

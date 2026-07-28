@@ -16,14 +16,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class InjectCustomContentSubscriber implements EventSubscriberInterface
+final readonly class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
-        private readonly Environment $twig,
-        private readonly RequestStack $requestStack,
-        private readonly RouterInterface $router,
+        private Config $config,
+        private GrapesJsBuilderModel $grapesJsBuilderModel,
+        private Environment $twig,
+        private RequestStack $requestStack,
+        private RouterInterface $router,
+        private readonly \MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 
@@ -60,7 +61,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                 }
             }
 
-            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
+            $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
                 if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
                     $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(

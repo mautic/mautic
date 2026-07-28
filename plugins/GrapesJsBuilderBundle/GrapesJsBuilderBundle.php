@@ -6,6 +6,6 @@ namespace MauticPlugin\GrapesJsBuilderBundle;
 
 use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
 
-class GrapesJsBuilderBundle extends AbstractPluginBundle
+final class GrapesJsBuilderBundle extends AbstractPluginBundle
 {
 }

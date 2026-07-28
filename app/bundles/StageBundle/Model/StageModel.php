@@ -3,7 +3,7 @@
 namespace Mautic\StageBundle\Model;
 
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -37,7 +37,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     public function __construct(
         protected LeadModel $leadModel,
         UserHelper $userHelper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -208,6 +208,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         $user = (!$this->security->isGranted('stage:stages:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->getRepository()->getStages($user);
+        return $this->stageRepository->getStages($user);
     }
 }
