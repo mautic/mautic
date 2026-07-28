@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
@@ -49,14 +50,18 @@ final class AjaxController extends CommonAjaxController
 
     private LeadModel $leadModel;
 
+    private DoNotContactRepository $doNotContactRepository;
+
     #[Required]
     public function autowireLeadAjaxController(
         \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
         \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
         \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
+        DoNotContactRepository $doNotContactRepository,
     ): void {
         $this->leadModel = $leadModel;
+        $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
@@ -397,7 +402,7 @@ final class AjaxController extends CommonAjaxController
 
         if (!empty($dncId)) {
             /** @var DoNotContact $dnc */
-            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->findOneBy(
+            $dnc = $this->doNotContactRepository->findOneBy(
                 [
                     'id' => $dncId,
                 ]

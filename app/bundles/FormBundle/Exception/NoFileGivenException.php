@@ -2,6 +2,6 @@
 
 namespace Mautic\FormBundle\Exception;
 
-class NoFileGivenException extends \Exception
+final class NoFileGivenException extends \Exception
 {
 }

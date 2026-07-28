@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
+    private const HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
+
     private static string $timezone;
 
     protected function setUp(): void
@@ -166,7 +168,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
             function (LeadEventLog $eventLog): void {
                 $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($now->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -273,7 +275,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
             $adjustPointEvent,
             function (LeadEventLog $eventLog) use ($triggerHourDate): void {
                 Assert::assertTrue($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($triggerHourDate->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($triggerHourDate->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -306,7 +308,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
             function (LeadEventLog $eventLog): void {
                 $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($now->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 

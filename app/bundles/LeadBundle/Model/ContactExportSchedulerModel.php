@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -37,7 +37,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         private readonly LeadModel $leadModel,
         private readonly ExportHelper $exportHelper,
         private readonly MailHelper $mailHelper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -32,7 +32,7 @@ final class LeadType extends AbstractType
     public function __construct(
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }

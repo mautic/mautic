@@ -2,7 +2,7 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PreAuthorizationEventListener
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly UserRepository $userRepository,
         private readonly CorePermissions $mauticSecurity,
         private readonly TranslatorInterface $translator,
