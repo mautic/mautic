@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-class ExceptionController extends CommonController
+final class ExceptionController extends CommonController
 {
     public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, ?DebugLoggerInterface $logger = null): JsonResponse|Response
     {
@@ -77,7 +77,7 @@ class ExceptionController extends CommonController
         }
 
         $template   = "@MauticCore/{$layout}/{$code}.html.twig";
-        if (!$this->container->get('twig')->getLoader()->exists($template)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 

@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -83,8 +82,8 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $daysJson     = $crawler->filter('canvas')->text(null, false);
         $daysData     = json_decode(html_entity_decode($daysJson), true);
         $daysDatasets = $daysData['datasets'];
-        Assert::assertIsArray($daysDatasets);
-        Assert::assertCount(3, $daysDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
+        $this->assertIsArray($daysDatasets);
+        $this->assertCount(3, $daysDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
 
         $expectedDaysLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $expectedDaysData   = [
@@ -92,10 +91,10 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
             ['label' => 'Email read', 'data' => [0, 1, 1, 0, 0, 0, 0]],
             ['label' => 'Email clicked', 'data' => [0, 4, 1, 0, 0, 0, 0]],
         ];
-        Assert::assertEquals($expectedDaysLabels, $daysData['labels']);
+        $this->assertEquals($expectedDaysLabels, $daysData['labels']);
         foreach ($daysDatasets as $index => $dataset) {
-            Assert::assertEquals($expectedDaysData[$index]['label'], $dataset['label']);
-            Assert::assertEquals($expectedDaysData[$index]['data'], $dataset['data']);
+            $this->assertEquals($expectedDaysData[$index]['label'], $dataset['label']);
+            $this->assertEquals($expectedDaysData[$index]['data'], $dataset['data']);
         }
     }
 
@@ -112,12 +111,12 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $hoursData = json_decode(html_entity_decode($hourJson), true);
 
         $hoursDatasets = $hoursData['datasets'];
-        Assert::assertIsArray($hoursDatasets);
-        Assert::assertCount(3, $hoursDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
+        $this->assertIsArray($hoursDatasets);
+        $this->assertCount(3, $hoursDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
 
         // Get the time format from CoreParametersHelper
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $timeFormat           = $coreParametersHelper->get('date_format_timeonly');
 
         // Generate expected hour labels based on the actual time format
@@ -128,7 +127,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
             $expectedHoursLabels[] = $startTime->format($timeFormat).' - '.$endTime->format($timeFormat);
         }
 
-        Assert::assertEquals($expectedHoursLabels, $hoursData['labels']);
+        $this->assertEquals($expectedHoursLabels, $hoursData['labels']);
 
         $expectedHoursData = [
             ['label' => 'Email sent', 'data' => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
@@ -136,8 +135,8 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
             ['label' => 'Email clicked', 'data' => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]],
         ];
         foreach ($hoursDatasets as $index => $dataset) {
-            Assert::assertEquals($expectedHoursData[$index]['label'], $dataset['label']);
-            Assert::assertEquals($expectedHoursData[$index]['data'], $dataset['data']);
+            $this->assertEquals($expectedHoursData[$index]['label'], $dataset['label']);
+            $this->assertEquals($expectedHoursData[$index]['data'], $dataset['data']);
         }
     }
 
@@ -212,7 +211,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
-        Assert::assertStringContainsString('7 total events were executed', $commandResult->getDisplay());
+        $this->assertStringContainsString('7 total events were executed', $commandResult->getDisplay());
 
         // check condition event details after running the campaign
         $conditionEventDetails = $this->getEventDetails($conditionEvent->getId());
@@ -251,7 +250,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         // emulate email read and link click
         $emailStats = $this->em->getRepository(Stat::class)->findBy(['email' => $email]);
         $email      = $emailStats[0]->getEmail();
-        Assert::assertCount(3, $emailStats);
+        $this->assertCount(3, $emailStats);
         $this->emailFixturesHelper->emulateEmailRead($emailStats[0], $email);
         $this->emailFixturesHelper->emulateEmailRead($emailStats[1], $email);
         $this->em->flush();
@@ -288,7 +287,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
-        Assert::assertStringContainsString('1 total event was executed', $commandResult->getDisplay());
+        $this->assertStringContainsString('1 total event was executed', $commandResult->getDisplay());
 
         // check condition event details after second rotation for the lead
         $conditionEventDetails = $this->getEventDetails($conditionEvent->getId());

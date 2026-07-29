@@ -209,13 +209,13 @@ class ReportDataResult
 
                 return $sum;
             case 'MAX':
-                if (!is_null($previousVal)) {
+                if (null !== $previousVal) {
                     $aggregatorVal[] = $previousVal;
                 }
 
                 return max($aggregatorVal);
             case 'MIN':
-                if (!is_null($previousVal)) {
+                if (null !== $previousVal) {
                     $aggregatorVal[] = $previousVal;
                 }
 
@@ -236,7 +236,7 @@ class ReportDataResult
             foreach ($aggregators as $j => $v) {
                 $aggregatorVal = array_column($this->data, $j);
 
-                if ($aggregatorVal) {
+                if ([] !== $aggregatorVal) {
                     $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
                     $this->totals[$j] = $this->calcTotal($calcFunc, $dataCount, $aggregatorVal, $this->totals[$j] ?? null);
                 }

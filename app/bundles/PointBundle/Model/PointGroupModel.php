@@ -13,19 +13,28 @@ use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
 use Mautic\PointBundle\PointGroupEvents;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Group>
  */
 class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private GroupRepository $groupRepository;
+
+    #[Required]
+    public function autowirePointGroupModel(GroupRepository $groupRepository): void
+    {
+        $this->groupRepository = $groupRepository;
+    }
+
     public function getRepository(): GroupRepository
     {
-        return $this->em->getRepository(Group::class);
+        return $this->groupRepository;
     }
 
     public function getPermissionBase(): string
@@ -35,7 +44,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * @param object               $entity
-     * @param FormFactory          $formFactory
+     * @param FormFactoryInterface $formFactory
      * @param string|null          $action
      * @param array<string,string> $options
      *

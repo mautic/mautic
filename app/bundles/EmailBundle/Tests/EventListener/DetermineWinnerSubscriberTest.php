@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber;
-use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,9 +15,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&EntityManagerInterface
+     * @var MockObject&StatRepository
      */
-    private MockObject $em;
+    private MockObject $statRepository;
+
+    /**
+     * @var MockObject&HitRepository
+     */
+    private MockObject $hitRepository;
 
     /**
      * @var MockObject&TranslatorInterface
@@ -33,16 +35,16 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->em         = $this->createMock(EntityManagerInterface::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
+        $this->statRepository = $this->createMock(StatRepository::class);
+        $this->hitRepository  = $this->createMock(HitRepository::class);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->subscriber     = new DetermineWinnerSubscriber($this->statRepository, $this->hitRepository, $this->translator);
     }
 
     public function testOnDetermineOpenRateWinner(): void
     {
         $parentMock = $this->createMock(Email::class);
         $children   = [2 => $this->createStub(Email::class)];
-        $repoMock   = $this->createMock(StatRepository::class);
         $ids        = [1, 2];
         $parameters = ['parent' => $parentMock, 'children' => $children];
         $event      = new DetermineWinnerEvent($parameters);
@@ -66,15 +68,11 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ['mautic.email.abtest.label.sent', [], null, null, 'sent'],
         ]);
 
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repoMock);
-
         $parentMock->expects($this->once())
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
@@ -82,7 +80,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $repoMock->expects($this->once())
+        $this->statRepository->expects($this->once())
             ->method('getOpenedRates')
             ->with($ids, $startDate)
             ->willReturn($openedRates);
@@ -104,8 +102,6 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $parentMock    = $this->createMock(Email::class);
         $children      = [2 => $this->createStub(Email::class)];
-        $pageRepoMock  = $this->createMock(HitRepository::class);
-        $emailRepoMock = $this->createMock(StatRepository::class);
         $ids           = [1, 2];
         $parameters    = ['parent' => $parentMock, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
@@ -128,26 +124,11 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $matcher = $this->exactly(2);
-
-        $this->em->expects($matcher)->method('getRepository')->willReturnCallback(function (...$parameters) use ($matcher, $pageRepoMock, $emailRepoMock) {
-            if (1 === $matcher->numberOfInvocations()) {
-                $this->assertSame(Hit::class, $parameters[0]);
-
-                return $pageRepoMock;
-            }
-            if (2 === $matcher->numberOfInvocations()) {
-                $this->assertSame(Stat::class, $parameters[0]);
-
-                return $emailRepoMock;
-            }
-        });
-
         $parentMock->expects($this->once())
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
@@ -155,12 +136,12 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $pageRepoMock->expects($this->once())
+        $this->hitRepository->expects($this->once())
             ->method('getEmailClickthroughHitCount')
             ->with($ids, $startDate)
             ->willReturn($clickthroughCounts);
 
-        $emailRepoMock->expects($this->once())
+        $this->statRepository->expects($this->once())
             ->method('getSentCounts')
             ->with($ids, $startDate)
             ->willReturn($sentCounts);

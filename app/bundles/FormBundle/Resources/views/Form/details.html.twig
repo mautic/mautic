@@ -171,7 +171,8 @@
                                 'title': 'mautic.form.stats.submission_counts.unique',
                                 'value': submissionCounts['unique'],
                                 'tooltip': 'mautic.form.stats.submission_counts.unique.desc',
-                                'icon': 'ri-user-6-line'
+                                'icon': 'ri-user-6-line',
+                                'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.form'|trans) ~ ':' ~ activeForm.alias}),
                             }
                         ]}) }}
                         <div class="panel">
@@ -415,21 +416,25 @@
         <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
         {{ include('@MauticCore/Components/code-snippet.html.twig', {
             'variant': 'multi',
-            'innerText': formScript
+            'innerText': formScript,
+            'className': 'code-snippet--scrollable'
         }) }}
 
         <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
         {{ include('@MauticCore/Components/code-snippet.html.twig', {
             'variant': 'multi',
-            'innerText': formContent
+            'innerText': formContent,
+            'className': 'code-snippet--scrollable'
         }) }}
     {% endset %}
 
     {{ include('@MauticCore/Components/modal.html.twig', {
         id: 'modal-manual-copy',
+        size: 'lg',
         modalLabel: 'mautic.form.form.header.copy',
         modalHeading: 'mautic.form.form.header.selfhosted',
         modalContent: manualCopyModalContent,
+        hasScrollingContent: true,
         buttons: [
             {
                 label: 'mautic.core.close'|trans,

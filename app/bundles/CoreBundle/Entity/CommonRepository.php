@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CommonRepository extends ServiceEntityRepository
 {
     /**
-     * @phpstan-param class-string<T>|null $entityFQCN
+     * @param class-string<T>|null $entityFQCN
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
@@ -158,7 +158,7 @@ class CommonRepository extends ServiceEntityRepository
 
                 $method = 'set'.ucfirst($property);
                 if (method_exists($entity, $method)) {
-                    $entity->$method($v);
+                    $entity->{$method}($v);
                 }
 
                 unset($data[$dbCol]);
@@ -889,7 +889,7 @@ class CommonRepository extends ServiceEntityRepository
             $idGetter  = "get{$idCol}";
             $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
             $columns[] = $column;
-            $values[]  = $assocEntity->$idGetter();
+            $values[]  = $assocEntity->{$idGetter}();
             $types[]   = Types::STRING;
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
@@ -1071,11 +1071,11 @@ class CommonRepository extends ServiceEntityRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
             $expr->add(
-                $q->expr()->$exprFunc($column, ":{$unique}")
+                $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
         }
 
@@ -1138,10 +1138,10 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->$exprFunc($col, ":{$unique}")
+                $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
         }
 
@@ -1301,7 +1301,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
 
                 $joinType = ($hasNullable) ? 'leftJoin' : 'join';
-                $q->$joinType($alias, $targetTable, $property, implode(' AND ', $joinColumns));
+                $q->{$joinType}($alias, $targetTable, $property, implode(' AND ', $joinColumns));
                 $joinAdded = true;
             }
         }
@@ -1428,7 +1428,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
             }
 
-            if ($partials) {
+            if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {
@@ -1620,12 +1620,12 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->or(
+                                $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
                             } else {
-                                $whereClause = $query->expr()->and(
+                                $whereClause = $query->expr()->andX(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );
@@ -1749,29 +1749,49 @@ class CommonRepository extends ServiceEntityRepository
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
-            if (isset($f->children)) {
-                [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
-            } else {
-                if (!empty($f->command)) {
-                    if ($this->isSupportedSearchCommand($f->command, $f->string)) {
-                        [$expr, $params] = $this->addSearchCommandWhereClause($qb, $f);
-                    } else {
-                        // treat the command:string as if its a single word
-                        $f->string       = $f->command.':'.$f->string;
-                        $f->not          = false;
-                        $f->strict       = true;
-                        [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
-                    }
-                } elseif ($f->string) {
-                    [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
-                }
-            }
+            [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
+
             if (!empty($params)) {
                 $parameters = array_merge($parameters, $params);
             }
 
             $this->appendExpression($expressions, $expr);
         }
+    }
+
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     *
+     * @return array{0: mixed, 1: array<mixed>}
+     */
+    private function getSearchFilterExpression($qb, \stdClass $filter): array
+    {
+        if ($filter->missingValue ?? false) {
+            return [$qb->expr()->eq(1, 0), []];
+        }
+
+        if (isset($filter->children)) {
+            return $this->addAdvancedSearchWhereClause($qb, $filter);
+        }
+
+        if (!empty($filter->command)) {
+            if ($this->isSupportedSearchCommand($filter->command, $filter->string)) {
+                return $this->addSearchCommandWhereClause($qb, $filter);
+            }
+
+            // treat the command:string as if its a single word
+            $filter->string = $filter->command.':'.$filter->string;
+            $filter->not    = false;
+            $filter->strict = true;
+
+            return $this->addCatchAllWhereClause($qb, $filter);
+        }
+
+        if ($filter->string) {
+            return $this->addCatchAllWhereClause($qb, $filter);
+        }
+
+        return [null, []];
     }
 
     /**

@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 
 class InputExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('inputUrl', InputHelper::url(...)),

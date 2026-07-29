@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Unit\Validator\Constraints;
 
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNesting;
 use Mautic\DynamicContentBundle\Validator\Constraints\NoNestingValidator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
@@ -52,26 +51,25 @@ final class NoNestingValidatorTest extends TestCase
     public function testValidateWithNull(): void
     {
         $this->validator->validate(null, $this->constraint);
-        Assert::assertCount(0, $this->context->getViolations(), 'No violation should be added for a null value.');
+        $this->assertCount(0, $this->context->getViolations(), 'No violation should be added for a null value.');
     }
 
     public function testValidateWithValidValue(): void
     {
         $this->validator->validate('Some valid value', $this->constraint);
-        Assert::assertCount(0, $this->context->getViolations(), 'No violation should be added for a valid value.');
+        $this->assertCount(0, $this->context->getViolations(), 'No violation should be added for a valid value.');
     }
 
     public function testValidateWithInvalidValue(): void
     {
         $this->validator->validate('Some invalid value {dwc=some}', $this->constraint);
-        Assert::assertCount(1, $this->context->getViolations(), 'There should be one violation for an invalid value.');
-        Assert::assertSame(self::TRANSLATED_MESSAGE, $this->context->getViolations()->get(0)->getMessage());
+        $this->assertCount(1, $this->context->getViolations(), 'There should be one violation for an invalid value.');
+        $this->assertSame(self::TRANSLATED_MESSAGE, $this->context->getViolations()->get(0)->getMessage());
     }
 
     private function createContext(): ExecutionContextInterface
     {
         $locale     = 'en_US';
-        $validator  = $this->createMock(ValidatorInterface::class);
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
 
@@ -79,6 +77,6 @@ final class NoNestingValidatorTest extends TestCase
             'mautic.dynamicContent.no_nesting' => self::TRANSLATED_MESSAGE,
         ], $locale, 'validators');
 
-        return new ExecutionContext($validator, null, $translator, 'validators');
+        return new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator, 'validators');
     }
 }

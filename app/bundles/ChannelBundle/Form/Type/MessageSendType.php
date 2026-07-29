@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class MessageSendType extends AbstractType
+final class MessageSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router,
@@ -33,7 +33,7 @@ class MessageSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.channel.choosemessage.notblank']
+                        message: 'mautic.channel.choosemessage.notblank'
                     ),
                 ],
             ]

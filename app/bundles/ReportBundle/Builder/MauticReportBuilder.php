@@ -359,7 +359,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
 
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
-                    if ($andGroup) {
+                    if ([] !== $andGroup) {
                         $orGroups[] = CompositeExpression::and(...$andGroup);
                         $andGroup   = [];
                     }
@@ -400,7 +400,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                            $queryBuilder->expr()->{$exprFunction}($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
                         $andGroup[] = $expression;
@@ -467,9 +467,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        if ($orGroups) {
+        if ([] !== $orGroups) {
             // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
-            if ($andGroup) {
+            if ([] !== $andGroup) {
                 $orGroups[] = CompositeExpression::and(...$andGroup);
             }
 
@@ -478,7 +478,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             } else {
                 $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
             }
-        } elseif ($andGroup) {
+        } elseif ([] !== $andGroup) {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
     }

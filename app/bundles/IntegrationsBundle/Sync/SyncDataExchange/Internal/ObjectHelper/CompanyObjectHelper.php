@@ -94,7 +94,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     {
         $updatedMappedObjects = [];
 
-        if (!$ids) {
+        if ([] === $ids) {
             return $updatedMappedObjects;
         }
 

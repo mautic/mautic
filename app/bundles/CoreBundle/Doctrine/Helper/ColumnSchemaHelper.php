@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -14,9 +15,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 class ColumnSchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    protected AbstractSchemaManager $sm;
 
     /**
      * @var string
@@ -67,11 +68,9 @@ class ColumnSchemaHelper
     }
 
     /**
-     * Get the SchemaManager.
-     *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
+    public function getSchemaManager(): AbstractSchemaManager
     {
         return $this->sm;
     }
@@ -155,7 +154,7 @@ class ColumnSchemaHelper
      * @throws SchemaException
      * @throws \OutOfRangeException
      */
-    public function updateColumnLength(string $column, ?int $length): ColumnSchemaHelper
+    public function updateColumnLength(string $column, ?int $length): self
     {
         if (empty($column)) {
             throw new SchemaException('The column name is should not be empty/missing.');

@@ -36,6 +36,14 @@ return [
                 'path'       => '/mtc.js',
                 'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
+            'mautic_essential_js' => [
+                'path'       => '/mautic-essential.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::essentialAction',
+            ],
+            'mautic_tracking_js' => [
+                'path'       => '/mautic-tracking.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::trackingAction',
+            ],
             'mautic_base_index' => [
                 'path'       => '/',
                 'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
@@ -303,7 +311,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
-                    'doctrine.orm.entity_manager',
+                    'mautic.core.repository.ip_address',
                     'mautic.helper.core_parameters',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
@@ -327,35 +335,6 @@ return [
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
-                ],
-            ],
-            'mautic.helper.phone_number' => [
-                'class' => Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
-            ],
-            'mautic.helper.input_helper' => [
-                'class' => Mautic\CoreBundle\Helper\InputHelper::class,
-            ],
-            'mautic.helper.file_uploader' => [
-                'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
-                'arguments' => [
-                    'mautic.helper.file_path_resolver',
-                    'translator',
-                ],
-            ],
-            'mautic.helper.file_path_resolver' => [
-                'class'     => Mautic\CoreBundle\Helper\FilePathResolver::class,
-                'arguments' => [
-                    'symfony.filesystem',
-                    'mautic.helper.input_helper',
-                ],
-            ],
-            'mautic.helper.file_properties' => [
-                'class' => Mautic\CoreBundle\Helper\FileProperties::class,
-            ],
-            'mautic.helper.trailing_slash' => [
-                'class'     => Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.token_builder' => [
@@ -385,9 +364,6 @@ return [
                     'mautic.native.connector',
                     'mautic.helper.core_parameters',
                 ],
-            ],
-            'mautic.helper.update_checks' => [
-                'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
             ],
         ],
         'menus' => [
@@ -420,16 +396,6 @@ return [
                 'arguments' => [
                     '%kernel.environment%',
                 ],
-            ],
-            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
-            'symfony.filesystem' => [
-                'class' => Symfony\Component\Filesystem\Filesystem::class,
-            ],
-            'mautic.filesystem' => [
-                'class' => Mautic\CoreBundle\Helper\Filesystem::class,
-            ],
-            'symfony.finder' => [
-                'class' => Symfony\Component\Finder\Finder::class,
             ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
@@ -606,9 +572,6 @@ return [
                     'mautic.cipher.openssl',
                 ],
             ],
-            'mautic.helper.url' => [
-                'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
-            ],
             'mautic.helper.composer' => [
                 'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
                 'arguments' => [
@@ -625,12 +588,6 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
-            ],
-            'mautic.helper.hash' => [
-                'class' => Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
-            ],
-            'mautic.helper.random' => [
-                'class' => Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.helper.command' => [
                 'class'     => Mautic\CoreBundle\Helper\CommandHelper::class,
@@ -661,8 +618,8 @@ return [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
                     'mautic.http.client',
-                    '%kernel.cache_dir%',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -735,9 +692,6 @@ return [
             ],
 
             // Update steps
-            'mautic.update.step_provider' => [
-                'class' => Mautic\CoreBundle\Update\StepProvider::class,
-            ],
             'mautic.update.step.delete_cache' => [
                 'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
                 'arguments' => [
@@ -778,7 +732,7 @@ return [
                 'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
                 'arguments' => [
                     'translator',
-                    'service_container',
+                    'kernel',
                 ],
                 'tag' => 'mautic.update_step',
             ],
@@ -809,14 +763,6 @@ return [
                     'doctrine.orm.default_entity_manager',
                 ],
                 'tag' => 'mautic.update_check',
-            ],
-        ],
-        'validator' => [
-            'mautic.core.validator.file_upload' => [
-                'class'     => Mautic\CoreBundle\Validator\FileUploadValidator::class,
-                'arguments' => [
-                    'translator',
-                ],
             ],
         ],
     ],

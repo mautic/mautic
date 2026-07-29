@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -17,12 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private readonly MonitoringModel $monitoringModel,
+        private readonly \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
@@ -79,13 +78,11 @@ class MauticSocialMonitoringCommand extends Command
             'limit' => 100,
         ];
 
-        $repository = $this->monitoringModel->getRepository();
-
         if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
-                        'column' => $repository->getTableAlias().'.id',
+                        'column' => $this->monitoringRepository->getTableAlias().'.id',
                         'expr'   => 'eq',
                         'value'  => (int) $id,
                     ],
@@ -93,7 +90,7 @@ class MauticSocialMonitoringCommand extends Command
             ];
         }
 
-        return $repository->getPublishedEntities($filter);
+        return $this->monitoringRepository->getPublishedEntities($filter);
     }
 
     /**

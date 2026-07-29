@@ -14,30 +14,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 #[AsCommand(
     name: 'mautic:theme:json-config',
-    description: 'Converts theme config to JSON from PHP'
-)]
-class ConvertConfigCommand extends Command
-{
-    public function __construct(
-        private readonly PathsHelper $pathsHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setDefinition([
-                new InputOption(
-                    'theme', null, InputOption::VALUE_REQUIRED,
-                    'The name of the theme whose config you are converting.'
-                ),
-                new InputOption(
-                    'save-php-config', null, InputOption::VALUE_NONE,
-                    'When used, the theme\'s PHP config file will be saved.'
-                ),
-            ])
-            ->setHelp(<<<'EOT'
+    description: 'Converts theme config to JSON from PHP',
+    help: <<<'TXT'
 The <info>%command.name%</info> command converts a PHP theme config file to JSON.
 
 <info>php %command.full_name%</info>
@@ -49,8 +27,29 @@ You must specify the name of the theme via the --theme parameter:
 You may opt to save the PHP config file by using the --save-php-config option.
 
 <info>php %command.full_name% --save-php-config</info>
-EOT
-            );
+TXT
+)]
+class ConvertConfigCommand extends Command
+{
+    public function __construct(
+        private readonly PathsHelper $pathsHelper,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDefinition([
+                new InputOption(
+                    'theme', null, InputOption::VALUE_REQUIRED,
+                    'The name of the theme whose config you are converting.'
+                ),
+                new InputOption(
+                    'save-php-config', null, InputOption::VALUE_NONE,
+                    'When used, the theme\'s PHP config file will be saved.'
+                ),
+            ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

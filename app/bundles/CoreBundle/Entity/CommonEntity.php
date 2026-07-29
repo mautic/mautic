@@ -63,7 +63,7 @@ class CommonEntity implements \Stringable
     protected function isChanged($prop, $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;

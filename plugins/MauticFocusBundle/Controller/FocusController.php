@@ -24,11 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FocusController extends AbstractStandardFormController
+final class FocusController extends AbstractStandardFormController
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
@@ -42,6 +39,8 @@ class FocusController extends AbstractStandardFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly FocusModel $focusModel,
+        private readonly TrackableModel $trackableModel,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -79,10 +78,8 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
@@ -168,10 +165,7 @@ class FocusController extends AbstractStandardFormController
             } else {
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
-
-                /** @var FocusModel $model */
-                $model = $this->getModel('focus');
-                $stats = $model->getStats(
+                $stats = $this->focusModel->getStats(
                     $item,
                     null,
                     $statsDateFrom,
@@ -179,9 +173,7 @@ class FocusController extends AbstractStandardFormController
                 );
 
                 if ('link' === $item->getType()) {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                    $trackables = $this->trackableModel->getTrackableList('focus', $item->getId());
 
                     $cacheItem->set([$stats, $trackables]);
                     $cacheItem->expiresAfter($cacheTimeout * 60);
@@ -232,10 +224,7 @@ class FocusController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return array
-     */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         $focus        = $this->getCurrentRequest()->request->all()['focus'] ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
@@ -262,7 +251,7 @@ class FocusController extends AbstractStandardFormController
         return [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
-            'name'         => $entity->$nameMethod(),
+            'name'         => $entity->{$nameMethod}(),
         ];
     }
 }

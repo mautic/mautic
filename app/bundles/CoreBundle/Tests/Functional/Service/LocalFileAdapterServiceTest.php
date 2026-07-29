@@ -19,7 +19,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = static::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
@@ -55,6 +55,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
         $this->folderName = (string) time();
         $user             = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
         $this->client->request(
@@ -63,9 +64,9 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         );
         self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = static::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
-        self::assertDirectoryExists($folderPath);
-        self::assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));
+        $this->assertDirectoryExists($folderPath);
+        $this->assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));
     }
 }

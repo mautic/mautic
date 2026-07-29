@@ -16,7 +16,6 @@ use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -47,7 +46,6 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(false);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
         $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
@@ -57,23 +55,22 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             ->with(self::callback(static fn ($entity): bool => $entity instanceof GrapesJsBuilder && '<mjml/>' === $entity->getCustomMjml()));
 
         /** @var MockObject&EntityManager $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->method('getRepository')->with(GrapesJsBuilder::class)->willReturn($grapesRepository);
+        $entityManager = $this->createStub(EntityManager::class);
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, $grapesRepository, $emailRepository);
 
         $email = new Email();
         $email->setContent(['existing' => true]);
 
         $model->addOrEditEntity($email);
 
-        Assert::assertSame('<html/>', $email->getCustomHtml());
+        $this->assertSame('<html/>', $email->getCustomHtml());
         $content = $email->getContent();
-        Assert::assertIsArray($content);
-        Assert::assertArrayHasKey('grapesjsbuilder', $content);
-        Assert::assertIsArray($content['grapesjsbuilder']);
-        Assert::assertSame(['pages' => [['id' => 'main']]], $content['grapesjsbuilder']['editorState']);
-        Assert::assertArrayHasKey('updatedAt', $content['grapesjsbuilder']);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('grapesjsbuilder', $content);
+        $this->assertIsArray($content['grapesjsbuilder']);
+        $this->assertSame(['pages' => [['id' => 'main']]], $content['grapesjsbuilder']['editorState']);
+        $this->assertArrayHasKey('updatedAt', $content['grapesjsbuilder']);
     }
 
     public function testAddOrEditEntitySkipsWhenTranslationChildrenAreUpdating(): void
@@ -88,18 +85,17 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EmailRepository $emailRepository */
         $emailRepository = $this->createMock(EmailRepository::class);
-        $emailRepository->expects(self::never())->method('saveEntity');
+        $emailRepository->expects($this->never())->method('saveEntity');
 
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(true);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects(self::never())->method('getRepository');
+        $entityManager->expects($this->never())->method('getRepository');
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, null, $emailRepository);
 
         $model->addOrEditEntity(new Email());
     }
@@ -129,10 +125,10 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $model->addOrEditPageEntity($page);
 
         $content = $page->getContent();
-        Assert::assertIsArray($content);
-        Assert::assertArrayHasKey('grapesjsbuilder', $content);
-        Assert::assertIsArray($content['grapesjsbuilder']);
-        Assert::assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('grapesjsbuilder', $content);
+        $this->assertIsArray($content['grapesjsbuilder']);
+        $this->assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
 
         $requestStackNoEditor = new RequestStack();
         $requestStackNoEditor->push(new Request([], [
@@ -143,8 +139,8 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EntityManager $entityManagerNoEditor */
         $entityManagerNoEditor = $this->createMock(EntityManager::class);
-        $entityManagerNoEditor->expects(self::never())->method('persist');
-        $entityManagerNoEditor->expects(self::never())->method('flush');
+        $entityManagerNoEditor->expects($this->never())->method('persist');
+        $entityManagerNoEditor->expects($this->never())->method('flush');
 
         $modelNoEditor = $this->getModel($requestStackNoEditor, $emailModel, $entityManagerNoEditor);
         $modelNoEditor->addOrEditPageEntity(new Page());
@@ -154,6 +150,8 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         RequestStack $requestStack,
         EmailModel $emailModel,
         EntityManager $entityManager,
+        ?GrapesJsBuilderRepository $grapesJsBuilderRepository = null,
+        ?EmailRepository $emailRepository = null,
     ): GrapesJsBuilderModel {
         return new GrapesJsBuilderModel(
             $requestStack,
@@ -165,7 +163,9 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class), // $grapesJsBuilderRepository
+            $emailRepository ?? $this->createStub(EmailRepository::class), // $emailRepository
         );
     }
 }

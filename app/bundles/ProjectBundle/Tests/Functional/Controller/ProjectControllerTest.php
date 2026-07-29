@@ -11,8 +11,9 @@ use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ProjectControllerTest extends MauticMysqlTestCase
@@ -43,7 +44,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('indexUrlsProvider')]
+    #[DataProvider('indexUrlsProvider')]
     public function testIndexActionDisplaysProjects(string $url): void
     {
         $this->client->request('GET', $url);
@@ -51,8 +52,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponseContent = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('project1', $clientResponseContent, 'The return must contain project1');
-        $this->assertStringContainsString('project2', $clientResponseContent, 'The return must contain project2');
+        $this->assertStringContainsString('project1', (string) $clientResponseContent, 'The return must contain project1');
+        $this->assertStringContainsString('project2', (string) $clientResponseContent, 'The return must contain project2');
     }
 
     /**
@@ -71,8 +72,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('project1', $clientResponseContent, 'The return must contain project1');
-        $this->assertStringNotContainsString('project2', $clientResponseContent, 'The return must not contain project2');
+        $this->assertStringContainsString('project1', (string) $clientResponseContent, 'The return must contain project1');
+        $this->assertStringNotContainsString('project2', (string) $clientResponseContent, 'The return must not contain project2');
     }
 
     public function testProjectDeletion(): void
@@ -105,7 +106,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($project->getName(), $clientResponseContent, 'The return must contain project');
+        $this->assertStringContainsString($project->getName(), (string) $clientResponseContent, 'The return must contain project');
     }
 
     public function testViewActionNotFound(): void
@@ -124,7 +125,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit project: '.$project->getName(), $clientResponseContent, 'The return must contain \'Edit project\' text');
+        $this->assertStringContainsString('Edit project: '.$project->getName(), (string) $clientResponseContent, 'The return must contain \'Edit project\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['project_entity[name]']->setValue($projectName);
@@ -173,7 +174,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $form->setValues(['project_entity[name]' => '']);
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A name is required.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('A name is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditProjectWithNoPermission(): void
@@ -219,7 +220,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);

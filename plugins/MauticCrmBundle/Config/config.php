@@ -23,14 +23,4 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'other' => [
-            'mautic_integration.service.transport' => [
-                'class'     => MauticPlugin\MauticCrmBundle\Services\Transport::class,
-                'arguments' => [
-                    'mautic.http.client',
-                ],
-            ],
-        ],
-    ],
 ];

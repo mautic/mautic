@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
-use PHPUnit\Framework\Assert;
 
 final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTestCase
 {
@@ -31,13 +30,13 @@ final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTest
         $this->assertResponseIsSuccessful();
 
         $headerCells = $crawler->filter('table#companyTable thead tr th');
-        Assert::assertCount(3, $headerCells);
+        $this->assertCount(3, $headerCells);
 
         $dataCells = $crawler->filter('table#companyTable tbody tr:first-child td');
-        Assert::assertCount(3, $dataCells);
+        $this->assertCount(3, $dataCells);
 
         $bodyText = $crawler->filter('table#companyTable tbody')->text();
-        Assert::assertStringContainsString('Acme Fixtures Ltd', $bodyText);
-        Assert::assertStringContainsString('42', $bodyText);
+        $this->assertStringContainsString('Acme Fixtures Ltd', $bodyText);
+        $this->assertStringContainsString('42', $bodyText);
     }
 }

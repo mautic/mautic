@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
@@ -225,7 +226,7 @@ class EmailRepository extends CommonRepository
         }
 
         // Only include those who belong to the associated lead lists
-        if (is_null($listIds)) {
+        if (null === $listIds) {
             // Get a list of lists associated with this email
             $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
@@ -315,8 +316,8 @@ class EmailRepository extends CommonRepository
         if ($threadId && $maxThreads) {
             if ($threadId <= $maxThreads) {
                 $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
-                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 
@@ -903,7 +904,7 @@ class EmailRepository extends CommonRepository
             ->setParameter('listId', $listId)
             ->fetchFirstColumn();
 
-        return array_values(array_unique(array_map('intval', [...$includedIds, ...$excludedIds])));
+        return array_values(array_unique(array_map(intval(...), [...$includedIds, ...$excludedIds])));
     }
 
     private function getExcludedListQuery(int $emailId): ?QueryBuilder

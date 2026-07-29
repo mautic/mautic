@@ -23,7 +23,6 @@ class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
         $contact1->addTag($tag);
 
         $contact3 = $this->getReference('lead-3');
-        \assert($contact1 instanceof Lead);
         $contact3->addTag($tag);
 
         $manager->persist($contact1);
@@ -31,10 +30,7 @@ class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 8;
     }
