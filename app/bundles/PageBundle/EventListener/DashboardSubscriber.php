@@ -44,8 +44,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected PageModel $pageModel,
-        protected RouterInterface $router,
+        private readonly PageModel $pageModel,
+        private readonly RouterInterface $router,
     ) {
     }
 
