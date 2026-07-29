@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
@@ -41,6 +45,42 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->set('mautic.core.service.local_file_adapter', Mautic\CoreBundle\Service\LocalFileAdapterService::class)
+        ->arg('$root', param('env(resolve:MAUTIC_EL_FINDER_PATH)'));
+
+    $services->alias(Mautic\CoreBundle\Service\LocalFileAdapterService::class, 'mautic.core.service.local_file_adapter');
+    $services->set('mautic.helper.maxmind_do_not_sell_download', Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class)
+        ->arg('$auth', param('mautic.ip_lookup_auth'));
+    $services->alias(Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class, 'mautic.helper.maxmind_do_not_sell_download');
+    $services->set('mautic.cache.warmer.middleware', Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class)
+        ->arg('$env', param('kernel.environment'))
+        ->tag('kernel.cache_warmer');
+    $services->alias(Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class, 'mautic.cache.warmer.middleware');
+    $services->set('mautic.helper.cache_storage', Mautic\CoreBundle\Helper\CacheStorageHelper::class)
+        ->arg('$adaptor', 'db')
+        ->arg('$namespace', param('mautic.db_table_prefix'))
+        ->arg('$connection', service('doctrine.dbal.default_connection'))
+        ->arg('$cacheDir', param('kernel.cache_dir'));
+    $services->alias(Mautic\CoreBundle\Helper\CacheStorageHelper::class, 'mautic.helper.cache_storage');
+    $services->set('mautic.helper.cache', Mautic\CoreBundle\Helper\CacheHelper::class)
+        ->arg('$cacheDir', param('kernel.cache_dir'));
+    $services->alias(Mautic\CoreBundle\Helper\CacheHelper::class, 'mautic.helper.cache');
+    $services->set('mautic.ip_lookup.factory', Mautic\CoreBundle\Factory\IpLookupFactory::class)
+        ->arg('$lookupServices', param('mautic.ip_lookup_services'))
+        ->arg('$cacheDir', param('kernel.cache_dir'));
+    $services->alias(Mautic\CoreBundle\Factory\IpLookupFactory::class, 'mautic.ip_lookup.factory');
+    $services->set('mautic.schema.helper.column', Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class)
+        ->arg('$prefix', param('mautic.db_table_prefix'));
+    $services->alias(Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class, 'mautic.schema.helper.column');
+    $services->set('mautic.schema.helper.index', Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class)
+        ->arg('$prefix', param('mautic.db_table_prefix'));
+    $services->alias(Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class, 'mautic.schema.helper.index');
+    $services->set('mautic.schema.helper.table', Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class)
+        ->arg('$prefix', param('mautic.db_table_prefix'));
+    $services->alias(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class, 'mautic.schema.helper.table');
+    $services->set('mautic.maxmind.doNotSellList', Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
+    $services->alias(Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class, 'mautic.maxmind.doNotSellList');
 
     $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
     $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
