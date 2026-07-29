@@ -122,6 +122,9 @@ return RectorConfig::configure()
         \Rector\Symfony\Symfony44\Rector\MethodCall\AuthorizationCheckerIsGrantedExtractorRector::class,
         \Rector\Transform\Rector\New_\NewToStaticCallRector::class,
 
+        // fix no nullable
+        \Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector::class,
+
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
@@ -156,6 +159,9 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
+
+        // to be fixed in dev-main
+        \Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector::class,
 
         // symfony
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
