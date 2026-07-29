@@ -15,11 +15,7 @@ final class TagManagerIntegrationTest extends TestCase
     {
         parent::setUp();
 
-        $this->tagManagerIntegration = new class() extends TagManagerIntegration {
-            public function __construct()
-            {
-            }
-        };
+        $this->tagManagerIntegration = new TagManagerIntegration();
     }
 
     public function testGetNameReturnsName(): void
@@ -34,9 +30,8 @@ final class TagManagerIntegrationTest extends TestCase
         $this->assertNotEmpty($displayName);
     }
 
-    public function testGetAuthenticationTypeReturnsNonEmptyValue(): void
+    public function testGetIconReturnsExpectedPath(): void
     {
-        $authenticationType = $this->tagManagerIntegration->getAuthenticationType();
-        $this->assertNotEmpty($authenticationType);
+        $this->assertSame('plugins/MauticTagManagerBundle/Assets/img/tagmanager.png', $this->tagManagerIntegration->getIcon());
     }
 }

@@ -24,6 +24,9 @@ class TagRepository extends BaseTagRepository
         return 'lt';
     }
 
+    /**
+     * @param string $tag
+     */
     public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -39,7 +42,9 @@ class TagRepository extends BaseTagRepository
     /**
      * Get a count of leads that belong to the tag.
      *
-     * @return array
+     * @param int|int[] $tagIds
+     *
+     * @return int|array<int, int>
      */
     public function countByLeads($tagIds)
     {
