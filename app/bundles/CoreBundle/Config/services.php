@@ -108,6 +108,14 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class)->tag('mautic.update_check');
     $services->alias('mautic.update.checks.database', Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class);
 
+    $services->alias('mautic.helper.user', Mautic\CoreBundle\Helper\UserHelper::class);
+    $services->alias('mautic.helper.ip_lookup', Mautic\CoreBundle\Helper\IpLookupHelper::class);
+    $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
+    $services->alias('mautic.helper.token_builder.factory', Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class);
+    $services->alias('mautic.helper.app_version', Mautic\CoreBundle\Helper\AppVersion::class);
+    $services->alias('mautic.helper.command', Mautic\CoreBundle\Helper\CommandHelper::class);
+    $services->alias('mautic.page.helper.factory', Mautic\CoreBundle\Factory\PageHelperFactory::class);
+
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
     // Explicitly register our Twig extension with high priority
