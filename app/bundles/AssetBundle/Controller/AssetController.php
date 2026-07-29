@@ -3,11 +3,17 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Service\ArchiveBuilder;
+use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
+use Mautic\AssetBundle\Service\BatchDownloadResponder;
+use Mautic\AssetBundle\Service\BatchFileCollector;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,11 +23,28 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
+    private BatchDownloadRequestValidator $batchDownloadRequestValidator;
+
+    private BatchFileCollector $batchFileCollector;
+
+    private ArchiveBuilder $archiveBuilder;
+
+    private BatchDownloadResponder $batchDownloadResponder;
+
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(AuditLogModel $auditLogModel): void
-    {
+    public function autowireAssetController(
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+        AuditLogModel $auditLogModel,
+    ): void {
+        $this->batchDownloadRequestValidator = $batchDownloadRequestValidator;
+        $this->batchFileCollector            = $batchFileCollector;
+        $this->archiveBuilder                = $archiveBuilder;
+        $this->batchDownloadResponder        = $batchDownloadResponder;
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -647,6 +670,39 @@ final class AssetController extends FormController
             array_merge($postActionVars, [
                 'flashes' => $flashes,
             ])
+        );
+    }
+
+    public function batchDownloadAction(Request $request): Response
+    {
+        if (!$this->batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
+        }
+
+        try {
+            $ids                = $this->batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $this->batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $this->archiveBuilder->buildArchive($downloadableAssets);
+
+            return $this->batchDownloadResponder->createResponse($zipPath);
+        } catch (BatchDownloadException $e) {
+            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, string|int> $messageVars
+     */
+    private function createBatchDownloadErrorResponse(string $messageKey, array $messageVars = []): JsonResponse
+    {
+        $this->addFlashMessage($messageKey, $messageVars, FlashBag::LEVEL_ERROR);
+
+        return new JsonResponse(
+            [
+                'message' => $this->translator->trans($messageKey, $messageVars, 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ],
+            Response::HTTP_BAD_REQUEST
         );
     }
 

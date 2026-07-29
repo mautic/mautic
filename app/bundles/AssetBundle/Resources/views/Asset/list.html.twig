@@ -28,6 +28,19 @@
                     'templateButtons': {
                         'delete': permissions['asset:assets:deleteown'] or permissions['asset:assets:deleteother'],
                     },
+                    'customButtons': permissions['asset:assets:viewown'] or permissions['asset:assets:viewother'] ? [
+                        {
+                            'attr': {
+                                'href': '#',
+                                'data-mautic-batch-download': path('mautic_asset_action', {'objectAction': 'batchDownload'}),
+                                'data-target': '#assetTable',
+                                'data-toggle': 'none',
+                            },
+                            'btnText': 'mautic.asset.asset.batch_download'|trans,
+                            'iconClass': 'ri-download-2-line',
+                            'primary': true,
+                        },
+                    ] : [],
                 },
                 'quickFilters': [
                     {

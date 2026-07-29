@@ -28,6 +28,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private const ADMIN_USER = 'admin';
 
+    private const BATCH_DOWNLOAD_PATH = '/s/assets/batchDownload';
+
     protected function setUp(): void
     {
         $this->configParams['validate_remote_domains'] = false;
@@ -171,6 +173,94 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
         $this->assertResponseIsSuccessful();
         $this->assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
+    }
+
+    public function testBatchDownloadWithoutIdsReturnsError(): void
+    {
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH);
+
+        $response   = $this->client->getResponse();
+        $translator = static::getContainer()->get('translator');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertArrayHasKey('message', $content);
+        $this->assertSame($translator->trans('mautic.asset.asset.batch_download.error.no_selection', [], 'flashes'), $content['message']);
+        $this->assertArrayHasKey('flashes', $content);
+    }
+
+    public function testBatchDownloadRejectsObjectShapedIds(): void
+    {
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => '{"asset": 1}']);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    public function testBatchDownloadReturnsZipWithSanitizedTitles(): void
+    {
+        $this->asset->setOriginalFileName('Asset controller test. Preview action.png');
+        $this->em->persist($this->asset);
+        $this->em->flush();
+
+        $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
+
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
+
+        $response = $this->client->getResponse();
+
+        self::assertResponseIsSuccessful();
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+
+        $contentDisposition = $response->headers->get('Content-Disposition');
+        $this->assertStringContainsString('assets-batch-', (string) $contentDisposition);
+        $this->assertStringEndsWith('.zip', $contentDisposition);
+
+        $zipContent = $this->client->getInternalResponse()->getContent();
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_test_');
+        \assert(false !== $zipPath);
+        file_put_contents($zipPath, $zipContent);
+
+        $zipArchive = new \ZipArchive();
+        $this->assertTrue($zipArchive->open($zipPath));
+        $this->assertSame(1, $zipArchive->numFiles);
+
+        $entryName     = $zipArchive->getNameIndex(0);
+        $entryContents = $zipArchive->getFromName($entryName);
+
+        $this->assertStringContainsString('asset', mb_strtolower($entryName));
+        $this->assertStringContainsString('controller', mb_strtolower($entryName));
+        $this->assertStringContainsString('test', mb_strtolower($entryName));
+        $this->assertStringEndsWith('.png', $entryName);
+        $this->assertSame($this->expectedPngContent, $entryContents);
+
+        $zipArchive->close();
+        unlink($zipPath);
+    }
+
+    public function testBatchDownloadRejectsRemoteAssets(): void
+    {
+        $remoteAsset = $this->createAsset([
+            'title'   => 'Remote asset',
+            'storage' => 'remote',
+            'path'    => 'http://127.0.0.1/internal-resource',
+        ]);
+
+        $ids = json_encode([$remoteAsset->getId()], JSON_THROW_ON_ERROR);
+
+        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $translator = static::getContainer()->get('translator');
+
+        $this->assertSame(
+            $translator->trans('mautic.asset.asset.batch_download.error.remote_unsupported', [], 'flashes'),
+            $content['message']
+        );
     }
 
     /**
