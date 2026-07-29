@@ -462,10 +462,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Get chart query helper to format dates.
-     *
-     * @return ChartQuery
      */
-    public function getChartQuery(): ?\Mautic\CoreBundle\Helper\Chart\ChartQuery
+    public function getChartQuery(): ?ChartQuery
     {
         return $this->chartQuery;
     }
