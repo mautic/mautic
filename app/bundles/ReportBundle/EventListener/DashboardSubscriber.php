@@ -43,8 +43,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        private readonly ReportModel $reportModel,
-        private readonly CorePermissions $security,
+        protected ReportModel $reportModel,
+        protected CorePermissions $security,
     ) {
     }
 

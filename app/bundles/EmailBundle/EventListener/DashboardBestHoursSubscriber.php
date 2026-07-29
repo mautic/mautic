@@ -39,7 +39,7 @@ final class DashboardBestHoursSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        private readonly EmailModel $emailModel,
+        protected EmailModel $emailModel,
     ) {
     }
 

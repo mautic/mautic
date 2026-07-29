@@ -39,8 +39,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        private readonly AssetModel $assetModel,
-        private readonly RouterInterface $router,
+        protected AssetModel $assetModel,
+        protected RouterInterface $router,
     ) {
     }
 

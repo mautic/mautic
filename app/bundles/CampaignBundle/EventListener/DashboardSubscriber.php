@@ -37,8 +37,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly EventModel $campaignEventModel,
+        protected CampaignModel $campaignModel,
+        protected EventModel $campaignEventModel,
     ) {
     }
 

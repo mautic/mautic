@@ -56,11 +56,11 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly ListModel $leadListModel,
-        private readonly RouterInterface $router,
-        private readonly TranslatorInterface $translator,
-        private readonly DateHelper $dateHelper,
+        protected LeadModel $leadModel,
+        protected ListModel $leadListModel,
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator,
+        protected DateHelper $dateHelper,
     ) {
     }
 
