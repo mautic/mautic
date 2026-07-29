@@ -61,12 +61,6 @@ return [
                 'class'     => Mautic\AssetBundle\Controller\UploadController::class,
             ],
         ],
-        'fixtures' => [
-            'mautic.asset.fixture.asset' => [
-                'class'     => Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
     ],
 
     'parameters' => [

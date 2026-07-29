@@ -46,9 +46,9 @@ use Utils\Rector\ValueObject\ServiceTag;
  *   'mautic.some.service' => ['class' => SomeService::class, 'tag' => 'security.voter']
  *   ->  $services->set('mautic.some.service', SomeService::class)->tag('security.voter');
  *
- * The manual "arguments" are dropped for every constructor parameter autowiring can fill on its own. What is
- * left over - a scalar, a "%mautic.some_config%" parameter or a service of a type the container does not know -
- * is written as an explicit ->arg() call, named after the constructor parameter:
+ * The manual "arguments" are dropped for every object-typed constructor parameter, as autowiring fills those
+ * on its own. What is left over - a scalar or a "%mautic.some_config%" parameter - is written as an explicit
+ * ->arg() call, named after the constructor parameter:
  *
  *   'mautic.some.service' => ['class' => SomeService::class, 'arguments' => ['translator', '%mautic.some_config%']]
  *   ->  $services->set('mautic.some.service', SomeService::class)->arg('$someConfig', param('mautic.some_config'));
@@ -106,21 +106,6 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         'permissions' => 'mautic.permissions',
     ];
 
-    /**
-     * @var string
-     */
-    private const CONTAINER_XML_ENV_NAME = 'MAUTIC_CONTAINER_XML';
-
-    /**
-     * @var string
-     */
-    private const DEFAULT_CONTAINER_XML_FILE_PATH = 'var/cache/test/AppKernelTestDebugContainer.xml';
-
-    /**
-     * @var array<string, true>|null
-     */
-    private ?array $containerServiceIds = null;
-
     public function __construct(
         private readonly SimplePhpParser $simplePhpParser,
         private readonly BetterNodeFinder $betterNodeFinder,
@@ -148,11 +133,6 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     private function refactorConfigFile(Return_ $return, Array_ $configArray): ?Return_
     {
-        // without a container there is no telling autowirable arguments from the ones to keep, see MAUTIC_CONTAINER_XML
-        if (!$this->hasContainerServiceIds()) {
-            return null;
-        }
-
         $servicesFilePath = dirname($this->getFile()->getFilePath()).'/services.php';
         if (!file_exists($servicesFilePath)) {
             return null;
@@ -819,29 +799,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     private function isAutowirableParameter(ParameterReflection $parameterReflection): bool
     {
-        $parameterType = $parameterReflection->getType();
-
         // scalars, arrays and parameters like "%mautic.some_config%" have to be wired by hand
-        if (!$parameterType->isObject()->yes()) {
-            return false;
-        }
-
-        // an object type alone is not enough, the container has to know a service of that very type,
-        // e.g. "Monolog\Logger" is no service, only "monolog.logger.mautic" is
-        foreach ($parameterType->getObjectClassNames() as $parameterClassName) {
-            if ($this->isKnownServiceId($parameterClassName)) {
-                continue;
-            }
-
-            // named autowiring, e.g. "Psr\Log\LoggerInterface $mauticLogger"
-            if ($this->isKnownServiceId($parameterClassName.' $'.$parameterReflection->getName())) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
+        return $parameterReflection->getType()->isObject()->yes();
     }
 
     /**
@@ -939,63 +898,6 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
     private function createConfiguratorFuncCall(string $functionName, string $argumentValue): FuncCall
     {
         return new FuncCall(new Name($functionName), [new Arg(new String_($argumentValue))]);
-    }
-
-    /**
-     * The service ids of the container built before the move, see MAUTIC_CONTAINER_XML.
-     * Without that container every argument would look like one to keep, so the rule moves nothing at all.
-     */
-    private function isKnownServiceId(string $serviceId): bool
-    {
-        return isset($this->resolveContainerServiceIds()[$serviceId]);
-    }
-
-    private function hasContainerServiceIds(): bool
-    {
-        return [] !== $this->resolveContainerServiceIds();
-    }
-
-    /**
-     * @return array<string, true>
-     */
-    private function resolveContainerServiceIds(): array
-    {
-        if (null !== $this->containerServiceIds) {
-            return $this->containerServiceIds;
-        }
-
-        $this->containerServiceIds = $this->loadContainerServiceIds();
-
-        return $this->containerServiceIds;
-    }
-
-    /**
-     * @return array<string, true>
-     */
-    private function loadContainerServiceIds(): array
-    {
-        $containerFilePath = getenv(self::CONTAINER_XML_ENV_NAME);
-        if (!is_string($containerFilePath) || '' === $containerFilePath) {
-            $containerFilePath = self::DEFAULT_CONTAINER_XML_FILE_PATH;
-        }
-
-        if (!file_exists($containerFilePath)) {
-            return [];
-        }
-
-        $containerFileContent = file_get_contents($containerFilePath);
-        if (!is_string($containerFileContent)) {
-            return [];
-        }
-
-        preg_match_all('#<service id="(?<service_id>[^"]+)"#', $containerFileContent, $matches);
-
-        $serviceIds = [];
-        foreach ($matches['service_id'] as $serviceId) {
-            $serviceIds[htmlspecialchars_decode($serviceId, \ENT_QUOTES | \ENT_XML1)] = true;
-        }
-
-        return $serviceIds;
     }
 
     private function matchArrayValueByKey(Array_ $array, string $keyName): ?Node

@@ -86,6 +86,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
     $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
         ->tag('controller.service_arguments');
+    $services->set('mautic.user.fixture.role', Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class, 'mautic.user.fixture.role');
+    $services->set('mautic.user.fixture.user', Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class, 'mautic.user.fixture.user');
     $services->set('mautic.security.saml.credential_store', Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class)
         ->arg('$entityId', param('mautic.saml_idp_entity_id'))
         ->tag('lightsaml.own_credential_store');
