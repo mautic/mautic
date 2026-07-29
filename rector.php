@@ -89,6 +89,12 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
+        // called by parent AjaxController::getBuilderTokensAction() via method_exists()
+        Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
+            __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
+        ],
+
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
 
         // modified with reflection

@@ -53,4 +53,14 @@ final class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Called by parent::getBuilderTokensAction().
+     *
+     * @return array
+     */
+    protected function getBuilderTokens($query)
+    {
+        return $this->pageModel->getBuilderComponents(null, ['tokens'], $query ?? '');
+    }
 }
