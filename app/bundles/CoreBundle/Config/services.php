@@ -61,6 +61,19 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.hash', Mautic\CoreBundle\Helper\HashHelper\HashHelper::class);
     $services->alias('mautic.helper.random', Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class);
     $services->alias('mautic.helper.phone_number', Mautic\CoreBundle\Helper\PhoneNumberHelper::class);
+    $services->set(Mautic\CoreBundle\Loader\RouteLoader::class)
+        ->tag('routing.loader');
+
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+
+    $services->get(Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
+    $services->alias('mautic.generated.columns.doctrine.listener', Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class);
+
+    $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
+        ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
 
     $services->get(Mautic\CoreBundle\EventListener\ErrorHandlingListener::class)
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
@@ -107,6 +120,36 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class)->tag('mautic.update_check');
     $services->alias('mautic.update.checks.database', Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class);
+    $services->alias('mautic.core.service.bulk_notification', Mautic\CoreBundle\Service\BulkNotification::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\LogProcessor::class)->tag('monolog.processor');
+    $services->alias('mautic.core.service.log_processor', Mautic\CoreBundle\Monolog\LogProcessor::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class)
+        ->arg('$exceptionFormatter', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.monolog.fulltrace.formatter'));
+    $services->alias('mautic.monolog.handler', Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class)
+        ->tag('container.env_var_processor');
+    $services->alias('mautic.di.env_processor.nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class)
+        ->tag('container.env_var_processor');
+
+    $services->alias('mautic.di.env_processor.int_nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class)
+        ->tag('container.env_var_processor');
+
+    $services->alias('mautic.di.env_processor.mauticconst', Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class);
+
+    $services->alias('mautic.helper.user', Mautic\CoreBundle\Helper\UserHelper::class);
+    $services->alias('mautic.helper.ip_lookup', Mautic\CoreBundle\Helper\IpLookupHelper::class);
+    $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
+    $services->alias('mautic.helper.token_builder.factory', Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class);
+    $services->alias('mautic.helper.app_version', Mautic\CoreBundle\Helper\AppVersion::class);
+    $services->alias('mautic.helper.command', Mautic\CoreBundle\Helper\CommandHelper::class);
+    $services->alias('mautic.page.helper.factory', Mautic\CoreBundle\Factory\PageHelperFactory::class);
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
