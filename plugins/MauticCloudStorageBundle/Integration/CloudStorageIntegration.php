@@ -8,6 +8,7 @@ use Gaufrette\Adapter;
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 
 abstract class CloudStorageIntegration extends BasicIntegration implements BasicInterface
 {
@@ -34,9 +35,12 @@ abstract class CloudStorageIntegration extends BasicIntegration implements Basic
      */
     abstract public function getPublicUrl($key);
 
+    /**
+     * @return array<string, string>
+     */
     public function getSupportedFeatures(): array
     {
-        return ['cloud_storage'];
+        return [ConfigFormFeaturesInterface::FEATURE_CLOUD_STORAGE => 'mautic.integration.form.feature.cloud_storage'];
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCloudStorageBundle\Tests\Unit\Integration;
 
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\MauticCloudStorageBundle\Exception\InvalidCredentialConfigurationException;
 use MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration;
@@ -42,7 +43,7 @@ final class AmazonS3IntegrationTest extends TestCase
 
     public function testGetSupportedFeaturesReturnsCloudStorage(): void
     {
-        $this->assertSame(['cloud_storage'], $this->integration->getSupportedFeatures());
+        $this->assertSame([ConfigFormFeaturesInterface::FEATURE_CLOUD_STORAGE => 'mautic.integration.form.feature.cloud_storage'], $this->integration->getSupportedFeatures());
     }
 
     public function testGetAdapterThrowsExceptionWhenCredentialsMissing(): void

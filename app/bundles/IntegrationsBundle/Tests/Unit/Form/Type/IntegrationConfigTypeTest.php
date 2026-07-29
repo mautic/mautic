@@ -14,10 +14,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class IntegrationConfigTypeTest extends TestCase
 {
-    public function testSupportedFeaturesChoicesUseTranslatableLabelsWithRealSlugAsValue(): void
+    public function testSupportedFeaturesChoicesFlipSlugLabelPairsIntoLabelSlugChoices(): void
     {
         $integrationObject = $this->createMock(ConfigFormFeaturesInterface::class);
-        $integrationObject->method('getSupportedFeatures')->willReturn(['cloud_storage', 'other_feature']);
+        $integrationObject->method('getSupportedFeatures')->willReturn([
+            ConfigFormFeaturesInterface::FEATURE_CLOUD_STORAGE => 'mautic.integration.form.feature.cloud_storage',
+            ConfigFormFeaturesInterface::FEATURE_SYNC          => 'mautic.integration.feature.sync',
+        ]);
 
         $integrationsHelper = $this->createMock(ConfigIntegrationsHelper::class);
         $integrationsHelper->method('getIntegration')->with('AmazonS3')->willReturn($integrationObject);
@@ -29,8 +32,8 @@ final class IntegrationConfigTypeTest extends TestCase
                 $this->assertSame(ChoiceType::class, $type);
                 $this->assertSame(
                     [
-                        'mautic.integration.form.feature.cloud_storage'  => 'cloud_storage',
-                        'mautic.integration.form.feature.other_feature' => 'other_feature',
+                        'mautic.integration.form.feature.cloud_storage' => ConfigFormFeaturesInterface::FEATURE_CLOUD_STORAGE,
+                        'mautic.integration.feature.sync'               => ConfigFormFeaturesInterface::FEATURE_SYNC,
                     ],
                     $options['choices']
                 );
