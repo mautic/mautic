@@ -40,14 +40,8 @@ final class LeadTimelineEvent extends Event
 
     private bool $countOnly = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     private ?\DateTime $dateFrom = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     private ?\DateTime $dateTo = null;
 
     /**
