@@ -42,19 +42,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'other' => [
-            'mautic.focus.helper.token' => [
-                'class'     => MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
-                'arguments' => [
-                    'mautic.focus.model.focus',
-                    'router',
-                    'mautic.security',
-                ],
-            ],
-        ],
-    ],
-
     'menu' => [
         'main' => [
             'mautic.focus' => [

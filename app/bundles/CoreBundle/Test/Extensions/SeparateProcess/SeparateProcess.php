@@ -60,8 +60,6 @@ class SeparateProcess implements Extension
             return;
         }
 
-        assert($test instanceof TestMethod);
-
         if ($test->metadata()->isRunInSeparateProcess()->isNotEmpty()) {
             return;
         }
