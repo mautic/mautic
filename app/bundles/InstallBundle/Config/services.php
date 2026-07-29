@@ -18,7 +18,6 @@ return function (ContainerConfigurator $configurator): void {
         'Helper/SchemaHelper.php',
     ];
 
-    $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class);
     $services->alias(Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface::class, Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class);
 
     $services->load('Mautic\\InstallBundle\\', '../')

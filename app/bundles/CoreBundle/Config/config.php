@@ -353,14 +353,6 @@ return [
                 'class'     => Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
             ],
-            'mautic.route_loader' => [
-                'class'     => Mautic\CoreBundle\Loader\RouteLoader::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.core_parameters',
-                ],
-                'tag' => 'routing.loader',
-            ],
             'mautic.security' => [
                 'class'     => Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
                 'arguments' => [
@@ -379,26 +371,6 @@ return [
                 ],
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic',
-            ],
-            'mautic.database.version.provider' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
-                'arguments' => ['database_connection', 'mautic.helper.core_parameters'],
-            ],
-            'mautic.generated.columns.provider' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,
-                'arguments' => ['mautic.database.version.provider', 'event_dispatcher'],
-            ],
-            'mautic.generated.columns.doctrine.listener' => [
-                'class'        => Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class,
-                'tag'          => 'doctrine.event_listener',
-                'tagArguments' => [
-                    'event' => 'postGenerateSchema',
-                    'lazy'  => true,
-                ],
-                'arguments' => [
-                    'mautic.generated.columns.provider',
-                    'monolog.logger.mautic',
-                ],
             ],
             'mautic.exception.listener' => [
                 'class'     => Mautic\CoreBundle\EventListener\ExceptionListener::class,
@@ -523,13 +495,6 @@ return [
             ],
 
             'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,
-
-            'mautic.doctrine.loader.mautic_fixtures_loader' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
-                'arguments' => [
-                    'doctrine.fixtures.loader',
-                ],
-            ],
             // Schema
             'mautic.schema.helper.column' => [
                 'class'     => Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class,
