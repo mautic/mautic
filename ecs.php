@@ -10,6 +10,7 @@ return ECSConfig::configure()
         __DIR__.'/config',
         __DIR__.'/plugins',
         __DIR__.'/tests',
+        __DIR__.'/utils',
     ])
     ->withRootFiles()
     ->withSkip([

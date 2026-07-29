@@ -19,7 +19,6 @@ $finder = PhpCsFixer\Finder::create()
         __DIR__.'/app/AppKernel.php',
         __DIR__.'/app/AppTestKernel.php',
         __DIR__.'/rector.php',
-        __DIR__.'/rector-older-symfony.php',
         __DIR__.'/.php-cs-fixer.php',
         __DIR__.'/ecs.php',
     ]);
