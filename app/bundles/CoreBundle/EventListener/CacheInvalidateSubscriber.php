@@ -16,10 +16,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsDoctrineListener(Events::postPersist)]
 #[AsDoctrineListener(Events::postUpdate)]
 #[AsDoctrineListener(Events::postRemove)]
-class CacheInvalidateSubscriber
+final readonly class CacheInvalidateSubscriber
 {
     private const ACTION_PERSIST = 'persist';
+
     private const ACTION_UPDATE  = 'update';
+
     private const ACTION_REMOVE  = 'remove';
 
     public function __construct(
@@ -57,7 +59,7 @@ class CacheInvalidateSubscriber
 
         $namespacesToDelete = $entity->getCacheNamespacesToDelete();
 
-        if (!$namespacesToDelete) {
+        if ([] === $namespacesToDelete) {
             return;
         }
 

@@ -12,19 +12,13 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
+    private WebhookModel $webhookModel;
 
-    /**
-     * @var MockHandler
-     */
-    private $clientMockHandler;
+    private MockHandler $clientMockHandler;
 
     protected function setUp(): void
     {
@@ -32,14 +26,14 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->configParams['disable_auto_unpublish'] = 'testDisableAutoUnpublishIsEnabled' === $this->name();
         parent::setUp();
 
-        $this->webhookModel                = self::$kernel->getContainer()->get('mautic.webhook.model.webhook');
+        $this->webhookModel                = self::$kernel->getContainer()->get(WebhookModel::class);
         $this->clientMockHandler           = new MockHandler();
     }
 
     /**
      * @param array<int> $logStatusCodes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataFailureWithPreviousLogs')]
+    #[DataProvider('dataFailureWithPreviousLogs')]
     public function testFailureWithPreviousLogs(array $logStatusCodes, bool $expectedIsPublished, int $expectedNumberOfLogs): void
     {
         $this->clientMockHandler->append(new Response(401));
@@ -52,7 +46,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertSame($expectedIsPublished, $webhook->getIsPublished());
+        $this->assertSame($expectedIsPublished, $webhook->getIsPublished());
         $this->assertNumberOfLogs($expectedNumberOfLogs);
     }
 
@@ -77,7 +71,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertFalse($webhook->getIsPublished());
+        $this->assertFalse($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -90,7 +84,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertTrue($webhook->getIsPublished());
+        $this->assertTrue($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -103,7 +97,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertFalse($webhook->getIsPublished());
+        $this->assertFalse($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -115,7 +109,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->processWebhook($webhook);
 
-        Assert::assertTrue($webhook->getIsPublished());
+        $this->assertTrue($webhook->getIsPublished());
         $this->assertNumberOfLogs(2);
     }
 
@@ -163,6 +157,6 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function assertNumberOfLogs(int $expectedNumberOfLogs): void
     {
-        Assert::assertSame($expectedNumberOfLogs, $this->em->getRepository(Log::class)->count([]));
+        $this->assertSame($expectedNumberOfLogs, $this->em->getRepository(Log::class)->count([]));
     }
 }

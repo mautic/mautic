@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
@@ -15,11 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<GroupListType>
  */
-class GroupListType extends AbstractType
+final class GroupListType extends AbstractType
 {
     public function __construct(
-        private EntityManager $em,
-        private GroupRepository $repo,
+        private readonly EntityManagerInterface $em,
+        private readonly GroupRepository $repo,
     ) {
     }
 

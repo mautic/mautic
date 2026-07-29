@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailModel $emailModel,

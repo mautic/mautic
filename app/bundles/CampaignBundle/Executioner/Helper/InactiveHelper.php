@@ -16,12 +16,12 @@ class InactiveHelper
     private ?\DateTimeInterface $earliestInactiveDate = null;
 
     public function __construct(
-        private EventScheduler $scheduler,
-        private InactiveContactFinder $inactiveContactFinder,
-        private LeadEventLogRepository $eventLogRepository,
-        private EventRepository $eventRepository,
-        private LoggerInterface $logger,
-        private DecisionHelper $decisionHelper,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LeadEventLogRepository $eventLogRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LoggerInterface $logger,
+        private readonly DecisionHelper $decisionHelper,
     ) {
     }
 
@@ -43,14 +43,12 @@ class InactiveHelper
     }
 
     /**
-     * @param int $lastActiveEventId
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(
         \DateTime $now,
         ArrayCollection $contacts,
-        $lastActiveEventId,
+        ?int $lastActiveEventId,
         ArrayCollection $negativeChildren,
         Event $event,
     ): void {
@@ -99,10 +97,7 @@ class InactiveHelper
         }
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getEarliestInactiveDateTime()
+    public function getEarliestInactiveDateTime(): ?\DateTimeInterface
     {
         return $this->earliestInactiveDate;
     }
@@ -139,7 +134,7 @@ class InactiveHelper
     /**
      * @return array<string, \DateTimeInterface>|null
      */
-    private function getLastActiveDates($lastActiveEventId, array $contactIds): ?array
+    private function getLastActiveDates(?int $lastActiveEventId, array $contactIds): ?array
     {
         // If there is a parent ID, get last active dates based on when that event was executed for the given contact
         // Otherwise, use when the contact was added to the campaign for comparison

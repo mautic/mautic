@@ -12,15 +12,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PageListType extends AbstractType
+final class PageListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private readonly bool $canViewOther;
 
     public function __construct(
-        private PageModel $model,
+        private readonly PageModel $model,
         CorePermissions $corePermissions,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
@@ -62,7 +59,7 @@ class PageListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

@@ -42,6 +42,117 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
+    $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
+    $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
+    $services->alias('mautic.helper.file_properties', Mautic\CoreBundle\Helper\FileProperties::class);
+    $services->alias('mautic.core.validator.file_upload', Mautic\CoreBundle\Validator\FileUploadValidator::class);
+    $services->alias('mautic.filesystem', Mautic\CoreBundle\Helper\Filesystem::class);
+
+    /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
+    $services->set('symfony.filesystem', Symfony\Component\Filesystem\Filesystem::class);
+    $services->alias(Symfony\Component\Filesystem\Filesystem::class, 'symfony.filesystem');
+
+    $services->set('symfony.finder', Symfony\Component\Finder\Finder::class);
+    $services->alias(Symfony\Component\Finder\Finder::class, 'symfony.finder');
+
+    $services->alias('mautic.helper.input_helper', Mautic\CoreBundle\Helper\InputHelper::class);
+    $services->alias('mautic.helper.trailing_slash', Mautic\CoreBundle\Helper\TrailingSlashHelper::class);
+    $services->alias('mautic.helper.url', Mautic\CoreBundle\Helper\UrlHelper::class);
+    $services->alias('mautic.helper.hash', Mautic\CoreBundle\Helper\HashHelper\HashHelper::class);
+    $services->alias('mautic.helper.random', Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class);
+    $services->alias('mautic.helper.phone_number', Mautic\CoreBundle\Helper\PhoneNumberHelper::class);
+    $services->set(Mautic\CoreBundle\Loader\RouteLoader::class)
+        ->tag('routing.loader');
+
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+
+    $services->get(Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
+    $services->alias('mautic.generated.columns.doctrine.listener', Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class);
+
+    $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
+        ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
+
+    $services->get(Mautic\CoreBundle\EventListener\ErrorHandlingListener::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->arg('$mainLogger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger'))
+        ->arg('$debugLogger', \Symfony\Component\DependencyInjection\Loader\Configurator\expr("container.has('monolog.logger.chrome') ? container.get('monolog.logger.chrome') : null"));
+    $services->alias('mautic.core.errorhandler.subscriber', Mautic\CoreBundle\EventListener\ErrorHandlingListener::class);
+
+    $services->get(Mautic\CoreBundle\Helper\UpdateHelper::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
+    $services->alias('mautic.helper.update', Mautic\CoreBundle\Helper\UpdateHelper::class);
+    $services->alias('mautic.helper.update.release_parser', Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class);
+
+    $services->get(Mautic\CoreBundle\Helper\ComposerHelper::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
+    $services->alias('mautic.helper.composer', Mautic\CoreBundle\Helper\ComposerHelper::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\DeleteCacheStep::class)->tag('mautic.update_step');
+    $services->alias('mautic.update.step.delete_cache', Mautic\CoreBundle\Update\Step\DeleteCacheStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class)->tag('mautic.update_step');
+    $services->alias('mautic.update.step.finalize', Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class)->tag('mautic.update_step');
+    $services->alias('mautic.update.step.install_new_files', Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('mautic.update_step');
+    $services->alias('mautic.update.step.remove_deleted_files', Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class)->tag('mautic.update_step');
+    $services->alias('mautic.update.step.update_schema', Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('mautic.update_step');
+    $services->alias('mautic.update.step.update_translations', Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class);
+
+    $services->get(Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class)->tag('mautic.update_step');
+    $services->alias('mautic.update.step.checks', Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class);
+
+    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class)->tag('mautic.update_check');
+    $services->alias('mautic.update.checks.php', Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class);
+
+    $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class)->tag('mautic.update_check');
+    $services->alias('mautic.update.checks.database', Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class);
+    $services->alias('mautic.core.service.bulk_notification', Mautic\CoreBundle\Service\BulkNotification::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\LogProcessor::class)->tag('monolog.processor');
+    $services->alias('mautic.core.service.log_processor', Mautic\CoreBundle\Monolog\LogProcessor::class);
+
+    $services->get(Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class)
+        ->arg('$exceptionFormatter', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.monolog.fulltrace.formatter'));
+    $services->alias('mautic.monolog.handler', Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class)
+        ->tag('container.env_var_processor');
+    $services->alias('mautic.di.env_processor.nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class)
+        ->tag('container.env_var_processor');
+
+    $services->alias('mautic.di.env_processor.int_nullable', Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class);
+
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class)
+        ->tag('container.env_var_processor');
+
+    $services->alias('mautic.di.env_processor.mauticconst', Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class);
+
+    $services->alias('mautic.helper.user', Mautic\CoreBundle\Helper\UserHelper::class);
+    $services->alias('mautic.helper.ip_lookup', Mautic\CoreBundle\Helper\IpLookupHelper::class);
+    $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
+    $services->alias('mautic.helper.token_builder.factory', Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class);
+    $services->alias('mautic.helper.app_version', Mautic\CoreBundle\Helper\AppVersion::class);
+    $services->alias('mautic.helper.command', Mautic\CoreBundle\Helper\CommandHelper::class);
+    $services->alias('mautic.page.helper.factory', Mautic\CoreBundle\Factory\PageHelperFactory::class);
+
+    $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
+
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
         ->autowire()
@@ -65,6 +176,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
+    $services->alias('mautic.helper.update_checks', Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class);
+    $services->alias('mautic.update.step_provider', Mautic\CoreBundle\Update\StepProvider::class);
 
     $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 

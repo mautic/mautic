@@ -3,25 +3,18 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @extends AbstractType<Page>
- */
-class PreferenceCenterListType extends AbstractType
+final class PreferenceCenterListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private readonly bool $canViewOther;
 
     public function __construct(
-        private PageModel $model,
+        private readonly PageModel $model,
         CorePermissions $corePermissions,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
@@ -64,7 +57,7 @@ class PreferenceCenterListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

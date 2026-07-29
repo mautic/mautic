@@ -11,10 +11,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SegmentInUseValidator extends ConstraintValidator
+final class SegmentInUseValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $listModel,
+        private readonly ListModel $listModel,
     ) {
     }
 

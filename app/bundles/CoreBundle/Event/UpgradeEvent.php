@@ -4,17 +4,14 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class UpgradeEvent extends Event
+final class UpgradeEvent extends Event
 {
     public function __construct(
-        protected array $status,
+        private array $status,
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getStatus()
+    public function getStatus(): array
     {
         return $this->status;
     }

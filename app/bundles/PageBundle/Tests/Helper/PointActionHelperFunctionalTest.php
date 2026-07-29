@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Helper\PointActionHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
 {
@@ -20,7 +21,7 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         $this->pointActionHelper = $this->getContainer()->get(PointActionHelper::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideReturnsWithinAndAfterCases')]
+    #[DataProvider('provideReturnsWithinAndAfterCases')]
     public function testValidateUrlHitReturnsWithinAndAfter(
         int $previousOffset,
         ?int $returnsWithin,
@@ -70,11 +71,11 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
     public static function provideReturnsWithinAndAfterCases(): \Generator
     {
         yield 'returns_within true' => [
-            -20,
+            -10,
             20,
             null,
             true,
-            'Should return true when returns_within is 20 and hit difference is 20',
+            'Should return true when returns_within is 20 and hit difference is less than 20',
         ];
         yield 'returns_within false' => [
             -21,

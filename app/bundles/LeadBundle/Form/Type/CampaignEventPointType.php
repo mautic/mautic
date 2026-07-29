@@ -13,10 +13,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<CampaignEventPointType>
  */
-class CampaignEventPointType extends AbstractType
+final class CampaignEventPointType extends AbstractType
 {
     public function __construct(
-        private TypeOperatorProviderInterface $typeOperatorProvider,
+        private readonly TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
     }
 

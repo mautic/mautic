@@ -4,24 +4,42 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Role>
  */
 class RoleModel extends FormModel implements GlobalSearchInterface
 {
+    private UserRepository $userRepository;
+
+    private PermissionRepository $permissionRepository;
+
+    private RoleRepository $roleRepository;
+
+    #[Required]
+    public function autowireRoleModel(RoleRepository $roleRepository, PermissionRepository $permissionRepository, UserRepository $userRepository): void
+    {
+        $this->roleRepository = $roleRepository;
+        $this->permissionRepository = $permissionRepository;
+        $this->userRepository = $userRepository;
+    }
+
     public function getRepository(): RoleRepository
     {
-        return $this->em->getRepository(Role::class);
+        return $this->roleRepository;
     }
 
     public function getPermissionBase(): string
@@ -42,7 +60,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
 
         if (!$isNew) {
             // delete all existing
-            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
+            $this->permissionRepository->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -80,7 +98,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+        $users = $this->userRepository->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
@@ -88,7 +106,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
@@ -108,6 +126,19 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         return parent::getEntity($id);
+    }
+
+    public function cloneEntity(Role $source): Role
+    {
+        $clone = new Role();
+        $clone->setName($this->translator->trans('mautic.user.role.clone.prefix', ['%name%' => $source->getName()], 'messages'));
+        $clone->setDescription($source->getDescription());
+        $clone->setIsAdmin($source->isAdmin());
+
+        $rawPermissions = $source->getRawPermissions() ?? [];
+        $clone->setRawPermissions($rawPermissions);
+
+        return $clone;
     }
 
     /**
@@ -137,7 +168,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new RoleEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

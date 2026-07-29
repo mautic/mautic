@@ -23,19 +23,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: ImportCommand::COMMAND_NAME,
-    description: 'Imports data to Mautic'
+    description: 'Imports data to Mautic',
+    help: <<<'TXT'
+The <info>%command.name%</info> command starts to import CSV files when some are created.
+
+<info>php %command.full_name%</info>
+TXT
 )]
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ImportModel $importModel,
-        private ProcessSignalService $processSignalService,
-        private UserTokenSetter $userTokenSetter,
-        private LoggerInterface $logger,
-        private NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly ImportModel $importModel,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly UserTokenSetter $userTokenSetter,
+        private readonly LoggerInterface $logger,
+        private readonly NotificationModel $notificationModel,
     ) {
         parent::__construct();
     }
@@ -44,14 +49,7 @@ class ImportCommand extends Command
     {
         $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
-            ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command starts to import CSV files when some are created.
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

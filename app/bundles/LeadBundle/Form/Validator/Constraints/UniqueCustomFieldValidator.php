@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class UniqueCustomFieldValidator extends ConstraintValidator
+final class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 

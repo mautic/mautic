@@ -210,7 +210,7 @@ abstract class AbstractFormFieldHelper
                 continue;
             }
 
-            if (('' === $label || null === $label) && ('' === $value || null === $value)) {
+            if (('' === $label || null === $label) && '' === $value) {
                 // Both label and value are empty which can't work as choices
                 continue;
             }

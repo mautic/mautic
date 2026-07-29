@@ -9,14 +9,14 @@ use Twig\TwigFunction;
 class DateTimeExtension extends AbstractExtension
 {
     public function __construct(
-        private DateTimeHelper $helper,
+        private readonly DateTimeHelper $helper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('dateTimeGetUtcDateTime', [$this, 'getUtcDateTime'], ['is_safe' => ['all']]),
+            new TwigFunction('dateTimeGetUtcDateTime', $this->getUtcDateTime(...), ['is_safe' => ['all']]),
         ];
     }
 

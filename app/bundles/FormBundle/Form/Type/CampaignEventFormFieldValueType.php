@@ -14,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventFormFieldValueType extends AbstractType
+final class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
-        private FormModel $model,
+        private readonly FormModel $model,
     ) {
     }
 
@@ -39,7 +39,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -99,7 +99,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
-                                } elseif (!is_array($option)) {
+                                } else {
                                     // Kept here for BC
                                     $options[$field->getAlias()][$option] = $option;
                                 }
@@ -121,7 +121,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'required'    => true,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                 ]
@@ -141,7 +141,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
-                                ['message' => 'mautic.core.value.required']
+                                message: 'mautic.core.value.required'
                             ),
                         ],
                     ]
@@ -160,7 +160,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
-                                ['message' => 'mautic.core.value.required']
+                                message: 'mautic.core.value.required'
                             ),
                         ],
                     ]

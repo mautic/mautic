@@ -32,6 +32,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,15 +50,15 @@ final class ImportController extends AbstractFormController
         ManagerRegistry $doctrine,
         CoreParametersHelper $coreParametersHelper,
         ModelFactory $modelFactory,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         CorePermissions $security,
-        private LoggerInterface $logger,
-        private PathsHelper $pathsHelper,
-        private FormFactoryInterface $formFactory,
+        private readonly LoggerInterface $logger,
+        private readonly PathsHelper $pathsHelper,
+        private readonly FormFactoryInterface $formFactory,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -65,7 +66,7 @@ final class ImportController extends AbstractFormController
     public function newAction(): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session  = $this->requestStack->getSession();
@@ -94,7 +95,7 @@ final class ImportController extends AbstractFormController
     public function uploadAction(Request $request): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fullPath = $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
@@ -177,10 +178,10 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): Response
+    public function cancelAction(): RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
@@ -446,7 +447,7 @@ final class ImportController extends AbstractFormController
     public function undoAction(): JsonResponse
     {
         if (!$this->security->isGranted('campaign:imports:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session         = $this->requestStack->getSession();

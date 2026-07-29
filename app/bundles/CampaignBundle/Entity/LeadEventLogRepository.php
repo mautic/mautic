@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadEventLog>
@@ -20,6 +21,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+
     public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])
@@ -145,7 +147,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+        $query = new QueryBuilder($this->_em->getConnection());
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -187,8 +189,9 @@ class LeadEventLogRepository extends CommonRepository
         if (isset($options['eventType'])) {
             if (is_array($options['eventType'])) {
                 $query->andWhere(
-                    $query->expr()->in('e.event_type', array_map([$query->expr(), 'literal'], $options['eventType']))
+                    $query->expr()->in('e.event_type', ':eventTypes')
                 );
+                $query->setParameter('eventTypes', $options['eventType'], ArrayParameterType::STRING);
             } else {
                 $query->andwhere('e.event_type = :eventTypes')
                     ->setParameter('eventTypes', $options['eventType']);
@@ -233,7 +236,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
-        $q->$join(
+        $q->{$join}(
             'o',
             MAUTIC_TABLE_PREFIX.'campaign_leads',
             'l',
@@ -353,8 +356,10 @@ class LeadEventLogRepository extends CommonRepository
 
         if (!empty($exists)) {
             $q->andWhere(
-                $q->expr()->notIn('event_id', $exists)
-            )->executeStatement();
+                $q->expr()->notIn('event_id', ':ids')
+            )
+                ->setParameter('ids', $exists, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
@@ -366,7 +371,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    public function getChartQuery($options): array
+    public function getChartQuery(array $options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 
@@ -405,11 +410,9 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $eventId
      *
-     * @return ArrayCollection
-     *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): ArrayCollection
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return new ArrayCollection();
@@ -464,12 +467,13 @@ class LeadEventLogRepository extends CommonRepository
             ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->in('o.id', $ids),
+                    $q->expr()->in('o.id', ':ids'),
                     $q->expr()->eq('o.isScheduled', 1),
                     $q->expr()->eq('c.isPublished', 1),
                     $q->expr()->isNull('c.deleted')
                 )
-            );
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return new ArrayCollection($q->getQuery()->getResult());
     }
@@ -521,9 +525,10 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('log.event_id', $eventId),
-                    $qb->expr()->in('log.lead_id', $contactIds)
+                    $qb->expr()->in('log.lead_id', ':contactIds')
                 )
-            );
+            )
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -649,11 +654,7 @@ SQL;
         /** @var LeadEventLog $log */
         $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
 
-        if (null !== $log && null !== $log->getFailedLog()) {
-            return true;
-        }
-
-        return false;
+        return null !== $log && null !== $log->getFailedLog();
     }
 
     public function deleteAnonymousContacts(): int
@@ -678,7 +679,7 @@ SQL;
      */
     public function markEventLogsQueued(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

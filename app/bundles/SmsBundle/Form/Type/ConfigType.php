@@ -12,13 +12,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
 
     public function __construct(
-        private TransportChain $transportChain,
-        private TranslatorInterface $translator,
+        private readonly TransportChain $transportChain,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -52,7 +52,7 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
                 ],
-                'data'=> !empty($options['data'][self::SMS_DISABLE_TRACKABLE_URLS]) ? true : false,
+                'data'=> !empty($options['data'][self::SMS_DISABLE_TRACKABLE_URLS]),
             ]
         );
     }

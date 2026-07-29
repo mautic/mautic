@@ -10,7 +10,7 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadModel $leadModel,

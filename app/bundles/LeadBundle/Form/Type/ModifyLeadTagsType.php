@@ -9,10 +9,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ModifyLeadTagsType extends AbstractType
+final class ModifyLeadTagsType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

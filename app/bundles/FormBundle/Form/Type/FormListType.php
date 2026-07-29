@@ -13,11 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormListType extends AbstractType
+final class FormListType extends AbstractType
 {
-    private $viewOther;
+    private readonly bool $viewOther;
 
-    private \Mautic\FormBundle\Entity\FormRepository $repo;
+    private readonly \Mautic\FormBundle\Entity\FormRepository $repo;
 
     public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {
@@ -61,7 +61,7 @@ class FormListType extends AbstractType
         $resolver->setDefined(['form_type']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

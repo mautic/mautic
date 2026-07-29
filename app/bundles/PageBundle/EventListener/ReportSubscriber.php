@@ -16,7 +16,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_PAGES      = 'pages';
 

@@ -21,13 +21,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class ListController extends CommonController
+final class ListController extends CommonController
 {
     public function __construct(
-        private PluginCollector $pluginCollector,
-        private RouteProvider $routeProvider,
+        private readonly PluginCollector $pluginCollector,
+        private readonly RouteProvider $routeProvider,
         ManagerRegistry $doctrine,
-        private Config $config,
+        private readonly Config $config,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -47,7 +47,7 @@ class ListController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();

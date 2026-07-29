@@ -22,15 +22,18 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 #[AsCommand(
     name: InstallCommand::COMMAND,
-    description: 'Installs Mautic'
+    description: 'Installs Mautic',
+    help: <<<'TXT'
+This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
+TXT
 )]
 class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
     public function __construct(
-        private InstallService $installer,
-        private ManagerRegistry $doctrineRegistry,
+        private readonly InstallService $installer,
+        private readonly ManagerRegistry $doctrineRegistry,
     ) {
         parent::__construct();
     }
@@ -38,11 +41,9 @@ class InstallCommand extends Command
     /**
      * Note: in every option (addOption()), please leave the default value empty to prevent problems with values from local.php being overwritten.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -240,7 +241,8 @@ class InstallCommand extends Command
                         $output->writeln('Install canceled');
 
                         return (int) -$step;
-                    } elseif (isset($messages['optional']) && !empty($messages['optional'])) {
+                    }
+                    if (isset($messages['optional']) && !empty($messages['optional'])) {
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 
@@ -385,7 +387,7 @@ class InstallCommand extends Command
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
                         if (isset($params[$key])) {
-                            $step->$key = $params[$key];
+                            $step->{$key} = $params[$key];
                         }
                     }
                 }
@@ -436,7 +438,7 @@ class InstallCommand extends Command
     private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            $output->writeln("  - [$type] $message");
+            $output->writeln("  - [{$type}] {$message}");
         }
     }
 }

@@ -1,14 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $lead = [
+    /**
+     * @var array<string, mixed>
+     */
+    private array $lead = [
         'firstname' => 'Bob',
         'lastname'  => 'Smith',
         'country'   => '',
@@ -24,8 +31,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
-        $reflectionProperty->setValue(null, [
+        ReflectionHelper::setStaticValue(TokenHelper::class, 'parameters', [
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
         ]);
@@ -45,8 +51,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getFields')
             ->willReturn($fields);
 
-        $reflectionProperty = new \ReflectionProperty(LeadRepository::class, 'leadFieldRepository');
-        $reflectionProperty->setValue(null, $leadFieldRepository);
+        ReflectionHelper::setStaticValue(LeadRepository::class, 'leadFieldRepository', $leadFieldRepository);
 
         parent::setUp();
     }
@@ -226,7 +231,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($tokenList[$token]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidateToken')]
+    #[DataProvider('dataValidateToken')]
     public function testValidToken(string $content, bool $expected): void
     {
         $this->assertSame($expected, TokenHelper::validToken($content));
@@ -243,7 +248,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['firstname', false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetTokenFieldAlias')]
+    #[DataProvider('dataGetTokenFieldAlias')]
     public function testGetTokenFieldAlias(string $content, string $expected): void
     {
         $this->assertSame($expected, TokenHelper::getTokenFieldAlias($content));
@@ -260,11 +265,8 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
-    /**
-     * @param string|int $result
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataLabelProvider')]
-    public function testLabelFormatForSelect(string $token, $result): void
+    #[DataProvider('dataLabelProvider')]
+    public function testLabelFormatForSelect(string $token, string|int $result): void
     {
         $lead         = $this->lead;
         $tokenList    = TokenHelper::findLeadTokens($token, $lead);
@@ -272,16 +274,13 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array<int, int|string>>
+     * @return \Iterator<int, array<int, (int|string)>>
      */
-    public static function dataLabelProvider(): array
+    public static function dataLabelProvider(): \Iterator
     {
-        return
-            [
-                ['{contactfield=select}', 'first'],
-                ['{contactfield=select|label}', 'First option'],
-                ['{contactfield=bool}', 1],
-                ['{contactfield=bool|label}', 'Yes'],
-            ];
+        yield ['{contactfield=select}', 'first'];
+        yield ['{contactfield=select|label}', 'First option'];
+        yield ['{contactfield=bool}', 1];
+        yield ['{contactfield=bool|label}', 'Yes'];
     }
 }

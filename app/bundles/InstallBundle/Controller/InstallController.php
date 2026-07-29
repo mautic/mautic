@@ -5,7 +5,6 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,11 +22,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class InstallController extends CommonController
+final class InstallController extends CommonController
 {
     public function __construct(
-        private Configurator $configurator,
-        private InstallService $installer,
+        private readonly Configurator $configurator,
+        private readonly InstallService $installer,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -44,7 +43,7 @@ class InstallController extends CommonController
     /**
      * Controller action for install steps.
      *
-     * @param int $index The step number to process
+     * @param float $index The step number to process
      *
      * @throws \Doctrine\DBAL\Exception
      */
@@ -75,7 +74,6 @@ class InstallController extends CommonController
         }
 
         $step   = $this->configurator->getStep($index)[0];
-        \assert($step instanceof StepInterface);
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
@@ -274,9 +272,6 @@ class InstallController extends CommonController
         );
     }
 
-    /**
-     * Handle installer errors.
-     */
     private function handleInstallerErrors(FormInterface $form, array $messages): void
     {
         foreach ($messages as $type => $message) {

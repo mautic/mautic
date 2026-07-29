@@ -2,7 +2,7 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -35,7 +36,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
 
     public function __construct(
         protected RequestStack $requestStack,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -43,6 +44,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly CategoryRepository $categoryRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -50,10 +52,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     // @phpstan-ignore-next-line method.childReturnType
     public function getRepository(): CategoryRepository
     {
-        $repository = $this->em->getRepository(Category::class);
-        \assert($repository instanceof CategoryRepository);
-
-        return $repository;
+        return $this->categoryRepository;
     }
 
     public function getNameGetter(): string
@@ -83,18 +82,17 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
-        $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
-        $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+        $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+            $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
@@ -106,7 +104,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -157,7 +155,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new CategoryEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -171,8 +169,6 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param string               $type
      * @param string               $filter
      * @param int                  $limit
@@ -190,7 +186,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             return $this->categoriesByBundleCache[$key];
         }
 
-        $result = $this->getRepository()->getCategoryList($type, $filter, $limit, $start);
+        $result = $this->categoryRepository->getCategoryList($type, $filter, $limit, $start);
 
         if (!isset($options['for_lookup'])) {
             return $this->categoriesByBundleCache[$key] = $result;

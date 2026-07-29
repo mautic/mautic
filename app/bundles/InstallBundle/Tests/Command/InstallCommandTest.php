@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InstallCommandTest extends TestCase
+final class InstallCommandTest extends TestCase
 {
     /**
      * @var MockObject&InstallService
@@ -43,7 +43,7 @@ class InstallCommandTest extends TestCase
         $inputDefinition->method('getOptions')->willReturn([]);
         $inputDefinition->method('getArguments')->willReturn([]);
 
-        $application->method('getHelperSet')->willReturn($this->createMock(HelperSet::class));
+        $application->method('getHelperSet')->willReturn($this->createStub(HelperSet::class));
         $application->method('getDefinition')->willReturn($inputDefinition);
         $application->method('find')->willReturn($command);
 
@@ -53,7 +53,7 @@ class InstallCommandTest extends TestCase
 
     public function testCommandWhenSiteInstalled(): void
     {
-        $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(true);
+        $this->installer->method('checkIfInstalled')->willReturn(true);
 
         $input  = new ArrayInput(['site_url' => 'localhost']);
         $output = new BufferedOutput();
@@ -64,9 +64,9 @@ class InstallCommandTest extends TestCase
 
     public function testCommandWhenSiteNotInstalled(): void
     {
-        $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(false);
+        $this->installer->method('checkIfInstalled')->willReturn(false);
 
-        $this->doctrineRegistry->method('getConnection')->willReturn($this->createMock(ConnectionWrapper::class));
+        $this->doctrineRegistry->method('getConnection')->willReturn($this->createStub(ConnectionWrapper::class));
 
         $input = new ArrayInput(
             [

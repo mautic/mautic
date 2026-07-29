@@ -19,11 +19,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class CacheController extends CommonController
+final class CacheController extends CommonController
 {
     public function __construct(
-        private Config $config,
-        private Allowlist $allowlist,
+        private readonly Config $config,
+        private readonly Allowlist $allowlist,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -44,7 +44,7 @@ class CacheController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->allowlist->clearCache();

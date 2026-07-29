@@ -15,7 +15,7 @@ use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SmsSubscriber implements EventSubscriberInterface
+final readonly class SmsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AuditLogModel $auditLogModel,

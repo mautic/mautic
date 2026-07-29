@@ -5,13 +5,13 @@ namespace Mautic\ChannelBundle\Event;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MessageQueueBatchProcessEvent extends Event
+final class MessageQueueBatchProcessEvent extends Event
 {
     /**
      * @param MessageQueue[] $messages
      */
     public function __construct(
-        private array $messages,
+        private readonly array $messages,
         private $channel,
         private $channelId,
     ) {
@@ -22,10 +22,7 @@ class MessageQueueBatchProcessEvent extends Event
         return $channel === $this->channel;
     }
 
-    /**
-     * @return array
-     */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }

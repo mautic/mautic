@@ -47,6 +47,30 @@ $container->loadFromExtension('framework', [
     'assets' => [
         'base_path' => './',
     ],
+    'asset_mapper' => [
+        'paths' => [
+            '%mautic.application_dir%/app/bundles/CoreBundle/Assets'             => '',
+            '%kernel.project_dir%/vendor/twbs/bootstrap-sass/assets/javascripts' => 'vendor/bootstrap',
+        ],
+        'public_prefix'       => '/assets/build/',
+        'missing_import_mode' => 'strict',
+        'excluded_patterns'   => [
+            '*/assets/build/*',
+            '*/assets/build/**',
+            '*/app/bundles/CoreBundle/Assets/images/*',
+            '*/app/bundles/CoreBundle/Assets/images/**',
+            '*/app/bundles/CoreBundle/Assets/js/*',
+            '*/app/bundles/CoreBundle/Assets/js/**',
+            '*/app/bundles/CoreBundle/Assets/json/*',
+            '*/app/bundles/CoreBundle/Assets/json/**',
+            '*/app/bundles/CoreBundle/Assets/pictograms/*',
+            '*/app/bundles/CoreBundle/Assets/pictograms/**',
+            '*/app/bundles/CoreBundle/Assets/css/app/scss/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/app/scss/**/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/libraries/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/libraries/**/_*.scss',
+        ],
+    ],
     'secret' => '%mautic.secret_key%',
     'router' => [
         'resource'            => '%mautic.application_dir%/app/config/routing.php',
@@ -105,6 +129,18 @@ $container->loadFromExtension('framework', [
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
     )*/
+]);
+
+$container->loadFromExtension('symfonycasts_sass', [
+    'root_sass'    => [
+        '%mautic.application_dir%/app/bundles/CoreBundle/Assets/css/app.scss',
+    ],
+    'sass_options' => [
+        'load_path'  => [
+            '%kernel.project_dir%/vendor/twbs/bootstrap-sass/assets/stylesheets',
+        ],
+        'source_map' => false,
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);

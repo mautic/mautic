@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -17,9 +17,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,19 +28,30 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper()
+ *
+ * @extends CrmAbstractIntegration<HubspotApi>
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    private StageRepository $stageRepository;
+
+    #[Required]
+    public function autowireHubspotIntegration(StageRepository $stageRepository): void
+    {
+        $this->stageRepository = $stageRepository;
+    }
+
     public const ACCESS_KEY = 'accessKey';
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RequestStack $requestStack,
         RouterInterface $router,
         TranslatorInterface $translator,
@@ -348,10 +359,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return array
-     */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         if (!isset($data['properties'])) {
             return [];
@@ -400,9 +408,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
                             if ($contact && !$contact->isNewlyCreated()) { // updated
-                                $executed[0] = $executed[0] + 1;
+                                ++$executed[0];
                             } elseif ($contact && $contact->isNewlyCreated()) { // newly created
-                                $executed[1] = $executed[1] + 1;
+                                ++$executed[1];
                             }
 
                             if ($contact) {
@@ -428,10 +436,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param bool  $id
+     * @param bool $id
      */
-    public function getCompanies($params = [], $id = false, &$executed = null)
+    public function getCompanies(array $params = [], $id = false, &$executed = null)
     {
         $results = [];
         try {
@@ -506,7 +513,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository(Stage::class)->getStageByName($stageName);
+                $stage = $this->stageRepository->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -562,10 +569,8 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -606,10 +611,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
 
             if (!empty($leadData['vid'])) {
-                /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
-                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity     = (empty($integrationId)) ?
+                $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
+                $integrationEntity = (empty($integrationId)) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],
@@ -617,10 +620,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $lead->getId(),
                         [],
                         false
-                    ) : $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                    ) : $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
 
                 $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                $this->getIntegrationEntityRepository()->saveEntity($integrationEntity);
+                $this->integrationEntityRepository->saveEntity($integrationEntity);
                 $this->em->detach($integrationEntity);
             }
 
@@ -643,17 +646,13 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    private function getReadOnlyFields($object): array
+    private function getReadOnlyFields(string $object): array
     {
         $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
 
         return array_filter(
             $fields,
-            function ($field) {
-                if (!empty($field['readOnly'])) {
-                    return $field;
-                }
-            }
+            fn (array $field): bool => !empty($field['readOnly'])
         );
     }
 }

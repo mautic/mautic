@@ -10,7 +10,6 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,10 +28,10 @@ class ContactScheduledExportCommand extends Command
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
     public function __construct(
-        private ContactExportSchedulerModel $contactExportSchedulerModel,
-        private EventDispatcherInterface $eventDispatcher,
-        private FormatterHelper $formatterHelper,
-        private ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FormatterHelper $formatterHelper,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly \Mautic\LeadBundle\Entity\ContactExportSchedulerRepository $contactExportSchedulerRepository,
     ) {
         parent::__construct();
     }
@@ -58,10 +57,10 @@ class ContactScheduledExportCommand extends Command
 
         $ids = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
 
-        if ($ids) {
-            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
+        if ([] !== $ids) {
+            $contactExportSchedulers = $this->contactExportSchedulerRepository->findBy(['id' => $ids]);
         } else {
-            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()
+            $contactExportSchedulers = $this->contactExportSchedulerRepository
                 ->findBy([], [], self::PICK_SCHEDULED_EXPORTS_LIMIT);
         }
 

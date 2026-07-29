@@ -27,12 +27,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<LeadList>
  */
-class ListType extends AbstractType
+final class ListType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private ListModel $listModel,
-        private RelativeDate $relativeDate,
+        private readonly TranslatorInterface $translator,
+        private readonly ListModel $listModel,
+        private readonly RelativeDate $relativeDate,
     ) {
     }
 

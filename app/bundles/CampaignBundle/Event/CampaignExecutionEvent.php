@@ -15,7 +15,7 @@ class CampaignExecutionEvent extends Event
     use ContextTrait;
 
     /**
-     * @var Lead
+     * @var Lead|mixed
      */
     protected $lead;
 
@@ -70,7 +70,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return Lead
+     * @return Lead|mixed
      */
     public function getLead()
     {
@@ -84,7 +84,7 @@ class CampaignExecutionEvent extends Event
      */
     public function getLeadFields()
     {
-        $lead         = $this->getLead();
+        $lead         = $this->lead;
         $isLeadEntity = $lead instanceof Lead;
 
         // In case Lead is a scalar value:
@@ -140,10 +140,8 @@ class CampaignExecutionEvent extends Event
 
     /**
      * @param bool|mixed[]|string|null $result
-     *
-     * @return $this
      */
-    public function setResult($result)
+    public function setResult($result): static
     {
         $this->result = $result;
 
@@ -154,10 +152,8 @@ class CampaignExecutionEvent extends Event
      * Set the result to failed.
      *
      * @param string|null $reason
-     *
-     * @return $this
      */
-    public function setFailed($reason = null)
+    public function setFailed($reason = null): static
     {
         $this->result = [
             'failed' => 1,
@@ -177,10 +173,8 @@ class CampaignExecutionEvent extends Event
 
     /**
      * Set a custom log entry to override auto-handling of the log entry.
-     *
-     * @return $this
      */
-    public function setLogEntry(LeadEventLog $log)
+    public function setLogEntry(LeadEventLog $log): static
     {
         $this->logUpdatedByListener = true;
         $this->log                  = $log;
@@ -188,10 +182,7 @@ class CampaignExecutionEvent extends Event
         return $this;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLogEntry()
+    public function getLogEntry(): ?LeadEventLog
     {
         return $this->log;
     }

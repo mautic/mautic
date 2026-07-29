@@ -9,6 +9,11 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
+    ->in(__DIR__.'/tests')
+    ->exclude('_support/_generated')
+    ->in(__DIR__.'/utils')
+    // rector rule fixtures are test data, not code, and reformatting them breaks the expected output
+    ->notName('*.php.inc')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
     ->append([
         __DIR__.'/app/AppKernel.php',
@@ -24,8 +29,8 @@ return (new PhpCsFixer\Config())
         '@Symfony'               => true,
         'binary_operator_spaces' => [
             'operators' => [
-                '=>' => 'align',
-                '='  => 'align',
+                '=>' => null,
+                '='  => null,
             ],
         ],
         'phpdoc_to_comment' => false,
@@ -43,12 +48,11 @@ return (new PhpCsFixer\Config())
         'header_comment'        => [
             'header' => '',
         ],
-        'Mautic/no_table_prefix_definition_in_tests'       => true,
         'multiline_whitespace_before_semicolons'           => true,
         'nullable_type_declaration_for_default_null_value' => true,
+        'new_with_parentheses'                             => ['anonymous_class' => true],
         'no_superfluous_phpdoc_tags'                       => [
             'allow_mixed' => true,
         ],
     ])
-    ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);

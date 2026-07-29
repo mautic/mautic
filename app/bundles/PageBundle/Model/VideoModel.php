@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -28,7 +28,7 @@ class VideoModel extends FormModel
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -36,13 +36,14 @@ class VideoModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly VideoHitRepository $videoHitRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getHitRepository(): VideoHitRepository
     {
-        return $this->em->getRepository(VideoHit::class);
+        return $this->videoHitRepository;
     }
 
     public function getPermissionBase(): string
@@ -62,7 +63,7 @@ class VideoModel extends FormModel
      */
     public function getHitForLeadByGuid(Lead $lead, $guid)
     {
-        return $this->getHitRepository()->getHitForLeadByGuid($lead, $guid);
+        return $this->videoHitRepository->getHitForLeadByGuid($lead, $guid);
     }
 
     /**

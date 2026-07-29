@@ -22,13 +22,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class DetailController extends CommonController
+final class DetailController extends CommonController
 {
     public function __construct(
-        private PackageModel $packageModel,
-        private RouteProvider $routeProvider,
-        private Config $config,
-        private ComposerHelper $composer,
+        private readonly PackageModel $packageModel,
+        private readonly RouteProvider $routeProvider,
+        private readonly Config $config,
+        private readonly ComposerHelper $composer,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -49,7 +49,7 @@ class DetailController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $isInstalled = $this->composer->isInstalled("{$vendor}/{$package}");

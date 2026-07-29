@@ -20,9 +20,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 final class ScheduleSendType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -39,9 +36,7 @@ final class ScheduleSendType extends AbstractType
                 'required'    => false,
                 'html5'       => false,
                 'constraints' => new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ]
         );

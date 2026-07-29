@@ -145,23 +145,21 @@ class Focus extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'type',
             new NotBlank(
-                ['message' => 'mautic.focus.error.select_type']
+                message: 'mautic.focus.error.select_type'
             )
         );
 
         $metadata->addPropertyConstraint(
             'style',
             new NotBlank(
-                ['message' => 'mautic.focus.error.select_style']
+                message: 'mautic.focus.error.select_style'
             )
         );
     }
@@ -278,10 +276,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $description
-     *
-     * @return Focus
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
 
@@ -298,10 +294,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->editor;
     }
 
-    /**
-     * @return Focus
-     */
-    public function setEditor($editor)
+    public function setEditor($editor): static
     {
         $this->isChanged('editor', $editor);
 
@@ -318,10 +311,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->html;
     }
 
-    /**
-     * @return Focus
-     */
-    public function setHtml($html)
+    public function setHtml($html): static
     {
         $this->isChanged('html', $html);
 
@@ -338,10 +328,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->htmlMode;
     }
 
-    /**
-     * @return Focus
-     */
-    public function setHtmlMode($htmlMode)
+    public function setHtmlMode($htmlMode): static
     {
         $this->isChanged('htmlMode', $htmlMode);
 
@@ -360,10 +347,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $name
-     *
-     * @return Focus
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
 
@@ -382,10 +367,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $category
-     *
-     * @return Focus
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
 
@@ -404,10 +387,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $publishUp
-     *
-     * @return Focus
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
 
@@ -426,10 +407,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $publishDown
-     *
-     * @return Focus
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
 
@@ -448,10 +427,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param array<mixed> $properties
-     *
-     * @return Focus
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -471,7 +448,7 @@ class Focus extends FormEntity implements UuidInterface
     /**
      * @param array $utmTags
      */
-    public function setUtmTags($utmTags)
+    public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -489,10 +466,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $type
-     *
-     * @return Focus
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
 
@@ -511,10 +486,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $style
-     *
-     * @return Focus
      */
-    public function setStyle($style)
+    public function setStyle($style): static
     {
         $this->isChanged('style', $style);
 
@@ -533,10 +506,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $website
-     *
-     * @return Focus
      */
-    public function setWebsite($website)
+    public function setWebsite($website): static
     {
         $this->isChanged('website', $website);
 
@@ -555,10 +526,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $form
-     *
-     * @return Focus
      */
-    public function setForm($form)
+    public function setForm($form): static
     {
         if ($form instanceof Form) {
             $form = $form->getId();
@@ -581,10 +550,8 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @param mixed $cache
-     *
-     * @return Focus
      */
-    public function setCache($cache)
+    public function setCache($cache): static
     {
         $this->cache = $cache;
 

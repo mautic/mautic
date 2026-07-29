@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @implements DataTransformerInterface<mixed, array<mixed>|mixed>
  */
-class FieldFilterTransformer implements DataTransformerInterface
+final class FieldFilterTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]
@@ -26,9 +26,9 @@ class FieldFilterTransformer implements DataTransformerInterface
     private array $defaultStrings;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private RelativeDate $relativeDate,
-        private array $default = [],
+        private readonly TranslatorInterface $translator,
+        private readonly RelativeDate $relativeDate,
+        private readonly array $default = [],
     ) {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {

@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -35,22 +35,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Page>
  */
-class PageType extends AbstractType
+final class PageType extends AbstractType
 {
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private readonly bool $canViewOther;
 
     public function __construct(
-        private EntityManager $em,
-        private PageModel $model,
+        private readonly EntityManagerInterface $em,
+        private readonly PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        private ThemeHelperInterface $themeHelper,
-        private PageConfigInterface $pageConfig,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly PageConfigInterface $pageConfig,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();

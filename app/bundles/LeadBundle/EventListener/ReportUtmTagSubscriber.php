@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportUtmTagSubscriber implements EventSubscriberInterface
+final readonly class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 

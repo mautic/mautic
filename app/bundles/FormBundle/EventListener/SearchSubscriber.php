@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FormModel $formModel,

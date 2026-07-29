@@ -7,23 +7,18 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormatterHelperTest extends \PHPUnit\Framework\TestCase
+final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DateHelper $dateHelper;
-
     private FormatterHelper $formatterHelper;
-
-    /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     private string $previousTimeZone;
 
@@ -31,16 +26,15 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->dateHelper           = new DateHelper(
+        $dateHelper                 = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $this->coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
-        $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
+        $this->formatterHelper               = new FormatterHelper($dateHelper, $this->translator);
     }
 
     protected function tearDown(): void
@@ -63,7 +57,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $matcher = $this->exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.yes', $parameters[0]);
 
@@ -74,6 +68,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
                     return 'no';
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $result = $this->formatterHelper->_(1, 'bool');
@@ -88,7 +84,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $result = $this->formatterHelper->_(1.55, 'float');
 
         $this->assertEquals('1.5500', $result);
-        $this->assertEquals('string', gettype($result));
+        $this->assertSame('string', gettype($result));
     }
 
     public function testIntFormat(): void
@@ -96,18 +92,17 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $result = $this->formatterHelper->_(10, 'int');
 
         $this->assertSame('10', $result);
-        $this->assertEquals('string', gettype($result));
+        $this->assertSame('string', gettype($result));
     }
 
-    /**
-     * @param mixed $input
-     * @param mixed $expected
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('stringProvider')]
-    public function testNormalizeStringValue($input, $expected): void
+    #[DataProvider('stringProvider')]
+    public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);
+        $this->assertEquals(
+            $expected,
+            $this->formatterHelper->normalizeStringValue($input)
+        );
     }
 
     /**
@@ -137,7 +132,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlFormatProvider')]
+    #[DataProvider('urlFormatProvider')]
     public function testUrlFormat(string $url, string $expected): void
     {
         $result = $this->formatterHelper->_($url, 'url');
@@ -145,59 +140,57 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return \Iterator<string, array<string>>
      */
-    public static function urlFormatProvider(): array
+    public static function urlFormatProvider(): \Iterator
     {
-        return [
-            'normal url' => [
-                'http://example.com',
-                '<a href="http://example.com" target="_blank">http://example.com</a>',
-            ],
-            'malicious url' => [
-                'http://example.com"><script>alert("XSS")</script>',
-                '<a href="http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;" target="_blank">http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
-            ],
-            'malicious url2' => [
-                'http://example.com?a="<b>test</b>',
-                '<a href="http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E" target="_blank">http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E</a>',
-            ],
-            'url with single GET parameter' => [
-                'http://example.com/page?param=value',
-                '<a href="http://example.com/page?param=value" target="_blank">http://example.com/page?param=value</a>',
-            ],
-            'url with multiple GET parameters' => [
-                'http://example.com/search?q=test&page=1&sort=desc',
-                '<a href="http://example.com/search?q=test&page=1&sort=desc" target="_blank">http://example.com/search?q=test&page=1&sort=desc</a>',
-            ],
-            'url with encoded GET parameters' => [
-                'http://example.com/search?q=hello+world&lang=en',
-                '<a href="http://example.com/search?q=hello%20world&lang=en" target="_blank">http://example.com/search?q=hello%20world&lang=en</a>',
-            ],
-            'url with special characters in GET parameters' => [
-                'http://example.com/path?param=value&special=!@#$%^&*()',
-                '<a href="http://example.com/path?param=value&special=%21%40#$%^&*()" target="_blank">http://example.com/path?param=value&special=%21%40#$%^&*()</a>',
-            ],
-            'https url' => [
-                'https://secure.example.com',
-                '<a href="https://secure.example.com" target="_blank">https://secure.example.com</a>',
-            ],
-            'url with port number' => [
-                'http://example.com:8080/path',
-                '<a href="http://example.com:8080/path" target="_blank">http://example.com:8080/path</a>',
-            ],
-            'url with username and password' => [
-                'http://user:pass@example.com',
-                '<a href="http://user:pass@example.com" target="_blank">http://user:pass@example.com</a>',
-            ],
-            'url with fragment identifier' => [
-                'http://example.com/page#section',
-                '<a href="http://example.com/page#section" target="_blank">http://example.com/page#section</a>',
-            ],
+        yield 'normal url' => [
+            'http://example.com',
+            '<a href="http://example.com" target="_blank">http://example.com</a>',
+        ];
+        yield 'malicious url' => [
+            'http://example.com"><script>alert("XSS")</script>',
+            '<a href="http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;" target="_blank">http://example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
+        ];
+        yield 'malicious url2' => [
+            'http://example.com?a="<b>test</b>',
+            '<a href="http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E" target="_blank">http://example.com?a=%22%3Cb%3Etest%3C%2Fb%3E</a>',
+        ];
+        yield 'url with single GET parameter' => [
+            'http://example.com/page?param=value',
+            '<a href="http://example.com/page?param=value" target="_blank">http://example.com/page?param=value</a>',
+        ];
+        yield 'url with multiple GET parameters' => [
+            'http://example.com/search?q=test&page=1&sort=desc',
+            '<a href="http://example.com/search?q=test&page=1&sort=desc" target="_blank">http://example.com/search?q=test&page=1&sort=desc</a>',
+        ];
+        yield 'url with encoded GET parameters' => [
+            'http://example.com/search?q=hello+world&lang=en',
+            '<a href="http://example.com/search?q=hello%20world&lang=en" target="_blank">http://example.com/search?q=hello%20world&lang=en</a>',
+        ];
+        yield 'url with special characters in GET parameters' => [
+            'http://example.com/path?param=value&special=!@#$%^&*()',
+            '<a href="http://example.com/path?param=value&special=%21%40#$%^&*()" target="_blank">http://example.com/path?param=value&special=%21%40#$%^&*()</a>',
+        ];
+        yield 'https url' => [
+            'https://secure.example.com',
+            '<a href="https://secure.example.com" target="_blank">https://secure.example.com</a>',
+        ];
+        yield 'url with port number' => [
+            'http://example.com:8080/path',
+            '<a href="http://example.com:8080/path" target="_blank">http://example.com:8080/path</a>',
+        ];
+        yield 'url with username and password' => [
+            'http://user:pass@example.com',
+            '<a href="http://user:pass@example.com" target="_blank">http://user:pass@example.com</a>',
+        ];
+        yield 'url with fragment identifier' => [
+            'http://example.com/page#section',
+            '<a href="http://example.com/page#section" target="_blank">http://example.com/page#section</a>',
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailFormatProvider')]
+    #[DataProvider('emailFormatProvider')]
     public function testEmailFormat(string $email, string $expected): void
     {
         $result = $this->formatterHelper->_($email, 'email');
@@ -205,23 +198,21 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return \Iterator<string, array<string>>
      */
-    public static function emailFormatProvider(): array
+    public static function emailFormatProvider(): \Iterator
     {
-        return [
-            'normal email' => [
-                'user@example.com',
-                '<a href="mailto:user@example.com">user@example.com</a>',
-            ],
-            'email with alias' => [
-                'user.one+test@example.com',
-                '<a href="mailto:user.one+test@example.com">user.one+test@example.com</a>',
-            ],
-            'malicious email' => [
-                'user@example.com"><script>alert("XSS")</script>',
-                '<a href="mailto:user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;">user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
-            ],
+        yield 'normal email' => [
+            'user@example.com',
+            '<a href="mailto:user@example.com">user@example.com</a>',
+        ];
+        yield 'email with alias' => [
+            'user.one+test@example.com',
+            '<a href="mailto:user.one+test@example.com">user.one+test@example.com</a>',
+        ];
+        yield 'malicious email' => [
+            'user@example.com"><script>alert("XSS")</script>',
+            '<a href="mailto:user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;">user@example.com&#34;&#62;&#60;script&#62;alert(&#34;XSS&#34;)&#60;/script&#62;</a>',
         ];
     }
 

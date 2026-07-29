@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\JobExtendTimeEvent;
@@ -17,11 +19,10 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporterTest extends \PHPUnit\Framework\TestCase
+final class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessExport(): void
     {
@@ -89,21 +90,21 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (Report $report, ReportExportOptions $exportOptions) use ($reportNow, $report2, $report1, $reportDataResult, $invokedCount): ReportDataResult {
                 $invocationCount = $invokedCount->numberOfInvocations();
                 if (0 < $invocationCount && $invocationCount <= 6) {
-                    self::assertSame($report1, $report);
-                    self::assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
-                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertSame($report1, $report);
+                    $this->assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
+                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 if (6 < $invocationCount && $invocationCount <= 12) {
-                    self::assertSame($report2, $report);
-                    self::assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
-                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertSame($report2, $report);
+                    $this->assertEquals((new \DateTime())->setTime(0, 0), $exportOptions->getDateFrom());
+                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 if (12 < $invocationCount && $invocationCount <= 18) {
-                    self::assertSame($reportNow, $report);
-                    self::assertEquals((new \DateTime())->setTime(0, 0)->sub(new \DateInterval('P10Y')), $exportOptions->getDateFrom());
-                    self::assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
+                    $this->assertSame($reportNow, $report);
+                    $this->assertEquals((new \DateTime())->setTime(0, 0)->sub(new \DateInterval('P10Y')), $exportOptions->getDateFrom());
+                    $this->assertEquals((new \DateTime('yesterday'))->setTime(23, 59, 59), $exportOptions->getDateTo());
                 }
 
                 return $reportDataResult;
@@ -118,21 +119,21 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->atLeast(3);
 
         $eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow): JobExtendTimeEvent|\Mautic\ReportBundle\Event\ReportScheduleSendEvent {
                 if ($event instanceof JobExtendTimeEvent) {
                     return $event;
                 }
 
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
-                Assert::assertSame($event->getFile(), 'my-path');
+                $this->assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $scheduler1);
+                    $this->assertSame($event->getScheduler(), $scheduler1);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $scheduler2);
+                    $this->assertSame($event->getScheduler(), $scheduler2);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    Assert::assertSame($event->getScheduler(), $schedulerNow);
+                    $this->assertSame($event->getScheduler(), $schedulerNow);
                 }
 
                 return $event;

@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
@@ -222,7 +222,6 @@ class ReportSubscriber implements EventSubscriberInterface
                     $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
-
                     $event->setGraph($g, $data);
                     break;
                 */

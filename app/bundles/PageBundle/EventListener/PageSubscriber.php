@@ -16,7 +16,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AssetsHelper $assetsHelper,
@@ -190,7 +190,7 @@ class PageSubscriber implements EventSubscriberInterface
         $livePageReflection   = new \ReflectionObject($livePage);
         $editedPageReflection = new \ReflectionObject($editedPage);
         foreach ($livePageReflection->getProperties() as $property) {
-            if ('id' == $property->getName()) {
+            if ('id' === $property->getName()) {
                 continue;
             }
 

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class MessageOnlyErrorHandlerException extends ErrorHandlerException
+final class MessageOnlyErrorHandlerException extends ErrorHandlerException
 {
     public function __construct($message = '')
     {

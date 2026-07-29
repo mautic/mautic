@@ -11,10 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadListType extends AbstractType
+final class LeadListType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel,
+        private readonly ListModel $segmentModel,
     ) {
     }
 
@@ -42,7 +42,7 @@ class LeadListType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

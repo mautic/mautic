@@ -2,7 +2,7 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\SmsBundle\Entity\Sms;
@@ -28,10 +29,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Sms>
  */
-class SmsType extends AbstractType
+final class SmsType extends AbstractType
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -92,7 +93,7 @@ class SmsType extends AbstractType
             ]
         );
 
-        $mediaFields = function (FormEvent $event) {
+        $mediaFields = function (FormEvent $event): void {
             $form        = $event->getForm();
             $data        = $event->getData();
             $mediaChoice = $data instanceof Sms ? $data->getMedia() : ($data['media'] ?? []);
@@ -118,7 +119,7 @@ class SmsType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         // add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -194,7 +195,7 @@ class SmsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 if (isset($data['translationParentSelector'])) {
                     $data['translationParent'] = $data['translationParentSelector'];

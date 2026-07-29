@@ -80,8 +80,8 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
         $operator = $translator->trans('mautic.lead.list.form.operator.in');
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
@@ -93,7 +93,7 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
                 '%comparisonValue%' => 'v1,v3',
                 '%value%'           => 'v1,v3',
             ]),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead2->getId()));
@@ -105,7 +105,7 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
                 '%comparisonValue%' => 'v1,v3',
                 '%value%'           => 'v1,v3',
             ]),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 }

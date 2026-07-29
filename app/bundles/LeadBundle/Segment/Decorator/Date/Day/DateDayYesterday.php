@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class DateDayYesterday extends DateDayAbstract
 {
-    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {
         $dateTimeHelper->modify('midnight yesterday');
     }

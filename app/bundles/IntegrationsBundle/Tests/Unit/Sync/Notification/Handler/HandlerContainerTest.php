@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerInterface;
 use PHPUnit\Framework\TestCase;
 
-class HandlerContainerTest extends TestCase
+final class HandlerContainerTest extends TestCase
 {
     public function testExceptionThrownIfIntegrationNotFound(): void
     {
@@ -23,30 +23,26 @@ class HandlerContainerTest extends TestCase
     {
         $this->expectException(HandlerNotSupportedException::class);
 
-        $handler = new HandlerContainer();
-
         $mockHandler = $this->createMock(HandlerInterface::class);
         $mockHandler->method('getIntegration')
             ->willReturn('foo');
         $mockHandler->method('getSupportedObject')
             ->willReturn('bogus');
 
-        $handler->registerHandler($mockHandler);
+        $handler = new HandlerContainer([$mockHandler]);
 
         $handler->getHandler('foo', 'bar');
     }
 
     public function testHandlerIsRegistered(): void
     {
-        $handler = new HandlerContainer();
-
         $mockHandler = $this->createMock(HandlerInterface::class);
         $mockHandler->method('getIntegration')
             ->willReturn('foo');
         $mockHandler->method('getSupportedObject')
             ->willReturn('bar');
 
-        $handler->registerHandler($mockHandler);
+        $handler = new HandlerContainer([$mockHandler]);
 
         $returnedHandler = $handler->getHandler('foo', 'bar');
 

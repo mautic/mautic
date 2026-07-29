@@ -7,10 +7,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
+
     /**
      * @var string
      */
@@ -27,14 +29,11 @@ class Stat
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
+     * @var LeadList|null
      */
     private $list;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -116,7 +115,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -197,7 +196,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateClicked()
     {
@@ -213,7 +212,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -229,7 +228,7 @@ class Stat
     }
 
     /**
-     * @return Notification
+     * @return Notification|null
      */
     public function getNotification()
     {
@@ -246,24 +245,18 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
-    public function setIpAddress(IpAddress $ip): void
+    public function setIpAddress(?IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsClicked()
     {
@@ -279,23 +272,20 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(?Lead $lead = null): void
     {
         $this->lead = $lead;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTrackingHash()
     {
@@ -311,7 +301,7 @@ class Stat
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadList
+     * @return LeadList|null
      */
     public function getList()
     {
@@ -327,7 +317,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getRetryCount()
     {
@@ -348,7 +338,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSource()
     {
@@ -364,7 +354,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -380,7 +370,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getTokens()
     {
@@ -396,7 +386,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getClickCount()
     {
@@ -405,10 +395,8 @@ class Stat
 
     /**
      * @param mixed $clickCount
-     *
-     * @return Stat
      */
-    public function setClickCount($clickCount)
+    public function setClickCount($clickCount): static
     {
         $this->clickCount = $clickCount;
 
@@ -424,10 +412,8 @@ class Stat
 
     /**
      * Up the sent count.
-     *
-     * @return Stat
      */
-    public function upClickCount()
+    public function upClickCount(): static
     {
         $count            = (int) $this->clickCount + 1;
         $this->clickCount = $count;
@@ -436,17 +422,14 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastClicked()
     {
         return $this->lastClicked;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setLastClicked(\DateTime $lastClicked)
+    public function setLastClicked(\DateTime $lastClicked): static
     {
         $this->lastClicked = $lastClicked;
 
@@ -454,7 +437,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getClickDetails()
     {
@@ -463,10 +446,8 @@ class Stat
 
     /**
      * @param mixed $clickDetails
-     *
-     * @return Stat
      */
-    public function setClickDetails($clickDetails)
+    public function setClickDetails($clickDetails): static
     {
         $this->clickDetails = $clickDetails;
 
@@ -474,7 +455,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {
@@ -483,10 +464,8 @@ class Stat
 
     /**
      * @param \DateTime $dateRead
-     *
-     * @return Stat
      */
-    public function setDateRead($dateRead)
+    public function setDateRead($dateRead): static
     {
         $this->dateRead = $dateRead;
 

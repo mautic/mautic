@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -12,10 +12,15 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
@@ -23,75 +28,49 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var IpLookupHelper&MockObject
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel&MockObject
+     * @var MockObject&AuditLogModel
      */
     private MockObject $auditLogModel;
-
-    /**
-     * @var LeadChangeEventDispatcher&MockObject
-     */
-    private MockObject $leadEventDispatcher;
 
     private DncReasonHelper $dncReasonHelper;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&LeadEventLogRepository
      */
-    private MockObject $entityManager;
+    private MockObject $leadEventLogRepository;
 
     /**
-     * @var TranslatorInterface&MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
-    /**
-     * @var RouterInterface&MockObject
-     */
-    private MockObject $router;
+    private LeadListRepository&\PHPUnit\Framework\MockObject\Stub $leadListRepository;
 
-    /**
-     * @var ModelFactory<object>&MockObject
-     */
-    private MockObject $modelFactory;
+    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
 
-    private LeadListRepository&MockObject $leadListRepository;
+    private CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
 
-    private SegmentCountCacheHelper&MockObject $segmentCountCacheHelper;
-
-    private CoreParametersHelper&MockObject $coreParametersHelper;
-
-    private CompanyLeadRepository&MockObject $companyLeadRepository;
+    private CompanyLeadRepository&\PHPUnit\Framework\MockObject\Stub $companyLeadRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->ipLookupHelper          = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel           = $this->createMock(AuditLogModel::class);
-        $this->leadEventDispatcher     = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper         = new DncReasonHelper($this->createMock(TranslatorInterface::class));
-        $this->entityManager           = $this->createMock(EntityManager::class);
+        $this->dncReasonHelper         = new DncReasonHelper($this->createStub(TranslatorInterface::class));
+        $this->leadEventLogRepository  = $this->createMock(LeadEventLogRepository::class);
         $this->translator              = $this->createMock(TranslatorInterface::class);
-        $this->router                  = $this->createMock(RouterInterface::class);
-        $this->modelFactory            = $this->createMock(ModelFactory::class);
-        $this->leadListRepository      = $this->createMock(LeadListRepository::class);
-        $this->segmentCountCacheHelper = $this->createMock(SegmentCountCacheHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
-        $this->companyLeadRepository   = $this->createMock(CompanyLeadRepository::class);
+        $this->leadListRepository      = $this->createStub(LeadListRepository::class);
+        $this->segmentCountCacheHelper = $this->createStub(SegmentCountCacheHelper::class);
+        $this->coreParametersHelper    = $this->createStub(CoreParametersHelper::class);
+        $this->companyLeadRepository   = $this->createStub(CompanyLeadRepository::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void
@@ -141,22 +120,30 @@ class LeadSubscriberTest extends CommonMocks
             ->method('writeToLog');
 
         $subscriber = new LeadSubscriber(
-            $this->ipLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->auditLogModel,
-            $this->leadEventDispatcher,
+            $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
-            $this->entityManager,
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->leadListRepository,
             $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
-            $this->companyLeadRepository
+            $this->companyLeadRepository,
+            $this->leadEventLogRepository,
+            $this->createStub(PointsChangeLogRepository::class),
+            $this->createStub(ListLeadRepository::class),
+            $this->createStub(LeadNoteRepository::class),
+            $this->createStub(LeadDeviceRepository::class),
+            $this->createStub(UtmTagRepository::class),
+            $this->createStub(DoNotContactRepository::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
         );
 
         $subscriber->onLeadPostSave(new LeadEvent($lead));
 
-        Assert::assertEmpty($lead->getChanges()); // changes were reset after they were processed.
+        $this->assertEmpty($lead->getChanges()); // changes were reset after they were processed.
     }
 
     /**
@@ -206,10 +193,9 @@ class LeadSubscriberTest extends CommonMocks
         ];
 
         $leadEvent = new LeadTimelineEvent($lead);
-        $repo      = $this->createMock(LeadEventLogRepository::class);
         $matcher   = $this->exactly(2);
 
-        $repo->expects($matcher)
+        $this->leadEventLogRepository->expects($matcher)
             ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
@@ -231,23 +217,26 @@ class LeadSubscriberTest extends CommonMocks
                 }
             });
 
-        $this->entityManager->method('getRepository')
-            ->with(LeadEventLog::class)
-            ->willReturn($repo);
-
         $subscriber = new LeadSubscriber(
-            $this->ipLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->auditLogModel,
-            $this->leadEventDispatcher,
+            $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
-            $this->entityManager,
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->leadListRepository,
             $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
-            $this->modelFactory,
+            $this->leadEventLogRepository,
+            $this->createStub(PointsChangeLogRepository::class),
+            $this->createStub(ListLeadRepository::class),
+            $this->createStub(LeadNoteRepository::class),
+            $this->createStub(LeadDeviceRepository::class),
+            $this->createStub(UtmTagRepository::class),
+            $this->createStub(DoNotContactRepository::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 
@@ -283,7 +272,7 @@ class LeadSubscriberTest extends CommonMocks
 
         // This method will be called exactly once per set of changes
         $this->auditLogModel->expects($matcher)
-            ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3) {
+            ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',
@@ -340,18 +329,25 @@ class LeadSubscriberTest extends CommonMocks
             });
 
         $subscriber = new LeadSubscriber(
-            $this->ipLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->auditLogModel,
-            $this->leadEventDispatcher,
+            $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
-            $this->entityManager,
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->leadListRepository,
             $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
-            $this->modelFactory,
+            $this->leadEventLogRepository,
+            $this->createStub(PointsChangeLogRepository::class),
+            $this->createStub(ListLeadRepository::class),
+            $this->createStub(LeadNoteRepository::class),
+            $this->createStub(LeadDeviceRepository::class),
+            $this->createStub(UtmTagRepository::class),
+            $this->createStub(DoNotContactRepository::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 
@@ -403,18 +399,25 @@ class LeadSubscriberTest extends CommonMocks
             );
 
         $subscriber = new LeadSubscriber(
-            $this->ipLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->auditLogModel,
-            $this->leadEventDispatcher,
+            $this->createStub(LeadChangeEventDispatcher::class),
             $this->dncReasonHelper,
-            $this->entityManager,
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->leadListRepository,
             $this->segmentCountCacheHelper,
             $this->coreParametersHelper,
             $this->companyLeadRepository,
-            $this->modelFactory,
+            $this->leadEventLogRepository,
+            $this->createStub(PointsChangeLogRepository::class),
+            $this->createStub(ListLeadRepository::class),
+            $this->createStub(LeadNoteRepository::class),
+            $this->createStub(LeadDeviceRepository::class),
+            $this->createStub(UtmTagRepository::class),
+            $this->createStub(DoNotContactRepository::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(AuditLogRepository::class),
             true
         );
 

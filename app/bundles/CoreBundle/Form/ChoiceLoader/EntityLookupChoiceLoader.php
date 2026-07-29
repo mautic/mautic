@@ -15,27 +15,21 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityLookupChoiceLoader implements ChoiceLoaderInterface
+final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var array
-     */
-    protected $selected = [];
+    private array $selected = [];
 
-    /**
-     * @var array
-     */
-    protected $choices = [];
+    private array $choices = [];
 
     /**
      * @param ModelFactory<object>               $modelFactory
      * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
-        protected ModelFactory $modelFactory,
-        protected TranslatorInterface $translator,
-        protected Connection $connection,
-        protected $options = [],
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private $options = [],
     ) {
         if (is_array($options)) {
             $options = (new OptionsResolver())->setDefaults($options);
@@ -85,11 +79,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * @param array|null $data
-     * @param bool       $includeNew
      *
      * @return array
      */
-    protected function getChoices($data = null, $includeNew = false)
+    private function getChoices($data = null, bool $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
@@ -153,7 +146,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array
      */
-    protected function prepareChoices($choices)
+    private function prepareChoices($choices)
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -176,7 +169,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if (count($duplicates)) {
                 foreach ($duplicates as $value => $label) {
-                    $prepped[$value] = "$label ($value)";
+                    $prepped[$value] = "{$label} ({$value})";
                 }
             }
 
@@ -189,13 +182,13 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    protected function fetchChoices($modelName, $data = [])
+    private function fetchChoices($modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
 
         if (!$this->modelFactory->hasModel($modelName)) {
-            throw new \InvalidArgumentException("$modelName not found as a registered model service.");
+            throw new \InvalidArgumentException("{$modelName} not found as a registered model service.");
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
@@ -214,6 +207,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $args['limit'] = max($args['limit'], count($data));
         }
 
+        $parameters = [];
         // Check if the method exists in the model
         $methodName = $this->options['model_lookup_method'] ?? null;
         if ($methodName && method_exists($model, $methodName)) {
@@ -224,15 +218,26 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
-            $limit     = max(100, count($data));
-            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = null;
+
+            $limit = 100;
+            if ($data) {
+                $composite = CompositeExpression::and(
+                    $expr->in($alias.'.id', ':dataIds')
+                );
+                $parameters['dataIds'] = $data;
+                if (count($data) > $limit) {
+                    $limit = count($data);
+                }
+            }
+
+            $choices = $model->getRepository()->getSimpleList($composite, $parameters, $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;
     }
 
-    protected function formatChoices(array &$choices)
+    private function formatChoices(array &$choices): void
     {
         $firstKey = array_key_first($choices);
 
@@ -276,7 +281,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     private function sanitizeIds(int|string|array|object|null $data): array
     {
-        if (is_null($data)) {
+        if (null === $data) {
             return [];
         }
 
@@ -292,7 +297,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $id = null;
 
             if (is_object($value) && method_exists($value, $getter)) {
-                $id = $value->$getter();
+                $id = $value->{$getter}();
             } elseif (is_scalar($value)) {
                 $id = $value;
             }

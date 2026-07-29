@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigTrackingPageType extends AbstractType
+final class ConfigTrackingPageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -1,12 +1,16 @@
-<div class="{% if hasBorder is defined and hasBorder %}mb-64{% else %}mb-160{% endif %}">
+{% set margin = 'mb-160' %}
+{% if hasBorder|default(false) %}{% set margin = 'mb-64' %}{% endif %}
+{% if noMargin|default(false) %}{% set margin = '' %}{% endif %}
+
+<div class="{{ margin }}">
     {% if heading is defined %}
     <div aria-level="2" class="content-block__heading type-fluid-heading-05 mb-32">{{ heading|trans }}</div>
     {% endif %}
-    
+
     {% if subheading is defined %}
     <div class="content-block__subheading type-heading-03 mb-32">{{ subheading|trans }}</div>
     {% endif %}
-    
+
     {% if copy is defined %}
         {% if copy is iterable %}
             {% for item in copy %}
@@ -16,11 +20,11 @@
             <div class="content-block__copy type-body-02 mb-lg">{{ copy|trans }}</div>
         {% endif %}
     {% endif %}
-    
+
     {% if childContainer is defined %}
         {{ childContainer|raw }}
     {% endif %}
-    
+
     {% if cta is defined and cta %}
     <div class="mt-32">
         {% set cta = cta|merge({
@@ -31,7 +35,7 @@
         {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
     </div>
     {% endif %}
-    
+
     {% if hasBorder is defined and hasBorder %}
     <hr class="mt-64 mb-0">
     {% endif %}

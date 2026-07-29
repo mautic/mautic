@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignModel $campaignModel,
@@ -45,8 +45,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
-        $security = $this->security;
-        if ($security->isGranted('campaign:campaigns:view')) {
+        if ($this->security->isGranted('campaign:campaigns:view')) {
             $event->addCommands(
                 'mautic.campaign.campaigns',
                 $this->campaignModel->getCommandList()

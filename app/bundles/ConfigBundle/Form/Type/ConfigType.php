@@ -13,11 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        private RestrictionHelper $restrictionHelper,
-        private EscapeTransformer $escapeTransformer,
+        private readonly RestrictionHelper $restrictionHelper,
+        private readonly EscapeTransformer $escapeTransformer,
     ) {
     }
 

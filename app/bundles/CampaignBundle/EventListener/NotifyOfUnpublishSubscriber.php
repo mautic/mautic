@@ -7,10 +7,11 @@ use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class NotifyOfUnpublishSubscriber implements EventSubscriberInterface
+final readonly class NotifyOfUnpublishSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private NotificationHelper $notificationHelper)
-    {
+    public function __construct(
+        private NotificationHelper $notificationHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

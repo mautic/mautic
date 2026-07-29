@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private DynamicContentModel $dynamicContentModel,

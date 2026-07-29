@@ -20,12 +20,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class RemoveController extends CommonController
+final class RemoveController extends CommonController
 {
     public function __construct(
-        private PackageModel $packageModel,
-        private RouteProvider $routeProvider,
-        private Config $config,
+        private readonly PackageModel $packageModel,
+        private readonly RouteProvider $routeProvider,
+        private readonly Config $config,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -46,7 +46,7 @@ class RemoveController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(

@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentFilterEntryType extends AbstractType
+final class DynamicContentFilterEntryType extends AbstractType
 {
     /**
      * @var mixed[]
@@ -28,27 +28,27 @@ class DynamicContentFilterEntryType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     /**
      * @var mixed[]
      */
-    private array $timezoneChoices;
+    private readonly array $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     public function __construct(
         ListModel $listModel,
-        private StageModel $stageModel,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly StageModel $stageModel,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 

@@ -23,10 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Point>
  */
-class PointType extends AbstractType
+final class PointType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 

@@ -14,23 +14,22 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriberTest extends TestCase
+final class BuilderSubscriberTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
     private BuilderSubscriber $builderSubscriber;
 
     private MockObject&EmailModel $emailModel;
-
-    private MockObject&TrackableModel $trackableModel;
-
-    private MockObject&RedirectModel $redirectModel;
 
     private MockObject&TranslatorInterface $translator;
 
@@ -40,19 +39,19 @@ class BuilderSubscriberTest extends TestCase
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $this->trackableModel       = $this->createMock(TrackableModel::class);
-        $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
         $fromEmailHelper            = new FromEmailHelper($this->coreParametersHelper, $this->leadRepository);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
-            $this->trackableModel,
-            $this->redirectModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
-            $fromEmailHelper
+            $fromEmailHelper,
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(RedirectRepository::class)
         );
 
         parent::setUp();
@@ -81,7 +80,7 @@ class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
             ['unsubscribe_text', null, null],
             ['webview_text', null, null],
             ['default_signature_text', null, 'Default Signature'],
@@ -96,12 +95,12 @@ class BuilderSubscriberTest extends TestCase
         $this->assertSame('Owner Signature', $event->getTokens()['{signature}']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fixEmailAccessibilityContent')]
+    #[DataProvider('fixEmailAccessibilityContent')]
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key): string|false {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -274,7 +273,7 @@ class BuilderSubscriberTest extends TestCase
             'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses) {
+            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
                 if ($callCount < count($expectedKeys)) {
                     $this->assertSame($expectedKeys[$callCount], $key);
                 }
@@ -284,13 +283,11 @@ class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(function ($route) use ($emailHash) {
-                return match ($route) {
-                    'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
-                    'mautic_email_webview'     => '/email/webview/'.$emailHash,
-                    'mautic_email_preview'     => '/email/preview/111',
-                    default                    => null,
-                };
+            ->willReturnCallback(fn (string $route): string => match ($route) {
+                'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
+                'mautic_email_webview'     => '/email/webview/'.$emailHash,
+                'mautic_email_preview'     => '/email/preview/111',
+                default                    => '',
             });
 
         $this->translator->method('trans')

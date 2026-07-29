@@ -10,10 +10,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardSegmentsBuildTime extends AbstractType
+final class DashboardSegmentsBuildTime extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel,
+        private readonly ListModel $segmentModel,
     ) {
     }
 

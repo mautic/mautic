@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -8,16 +10,16 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 
-class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
+final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    protected GroupContactScoreRepository $repository;
+    private GroupContactScoreRepository $repository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = $this->em->getRepository(GroupContactScore::class);
+        $this->repository = self::getContainer()->get(GroupContactScoreRepository::class);
     }
 
     public function testCompareScore(): void

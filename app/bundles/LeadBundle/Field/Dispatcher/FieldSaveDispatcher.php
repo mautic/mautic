@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldSaveDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

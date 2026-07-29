@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
@@ -17,7 +18,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
      * @param array<string, bool|null> $data
      * @param array<string, string>    $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForReadOnlyConfigurationSetting')]
+    #[DataProvider('dataForReadOnlyConfigurationSetting')]
     public function testFieldConfiguration(array $data, array $expected): void
     {
         // Create a form
@@ -134,7 +135,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $this->assertInputCounts($crawler, 2);
 
         $readOnlyInput = $crawler->filterXPath('//input[@readonly]');
-        $readOnlyInput->each(function (Crawler $node, $i) use ($formValues) {
+        $readOnlyInput->each(function (Crawler $node, $i) use ($formValues): void {
             $this->assertStringContainsString('readonly', $node->outerHtml());
             $this->assertSame($formValues[$i], $node->attr('value'));
         });

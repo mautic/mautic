@@ -7,7 +7,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class FieldValueTransformer
+final class FieldValueTransformer
 {
     private array $contactFieldsToUpdate = [];
 
@@ -16,13 +16,13 @@ class FieldValueTransformer
     private bool $isTransformed = false;
 
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
-        if (true === $this->isTransformed) {
+        if ($this->isTransformed) {
             return;
         }
 
@@ -63,18 +63,12 @@ class FieldValueTransformer
         $this->isTransformed = true;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactFieldsToUpdate()
+    public function getContactFieldsToUpdate(): array
     {
         return $this->contactFieldsToUpdate;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokensToUpdate()
+    public function getTokensToUpdate(): array
     {
         return $this->tokensToUpdate;
     }

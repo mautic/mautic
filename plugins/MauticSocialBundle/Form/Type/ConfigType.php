@@ -10,10 +10,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
     ) {
     }
 

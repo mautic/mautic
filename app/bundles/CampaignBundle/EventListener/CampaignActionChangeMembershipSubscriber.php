@@ -14,7 +14,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private MembershipManager $membershipManager,

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\EmailBundle\Entity\Email;
@@ -21,9 +22,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriber implements EventSubscriberInterface
+final class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
+    use QueryBuilderManipulatorTrait;
 
     public function __construct(
         private LeadModel $leadModel,
@@ -34,8 +35,8 @@ class SearchSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private Environment $twig,
         private GlobalSearch $globalSearch,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
-        $this->leadRepo        = $leadModel->getRepository();
     }
 
     public static function getSubscribedEvents(): array
@@ -63,8 +64,8 @@ class SearchSubscriber implements EventSubscriberInterface
         $filter    = ['string' => $str, 'force' => ''];
 
         // only show results that are not anonymous so as to not clutter up things
-        if (!str_contains($str, "$anonymous")) {
-            $filter['force'] = " !$anonymous";
+        if (!str_contains($str, "{$anonymous}")) {
+            $filter['force'] = " !{$anonymous}";
         }
 
         $permissions = $this->security->isGranted(
@@ -75,7 +76,7 @@ class SearchSubscriber implements EventSubscriberInterface
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
             // only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
 
             $results = $this->leadModel->getEntities(
@@ -227,11 +228,9 @@ class SearchSubscriber implements EventSubscriberInterface
             }
 
             $nq->select('l.id'); // select only id
-            $nsql = $nq->getSQL();
-            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
-            }
-            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+            $query = $q->expr()->in('l.id', $nq->getSQL());
+
+            $this->copyParams($nq, $q);
             $event->setSubQuery($query);
 
             return;
@@ -379,7 +378,7 @@ class SearchSubscriber implements EventSubscriberInterface
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
         ));
 
-        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+        $this->leadRepository->applySearchQueryRelationship($q, $tables, true, $expr);
         $event->setReturnParameters(true);
         $event->setStrict(true);
         $event->setSearchStatus(true);
@@ -452,10 +451,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildNotificationSentQuery($event, true);
     }
 
-    /**
-     * @param bool $isMobile
-     */
-    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = false): void
+    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, bool $isMobile = false): void
     {
         $tables = [
             [
@@ -518,7 +514,7 @@ class SearchSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+        $this->leadRepository->applySearchQueryRelationship($q, $tables, true, $expr);
 
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like
@@ -544,7 +540,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
 
         $renderedResults = array_map(
-            fn ($item) => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
+            fn ($item): string => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
             $results['results']
         );
 

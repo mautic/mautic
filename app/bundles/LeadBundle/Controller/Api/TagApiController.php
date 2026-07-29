@@ -22,11 +22,21 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class TagApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $leadTagModel = $modelFactory->getModel('lead.tag');
-        \assert($leadTagModel instanceof TagModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        TagModel $leadTagModel,
+        private readonly \Mautic\LeadBundle\Entity\TagRepository $tagRepository,
+    ) {
         $this->model           = $leadTagModel;
         $this->entityClass     = Tag::class;
         $this->entityNameOne   = 'tag';
@@ -51,6 +61,6 @@ class TagApiController extends CommonApiController
         $tagModel = $this->model;
         \assert($tagModel instanceof TagModel);
 
-        return $tagModel->getRepository()->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
+        return $this->tagRepository->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
     }
 }

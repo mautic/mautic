@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseApi::class)]
-class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(ConnectwiseApi::class)]
+final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 
     /**
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
-    #[\PHPUnit\Framework\Attributes\TestDox('Tests that fetchAllRecords loops until all records are obtained')]
+    #[TestDox('Tests that fetchAllRecords loops until all records are obtained')]
     public function testResultPagination(): void
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
@@ -26,7 +30,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(3))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($endpoint, $parameters) use (&$page) {
+                function ($endpoint, $parameters) use (&$page): array {
                     ++$page;
 
                     // Page should be incremented 3 times by fetchAllRecords method

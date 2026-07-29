@@ -18,7 +18,9 @@ use PHPUnit\TextUI\Configuration\Configuration;
 class SeparateProcess implements Extension
 {
     private bool $prepared          = false;
+
     private bool $preparationFailed = false;
+
     /**
      * @var array<string,string[]>
      */
@@ -57,8 +59,6 @@ class SeparateProcess implements Extension
         if (!$test->isTestMethod()) {
             return;
         }
-
-        assert($test instanceof TestMethod);
 
         if ($test->metadata()->isRunInSeparateProcess()->isNotEmpty()) {
             return;

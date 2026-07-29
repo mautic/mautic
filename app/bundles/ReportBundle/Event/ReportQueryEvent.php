@@ -5,41 +5,32 @@ namespace Mautic\ReportBundle\Event;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportQueryEvent extends AbstractReportEvent
+final class ReportQueryEvent extends AbstractReportEvent
 {
-    private int $totalResults;
+    private readonly int $totalResults;
 
     public function __construct(
         Report $report,
         private QueryBuilder $query,
         $totalResults,
-        private array $options,
+        private readonly array $options,
     ) {
         $this->context      = $report->getSource();
         $this->report       = $report;
         $this->totalResults = (int) $totalResults;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQuery()
+    public function getQuery(): QueryBuilder
     {
         return $this->query;
     }
 
-    /**
-     * @param QueryBuilder $query
-     */
-    public function setQuery($query): void
+    public function setQuery(QueryBuilder $query): void
     {
         $this->query = $query;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

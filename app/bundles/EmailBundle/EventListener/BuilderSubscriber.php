@@ -20,7 +20,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
@@ -28,13 +28,15 @@ class BuilderSubscriber implements EventSubscriberInterface
     private array $convertedContent = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EmailModel $emailModel,
-        private TrackableModel $pageTrackableModel,
-        private RedirectModel $pageRedirectModel,
-        private TranslatorInterface $translator,
-        private MailHashHelper $mailHash,
-        private FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EmailModel $emailModel,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly RedirectModel $pageRedirectModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MailHashHelper $mailHash,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
     ) {
     }
 
@@ -123,7 +125,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
         $content = preg_replace_callback(
             "/<title>(.*?)<\/title>/is",
-            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            fn ($matches): string => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
             $content,
             -1,
             $fixed
@@ -286,16 +288,13 @@ class BuilderSubscriber implements EventSubscriberInterface
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
-                $trackableRepository = $this->pageTrackableModel->getRepository();
-                $redirectRepository  = $this->pageRedirectModel->getRepository();
-
                 if ($trackable instanceof Trackable) {
-                    $trackableRepository->detachEntity($trackable);
-                    $redirectRepository->detachEntity($trackable->getRedirect());
-                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                    $this->trackableRepository->detachEntity($trackable);
+                    $this->redirectRepository->detachEntity($trackable->getRedirect());
+                    $this->trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
                 } else {
-                    $redirectRepository->detachEntity($trackable);
-                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                    $this->redirectRepository->detachEntity($trackable);
+                    $this->trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
         }

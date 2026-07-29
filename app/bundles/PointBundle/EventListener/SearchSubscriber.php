@@ -14,7 +14,7 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PointModel $pointModel,
@@ -81,8 +81,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
-        $security = $this->security;
-        if ($security->isGranted('point:points:view')) {
+        if ($this->security->isGranted('point:points:view')) {
             $event->addCommands(
                 'mautic.point.actions.header.index',
                 $this->pointModel->getCommandList()

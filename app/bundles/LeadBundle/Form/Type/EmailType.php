@@ -19,12 +19,12 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailType extends AbstractType
+final class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
     public function __construct(
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
     ) {
     }
 
@@ -111,7 +111,7 @@ class EmailType extends AbstractType
                     'allow-full-html'      => true,
                 ],
                 'constraints' => [
-                    new Callback(callback: function ($value, ExecutionContextInterface $context) {
+                    new Callback(callback: function ($value, ExecutionContextInterface $context): void {
                         if ('' === trim(strip_tags($value))) {
                             $context->buildViolation('mautic.lead.email.body.required')->addViolation();
                         }

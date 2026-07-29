@@ -7,16 +7,16 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateOptionParameters
 {
-    private bool $hasTimePart;
+    private readonly bool $hasTimePart;
 
     /**
      * @var mixed
      */
     private $timeframe;
 
-    private bool $requiresBetween;
+    private readonly bool $requiresBetween;
 
-    private bool $shouldUseLastDayOfRange;
+    private readonly bool $shouldUseLastDayOfRange;
 
     private DateTimeHelper $dateTimeHelper;
 
@@ -61,10 +61,7 @@ class DateOptionParameters
         return $this->shouldUseLastDayOfRange;
     }
 
-    /**
-     * @return DateTimeHelper
-     */
-    public function getDefaultDate()
+    public function getDefaultDate(): DateTimeHelper
     {
         return $this->dateTimeHelper;
     }
@@ -86,6 +83,6 @@ class DateOptionParameters
 
     private function setDateTimeHelper(TimezoneResolver $timezoneResolver): void
     {
-        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart);
     }
 }

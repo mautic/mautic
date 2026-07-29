@@ -15,11 +15,12 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel,
         private LeadModel $leadModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
     }
 
@@ -292,7 +293,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 
             if ($detachContactReference) {
                 $detachContactReference = false;
-                $this->leadModel->getRepository()->detachEntity($contact);
+                $this->leadRepository->detachEntity($contact);
             }
         }
     }

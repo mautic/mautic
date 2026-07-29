@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldSelectType extends AbstractType
+final class FormFieldSelectType extends AbstractType
 {
     use SortableListTrait;
 
@@ -33,7 +33,7 @@ class FormFieldSelectType extends AbstractType
         );
 
         if (!empty($options['parentData'])) {
-            $default = (empty($options['parentData']['properties']['multiple'])) ? false : true;
+            $default = !empty($options['parentData']['properties']['multiple']);
         } else {
             $default = false;
         }

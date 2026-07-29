@@ -18,11 +18,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FilterType extends AbstractType
+final class FilterType extends AbstractType
 {
     public function __construct(
-        private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        private ListModel $listModel,
+        private readonly FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        private readonly ListModel $listModel,
     ) {
     }
 
@@ -69,7 +69,7 @@ class FilterType extends AbstractType
                 $deprecatedOperatorTypes = $this->listModel->getOperatorsForFieldType([
                     'include' => $legacyOperators,
                 ]);
-                $operators += array_filter($deprecatedOperatorTypes, static fn ($v) => $v === $operator);
+                $operators += array_filter($deprecatedOperatorTypes, static fn ($v): bool => $v === $operator);
             }
 
             $form->add(
