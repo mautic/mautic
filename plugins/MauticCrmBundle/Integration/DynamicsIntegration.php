@@ -208,11 +208,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
