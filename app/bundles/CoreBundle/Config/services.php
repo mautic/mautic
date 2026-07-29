@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Twig\Extra\String\StringExtension;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -44,8 +45,10 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+
     $services->set('mautic.core.service.local_file_adapter', Mautic\CoreBundle\Service\LocalFileAdapterService::class)
         ->arg('$root', param('env(resolve:MAUTIC_EL_FINDER_PATH)'));
+
     $services->alias(Mautic\CoreBundle\Service\LocalFileAdapterService::class, 'mautic.core.service.local_file_adapter');
     $services->set('mautic.core.subscriber.router', Mautic\CoreBundle\EventListener\RouterSubscriber::class)
         ->arg('$scheme', param('router.request_context.scheme'))
