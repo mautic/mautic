@@ -130,8 +130,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
     ]);
