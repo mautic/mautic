@@ -10,36 +10,6 @@ return [
     ],
     'menu'     => [],
     'services' => [
-        'events'    => [
-            'mautic.cache.clear_cache_subscriber' => [
-                'class'     => Mautic\CacheBundle\EventListener\CacheClearSubscriber::class,
-                'tags'      => ['kernel.cache_clearer'],
-                'arguments' => [
-                    'mautic.cache.provider',
-                    'monolog.logger.mautic',
-                ],
-            ],
-        ],
-        'other'     => [
-            'mautic.cache.adapter.filesystem' => [
-                'class'     => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
-                'arguments' => [
-                    '%mautic.cache_prefix%',
-                    '%mautic.cache_lifetime%',
-                    '%mautic.tmp_path%',
-                ],
-                'tag'       => 'mautic.cache.adapter',
-            ],
-            'mautic.cache.adapter.memcached'  => [
-                'class'     => Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class,
-                'arguments' => [
-                    '%mautic.cache_adapter_memcached%',
-                    '%mautic.cache_prefix%',
-                    '%mautic.cache_lifetime%',
-                ],
-                'tag'       => 'mautic.cache.adapter',
-            ],
-        ],
         'models'    => [],
         'validator' => [],
     ],

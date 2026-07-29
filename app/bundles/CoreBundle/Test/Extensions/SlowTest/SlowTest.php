@@ -87,8 +87,6 @@ class SlowTest implements Extension
             return;
         }
 
-        assert($test instanceof TestMethod);
-
         $this->handleFinish($event->telemetryInfo(), $test);
 
         $this->time = null;
