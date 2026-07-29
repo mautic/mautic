@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final class AddToCompanyActionType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 

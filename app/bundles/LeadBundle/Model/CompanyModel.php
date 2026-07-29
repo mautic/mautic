@@ -804,7 +804,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
-        \assert($company instanceof Company);
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;

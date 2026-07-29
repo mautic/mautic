@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Callback;
 
 use Mautic\SmsBundle\Exception\CallbackHandlerNotFound;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class HandlerContainer
 {
@@ -11,7 +12,19 @@ class HandlerContainer
      */
     private ?array $handlers = null;
 
-    public function registerHandler(CallbackInterface $handler): void
+    /**
+     * @param iterable<CallbackInterface> $callbackHandlers
+     */
+    public function __construct(
+        #[AutowireIterator('mautic.sms_callback_handler')]
+        iterable $callbackHandlers = [],
+    ) {
+        foreach ($callbackHandlers as $callbackHandler) {
+            $this->registerHandler($callbackHandler);
+        }
+    }
+
+    private function registerHandler(CallbackInterface $handler): void
     {
         $this->handlers[$handler->getTransportName()] = $handler;
     }
