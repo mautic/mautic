@@ -8,6 +8,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\Symfony\Set\SymfonySetList;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -29,6 +30,37 @@ return RectorConfig::configure()
         privatization: true,
     )
     ->withPhpSets()
+    ->withSets([
+        SymfonySetList::SYMFONY_25,
+        SymfonySetList::SYMFONY_26,
+        SymfonySetList::SYMFONY_27,
+        SymfonySetList::SYMFONY_28,
+        SymfonySetList::SYMFONY_30,
+        SymfonySetList::SYMFONY_31,
+        SymfonySetList::SYMFONY_32,
+        SymfonySetList::SYMFONY_33,
+        SymfonySetList::SYMFONY_34,
+        SymfonySetList::SYMFONY_40,
+        SymfonySetList::SYMFONY_41,
+        SymfonySetList::SYMFONY_42,
+        SymfonySetList::SYMFONY_43,
+        SymfonySetList::SYMFONY_44,
+        SymfonySetList::SYMFONY_50,
+        SymfonySetList::SYMFONY_51,
+        SymfonySetList::SYMFONY_52,
+        SymfonySetList::SYMFONY_53,
+        SymfonySetList::SYMFONY_54,
+        SymfonySetList::SYMFONY_60,
+        SymfonySetList::SYMFONY_61,
+        SymfonySetList::SYMFONY_62,
+        SymfonySetList::SYMFONY_63,
+        SymfonySetList::SYMFONY_64,
+        SymfonySetList::SYMFONY_70,
+        SymfonySetList::SYMFONY_71,
+        SymfonySetList::SYMFONY_72,
+        SymfonySetList::SYMFONY_73,
+        SymfonySetList::SYMFONY_74,
+    ])
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
@@ -69,7 +101,7 @@ return RectorConfig::configure()
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withComposerBased(phpunit: true, symfony: true)
+    ->withComposerBased(phpunit: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
@@ -87,6 +119,8 @@ return RectorConfig::configure()
         Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
             '*Command.php',
         ],
+        \Rector\Symfony\Symfony44\Rector\MethodCall\AuthorizationCheckerIsGrantedExtractorRector::class,
+        \Rector\Transform\Rector\New_\NewToStaticCallRector::class,
 
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
