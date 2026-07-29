@@ -96,7 +96,7 @@ final class EmailGraphStatsController extends AbstractController
                 'stats'         => $stats,
                 'statsDevices'  => $statsDevices,
                 'showAllStats'  => $includeVariants,
-                'dateRangeForm' => $dateRangeForm->createView(),
+                'dateRangeForm' => $dateRangeForm,
                 'isVariant'     => $isVariant,
             ]
         );

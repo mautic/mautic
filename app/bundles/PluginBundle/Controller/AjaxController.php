@@ -86,7 +86,7 @@ final class AjaxController extends CommonAjaxController
                     );
 
                     $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                        'form'      => $form->createView(),
+                        'form'      => $form,
                         'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                         'function'  => 'row',
                     ]
@@ -145,7 +145,7 @@ final class AjaxController extends CommonAjaxController
                 ]);
 
                 $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                    'form'      => $form->createView(),
+                    'form'      => $form,
                     'function'  => 'widget',
                     'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                     'variables' => [
@@ -196,7 +196,7 @@ final class AjaxController extends CommonAjaxController
                 ]);
 
                 $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                    'form'      => $form->createView(),
+                    'form'      => $form,
                     'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                     'function'  => 'widget',
                     'variables' => [
