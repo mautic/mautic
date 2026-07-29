@@ -205,7 +205,7 @@ trait VariantEntityTrait
     public function getVariants(): array
     {
         $parent = $this->getVariantParent();
-        if (! $parent instanceof VariantEntityInterface) {
+        if (!$parent instanceof VariantEntityInterface) {
             $parent = $this;
         }
 

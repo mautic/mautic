@@ -156,7 +156,7 @@ trait TranslationEntityTrait
     {
         $parent = $this->getTranslationParent();
 
-        if (! $parent instanceof TranslationEntityInterface) {
+        if (!$parent instanceof TranslationEntityInterface) {
             $parent = $this;
         }
 
