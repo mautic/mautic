@@ -33,7 +33,7 @@ class AmazonS3Integration extends CloudStorageIntegration
     /**
      * @return AwsS3
      */
-    public function getAdapter()
+    public function getAdapter(): \Gaufrette\Adapter
     {
         if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
