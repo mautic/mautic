@@ -661,6 +661,30 @@ CODE_SAMPLE;
         );
     }
 
+    public function testSkipServiceWithAliasWithoutTagToCarryIt(): void
+    {
+        // "events" gets its tag from autoconfigure(), so there is no tag here the alias could ride on
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'events' => [
+            'mautic.some.subscriber' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'alias' => 'some_subscriber',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertNull($this->refactorConfigFile($configFileContent));
+        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+    }
+
     public function testMovesServiceWithMethodCalls(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'

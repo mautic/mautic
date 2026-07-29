@@ -104,17 +104,21 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
     private const CONFIGURATOR_NAMESPACE = 'Symfony\Component\DependencyInjection\Loader\Configurator';
 
     /**
-     * The default tags ServicePass gives a whole group of services, in the tags the moved service would lose.
+     * The default tag ServicePass gives a whole group of services, in the tag the moved service would lose,
+     * see the group switch of Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass.
      *
-     * The other groups keep their default tag through autoconfigure(), e.g. "events" tags every
-     * EventSubscriberInterface with "kernel.event_subscriber" on its own.
+     * The 3 groups left out of the switch - "events", "forms" and "controllers" - get their default tag
+     * from autoconfigure() instead, e.g. every EventSubscriberInterface is tagged "kernel.event_subscriber"
+     * on its own, so naming the tag here would leave the moved service tagged twice.
      *
      * @var array<string, string>
      */
     private const GROUP_DEFAULT_TAGS = [
-        'helpers'     => 'twig.helper',
-        'models'      => 'mautic.model',
-        'permissions' => 'mautic.permissions',
+        'helpers'      => 'twig.helper',
+        'integrations' => 'mautic.integration',
+        'menus'        => 'knp_menu.menu',
+        'models'       => 'mautic.model',
+        'permissions'  => 'mautic.permissions',
     ];
 
     public function __construct(
@@ -612,6 +616,12 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 return null;
             }
 
+            // the alias rides on a tag, and the tag of an autoconfigured group is nowhere to be seen here,
+            // so there would be nothing to hand it over to
+            if ([] === $serviceTags) {
+                return null;
+            }
+
             $serviceTags = $this->addTagAlias($serviceTags, $aliasValue->value);
         }
 
@@ -625,8 +635,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     /**
      * The "alias" is no service alias, ServicePass hands it over as an argument of every tag the service carries,
-     * see ServicePass::process(). A service without a tag has nothing to carry it, so the alias goes,
-     * just like it does today.
+     * see ServicePass::process(). The tag is the explicit one, or the default one of the group,
+     * e.g. "twig.helper" for a "helpers" service, see GROUP_DEFAULT_TAGS.
      *
      * @param ServiceTag[] $serviceTags
      *
