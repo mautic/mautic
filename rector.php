@@ -59,10 +59,7 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
         // symfony
-        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
         // DI
         // ConfigServiceToAutowiredServiceRector::class,
@@ -72,7 +69,7 @@ return RectorConfig::configure()
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withComposerBased(phpunit: true)
+    ->withComposerBased(phpunit: true, symfony: true)
     ->withCodingStyleLevel(3)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
@@ -125,6 +122,10 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
 
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
