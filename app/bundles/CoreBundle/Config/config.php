@@ -162,33 +162,6 @@ return [
                 ],
             ],
         ],
-        'events' => [
-            'mautic.core.subscriber.router' => [
-                'class'     => Mautic\CoreBundle\EventListener\RouterSubscriber::class,
-                'arguments' => [
-                    'router',
-                    '%router.request_context.scheme%',
-                    '%router.request_context.host%',
-                    '%request_listener.https_port%',
-                    '%request_listener.http_port%',
-                    '%router.request_context.base_url%',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.dynamic_content_filter_entry_filters' => [
-                'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.lead.model.list',
-                ],
-                'methodCalls' => [
-                    'setConnection' => [
-                        'database_connection',
-                    ],
-                ],
-            ],
-        ],
         'helpers' => [
             'mautic.helper.twig.menu' => [
                 'class'     => Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
@@ -276,29 +249,12 @@ return [
                 ],
                 'alias' => 'security',
             ],
-            'mautic.helper.paths' => [
-                'class'     => Mautic\CoreBundle\Helper\PathsHelper::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.helper.core_parameters',
-                    '%kernel.cache_dir%',
-                    '%kernel.logs_dir%',
-                    '%mautic.application_dir%',
-                ],
-            ],
             'mautic.helper.core_parameters' => [
                 'class'     => Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
                     'service_container',
                 ],
                 'serviceAlias' => 'mautic.config',
-            ],
-            'mautic.helper.bundle' => [
-                'class'     => Mautic\CoreBundle\Helper\BundleHelper::class,
-                'arguments' => [
-                    '%mautic.bundles%',
-                    '%mautic.plugin.bundles%',
-                ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [
                 'class'     => Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
@@ -342,27 +298,6 @@ return [
                 ],
             ],
 
-            // Configurator (used in installer and managing global config]
-            'mautic.configurator' => [
-                'class'     => Mautic\CoreBundle\Configurator\Configurator::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                ],
-            ],
-            'mautic.cipher.openssl' => [
-                'class'     => Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
-                'arguments' => ['%kernel.environment%'],
-            ],
-            'mautic.security' => [
-                'class'     => Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    '%mautic.bundles%',
-                    '%mautic.plugin.bundles%',
-                ],
-            ],
             'mautic.translation.loader' => [
                 'class'     => Mautic\CoreBundle\Loader\TranslationLoader::class,
                 'arguments' => [
@@ -371,32 +306,6 @@ return [
                 ],
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic',
-            ],
-            'mautic.exception.listener' => [
-                'class'     => Mautic\CoreBundle\EventListener\ExceptionListener::class,
-                'arguments' => [
-                    'router',
-                    'Mautic\CoreBundle\Controller\ExceptionController::showAction',
-                    'monolog.logger.mautic',
-                ],
-                'tag'          => 'kernel.event_listener',
-                'tagArguments' => [
-                    'event'    => 'kernel.exception',
-                    'method'   => 'onKernelException',
-                    'priority' => 253,
-                ],
-            ],
-            // Helpers
-            'mautic.helper.cookie' => [
-                'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
-                'arguments' => [
-                    '%mautic.cookie_path%',
-                    '%mautic.cookie_domain%',
-                    '%mautic.cookie_secure%',
-                    '%mautic.cookie_httponly%',
-                    'request_stack',
-                ],
-                'tag' => 'kernel.event_subscriber',
             ],
             'mautic.helper.cache_storage' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,
@@ -431,13 +340,6 @@ return [
                     'setDefaultTheme' => [
                         '%mautic.theme%',
                     ],
-                ],
-            ],
-            'mautic.helper.encryption' => [
-                'class'     => Mautic\CoreBundle\Helper\EncryptionHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.cipher.openssl',
                 ],
             ],
             // Menu
@@ -517,14 +419,6 @@ return [
                     '%mautic.db_table_prefix%',
                     'mautic.schema.helper.column',
                 ],
-            ],
-            'mautic.form.list.validator.circular' => [
-                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'request_stack',
-                ],
-                'tag' => 'validator.constraint_validator',
             ],
             'mautic.maxmind.doNotSellList' => [
                 'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
