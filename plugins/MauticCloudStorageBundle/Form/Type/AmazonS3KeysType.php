@@ -24,9 +24,13 @@ final class AmazonS3KeysType extends AbstractType
         // "required" state depends on whether a value was already saved, mirroring the old
         // KeysType behaviour: required the first time, optional on subsequent saves so leaving
         // the always-blank password field untouched doesn't block re-saving other fields.
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+        $existingClientSecret = '';
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use (&$existingClientSecret): void {
             $form = $event->getForm();
             $data = $event->getData() ?? [];
+
+            $existingClientSecret = $data['client_secret'] ?? '';
 
             if (empty($data['region'])) {
                 $data['region'] = 'us-east-1';
@@ -91,6 +95,18 @@ final class AmazonS3KeysType extends AbstractType
                     'required'   => false,
                 ]
             );
+        });
+
+        // The password field always renders blank regardless of whether a secret is already
+        // saved, so a blank submission must not be treated as "clear the secret" - only as "leave it unchanged".
+        // Without this, saving any other field with the password box left empty silently wipes out a previously-saved client_secret.
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use (&$existingClientSecret): void {
+            $data = $event->getData() ?? [];
+
+            if (empty($data['client_secret']) && !empty($existingClientSecret)) {
+                $data['client_secret'] = $existingClientSecret;
+                $event->setData($data);
+            }
         });
     }
 
