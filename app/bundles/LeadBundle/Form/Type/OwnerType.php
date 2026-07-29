@@ -22,7 +22,10 @@ final class OwnerType extends AbstractType
             [
                 'label'             => 'mautic.lead.batch.add_to',
                 'multiple'          => false,
-                'choices'           => $options['items'],
+                'choices'           => array_merge(
+                    [$options['remove_label'] => '__none__'],
+                    $options['items']
+                ),
                 'required'          => false,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
@@ -54,6 +57,7 @@ final class OwnerType extends AbstractType
         $resolver->setRequired(
             [
                 'items',
+                'remove_label',
             ]
         );
     }
