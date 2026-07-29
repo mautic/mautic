@@ -39,18 +39,6 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'other' => [
-            'mautic.dashboard.widget' => [
-                'class'     => Mautic\DashboardBundle\Dashboard\Widget::class,
-                'arguments' => [
-                    'mautic.dashboard.model.dashboard',
-                    'mautic.helper.user',
-                    'request_stack',
-                ],
-            ],
-        ],
-    ],
     'parameters' => [
         'dashboard_import_dir'      => '%mautic.application_dir%/app/assets/dashboards',
         'dashboard_import_user_dir' => '%mautic.application_dir%/media/dashboards',
