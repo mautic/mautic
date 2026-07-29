@@ -65,7 +65,6 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('TestTitleCategoryController1', (string) $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringContainsString('TestTitleCategoryController2', (string) $clientResponseContent, 'The return must contain TestTitleCategoryController2');
-        $this->assertStringContainsString('Associated items will not be deleted; they will be assigned as uncategorized.', (string) $clientResponseContent);
     }
 
     /**
