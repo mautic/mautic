@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Membership\Exception;
 
-class RunLimitReachedException extends \Exception
+final class RunLimitReachedException extends \Exception
 {
     private readonly int $contactsProcessed;
 

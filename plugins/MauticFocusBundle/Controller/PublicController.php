@@ -8,16 +8,18 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusViewEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends CommonController
+final class PublicController extends CommonController
 {
-    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;
+    private FocusModel $focusModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowirePublicController(
-        \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel,
+        FocusModel $focusModel,
     ): void {
         $this->focusModel = $focusModel;
     }

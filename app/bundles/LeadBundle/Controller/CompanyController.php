@@ -15,30 +15,36 @@ use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class CompanyController extends FormController
+final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
+
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
 
     private FieldModel $fieldModel;
 
     private CompanyModel $companyModel;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireCompanyController(
-        \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
+        $this->companyRepository = $companyRepository;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
@@ -110,7 +116,7 @@ class CompanyController extends FormController
 
         $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $this->companyModel->getRepository()->getLeadCount($companyIds) : [];
+        $leadCounts = (!empty($companyIds)) ? $this->companyRepository->getLeadCount($companyIds) : [];
 
         return $this->delegateView(
             [
@@ -543,7 +549,7 @@ class CompanyController extends FormController
         }
 
         /** @var Company $company */
-        $this->companyModel->getRepository()->refetchEntity($company);
+        $this->companyRepository->refetchEntity($company);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -977,10 +983,8 @@ class CompanyController extends FormController
 
     /**
      * Company Merge function.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, $objectId)
+    public function mergeAction(Request $request, $objectId): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(

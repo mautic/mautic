@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -120,7 +120,7 @@ class ConfigType extends AbstractType
      */
     private function greaterThanOrEqualConstraint(int|float $value): array
     {
-        return [new GreaterThanOrEqual(['value' => $value])];
+        return [new GreaterThanOrEqual(value: $value)];
     }
 
     public function getBlockPrefix(): string

@@ -36,6 +36,14 @@ return [
                 'path'       => '/mtc.js',
                 'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
+            'mautic_essential_js' => [
+                'path'       => '/mautic-essential.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::essentialAction',
+            ],
+            'mautic_tracking_js' => [
+                'path'       => '/mautic-tracking.js',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::trackingAction',
+            ],
             'mautic_base_index' => [
                 'path'       => '/',
                 'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
@@ -303,7 +311,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
-                    'doctrine.orm.entity_manager',
+                    'mautic.core.repository.ip_address',
                     'mautic.helper.core_parameters',
                     'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
@@ -327,35 +335,6 @@ return [
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
-                ],
-            ],
-            'mautic.helper.phone_number' => [
-                'class' => Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
-            ],
-            'mautic.helper.input_helper' => [
-                'class' => Mautic\CoreBundle\Helper\InputHelper::class,
-            ],
-            'mautic.helper.file_uploader' => [
-                'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
-                'arguments' => [
-                    'mautic.helper.file_path_resolver',
-                    'translator',
-                ],
-            ],
-            'mautic.helper.file_path_resolver' => [
-                'class'     => Mautic\CoreBundle\Helper\FilePathResolver::class,
-                'arguments' => [
-                    'symfony.filesystem',
-                    'mautic.helper.input_helper',
-                ],
-            ],
-            'mautic.helper.file_properties' => [
-                'class' => Mautic\CoreBundle\Helper\FileProperties::class,
-            ],
-            'mautic.helper.trailing_slash' => [
-                'class'     => Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.token_builder' => [
@@ -385,9 +364,6 @@ return [
                     'mautic.native.connector',
                     'mautic.helper.core_parameters',
                 ],
-            ],
-            'mautic.helper.update_checks' => [
-                'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
             ],
         ],
         'menus' => [
@@ -420,26 +396,6 @@ return [
                 'arguments' => [
                     '%kernel.environment%',
                 ],
-            ],
-            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
-            'symfony.filesystem' => [
-                'class' => Symfony\Component\Filesystem\Filesystem::class,
-            ],
-            'mautic.filesystem' => [
-                'class' => Mautic\CoreBundle\Helper\Filesystem::class,
-            ],
-            'symfony.finder' => [
-                'class' => Symfony\Component\Finder\Finder::class,
-            ],
-            // Error handler
-            'mautic.core.errorhandler.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'monolog.logger',
-                    "@=container.has('monolog.logger.chrome') ? container.get('monolog.logger.chrome') : null",
-                ],
-                'tag' => 'kernel.event_subscriber',
             ],
 
             // Configurator (used in installer and managing global config]
@@ -556,23 +512,6 @@ return [
                     '%kernel.cache_dir%',
                 ],
             ],
-            'mautic.helper.update' => [
-                'class'     => Mautic\CoreBundle\Helper\UpdateHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                    'mautic.helper.update.release_parser',
-                    'mautic.helper.update_checks',
-                ],
-            ],
-            'mautic.helper.update.release_parser' => [
-                'class'     => Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
-                'arguments' => [
-                    'mautic.http.client',
-                ],
-            ],
             'mautic.helper.cache' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
@@ -606,16 +545,6 @@ return [
                     'mautic.cipher.openssl',
                 ],
             ],
-            'mautic.helper.url' => [
-                'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
-            ],
-            'mautic.helper.composer' => [
-                'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
-                'arguments' => [
-                    'kernel',
-                    'monolog.logger.mautic',
-                ],
-            ],
             // Menu
             'mautic.helper.menu' => [
                 'class'     => Mautic\CoreBundle\Menu\MenuHelper::class,
@@ -625,12 +554,6 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
-            ],
-            'mautic.helper.hash' => [
-                'class' => Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
-            ],
-            'mautic.helper.random' => [
-                'class' => Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.helper.command' => [
                 'class'     => Mautic\CoreBundle\Helper\CommandHelper::class,
@@ -661,8 +584,8 @@ return [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
                     'mautic.http.client',
-                    '%kernel.cache_dir%',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -731,91 +654,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.monolog.fulltrace.formatter',
-                ],
-            ],
-
-            // Update steps
-            'mautic.update.step_provider' => [
-                'class' => Mautic\CoreBundle\Update\StepProvider::class,
-            ],
-            'mautic.update.step.delete_cache' => [
-                'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
-                'arguments' => [
-                    'mautic.helper.cache',
-                    'translator',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.finalize' => [
-                'class'     => Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.paths',
-                    'request_stack',
-                    'mautic.helper.app_version',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.install_new_files' => [
-                'class'     => Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.update',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.remove_deleted_files' => [
-                'class'     => Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.update_schema' => [
-                'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
-                'arguments' => [
-                    'translator',
-                    'service_container',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.update_translations' => [
-                'class'     => Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.language',
-                    'monolog.logger.mautic',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.checks' => [
-                'class'     => Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.update',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.checks.php' => [
-                'class' => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
-                'tag'   => 'mautic.update_check',
-            ],
-            'mautic.update.checks.database' => [
-                'class'     => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
-                'arguments' => [
-                    'doctrine.orm.default_entity_manager',
-                ],
-                'tag' => 'mautic.update_check',
-            ],
-        ],
-        'validator' => [
-            'mautic.core.validator.file_upload' => [
-                'class'     => Mautic\CoreBundle\Validator\FileUploadValidator::class,
-                'arguments' => [
-                    'translator',
                 ],
             ],
         ],

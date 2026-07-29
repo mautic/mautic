@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -29,6 +30,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -101,7 +103,7 @@ final class MailHelperTest extends TestCase
     /**
      * @var array<array<string,string|int>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -455,7 +457,8 @@ final class MailHelperTest extends TestCase
             $this->createStub(TrackableModel::class),
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
 
         $email = new Email();
@@ -685,7 +688,7 @@ final class MailHelperTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmails')]
+    #[DataProvider('provideEmails')]
     public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper = $this->mockEmptyMailHelper();
@@ -1072,7 +1075,7 @@ final class MailHelperTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('minifyHtmlDataProvider')]
+    #[DataProvider('minifyHtmlDataProvider')]
     public function testMinifyHtml(bool $minifyHtml, string $html, string $expectedHtml): void
     {
         $params = [
@@ -1413,6 +1416,7 @@ final class MailHelperTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
             $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
     }
 
@@ -1456,7 +1460,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
         $mailer->setIdHash();
@@ -1535,7 +1540,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
 

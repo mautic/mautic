@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ThemeController extends FormController
+final class ThemeController extends FormController
 {
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
     {
@@ -224,9 +224,6 @@ class ThemeController extends FormController
         );
     }
 
-    /**
-     * Deletes a theme.
-     */
     public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];

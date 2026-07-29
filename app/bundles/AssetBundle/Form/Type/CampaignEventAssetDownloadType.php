@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventAssetDownloadType extends AbstractType
+final class CampaignEventAssetDownloadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

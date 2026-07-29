@@ -3,7 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
@@ -30,6 +31,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -39,7 +41,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
@@ -49,6 +53,7 @@ use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -100,7 +105,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
         private VariantConverterService $variantConverterService,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -110,10 +115,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private StatRepository $statRepository,
         private BotRatioHelper $botRatioHelper,
         private ValidatorInterface $validator,
-        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
-        private readonly \Mautic\PageBundle\Entity\HitRepository $hitRepository,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        private readonly \Mautic\LeadBundle\Entity\UtmTagRepository $utmTagRepository,
+        private readonly PageRepository $pageRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly UtmTagRepository $utmTagRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -125,15 +130,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
+    public function getRepository(): PageRepository
     {
-        $repo = $this->pageRepository;
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $this->pageRepository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo;
+        return $this->pageRepository;
     }
 
-    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
+    public function getHitRepository(): HitRepository
     {
         return $this->hitRepository;
     }
@@ -211,7 +215,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -539,8 +543,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->emailRepository;
-                if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
             }
@@ -604,12 +607,12 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $lastHit = $request->cookies->get('mautic_referer_id');
         if (!empty($lastHit) && is_numeric($lastHit)) {
             // Update the last hit with the date/time the user left
-            $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
+            $this->hitRepository->updateHitDateLeft((int) $lastHit);
         }
 
         // Check if this is a unique page hit
         $trackingId = $hit->getTrackingId();
-        $isUnique   = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
+        $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
         if (!empty($page)) {
             if ($page instanceof Page) {
@@ -771,7 +774,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
-        return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
+        return $this->hitRepository->getBounces($page->getId(), $fromDate);
     }
 
     /**
@@ -904,7 +907,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
-        $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
+        $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
         $query       = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
@@ -1081,8 +1084,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->utmTagRepository;
-            $repo->saveEntity($utmTags);
+            $this->utmTagRepository->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
         }

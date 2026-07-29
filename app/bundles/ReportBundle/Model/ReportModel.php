@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
@@ -31,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,14 +77,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         private readonly RequestStack $requestStack,
-        private readonly \Mautic\ReportBundle\Entity\ReportRepository $reportRepository,
+        private readonly ReportRepository $reportRepository,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
+    public function getRepository(): ReportRepository
     {
         return $this->reportRepository;
     }
@@ -104,7 +106,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -752,7 +754,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
-        return $this->getRepository()->findReportsWithGraphs($ownedBy);
+        return $this->reportRepository->findReportsWithGraphs($ownedBy);
     }
 
     /**

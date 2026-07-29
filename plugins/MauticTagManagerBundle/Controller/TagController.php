@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -17,20 +18,25 @@ use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TagController extends FormController
+final class TagController extends FormController
 {
+    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
+
     private TagModel $leadTagModel;
 
     private TagManagerModel $tagManagerModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function autowireTagController(
         TagModel $leadTagModel,
         TagManagerModel $tagManagerModel,
+        \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
         $this->leadTagModel = $leadTagModel;
         $this->tagManagerModel = $tagManagerModel;
+        $this->tagRepository = $tagRepository;
     }
 
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
@@ -125,7 +131,7 @@ class TagController extends FormController
         $session->set('mautic.tagmanager.page', $page);
 
         $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
-        $tagsCount = (!empty($tagIds)) ? $this->tagManagerModel->getRepository()->countByLeads($tagIds) : [];
+        $tagsCount = (!empty($tagIds)) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
             'items'       => $items,
@@ -199,7 +205,7 @@ class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $found = $model->getRepository()->countOccurrences($tag->getTag());
+                $found = $this->tagRepository->countOccurrences($tag->getTag());
                 if (0 !== $found) {
                     $valid = false;
                     $this->addFlashMessage('mautic.core.notice.updated', [
@@ -384,7 +390,7 @@ class TagController extends FormController
 
     private function isTagUnique(Tag $tag): bool
     {
-        $existingTags = $this->tagManagerModel->getRepository()->getTagsByName([$tag->getTag()]);
+        $existingTags = $this->tagRepository->getTagsByName([$tag->getTag()]);
         foreach ($existingTags as $existingTag) {
             if ($existingTag->getId() != $tag->getId()) {
                 return false;
@@ -448,8 +454,6 @@ class TagController extends FormController
      */
     public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
     {
-        $security = $this->security;
-
         $tag = $this->leadTagModel->getEntity($objectId);
 
         // set the page we came from
@@ -483,7 +487,7 @@ class TagController extends FormController
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
                 'tag'        => $tag,
-                'security'   => $security,
+                'security'   => $this->security,
                 'usageStats' => $tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
@@ -523,7 +527,7 @@ class TagController extends FormController
                 ]);
 
                 $form = $this->formFactory->create(
-                    \MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType::class,
+                    TagMergeType::class,
                     [],
                     [
                         'action'      => $action,

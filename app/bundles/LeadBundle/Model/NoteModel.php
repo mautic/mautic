@@ -17,6 +17,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -68,7 +69,7 @@ class NoteModel extends FormModel
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -135,6 +136,6 @@ class NoteModel extends FormModel
         $noteType  = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
         $createdBy = $canViewOther ? null : $this->userHelper->getUser()?->getId();
 
-        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
+        return $this->leadNoteRepository->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
     }
 }

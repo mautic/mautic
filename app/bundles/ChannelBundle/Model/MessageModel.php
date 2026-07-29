@@ -2,7 +2,7 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -38,7 +39,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     public function __construct(
         protected ChannelListHelper $channelListHelper,
         protected CampaignModel $campaignModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -67,7 +68,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
             foreach ($channels as $channel) {
                 $channel->setMessage($entity);
             }
-            $this->getRepository()->saveEntities($channels);
+            $this->messageRepository->saveEntities($channels);
         }
     }
 
@@ -94,9 +95,9 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      * @param object  $entity
      * @param mixed[] $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -156,7 +157,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         $results = [];
         switch ($type) {
             case 'channel.message':
-                $entities = $this->getRepository()->getMessageList(
+                $entities = $this->messageRepository->getMessageList(
                     $filter,
                     $limit,
                     $start
@@ -177,7 +178,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
 
     public function getMessageChannels($messageId): array
     {
-        return $this->getRepository()->getMessageChannels($messageId);
+        return $this->messageRepository->getMessageChannels($messageId);
     }
 
     /**
@@ -185,7 +186,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      */
     public function getChannelMessageByChannelId($channelId)
     {
-        return $this->getRepository()->getChannelMessageByChannelId($channelId);
+        return $this->messageRepository->getChannelMessageByChannelId($channelId);
     }
 
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null): array

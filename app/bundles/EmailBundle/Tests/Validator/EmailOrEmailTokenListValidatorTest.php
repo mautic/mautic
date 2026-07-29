@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -74,7 +75,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $this->assertSame(1, $context->violationCount);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
+    #[DataProvider('provider')]
     public function testNoEmailsProvided(?string $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class() extends ExecutionContext {

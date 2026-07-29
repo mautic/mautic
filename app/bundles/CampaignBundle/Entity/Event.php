@@ -716,7 +716,7 @@ class Event implements ChannelInterface, UuidInterface
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
             ->setMaxResults(1);
 
-        $log = $this->getLog()->matching($criteria);
+        $log = $this->log->matching($criteria);
 
         if (count($log)) {
             return $log->first();
@@ -1204,6 +1204,6 @@ class Event implements ChannelInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getCampaign()->getCreatedBy();
+        return $this->campaign->getCreatedBy();
     }
 }

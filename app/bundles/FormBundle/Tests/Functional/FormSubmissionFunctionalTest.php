@@ -81,7 +81,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = static::getContainer()->get(EmailModel::class);
         $emailModel->sendEmail($email, [[
             'id'        => $lead->getId(),
             'email'     => $lead->getEmail(),

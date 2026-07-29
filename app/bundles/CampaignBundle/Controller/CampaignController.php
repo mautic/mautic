@@ -3,18 +3,16 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -111,10 +109,12 @@ class CampaignController extends AbstractStandardFormController
         private LoggerInterface $logger,
         private RequestStack $requestStack,
         CorePermissions $security,
-        private EntityManager $em,
         private PublishStateService $publishStateService,
         private CampaignModel $campaignModel,
-        private \Mautic\CampaignBundle\Model\EventModel $eventModel,
+        private EventModel $eventModel,
+        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
+        private readonly SummaryRepository $summaryRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -238,8 +238,7 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $repo = $this->em->getRepository(Campaign::class);
-            $repo->setTranslator($this->translator);
+            $this->campaignRepository->setTranslator($this->translator);
 
             $args = [
                 'filter'           => $filter,
@@ -249,7 +248,7 @@ class CampaignController extends AbstractStandardFormController
             ];
 
             // Query campaigns
-            $campaigns = $repo->getEntities($args);
+            $campaigns = $this->campaignRepository->getEntities($args);
 
             // Get campaign IDs
             $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
@@ -347,7 +346,7 @@ class CampaignController extends AbstractStandardFormController
             $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $hasCampaignLeads = $this->campaignModel->getRepository()->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
+        $hasCampaignLeads = $this->campaignRepository->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
@@ -781,7 +780,7 @@ class CampaignController extends AbstractStandardFormController
             $this->setCampaignSources($isClone);
             $this->campaignModel->setLeadSources($entity, $this->campaignElements['campaignSources'], []);
             // If this is a clone, we need to save the entity first to properly build the events, sources and canvas settings
-            $this->campaignModel->getRepository()->saveEntity($entity);
+            $this->campaignRepository->saveEntity($entity);
             // Set as new so that timestamps are still hydrated
             $entity->setNew();
             $this->sessionId = $entity->getId();
@@ -1156,16 +1155,12 @@ class CampaignController extends AbstractStandardFormController
     private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
-            /** @var SummaryRepository $summaryRepo */
-            $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
-            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
+            $campaignLogCounts          = $this->summaryRepository->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
             $cacheTTL = (int) $this->coreParametersHelper->get('campaign_event_cache_ttl');
-            /** @var LeadEventLogRepository $eventLogRepo */
-            $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCounts          = $this->leadEventLogRepository->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCountsProcessed = $this->leadEventLogRepository->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
         }
 
         return [

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -38,6 +40,8 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -48,6 +52,7 @@ use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PointBundle\Model\PointGroupModel;
+use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -57,21 +62,30 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class LeadController extends FormController
+final class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+
+    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+
+    private LeadRepository $leadRepository;
+
     private NoteModel $noteModel;
 
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
+    private CampaignModel $campaignModel;
 
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
+    private StageModel $stageModel;
 
-    private \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel;
+    private ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
+    private CompanyModel $companyModel;
 
     private ListModel $leadListModel;
 
@@ -81,17 +95,27 @@ class LeadController extends FormController
 
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    private DoNotContactRepository $doNotContactRepository;
+
+    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+
+    #[Required]
     public function autowireLeadController(
         LeadModel $leadModel,
         ListModel $leadListModel,
-        \Mautic\StageBundle\Model\StageModel $stageModel,
-        \Mautic\LeadBundle\Model\CompanyModel $companyModel,
-        \Mautic\LeadBundle\Model\ContactExportSchedulerModel $contactExportSchedulerModel,
-        \Mautic\CampaignBundle\Model\CampaignModel $campaignModel,
+        StageModel $stageModel,
+        CompanyModel $companyModel,
+        ContactExportSchedulerModel $contactExportSchedulerModel,
+        CampaignModel $campaignModel,
         NoteModel $noteModel,
         FieldModel $leadFieldModel,
         UserModel $userModel,
+        LeadRepository $leadRepository,
+        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        DoNotContactRepository $doNotContactRepository,
+        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -102,6 +126,12 @@ class LeadController extends FormController
         $this->noteModel = $noteModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->userModel = $userModel;
+        $this->leadRepository = $leadRepository;
+        $this->companyRepository = $companyRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->userRepository = $userRepository;
+        $this->doNotContactRepository = $doNotContactRepository;
+        $this->emailRepository = $emailRepository;
     }
 
     /**
@@ -153,10 +183,9 @@ class LeadController extends FormController
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
-        $translator  = $this->translator;
-        $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
-        $mine        = $translator->trans('mautic.core.searchcommand.ismine');
+        $anonymous   = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $listCommand = $this->translator->trans('mautic.lead.lead.searchcommand.list');
+        $mine        = $this->translator->trans('mautic.core.searchcommand.ismine');
         $indexMode   = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
 
         $session->set('mautic.lead.indexmode', $indexMode);
@@ -241,9 +270,7 @@ class LeadController extends FormController
         }
 
         // Get the max ID of the latest lead added
-        $maxLeadId = $this->leadModel->getRepository()->getMaxLeadId();
-
-        \assert($leadDNCModel instanceof DoNotContactModel);
+        $maxLeadId = $this->leadRepository->getMaxLeadId();
         $dncRepository = $leadDNCModel->getDncRepo();
 
         return $this->delegateView(
@@ -398,7 +425,7 @@ class LeadController extends FormController
             );
         }
 
-        $this->leadModel->getRepository()->refetchEntity($lead);
+        $this->leadRepository->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -426,8 +453,8 @@ class LeadController extends FormController
         $fields            = $lead->getFields();
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        $companiesRepo = $this->companyModel->getRepository();
-        $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
+
+        $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
             if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
@@ -443,13 +470,13 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
-        $lists = $this->leadListModel->getRepository()->getLeadLists([$lead], true, true);
+        $lists = $this->leadListRepository->getLeadLists([$lead], true, true);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
@@ -503,10 +530,8 @@ class LeadController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage): Response
     {
         $lead  = $this->leadModel->getEntity();
 
@@ -555,11 +580,8 @@ class LeadController extends FormController
                         $userHelper->getUser()->getName()
                     ));
 
-                    /** @var LeadRepository $contactRepository */
-                    $contactRepository = $this->doctrine->getManager()->getRepository(Lead::class);
-
                     // Save here as we need the entity with an ID for the company code bellow.
-                    $contactRepository->saveEntity($lead);
+                    $this->leadRepository->saveEntity($lead);
 
                     if (!empty($companies)) {
                         $this->leadModel->modifyCompanies($lead, $companies);
@@ -674,10 +696,8 @@ class LeadController extends FormController
      * Generates edit form.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 
@@ -877,10 +897,8 @@ class LeadController extends FormController
 
     /**
      * Generates merge form and action.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
+    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId): Response
     {
         $mainLead = $this->leadModel->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
@@ -1431,7 +1449,7 @@ class LeadController extends FormController
         $leadFields = $emailModel->enrichedContactWithCompanies($leadFields);
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'email');
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
@@ -1456,7 +1474,7 @@ class LeadController extends FormController
 
                     // Set the email entity template so the email configuration like preheader would apply.
                     if ($email['templates']) {
-                        $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                        $emailEntity = $this->emailRepository->find($email['templates']);
                     }
 
                     // Overwrite the mailer with the values from the form.
@@ -1913,7 +1931,7 @@ class LeadController extends FormController
                 ]
             );
         }
-        $users = $this->userModel->getRepository()->getUserList('', 0);
+        $users = $this->userRepository->getUserList('', 0);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
@@ -2170,9 +2188,8 @@ class LeadController extends FormController
         $ids        = $request->get('ids');
 
         $filter     = ['string' => $search, 'force' => ''];
-        $translator = $this->translator;
-        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+        $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
         if (!empty($ids)) {
@@ -2305,7 +2322,7 @@ class LeadController extends FormController
     /**
      * @param array<mixed> $permissions
      */
-    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): Response
+    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): JsonResponse
     {
         $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);

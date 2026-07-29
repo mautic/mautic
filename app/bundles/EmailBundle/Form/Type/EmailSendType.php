@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailSendType extends AbstractType
+final class EmailSendType extends AbstractType
 {
     public function __construct(
         private readonly RouterInterface $router,
@@ -42,7 +42,7 @@ class EmailSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.email.chooseemail.notblank']
+                        message: 'mautic.email.chooseemail.notblank'
                     ),
                 ],
             ]

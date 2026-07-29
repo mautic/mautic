@@ -2,9 +2,10 @@
 
 namespace Mautic\ApiBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -17,6 +18,7 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -38,7 +40,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
 
     public function __construct(
         private readonly RequestStack $requestStack,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -46,7 +48,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\ApiBundle\Entity\oAuth2\ClientRepository $clientRepository,
+        private readonly ClientRepository $clientRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -69,7 +71,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         $this->apiMode = $apiMode;
     }
 
-    public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
+    public function getRepository(): ClientRepository
     {
         return $this->clientRepository;
     }
@@ -82,7 +84,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -140,7 +142,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
      */
     public function getUserClients(User $user)
     {
-        return $this->getRepository()->getUserClients($user);
+        return $this->clientRepository->getUserClients($user);
     }
 
     /**

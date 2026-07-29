@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
@@ -17,6 +18,7 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -30,7 +32,7 @@ class FieldModel extends CommonFormModel
 {
     public function __construct(
         protected LeadFieldModel $leadFieldModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -40,7 +42,7 @@ class FieldModel extends CommonFormModel
         CoreParametersHelper $coreParametersHelper,
         private readonly RequestStack $requestStack,
         private readonly ColumnSchemaHelper $columnSchemaHelper,
-        private readonly \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
+        private readonly FieldRepository $fieldRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -55,9 +57,9 @@ class FieldModel extends CommonFormModel
      * @param string|null         $action
      * @param array               $options
      *
-     * @return \Symfony\Component\Form\FormInterface<mixed>
+     * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -66,7 +68,7 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    public function getRepository(): \Mautic\FormBundle\Entity\FieldRepository
+    public function getRepository(): FieldRepository
     {
         return $this->fieldRepository;
     }

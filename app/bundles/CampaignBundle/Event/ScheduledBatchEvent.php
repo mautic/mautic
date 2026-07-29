@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class ScheduledBatchEvent extends AbstractLogCollectionEvent
+final class ScheduledBatchEvent extends AbstractLogCollectionEvent
 {
     /**
      * @param bool $isReschedule

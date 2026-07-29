@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
@@ -95,7 +95,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return array<string, string>
      */
-    protected function getBuilderTokens(string $query): array
+    private function getBuilderTokens(string $query): array
     {
         $components   = $this->emailModel->getBuilderComponents(null, ['tokens'], $query);
         $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];
