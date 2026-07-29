@@ -155,29 +155,11 @@ return [
     ],
     'services' => [
         'main' => [
-            'mautic.core.service.flashbag' => [
-                'class'     => Mautic\CoreBundle\Service\FlashBag::class,
-                'arguments' => [
-                    'translator',
-                    'request_stack',
-                    'mautic.core.model.notification',
-                ],
-            ],
-            'mautic.core.service.bulk_notification' => [
-                'class'     => Mautic\CoreBundle\Service\BulkNotification::class,
-                'arguments' => [
-                    'mautic.core.model.notification',
-                ],
-            ],
             'mautic.core.service.local_file_adapter' => [
                 'class'     => Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                 'arguments' => [
                     '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
-            ],
-            'mautic.core.service.log_processor' => [
-                'class'     => Mautic\CoreBundle\Monolog\LogProcessor::class,
-                'tags'      => ['monolog.processor'],
             ],
         ],
         'events' => [
@@ -404,20 +386,6 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                 ],
-            ],
-
-            // System uses
-            'mautic.di.env_processor.nullable' => [
-                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
-                'tag'   => 'container.env_var_processor',
-            ],
-            'mautic.di.env_processor.int_nullable' => [
-                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
-                'tag'   => 'container.env_var_processor',
-            ],
-            'mautic.di.env_processor.mauticconst' => [
-                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class,
-                'tag'   => 'container.env_var_processor',
             ],
             'mautic.cipher.openssl' => [
                 'class'     => Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
@@ -646,14 +614,6 @@ return [
                 'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                ],
-            ],
-            // Logger
-            'mautic.monolog.handler' => [
-                'class'     => Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.monolog.fulltrace.formatter',
                 ],
             ],
         ],
