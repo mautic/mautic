@@ -26,7 +26,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $this->fieldChangeRepository = self::getContainer()->get(FieldChangeRepository::class);
 
         static::getContainer()->set(
-            'mautic.integrations.helper.sync_integrations',
+            SyncIntegrationsHelper::class,
             new class() extends SyncIntegrationsHelper {
                 public function __construct()
                 {

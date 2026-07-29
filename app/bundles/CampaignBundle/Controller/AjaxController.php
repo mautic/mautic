@@ -114,7 +114,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * @return LeadEventLog|null
      */
-    protected function getContactEventLog($eventId, $contactId)
+    private function getContactEventLog(int $eventId, int $contactId)
     {
         $contact = $this->leadModel->getEntity($contactId);
         if ($contact) {

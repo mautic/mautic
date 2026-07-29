@@ -59,19 +59,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'helpers' => [
-            'mautic.channel.helper.channel_list' => [
-                'class'     => Mautic\ChannelBundle\Helper\ChannelListHelper::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                ],
-                'alias' => 'channel',
-            ],
-        ],
-    ],
-
     'parameters' => [
     ],
 ];

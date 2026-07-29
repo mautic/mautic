@@ -27,8 +27,8 @@ final class CompanyType extends AbstractType
 
     public function __construct(
         private EntityManagerInterface $em,
-        protected RouterInterface $router,
-        protected TranslatorInterface $translator,
+        private RouterInterface $router,
+        private TranslatorInterface $translator,
     ) {
     }
 
