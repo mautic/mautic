@@ -2,19 +2,6 @@
 
 return [
     'services' => [
-        'events' => [
-            'mautic.notification.campaignbundle.subscriber' => [
-                'class'     => Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.notification.model.notification',
-                    'mautic.notification.api',
-                    'event_dispatcher',
-                    'mautic.lead.model.dnc',
-                    'translator',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.notification.api' => [
                 'class'     => Mautic\NotificationBundle\Api\OneSignalApi::class,

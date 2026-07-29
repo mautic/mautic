@@ -6,14 +6,17 @@ namespace Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\UnaryMinus;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\Int_;
@@ -23,6 +26,7 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
+use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Type;
 use Rector\PhpParser\Node\BetterNodeFinder;
@@ -30,6 +34,7 @@ use Rector\PhpParser\Parser\SimplePhpParser;
 use Rector\PhpParser\Printer\BetterStandardPrinter;
 use Rector\Rector\AbstractRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Utils\Rector\ValueObject\ServiceArgument;
 use Utils\Rector\ValueObject\ServiceDefinition;
 use Utils\Rector\ValueObject\ServiceTag;
 
@@ -41,10 +46,20 @@ use Utils\Rector\ValueObject\ServiceTag;
  *   'mautic.some.service' => ['class' => SomeService::class, 'tag' => 'security.voter']
  *   ->  $services->set('mautic.some.service', SomeService::class)->tag('security.voter');
  *
- * The manual "arguments" are dropped, but only for a class whose constructor autowiring can fill on its own -
- * a single scalar or array argument, e.g. a "%mautic.some_config%" parameter, keeps the whole definition in config.php.
+ * The manual "arguments" are dropped for every constructor parameter autowiring can fill on its own. What is
+ * left over - a scalar, a "%mautic.some_config%" parameter or a service of a type the container does not know -
+ * is written as an explicit ->arg() call, named after the constructor parameter:
+ *
+ *   'mautic.some.service' => ['class' => SomeService::class, 'arguments' => ['translator', '%mautic.some_config%']]
+ *   ->  $services->set('mautic.some.service', SomeService::class)->arg('$someConfig', param('mautic.some_config'));
+ *
+ * The argument values follow ServicePass, see Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass:
+ * "%some.parameter%" becomes param(), a class name string stays a string, a quoted "some string" loses its quotes
+ * and anything else is a service reference. A "@=" expression keeps the whole definition in config.php.
  *
  * The tags are kept as ->tag() calls, "tags" pairing with "tagArguments" by index, just like ServicePass does.
+ * A service of a group ServicePass tags on its own, e.g. "permissions", is given that tag explicitly,
+ * see GROUP_DEFAULT_TAGS.
  *
  * Definitions with "alias", "parent", "factory", ... are left in place,
  * as moving them would silently drop their configuration.
@@ -61,6 +76,35 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      * @var string
      */
     private const SERVICES_VARIABLE_NAME = 'services';
+
+    /**
+     * @var string
+     */
+    private const SERVICE_FUNCTION_NAME = 'service';
+
+    /**
+     * @var string
+     */
+    private const PARAM_FUNCTION_NAME = 'param';
+
+    /**
+     * @var string
+     */
+    private const CONFIGURATOR_NAMESPACE = 'Symfony\Component\DependencyInjection\Loader\Configurator';
+
+    /**
+     * The default tags ServicePass gives a whole group of services, in the tags the moved service would lose.
+     *
+     * The other groups keep their default tag through autoconfigure(), e.g. "events" tags every
+     * EventSubscriberInterface with "kernel.event_subscriber" on its own, and the "helpers" tag "twig.helper"
+     * is read by no compiler pass at all.
+     *
+     * @var array<string, string>
+     */
+    private const GROUP_DEFAULT_TAGS = [
+        'models'      => 'mautic.model',
+        'permissions' => 'mautic.permissions',
+    ];
 
     /**
      * @var string
@@ -104,6 +148,11 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     private function refactorConfigFile(Return_ $return, Array_ $configArray): ?Return_
     {
+        // without a container there is no telling autowirable arguments from the ones to keep, see MAUTIC_CONTAINER_XML
+        if (!$this->hasContainerServiceIds()) {
+            return null;
+        }
+
         $servicesFilePath = dirname($this->getFile()->getFilePath()).'/services.php';
         if (!file_exists($servicesFilePath)) {
             return null;
@@ -230,8 +279,10 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 continue;
             }
 
+            $groupName = $groupArrayItem->key instanceof String_ ? $groupArrayItem->key->value : '';
+
             foreach ($groupArray->items as $key => $serviceArrayItem) {
-                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem);
+                $serviceDefinition = $this->matchServiceDefinition($serviceArrayItem, $groupName);
                 if (!$serviceDefinition instanceof ServiceDefinition) {
                     continue;
                 }
@@ -289,12 +340,125 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         $appendContent = '';
 
         foreach ($setStmts as $setStmt) {
-            $appendContent .= "\n".$indentation.$this->betterStandardPrinter->print([$setStmt]);
+            $appendContent .= "\n".$indentation.$this->wrapPrintedStmt($this->betterStandardPrinter->print([$setStmt]), $indentation);
         }
 
-        return substr($servicesFileContent, 0, $anchorEndPosition + 1)
+        $updatedServicesFileContent = substr($servicesFileContent, 0, $anchorEndPosition + 1)
             .$appendContent
             .substr($servicesFileContent, $anchorEndPosition + 1);
+
+        // the imports go last, so the anchor position stays valid while the services are appended
+        return $this->addConfiguratorImports($updatedServicesFileContent, $setStmts);
+    }
+
+    /**
+     * A wired service carries enough calls to outgrow its line, so each of them gets one of its own.
+     */
+    private function wrapPrintedStmt(string $printedStmt, string $indentation): string
+    {
+        if (!str_contains($printedStmt, '->arg(')) {
+            return $printedStmt;
+        }
+
+        return str_replace(
+            ['->arg(', '->tag('],
+            ["\n".$indentation.'    ->arg(', "\n".$indentation.'    ->tag('],
+            $printedStmt
+        );
+    }
+
+    /**
+     * The printed service() and param() calls are unqualified, so services.php has to import them.
+     *
+     * @param Expression[] $setStmts
+     */
+    private function addConfiguratorImports(string $servicesFileContent, array $setStmts): string
+    {
+        $funcCalls = $this->betterNodeFinder->find(
+            $setStmts,
+            fn (Node $node): bool => $node instanceof FuncCall
+                && $this->isNames($node->name, [self::SERVICE_FUNCTION_NAME, self::PARAM_FUNCTION_NAME])
+        );
+
+        $functionNames = [];
+        foreach ($funcCalls as $funcCall) {
+            if ($funcCall instanceof FuncCall && $funcCall->name instanceof Name) {
+                $functionNames[$funcCall->name->toString()] = true;
+            }
+        }
+
+        $functionNames = array_keys($functionNames);
+        sort($functionNames);
+
+        foreach ($functionNames as $functionName) {
+            $useStatement = 'use function '.self::CONFIGURATOR_NAMESPACE.'\\'.$functionName.';';
+
+            if (str_contains($servicesFileContent, $useStatement)) {
+                continue;
+            }
+
+            $servicesFileContent = $this->insertUseStatement($servicesFileContent, $useStatement);
+        }
+
+        return $servicesFileContent;
+    }
+
+    /**
+     * A new import joins the function imports, in alphabetical order,
+     * or opens their very own block right below the class ones.
+     */
+    private function insertUseStatement(string $servicesFileContent, string $useStatement): string
+    {
+        $functionUseStatements = $this->matchUseStatements($servicesFileContent, '#^use function [^;]+;$#m');
+
+        foreach ($functionUseStatements as [$matchedUseStatement, $matchPosition]) {
+            if (strcmp($matchedUseStatement, $useStatement) < 0) {
+                continue;
+            }
+
+            return substr($servicesFileContent, 0, $matchPosition)
+                .$useStatement."\n"
+                .substr($servicesFileContent, $matchPosition);
+        }
+
+        // below the last import of the block the new one belongs to
+        $blocks = [
+            ["\n", $functionUseStatements],
+            ["\n\n", $this->matchUseStatements($servicesFileContent, '#^use [^;]+;$#m')],
+            ["\n\n", $this->matchUseStatements($servicesFileContent, '#^(?:declare\(strict_types=1\);|<\?php)$#m')],
+        ];
+
+        foreach ($blocks as [$separator, $useStatements]) {
+            if ([] === $useStatements) {
+                continue;
+            }
+
+            [$lastUseStatement, $lastPosition] = $useStatements[count($useStatements) - 1];
+            $insertPosition                    = $lastPosition + strlen($lastUseStatement);
+
+            return substr($servicesFileContent, 0, $insertPosition)
+                .$separator.$useStatement
+                .substr($servicesFileContent, $insertPosition);
+        }
+
+        return $servicesFileContent;
+    }
+
+    /**
+     * @return array<int, array{string, int}> matched statements and their positions, in the order they appear
+     */
+    private function matchUseStatements(string $servicesFileContent, string $pattern): array
+    {
+        if (0 === preg_match_all($pattern, $servicesFileContent, $matches, \PREG_OFFSET_CAPTURE)) {
+            return [];
+        }
+
+        $useStatements = [];
+        foreach ($matches[0] as [$matchedUseStatement, $matchPosition]) {
+            $useStatements[] = [$matchedUseStatement, $matchPosition];
+        }
+
+        return $useStatements;
     }
 
     /**
@@ -408,7 +572,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      * Matches a service definition made of a "class" key and optional "arguments", "tag", "tags" and "tagArguments",
      * e.g. ['class' => SomeService::class, 'arguments' => ['translator'], 'tag' => 'security.voter'].
      */
-    private function matchServiceDefinition(ArrayItem $arrayItem): ?ServiceDefinition
+    private function matchServiceDefinition(ArrayItem $arrayItem, string $groupName): ?ServiceDefinition
     {
         if (!$arrayItem->key instanceof String_) {
             return null;
@@ -444,23 +608,24 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        // the moved service is autowired, so autowiring has to fill every constructor argument on its own
-        if (!$this->isAutowirableClass($className->value)) {
+        // the moved service is autowired, whatever autowiring cannot fill becomes an explicit ->arg() call
+        $serviceArguments = $this->resolveServiceArguments($className->value, $this->matchArrayValueByKey($definitionArray, 'arguments'));
+        if (null === $serviceArguments) {
             return null;
         }
 
-        $serviceTags = $this->matchServiceTags($definitionArray);
+        $serviceTags = $this->matchServiceTags($definitionArray, $groupName);
         if (null === $serviceTags) {
             return null;
         }
 
-        return new ServiceDefinition($className->value, $serviceTags);
+        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags);
     }
 
     /**
      * @return ServiceTag[]|null null when the tags cannot be turned into ->tag() calls
      */
-    private function matchServiceTags(Array_ $definitionArray): ?array
+    private function matchServiceTags(Array_ $definitionArray, string $groupName): ?array
     {
         $tagArgumentsValue = $this->matchArrayValueByKey($definitionArray, 'tagArguments');
         if (null !== $tagArgumentsValue && !$tagArgumentsValue instanceof Array_) {
@@ -473,10 +638,18 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         if (!$tagsValue instanceof Array_) {
             $tagValue = $this->matchArrayValueByKey($definitionArray, 'tag');
             if (null === $tagValue) {
-                return null !== $tagArgumentsValue ? null : [];
+                if (null !== $tagArgumentsValue) {
+                    return null;
+                }
+
+                // the group tags its services on its own, so the moved one has to say the tag out loud
+                $groupDefaultTag = self::GROUP_DEFAULT_TAGS[$groupName] ?? null;
+
+                return null === $groupDefaultTag ? [] : [new ServiceTag(new String_($groupDefaultTag), new Array_([]))];
             }
 
-            if (!$tagValue instanceof String_) {
+            $tagName = $this->createTagNameExpr($tagValue);
+            if (!$tagName instanceof Expr) {
                 return null;
             }
 
@@ -485,14 +658,15 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 return null;
             }
 
-            return [new ServiceTag($tagValue->value, $tagArguments)];
+            return [new ServiceTag($tagName, $tagArguments)];
         }
 
         // "tags" pair with "tagArguments" by index, see ServicePass
         $serviceTags = [];
 
         foreach ($tagsValue->items as $key => $tagArrayItem) {
-            if (!$tagArrayItem->value instanceof String_) {
+            $tagName = $this->createTagNameExpr($tagArrayItem->value);
+            if (!$tagName instanceof Expr) {
                 return null;
             }
 
@@ -509,10 +683,31 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 return null;
             }
 
-            $serviceTags[] = new ServiceTag($tagArrayItem->value->value, $tagArguments);
+            $serviceTags[] = new ServiceTag($tagName, $tagArguments);
         }
 
         return $serviceTags;
+    }
+
+    /**
+     * A tag is named by a plain string or by a class constant, e.g. FixturesCompilerPass::FIXTURE_TAG.
+     */
+    private function createTagNameExpr(Node $tagValue): ?Expr
+    {
+        if ($tagValue instanceof String_) {
+            return new String_($tagValue->value);
+        }
+
+        if (!$tagValue instanceof ClassConstFetch || !$tagValue->class instanceof Name || !$tagValue->name instanceof Identifier) {
+            return null;
+        }
+
+        // the class name itself would be no tag name at all
+        if ($this->isName($tagValue->name, 'class')) {
+            return null;
+        }
+
+        return new ClassConstFetch(new Name($tagValue->class->toString()), $tagValue->name->toString());
     }
 
     /**
@@ -568,70 +763,216 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         return new String_($classValue->class->toString());
     }
 
-    private function isAutowirableClass(string $className): bool
+    /**
+     * Pairs the manual "arguments" with the constructor parameters, by position, just like ServicePass does.
+     *
+     * @return ServiceArgument[]|null the arguments autowiring cannot fill, null when the service has to stay in config.php
+     */
+    private function resolveServiceArguments(string $className, ?Node $argumentsValue): ?array
     {
         if (!$this->reflectionProvider->hasClass($className)) {
-            return false;
+            return null;
         }
 
         $classReflection = $this->reflectionProvider->getClass($className);
         if (!$classReflection->hasConstructor()) {
-            return true;
+            return [];
         }
 
         $parametersAcceptor = $classReflection->getConstructor()->getVariants()[0] ?? null;
         if (null === $parametersAcceptor) {
-            return false;
+            return null;
         }
 
-        foreach ($parametersAcceptor->getParameters() as $parameterReflection) {
-            if ($parameterReflection->getDefaultValue() instanceof Type) {
+        $argumentValues = $this->resolveArgumentValues($argumentsValue);
+        if (null === $argumentValues) {
+            return null;
+        }
+
+        $serviceArguments = [];
+
+        foreach ($parametersAcceptor->getParameters() as $position => $parameterReflection) {
+            if ($this->isAutowirableParameter($parameterReflection)) {
                 continue;
             }
 
-            $parameterType = $parameterReflection->getType();
-
-            // scalars, arrays and parameters like "%mautic.some_config%" have to stay wired by hand
-            if (!$parameterType->isObject()->yes()) {
-                return false;
-            }
-
-            // an object type alone is not enough, the container has to know a service of that very type,
-            // e.g. "Monolog\Logger" is no service, only "monolog.logger.mautic" is
-            foreach ($parameterType->getObjectClassNames() as $parameterClassName) {
-                if ($this->isKnownServiceId($parameterClassName)) {
+            $argumentValue = $argumentValues[$position] ?? null;
+            if (null === $argumentValue) {
+                // nothing to wire, the parameter falls back to its own default value
+                if ($parameterReflection->getDefaultValue() instanceof Type) {
                     continue;
                 }
 
-                // named autowiring, e.g. "Psr\Log\LoggerInterface $mauticLogger"
-                if ($this->isKnownServiceId($parameterClassName.' $'.$parameterReflection->getName())) {
-                    continue;
-                }
-
-                return false;
+                return null;
             }
+
+            $argumentExpr = $this->createArgumentExpr($argumentValue);
+            if (!$argumentExpr instanceof Expr) {
+                return null;
+            }
+
+            $serviceArguments[] = new ServiceArgument('$'.$parameterReflection->getName(), $argumentExpr);
+        }
+
+        return $serviceArguments;
+    }
+
+    private function isAutowirableParameter(ParameterReflection $parameterReflection): bool
+    {
+        $parameterType = $parameterReflection->getType();
+
+        // scalars, arrays and parameters like "%mautic.some_config%" have to be wired by hand
+        if (!$parameterType->isObject()->yes()) {
+            return false;
+        }
+
+        // an object type alone is not enough, the container has to know a service of that very type,
+        // e.g. "Monolog\Logger" is no service, only "monolog.logger.mautic" is
+        foreach ($parameterType->getObjectClassNames() as $parameterClassName) {
+            if ($this->isKnownServiceId($parameterClassName)) {
+                continue;
+            }
+
+            // named autowiring, e.g. "Psr\Log\LoggerInterface $mauticLogger"
+            if ($this->isKnownServiceId($parameterClassName.' $'.$parameterReflection->getName())) {
+                continue;
+            }
+
+            return false;
         }
 
         return true;
     }
 
     /**
+     * The "arguments" are a positional list, a lonely value counts as a list of one, see ServicePass.
+     *
+     * @return array<int, Node>|null null when the list is keyed, so the positions cannot be trusted
+     */
+    private function resolveArgumentValues(?Node $argumentsValue): ?array
+    {
+        if (null === $argumentsValue) {
+            return [];
+        }
+
+        if (!$argumentsValue instanceof Array_) {
+            return [$argumentsValue];
+        }
+
+        $argumentValues = [];
+
+        foreach ($argumentsValue->items as $argumentArrayItem) {
+            if (null !== $argumentArrayItem->key) {
+                return null;
+            }
+
+            $argumentValues[] = $argumentArrayItem->value;
+        }
+
+        return $argumentValues;
+    }
+
+    /**
+     * Re-creates a config.php argument as a services.php one, following ServicePass::processArgument().
+     * Nodes are built from scratch, as the parsed ones belong to another file.
+     */
+    private function createArgumentExpr(Node $argumentValue): ?Expr
+    {
+        if ($argumentValue instanceof String_) {
+            return $this->createStringArgumentExpr($argumentValue->value);
+        }
+
+        // a class constant, e.g. SomeClass::class, ends up as a plain class name string
+        if ($argumentValue instanceof ClassConstFetch) {
+            $className = $this->matchClassName($argumentValue);
+
+            return $className instanceof String_ ? new ClassConstFetch(new Name($className->value), 'class') : null;
+        }
+
+        if ($argumentValue instanceof Int_) {
+            return new Int_($argumentValue->value);
+        }
+
+        if ($argumentValue instanceof UnaryMinus && $argumentValue->expr instanceof Int_) {
+            return new UnaryMinus(new Int_($argumentValue->expr->value));
+        }
+
+        if ($argumentValue instanceof ConstFetch) {
+            return new ConstFetch(new Name($argumentValue->name->toString()));
+        }
+
+        return null;
+    }
+
+    private function createStringArgumentExpr(string $argumentValue): ?Expr
+    {
+        // "" is filled in during compilation, there is no telling with what
+        if ('' === $argumentValue) {
+            return null;
+        }
+
+        if (str_starts_with($argumentValue, '%') && str_ends_with($argumentValue, '%') && strlen($argumentValue) > 2) {
+            $parameterName = str_replace('%%', '%', substr($argumentValue, 1, -1));
+
+            return $this->createConfiguratorFuncCall(self::PARAM_FUNCTION_NAME, $parameterName);
+        }
+
+        // a class name stays a string, e.g. a form type passed to a factory
+        if (str_contains($argumentValue, '\\')) {
+            return new String_($argumentValue);
+        }
+
+        if (str_starts_with($argumentValue, '"')) {
+            return new String_(substr($argumentValue, 1, -1));
+        }
+
+        // an expression would need expr(), which brings its own compilation rules along
+        if (str_starts_with($argumentValue, '@=')) {
+            return null;
+        }
+
+        $serviceId = str_starts_with($argumentValue, '@') ? substr($argumentValue, 1) : $argumentValue;
+
+        return $this->createConfiguratorFuncCall(self::SERVICE_FUNCTION_NAME, $serviceId);
+    }
+
+    private function createConfiguratorFuncCall(string $functionName, string $argumentValue): FuncCall
+    {
+        return new FuncCall(new Name($functionName), [new Arg(new String_($argumentValue))]);
+    }
+
+    /**
      * The service ids of the container built before the move, see MAUTIC_CONTAINER_XML.
-     * Without that container the rule stays on the safe side and moves nothing.
+     * Without that container every argument would look like one to keep, so the rule moves nothing at all.
      */
     private function isKnownServiceId(string $serviceId): bool
     {
-        if (null === $this->containerServiceIds) {
-            $this->containerServiceIds = $this->resolveContainerServiceIds();
-        }
+        return isset($this->resolveContainerServiceIds()[$serviceId]);
+    }
 
-        return isset($this->containerServiceIds[$serviceId]);
+    private function hasContainerServiceIds(): bool
+    {
+        return [] !== $this->resolveContainerServiceIds();
     }
 
     /**
      * @return array<string, true>
      */
     private function resolveContainerServiceIds(): array
+    {
+        if (null !== $this->containerServiceIds) {
+            return $this->containerServiceIds;
+        }
+
+        $this->containerServiceIds = $this->loadContainerServiceIds();
+
+        return $this->containerServiceIds;
+    }
+
+    /**
+     * @return array<string, true>
+     */
+    private function loadContainerServiceIds(): array
     {
         $containerFilePath = getenv(self::CONTAINER_XML_ENV_NAME);
         if (!is_string($containerFilePath) || '' === $containerFilePath) {
@@ -705,8 +1046,15 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             new Arg(new ClassConstFetch(new Name($serviceDefinition->getClassName()), 'class')),
         ]);
 
+        foreach ($serviceDefinition->getServiceArguments() as $serviceArgument) {
+            $methodCall = new MethodCall($methodCall, 'arg', [
+                new Arg(new String_($serviceArgument->getName())),
+                new Arg($serviceArgument->getValue()),
+            ]);
+        }
+
         foreach ($serviceDefinition->getServiceTags() as $serviceTag) {
-            $args = [new Arg(new String_($serviceTag->getName()))];
+            $args = [new Arg($serviceTag->getName())];
 
             if ($serviceTag->hasArguments()) {
                 $args[] = new Arg($serviceTag->getArguments());

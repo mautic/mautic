@@ -119,15 +119,6 @@ return [
             'class' => Mautic\EmailBundle\Entity\Email::class,
         ],
     ],
-    'services' => [
-        'fixtures' => [
-            'mautic.email.fixture.email' => [
-                'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.email.model.email'],
-            ],
-        ],
-    ],
     'parameters' => [
         'mailer_from_name'                                                  => 'Mautic',
         'mailer_from_email'                                                 => 'email@yoursite.com',
