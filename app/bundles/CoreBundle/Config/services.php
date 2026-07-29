@@ -35,17 +35,21 @@ return function (ContainerConfigurator $configurator): void {
         'ProcessSignal/ProcessSignalState.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
         'Twig/Helper/ThemeHelper.php',
+        'Twig/Helper/MenuHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
         'Cache/ResultCacheOptions.php',
     ];
 
+    $services->set(Mautic\CoreBundle\Twig\Helper\MenuHelper::class)
+        ->arg('$helper', \Symfony\Component\DependencyInjection\Loader\Configurator\service('knp_menu.helper'))
+        ->tag('twig.helper', ['alias' => 'menu']);
+
     $services->load('Mautic\\CoreBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set('mautic.helper.twig.menu', Mautic\CoreBundle\Twig\Helper\MenuHelper::class)->tag('twig.helper', ['alias' => 'menu']);
-    $services->alias(Mautic\CoreBundle\Twig\Helper\MenuHelper::class, 'mautic.helper.twig.menu');
+
     $services->set('mautic.helper.twig.date', Mautic\CoreBundle\Twig\Helper\DateHelper::class)
         ->arg('$dateFullFormat', param('mautic.date_format_full'))
         ->arg('$dateShortFormat', param('mautic.date_format_short'))
