@@ -69,10 +69,8 @@ final class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Returns the array of widget types.
-     *
-     * @return array
      */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->widgetTypes;
     }

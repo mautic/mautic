@@ -77,10 +77,7 @@ final class ChannelBroadcastEvent extends Event
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }

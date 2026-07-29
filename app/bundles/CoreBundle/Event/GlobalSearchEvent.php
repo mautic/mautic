@@ -47,10 +47,8 @@ final class GlobalSearchEvent extends Event
 
     /**
      * Returns the results.
-     *
-     * @return array
      */
-    public function getResults()
+    public function getResults(): array
     {
         uksort($this->results, strnatcmp(...));
 

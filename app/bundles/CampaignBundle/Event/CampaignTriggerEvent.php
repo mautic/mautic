@@ -22,10 +22,7 @@ final class CampaignTriggerEvent extends Event
         return $this->campaign;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldTrigger()
+    public function shouldTrigger(): bool
     {
         return $this->triggerCampaign;
     }

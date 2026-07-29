@@ -360,10 +360,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Check if the event is getting an engagement count only.
-     *
-     * @return bool
      */
-    public function isEngagementCount()
+    public function isEngagementCount(): bool
     {
         return $this->countOnly;
     }
@@ -467,7 +465,7 @@ final class LeadTimelineEvent extends Event
      *
      * @return ChartQuery
      */
-    public function getChartQuery()
+    public function getChartQuery(): ?\Mautic\CoreBundle\Helper\Chart\ChartQuery
     {
         return $this->chartQuery;
     }

@@ -83,10 +83,7 @@ final class CustomContentEvent extends Event
         return $this->content;
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplates()
+    public function getTemplates(): array
     {
         return $this->templates;
     }

@@ -40,10 +40,8 @@ final class ChannelEvent extends CommonEvent
 
     /**
      * Returns registered channels with their configs.
-     *
-     * @return array
      */
-    public function getChannelConfigs()
+    public function getChannelConfigs(): array
     {
         return $this->channels;
     }
@@ -81,10 +79,7 @@ final class ChannelEvent extends CommonEvent
         return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'] ?? 'name';
     }
 
-    /**
-     * @return array
-     */
-    public function getFeatureChannels()
+    public function getFeatureChannels(): array
     {
         return $this->featureChannels;
     }
