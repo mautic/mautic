@@ -551,9 +551,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     public function testQuickAddAction(): void
     {
-        $this->client->request('GET', '/s/contacts/quickAdd');
+        $crawler = $this->client->request('GET', '/s/contacts/quickAdd');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertCount(1, $crawler->filter('button[name="lead[buttons][save_and_new]"]'));
     }
 
     public function testAddContactsErrorMessage(): void

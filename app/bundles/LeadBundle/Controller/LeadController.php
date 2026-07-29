@@ -637,6 +637,10 @@ final class LeadController extends FormController
                     $inQuickForm = $request->get('qf', false);
 
                     if ($inQuickForm) {
+                        if ($this->getFormButton($form, ['buttons', 'save_and_new'])->isClicked()) {
+                            return $this->quickAddAction($request, $tokenStorage);
+                        }
+
                         $viewParameters = ['page' => $page];
                         $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
                         $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
