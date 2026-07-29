@@ -397,16 +397,6 @@ return [
                     '%kernel.environment%',
                 ],
             ],
-            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
-            'symfony.filesystem' => [
-                'class' => Symfony\Component\Filesystem\Filesystem::class,
-            ],
-            'mautic.filesystem' => [
-                'class' => Mautic\CoreBundle\Helper\Filesystem::class,
-            ],
-            'symfony.finder' => [
-                'class' => Symfony\Component\Finder\Finder::class,
-            ],
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
