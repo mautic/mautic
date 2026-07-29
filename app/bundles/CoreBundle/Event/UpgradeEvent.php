@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class UpgradeEvent extends Event
 {
     public function __construct(
-        protected array $status,
+        private array $status,
     ) {
     }
 

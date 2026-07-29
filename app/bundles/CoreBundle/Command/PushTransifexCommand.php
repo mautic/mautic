@@ -70,7 +70,6 @@ class PushTransifexCommand extends Command
         }
 
         $resources = $transifex->getConnector(Resources::class);
-        \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
         $promises          = new \SplQueue();
