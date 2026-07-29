@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;
+use Gaufrette\Adapter;
 use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
@@ -30,10 +31,7 @@ class AmazonS3Integration extends CloudStorageIntegration
         return 'plugins/MauticCloudStorageBundle/Assets/img/amazons3.png';
     }
 
-    /**
-     * @return AwsS3
-     */
-    public function getAdapter(): \Gaufrette\Adapter
+    public function getAdapter(): Adapter
     {
         if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
