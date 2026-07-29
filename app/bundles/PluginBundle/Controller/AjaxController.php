@@ -18,8 +18,9 @@ final class AjaxController extends CommonAjaxController
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginAjaxController(PluginModel $pluginModel): void
-    {
+    public function autowirePluginAjaxController(
+        PluginModel $pluginModel,
+    ): void {
         $this->pluginModel = $pluginModel;
     }
 

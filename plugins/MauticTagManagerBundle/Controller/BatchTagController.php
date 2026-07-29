@@ -16,7 +16,8 @@ final class BatchTagController extends AbstractFormController
 
     #[Required]
     public function autowireBatchTagController(
-        TagModel $tagModel, \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
+        TagModel $tagModel,
+        \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
     ): void {
         $this->tagRepository = $tagRepository;
     }
