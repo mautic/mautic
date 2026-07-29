@@ -33,12 +33,12 @@ final class TableHeaderTest extends TestCase
     private function render(array $context): string
     {
         $context += [
-            'app' => new class {
+            'app' => new class() {
                 public object $session;
 
                 public function __construct()
                 {
-                    $this->session = new class {
+                    $this->session = new class() {
                         public function get(string $key, mixed $default = null): mixed
                         {
                             return $default;
@@ -58,8 +58,8 @@ final class TableHeaderTest extends TestCase
             'tooltip' => 'Tooltip',
         ]);
 
-        self::assertStringContainsString('data-toggle="tooltip"', $html);
-        self::assertStringContainsString('data-original-title="Tooltip"', $html);
+        $this->assertStringContainsString('data-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-original-title="Tooltip"', $html);
     }
 
     public function testNoTooltipMarkupWhenTooltipIsNotProvidedWithoutSessionVar(): void
@@ -68,7 +68,7 @@ final class TableHeaderTest extends TestCase
             'text' => 'Test Column',
         ]);
 
-        self::assertStringNotContainsString('data-toggle="tooltip"', $html);
+        $this->assertStringNotContainsString('data-toggle="tooltip"', $html);
     }
 
     public function testTooltipIsRenderedOnSortableHeader(): void
@@ -80,8 +80,8 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'SortMe',
         ]);
 
-        self::assertStringContainsString('class="fw-b" data-toggle="tooltip"', $html);
-        self::assertStringContainsString('data-original-title="SortMe"', $html);
+        $this->assertStringContainsString('class="fw-b" data-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-original-title="SortMe"', $html);
     }
 
     public function testTooltipIsRenderedOnNonSortableHeaderWithSessionVar(): void
@@ -92,8 +92,8 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'StaticColumn',
         ]);
 
-        self::assertStringContainsString('class="pa-md" data-toggle="tooltip"', $html);
-        self::assertStringContainsString('data-original-title="StaticColumn"', $html);
+        $this->assertStringContainsString('class="pa-md" data-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-original-title="StaticColumn"', $html);
     }
 
     public function testTooltipAttributeValueIsEscaped(): void
@@ -103,7 +103,7 @@ final class TableHeaderTest extends TestCase
             'tooltip' => '"><script>alert(1)</script>',
         ]);
 
-        self::assertStringNotContainsString('<script>', $html);
-        self::assertMatchesRegularExpression('/<span[^>]*data-original-title="[^"]*"[^>]*>Test Column<\/span>/', $html);
+        $this->assertStringNotContainsString('<script>', $html);
+        $this->assertMatchesRegularExpression('/<span[^>]*data-original-title="[^"]*"[^>]*>Test Column<\/span>/', $html);
     }
 }
