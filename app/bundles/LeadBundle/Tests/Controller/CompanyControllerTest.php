@@ -253,7 +253,10 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful($response->getContent());
         $this->assertStringContainsString('Remove from company', (string) $response->getContent());
-        $this->assertStringContainsString('Remove the selected contacts from this company? The contacts will remain in Mautic.', (string) $response->getContent());
+        $this->assertStringContainsString(
+            "Remove the selected contacts from this company? The contacts will remain in Mautic. If this is a contact's primary company, another company may become primary or the contact will have no company.",
+            html_entity_decode((string) $response->getContent())
+        );
         $this->assertStringContainsString('/s/companies/batchRemoveContacts/'.$this->company1Id, (string) $response->getContent());
     }
 
