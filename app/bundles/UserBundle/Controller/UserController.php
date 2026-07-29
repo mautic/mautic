@@ -168,7 +168,7 @@ final class UserController extends FormController
                         'redirect'   => $this->generateUrl('mautic_user_index'),
                     ]);
                 } else {
-                    $response = $this->redirect($this->generateUrl('mautic_user_index'));
+                    $response = $this->redirectToRoute('mautic_user_index');
                 }
             }
 
