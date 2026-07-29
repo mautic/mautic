@@ -45,6 +45,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.report.model.report_file_writer', Mautic\ReportBundle\Model\ReportFileWriter::class);
     $services->alias('mautic.report.model.export_handler', Mautic\ReportBundle\Model\ExportHandler::class);
 
-    $services->alias('mautic.report.helper.report', Mautic\ReportBundle\Helper\ReportHelper::class);
-    $services->get(Mautic\ReportBundle\Helper\ReportHelper::class)->tag('twig.helper', ['alias' => 'report']);
+    $services->alias('report', Mautic\ReportBundle\Helper\ReportHelper::class);
 };

@@ -23,6 +23,9 @@ return function (ContainerConfigurator $configurator): void {
         'Integration/IntegrationObject.php',
     ];
 
+    $services->set(Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class)
+        ->call('initiateDebugLogger', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.sync.logger')]);
+
     $services->load('Mautic\\IntegrationsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
@@ -85,8 +88,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.integrations.helper.config_integrations', Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class);
     $services->alias('mautic.integrations.helper.builder_integrations', Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class);
     $services->alias('mautic.integrations.sync.notification.handler_container', Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class);
-
-    $services->alias('mautic.integrations.sync.service', Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class);
-    $services->get(Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class)
-        ->call('initiateDebugLogger', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.sync.logger')]);
 };
