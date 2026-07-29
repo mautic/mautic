@@ -41,6 +41,16 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.helper.menu', Mautic\CoreBundle\Menu\MenuHelper::class);
+    $services->alias('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
+
+    // Configurator (used in installer and managing global config)
+    $services->alias('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
+    $services->alias('mautic.form.list.validator.circular', Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class);
+    $services->alias('mautic.maxmind.doNotSellList', Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
+
+    $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
+    $services->alias('mautic.cipher.openssl', Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
