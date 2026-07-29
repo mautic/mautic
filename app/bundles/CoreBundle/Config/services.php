@@ -124,6 +124,54 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class, 'mautic.schema.helper.table');
     $services->set('mautic.maxmind.doNotSellList', Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class);
     $services->alias(Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class, 'mautic.maxmind.doNotSellList');
+    $services->set('mautic.form.type.dynamic_content_filter_entry_filters', Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class)
+        ->call('setConnection', [service('database_connection')]);
+    $services->alias(Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class, 'mautic.form.type.dynamic_content_filter_entry_filters');
+
+    $services->set('mautic.core.subscriber.router', Mautic\CoreBundle\EventListener\RouterSubscriber::class)
+        ->arg('$scheme', param('router.request_context.scheme'))
+        ->arg('$host', param('router.request_context.host'))
+        ->arg('$httpsPort', param('request_listener.https_port'))
+        ->arg('$httpPort', param('request_listener.http_port'))
+        ->arg('$baseUrl', param('router.request_context.base_url'));
+    $services->alias(Mautic\CoreBundle\EventListener\RouterSubscriber::class, 'mautic.core.subscriber.router');
+    $services->set('mautic.helper.paths', Mautic\CoreBundle\Helper\PathsHelper::class)
+        ->arg('$cacheDir', param('kernel.cache_dir'))
+        ->arg('$logsDir', param('kernel.logs_dir'))
+        ->arg('$rootDir', param('mautic.application_dir'));
+    $services->alias(Mautic\CoreBundle\Helper\PathsHelper::class, 'mautic.helper.paths');
+    $services->set('mautic.helper.bundle', Mautic\CoreBundle\Helper\BundleHelper::class)
+        ->arg('$coreBundles', param('mautic.bundles'))
+        ->arg('$pluginBundles', param('mautic.plugin.bundles'));
+    $services->alias(Mautic\CoreBundle\Helper\BundleHelper::class, 'mautic.helper.bundle');
+    $services->set('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
+    $services->alias(Mautic\CoreBundle\Configurator\Configurator::class, 'mautic.configurator');
+    $services->set('mautic.cipher.openssl', Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
+    $services->alias(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class, 'mautic.cipher.openssl');
+    $services->set('mautic.security', Mautic\CoreBundle\Security\Permissions\CorePermissions::class)
+        ->arg('$bundles', param('mautic.bundles'))
+        ->arg('$pluginBundles', param('mautic.plugin.bundles'));
+    $services->alias(Mautic\CoreBundle\Security\Permissions\CorePermissions::class, 'mautic.security');
+    $services->set('mautic.exception.listener', Mautic\CoreBundle\EventListener\ExceptionListener::class)
+        ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction')
+        ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException', 'priority' => 253]);
+    $services->alias(Mautic\CoreBundle\EventListener\ExceptionListener::class, 'mautic.exception.listener');
+    $services->set('mautic.helper.cookie', Mautic\CoreBundle\Helper\CookieHelper::class)
+        ->arg('$path', param('mautic.cookie_path'))
+        ->arg('$domain', param('mautic.cookie_domain'))
+        ->arg('$secure', param('mautic.cookie_secure'))
+        ->arg('$httponly', param('mautic.cookie_httponly'))
+        ->tag('kernel.event_subscriber');
+    $services->alias(Mautic\CoreBundle\Helper\CookieHelper::class, 'mautic.helper.cookie');
+
+    $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
+        ->args([
+            service('mautic.helper.core_parameters'),
+            service('mautic.cipher.openssl'),
+        ]);
+
+    $services->set('mautic.form.list.validator.circular', Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class)->tag('validator.constraint_validator');
+    $services->alias(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class, 'mautic.form.list.validator.circular');
 
     $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
     $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
