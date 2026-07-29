@@ -154,14 +154,6 @@ return [
         ],
     ],
     'services' => [
-        'main' => [
-            'mautic.core.service.local_file_adapter' => [
-                'class'     => Mautic\CoreBundle\Service\LocalFileAdapterService::class,
-                'arguments' => [
-                    '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                ],
-            ],
-        ],
         'events' => [
             'mautic.core.subscriber.router' => [
                 'class'     => Mautic\CoreBundle\EventListener\RouterSubscriber::class,
@@ -214,15 +206,6 @@ return [
                     '%mautic.plugin.bundles%',
                 ],
             ],
-            'mautic.helper.maxmind_do_not_sell_download' => [
-                'class'     => Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
-                'arguments' => [
-                    '%mautic.ip_lookup_auth%',
-                    'monolog.logger.mautic',
-                    'mautic.native.connector',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -248,14 +231,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.cache.warmer.middleware' => [
-                'class'     => Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
-                'tag'       => 'kernel.cache_warmer',
-                'arguments' => [
-                    '%kernel.environment%',
-                ],
-            ],
-
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
                 'class'     => Mautic\CoreBundle\Configurator\Configurator::class,
@@ -303,40 +278,11 @@ return [
                 ],
                 'tag' => 'kernel.event_subscriber',
             ],
-            'mautic.helper.cache_storage' => [
-                'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,
-                'arguments' => [
-                    '"db"',
-                    '%mautic.db_table_prefix%',
-                    'doctrine.dbal.default_connection',
-                    '%kernel.cache_dir%',
-                ],
-            ],
-            'mautic.helper.cache' => [
-                'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
-                'arguments' => [
-                    '%kernel.cache_dir%',
-                    'request_stack',
-                    'mautic.helper.paths',
-                    'kernel',
-                ],
-            ],
             'mautic.helper.encryption' => [
                 'class'     => Mautic\CoreBundle\Helper\EncryptionHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                ],
-            ],
-            // IP Lookup
-            'mautic.ip_lookup.factory' => [
-                'class'     => Mautic\CoreBundle\Factory\IpLookupFactory::class,
-                'arguments' => [
-                    '%mautic.ip_lookup_services%',
-                    'monolog.logger.mautic',
-                    'mautic.http.client',
-                    'mautic.helper.core_parameters',
-                    '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -355,29 +301,6 @@ return [
             ],
 
             'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,
-            // Schema
-            'mautic.schema.helper.column' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class,
-                'arguments' => [
-                    'database_connection',
-                    '%mautic.db_table_prefix%',
-                ],
-            ],
-            'mautic.schema.helper.index' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class,
-                'arguments' => [
-                    'database_connection',
-                    '%mautic.db_table_prefix%',
-                ],
-            ],
-            'mautic.schema.helper.table' => [
-                'class'     => Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class,
-                'arguments' => [
-                    'database_connection',
-                    '%mautic.db_table_prefix%',
-                    'mautic.schema.helper.column',
-                ],
-            ],
             'mautic.form.list.validator.circular' => [
                 'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
                 'arguments' => [
@@ -385,12 +308,6 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
-            ],
-            'mautic.maxmind.doNotSellList' => [
-                'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
             ],
         ],
     ],
