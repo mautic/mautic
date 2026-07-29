@@ -52,7 +52,10 @@ final class ListController extends FormController
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
-    private array $listFilters = [];
+    /**
+     * @var array
+     */
+    protected $listFilters = [];
 
     /**
      * Generate's default list view.

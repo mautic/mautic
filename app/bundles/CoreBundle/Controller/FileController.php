@@ -16,9 +16,9 @@ final class FileController extends AjaxController
 {
     public const EDITOR_CKEDITOR = 'ckeditor';
 
-    private array $response = [];
+    protected $response = [];
 
-    private int $statusCode = Response::HTTP_OK;
+    protected $statusCode = Response::HTTP_OK;
 
     /**
      * Uploads a file.

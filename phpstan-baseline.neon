@@ -1285,6 +1285,18 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/ExceptionController.php
 
 		-
+			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$response has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/bundles/CoreBundle/Controller/FileController.php
+
+		-
+			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$statusCode has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/bundles/CoreBundle/Controller/FileController.php
+
+		-
 			message: '#^Property Mautic\\CoreBundle\\Controller\\FormController\:\:\$activeLink has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
