@@ -95,6 +95,7 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
+<<<<<<< HEAD
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
@@ -102,6 +103,8 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
         ],
 
+=======
+>>>>>>> ca41fa1446 ([CampaignBundle] flip config.php services to autowired services.php)
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
@@ -121,6 +124,7 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
+        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
