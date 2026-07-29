@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class LeadFieldsType extends AbstractType
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
+        protected FieldModel $fieldModel,
     ) {
     }
 

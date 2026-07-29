@@ -6,13 +6,13 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ListPreProcessListEvent extends CommonEvent
 {
-    private $result;
+    protected $result;
 
     /**
      * @param bool $isNew
      */
     public function __construct(
-        private array $list,
+        protected array $list,
         $isNew = false,
     ) {
         $this->isNew = $isNew;

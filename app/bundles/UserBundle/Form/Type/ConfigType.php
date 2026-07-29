@@ -20,8 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ConfigType extends AbstractType
 {
     public function __construct(
-        private readonly CoreParametersHelper $parameters,
-        private readonly TranslatorInterface $translator,
+        protected CoreParametersHelper $parameters,
+        protected TranslatorInterface $translator,
     ) {
     }
 

@@ -10,19 +10,19 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class CampaignDecisionEvent extends Event
 {
-    private $decisionTriggered = false;
+    protected $decisionTriggered = false;
 
     /**
      * @param LeadEventLog[] $logs
      */
     public function __construct(
-        private $lead,
-        private $decisionType,
-        private $decisionEventDetails,
-        private $events,
-        private $eventSettings,
-        private $isRootLevel = false,
-        private $logs = [],
+        protected $lead,
+        protected $decisionType,
+        protected $decisionEventDetails,
+        protected $events,
+        protected $eventSettings,
+        protected $isRootLevel = false,
+        protected $logs = [],
     ) {
     }
 

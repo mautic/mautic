@@ -9,18 +9,21 @@ final class CustomContentEvent extends Event
     /**
      * @var array
      */
-    private $content = [];
+    protected $content = [];
 
-    private array $templates = [];
+    /**
+     * @var array
+     */
+    protected $templates = [];
 
     /**
      * @param string      $viewName
      * @param string|null $context
      */
     public function __construct(
-        private $viewName,
-        private $context = null,
-        private readonly array $vars = [],
+        protected $viewName,
+        protected $context = null,
+        protected array $vars = [],
     ) {
     }
 
@@ -83,7 +86,10 @@ final class CustomContentEvent extends Event
         return $this->content;
     }
 
-    public function getTemplates(): array
+    /**
+     * @return array
+     */
+    public function getTemplates()
     {
         return $this->templates;
     }

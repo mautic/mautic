@@ -19,9 +19,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class FeatureSettingsType extends AbstractType
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly LoggerInterface $logger,
+        protected RequestStack $requestStack,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected LoggerInterface $logger,
     ) {
     }
 

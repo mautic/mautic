@@ -6,12 +6,17 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CommandListEvent extends Event
 {
-    private array $commands = [];
+    /**
+     * @var array
+     */
+    protected $commands = [];
 
     /**
      * Returns the list of currently stored commands.
+     *
+     * @return mixed
      */
-    public function getCommands(): array
+    public function getCommands()
     {
         return $this->commands;
     }

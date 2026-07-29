@@ -11,9 +11,9 @@ final class NotificationSendEvent extends CommonEvent
      * @param string $message
      */
     public function __construct(
-        private $message,
-        private $heading,
-        private readonly Lead $lead,
+        protected $message,
+        protected $heading,
+        protected Lead $lead,
     ) {
     }
 

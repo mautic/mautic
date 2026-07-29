@@ -22,8 +22,8 @@ use Symfony\Component\Form\FormEvents;
 final class WidgetType extends AbstractType
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly CorePermissions $security,
+        protected EventDispatcherInterface $dispatcher,
+        protected CorePermissions $security,
     ) {
     }
 

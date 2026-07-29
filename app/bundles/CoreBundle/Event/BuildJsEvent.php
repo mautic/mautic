@@ -13,8 +13,8 @@ final class BuildJsEvent extends Event
      * @param BuildJsScope[] $acceptedScopes
      */
     public function __construct(
-        private $js,
-        private $debugMode = false,
+        protected $js,
+        protected $debugMode = false,
         private readonly array $acceptedScopes = [
             BuildJsScope::RUNTIME,
             BuildJsScope::ESSENTIAL,

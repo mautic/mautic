@@ -7,9 +7,15 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ChannelEvent extends CommonEvent
 {
-    private array $channels = [];
+    /**
+     * @var array
+     */
+    protected $channels = [];
 
-    private array $featureChannels = [];
+    /**
+     * @var array
+     */
+    protected $featureChannels = [];
 
     /**
      * Adds a submit action to the list of available actions.
@@ -40,8 +46,10 @@ final class ChannelEvent extends CommonEvent
 
     /**
      * Returns registered channels with their configs.
+     *
+     * @return array
      */
-    public function getChannelConfigs(): array
+    public function getChannelConfigs()
     {
         return $this->channels;
     }
@@ -79,7 +87,10 @@ final class ChannelEvent extends CommonEvent
         return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'] ?? 'name';
     }
 
-    public function getFeatureChannels(): array
+    /**
+     * @return array
+     */
+    public function getFeatureChannels()
     {
         return $this->featureChannels;
     }

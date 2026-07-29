@@ -11,15 +11,17 @@ final class LeadTimelineEvent extends Event
 {
     /**
      * Container with all filtered events.
+     *
+     * @var array
      */
-    private array $events = [];
+    protected $events = [];
 
     /**
      * Container with all registered events types.
      *
      * @var array
      */
-    private $eventTypes = [];
+    protected $eventTypes = [];
 
     /**
      * Array of filters
@@ -29,36 +31,54 @@ final class LeadTimelineEvent extends Event
      *
      * @var mixed[]
      */
-    private array $filters;
+    protected array $filters;
 
     /**
      * @var array<string, int>
      */
-    private array $totalEvents = [];
+    protected $totalEvents = [];
 
-    private array $totalEventsByUnit = [];
+    /**
+     * @var array
+     */
+    protected $totalEventsByUnit = [];
 
-    private bool $countOnly = false;
+    /**
+     * @var bool
+     */
+    protected $countOnly = false;
 
-    private ?\DateTime $dateFrom = null;
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $dateFrom;
 
-    private ?\DateTime $dateTo = null;
+    /**
+     * @var \DateTimeInterface|null
+     */
+    protected $dateTo;
 
     /**
      * Time unit to group counts by (M = month, D = day, Y = year, null = no grouping).
      *
      * @var string
      */
-    private $groupUnit;
+    protected $groupUnit;
 
-    private ?ChartQuery $chartQuery = null;
+    /**
+     * @var ChartQuery
+     */
+    protected $chartQuery;
 
-    private bool $fetchTypesOnly = false;
+    /**
+     * @var bool
+     */
+    protected $fetchTypesOnly = false;
 
     /**
      * @var array
      */
-    private $serializerGroups = [
+    protected $serializerGroups = [
         'ipAddressList',
     ];
 
@@ -70,13 +90,13 @@ final class LeadTimelineEvent extends Event
      * @param string|null $siteDomain
      */
     public function __construct(
-        private readonly ?Lead $lead = null,
+        protected ?Lead $lead = null,
         array $filters = [],
-        private ?array $orderBy = null,
-        private $page = 1,
-        private $limit = 25,
-        private $forTimeline = true,
-        private $siteDomain = null,
+        protected ?array $orderBy = null,
+        protected $page = 1,
+        protected $limit = 25,
+        protected $forTimeline = true,
+        protected $siteDomain = null,
     ) {
         $this->filters = !empty($filters)
             ? $filters
@@ -360,8 +380,10 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Check if the event is getting an engagement count only.
+     *
+     * @return bool
      */
-    public function isEngagementCount(): bool
+    public function isEngagementCount()
     {
         return $this->countOnly;
     }
@@ -462,8 +484,10 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Get chart query helper to format dates.
+     *
+     * @return ChartQuery
      */
-    public function getChartQuery(): ?ChartQuery
+    public function getChartQuery()
     {
         return $this->chartQuery;
     }

@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -24,6 +25,7 @@ final class SubmitActionEmailType extends AbstractType
 
     public function __construct(
         private TranslatorInterface $translator,
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

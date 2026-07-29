@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class CampaignEventLeadCampaignsType extends AbstractType
 {
     public function __construct(
-        private readonly ListModel $listModel,
+        protected ListModel $listModel,
     ) {
     }
 

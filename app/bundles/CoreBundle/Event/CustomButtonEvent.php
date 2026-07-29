@@ -10,13 +10,13 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * @var array
      */
-    private $buttons = [];
+    protected $buttons = [];
 
     public function __construct(
-        private $location,
+        protected $location,
         Request $request,
         array $buttons = [],
-        private $item = null,
+        protected $item = null,
     ) {
         parent::__construct($request);
 
@@ -115,7 +115,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Generate a button ID that can be overridden by other plugins.
      */
-    private function generateButtonKey(array $button): string
+    protected function generateButtonKey(array $button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {

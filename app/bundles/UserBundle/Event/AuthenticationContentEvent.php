@@ -10,15 +10,15 @@ final class AuthenticationContentEvent extends Event
     /**
      * @var array
      */
-    private $content = [];
+    protected $content = [];
 
     /**
      * @var bool
      */
-    private $postLogout = false;
+    protected $postLogout = false;
 
     public function __construct(
-        private readonly Request $request,
+        protected Request $request,
     ) {
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }

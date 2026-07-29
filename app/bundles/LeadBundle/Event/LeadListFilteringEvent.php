@@ -11,9 +11,9 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  */
 final class LeadListFilteringEvent extends CommonEvent
 {
-    private bool $isFilteringDone;
+    protected bool $isFilteringDone;
 
-    private string $subQuery;
+    protected string $subQuery;
 
     private readonly string $leadsTableAlias;
 
@@ -25,11 +25,11 @@ final class LeadListFilteringEvent extends CommonEvent
      * @param QueryBuilder $queryBuilder
      */
     public function __construct(
-        private $details,
-        private $leadId,
-        private $alias,
-        private $func,
-        private $queryBuilder,
+        protected $details,
+        protected $leadId,
+        protected $alias,
+        protected $func,
+        protected $queryBuilder,
         EntityManagerInterface $entityManager,
     ) {
         $this->em              = $entityManager;

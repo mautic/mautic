@@ -7,9 +7,9 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 final class SocialMonitorEvent extends CommonEvent
 {
-    private readonly int $newLeadCount;
+    protected int $newLeadCount;
 
-    private readonly int $updatedLeadCount;
+    protected int $updatedLeadCount;
 
     /**
      * @param string $integrationName
@@ -17,9 +17,9 @@ final class SocialMonitorEvent extends CommonEvent
      * @param int    $updatedLeadCount
      */
     public function __construct(
-        private $integrationName,
+        protected $integrationName,
         Monitoring $monitoring,
-        private readonly array $leadIds,
+        protected array $leadIds,
         $newLeadCount,
         $updatedLeadCount,
     ) {

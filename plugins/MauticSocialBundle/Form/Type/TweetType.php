@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final class TweetType extends AbstractType
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        protected EntityManagerInterface $em,
     ) {
     }
 

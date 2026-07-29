@@ -10,14 +10,14 @@ final class MenuEvent extends Event
     /**
      * @var array
      */
-    private $menuItems = ['children' => []];
+    protected $menuItems = ['children' => []];
 
     /**
      * @param string $type
      */
     public function __construct(
-        private readonly MenuHelper $helper,
-        private $type = 'main',
+        protected MenuHelper $helper,
+        protected $type = 'main',
     ) {
     }
 

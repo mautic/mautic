@@ -7,9 +7,9 @@ use Mautic\DashboardBundle\Entity\Widget;
 
 final class WidgetFormEvent extends CommonEvent
 {
-    private $form;
+    protected $form;
 
-    private $type;
+    protected $type;
 
     /**
      * Set the widget type.

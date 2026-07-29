@@ -9,8 +9,8 @@ final class VideoHitEvent extends CommonEvent
 {
     public function __construct(
         VideoHit $hit,
-        private $request,
-        private $code,
+        protected $request,
+        protected $code,
     ) {
         $this->entity  = $hit;
     }

@@ -9,8 +9,10 @@ final class ChannelBroadcastEvent extends Event
 {
     /**
      * Number of contacts successfully processed and/or failed per channel.
+     *
+     * @var array
      */
-    private array $results = [];
+    protected $results = [];
 
     /**
      * Min contact ID filter can be used for process parallelization.
@@ -44,12 +46,12 @@ final class ChannelBroadcastEvent extends Event
         /**
          * Specific channel.
          */
-        private readonly ?string $channel,
+        protected ?string $channel,
         /**
          * Specific ID of a specific channel.
          */
-        private readonly string|int|null $id,
-        private readonly OutputInterface $output,
+        protected string|int|null $id,
+        protected OutputInterface $output,
     ) {
     }
 
@@ -77,7 +79,10 @@ final class ChannelBroadcastEvent extends Event
         ];
     }
 
-    public function getResults(): array
+    /**
+     * @return array
+     */
+    public function getResults()
     {
         return $this->results;
     }

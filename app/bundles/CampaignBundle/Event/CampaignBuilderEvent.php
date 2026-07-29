@@ -179,7 +179,7 @@ final class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    private function sort(string $property)
+    protected function sort($property)
     {
         if (empty($this->sortCache[$property])) {
             uasort(

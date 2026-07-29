@@ -16,7 +16,7 @@ final class UpdateCompanyActionType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private FieldModel $fieldModel,
+        protected FieldModel $fieldModel,
     ) {
     }
 

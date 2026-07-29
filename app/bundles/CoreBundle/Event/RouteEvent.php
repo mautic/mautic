@@ -8,14 +8,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class RouteEvent extends Event
 {
-    private readonly RouteCollection $collection;
+    protected RouteCollection $collection;
 
     /**
      * @param string $type
      */
     public function __construct(
-        private readonly Loader $loader,
-        private $type = 'main',
+        protected Loader $loader,
+        protected $type = 'main',
     ) {
         $this->collection = new RouteCollection();
     }

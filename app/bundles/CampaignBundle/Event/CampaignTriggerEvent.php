@@ -7,10 +7,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CampaignTriggerEvent extends Event
 {
-    private bool $triggerCampaign = true;
+    /**
+     * @var bool
+     */
+    protected $triggerCampaign = true;
 
     public function __construct(
-        private readonly Campaign $campaign,
+        protected Campaign $campaign,
     ) {
     }
 
@@ -22,7 +25,10 @@ final class CampaignTriggerEvent extends Event
         return $this->campaign;
     }
 
-    public function shouldTrigger(): bool
+    /**
+     * @return bool
+     */
+    public function shouldTrigger()
     {
         return $this->triggerCampaign;
     }

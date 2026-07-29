@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class ContactFrequencyType extends AbstractType
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -9,9 +9,12 @@ final class GlobalSearchEvent extends Event
 {
     public const RESULTS_LIMIT = 3;
 
-    private array $results = [];
+    /**
+     * @var array
+     */
+    protected $results = [];
 
-    private readonly string $searchString;
+    protected string $searchString;
 
     /**
      * @param string     $searchString
@@ -19,7 +22,7 @@ final class GlobalSearchEvent extends Event
      */
     public function __construct(
         $searchString,
-        private $translator,
+        protected $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }
@@ -47,8 +50,10 @@ final class GlobalSearchEvent extends Event
 
     /**
      * Returns the results.
+     *
+     * @return array
      */
-    public function getResults(): array
+    public function getResults()
     {
         uksort($this->results, strnatcmp(...));
 

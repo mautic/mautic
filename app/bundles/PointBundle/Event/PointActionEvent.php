@@ -9,8 +9,8 @@ use Mautic\PointBundle\Entity\Point;
 final class PointActionEvent extends CommonEvent
 {
     public function __construct(
-        private Point $point,
-        private Lead $lead,
+        protected Point $point,
+        protected Lead $lead,
     ) {
     }
 

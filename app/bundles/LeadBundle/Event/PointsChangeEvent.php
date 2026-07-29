@@ -7,9 +7,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class PointsChangeEvent extends CommonEvent
 {
-    private readonly int $old;
+    protected int $old;
 
-    private readonly int $new;
+    protected int $new;
 
     public function __construct(Lead &$lead, $old, $new)
     {
