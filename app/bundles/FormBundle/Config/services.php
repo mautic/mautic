@@ -47,8 +47,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\FormBundle\Helper\PropertiesAccessor::class, 'mautic.form.helper.properties.accessor');
     $services->set('mautic.form.validator.upload_field_validator', Mautic\FormBundle\Validator\UploadFieldValidator::class);
     $services->alias(Mautic\FormBundle\Validator\UploadFieldValidator::class, 'mautic.form.validator.upload_field_validator');
-    $services->set('mautic.form.validator.constraint.file_extension_constraint_validator', Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)->tag('validator.constraint_validator')->tag('file_extension_constraint_validator');
-    $services->alias(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class, 'mautic.form.validator.constraint.file_extension_constraint_validator');
+
+    $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
+        ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);
+
     $services->set('mautic.form.command.form_submissions_records_clean', Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class)->tag('console.command');
     $services->alias(Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class, 'mautic.form.command.form_submissions_records_clean');
     $services->set('mautic.form.command.form_submissions_table_clean', Mautic\FormBundle\Command\DeleteOrphanFormResultsTableCommand::class)->tag('console.command');
