@@ -99,17 +99,12 @@ CODE_SAMPLE;
         // the container is shared between test cases, drop it to get a rule with a fresh file provider
         self::$rectorConfig = null;
 
-        // the rule only moves services the container knows how to autowire
-        putenv('MAUTIC_CONTAINER_XML='.__DIR__.'/Source/container.xml');
-
         $this->temporaryDirectory = sys_get_temp_dir().'/rector_config_service_test_'.uniqid();
         mkdir($this->temporaryDirectory, 0777, true);
     }
 
     protected function tearDown(): void
     {
-        putenv('MAUTIC_CONTAINER_XML');
-
         foreach (glob($this->temporaryDirectory.'/*.php') ?: [] as $filePath) {
             unlink($filePath);
         }
@@ -277,17 +272,17 @@ CODE_SAMPLE;
         );
     }
 
-    public function testMovesServiceWithConstructorArgumentOutsideOfContainer(): void
+    public function testMovesServiceWithServiceConstructorArgument(): void
     {
-        // the container fixture knows no service of the "Monolog\Logger" type, so the argument has to be kept
+        // autowiring has no type to wire the parameter by, so the argument has to be kept
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
 
 return [
     'services' => [
         'others' => [
-            'mautic.some.logger_aware_helper' => [
-                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\LoggerAwareHelper::class,
+            'mautic.some.service_aware_helper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ServiceAwareHelper::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                 ],
@@ -301,12 +296,12 @@ CODE_SAMPLE;
 
         $printedFileContent = $this->refactorConfigFile($configFileContent);
         $this->assertIsString($printedFileContent);
-        $this->assertStringNotContainsString('mautic.some.logger_aware_helper', $printedFileContent);
+        $this->assertStringNotContainsString('mautic.some.service_aware_helper', $printedFileContent);
 
         $servicesFileContent = $this->readServicesFile();
 
         $this->assertStringContainsString(
-            "->arg('\$logger', service('monolog.logger.mautic'));",
+            "->arg('\$someService', service('monolog.logger.mautic'));",
             $servicesFileContent
         );
 
@@ -430,8 +425,8 @@ CODE_SAMPLE;
 return [
     'services' => [
         'others' => [
-            'mautic.some.logger_aware_helper' => [
-                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\LoggerAwareHelper::class,
+            'mautic.some.service_aware_helper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ServiceAwareHelper::class,
                 'arguments' => [
                     '@=service("mautic.some.factory").getLogger()',
                 ],
@@ -491,16 +486,6 @@ CODE_SAMPLE;
         $this->createFile('services.php', self::SERVICES_FILE);
 
         $this->assertNull($this->refactorConfigFile($configFileContent));
-        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
-    }
-
-    public function testSkipEverythingWithoutContainer(): void
-    {
-        putenv('MAUTIC_CONTAINER_XML='.$this->temporaryDirectory.'/no-container.xml');
-
-        $this->createFile('services.php', self::SERVICES_FILE);
-
-        $this->assertNull($this->refactorConfigFile(self::CONFIG_WITH_CLASS_ONLY_SERVICE));
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 

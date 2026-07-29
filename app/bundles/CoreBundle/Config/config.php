@@ -397,16 +397,6 @@ return [
                     '%kernel.environment%',
                 ],
             ],
-            // Error handler
-            'mautic.core.errorhandler.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'monolog.logger',
-                    "@=container.has('monolog.logger.chrome') ? container.get('monolog.logger.chrome') : null",
-                ],
-                'tag' => 'kernel.event_subscriber',
-            ],
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
@@ -522,23 +512,6 @@ return [
                     '%kernel.cache_dir%',
                 ],
             ],
-            'mautic.helper.update' => [
-                'class'     => Mautic\CoreBundle\Helper\UpdateHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                    'mautic.helper.update.release_parser',
-                    'mautic.helper.update_checks',
-                ],
-            ],
-            'mautic.helper.update.release_parser' => [
-                'class'     => Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
-                'arguments' => [
-                    'mautic.http.client',
-                ],
-            ],
             'mautic.helper.cache' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
@@ -570,13 +543,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                ],
-            ],
-            'mautic.helper.composer' => [
-                'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
-                'arguments' => [
-                    'kernel',
-                    'monolog.logger.mautic',
                 ],
             ],
             // Menu
@@ -689,80 +655,6 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.monolog.fulltrace.formatter',
                 ],
-            ],
-
-            // Update steps
-            'mautic.update.step.delete_cache' => [
-                'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
-                'arguments' => [
-                    'mautic.helper.cache',
-                    'translator',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.finalize' => [
-                'class'     => Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.paths',
-                    'request_stack',
-                    'mautic.helper.app_version',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.install_new_files' => [
-                'class'     => Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.update',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.remove_deleted_files' => [
-                'class'     => Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.update_schema' => [
-                'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
-                'arguments' => [
-                    'translator',
-                    'kernel',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.update_translations' => [
-                'class'     => Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.language',
-                    'monolog.logger.mautic',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.step.checks' => [
-                'class'     => Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.update',
-                ],
-                'tag' => 'mautic.update_step',
-            ],
-            'mautic.update.checks.php' => [
-                'class' => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
-                'tag'   => 'mautic.update_check',
-            ],
-            'mautic.update.checks.database' => [
-                'class'     => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
-                'arguments' => [
-                    'doctrine.orm.default_entity_manager',
-                ],
-                'tag' => 'mautic.update_check',
             ],
         ],
     ],

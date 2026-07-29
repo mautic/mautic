@@ -31,25 +31,4 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'sync' => [
-            'mautic.integrations.sync.service' => [
-                'class'     => Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class,
-                'arguments' => [
-                    'mautic.integrations.sync.data_exchange.mautic',
-                    'mautic.integrations.helper.sync_date',
-                    'mautic.integrations.helper.sync_mapping',
-                    'mautic.integrations.sync.helper.relations',
-                    'mautic.integrations.helper.sync_integrations',
-                    'event_dispatcher',
-                    'mautic.integrations.sync.notifier',
-                    'mautic.integrations.sync.integration_process',
-                    'mautic.integrations.sync.internal_process',
-                ],
-                'methodCalls' => [
-                    'initiateDebugLogger' => ['mautic.sync.logger'],
-                ],
-            ],
-        ],
-    ],
 ];

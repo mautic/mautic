@@ -23,6 +23,9 @@ return function (ContainerConfigurator $configurator): void {
         'Integration/IntegrationObject.php',
     ];
 
+    $services->set(Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class)
+        ->call('initiateDebugLogger', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.sync.logger')]);
+
     $services->load('Mautic\\IntegrationsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 

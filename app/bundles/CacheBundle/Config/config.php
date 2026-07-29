@@ -9,10 +9,6 @@ return [
         'api'    => [],
     ],
     'menu'     => [],
-    'services' => [
-        'models'    => [],
-        'validator' => [],
-    ],
 
     'parameters' => [
         'cache_adapter'           => 'mautic.cache.adapter.filesystem',

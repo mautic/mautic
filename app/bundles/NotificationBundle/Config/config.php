@@ -1,19 +1,6 @@
 <?php
 
 return [
-    'services' => [
-        'other' => [
-            'mautic.notification.api' => [
-                'class'     => Mautic\NotificationBundle\Api\OneSignalApi::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.page.model.trackable',
-                    'mautic.helper.integration',
-                ],
-                'alias' => 'notification_api',
-            ],
-        ],
-    ],
     'routes' => [
         'main' => [
             'mautic_notification_index' => [
