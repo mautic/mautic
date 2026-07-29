@@ -44,4 +44,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.report.model.report_export_options', Mautic\ReportBundle\Model\ReportExportOptions::class);
     $services->alias('mautic.report.model.report_file_writer', Mautic\ReportBundle\Model\ReportFileWriter::class);
     $services->alias('mautic.report.model.export_handler', Mautic\ReportBundle\Model\ExportHandler::class);
+
+    $services->alias('report', Mautic\ReportBundle\Helper\ReportHelper::class);
 };

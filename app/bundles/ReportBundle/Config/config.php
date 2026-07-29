@@ -74,18 +74,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'helpers' => [
-            'mautic.report.helper.report' => [
-                'class'     => Mautic\ReportBundle\Helper\ReportHelper::class,
-                'alias'     => 'report',
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'report_temp_dir'                     => '%mautic.application_dir%/media/files/temp',
         'report_export_batch_size'            => 1000,
