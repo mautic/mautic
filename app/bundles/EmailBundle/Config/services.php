@@ -27,6 +27,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.email.fixture.email', Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class, 'mautic.email.fixture.email');
     $services->set('mautic.di.env_processor.mailerdsn', Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class)->tag('container.env_var_processor');
     $services->set('mautic.message.search.contact', Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class);
 
@@ -75,6 +77,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.message.processor.bounce', Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
     $services->alias('mautic.message.processor.replier', Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
     $services->alias('mautic.email.helper.stat', Mautic\EmailBundle\Stat\StatHelper::class);
+    $services->alias('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)
         ->arg('$includeDetails', '%mautic.webhook_email_details%');

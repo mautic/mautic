@@ -385,6 +385,12 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
+			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/bundles/CampaignBundle/Controller/CampaignController.php
+
+		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -1279,18 +1285,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/ExceptionController.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$response has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$statusCode has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Controller\\FormController\:\:\$activeLink has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1552,15 +1546,21 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
-			count: 2
+			count: 1
+			path: app/bundles/CoreBundle/Entity/CommonRepository.php
+
+		-
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
@@ -3251,6 +3251,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/StatRepository.php
+
+		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Form\\Type\\DwcEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
@@ -7531,6 +7537,12 @@ parameters:
 			path: app/bundles/NotificationBundle/Event/NotificationSendEvent.php
 
 		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/NotificationBundle/EventListener/NotificationSubscriber.php
+
+		-
 			message: '#^Method Mautic\\NotificationBundle\\Helper\\NotificationHelper\:\:getHeaderScript\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -9536,6 +9548,12 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
+
+		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/SmsBundle/EventListener/SmsSubscriber.php
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has no return type specified\.$#'
@@ -12854,27 +12872,3 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
-
-		-
-			message: '#^Instead of assigning service property to a variable, use the property directly$#'
-			identifier: symplify.noJustPropertyAssign
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countByLeads\(\) has parameter \$tagIds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countOccurrences\(\) has parameter \$tag with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php

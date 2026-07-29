@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class SyncIntegrationsHelper
 {
@@ -24,12 +25,23 @@ class SyncIntegrationsHelper
      */
     private ?array $enabled = null;
 
+    /**
+     * @param iterable<SyncInterface> $integrations
+     */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
         private readonly ObjectProvider $objectProvider,
+        #[AutowireIterator('mautic.sync_integration')]
+        iterable $integrations = [],
     ) {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
     }
 
+    /**
+     * Stays public so functional tests can register an integration on the built container.
+     */
     public function addIntegration(SyncInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;

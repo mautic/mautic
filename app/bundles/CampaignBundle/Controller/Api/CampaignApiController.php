@@ -271,7 +271,6 @@ class CampaignApiController extends CommonApiController
             $errors = [];
             foreach ($eventViolations as $violationList) {
                 foreach ($violationList as $violation) {
-                    \assert($violation instanceof ConstraintViolationInterface);
                     $errors[] = [
                         'code'    => $violation->getCode(),
                         'message' => $violation->getMessage(),

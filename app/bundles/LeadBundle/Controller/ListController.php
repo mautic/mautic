@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -55,10 +54,7 @@ final class ListController extends FormController
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
-    /**
-     * @var array
-     */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * Generate's default list view.
@@ -899,7 +895,6 @@ final class ListController extends FormController
     public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
     {
         $session = $request->getSession();
-        \assert($session instanceof SessionInterface);
         $session->set('mautic.segment.contact.page', $page);
 
         $manuallyRemoved = 0;
