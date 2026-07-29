@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\TagModel;
 
@@ -122,7 +123,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('2 companies affected', (string) $this->client->getResponse()->getContent());
 
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get(CompanyModel::class);
         $company1     = $companyModel->getEntity($this->companies[0]->getId());
         $tagIds       = $this->getTagIds($company1);
         $this->assertContains($this->tags[0]->getId(), $tagIds);
@@ -183,7 +184,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
      */
     public function addCompanies(): array
     {
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get(CompanyModel::class);
         $company      = $companyModel->getEntity();
 
         $company->setName('Company 1');
