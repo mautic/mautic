@@ -41,6 +41,7 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+
     $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
     $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
     $services->alias('mautic.helper.file_properties', Mautic\CoreBundle\Helper\FileProperties::class);
@@ -60,6 +61,19 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.hash', Mautic\CoreBundle\Helper\HashHelper\HashHelper::class);
     $services->alias('mautic.helper.random', Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class);
     $services->alias('mautic.helper.phone_number', Mautic\CoreBundle\Helper\PhoneNumberHelper::class);
+    $services->set(Mautic\CoreBundle\Loader\RouteLoader::class)
+        ->tag('routing.loader');
+
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
+    $services->set(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+
+    $services->get(Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
+        ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
+    $services->alias('mautic.generated.columns.doctrine.listener', Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class);
+
+    $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
+        ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
 
     $services->alias('mautic.core.repository.ip_address', Mautic\CoreBundle\Entity\IpAddressRepository::class);
 
