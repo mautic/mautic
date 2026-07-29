@@ -41,6 +41,55 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function testScopedEndpointContracts(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focus      = $this->createFocus('scoped');
+        $focus->setStyle('bar');
+        $focusModel->saveEntity($focus);
+        $id = $focus->getId();
+
+        foreach (["/focus/{$id}.js", "/focus/{$id}/display.js", "/focus/{$id}/tracking.js"] as $url) {
+            $this->client->request(Request::METHOD_GET, $url);
+            $response = $this->client->getResponse();
+
+            $this->assertResponseIsSuccessful();
+            $this->assertResponseHeaderSame('Content-Type', 'application/javascript');
+            $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+            $this->assertTrue($response->headers->hasCacheControlDirective('no-store'));
+        }
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}/display.js");
+        $displayContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString("MauticFocus{$id}", $displayContent);
+        $this->assertStringContainsString("mautic_focus_{$id}", $displayContent);
+        $this->assertStringContainsString("mautic_focus_{$id}_closed", $displayContent);
+        $this->assertStringContainsString("mf-bar-collapser-{$id}", $displayContent);
+        $this->assertStringContainsString('privacysafe.example', $displayContent);
+        $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
+        $this->assertStringNotContainsString('mauticform[focusId]', $displayContent);
+        $this->assertStringNotContainsString('localStorage', $displayContent);
+        $this->assertStringNotContainsString('sessionStorage', $displayContent);
+        $this->assertStringNotContainsString('mtc_id', $displayContent);
+        $this->assertStringNotContainsString('mautic_device_id', $displayContent);
+        $this->assertStringNotContainsString('/mautic-tracking.js', $displayContent);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
+        $legacyContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('viewpixel.gif', $legacyContent);
+        $this->assertStringNotContainsString('privacysafe.example', $legacyContent);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}/tracking.js");
+        $trackingContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('window.MauticFocusItems', $trackingContent);
+        $this->assertStringContainsString('runtimeReady', $trackingContent);
+        $this->assertStringNotContainsString('createIframe', $trackingContent);
+        $this->assertStringNotContainsString('iframeDoc', $trackingContent);
+    }
+
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
@@ -49,10 +98,19 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $focus->setIsPublished(false);
         $focusModel->saveEntity($focus);
 
-        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isNotFound());
-        $this->assertEmpty($response->getContent());
+        foreach ([
+            "/focus/{$focus->getId()}.js",
+            "/focus/{$focus->getId()}/display.js",
+            "/focus/{$focus->getId()}/tracking.js",
+            '/focus/999999999.js',
+            '/focus/999999999/display.js',
+            '/focus/999999999/tracking.js',
+        ] as $url) {
+            $this->client->request(Request::METHOD_GET, $url);
+            $response = $this->client->getResponse();
+            $this->assertTrue($response->isNotFound(), $url);
+            $this->assertEmpty($response->getContent(), $url);
+        }
     }
 
     private function createFocus(string $name): Focus
@@ -85,10 +143,10 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
                 'button_text' => 'ffffff',
             ],
             'content' => [
-                'headline'        => null,
+                'headline'        => 'Privacy-safe Focus Item',
                 'tagline'         => null,
                 'link_text'       => null,
-                'link_url'        => null,
+                'link_url'        => 'https://privacysafe.example/destination',
                 'link_new_window' => 1,
                 'font'            => 'Arial, Helvetica, sans-serif',
                 'css'             => null,

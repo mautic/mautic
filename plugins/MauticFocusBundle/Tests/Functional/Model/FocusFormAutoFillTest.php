@@ -95,5 +95,10 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $this->assertStringContainsString('name="mauticform[email]"', (string) $formHtml);
         $this->assertStringContainsString('value="test-autofill@example.com"', (string) $formHtml);
         $this->assertStringContainsString('type="email"', (string) $formHtml);
+
+        $anonymousContent = $focusModel->getContent($focus->toArray(), false, '#', false);
+        $anonymousForm    = (string) $anonymousContent['form'];
+        $this->assertStringNotContainsString('value="test-autofill@example.com"', $anonymousForm);
+        $this->assertStringNotContainsString('mauticform[focusId]', $anonymousForm);
     }
 }
