@@ -13,7 +13,7 @@ final class WebhookQueueEvent extends CommonEvent
      */
     public function __construct(
         WebhookQueue $webhookQueue,
-        protected Webhook $webhook,
+        private Webhook $webhook,
         $isNew = false,
     ) {
         $this->entity  = $webhookQueue;
