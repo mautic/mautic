@@ -220,6 +220,8 @@ parameters:
 		-
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
+		-
+			identifier: typePerfect.noArrayAccessOnObject
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
