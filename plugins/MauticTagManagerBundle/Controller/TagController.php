@@ -454,8 +454,6 @@ final class TagController extends FormController
      */
     public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
     {
-        $security = $this->security;
-
         $tag = $this->leadTagModel->getEntity($objectId);
 
         // set the page we came from
@@ -489,7 +487,7 @@ final class TagController extends FormController
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
                 'tag'        => $tag,
-                'security'   => $security,
+                'security'   => $this->security,
                 'usageStats' => $tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
