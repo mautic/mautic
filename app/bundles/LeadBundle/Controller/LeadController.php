@@ -271,8 +271,6 @@ final class LeadController extends FormController
 
         // Get the max ID of the latest lead added
         $maxLeadId = $this->leadRepository->getMaxLeadId();
-
-        \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
         return $this->delegateView(

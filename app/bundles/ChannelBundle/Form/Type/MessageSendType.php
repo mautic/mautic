@@ -2,7 +2,6 @@
 
 namespace Mautic\ChannelBundle\Form\Type;
 
-use Mautic\ChannelBundle\Model\MessageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,8 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final class MessageSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
-        protected MessageModel $messageModel,
+        private readonly RouterInterface $router,
     ) {
     }
 

@@ -12,7 +12,7 @@ final class ApiEntityEvent extends CommonEvent
      */
     public function __construct(
         protected $entity,
-        protected array $entityRequestParameters,
+        private readonly array $entityRequestParameters,
         private readonly Request $request,
     ) {
     }
