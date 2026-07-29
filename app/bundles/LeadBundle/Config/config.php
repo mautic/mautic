@@ -404,36 +404,6 @@ return [
                 'alias'     => 'lead_dnc_reason',
             ],
         ],
-        'fixtures' => [
-            'mautic.lead.fixture.test.page_hit' => [
-                'class'    => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
-                'tag'      => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional' => true,
-            ],
-            'mautic.lead.fixture.test.segment' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.click' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.dnc' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.tag' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional'  => true,
-            ],
-        ],
     ],
     'parameters' => [
         'parallel_import_limit'               => 1,

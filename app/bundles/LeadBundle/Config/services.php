@@ -30,6 +30,16 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.lead.fixture.test.click', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class, 'mautic.lead.fixture.test.click');
+    $services->set('mautic.lead.fixture.test.dnc', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class, 'mautic.lead.fixture.test.dnc');
+    $services->set('mautic.lead.fixture.test.tag', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class, 'mautic.lead.fixture.test.tag');
+    $services->set('mautic.lead.fixture.test.page_hit', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class, 'mautic.lead.fixture.test.page_hit');
+    $services->set('mautic.lead.fixture.test.segment', Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->alias(Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class, 'mautic.lead.fixture.test.segment');
     $services->set('mautic.lead.fixture.company', Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->alias(Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class, 'mautic.lead.fixture.company');
     $services->set('mautic.lead.fixture.contact', Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);

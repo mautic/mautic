@@ -146,25 +146,18 @@ return [
         ],
     ],
 
-    'services' => [
-        'services' => [
-            'mautic.campaign.service.campaign'=> [
-                /** @phpstan-ignore-next-line */
-                'class'     => Mautic\CampaignBundle\Service\Campaign::class,
-                'arguments' => [
-                    'mautic.campaign.repository.campaign',
-                    'mautic.email.repository.email',
-                ],
-            ],
-        ],
-        'fixtures' => [
-            'mautic.campaign.fixture.campaign' => [
-                'class'    => Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class,
-                'tag'      => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional' => true,
-            ],
-        ],
-    ],
+//    'services' => [
+//        'services' => [
+//            'mautic.campaign.service.campaign'=> [
+//                /** @phpstan-ignore-next-line */
+//                'class'     => Mautic\CampaignBundle\Service\Campaign::class,
+//                'arguments' => [
+//                    'mautic.campaign.repository.campaign',
+//                    'mautic.email.repository.email',
+//                ],
+//            ],
+//        ],
+//    ],
     'parameters' => [
         'campaign_time_wait_on_event_false'                                                     => 'PT1H',
         'campaign_use_summary'                                                                  => 0,

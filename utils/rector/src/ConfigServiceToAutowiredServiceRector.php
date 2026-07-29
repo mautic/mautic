@@ -36,6 +36,7 @@ use Rector\Rector\AbstractRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Utils\Rector\ValueObject\ServiceArgument;
 use Utils\Rector\ValueObject\ServiceDefinition;
+use Utils\Rector\ValueObject\ServiceMethodCall;
 use Utils\Rector\ValueObject\ServiceTag;
 
 /**
@@ -61,7 +62,17 @@ use Utils\Rector\ValueObject\ServiceTag;
  * A service of a group ServicePass tags on its own, e.g. "permissions", is given that tag explicitly,
  * see GROUP_DEFAULT_TAGS.
  *
- * Definitions with "alias", "parent", "factory", ... are left in place,
+ * The "alias" is no service alias at all, ServicePass hands it over as a tag argument, so it becomes one here too:
+ *
+ *   'mautic.some.validator' => ['class' => SomeValidator::class, 'tag' => 'validator.constraint_validator', 'alias' => 'some_validator']
+ *   ->  $services->set(...)->tag('validator.constraint_validator', ['alias' => 'some_validator']);
+ *
+ * The "methodCalls" become ->call() calls, their arguments following the very same rules as the constructor ones:
+ *
+ *   'mautic.some.helper' => ['class' => SomeHelper::class, 'methodCalls' => ['setFormModel' => ['mautic.form.model.form']]]
+ *   ->  $services->set(...)->call('setFormModel', [service('mautic.form.model.form')]);
+ *
+ * Definitions with "parent", "factory", ... are left in place,
  * as moving them would silently drop their configuration.
  *
  * Both sides of the move happen in a single run, triggered by config.php alone. The new $services->set() lines
@@ -96,12 +107,12 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      * The default tags ServicePass gives a whole group of services, in the tags the moved service would lose.
      *
      * The other groups keep their default tag through autoconfigure(), e.g. "events" tags every
-     * EventSubscriberInterface with "kernel.event_subscriber" on its own, and the "helpers" tag "twig.helper"
-     * is read by no compiler pass at all.
+     * EventSubscriberInterface with "kernel.event_subscriber" on its own.
      *
      * @var array<string, string>
      */
     private const GROUP_DEFAULT_TAGS = [
+        'helpers'     => 'twig.helper',
         'models'      => 'mautic.model',
         'permissions' => 'mautic.permissions',
     ];
@@ -336,13 +347,13 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      */
     private function wrapPrintedStmt(string $printedStmt, string $indentation): string
     {
-        if (!str_contains($printedStmt, '->arg(')) {
+        if (!str_contains($printedStmt, '->arg(') && !str_contains($printedStmt, '->call(')) {
             return $printedStmt;
         }
 
         return str_replace(
-            ['->arg(', '->tag('],
-            ["\n".$indentation.'    ->arg(', "\n".$indentation.'    ->tag('],
+            ['->arg(', '->call(', '->tag('],
+            ["\n".$indentation.'    ->arg(', "\n".$indentation.'    ->call(', "\n".$indentation.'    ->tag('],
             $printedStmt
         );
     }
@@ -549,17 +560,13 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
     }
 
     /**
-     * Matches a service definition made of a "class" key and optional "arguments", "tag", "tags" and "tagArguments",
+     * Matches a service definition made of a "class" key and optional "arguments", "tag", "tags", "tagArguments",
+     * "alias" and "methodCalls",
      * e.g. ['class' => SomeService::class, 'arguments' => ['translator'], 'tag' => 'security.voter'].
      */
     private function matchServiceDefinition(ArrayItem $arrayItem, string $groupName): ?ServiceDefinition
     {
         if (!$arrayItem->key instanceof String_) {
-            return null;
-        }
-
-        // 3rd party class overrides, e.g. "oneup_uploader.controller.dropzone.class"; those are not autowirable
-        if (str_ends_with($arrayItem->key->value, '.class')) {
             return null;
         }
 
@@ -577,8 +584,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             $definitionKeys[] = $definitionArrayItem->key->value;
         }
 
-        // "alias", "parent", "factory", ... would be silently dropped on the way
-        if ([] !== array_diff($definitionKeys, ['class', 'arguments', 'tag', 'tags', 'tagArguments'])) {
+        // "parent", "factory", ... would be silently dropped on the way
+        if ([] !== array_diff($definitionKeys, ['class', 'arguments', 'tag', 'tags', 'tagArguments', 'alias', 'methodCalls'])) {
             return null;
         }
 
@@ -599,7 +606,98 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags);
+        $aliasValue = $this->matchArrayValueByKey($definitionArray, 'alias');
+        if (null !== $aliasValue) {
+            if (!$aliasValue instanceof String_) {
+                return null;
+            }
+
+            $serviceTags = $this->addTagAlias($serviceTags, $aliasValue->value);
+        }
+
+        $serviceMethodCalls = $this->resolveServiceMethodCalls($this->matchArrayValueByKey($definitionArray, 'methodCalls'));
+        if (null === $serviceMethodCalls) {
+            return null;
+        }
+
+        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags, $serviceMethodCalls);
+    }
+
+    /**
+     * The "alias" is no service alias, ServicePass hands it over as an argument of every tag the service carries,
+     * see ServicePass::process(). A service without a tag has nothing to carry it, so the alias goes,
+     * just like it does today.
+     *
+     * @param ServiceTag[] $serviceTags
+     *
+     * @return ServiceTag[]
+     */
+    private function addTagAlias(array $serviceTags, string $alias): array
+    {
+        $aliasedServiceTags = [];
+
+        foreach ($serviceTags as $serviceTag) {
+            $arrayItems = [];
+
+            foreach ($serviceTag->getArguments()->items as $tagArgumentArrayItem) {
+                // the "alias" wins over a "tagArguments" one of the very same name, see ServicePass
+                if ($tagArgumentArrayItem->key instanceof String_ && 'alias' === $tagArgumentArrayItem->key->value) {
+                    continue;
+                }
+
+                $arrayItems[] = $tagArgumentArrayItem;
+            }
+
+            $arrayItems[] = new ArrayItem(new String_($alias), new String_('alias'));
+
+            $aliasedServiceTags[] = new ServiceTag($serviceTag->getName(), new Array_($arrayItems));
+        }
+
+        return $aliasedServiceTags;
+    }
+
+    /**
+     * The "methodCalls" are keyed by the method name, their arguments a positional list, see ServicePass.
+     *
+     * @return ServiceMethodCall[]|null null when a call cannot be re-created
+     */
+    private function resolveServiceMethodCalls(?Node $methodCallsValue): ?array
+    {
+        if (null === $methodCallsValue) {
+            return [];
+        }
+
+        if (!$methodCallsValue instanceof Array_) {
+            return null;
+        }
+
+        $serviceMethodCalls = [];
+
+        foreach ($methodCallsValue->items as $methodCallArrayItem) {
+            if (!$methodCallArrayItem->key instanceof String_) {
+                return null;
+            }
+
+            $argumentValues = $this->resolveArgumentValues($methodCallArrayItem->value);
+            if (null === $argumentValues) {
+                return null;
+            }
+
+            $arrayItems = [];
+
+            foreach ($argumentValues as $argumentValue) {
+                $argumentExpr = $this->createArgumentExpr($argumentValue);
+                if (!$argumentExpr instanceof Expr) {
+                    return null;
+                }
+
+                $arrayItems[] = new ArrayItem($argumentExpr);
+            }
+
+            $serviceMethodCalls[] = new ServiceMethodCall($methodCallArrayItem->key->value, new Array_($arrayItems));
+        }
+
+        return $serviceMethodCalls;
     }
 
     /**
@@ -952,6 +1050,13 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             $methodCall = new MethodCall($methodCall, 'arg', [
                 new Arg(new String_($serviceArgument->getName())),
                 new Arg($serviceArgument->getValue()),
+            ]);
+        }
+
+        foreach ($serviceDefinition->getServiceMethodCalls() as $serviceMethodCall) {
+            $methodCall = new MethodCall($methodCall, 'call', [
+                new Arg(new String_($serviceMethodCall->getMethodName())),
+                new Arg($serviceMethodCall->getArguments()),
             ]);
         }
 
