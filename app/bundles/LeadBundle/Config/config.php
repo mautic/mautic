@@ -340,12 +340,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class,
-                'arguments' => ['mautic.lead.model.list'],
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
             Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
                 'tag'       => 'validator.constraint_validator',
@@ -364,44 +358,6 @@ return [
                     'mautic.lead.model.list',
                     'mautic.helper.field.alias',
                 ],
-            ],
-            'mautic.lead.constraint.alias' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class,
-                'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'uniqueleadlist',
-            ],
-            'mautic.lead_list.constraint.in_use' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                ],
-                'tag'   => 'validator.constraint_validator',
-                'alias' => 'segment_in_use',
-            ],
-        ],
-        'helpers' => [
-            'mautic.helper.twig.avatar' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\AvatarHelper::class,
-                'arguments' => [
-                    'twig.helper.assets',
-                    'mautic.helper.paths',
-                    'mautic.helper.twig.gravatar',
-                    'mautic.helper.twig.default_avatar',
-                ],
-                'alias' => 'lead_avatar',
-            ],
-            'mautic.helper.twig.default_avatar' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
-                'arguments' => [
-                    'twig.helper.assets',
-                ],
-                'alias' => 'default_avatar',
-            ],
-            'mautic.helper.twig.dnc_reason' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class,
-                'arguments' => ['translator'],
-                'alias'     => 'lead_dnc_reason',
             ],
         ],
     ],

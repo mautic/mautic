@@ -154,107 +154,7 @@ return [
         ],
     ],
     'services' => [
-        'forms' => [
-            'mautic.form.type.dynamic_content_filter_entry_filters' => [
-                'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.lead.model.list',
-                ],
-                'methodCalls' => [
-                    'setConnection' => [
-                        'database_connection',
-                    ],
-                ],
-            ],
-        ],
         'helpers' => [
-            'mautic.helper.twig.menu' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
-                'arguments' => ['knp_menu.helper'],
-                'alias'     => 'menu',
-            ],
-            'mautic.helper.twig.date' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\DateHelper::class,
-                'arguments' => [
-                    '%mautic.date_format_full%',
-                    '%mautic.date_format_short%',
-                    '%mautic.date_format_dateonly%',
-                    '%mautic.date_format_timeonly%',
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-                'alias' => 'date',
-            ],
-            'mautic.helper.twig.gravatar' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\GravatarHelper::class,
-                'arguments' => [
-                    'mautic.helper.twig.default_avatar',
-                    'mautic.helper.core_parameters',
-                    'request_stack',
-                ],
-                'alias'     => 'gravatar',
-            ],
-            'mautic.helper.twig.analytics' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class,
-                'alias'     => 'analytics',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.helper.twig.config' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\ConfigHelper::class,
-                'alias'     => 'config',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.helper.twig.mautibot' => [
-                'class' => Mautic\CoreBundle\Twig\Helper\MautibotHelper::class,
-                'alias' => 'mautibot',
-            ],
-            'mautic.helper.twig.button' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
-                'arguments' => [
-                    'twig',
-                    'translator',
-                    'event_dispatcher',
-                ],
-                'alias' => 'buttons',
-            ],
-            'mautic.helper.twig.content' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
-                'arguments' => [
-                    'twig',
-                    'event_dispatcher',
-                ],
-                'alias' => 'content',
-            ],
-            'mautic.helper.twig.formatter' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\FormatterHelper::class,
-                'arguments' => [
-                    'mautic.helper.twig.date',
-                    'translator',
-                ],
-                'alias' => 'formatter',
-            ],
-            'mautic.helper.twig.version' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\VersionHelper::class,
-                'arguments' => [
-                    'mautic.helper.app_version',
-                ],
-                'alias' => 'version',
-            ],
-            'mautic.helper.twig.security' => [
-                'class'     => Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
-                'arguments' => [
-                    'mautic.security',
-                    'request_stack',
-                    'event_dispatcher',
-                    'security.csrf.token_manager',
-                ],
-                'alias' => 'security',
-            ],
             'mautic.helper.core_parameters' => [
                 'class'     => Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
@@ -287,41 +187,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.translation.loader' => [
-                'class'     => Mautic\CoreBundle\Loader\TranslationLoader::class,
-                'arguments' => [
-                    'mautic.helper.bundle',
-                    'mautic.helper.paths',
-                ],
-                'tag'       => 'translation.loader',
-                'alias'     => 'mautic',
-            ],
-            'mautic.helper.theme' => [
-                'class'     => Mautic\CoreBundle\Helper\ThemeHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'twig',
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    'mautic.filesystem',
-                    'symfony.finder',
-                    'mautic.integrations.helper.builder_integrations',
-                ],
-                'methodCalls' => [
-                    'setDefaultTheme' => [
-                        '%mautic.theme%',
-                    ],
-                ],
-            ],
-            'mautic.menu_renderer' => [
-                'class'     => Mautic\CoreBundle\Menu\MenuRenderer::class,
-                'arguments' => [
-                    'knp_menu.matcher',
-                    'twig',
-                ],
-                'tag'   => 'knp_menu.renderer',
-                'alias' => 'mautic',
-            ],
             'mautic.ip_lookup' => [
                 'class'     => Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
                 'factory'   => ['@mautic.ip_lookup.factory', 'getService'],
