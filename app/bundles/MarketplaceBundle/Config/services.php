@@ -16,6 +16,18 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\MarketplaceBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+    $services->set('marketplace.permissions', Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class)->tag('mautic.permissions');
+    $services->alias(Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class, 'marketplace.permissions');
+    $services->set('marketplace.api.connection', Mautic\MarketplaceBundle\Api\Connection::class);
+    $services->alias(Mautic\MarketplaceBundle\Api\Connection::class, 'marketplace.api.connection');
+    $services->set('marketplace.service.plugin_collector', Mautic\MarketplaceBundle\Service\PluginCollector::class);
+    $services->alias(Mautic\MarketplaceBundle\Service\PluginCollector::class, 'marketplace.service.plugin_collector');
+    $services->set('marketplace.service.route_provider', Mautic\MarketplaceBundle\Service\RouteProvider::class);
+    $services->alias(Mautic\MarketplaceBundle\Service\RouteProvider::class, 'marketplace.service.route_provider');
+    $services->set('marketplace.service.config', Mautic\MarketplaceBundle\Service\Config::class);
+    $services->alias(Mautic\MarketplaceBundle\Service\Config::class, 'marketplace.service.config');
+    $services->set('marketplace.service.allowlist', Mautic\MarketplaceBundle\Service\Allowlist::class);
+    $services->alias(Mautic\MarketplaceBundle\Service\Allowlist::class, 'marketplace.service.allowlist');
 
     $services->alias('marketplace.model.package', Mautic\MarketplaceBundle\Model\PackageModel::class);
 };
