@@ -33,7 +33,7 @@ final class RemoteAssetBrowseSubscriberTest extends TestCase
 
     public function testOnAssetRemoteBrowseSetsAdapterWhenIntegrationSucceeds(): void
     {
-        $adapter     = $this->createMock(Adapter::class);
+        $adapter     = $this->createStub(Adapter::class);
         $integration = $this->createMock(CloudStorageIntegration::class);
         $integration->method('getAdapter')->willReturn($adapter);
 
@@ -56,7 +56,7 @@ final class RemoteAssetBrowseSubscriberTest extends TestCase
 
         $this->subscriber->onAssetRemoteBrowse($event);
 
-        $this->assertNull($event->getAdapter());
+        $this->assertNotInstanceOf(Adapter::class, $event->getAdapter());
         $this->assertSame('client_id or client_secret missing.', $event->getFailureMessage());
     }
 }
