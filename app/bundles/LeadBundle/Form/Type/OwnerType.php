@@ -20,7 +20,7 @@ final class OwnerType extends AbstractType
             'addowner',
             ChoiceType::class,
             [
-                'label'             => 'mautic.lead.batch.add_to',
+                'label'             => 'mautic.lead.batch.set',
                 'multiple'          => false,
                 'choices'           => array_merge(
                     [$options['remove_label'] => '__none__'],
