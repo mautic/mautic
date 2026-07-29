@@ -190,9 +190,6 @@ return [
             ],
         ],
         'helpers' => [
-            'mautic.helper.app_version' => [
-                'class' => Mautic\CoreBundle\Helper\AppVersion::class,
-            ],
             'mautic.helper.twig.menu' => [
                 'class'     => Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
@@ -289,22 +286,6 @@ return [
                     '%mautic.application_dir%',
                 ],
             ],
-            'mautic.helper.ip_lookup' => [
-                'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.core.repository.ip_address',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.factory.device_detector_factory',
-                    'mautic.ip_lookup',
-                ],
-            ],
-            'mautic.helper.user' => [
-                'class'     => Mautic\CoreBundle\Helper\UserHelper::class,
-                'arguments' => [
-                    'security.token_storage',
-                ],
-            ],
             'mautic.helper.core_parameters' => [
                 'class'     => Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
@@ -317,25 +298,6 @@ return [
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
-                ],
-            ],
-            'mautic.helper.token_builder' => [
-                'class'     => Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.model.factory',
-                    'database_connection',
-                    'mautic.helper.user',
-                ],
-            ],
-            'mautic.helper.token_builder.factory' => [
-                'class'     => Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.model.factory',
-                    'database_connection',
-                    'mautic.helper.user',
-                    'translator',
                 ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [
@@ -407,13 +369,6 @@ return [
                     'mautic.helper.core_parameters',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
-                ],
-            ],
-            'mautic.page.helper.factory' => [
-                'class'     => Mautic\CoreBundle\Factory\PageHelperFactory::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.translation.loader' => [
@@ -522,10 +477,6 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
-            ],
-            'mautic.helper.command' => [
-                'class'     => Mautic\CoreBundle\Helper\CommandHelper::class,
-                'arguments' => 'kernel',
             ],
             'mautic.menu_renderer' => [
                 'class'     => Mautic\CoreBundle\Menu\MenuRenderer::class,
