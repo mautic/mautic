@@ -9,12 +9,9 @@ final class GlobalSearchEvent extends Event
 {
     public const RESULTS_LIMIT = 3;
 
-    /**
-     * @var array
-     */
-    protected $results = [];
+    private array $results = [];
 
-    protected string $searchString;
+    private readonly string $searchString;
 
     /**
      * @param string     $searchString
@@ -22,7 +19,7 @@ final class GlobalSearchEvent extends Event
      */
     public function __construct(
         $searchString,
-        protected $translator,
+        private $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }

@@ -90,16 +90,6 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * Called by parent::getBuilderTokensAction().
-     *
-     * @return array
-     */
-    protected function getBuilderTokens($query)
-    {
-        return $this->emailModel->getBuilderComponents(null, ['tokens'], (string) $query);
-    }
-
     public function generatePlaintTextAction(Request $request): JsonResponse
     {
         $custom = $request->request->get('custom');

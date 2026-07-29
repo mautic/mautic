@@ -9,20 +9,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WidgetTypeListEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $widgetTypes = [];
+    private array $widgetTypes = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    private ?TranslatorInterface $translator = null;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    private ?CorePermissions $security = null;
 
     /**
      * Adds a new widget type to the widget types list.

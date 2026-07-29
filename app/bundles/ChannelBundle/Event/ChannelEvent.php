@@ -7,15 +7,9 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ChannelEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $channels = [];
+    private array $channels = [];
 
-    /**
-     * @var array
-     */
-    protected $featureChannels = [];
+    private array $featureChannels = [];
 
     /**
      * Adds a submit action to the list of available actions.

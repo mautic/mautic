@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Symfony\CodeQuality\Rector\ClassMethod\ResponseReturnTypeControllerActionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -24,6 +22,7 @@ return RectorConfig::configure()
     ->withPreparedSets(
         deadCode: true,
         typeDeclarations: true,
+        privatization: true,
         phpunitCodeQuality: true,
         phpunitMockToStub: true,
         phpunitNarrowAsserts: true,
@@ -65,7 +64,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
         // DI
-        // ConfigServiceToAutowiredServiceRector::class,
+        ConfigServiceToAutowiredServiceRector::class,
         // applied on:
         // * email-bundle
 
@@ -86,18 +85,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
-        // to be fixed in dev-main
-        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
-            '*Command.php',
-        ],
-
-        // skip as might be overriden by 3rd party controllers
-        ResponseReturnTypeControllerActionRector::class => [
-            __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
-            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
-            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractFormController.php',
-            __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
-        ],
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
@@ -133,7 +120,4 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-
-        // handle later with full PHP 8.0 upgrade
-        OptionalParametersAfterRequiredRector::class,
     ]);

@@ -25,7 +25,7 @@ final class SubmitActionEmailType extends AbstractType
 
     public function __construct(
         private TranslatorInterface $translator,
-        protected CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
