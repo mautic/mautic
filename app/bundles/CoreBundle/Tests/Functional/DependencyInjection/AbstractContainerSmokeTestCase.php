@@ -73,7 +73,7 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         return $serviceIds;
     }
 
-    private function buildContainer(): Container
+    protected function buildContainer(): Container
     {
         $kernel = new TestKernel();
         $kernel->boot();

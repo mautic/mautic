@@ -48,17 +48,17 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
 
     public function deleteExpired($isDryRun = false): int
     {
-        $qb = $this->createQueryBuilder('ut');
+        $qb = $this->createQueryBuilder('ut')
+            ->where('ut.expiration <= :current_datetime')
+            ->setParameter('current_datetime', new \DateTime());
 
         if ($isDryRun) {
-            $qb->select('count(ut.id) as records');
-        } else {
-            $qb->delete(UserToken::class, 'ut');
+            return (int) $qb->select('count(ut.id)')
+                ->getQuery()
+                ->getSingleScalarResult();
         }
 
-        return (int) $qb
-            ->where('ut.expiration <= :current_datetime')
-            ->setParameter('current_datetime', new \DateTime())
+        return (int) $qb->delete(UserToken::class, 'ut')
             ->getQuery()
             ->execute();
     }

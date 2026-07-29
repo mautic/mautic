@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -625,7 +624,6 @@ class LeadApiController extends CommonApiController
         // Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
             $ipAddress = $this->ipLookupHelper->getIpAddress($this->entityRequestParameters['ipAddress']);
-            \assert($ipAddress instanceof IpAddress);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
