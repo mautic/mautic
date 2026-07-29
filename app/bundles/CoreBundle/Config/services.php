@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+
 use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
@@ -41,6 +44,33 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->set('mautic.helper.twig.menu', Mautic\CoreBundle\Twig\Helper\MenuHelper::class)->tag('twig.helper', ['alias' => 'menu']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\MenuHelper::class, 'mautic.helper.twig.menu');
+    $services->set('mautic.helper.twig.date', Mautic\CoreBundle\Twig\Helper\DateHelper::class)
+        ->arg('$dateFullFormat', param('mautic.date_format_full'))
+        ->arg('$dateShortFormat', param('mautic.date_format_short'))
+        ->arg('$dateOnlyFormat', param('mautic.date_format_dateonly'))
+        ->arg('$timeOnlyFormat', param('mautic.date_format_timeonly'))
+        ->tag('twig.helper', ['alias' => 'date']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\DateHelper::class, 'mautic.helper.twig.date');
+    $services->set('mautic.helper.twig.gravatar', Mautic\CoreBundle\Twig\Helper\GravatarHelper::class)->tag('twig.helper', ['alias' => 'gravatar']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\GravatarHelper::class, 'mautic.helper.twig.gravatar');
+    $services->set('mautic.helper.twig.analytics', Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class)->tag('twig.helper', ['alias' => 'analytics']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class, 'mautic.helper.twig.analytics');
+    $services->set('mautic.helper.twig.config', Mautic\CoreBundle\Twig\Helper\ConfigHelper::class)->tag('twig.helper', ['alias' => 'config']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\ConfigHelper::class, 'mautic.helper.twig.config');
+    $services->set('mautic.helper.twig.mautibot', Mautic\CoreBundle\Twig\Helper\MautibotHelper::class)->tag('twig.helper', ['alias' => 'mautibot']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\MautibotHelper::class, 'mautic.helper.twig.mautibot');
+    $services->set('mautic.helper.twig.button', Mautic\CoreBundle\Twig\Helper\ButtonHelper::class)->tag('twig.helper', ['alias' => 'buttons']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\ButtonHelper::class, 'mautic.helper.twig.button');
+    $services->set('mautic.helper.twig.content', Mautic\CoreBundle\Twig\Helper\ContentHelper::class)->tag('twig.helper', ['alias' => 'content']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\ContentHelper::class, 'mautic.helper.twig.content');
+    $services->set('mautic.helper.twig.formatter', Mautic\CoreBundle\Twig\Helper\FormatterHelper::class)->tag('twig.helper', ['alias' => 'formatter']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\FormatterHelper::class, 'mautic.helper.twig.formatter');
+    $services->set('mautic.helper.twig.version', Mautic\CoreBundle\Twig\Helper\VersionHelper::class)->tag('twig.helper', ['alias' => 'version']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\VersionHelper::class, 'mautic.helper.twig.version');
+    $services->set('mautic.helper.twig.security', Mautic\CoreBundle\Twig\Helper\SecurityHelper::class)->tag('twig.helper', ['alias' => 'security']);
+    $services->alias(Mautic\CoreBundle\Twig\Helper\SecurityHelper::class, 'mautic.helper.twig.security');
 
     $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
     $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
