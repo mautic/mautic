@@ -174,12 +174,21 @@ final class MauticDenyAccessListenerTest extends TestCase
             }
         };
 
-        $requestObject = $this->getMockBuilder(FormEntity::class)
-            ->onlyMethods(['getCreatedBy'])
-            ->addMethods(['getCustomObject'])
-            ->getMock();
-        $requestObject->method('getCustomObject')->willReturn($customObjectMock);
-        $requestObject->method('getCreatedBy')->willReturn(0);
+        $requestObject = new class($customObjectMock) {
+            public function __construct(private readonly object $customObject)
+            {
+            }
+
+            public function getCustomObject(): object
+            {
+                return $this->customObject;
+            }
+
+            public function getCreatedBy(): int
+            {
+                return 0;
+            }
+        };
 
         $this->configureRequest($requestObject);
 
@@ -215,7 +224,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         };
 
         $requestObject = new class($customFieldMock) {
-            public function __construct(private object $customField)
+            public function __construct(private readonly object $customField)
             {
             }
 

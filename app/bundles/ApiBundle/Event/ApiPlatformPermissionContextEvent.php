@@ -12,11 +12,11 @@ final class ApiPlatformPermissionContextEvent
      * @param array<string, mixed> $attributes
      */
     public function __construct(
-        private string $securityExpression,
+        private readonly string $securityExpression,
         private string $permission,
         private mixed $requestObject,
-        private ?Request $request = null,
-        private array $attributes = [],
+        private readonly ?Request $request = null,
+        private readonly array $attributes = [],
     ) {
     }
 

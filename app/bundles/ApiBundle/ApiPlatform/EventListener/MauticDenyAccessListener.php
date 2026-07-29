@@ -64,7 +64,7 @@ final readonly class MauticDenyAccessListener
         $permission    = $permissionContextEvent->getPermission();
         $requestObject = $permissionContextEvent->getRequestObject();
 
-        if ($this->shouldCheckEntityOwnership($permission, $attributes)) {
+        if ($this->shouldCheckEntityOwnership($permission)) {
             [$ownPermission, $otherPermission] = $this->resolveOwnershipPermissions($permission);
 
             if (!$this->security->hasEntityAccess($ownPermission, $otherPermission, $this->resolveOwner($requestObject))) {
@@ -79,10 +79,7 @@ final readonly class MauticDenyAccessListener
         }
     }
 
-    /**
-     * @param array<string, mixed> $attributes
-     */
-    private function shouldCheckEntityOwnership(string $permission, array $attributes): bool
+    private function shouldCheckEntityOwnership(string $permission): bool
     {
         if (preg_match('/:(?:view|edit|delete)(?:own|other)$/', $permission)) {
             return true;
