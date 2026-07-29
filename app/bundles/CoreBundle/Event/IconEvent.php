@@ -10,10 +10,10 @@ final class IconEvent extends Event
     /**
      * @var array
      */
-    protected $icons = [];
+    private $icons = [];
 
     public function __construct(
-        protected CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 

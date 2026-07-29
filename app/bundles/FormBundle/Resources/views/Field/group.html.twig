@@ -31,7 +31,7 @@
   }) %}
 {% endif %}
 
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'boolean', 'rating', 'textarea'] %}
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'rating', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
           'value': field.defaultValue|default(''),
   }) %}
@@ -85,13 +85,6 @@
           widthClass
         ]),
 }) %}
-
-{# Add boolean-specific class for boolean fields #}
-{% if field.type == 'boolean' %}
-  {% set containerAttributes = containerAttributes|merge({
-          'class': containerAttributes.class|merge(['mauticform-boolean']),
-  }) %}
-{% endif %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
 
@@ -138,7 +131,7 @@
 {# Setup list parsing #}
 {%- if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined -%}
   {%- set parseList = [] -%}
-  {%- set isBooleanList = (field.type == 'boolean') -%}
+  {%- set isBooleanList = false -%}
 
   {%- if
         (field.properties.syncList is defined and field.properties.syncList is not empty) and
@@ -209,8 +202,7 @@
   {%- endif -%}
 
   {%- if isBooleanList -%}
-    {# For boolean fields, preserve the original list structure to maintain boolean keys #}
-    {%- set list = parseList -%}
+    {%- set list = formFieldParseBooleanList(parseList) -%}
   {%- else -%}
     {%- set list = formFieldParseList(parseList) -%}
   {%- endif -%}
@@ -248,8 +240,6 @@
             'type': type,
             'value': listValue|e,
     }) %}
-
-    {# Add boolean-specific classes for positive/negative options #}
     {% if field.type == 'boolean' %}
       {% if listValue == '1' %}
         {% set listInputAttributes = listInputAttributes|merge({
@@ -261,9 +251,10 @@
         }) %}
       {% endif %}
     {% endif %}
-
-    {% if field.defaultValue is defined and field.defaultValue is not empty and listValue == field.defaultValue %}
-      {% set listInputAttributes = listInputAttributes|merge({'checked': 'checked'}) %}
+    {% if field.defaultValue is defined and field.defaultValue is not null and field.defaultValue == listValue %}
+      {% set listInputAttributes = listInputAttributes|merge({
+              'checked': 'checked',
+      }) %}
     {% endif %}
 
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}

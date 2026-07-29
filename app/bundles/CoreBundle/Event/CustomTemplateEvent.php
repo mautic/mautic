@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
-    protected string $template;
+    private string $template;
 
     /**
      * @param array<string, string> $vars
@@ -14,7 +14,7 @@ final class CustomTemplateEvent extends AbstractCustomRequestEvent
     public function __construct(
         ?Request $request = null,
         string $template = '',
-        protected array $vars = [],
+        private array $vars = [],
     ) {
         parent::__construct($request);
 

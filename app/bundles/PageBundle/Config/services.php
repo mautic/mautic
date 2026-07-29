@@ -20,6 +20,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.page.segment_tracking_subscriber', Mautic\PageBundle\EventListener\SegmentTrackingSubscriber::class);
+    $services->set('mautic.page.helper.token', Mautic\PageBundle\Helper\TokenHelper::class);
+    $services->set('mautic.page.helper.tracking', Mautic\PageBundle\Helper\TrackingHelper::class);
 
     $services->get(Mautic\PageBundle\Model\PageModel::class)->call('setCatInUrl', ['%mautic.cat_in_page_url%']);
     $services->alias('mautic.page.model.page', Mautic\PageBundle\Model\PageModel::class);
