@@ -363,15 +363,6 @@ return [
                     '%mautic.plugin.bundles%',
                 ],
             ],
-            'mautic.translation.loader' => [
-                'class'     => Mautic\CoreBundle\Loader\TranslationLoader::class,
-                'arguments' => [
-                    'mautic.helper.bundle',
-                    'mautic.helper.paths',
-                ],
-                'tag'       => 'translation.loader',
-                'alias'     => 'mautic',
-            ],
             'mautic.exception.listener' => [
                 'class'     => Mautic\CoreBundle\EventListener\ExceptionListener::class,
                 'arguments' => [
@@ -416,56 +407,11 @@ return [
                     'kernel',
                 ],
             ],
-            'mautic.helper.theme' => [
-                'class'     => Mautic\CoreBundle\Helper\ThemeHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'twig',
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    'mautic.filesystem',
-                    'symfony.finder',
-                    'mautic.integrations.helper.builder_integrations',
-                ],
-                'methodCalls' => [
-                    'setDefaultTheme' => [
-                        '%mautic.theme%',
-                    ],
-                ],
-            ],
             'mautic.helper.encryption' => [
                 'class'     => Mautic\CoreBundle\Helper\EncryptionHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                ],
-            ],
-            // Menu
-            'mautic.helper.menu' => [
-                'class'     => Mautic\CoreBundle\Menu\MenuHelper::class,
-                'arguments' => [
-                    'mautic.security',
-                    'request_stack',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.menu_renderer' => [
-                'class'     => Mautic\CoreBundle\Menu\MenuRenderer::class,
-                'arguments' => [
-                    'knp_menu.matcher',
-                    'twig',
-                ],
-                'tag'   => 'knp_menu.renderer',
-                'alias' => 'mautic',
-            ],
-            'mautic.menu.builder' => [
-                'class'     => Mautic\CoreBundle\Menu\MenuBuilder::class,
-                'arguments' => [
-                    'knp_menu.factory',
-                    'knp_menu.matcher',
-                    'event_dispatcher',
-                    'mautic.helper.menu',
                 ],
             ],
             // IP Lookup

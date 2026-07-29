@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+
 use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
@@ -41,6 +44,18 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->set('mautic.translation.loader', Mautic\CoreBundle\Loader\TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
+    $services->alias(Mautic\CoreBundle\Loader\TranslationLoader::class, 'mautic.translation.loader');
+    $services->set('mautic.helper.theme', Mautic\CoreBundle\Helper\ThemeHelper::class)
+        ->call('setDefaultTheme', [param('mautic.theme')]);
+    $services->alias(Mautic\CoreBundle\Helper\ThemeHelper::class, 'mautic.helper.theme');
+    $services->set('mautic.menu_renderer', Mautic\CoreBundle\Menu\MenuRenderer::class)->tag('knp_menu.renderer', ['alias' => 'mautic']);
+    $services->alias(Mautic\CoreBundle\Menu\MenuRenderer::class, 'mautic.menu_renderer');
+
+    $services->set('mautic.helper.menu', Mautic\CoreBundle\Menu\MenuHelper::class);
+    $services->alias(Mautic\CoreBundle\Menu\MenuHelper::class, 'mautic.helper.menu');
+    $services->set('mautic.menu.builder', Mautic\CoreBundle\Menu\MenuBuilder::class);
+    $services->alias(Mautic\CoreBundle\Menu\MenuBuilder::class, 'mautic.menu.builder');
 
     $services->alias('mautic.helper.file_uploader', Mautic\CoreBundle\Helper\FileUploader::class);
     $services->alias('mautic.helper.file_path_resolver', Mautic\CoreBundle\Helper\FilePathResolver::class);
