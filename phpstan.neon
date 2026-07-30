@@ -17,6 +17,7 @@ parameters:
 		constant: 3
 	paths:
 		- app/bundles
+		- app/config
 		- app/migrations
 		- plugins
 		- utils
@@ -251,18 +252,22 @@ rules:
 	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
-	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
+	- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
 
-#services:
-#	-
-#		class: Utils\PHPStan\Collector\ServiceAliasCollector
-#		tags:
-#			- phpstan.collector
-#	-
-#		class: Utils\PHPStan\Collector\ServiceNameUsageCollector
-#		tags:
-#			- phpstan.collector
-#	-
-#		class: Utils\PHPStan\Collector\ServiceTypeUsageCollector
-#		tags:
-#			- phpstan.collector
+services:
+	-
+		class: Utils\PHPStan\Collector\ServiceAliasCollector
+		tags:
+			- phpstan.collector
+	-
+		class: Utils\PHPStan\Collector\ServiceClassUsageCollector
+		tags:
+			- phpstan.collector
+	-
+		class: Utils\PHPStan\Collector\ServiceNameUsageCollector
+		tags:
+			- phpstan.collector
+	-
+		class: Utils\PHPStan\Collector\ServiceTypeUsageCollector
+		tags:
+			- phpstan.collector

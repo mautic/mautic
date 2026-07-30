@@ -8,6 +8,7 @@ use PHPStan\Collectors\Collector;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 use Utils\PHPStan\Collector\ServiceAliasCollector;
+use Utils\PHPStan\Collector\ServiceClassUsageCollector;
 use Utils\PHPStan\Collector\ServiceNameUsageCollector;
 use Utils\PHPStan\Collector\ServiceTypeUsageCollector;
 use Utils\PHPStan\Rule\NoUnusedServiceAliasRule;
@@ -29,6 +30,7 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
     {
         return [
             new ServiceAliasCollector(),
+            new ServiceClassUsageCollector(),
             new ServiceNameUsageCollector(),
             new ServiceTypeUsageCollector(),
         ];
@@ -42,16 +44,18 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
             $servicesFilePath,
             __DIR__.'/Fixture/AliasBundle/Config/config.php',
             __DIR__.'/Fixture/AliasBundle/AliasHelperConsumer.php',
+            __DIR__.'/Fixture/AliasBundle/AliasHelperFetcher.php',
             __DIR__.'/Fixture/AliasBundle/UsedAliasHelper.php',
+            __DIR__.'/Fixture/AliasBundle/ClassFetchedAliasHelper.php',
             __DIR__.'/Fixture/AliasBundle/UnusedAliasHelper.php',
         ], [
             [
                 'Service alias "Utils\PHPStan\Tests\Rule\Fixture\AliasBundle\UnusedAliasHelper" is never used, remove it.',
-                17,
+                23,
             ],
             [
                 'Service alias "mautic.alias.legacy_unused_helper" is never used, remove it.',
-                18,
+                24,
             ],
         ]);
     }

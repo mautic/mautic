@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Collector;
 
 use PhpParser\Node;
+use PhpParser\Node\InterpolatedStringPart;
+use PhpParser\Node\Scalar;
+use PhpParser\Node\Scalar\InterpolatedString;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Collectors\Collector;
@@ -13,9 +16,10 @@ use PHPStan\Collectors\Collector;
  * Collects every string that looks like a service id, e.g. 'mautic.some.helper' in config.php "arguments",
  * in service('mautic.some.helper') calls or in a plain $container->get('mautic.some.helper').
  *
- * The sprintf() formats of ids built at runtime are collected too, e.g. 'mautic.%s.model.%s' of ModelFactory.
+ * The formats of ids built at runtime are collected too, both the sprintf() one, e.g. 'mautic.%s.model.%s'
+ * of ModelFactory, and the interpolated one, e.g. "mautic.integration.{$name}" of IntegrationHelper.
  *
- * @implements Collector<String_, array{string, int}>
+ * @implements Collector<\PhpParser\Node\Scalar, array{string, int}>
  */
 final class ServiceNameUsageCollector implements Collector
 {
@@ -29,7 +33,7 @@ final class ServiceNameUsageCollector implements Collector
 
     public function getNodeType(): string
     {
-        return String_::class;
+        return Scalar::class;
     }
 
     /**
@@ -37,10 +41,37 @@ final class ServiceNameUsageCollector implements Collector
      */
     public function processNode(Node $node, Scope $scope): ?array
     {
-        if (1 !== preg_match(self::SERVICE_ID_PATTERN, $node->value)) {
+        $serviceId = $this->matchServiceId($node);
+        if (null === $serviceId) {
             return null;
         }
 
-        return [$node->value, $node->getStartLine()];
+        if (1 !== preg_match(self::SERVICE_ID_PATTERN, $serviceId)) {
+            return null;
+        }
+
+        return [$serviceId, $node->getStartLine()];
+    }
+
+    /**
+     * An interpolated string turns into the very format the id is built by, e.g. "mautic.integration.{$name}"
+     * turns into "mautic.integration.%s".
+     */
+    private function matchServiceId(Node $node): ?string
+    {
+        if ($node instanceof String_) {
+            return $node->value;
+        }
+
+        if (!$node instanceof InterpolatedString) {
+            return null;
+        }
+
+        $serviceId = '';
+        foreach ($node->parts as $part) {
+            $serviceId .= $part instanceof InterpolatedStringPart ? $part->value : '%s';
+        }
+
+        return $serviceId;
     }
 }
