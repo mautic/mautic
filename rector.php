@@ -3,13 +3,11 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
@@ -72,19 +70,9 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
-        Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
-        ],
-
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
-        ],
-
-<<<<<<< HEAD
-        // to be fixed in dev-main
-        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
-            '*Command.php',
         ],
 
         // promoting $model would type a property the untyped CommonApiController::$model already declares,
@@ -93,12 +81,6 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__.'/app/bundles/*/Controller/Api/*ApiController.php',
             __DIR__.'/plugins/*/Controller/Api/*ApiController.php',
-        ],
-
-=======
->>>>>>> ddc5618da4 (update config)
-        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
-            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
@@ -127,9 +109,5 @@ return RectorConfig::configure()
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
-        ],
-
-        StringReturnTypeFromStrictStringReturnsRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
     ]);
