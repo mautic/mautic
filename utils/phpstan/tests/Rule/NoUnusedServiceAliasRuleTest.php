@@ -46,12 +46,12 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
             __DIR__.'/Fixture/AliasBundle/UnusedAliasHelper.php',
         ], [
             [
-                'Service alias "mautic.alias.model.unused_model" is never used, remove it.',
-                20,
+                'Service alias "mautic.alias.model.not_a_model" is never used, remove it.',
+                21,
             ],
             [
                 'Service alias "mautic.alias.legacy_unused_helper" is never used, remove it.',
-                24,
+                25,
             ],
         ]);
     }
