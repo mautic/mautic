@@ -9,6 +9,6 @@ final class Length extends SymfonyLength
 {
     public function validatedBy(): string
     {
-        return static::class.'Validator';
+        return self::class.'Validator';
     }
 }
