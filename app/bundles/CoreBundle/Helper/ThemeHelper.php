@@ -344,6 +344,7 @@ class ThemeHelper implements ThemeHelperInterface
         $requiredFiles      = ['config.json', 'html/message.html.twig'];
         $foundRequiredFiles = [];
         $allowedFiles       = [];
+        $zipEntries         = [];
         $allowedExtensions  = $this->coreParametersHelper->get('theme_import_allowed_extensions');
 
         $config = [];
@@ -353,6 +354,7 @@ class ThemeHelper implements ThemeHelperInterface
                 $entry = substr($entry, 1);
             }
 
+            $zipEntries[] = $entry;
             $extension = pathinfo($entry, PATHINFO_EXTENSION);
 
             // Check for required files
@@ -365,7 +367,7 @@ class ThemeHelper implements ThemeHelperInterface
                 $allowedFiles[] = $entry;
             }
 
-            if ('config.json' === $entry) {
+            if ('config.json' === basename($entry)) {
                 $config = json_decode($zipper->getFromName($entry), true);
             }
         }
@@ -381,18 +383,125 @@ class ThemeHelper implements ThemeHelperInterface
             }
         }
 
+        $archivePrefix = $this->getThemeArchivePrefix($zipEntries, $requiredFiles);
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
-            throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            if (null === $archivePrefix) {
+                throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            }
+
+            foreach ($missingFiles as $missingFile) {
+                if (in_array($archivePrefix.'/'.$missingFile, $zipEntries, true)) {
+                    $foundRequiredFiles[] = $missingFile;
+                }
+            }
+
+            $missingFiles = array_diff($requiredFiles, $foundRequiredFiles);
+            if ($missingFiles) {
+                throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            }
         }
 
-        // Extract the archive file now
-        if (!$zipper->extractTo($themePath, $allowedFiles)) {
+        if (!is_dir($themePath) && !mkdir($themePath, 0755, true) && !is_dir($themePath)) {
+            $zipper->close();
             throw new \Exception('mautic.core.update.error_extracting_package');
+        }
+
+        foreach ($allowedFiles as $file) {
+            $targetFile = $file;
+            if (null !== $archivePrefix && str_starts_with($file, $archivePrefix.'/')) {
+                $targetFile = substr($file, strlen($archivePrefix) + 1);
+            }
+
+            $destination = $themePath.'/'.$targetFile;
+            if (str_ends_with($file, '/')) {
+                if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
+                    $zipper->close();
+                    throw new \Exception('mautic.core.update.error_extracting_package');
+                }
+
+                continue;
+            }
+
+            $stream = $zipper->getStream($file);
+            if (!$stream) {
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            }
+
+            $destinationDir = dirname($destination);
+            if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, true) && !is_dir($destinationDir)) {
+                fclose($stream);
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            }
+
+            $target = fopen($destination, 'wb');
+            if (!$target) {
+                fclose($stream);
+                $zipper->close();
+                throw new \Exception('mautic.core.update.error_extracting_package');
+            }
+
+            while (!feof($stream)) {
+                $chunk = fread($stream, 8192);
+                if (false === $chunk) {
+                    fclose($target);
+                    fclose($stream);
+                    $zipper->close();
+                    throw new \Exception('mautic.core.update.error_extracting_package');
+                }
+
+                if ('' !== $chunk) {
+                    fwrite($target, $chunk);
+                }
+            }
+
+            fclose($target);
+            fclose($stream);
         }
         $zipper->close();
         unlink($zipFile);
 
         return true;
+    }
+
+    /**
+     * @param string[] $zipEntries
+     * @param string[] $requiredFiles
+     */
+    private function getThemeArchivePrefix(array $zipEntries, array $requiredFiles): ?string
+    {
+        $prefixes = [];
+
+        foreach ($zipEntries as $entry) {
+            if (str_ends_with($entry, '/')) {
+                continue;
+            }
+
+            $parts = explode('/', $entry, 2);
+            if (2 !== count($parts)) {
+                return null;
+            }
+
+            $prefixes[$parts[0]] = true;
+        }
+
+        if (1 !== count($prefixes)) {
+            return null;
+        }
+
+        $prefix = array_key_first($prefixes);
+        if (null === $prefix) {
+            return null;
+        }
+
+        foreach ($requiredFiles as $requiredFile) {
+            if (!in_array($prefix.'/'.$requiredFile, $zipEntries, true)) {
+                return null;
+            }
+        }
+
+        return $prefix;
     }
 
     /**

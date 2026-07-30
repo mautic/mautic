@@ -164,6 +164,35 @@ final class ThemeHelperTest extends TestCase
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
     }
 
+    public function testThemeIsInstalledFromSingleTopLevelFolder(): void
+    {
+        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn($themeRoot);
+
+        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
+        $zipName = basename($zipPath, '.zip');
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('my-theme/config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
+        $zip->addFromString('my-theme/html/message.html.twig', '<p>Message</p>');
+        $zip->addFromString('my-theme/html/page.html.twig', '<p>Page</p>');
+        $zip->close();
+
+        try {
+            $this->themeHelper->install($zipPath);
+
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/config.json');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/message.html.twig');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/page.html.twig');
+        } finally {
+            $filesystem = new Filesystem();
+            $filesystem->remove([$themeRoot, $zipPath]);
+        }
+    }
+
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
         $this->twig->expects($this->exactly(2))
