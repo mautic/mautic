@@ -50,6 +50,16 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->set('mautic.helper.core_parameters', Mautic\CoreBundle\Helper\CoreParametersHelper::class)->tag('twig.helper');
+    $services->alias(Mautic\CoreBundle\Helper\CoreParametersHelper::class, 'mautic.helper.core_parameters');
+    $services->alias('mautic.config', 'mautic.helper.core_parameters');
+    $services->set('mautic.ip_lookup', Mautic\CoreBundle\IpLookup\AbstractLookup::class)
+        ->factory([service('mautic.ip_lookup.factory'), 'getService'])
+        ->args([param('mautic.ip_lookup_service'), param('mautic.ip_lookup_auth'), param('mautic.ip_lookup_config'), service('mautic.http.client')]);
+    $services->alias(Mautic\CoreBundle\IpLookup\AbstractLookup::class, 'mautic.ip_lookup');
+    $services->set('mautic.native.connector', Symfony\Contracts\HttpClient\HttpClientInterface::class)
+        ->factory([Symfony\Component\HttpClient\HttpClient::class, 'create']);
+    $services->alias(Symfony\Contracts\HttpClient\HttpClientInterface::class, 'mautic.native.connector');
     $services->set('mautic.translation.loader', Mautic\CoreBundle\Loader\TranslationLoader::class)->tag('translation.loader', ['alias' => 'mautic']);
     $services->alias(Mautic\CoreBundle\Loader\TranslationLoader::class, 'mautic.translation.loader');
     $services->set('mautic.helper.theme', Mautic\CoreBundle\Helper\ThemeHelper::class)

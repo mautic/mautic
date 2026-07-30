@@ -154,15 +154,6 @@ return [
         ],
     ],
     'services' => [
-        'helpers' => [
-            'mautic.helper.core_parameters' => [
-                'class'     => Mautic\CoreBundle\Helper\CoreParametersHelper::class,
-                'arguments' => [
-                    'service_container',
-                ],
-                'serviceAlias' => 'mautic.config',
-            ],
-        ],
         'menus' => [
             'mautic.menu.main' => [
                 'alias' => 'main',
@@ -187,21 +178,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.ip_lookup' => [
-                'class'     => Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
-                'factory'   => ['@mautic.ip_lookup.factory', 'getService'],
-                'arguments' => [
-                    '%mautic.ip_lookup_service%',
-                    '%mautic.ip_lookup_auth%',
-                    '%mautic.ip_lookup_config%',
-                    'mautic.http.client',
-                ],
-            ],
-            'mautic.native.connector' => [
-                'class'     => Symfony\Contracts\HttpClient\HttpClientInterface::class,
-                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
-            ],
-
             'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,
         ],
     ],

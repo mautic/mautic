@@ -130,17 +130,6 @@ return [
 
     'services' => [
         'other' => [
-            // Authentication
-            'mautic.user.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\User::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.permission.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\Permission::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
             'mautic.security.logout_handler' => [
                 'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
                 'tagArguments' => [
@@ -151,17 +140,6 @@ return [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
-                ],
-            ],
-
-            'mautic.security.saml.entity_descriptor_provider' => [
-                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
-                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
-                'arguments' => [
-                    '%lightsaml.own.entity_id%',
-                    'router',
-                    '%lightsaml.route.login_check%',
-                    'lightsaml.own.credential_store',
                 ],
             ],
 
