@@ -193,6 +193,43 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($result, $message);
     }
 
+    public function testValidateUrlHitTreatsSqlWildcardsAsPlainTextForRepositoryQueries(): void
+    {
+        $lead = $this->createLead();
+        $now  = new \DateTimeImmutable();
+
+        $this->createHit(
+            $lead,
+            'https://example.com/product/nameX100-anything-25',
+            $now->modify('-30 seconds'),
+            200,
+            'test-tracking-id-1',
+            $now->modify('-20 seconds')
+        );
+
+        $currentHit = $this->createHit(
+            $lead,
+            'https://example.com/product/name_100%25',
+            $now,
+            200,
+            'test-tracking-id-2'
+        );
+
+        $action = [
+            'properties' => [
+                'page_url'          => 'name_100%25',
+                'returns_within'    => 40,
+                'returns_after'     => null,
+                'first_time'        => false,
+                'accumulative_time' => null,
+                'page_hits'         => 2,
+            ],
+        ];
+
+        $result = $this->pointActionHelper->validateUrlHit($currentHit, $action);
+        $this->assertFalse($result, 'SQL wildcard characters in plain text URL filters should not broaden repository matches.');
+    }
+
     private function createProductHits(Lead $lead): Hit
     {
         $now  = new \DateTimeImmutable();
