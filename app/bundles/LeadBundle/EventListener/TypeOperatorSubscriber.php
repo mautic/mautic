@@ -22,6 +22,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -43,7 +44,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
         private TranslatorInterface $translator,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StageRepository $stageRepository,
     ) {
     }
 

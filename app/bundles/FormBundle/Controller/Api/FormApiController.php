@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -50,7 +51,7 @@ class FormApiController extends CommonApiController
         private readonly FormModel $formModel,
         private readonly FieldModel $fieldModel,
         private readonly ActionModel $actionModel,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly FormRepository $formRepository,
     ) {
         $this->model            = $formModel;
         $this->entityClass      = Form::class;

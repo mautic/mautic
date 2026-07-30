@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -65,7 +66,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         PathsHelper $pathsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private ProcessSignalService $processSignalService,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
