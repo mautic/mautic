@@ -11,6 +11,9 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
+    $parameters = $configurator->parameters();
+    $parameters->set('twig.controller.exception.class', Mautic\CoreBundle\Controller\ExceptionController::class);
+
     $services = $configurator->services()
         ->defaults()
         ->autowire()

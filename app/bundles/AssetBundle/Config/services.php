@@ -6,6 +6,9 @@ use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
+    $parameters = $configurator->parameters();
+    $parameters->set('oneup_uploader.controller.dropzone.class', Mautic\AssetBundle\Controller\UploadController::class);
+
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -21,8 +24,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set('oneup_uploader.controller.dropzone.class', Mautic\AssetBundle\Controller\UploadController::class)
-        ->autowire(false);
+
     $services->alias(Mautic\AssetBundle\Controller\UploadController::class, 'oneup_uploader.controller.dropzone.class');
     $services->set('mautic.asset.fixture.asset', Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->alias(Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class, 'mautic.asset.fixture.asset');

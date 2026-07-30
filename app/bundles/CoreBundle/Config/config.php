@@ -177,9 +177,6 @@ return [
                 ],
             ],
         ],
-        'other' => [
-            'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,
-        ],
     ],
 
     'ip_lookup_services' => [
