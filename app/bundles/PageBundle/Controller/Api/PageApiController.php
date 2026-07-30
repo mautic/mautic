@@ -25,11 +25,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class PageApiController extends CommonApiController
 {
-    /**
-     * @var PageModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -42,9 +37,8 @@ final class PageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        PageModel $pageModel,
+        protected PageModel $model,
     ) {
-        $this->model            = $pageModel;
         $this->entityClass      = Page::class;
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';

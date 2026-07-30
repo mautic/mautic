@@ -24,11 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class WebhookApiController extends CommonApiController
 {
-    /**
-     * @var WebhookModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -41,9 +36,8 @@ final class WebhookApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        WebhookModel $webhookModel,
+        protected WebhookModel $model,
     ) {
-        $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
         $this->entityNameMulti  = 'hooks';

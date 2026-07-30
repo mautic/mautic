@@ -29,11 +29,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class PointGroupsApiController extends CommonApiController
 {
-    /**
-     * @var PointGroupModel
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -46,10 +41,9 @@ final class PointGroupsApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        PointGroupModel $pointGroupModel,
+        protected PointGroupModel $model,
         private readonly LeadModel $leadModel,
     ) {
-        $this->model            = $pointGroupModel;
         $this->entityClass      = Group::class;
         $this->entityNameOne    = 'pointGroup';
         $this->entityNameMulti  = 'pointGroups';

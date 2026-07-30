@@ -41,11 +41,6 @@ final class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    /**
-     * @var CampaignModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -62,10 +57,9 @@ final class CampaignApiController extends CommonApiController
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
-        CampaignModel $campaignModel,
+        protected CampaignModel $model,
         private LeadModel $leadModel,
     ) {
-        $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';
         $this->entityNameMulti   = 'campaigns';
@@ -370,7 +364,7 @@ final class CampaignApiController extends CommonApiController
         }
 
         $original = $this->model->getEntity($campaignId);
-        if (empty($original)) {
+        if (!$original instanceof Campaign) {
             return $this->notFound();
         }
         $entity = clone $original;

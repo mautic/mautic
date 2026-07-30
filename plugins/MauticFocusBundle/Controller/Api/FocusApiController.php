@@ -23,11 +23,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class FocusApiController extends CommonApiController
 {
-    /**
-     * @var FocusModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -40,9 +35,8 @@ final class FocusApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        FocusModel $focusModel,
+        protected FocusModel $model,
     ) {
-        $this->model           = $focusModel;
         $this->entityClass     = Focus::class;
         $this->entityNameOne   = 'focus';
         $this->entityNameMulti = 'focus';

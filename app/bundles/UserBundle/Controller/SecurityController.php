@@ -110,13 +110,6 @@ final class SecurityController extends CommonController implements EventSubscrib
     }
 
     /**
-     * Do nothing.
-     */
-    public function loginCheckAction(): void
-    {
-    }
-
-    /**
      * The plugin should be handling this in it's listener.
      */
     public function ssoLoginAction($integration): RedirectResponse

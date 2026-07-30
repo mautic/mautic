@@ -34,7 +34,7 @@ final class ThemeApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        protected ThemeHelper $themeHelper,
+        private readonly ThemeHelper $themeHelper,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,

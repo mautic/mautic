@@ -33,7 +33,7 @@ final class NotificationApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        protected ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,

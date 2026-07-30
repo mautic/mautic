@@ -22,11 +22,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class TweetApiController extends CommonApiController
 {
-    /**
-     * @var TweetModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -39,9 +34,8 @@ final class TweetApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        TweetModel $tweetModel,
+        protected TweetModel $model,
     ) {
-        $this->model           = $tweetModel;
         $this->entityClass     = Tweet::class;
         $this->entityNameOne   = 'tweet';
         $this->entityNameMulti = 'tweets';

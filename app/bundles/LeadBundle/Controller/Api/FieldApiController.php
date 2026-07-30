@@ -32,12 +32,7 @@ final class FieldApiController extends CommonApiController
      *
      * @var string
      */
-    protected $fieldObject;
-
-    /**
-     * @var FieldModel|null
-     */
-    protected $model;
+    private $fieldObject;
 
     public function __construct(
         CorePermissions $security,
@@ -51,13 +46,11 @@ final class FieldApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        FieldModel $fieldModel,
+        protected FieldModel $model,
         private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
     ) {
         $request = $requestStack->getCurrentRequest();
         \assert(null !== $request);
-
-        $this->model           = $fieldModel;
         $this->fieldObject     = $request->get('object');
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';

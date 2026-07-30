@@ -291,7 +291,7 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createActionEntityForm(Action $entity, array $action)
+    protected function createActionEntityForm(Action $entity, array $action): FormInterface
     {
         $components = $this->formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
@@ -313,7 +313,7 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity)
+    protected function createFieldEntityForm($entity): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,

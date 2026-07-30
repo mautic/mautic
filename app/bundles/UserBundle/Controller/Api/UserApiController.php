@@ -28,11 +28,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 final class UserApiController extends CommonApiController
 {
-    /**
-     * @var UserModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -46,9 +41,8 @@ final class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserModel $userModel,
+        protected UserModel $model,
     ) {
-        $this->model            = $userModel;
         $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';

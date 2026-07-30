@@ -25,11 +25,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class MessageApiController extends CommonApiController
 {
-    /**
-     * @var MessageModel|null
-     */
-    protected $model;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -42,9 +37,8 @@ final class MessageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        MessageModel $messageModel,
+        protected MessageModel $model,
     ) {
-        $this->model            = $messageModel;
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';
         $this->entityNameMulti  = 'messages';
