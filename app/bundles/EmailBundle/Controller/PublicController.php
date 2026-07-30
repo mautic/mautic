@@ -138,7 +138,6 @@ final class PublicController extends CommonFormController
         \assert($formFactory instanceof FormFactoryInterface);
 
         $emailModel = $this->getModel('email');
-        \assert($emailModel instanceof EmailModel);
 
         $themeHelper = $this->get('mautic.helper.theme');
         \assert($themeHelper instanceof ThemeHelperInterface);

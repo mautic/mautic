@@ -29,10 +29,6 @@ final class BuilderSubscriberTest extends TestCase
 
     private MockObject&EmailModel $emailModel;
 
-    private MockObject&TrackableModel $trackableModelMock;
-
-    private MockObject&RedirectModel $redirectModelMock;
-
     private MockObject&TranslatorInterface $translator;
 
     private BuilderSubscriber $builderSubscriber;
@@ -111,11 +107,18 @@ final class BuilderSubscriberTest extends TestCase
 
                 return sprintf('/email/%s/%s', str_replace('mautic_email_', '', $route), $parameters['idHash']);
             });
+        $matcher = $this->never();
 
-        $this->translator->expects($this->never())
-            ->method('trans')
-            ->withConsecutive([$unsubscribeTokenizedText], [])
-            ->willReturn($unsubscribeTokenizedText);
+        $this->translator->expects($matcher)
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText): string {
+                if (1 === $matcher->numberOfInvocations()) {
+                    $this->assertSame($unsubscribeTokenizedText, $parameters[0]);
+                }
+                if (2 === $matcher->numberOfInvocations()) {
+                }
+
+                return $unsubscribeTokenizedText;
+            });
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(

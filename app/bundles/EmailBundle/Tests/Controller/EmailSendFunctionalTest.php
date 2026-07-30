@@ -83,8 +83,8 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
         $this->assertNotEmpty($unsubscribeMatches1[1], $messages[0]->getHtmlBody());
         $this->assertNotEmpty($unsubscribeMatches1[2], $messages[0]->getHtmlBody());
-        $this->assertEquals($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
-        $this->assertEquals($unsubscribeMatches1[2], $resubscribeMatches1[2], $messages[0]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches1[2], $resubscribeMatches1[2], $messages[0]->getHtmlBody());
 
         // Second email:
         $this->assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
@@ -93,11 +93,11 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         $this->assertNotEmpty($unsubscribeMatches2[1], $messages[1]->getHtmlBody());
         $this->assertNotEmpty($unsubscribeMatches2[2], $messages[1]->getHtmlBody());
-        $this->assertEquals($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
-        $this->assertEquals($unsubscribeMatches2[2], $resubscribeMatches2[2], $messages[1]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches2[2], $resubscribeMatches2[2], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:
-        $this->assertNotEquals($unsubscribeMatches1[2], $unsubscribeMatches2[2], $messages[0]->getHtmlBody());
+        $this->assertNotSame($unsubscribeMatches1[2], $unsubscribeMatches2[2], $messages[0]->getHtmlBody());
 
         $this->assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
         $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
