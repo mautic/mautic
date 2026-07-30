@@ -10,10 +10,5 @@ return [
                 'alias' => 'main',
             ],
         ],
-        'others' => [
-            'mautic.some.helper' => [
-                'class' => 'Mautic\CoreBundle\Helper\SomeHelper',
-            ],
-        ],
     ],
 ];

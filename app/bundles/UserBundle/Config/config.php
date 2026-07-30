@@ -127,35 +127,6 @@ return [
             ],
         ],
     ],
-
-    'services' => [
-        'other' => [
-            'mautic.security.logout_handler' => [
-                'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
-                'tagArguments' => [
-                    'event'      => Symfony\Component\Security\Http\Event\LogoutEvent::class,
-                ],
-                'tag'          => 'kernel.event_listener',
-                'arguments'    => [
-                    'mautic.user.model.user',
-                    'event_dispatcher',
-                    'mautic.helper.user',
-                ],
-            ],
-
-            'mautic.security.saml.username_mapper' => [
-                'class'     => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
-                'arguments' => [
-                    [
-                        'email'     => '%mautic.saml_idp_email_attribute%',
-                        'username'  => '%mautic.saml_idp_username_attribute%',
-                        'firstname' => '%mautic.saml_idp_firstname_attribute%',
-                        'lastname'  => '%mautic.saml_idp_lastname_attribute%',
-                    ],
-                ],
-            ],
-        ],
-    ],
     'parameters' => [
         'saml_idp_metadata'            => '',
         'saml_idp_entity_id'           => '',

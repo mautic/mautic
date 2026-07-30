@@ -90,8 +90,20 @@ use Utils\Rector\ValueObject\ServiceTag;
  *           ->factory([service('doctrine'), 'getManagerForClass'])
  *           ->args([User::class]);
  *
+ * A service named after its very own class carries that class as its key, so it needs no name of its own:
+ *
+ *   SomeValidator::class => ['class' => SomeValidator::class, 'tag' => 'validator.constraint_validator']
+ *   ->  $services->set(SomeValidator::class)->tag('validator.constraint_validator');
+ *
+ * A constructor autowiring cannot fill, with no "arguments" to fill it by hand either, is the one ServicePass
+ * builds argument-less as well, so the moved service says out loud it is not autowired:
+ *
+ *   'oneup_uploader.controller.dropzone.class' => ['class' => UploadController::class]
+ *   ->  $services->set('oneup_uploader.controller.dropzone.class', UploadController::class)->autowire(false);
+ *
  * Definitions with "parent", "configurator", ... are left in place,
- * as moving them would silently drop their configuration.
+ * as moving them would silently drop their configuration. The "menus" group stays put as well - a menu is
+ * no service of its own, ServicePass builds it out of the KnpMenu builder and gives it a renderer of its own.
  *
  * Both sides of the move happen in a single run, triggered by config.php alone. The new $services->set() lines
  * are written into services.php right here, as text, before the definitions are dropped from the config.php AST -
