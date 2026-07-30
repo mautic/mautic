@@ -15,10 +15,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.alias.integration.some_crm', 'mautic.alias.used_helper');
 
-    $services->alias('mautic.alias.model.used_model', 'mautic.alias.used_helper');
-    $services->alias('mautic.camelAlias.model.camelAlias', 'mautic.alias.used_helper');
-    $services->alias('mautic.alias.model.option_model', 'mautic.alias.used_helper');
-    $services->alias('mautic.alias.model.not_a_model', 'mautic.alias.used_helper');
+    $services->alias('mautic.alias.model.never_asked_for', 'mautic.alias.used_helper');
 
     $services->set('mautic.alias.unused_helper', UnusedAliasHelper::class);
     $services->alias(UnusedAliasHelper::class, 'mautic.alias.unused_helper');
