@@ -88,7 +88,7 @@ class MessageQueue
      */
     private $dateSent;
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
@@ -104,10 +104,7 @@ class MessageQueue
      */
     private $failed = false;
 
-    /**
-     * @var bool
-     */
-    private $metadataUpdated = false;
+    private bool $metadataUpdated = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

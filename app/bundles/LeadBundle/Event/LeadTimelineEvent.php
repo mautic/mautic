@@ -16,10 +16,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Container with all registered events types.
-     *
-     * @var array
      */
-    private $eventTypes = [];
+    private array $eventTypes = [];
 
     /**
      * Array of filters

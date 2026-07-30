@@ -6,10 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CustomContentEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $content = [];
+    private array $content = [];
 
     private array $templates = [];
 

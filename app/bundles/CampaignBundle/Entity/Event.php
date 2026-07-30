@@ -218,10 +218,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
