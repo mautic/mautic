@@ -31,8 +31,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class, 'mautic.asset.permissions');
     $services->set('mautic.asset.upload.error.handler', Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
     $services->alias(Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class, 'mautic.asset.upload.error.handler');
-    $services->alias('mautic.asset.helper.token', Mautic\AssetBundle\Helper\TokenHelper::class);
     $services->alias('mautic.asset.model.asset', Mautic\AssetBundle\Model\AssetModel::class);
     $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
-    $services->alias('mautic.asset.repository.download', Mautic\AssetBundle\Entity\DownloadRepository::class);
 };

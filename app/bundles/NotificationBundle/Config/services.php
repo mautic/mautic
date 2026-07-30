@@ -28,9 +28,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\NotificationBundle\Integration\OneSignalIntegration::class, 'mautic.integration.onesignal');
 
     $services->alias('mautic.notification.model.notification', Mautic\NotificationBundle\Model\NotificationModel::class);
-    $services->alias('mautic.notification.repository.stat', Mautic\NotificationBundle\Entity\StatRepository::class);
     $services->alias('mautic.helper.notification', Mautic\NotificationBundle\Helper\NotificationHelper::class);
-    $services->alias('notification_helper', Mautic\NotificationBundle\Helper\NotificationHelper::class);
 
     $services->alias('mautic.notification.api', Mautic\NotificationBundle\Api\OneSignalApi::class);
 };

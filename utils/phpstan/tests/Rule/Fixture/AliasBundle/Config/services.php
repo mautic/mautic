@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Utils\PHPStan\Tests\Rule\Fixture\AliasBundle\ClassFetchedAliasHelper;
 use Utils\PHPStan\Tests\Rule\Fixture\AliasBundle\UnusedAliasHelper;
 use Utils\PHPStan\Tests\Rule\Fixture\AliasBundle\UsedAliasHelper;
 
@@ -14,10 +13,11 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(UsedAliasHelper::class, 'mautic.alias.used_helper');
     $services->alias('mautic.alias.legacy_used_helper', 'mautic.alias.used_helper');
 
-    $services->set('mautic.alias.class_fetched_helper', ClassFetchedAliasHelper::class);
-    $services->alias(ClassFetchedAliasHelper::class, 'mautic.alias.class_fetched_helper');
-
     $services->alias('mautic.alias.integration.some_crm', 'mautic.alias.used_helper');
+
+    $services->alias('mautic.alias.model.used_model', 'mautic.alias.used_helper');
+    $services->alias('mautic.camelAlias.model.camelAlias', 'mautic.alias.used_helper');
+    $services->alias('mautic.alias.model.unused_model', 'mautic.alias.used_helper');
 
     $services->set('mautic.alias.unused_helper', UnusedAliasHelper::class);
     $services->alias(UnusedAliasHelper::class, 'mautic.alias.unused_helper');

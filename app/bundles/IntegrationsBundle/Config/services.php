@@ -75,13 +75,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.integrations.sync.notification.bulk_notification', Mautic\IntegrationsBundle\Sync\Notification\BulkNotification::class);
     $services->set('mautic.integrations.sync.notification.helper_user_summary_notification', Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class);
 
-    $services->alias('mautic.integrations.repository.field_change', Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class);
-    $services->alias('mautic.integrations.repository.object_mapping', Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::class);
-    $services->alias('mautic.plugin.integrations.repository.integration', Mautic\PluginBundle\Entity\IntegrationRepository::class);
-    $services->alias('mautic.integrations.helper.contact_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class);
-    $services->alias('mautic.integrations.helper.company_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class);
-    $services->alias('mautic.integrations.sync.data_exchange.mautic.field_helper', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class);
-    $services->alias('mautic.integrations.helper.sync_mapping', Mautic\IntegrationsBundle\Sync\Helper\MappingHelper::class);
     $services->alias('mautic.integrations.helper', Mautic\IntegrationsBundle\Helper\IntegrationsHelper::class);
     $services->alias('mautic.integrations.helper.auth_integrations', Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper::class);
     $services->alias('mautic.integrations.helper.sync_integrations', Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper::class);
