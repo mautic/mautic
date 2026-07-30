@@ -26,8 +26,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
     $services->set('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
 
-    $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class)
-        ->tag('kernel.event_listener', ['event' => 'fos_oauth_server.pre_authorization_process', 'method' => 'onPreAuthorizationProcess'])->tag('kernel.event_listener', ['event' => 'fos_oauth_server.post_authorization_process', 'method' => 'onPostAuthorizationProcess']);
+    $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class);
 
     $services->set('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.api.security.voter.permission', Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class)->tag('security.voter');
