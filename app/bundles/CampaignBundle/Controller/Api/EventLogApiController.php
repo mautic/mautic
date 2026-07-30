@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @extends FetchCommonApiController<LeadEventLog>
  */
-class EventLogApiController extends FetchCommonApiController
+final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Report>
  */
-class ReportApiController extends CommonApiController
+final class ReportApiController extends CommonApiController
 {
     /**
      * @var ReportModel|null

@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Notification>
  */
-class NotificationApiController extends CommonApiController
+final class NotificationApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

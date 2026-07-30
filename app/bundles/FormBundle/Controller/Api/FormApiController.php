@@ -28,7 +28,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Form>
  */
-class FormApiController extends CommonApiController
+final class FormApiController extends CommonApiController
 {
     /**
      * @var FormModel|null

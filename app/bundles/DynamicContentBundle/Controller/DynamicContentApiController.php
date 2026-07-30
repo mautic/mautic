@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentApiController extends CommonController
+final class DynamicContentApiController extends CommonController
 {
     private PageModel $pageModel;
 

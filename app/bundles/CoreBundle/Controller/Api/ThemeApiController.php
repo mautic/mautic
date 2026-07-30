@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<object>
  */
-class ThemeApiController extends CommonApiController
+final class ThemeApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

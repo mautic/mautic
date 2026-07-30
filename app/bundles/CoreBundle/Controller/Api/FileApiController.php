@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<object>
  */
-class FileApiController extends CommonApiController
+final class FileApiController extends CommonApiController
 {
     /**
      * Holds array of allowed file extensions.

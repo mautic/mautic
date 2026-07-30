@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Point>
  */
-class PointApiController extends CommonApiController
+final class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
