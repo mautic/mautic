@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\DependencyInjection;
 
+use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,6 +36,9 @@ class MauticCoreExtension extends Extension
         // A permission object is picked up by PermissionsPass through this tag, no need to spell it out
         $container->registerForAutoconfiguration(AbstractPermissions::class)
             ->addTag('mautic.permissions');
+
+        $container->registerForAutoconfiguration(\Doctrine\Common\DataFixtures\FixtureInterface::class)
+            ->addTag(FixturesCompilerPass::FIXTURE_TAG);
 
         // For the project:
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));

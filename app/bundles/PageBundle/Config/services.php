@@ -20,9 +20,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class);
+    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class);
+    $services->set(Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class);
     $services->set(Mautic\PageBundle\EventListener\SegmentTrackingSubscriber::class);
     $services->set(Mautic\PageBundle\Helper\TokenHelper::class);
     $services->set(Mautic\PageBundle\Helper\TrackingHelper::class);

@@ -26,17 +26,13 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
-    $services->set(Mautic\FormBundle\Form\Type\FieldType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\Form\Type\SubmitActionEmailType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class)
-        ->call('setFieldModel', [service('mautic.form.model.field')])
-        ->call('setFormModel', [service('mautic.form.model.form')]);
-    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
-    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+
+    $services->set(Mautic\FormBundle\Form\Type\FieldType::class);
+    $services->set(Mautic\FormBundle\Form\Type\SubmitActionEmailType::class);
+    $services->set(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class);
+
+    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class);
+    $services->set(Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class);
     $services->set(Mautic\FormBundle\Collector\ObjectCollector::class);
     $services->set(Mautic\FormBundle\Collector\FieldCollector::class);
     $services->set(Mautic\FormBundle\Collector\MappedObjectCollector::class);

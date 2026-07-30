@@ -147,15 +147,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Security\Permissions\CorePermissions::class, 'mautic.security');
 
     $services->set(Mautic\CoreBundle\EventListener\ExceptionListener::class)
-        ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction')
-        ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException', 'priority' => 253]);
+        ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction');
 
     $services->set(Mautic\CoreBundle\Helper\CookieHelper::class)
         ->arg('$path', param('mautic.cookie_path'))
         ->arg('$domain', param('mautic.cookie_domain'))
         ->arg('$secure', param('mautic.cookie_secure'))
-        ->arg('$httponly', param('mautic.cookie_httponly'))
-        ->tag('kernel.event_subscriber');
+        ->arg('$httponly', param('mautic.cookie_httponly'));
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
         ->args([

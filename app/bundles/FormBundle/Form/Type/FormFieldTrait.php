@@ -4,26 +4,20 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait FormFieldTrait
 {
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected FieldModel $fieldModel;
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected FormModel $formModel;
 
-    public function setFieldModel(FieldModel $fieldModel): void
-    {
+    #[Required]
+    public function autowireFormFieldTrait(
+        FieldModel $fieldModel,
+        FormModel $formModel,
+    ): void {
         $this->fieldModel = $fieldModel;
-    }
-
-    public function setFormModel(FormModel $formModel): void
-    {
         $this->formModel = $formModel;
     }
 

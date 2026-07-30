@@ -26,7 +26,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->set(Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+    $services->set(Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class);
 
     $services->set(Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class);
     $services->set(Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder::class);
