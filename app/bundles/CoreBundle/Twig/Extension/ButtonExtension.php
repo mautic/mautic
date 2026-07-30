@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ButtonExtension extends AbstractExtension
+final class ButtonExtension extends AbstractExtension
 {
     public function __construct(
         protected ButtonHelper $buttonHelper,

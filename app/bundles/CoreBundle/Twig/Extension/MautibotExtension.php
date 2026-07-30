@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Twig\Helper\MautibotHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class MautibotExtension extends AbstractExtension
+final class MautibotExtension extends AbstractExtension
 {
     public function __construct(
         protected MautibotHelper $mautibotHelper,

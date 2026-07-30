@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class LeadExtension extends AbstractExtension
+final class LeadExtension extends AbstractExtension
 {
     public function __construct(
         protected AvatarHelper $avatarHelper,
