@@ -16,7 +16,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\MarketplaceBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->set(Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class)->tag('mautic.permissions');
+    $services->set(Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class);
 
     $services->set(Mautic\MarketplaceBundle\Api\Connection::class)
         ->arg('$httpClient', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.http.client'));
