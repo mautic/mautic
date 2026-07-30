@@ -7,13 +7,15 @@ namespace Utils\Rector\ValueObject;
 final readonly class ServiceDefinition
 {
     /**
-     * @param ServiceArgument[] $serviceArguments
-     * @param ServiceTag[]      $serviceTags
+     * @param ServiceArgument[]   $serviceArguments
+     * @param ServiceTag[]        $serviceTags
+     * @param ServiceMethodCall[] $serviceMethodCalls
      */
     public function __construct(
         private string $className,
         private array $serviceArguments,
         private array $serviceTags,
+        private array $serviceMethodCalls,
     ) {
     }
 
@@ -36,5 +38,13 @@ final readonly class ServiceDefinition
     public function getServiceTags(): array
     {
         return $this->serviceTags;
+    }
+
+    /**
+     * @return ServiceMethodCall[]
+     */
+    public function getServiceMethodCalls(): array
+    {
+        return $this->serviceMethodCalls;
     }
 }

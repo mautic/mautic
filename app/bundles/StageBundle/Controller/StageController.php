@@ -23,7 +23,8 @@ final class StageController extends AbstractFormController
 
     #[Required]
     public function autowireStageController(
-        StageModel $stageModel, \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        StageModel $stageModel,
+        \Mautic\StageBundle\Entity\StageRepository $stageRepository,
     ): void {
         $this->stageModel = $stageModel;
         $this->stageRepository = $stageRepository;

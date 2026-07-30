@@ -20,8 +20,9 @@ final class AssetController extends FormController
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(AuditLogModel $auditLogModel): void
-    {
+    public function autowireAssetController(
+        AuditLogModel $auditLogModel,
+    ): void {
         $this->auditLogModel = $auditLogModel;
     }
 

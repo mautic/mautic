@@ -39,8 +39,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     private DynamicContentRepository $dynamicContentRepository;
 
     #[Required]
-    public function autowireDynamicContentModel(DynamicContentRepository $dynamicContentRepository, StatRepository $statRepository): void
-    {
+    public function autowireDynamicContentModel(
+        DynamicContentRepository $dynamicContentRepository,
+        StatRepository $statRepository,
+    ): void {
         $this->dynamicContentRepository = $dynamicContentRepository;
         $this->statRepository = $statRepository;
     }

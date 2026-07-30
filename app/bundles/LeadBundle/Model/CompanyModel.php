@@ -990,7 +990,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
