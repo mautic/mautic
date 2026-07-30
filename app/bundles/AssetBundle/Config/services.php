@@ -25,7 +25,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias(Mautic\AssetBundle\Controller\UploadController::class, 'oneup_uploader.controller.dropzone.class');
     $services->set('mautic.asset.fixture.asset', Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->alias(Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class, 'mautic.asset.fixture.asset');
     $services->set('mautic.asset.permissions', Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)->tag('mautic.permissions');
