@@ -4,7 +4,7 @@ includes:
 parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
-	# reportUnmatchedIgnoredErrors: false
+	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	parallel:
 		processTimeout: 1000.0
@@ -194,11 +194,6 @@ parameters:
 		-
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
-
-		# the concrete Form is created by the form factory, not autowired
-		-
-			identifier: mautic.preferInterfaceInConstructor
-			path: app/bundles/ApiBundle/Controller/oAuth2/AuthorizeController.php
 
 		# not useful, rather pedantic from phsptan-* extensions
 		-
