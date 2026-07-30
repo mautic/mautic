@@ -859,7 +859,7 @@ final class AjaxController extends CommonAjaxController
         return $this->render(
             '@MauticLead/Field/_field_order.html.twig',
             [
-                'form' => $form->createView(),
+                'form' => $form,
             ]
         );
     }

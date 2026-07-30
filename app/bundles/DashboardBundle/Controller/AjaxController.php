@@ -60,7 +60,7 @@ final class AjaxController extends CommonAjaxController
 
         $form     = $this->createForm(WidgetType::class, $widget);
         $formHtml = $this->render('@MauticDashboard/Widget/form.html.twig',
-            ['form' => $form->submit($data)->createView()]
+            ['form' => $form->submit($data)]
         )->getContent();
 
         $dataArray['formHtml'] = $formHtml;
