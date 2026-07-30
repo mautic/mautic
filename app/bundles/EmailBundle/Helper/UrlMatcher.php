@@ -5,11 +5,11 @@ namespace Mautic\EmailBundle\Helper;
 class UrlMatcher
 {
     /**
-     * @param array<array-key, mixed> $urlsToCheckAgainst
+     * @param array<array-key, string> $urlsToCheckAgainst
      */
-    public static function hasMatch(array $urlsToCheckAgainst, mixed $urlToFind): bool
+    public static function hasMatch(array $urlsToCheckAgainst, string $urlToFind): bool
     {
-        $urlToFind = self::sanitizeUrl((string) $urlToFind);
+        $urlToFind = self::sanitizeUrl($urlToFind);
 
         foreach ($urlsToCheckAgainst as $url) {
             $url = (string) $url;
