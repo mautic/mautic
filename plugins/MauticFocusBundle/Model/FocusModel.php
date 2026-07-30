@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper as LeadTokenHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -145,7 +146,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         $trackingOnly    = $trackingEnabled && !$runtimeEnabled && !$displayEnabled;
         $lead            = $trackingEnabled ? $this->contactTracker->getContact() : null;
         $focusArray      = $focus->toArray();
-        $url             = $trackingEnabled ? '' : ($focusArray['properties']['content']['link_url'] ?? '');
+        $url             = $trackingEnabled ? '' : $this->getAnonymousClickUrl($focusArray['properties']['content']['link_url'] ?? '');
         $trackableUrl    = null;
 
         if ($trackingEnabled && $trackableUrl = $this->generateTrackableUrl($focus, $lead)) {
@@ -197,6 +198,9 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             }
             $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
             $focusContent = $tokenEvent->getContent();
+        } else {
+            $focusContent = $this->replaceContactTokensWithDefaults($focusContent);
+            $data['form'] = $this->replaceContactTokensWithDefaults($data['form']);
         }
 
         $focusContent = str_replace('{focus_form}', $data['form'], $focusContent, $formReplaced);
@@ -469,6 +473,33 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ],
             false,
             $focus->getUtmTags()
+        );
+    }
+
+    private function getAnonymousClickUrl(string $url): string
+    {
+        if (preg_match_all(LeadTokenHelper::REGEX, $url, $matches)) {
+            foreach ($matches[2] as $token) {
+                $default = explode('|', $token)[1] ?? '';
+                if ('' === $default) {
+                    return '#';
+                }
+            }
+        }
+
+        return $this->replaceContactTokensWithDefaults($url);
+    }
+
+    private function replaceContactTokensWithDefaults(string $content): string
+    {
+        return preg_replace_callback(
+            LeadTokenHelper::REGEX,
+            static function (array $matches): string {
+                $default = explode('|', $matches[2])[1] ?? '';
+
+                return $default;
+            },
+            $content
         );
     }
 }

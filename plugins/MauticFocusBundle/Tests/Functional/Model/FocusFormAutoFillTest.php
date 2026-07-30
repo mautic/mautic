@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\HttpFoundation\Request;
 
 final class FocusFormAutoFillTest extends MauticMysqlTestCase
 {
@@ -26,7 +27,7 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $form->setAlias('testformforfocus');
 
         $emailField = new Field();
-        $emailField->setLabel('Email');
+        $emailField->setLabel('{contactfield=firstname|Visitor}');
         $emailField->setType('email');
         $emailField->setAlias('email');
         $emailField->setIsRequired(true);
@@ -64,8 +65,11 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
                 'button_text' => '3498db',
             ],
             'size'    => '600px',
+            'when'    => 'immediately',
+            'frequency' => 'everypage',
             'content' => [
                 'headline' => 'Subscribe to our newsletter',
+                'link_url' => '',
                 'font'     => 'Arial, sans-serif',
             ],
         ]);
@@ -100,5 +104,11 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $anonymousForm    = (string) $anonymousContent['form'];
         $this->assertStringNotContainsString('value="test-autofill@example.com"', $anonymousForm);
         $this->assertStringNotContainsString('mauticform[focusId]', $anonymousForm);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}/display.js");
+        $displayContent = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Visitor', $displayContent);
+        $this->assertStringNotContainsString('contactfield', $displayContent);
     }
 }

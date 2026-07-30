@@ -23,7 +23,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
     #[RunInSeparateProcess]
     public function testGenerateActionWithContactTokenInLinkUrl(): void
     {
-        $linkUrl = 'https://{contactfield=site_url}/tour';
+        $linkUrl = 'https://anonymous.example/{contactfield=firstname|visitor}/tour';
         $focus   = new Focus();
         $focus->setName('Test');
         $focus->setType('link');
@@ -49,18 +49,25 @@ final class PublicControllerTest extends MauticMysqlTestCase
             ],
         ]);
         $this->em->persist($focus);
+
+        $contact = new Lead();
+        $contact->setFirstname('DisplayFocusContact');
+        $this->em->persist($contact);
         $this->em->flush();
         $this->em->clear();
+
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = static::getContainer()->get(ContactTracker::class);
+        $contactTracker->setSystemContact($contact);
 
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/display.js', $focus->getId()));
         $displayContent = (string) $this->client->getResponse()->getContent();
         $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
+        $this->assertStringNotContainsString('DisplayFocusContact', $displayContent);
+        $this->assertStringContainsString('anonymous.example', $displayContent);
+        $this->assertStringContainsString('visitor', $displayContent);
+        $this->assertStringNotContainsString('contactfield', $displayContent);
         $this->assertCount(0, $this->em->getRepository(Redirect::class)->findAll());
-
-        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
-        $trackingContent = (string) $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('activateTracking', $trackingContent);
-        $this->assertCount(1, $this->em->getRepository(Redirect::class)->findAll());
 
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
         $content = $this->client->getResponse()->getContent();
@@ -79,6 +86,28 @@ final class PublicControllerTest extends MauticMysqlTestCase
         }
         $url = $twig->getRuntime(EscaperRuntime::class)->escape($url, 'js');
         $this->assertStringContainsString($url, (string) $content);
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testTrackingActionCreatesTrackedRedirect(): void
+    {
+        $focus = new Focus();
+        $focus->setName('Tracking redirect');
+        $focus->setType('link');
+        $focus->setStyle('modal');
+        $focus->setProperties([
+            'content' => [
+                'link_url' => 'https://example.com/tracking',
+            ],
+        ]);
+        $this->em->persist($focus);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+
+        $this->assertStringContainsString('activateTracking', (string) $this->client->getResponse()->getContent());
+        $this->assertCount(1, $this->em->getRepository(Redirect::class)->findAll());
     }
 
     #[PreserveGlobalState(false)]
