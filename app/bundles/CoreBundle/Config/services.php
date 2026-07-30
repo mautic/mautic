@@ -141,10 +141,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\CoreBundle\Configurator\Configurator::class, 'mautic.configurator');
     $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
     $services->alias('mautic.cipher.openssl', Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
-    $services->set('mautic.security', Mautic\CoreBundle\Security\Permissions\CorePermissions::class)
+
+    $services->set(Mautic\CoreBundle\Security\Permissions\CorePermissions::class)
         ->arg('$bundles', param('mautic.bundles'))
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
-    $services->alias(Mautic\CoreBundle\Security\Permissions\CorePermissions::class, 'mautic.security');
 
     $services->set(Mautic\CoreBundle\EventListener\ExceptionListener::class)
         ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction');
@@ -196,23 +196,11 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\CoreBundle\Helper\ComposerHelper::class)
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
-    $services->get(Mautic\CoreBundle\Update\Step\DeleteCacheStep::class)->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class)->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class)->tag('mautic.update_step');
-
     $services->get(Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class)
-        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
-        ->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class)->tag('mautic.update_step');
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
     $services->get(Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class)
-        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
-        ->tag('mautic.update_step');
-
-    $services->get(Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class)->tag('mautic.update_step');
+        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'));
 
     $services->set(Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class)->tag('mautic.update_check');
 
@@ -224,14 +212,11 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$exceptionFormatter', \Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.monolog.fulltrace.formatter'));
     $services->alias('mautic.monolog.handler', Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class);
 
-    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class)
-        ->tag('container.env_var_processor');
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class);
 
-    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class)
-        ->tag('container.env_var_processor');
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class);
 
-    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class)
-        ->tag('container.env_var_processor');
+    $services->set(Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class);
 
     $services->alias('mautic.helper.token_builder', Mautic\CoreBundle\Helper\BuilderTokenHelper::class);
 

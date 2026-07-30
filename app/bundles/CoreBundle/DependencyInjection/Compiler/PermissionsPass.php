@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -11,7 +12,7 @@ final class PermissionsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $corePermissions = $container->findDefinition('mautic.security');
+        $corePermissions = $container->findDefinition(CorePermissions::class);
 
         foreach ($container->findTaggedServiceIds('mautic.permissions') as $id => $tags) {
             $permissionObject = $container->findDefinition($id);

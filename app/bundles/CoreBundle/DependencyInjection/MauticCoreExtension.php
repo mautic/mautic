@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\DependencyInjection;
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\CoreBundle\Update\Step\StepInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -36,6 +37,10 @@ class MauticCoreExtension extends Extension
         // A permission object is picked up by PermissionsPass through this tag, no need to spell it out
         $container->registerForAutoconfiguration(AbstractPermissions::class)
             ->addTag('mautic.permissions');
+
+        // an update step is collected by its tag, the interface is what makes it one
+        $container->registerForAutoconfiguration(StepInterface::class)
+            ->addTag('mautic.update_step');
 
         $container->registerForAutoconfiguration(\Doctrine\Common\DataFixtures\FixtureInterface::class)
             ->addTag(FixturesCompilerPass::FIXTURE_TAG);

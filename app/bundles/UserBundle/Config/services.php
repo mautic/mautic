@@ -81,8 +81,7 @@ return function (ContainerConfigurator $configurator): void {
 
     // Below are fixes for autowiring of SAML SpBundle.
     $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
-    $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
-        ->tag('controller.service_arguments');
+    $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php');
 
     $services->set(Mautic\UserBundle\EventListener\LogoutListener::class);
 
