@@ -20,8 +20,9 @@ final class PublicController extends AbstractFormController
     private \Mautic\AssetBundle\Entity\AssetRepository $assetRepository;
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\AssetBundle\Entity\AssetRepository $assetRepository): void
-    {
+    public function autowirePublicController(
+        \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
+    ): void {
         $this->assetRepository = $assetRepository;
     }
 

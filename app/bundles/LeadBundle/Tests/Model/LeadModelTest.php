@@ -142,8 +142,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->requestStack             = new RequestStack();
-        $this->requestStack->push(new Request());
+        $this->requestStack             = new RequestStack([new Request()]);
         $this->fieldModelMock                   = $this->createMock(FieldModel::class);
         $this->fieldsWithUniqueIdentifier       = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);

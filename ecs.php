@@ -27,14 +27,15 @@ return ECSConfig::configure()
         Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
-    ->withRules([
-        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
-    ])
+//    ->withRules([
+//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
+//    ])
     ->withPreparedSets(
         comments: true,
         docblocks: true,
         namespaces: true,
         cleanup: true,
         controlStructures: true,
+        standaloneLine: true,
     );
