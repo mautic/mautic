@@ -36,12 +36,20 @@ final class EventLogApiController extends FetchCommonApiController
 
     private const LOG_SERIALIZATION = 30;
 
-    private ?Campaign $campaign = null;
+    /**
+     * @var Campaign
+     */
+    protected $campaign;
 
     /**
      * @var Lead
      */
-    private $contact;
+    protected $contact;
+
+    /**
+     * @var EventLogModel|null
+     */
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -53,11 +61,12 @@ final class EventLogApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected EventLogModel $model,
+        EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
     ) {
+        $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
         $this->entityNameOne            = 'event';
         $this->entityNameMulti          = 'events';
