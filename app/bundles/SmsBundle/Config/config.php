@@ -2,21 +2,6 @@
 
 return [
     'services' => [
-        'helpers' => [
-            'mautic.helper.sms' => [
-                'class'     => Mautic\SmsBundle\Helper\SmsHelper::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.phone_number',
-                    'mautic.sms.model.sms',
-                    'mautic.helper.integration',
-                    'mautic.lead.model.dnc',
-                    'mautic.helper.core_parameters',
-                ],
-                'alias' => 'sms_helper',
-            ],
-        ],
         'other' => [
             'mautic.sms.twilio.transport' => [
                 'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
