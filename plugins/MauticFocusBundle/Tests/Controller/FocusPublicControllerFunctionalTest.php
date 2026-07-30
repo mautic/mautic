@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\Process;
 
 final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -73,6 +74,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('window.MauticFocusItems', $displayContent);
         $this->assertStringContainsString('loadTracking', $displayContent);
         $this->assertStringContainsString('queueTrackingActivation', $displayContent);
+        $this->assertStringContainsString('MauticFocusTrackingQueue', $displayContent);
         $this->assertStringContainsString('DOMContentLoaded', $displayContent);
         $this->assertStringContainsString('initialized', $displayContent);
         $this->assertStringContainsString('delete window.MauticFocusItems', $displayContent);
@@ -109,6 +111,47 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('mautic_focus_', $trackingContent);
         $this->assertStringNotContainsString('createIframe', $trackingContent);
         $this->assertStringNotContainsString('privacysafe.example', $trackingContent);
+    }
+
+    public function testTrackingActivationRuntime(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focus      = $this->createFocus('tracking-runtime');
+        $properties = $focus->getProperties();
+        $properties['when']            = 'leave';
+        $properties['link_activation'] = 0;
+        $focus->setProperties($properties);
+        $focusModel->saveEntity($focus);
+        $id = $focus->getId();
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}/display.js");
+        $displayContent = (string) $this->client->getResponse()->getContent();
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}/tracking.js");
+        $trackingContent = (string) $this->client->getResponse()->getContent();
+
+        $temporaryDirectory = sys_get_temp_dir().'/mautic-focus-'.bin2hex(random_bytes(8));
+        self::assertTrue(mkdir($temporaryDirectory));
+        $displayPath  = $temporaryDirectory.'/display.js';
+        $trackingPath = $temporaryDirectory.'/tracking.js';
+        file_put_contents($displayPath, $displayContent);
+        file_put_contents($trackingPath, $trackingContent);
+
+        try {
+            $process = new Process([
+                'node',
+                __DIR__.'/../Fixtures/focus-tracking-runtime.js',
+                $displayPath,
+                $trackingPath,
+                (string) $id,
+            ]);
+            $process->mustRun();
+            self::assertSame('', $process->getErrorOutput());
+        } finally {
+            unlink($displayPath);
+            unlink($trackingPath);
+            rmdir($temporaryDirectory);
+        }
     }
 
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]

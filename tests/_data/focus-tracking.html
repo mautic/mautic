@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Focus tracking</title>
+    <script>
+        window.focusScriptErrors = [];
+        window.focusNetworkRequests = [];
+
+        function recordFocusRequest(type, url) {
+            window.focusNetworkRequests.push({type: type, url: new URL(url, window.location.href).href});
+        }
+
+        window.addEventListener('error', function (event) {
+            window.focusScriptErrors.push(event.message);
+        });
+        document.addEventListener('error', function (event) {
+            if (event.target && event.target.src) {
+                window.focusScriptErrors.push('Failed to load ' + event.target.src);
+            }
+        }, true);
+
+        var imageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+            configurable: true,
+            get: imageSrc.get,
+            set: function (value) {
+                recordFocusRequest('image', value);
+
+                imageSrc.set.call(this, value);
+            }
+        });
+
+        var parameters = new URLSearchParams(window.location.search);
+        var focusId = parameters.get('focus');
+        var mauticUrl = parameters.get('mautic');
+        if (focusId && mauticUrl) {
+            if (parameters.get('queued') === '1') {
+                window.MauticFocusTrackingQueue = {};
+                window.MauticFocusTrackingQueue[focusId] = true;
+            }
+
+            var display = document.createElement('script');
+            display.async = true;
+            display.src = new URL('/focus/' + focusId + '/display.js', mauticUrl).href;
+            document.head.appendChild(display);
+        }
+    </script>
+</head>
+<body></body>
+</html>
