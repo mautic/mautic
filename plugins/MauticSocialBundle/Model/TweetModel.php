@@ -30,8 +30,10 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     private TweetRepository $tweetRepository;
 
     #[Required]
-    public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
-    {
+    public function autowireTweetModel(
+        TweetRepository $tweetRepository,
+        TweetStatRepository $tweetStatRepository,
+    ): void {
         $this->tweetRepository = $tweetRepository;
         $this->tweetStatRepository = $tweetStatRepository;
     }
