@@ -36,8 +36,12 @@ class OrderResultsDAO
      * @param RemappedObjectDAO[] $remappedObjects
      * @param ObjectChangeDAO[]   $deletedObjects
      */
-    public function __construct(array $newObjectMappings, array $updatedObjectMappings, array $remappedObjects, array $deletedObjects)
-    {
+    public function __construct(
+        array $newObjectMappings,
+        array $updatedObjectMappings,
+        array $remappedObjects,
+        array $deletedObjects,
+    ) {
         $this->groupNewObjectMappingsByObjectName($newObjectMappings);
         $this->groupUpdatedObjectMappingsByObjectName($updatedObjectMappings);
         $this->groupRemappedObjectsByObjectName($remappedObjects);

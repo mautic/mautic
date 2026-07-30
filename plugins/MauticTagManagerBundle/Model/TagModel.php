@@ -17,8 +17,9 @@ class TagModel extends BaseTagModel implements GlobalSearchInterface
     private TagRepository $tagRepository;
 
     #[Required]
-    public function autowirePluginTagModel(TagRepository $tagRepository): void
-    {
+    public function autowirePluginTagModel(
+        TagRepository $tagRepository,
+    ): void {
         $this->tagRepository = $tagRepository;
     }
 
