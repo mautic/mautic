@@ -26,7 +26,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
     $services->set(Mautic\ApiBundle\Helper\EntityResultHelper::class);
 
-    $services->set(Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class);
+    $services->set(Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class);
 
     $services->alias(AuthorizeFormHandler::class, 'fos_oauth_server.authorize.form.handler.default');
 

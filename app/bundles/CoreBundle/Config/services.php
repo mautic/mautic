@@ -161,7 +161,7 @@ return function (ContainerConfigurator $configurator): void {
             service('mautic.cipher.openssl'),
         ]);
 
-    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class);
 
     $services->alias('mautic.filesystem', Mautic\CoreBundle\Helper\Filesystem::class);
 
