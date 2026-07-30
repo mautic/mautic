@@ -27,8 +27,10 @@ final class PluginController extends FormController
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginController(PluginModel $pluginModel, \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository): void
-    {
+    public function autowirePluginController(
+        PluginModel $pluginModel,
+        \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository,
+    ): void {
         $this->pluginModel = $pluginModel;
         $this->pluginRepository = $pluginRepository;
     }

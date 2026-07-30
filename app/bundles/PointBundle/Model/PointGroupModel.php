@@ -27,8 +27,9 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
     private GroupRepository $groupRepository;
 
     #[Required]
-    public function autowirePointGroupModel(GroupRepository $groupRepository): void
-    {
+    public function autowirePointGroupModel(
+        GroupRepository $groupRepository,
+    ): void {
         $this->groupRepository = $groupRepository;
     }
 

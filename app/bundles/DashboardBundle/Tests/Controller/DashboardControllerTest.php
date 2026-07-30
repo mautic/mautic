@@ -63,9 +63,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $requestStack             = new RequestStack();
-
-        $requestStack->push($this->requestMock);
+        $requestStack             = new RequestStack([$this->requestMock]);
 
         $this->controller = new DashboardController(
             $this->createStub(ManagerRegistry::class),
