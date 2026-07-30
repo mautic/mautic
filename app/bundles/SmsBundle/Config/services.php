@@ -28,7 +28,6 @@ return function (ContainerConfigurator $configurator): void {
         ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
 
     $services->alias(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class, 'mautic.sms.twilio.transport');
-    $services->alias('sms_api', 'mautic.sms.twilio.transport');
     $services->alias('mautic.sms.api', 'mautic.sms.twilio.transport');
     $services->set('mautic.helper.sms', Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
     $services->alias(Mautic\SmsBundle\Helper\SmsHelper::class, 'mautic.helper.sms');
@@ -44,6 +43,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.integration.twilio', Mautic\SmsBundle\Integration\TwilioIntegration::class);
 
     $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
-    $services->alias('mautic.sms.repository.stat', Mautic\SmsBundle\Entity\StatRepository::class);
     $services->alias('mautic.sms.callback_handler_container', Mautic\SmsBundle\Callback\HandlerContainer::class);
 };

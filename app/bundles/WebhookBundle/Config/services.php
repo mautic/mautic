@@ -28,5 +28,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\WebhookBundle\Helper\CampaignHelper::class, 'mautic.webhook.campaign.helper');
 
     $services->alias('mautic.webhook.model.webhook', Mautic\WebhookBundle\Model\WebhookModel::class);
-    $services->alias('mautic.webhook.repository.queue', Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
 };

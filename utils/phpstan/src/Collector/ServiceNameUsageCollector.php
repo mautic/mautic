@@ -24,12 +24,13 @@ use PHPStan\Collectors\Collector;
 final class ServiceNameUsageCollector implements Collector
 {
     /**
-     * Service ids are lowercase and dot separated, e.g. "mautic.lead.model.lead",
-     * a "%s" placeholder stands for the part filled in at runtime.
+     * Service ids are dot separated and mostly lowercase, yet a bundle named in camel case brings a camel case
+     * segment along, e.g. "mautic.dynamicContent.model.dynamicContent". A "%s" placeholder stands for the part
+     * filled in at runtime.
      *
      * @var string
      */
-    private const SERVICE_ID_PATTERN = '#^[a-z][a-z0-9_%]*(\.[a-z0-9_%]+)+$#';
+    private const SERVICE_ID_PATTERN = '#^[a-zA-Z][a-zA-Z0-9_%]*(\.[a-zA-Z0-9_%]+)+$#';
 
     public function getNodeType(): string
     {
@@ -56,11 +57,15 @@ final class ServiceNameUsageCollector implements Collector
     /**
      * An interpolated string turns into the very format the id is built by, e.g. "mautic.integration.{$name}"
      * turns into "mautic.integration.%s".
+     *
+     * A plain string is taken as is. The sprintf() format of ModelFactory is skipped on purpose: it would
+     * mark every "mautic.*.model.*" alias used, while ServiceModelKeyUsageCollector resolves the very
+     * model keys asked for.
      */
     private function matchServiceId(Node $node): ?string
     {
         if ($node instanceof String_) {
-            return $node->value;
+            return str_contains($node->value, '%s') ? null : $node->value;
         }
 
         if (!$node instanceof InterpolatedString) {

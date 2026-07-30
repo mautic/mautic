@@ -272,14 +272,10 @@ services:
 		tags:
 			- phpstan.collector
 	-
-		class: Utils\PHPStan\Collector\ServiceClassUsageCollector
+		class: Utils\PHPStan\Collector\ServiceModelKeyUsageCollector
 		tags:
 			- phpstan.collector
 	-
 		class: Utils\PHPStan\Collector\ServiceNameUsageCollector
-		tags:
-			- phpstan.collector
-	-
-		class: Utils\PHPStan\Collector\ServiceTypeUsageCollector
 		tags:
 			- phpstan.collector

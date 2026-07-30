@@ -69,10 +69,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.user.model.role', Mautic\UserBundle\Model\RoleModel::class);
     $services->alias('mautic.user.model.user', Mautic\UserBundle\Model\UserModel::class);
-    $services->alias('mautic.user.repository.user_token', Mautic\UserBundle\Entity\UserTokenRepository::class);
     $services->alias('mautic.user.repository', Mautic\UserBundle\Entity\UserRepository::class);
     $services->alias('mautic.permission.repository', Mautic\UserBundle\Entity\PermissionRepository::class);
-    $services->alias('mautic.user.model.password_strength_estimator', Mautic\UserBundle\Model\PasswordStrengthEstimatorModel::class);
     $services->get(Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
 
     $services->load('Mautic\\UserBundle\\Security\\SAML\Store\\Request\\', '../Security/SAML/Store/Request/*.php');
@@ -111,14 +109,11 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.security.saml.credential_store', Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class)
         ->arg('$entityId', param('mautic.saml_idp_entity_id'))
         ->tag('lightsaml.own_credential_store');
-    $services->alias(Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class, 'mautic.security.saml.credential_store');
     $services->set('mautic.security.saml.trust_store', Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class)
         ->arg('$entityId', param('mautic.saml_idp_entity_id'))
         ->tag('lightsaml.trust_options_store');
-    $services->alias(Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class, 'mautic.security.saml.trust_store');
     $services->set('mautic.security.saml.user_creator', Mautic\UserBundle\Security\SAML\User\UserCreator::class)
         ->arg('$defaultRole', param('mautic.saml_idp_default_role'));
-    $services->alias(Mautic\UserBundle\Security\SAML\User\UserCreator::class, 'mautic.security.saml.user_creator');
 
     $services->set(Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);
     $services->alias('mautic.security.authentication_handler', Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class);

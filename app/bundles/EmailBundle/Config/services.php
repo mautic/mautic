@@ -33,10 +33,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.message.search.contact', Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class);
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
-    $services->alias('mautic.message.processor.unsubscribe', Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
-    $services->alias('mautic.message.processor.feedbackloop', Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class);
 
     $services->set('mautic.validator.email', Mautic\EmailBundle\Helper\EmailValidator::class);
     $services->set('mautic.email.fetcher', Mautic\EmailBundle\MonitoredEmail\Fetcher::class);
@@ -66,17 +64,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
 
     $services->alias('mautic.email.model.email', Mautic\EmailBundle\Model\EmailModel::class);
-    $services->alias('mautic.email.model.send_email_to_user', Mautic\EmailBundle\Model\SendEmailToUser::class);
-    $services->alias('mautic.email.model.send_email_to_contacts', Mautic\EmailBundle\Model\SendEmailToContact::class);
-    $services->alias('mautic.email.model.transport_callback', Mautic\EmailBundle\Model\TransportCallback::class);
-    $services->alias('mautic.email.repository.email', Mautic\EmailBundle\Entity\EmailRepository::class);
-    $services->alias('mautic.email.repository.emailReply', Mautic\EmailBundle\Entity\EmailReplyRepository::class);
-    $services->alias('mautic.email.repository.stat', Mautic\EmailBundle\Entity\StatRepository::class);
     $services->alias('mautic.helper.mailbox', Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
     $services->alias('mautic.helper.mailer', Mautic\EmailBundle\Helper\MailHelper::class);
-    $services->alias('mautic.message.processor.bounce', Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
-    $services->alias('mautic.message.processor.replier', Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
-    $services->alias('mautic.email.helper.stat', Mautic\EmailBundle\Stat\StatHelper::class);
     $services->alias('mautic.email.stats.helper_container', Mautic\EmailBundle\Stats\StatHelperContainer::class);
 
     $services->get(Mautic\EmailBundle\EventListener\WebhookSubscriber::class)

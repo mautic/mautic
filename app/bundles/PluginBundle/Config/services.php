@@ -33,9 +33,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.plugin.facade.reload', Mautic\PluginBundle\Facade\ReloadFacade::class);
     $services->alias(Mautic\PluginBundle\Facade\ReloadFacade::class, 'mautic.plugin.facade.reload');
 
-    $services->alias('mautic.plugin.repository.integration', Mautic\PluginBundle\Entity\IntegrationRepository::class);
     $services->alias('mautic.plugin.model.plugin', Mautic\PluginBundle\Model\PluginModel::class);
-    $services->alias('mautic.plugin.model.integration_entity', Mautic\PluginBundle\Model\IntegrationEntityModel::class);
 
     $services->set(FormSubscriber::class)
         ->call('setIntegrationHelper', [service('mautic.helper.integration')]);

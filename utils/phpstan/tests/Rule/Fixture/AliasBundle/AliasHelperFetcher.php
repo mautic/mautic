@@ -11,13 +11,25 @@ final class AliasHelperFetcher
     ) {
     }
 
-    public function fetchByClassName(): object
-    {
-        return $this->container->get(ClassFetchedAliasHelper::class);
-    }
-
     public function fetchByInterpolatedName(string $name): object
     {
         return $this->container->get("mautic.alias.integration.{$name}");
+    }
+
+    /**
+     * The model key is what a model container id is built of at runtime,
+     * "alias.used_model" stands for "mautic.alias.model.used_model".
+     */
+    public function fetchModelName(): string
+    {
+        return 'alias.used_model';
+    }
+
+    /**
+     * A bundle named in camel case brings a camel case model key along.
+     */
+    public function fetchCamelModelName(): string
+    {
+        return 'camelAlias';
     }
 }
