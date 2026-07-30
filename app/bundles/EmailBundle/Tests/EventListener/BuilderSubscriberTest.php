@@ -33,10 +33,6 @@ final class BuilderSubscriberTest extends TestCase
 
     private BuilderSubscriber $builderSubscriber;
 
-    private MockObject&EmailModel $emailModel;
-
-    private MockObject&TranslatorInterface $translator;
-
     private MockObject&LeadRepository $leadRepository;
 
     protected function setUp(): void
@@ -63,15 +59,25 @@ final class BuilderSubscriberTest extends TestCase
 
     public function testOwnerSignatureIsUsedOnEmailGenerate(): void
     {
+        $lead = new Lead();
+        $lead->setId(7);
+        $lead->setLastname('Boss');
+        $lead->setEmail('lukas.sykora@acquia.com');
+
+        $company = new Company();
+        $company->setName('ACME');
+
         $email = new Email();
         $email->setUseOwnerAsMailer(true);
 
+        $leadArray                = $lead->convertToArray();
+        $leadArray['owner_id']    = 1;
+        $leadArray['companies'][] = ['companyname' => $company->getName(), 'is_primary' => true];
+
         $event = new EmailSendEvent(null, [
-            'email' => $email,
-            'lead'  => [
-                'owner_id' => 1,
-                'email'    => 'contact1@somewhere.com',
-            ],
+            'email'  => $email,
+            'lead'   => $leadArray,
+            'idHash' => 'hash',
         ]);
 
         $this->leadRepository->expects($this->once())
@@ -84,9 +90,11 @@ final class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
+        $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
+
         $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
-            ['unsubscribe_text', null, null],
-            ['webview_text', null, null],
+            ['unsubscribe_text', null, $unsubscribeTokenizedText],
+            ['webview_text', null, 'Just a text'],
             ['default_signature_text', null, 'Default Signature'],
             ['brand_name', null, 'Brand Name'],
             ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -106,18 +114,6 @@ final class BuilderSubscriberTest extends TestCase
                 }
 
                 return sprintf('/email/%s/%s', str_replace('mautic_email_', '', $route), $parameters['idHash']);
-            });
-        $matcher = $this->never();
-
-        $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $unsubscribeTokenizedText): string {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($unsubscribeTokenizedText, $parameters[0]);
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                }
-
-                return $unsubscribeTokenizedText;
             });
 
         $this->builderSubscriber->onEmailGenerate($event);

@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,11 +43,14 @@ final class PublicControllerPreferenceCenterFallbackFunctionalTest extends Mauti
 
         $this->em->flush();
 
+        $urlEmail = $stat->getEmailAddress();
+
         $this->setUpSymfony(array_merge($this->configParams, [
             'email_default_preference_center_id' => $defaultA->getId(),
         ]));
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+        $secretHash = self::getContainer()->get(MailHashHelper::class)->getEmailHash($urlEmail);
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash().'/'.$urlEmail.'/'.$secretHash);
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Default A', $crawler->html());
 
@@ -54,7 +58,8 @@ final class PublicControllerPreferenceCenterFallbackFunctionalTest extends Mauti
             'email_default_preference_center_id' => $defaultB->getId(),
         ]));
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash());
+        $secretHash = self::getContainer()->get(MailHashHelper::class)->getEmailHash($urlEmail);
+        $crawler    = $this->client->request(Request::METHOD_GET, '/email/unsubscribe/'.$stat->getTrackingHash().'/'.$urlEmail.'/'.$secretHash);
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Default B', $crawler->html());
         $this->assertStringNotContainsString('Default A', $crawler->html());

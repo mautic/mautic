@@ -656,12 +656,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    /**
-     * @param string $idHash
-     *
-     * @return ?Stat
-     */
-    public function getEmailStatus($idHash)
+    public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->getStatRepository()->getEmailStatus($idHash);
     }

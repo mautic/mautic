@@ -14,23 +14,32 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 final class EmailAddressMatchesLinkValidatorTest extends TestCase
 {
+    private function createMailHashHelper(string $secret = 'secret'): MailHashHelper
+    {
+        $coreParameters = $this->createMock(CoreParametersHelper::class);
+        $coreParameters->method('get')
+            ->with('secret_key')
+            ->willReturn($secret);
+
+        return new MailHashHelper($coreParameters);
+    }
+
     public function testItSkipsEmptyValue(): void
     {
-        $mailHash = $this->createMock(MailHashHelper::class);
-        $mailHash->expects($this->never())
-            ->method('getEmailHash');
+        $mailHash = $this->createMailHashHelper();
+        $context = $this->createMock(ExecutionContextInterface::class);
+        $context->expects($this->never())
+            ->method('buildViolation');
 
         $validator = new EmailAddressMatchesLinkValidator($mailHash);
+        $validator->initialize($context);
         $validator->validate('', new EmailAddressMatchesLink(['secretHash' => 'hash']));
     }
 
     public function testItAddsViolationWhenHashDoesNotMatch(): void
     {
-        $mailHash = $this->createMock(MailHashHelper::class);
-        $mailHash->expects($this->once())
-            ->method('getEmailHash')
-            ->with('john@doe.com')
-            ->willReturn('different-hash');
+        $mailHash = $this->createMailHashHelper();
+        $expectedHash = MailHashHelper::getEmailHashForSecret('john@doe.com', 'secret');
 
         $context   = $this->createMock(ExecutionContextInterface::class);
         $violation = $this->createMock(ConstraintViolationBuilderInterface::class);
@@ -45,16 +54,13 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
 
         $validator = new EmailAddressMatchesLinkValidator($mailHash);
         $validator->initialize($context);
-        $validator->validate('john@doe.com', new EmailAddressMatchesLink(['secretHash' => 'expected-hash']));
+        $validator->validate('john@doe.com', new EmailAddressMatchesLink(['secretHash' => $expectedHash.'-different']));
     }
 
     public function testItAddsViolationWhenStatEmailDoesNotMatch(): void
     {
-        $mailHash = $this->createMock(MailHashHelper::class);
-        $mailHash->expects($this->once())
-            ->method('getEmailHash')
-            ->with('john@doe.com')
-            ->willReturn('expected-hash');
+        $mailHash = $this->createMailHashHelper();
+        $secretHash = MailHashHelper::getEmailHashForSecret('john@doe.com', 'secret');
 
         $context   = $this->createMock(ExecutionContextInterface::class);
         $violation = $this->createMock(ConstraintViolationBuilderInterface::class);
@@ -72,7 +78,7 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
         $validator->validate(
             'john@doe.com',
             new EmailAddressMatchesLink([
-                'secretHash'       => 'expected-hash',
+                'secretHash'       => $secretHash,
                 'statEmailAddress' => 'jane@doe.com',
             ])
         );
@@ -80,11 +86,8 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
 
     public function testItPassesWhenHashAndStatEmailMatch(): void
     {
-        $mailHash = $this->createMock(MailHashHelper::class);
-        $mailHash->expects($this->once())
-            ->method('getEmailHash')
-            ->with('john@doe.com')
-            ->willReturn('expected-hash');
+        $mailHash = $this->createMailHashHelper();
+        $secretHash = MailHashHelper::getEmailHashForSecret('john@doe.com', 'secret');
 
         $context = $this->createMock(ExecutionContextInterface::class);
         $context->expects($this->never())
@@ -95,7 +98,7 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
         $validator->validate(
             'john@doe.com',
             new EmailAddressMatchesLink([
-                'secretHash'       => 'expected-hash',
+                'secretHash'       => $secretHash,
                 'statEmailAddress' => 'john@doe.com',
             ])
         );
@@ -103,12 +106,7 @@ final class EmailAddressMatchesLinkValidatorTest extends TestCase
 
     public function testItPassesWhenSubmittedEmailDiffersByCaseFromStatEmail(): void
     {
-        $coreParameters = $this->createMock(CoreParametersHelper::class);
-        $coreParameters->method('get')
-            ->with('secret_key')
-            ->willReturn('secret');
-
-        $mailHash = new MailHashHelper($coreParameters);
+        $mailHash = $this->createMailHashHelper();
 
         $statEmail   = 'jan.linhart+Contact2@acquia.com';
         $secretHash  = $mailHash->getEmailHash($statEmail);
