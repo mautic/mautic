@@ -605,7 +605,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      */
     private function matchServiceDefinition(ArrayItem $arrayItem, string $groupName): ?ServiceDefinition
     {
-        if (!$arrayItem->key instanceof String_) {
+        $serviceName = $this->matchServiceName($arrayItem);
+        if (!$serviceName instanceof String_) {
             return null;
         }
 
@@ -679,7 +680,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        $serviceAliases = $this->resolveServiceAliases($definitionArray, $arrayItem->key->value);
+        $serviceAliases = $this->resolveServiceAliases($definitionArray, $serviceName->value);
         if (null === $serviceAliases) {
             return null;
         }
@@ -1041,6 +1042,9 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                 $tagArgumentValue = new UnaryMinus(new Int_($tagArgumentValue->expr->value));
             } elseif ($tagArgumentValue instanceof ConstFetch) {
                 $tagArgumentValue = new ConstFetch(new Name($tagArgumentValue->name->toString()));
+            } elseif ($tagArgumentValue instanceof ClassConstFetch && $tagArgumentValue->class instanceof Name && $tagArgumentValue->name instanceof Identifier) {
+                // an event name and friends, e.g. LogoutEvent::class or Events::POST_SERIALIZE
+                $tagArgumentValue = new ClassConstFetch(new Name($tagArgumentValue->class->toString()), $tagArgumentValue->name->toString());
             } else {
                 return null;
             }
@@ -1049,6 +1053,19 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         }
 
         return new Array_($arrayItems);
+    }
+
+    /**
+     * A service is keyed by its plain name or, when it is named after its very own class, by a class constant,
+     * e.g. FieldAliasKeywordValidator::class => ['class' => FieldAliasKeywordValidator::class, ...].
+     */
+    private function matchServiceName(ArrayItem $arrayItem): ?String_
+    {
+        if ($arrayItem->key instanceof String_) {
+            return $arrayItem->key;
+        }
+
+        return $arrayItem->key instanceof ClassConstFetch ? $this->matchClassName($arrayItem->key) : null;
     }
 
     private function matchClassName(?Node $classValue): ?String_
@@ -1185,7 +1202,41 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return new ConstFetch(new Name($argumentValue->name->toString()));
         }
 
+        if ($argumentValue instanceof Array_) {
+            return $this->createArrayArgumentExpr($argumentValue);
+        }
+
         return null;
+    }
+
+    /**
+     * An array argument is handed over as it is, only its "%mautic.some_config%" values being resolved,
+     * see ServicePass::processArgument(). A plain value is no service reference in there, so it stays a string.
+     */
+    private function createArrayArgumentExpr(Array_ $argumentArray): ?Array_
+    {
+        $arrayItems = [];
+
+        foreach ($argumentArray->items as $argumentArrayItem) {
+            if (null !== $argumentArrayItem->key && !$argumentArrayItem->key instanceof String_) {
+                return null;
+            }
+
+            $itemValue = $argumentArrayItem->value;
+            if (!$itemValue instanceof String_) {
+                return null;
+            }
+
+            $itemValueExpr = str_starts_with($itemValue->value, '%') && str_ends_with($itemValue->value, '%') && strlen($itemValue->value) > 2
+                ? $this->createConfiguratorFuncCall(self::PARAM_FUNCTION_NAME, str_replace('%%', '%', substr($itemValue->value, 1, -1)))
+                : new String_($itemValue->value);
+
+            $itemKey = $argumentArrayItem->key instanceof String_ ? new String_($argumentArrayItem->key->value) : null;
+
+            $arrayItems[] = new ArrayItem($itemValueExpr, $itemKey);
+        }
+
+        return new Array_($arrayItems);
     }
 
     private function createStringArgumentExpr(string $argumentValue): ?Expr
