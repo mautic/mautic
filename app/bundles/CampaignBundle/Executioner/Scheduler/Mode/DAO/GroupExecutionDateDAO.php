@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-class GroupExecutionDateDAO
+final class GroupExecutionDateDAO
 {
     private readonly ArrayCollection $contacts;
 
