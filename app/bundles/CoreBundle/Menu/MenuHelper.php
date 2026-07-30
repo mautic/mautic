@@ -15,10 +15,10 @@ final class MenuHelper
     private array $orphans = [];
 
     public function __construct(
-        private CorePermissions $security,
-        private RequestStack $requestStack,
+        private readonly CorePermissions $security,
+        private readonly RequestStack $requestStack,
         private readonly CoreParametersHelper $coreParametersHelper,
-        private IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 

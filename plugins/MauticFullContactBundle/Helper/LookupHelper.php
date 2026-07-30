@@ -25,11 +25,11 @@ final class LookupHelper
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        private UserHelper $userHelper,
-        private Logger $logger,
-        private Router $router,
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
+        private readonly UserHelper $userHelper,
+        private readonly Logger $logger,
+        private readonly Router $router,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -177,7 +177,7 @@ final class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    private function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

@@ -19,10 +19,7 @@ final class SchemaHelper
 {
     private Connection $db;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private ?EntityManagerInterface $em = null;
 
     /**
      * @var AbstractPlatform

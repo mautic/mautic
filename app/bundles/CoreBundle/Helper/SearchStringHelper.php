@@ -10,27 +10,18 @@ final class SearchStringHelper
 
     public const COMMAND_NEUTRAL = 2;
 
-    /**
-     * @var array
-     */
-    private $needsParsing = [
+    private array $needsParsing = [
         ' ',
         '(',
         ')',
     ];
 
-    /**
-     * @var array
-     */
-    private $needsClosing = [
+    private array $needsClosing = [
         'quote'       => '"',
         'parenthesis' => '(',
     ];
 
-    /**
-     * @var array
-     */
-    private $closingChars = [
+    private array $closingChars = [
         'quote'       => '"',
         'parenthesis' => ')',
     ];

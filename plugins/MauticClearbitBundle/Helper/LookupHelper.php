@@ -23,10 +23,10 @@ final class LookupHelper
 
     public function __construct(
         IntegrationsHelper $integrationsHelper,
-        private UserHelper $userHelper,
-        private LoggerInterface $logger,
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
+        private readonly UserHelper $userHelper,
+        private readonly LoggerInterface $logger,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
     ) {
         try {
             /** @var ClearbitIntegration $integration */
@@ -150,10 +150,7 @@ final class LookupHelper
         return false;
     }
 
-    /**
-     * @param bool $person
-     */
-    private function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
+    private function getClearbit(bool $person = true): false|Clearbit_Person|Clearbit_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
@@ -165,7 +162,7 @@ final class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    private function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

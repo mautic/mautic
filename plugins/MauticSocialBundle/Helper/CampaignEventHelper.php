@@ -13,17 +13,14 @@ use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 final class CampaignEventHelper
 {
-    /**
-     * @var array
-     */
-    private $clickthrough = [];
+    private array $clickthrough = [];
 
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private TrackableModel $trackableModel,
-        private PageTokenHelper $pageTokenHelper,
-        private AssetTokenHelper $assetTokenHelper,
-        private TweetModel $tweetModel,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly TrackableModel $trackableModel,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
+        private readonly TweetModel $tweetModel,
     ) {
     }
 

@@ -21,8 +21,8 @@ final class CampaignHelper
     private array $contactsValues = [];
 
     public function __construct(
-        private Client $client,
-        private CompanyModel $companyModel,
+        private readonly Client $client,
+        private readonly CompanyModel $companyModel,
         private readonly EventDispatcherInterface $dispatcher,
     ) {
     }

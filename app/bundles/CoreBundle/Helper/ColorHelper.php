@@ -7,20 +7,11 @@ namespace Mautic\CoreBundle\Helper;
  */
 final class ColorHelper
 {
-    /**
-     * @var int
-     */
-    private $red = 0;
+    private int|float $red = 0;
 
-    /**
-     * @var int
-     */
-    private $green = 0;
+    private int|float $green = 0;
 
-    /**
-     * @var int
-     */
-    private $blue = 0;
+    private int|float $blue = 0;
 
     /**
      * @param string $hex in format #xxxxxx or #xxx
