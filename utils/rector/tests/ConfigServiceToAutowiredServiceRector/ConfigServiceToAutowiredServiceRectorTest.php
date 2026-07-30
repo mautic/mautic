@@ -725,6 +725,145 @@ CODE_SAMPLE;
         );
     }
 
+    public function testMovesServiceBuiltByServiceFactory(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.user.manager' => [
+                'class'     => Doctrine\ORM\EntityManager::class,
+                'arguments' => Mautic\UserBundle\Entity\User::class,
+                'factory'   => ['@doctrine', 'getManagerForClass'],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $printedFileContent = $this->refactorConfigFile($configFileContent);
+        $this->assertIsString($printedFileContent);
+        $this->assertStringNotContainsString('mautic.user.manager', $printedFileContent);
+
+        $servicesFileContent = $this->readServicesFile();
+
+        // the arguments feed the factory call, so they keep their positions instead of being autowired away
+        $expectedSetStmts = <<<'CODE_SAMPLE'
+    $services->set('mautic.user.manager', Doctrine\ORM\EntityManager::class)
+        ->factory([service('doctrine'), 'getManagerForClass'])
+        ->args([Mautic\UserBundle\Entity\User::class]);
+    $services->alias(Doctrine\ORM\EntityManager::class, 'mautic.user.manager');
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmts, $servicesFileContent);
+
+        $this->assertStringContainsString(
+            'use function Symfony\Component\DependencyInjection\Loader\Configurator\service;',
+            $servicesFileContent
+        );
+    }
+
+    public function testMovesServiceBuiltByClassFactory(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.http_client' => [
+                'class'   => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'factory' => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.http_client', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class)
+        ->factory([Symfony\Component\HttpClient\HttpClient::class, 'create']);
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $this->readServicesFile());
+    }
+
+    public function testMovesServiceBuiltByFactoryNamedInSingleString(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.entity_descriptor' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'factory'   => 'SomeNamespace\SomeDescriptorFactory::build',
+                'arguments' => [
+                    '%mautic.some_secret%',
+                    'router',
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $servicesFileContent = $this->readServicesFile();
+
+        // the "Class::method" string names the very same pair as ['Class', 'method']
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.entity_descriptor', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class)
+        ->factory([SomeNamespace\SomeDescriptorFactory::class, 'build'])
+        ->args([param('mautic.some_secret'), service('router')]);
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $servicesFileContent);
+
+        $expectedImports = <<<'CODE_SAMPLE'
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedImports, $servicesFileContent);
+    }
+
+    public function testSkipServiceBuiltByFactoryFunction(): void
+    {
+        // a plain function name is no ['@service', 'method'] pair, there is no telling what it builds
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.helper' => [
+                'class'   => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'factory' => 'some_factory_function',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertNull($this->refactorConfigFile($configFileContent));
+        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+    }
+
     public function testSkipConfigWithoutServices(): void
     {
         $this->createFile('services.php', self::SERVICES_FILE);
@@ -773,6 +912,134 @@ CODE_SAMPLE;
 CODE_SAMPLE;
 
         $this->assertStringContainsString($expectedSetStmts, $this->readServicesFile());
+    }
+
+    public function testMovesServiceWithServiceAliases(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.sms.twilio.transport' => [
+                'class'        => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ServiceAwareHelper::class,
+                'arguments'    => [
+                    'mautic.sms.twilio.configuration',
+                ],
+                'tag'          => 'mautic.sms_transport',
+                'tagArguments' => [
+                    'integrationAlias' => 'Twilio',
+                ],
+                'serviceAliases' => [
+                    'sms_api',
+                    'mautic.sms.api',
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $printedFileContent = $this->refactorConfigFile($configFileContent);
+        $this->assertIsString($printedFileContent);
+        $this->assertStringNotContainsString('mautic.sms.twilio.transport', $printedFileContent);
+
+        // every "serviceAliases" entry is a service alias of its very own, see ServicePass
+        $expectedSetStmts = <<<'CODE_SAMPLE'
+    $services->set('mautic.sms.twilio.transport', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ServiceAwareHelper::class)
+        ->arg('$someService', service('mautic.sms.twilio.configuration'))
+        ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
+    $services->alias(Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ServiceAwareHelper::class, 'mautic.sms.twilio.transport');
+    $services->alias('sms_api', 'mautic.sms.twilio.transport');
+    $services->alias('mautic.sms.api', 'mautic.sms.twilio.transport');
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmts, $this->readServicesFile());
+    }
+
+    public function testMovesServiceWithSingleServiceAlias(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'helpers' => [
+            'mautic.helper.core_parameters' => [
+                'class'        => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'serviceAlias' => 'mautic.config',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $expectedSetStmts = <<<'CODE_SAMPLE'
+    $services->set('mautic.helper.core_parameters', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class)->tag('twig.helper');
+    $services->alias(Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class, 'mautic.helper.core_parameters');
+    $services->alias('mautic.config', 'mautic.helper.core_parameters');
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmts, $this->readServicesFile());
+    }
+
+    public function testMovesServiceWithServiceAliasPattern(): void
+    {
+        // the alias name is an sprintf() pattern, the service name filling its placeholder
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.helper' => [
+                'class'        => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'serviceAlias' => '%%s.api',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $this->assertStringContainsString(
+            "\$services->alias('mautic.some.helper.api', 'mautic.some.helper');",
+            $this->readServicesFile()
+        );
+    }
+
+    public function testSkipServiceWithParameterLikeServiceAlias(): void
+    {
+        // "%mautic.some_alias%" is no sprintf() placeholder, there is no telling what the alias would be
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.helper' => [
+                'class'        => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'serviceAlias' => '%mautic.some_alias%',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertNull($this->refactorConfigFile($configFileContent));
+        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
     private function createFile(string $fileName, string $fileContent): string

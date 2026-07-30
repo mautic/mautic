@@ -36,6 +36,7 @@ use Rector\Rector\AbstractRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Utils\Rector\ValueObject\ServiceArgument;
 use Utils\Rector\ValueObject\ServiceDefinition;
+use Utils\Rector\ValueObject\ServiceFactory;
 use Utils\Rector\ValueObject\ServiceMethodCall;
 use Utils\Rector\ValueObject\ServiceTag;
 
@@ -67,12 +68,29 @@ use Utils\Rector\ValueObject\ServiceTag;
  *   'mautic.some.validator' => ['class' => SomeValidator::class, 'tag' => 'validator.constraint_validator', 'alias' => 'some_validator']
  *   ->  $services->set(...)->tag('validator.constraint_validator', ['alias' => 'some_validator']);
  *
+ * The "serviceAlias" and "serviceAliases" are the real service aliases, their value an sprintf() pattern
+ * the service name is filled into, see ServicePass::process():
+ *
+ *   'mautic.sms.twilio.transport' => ['class' => TwilioTransport::class, 'serviceAliases' => ['sms_api']]
+ *   ->  $services->alias('sms_api', 'mautic.sms.twilio.transport');
+ *
  * The "methodCalls" become ->call() calls, their arguments following the very same rules as the constructor ones:
  *
  *   'mautic.some.helper' => ['class' => SomeHelper::class, 'methodCalls' => ['setFormModel' => ['mautic.form.model.form']]]
  *   ->  $services->set(...)->call('setFormModel', [service('mautic.form.model.form')]);
  *
- * Definitions with "parent", "factory", ... are left in place,
+ * The "factory" becomes a ->factory() call, its "@service" turning into a service() reference,
+ * a class name into a class constant, see ServicePass::process(). The "arguments" of such a service belong
+ * to the factory call, not to the constructor, so they are kept as they are, in a positional ->args() call:
+ *
+ *   'mautic.user.manager' => [
+ *       'class' => EntityManager::class, 'arguments' => User::class, 'factory' => ['@doctrine', 'getManagerForClass'],
+ *   ]
+ *   ->  $services->set('mautic.user.manager', EntityManager::class)
+ *           ->factory([service('doctrine'), 'getManagerForClass'])
+ *           ->args([User::class]);
+ *
+ * Definitions with "parent", "configurator", ... are left in place,
  * as moving them would silently drop their configuration.
  *
  * Both sides of the move happen in a single run, triggered by config.php alone. The new $services->set() lines
@@ -186,7 +204,14 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             // ServicePass gives every config.php service an alias of its very class name,
             // see Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass
             if ($serviceName !== $serviceDefinition->getClassName()) {
-                $setStmts[] = $this->createServiceAliasStmt($serviceName, $serviceDefinition->getClassName());
+                $setStmts[] = $this->createServiceAliasStmt(
+                    new ClassConstFetch(new Name($serviceDefinition->getClassName()), 'class'),
+                    $serviceName
+                );
+            }
+
+            foreach ($serviceDefinition->getServiceAliases() as $serviceAlias) {
+                $setStmts[] = $this->createServiceAliasStmt(new String_($serviceAlias), $serviceName);
             }
         }
 
@@ -351,13 +376,23 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      */
     private function wrapPrintedStmt(string $printedStmt, string $indentation): string
     {
-        if (!str_contains($printedStmt, '->arg(') && !str_contains($printedStmt, '->call(')) {
+        $wrappedMethodNames = ['->factory(', '->arg(', '->args(', '->call('];
+
+        $isWrapped = false;
+        foreach ($wrappedMethodNames as $wrappedMethodName) {
+            $isWrapped = $isWrapped || str_contains($printedStmt, $wrappedMethodName);
+        }
+
+        if (!$isWrapped) {
             return $printedStmt;
         }
 
+        // the tag joins the wrapping, so the whole call chain reads the same way
+        $wrappedMethodNames[] = '->tag(';
+
         return str_replace(
-            ['->arg(', '->call(', '->tag('],
-            ["\n".$indentation.'    ->arg(', "\n".$indentation.'    ->call(', "\n".$indentation.'    ->tag('],
+            $wrappedMethodNames,
+            array_map(static fn (string $wrappedMethodName): string => "\n".$indentation.'    '.$wrappedMethodName, $wrappedMethodNames),
             $printedStmt
         );
     }
@@ -565,7 +600,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     /**
      * Matches a service definition made of a "class" key and optional "arguments", "tag", "tags", "tagArguments",
-     * "alias" and "methodCalls",
+     * "alias", "methodCalls" and "factory",
      * e.g. ['class' => SomeService::class, 'arguments' => ['translator'], 'tag' => 'security.voter'].
      */
     private function matchServiceDefinition(ArrayItem $arrayItem, string $groupName): ?ServiceDefinition
@@ -588,8 +623,8 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             $definitionKeys[] = $definitionArrayItem->key->value;
         }
 
-        // "parent", "factory", ... would be silently dropped on the way
-        if ([] !== array_diff($definitionKeys, ['class', 'arguments', 'tag', 'tags', 'tagArguments', 'alias', 'methodCalls'])) {
+        // "parent", "configurator", ... would be silently dropped on the way
+        if ([] !== array_diff($definitionKeys, ['class', 'arguments', 'tag', 'tags', 'tagArguments', 'alias', 'methodCalls', 'serviceAlias', 'serviceAliases', 'factory'])) {
             return null;
         }
 
@@ -599,10 +634,24 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        // the moved service is autowired, whatever autowiring cannot fill becomes an explicit ->arg() call
-        $serviceArguments = $this->resolveServiceArguments($className->value, $this->matchArrayValueByKey($definitionArray, 'arguments'));
-        if (null === $serviceArguments) {
-            return null;
+        $argumentsValue = $this->matchArrayValueByKey($definitionArray, 'arguments');
+        $factoryValue   = $this->matchArrayValueByKey($definitionArray, 'factory');
+
+        $serviceFactory   = null;
+        $serviceArguments = [];
+
+        if (null === $factoryValue) {
+            // the moved service is autowired, whatever autowiring cannot fill becomes an explicit ->arg() call
+            $serviceArguments = $this->resolveServiceArguments($className->value, $argumentsValue);
+            if (null === $serviceArguments) {
+                return null;
+            }
+        } else {
+            // the arguments feed the factory call, so there is no constructor to pair them with
+            $serviceFactory = $this->createServiceFactory($factoryValue, $argumentsValue);
+            if (!$serviceFactory instanceof ServiceFactory) {
+                return null;
+            }
         }
 
         $serviceTags = $this->matchServiceTags($definitionArray, $groupName);
@@ -630,7 +679,175 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags, $serviceMethodCalls);
+        $serviceAliases = $this->resolveServiceAliases($definitionArray, $arrayItem->key->value);
+        if (null === $serviceAliases) {
+            return null;
+        }
+
+        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags, $serviceMethodCalls, $serviceAliases, $serviceFactory);
+    }
+
+    /**
+     * The "factory" names the callable building the service, its "arguments" the ones it is called with,
+     * see ServicePass::process(). A factory is spelled out as a ['@some.service', 'someMethod'] pair,
+     * as a [SomeClass::class, 'someMethod'] one, or as the very same pair joined by "::" into a single string.
+     *
+     * @return ServiceFactory|null null when the factory cannot be re-created
+     */
+    private function createServiceFactory(Node $factoryValue, ?Node $argumentsValue): ?ServiceFactory
+    {
+        $factoryExpr = $this->createFactoryExpr($factoryValue);
+        if (!$factoryExpr instanceof Expr) {
+            return null;
+        }
+
+        $factoryArguments = $this->createFactoryArguments($argumentsValue);
+        if (!$factoryArguments instanceof Array_) {
+            return null;
+        }
+
+        return new ServiceFactory($factoryExpr, $factoryArguments);
+    }
+
+    private function createFactoryExpr(Node $factoryValue): ?Expr
+    {
+        // "@some.service::someMethod" and "SomeClass::someMethod" name the very same pair in a single string
+        if ($factoryValue instanceof String_) {
+            if (!str_contains($factoryValue->value, '::')) {
+                return null;
+            }
+
+            [$targetValue, $methodName] = explode('::', $factoryValue->value, 2);
+
+            return $this->createFactoryPairExpr(new String_($targetValue), new String_($methodName));
+        }
+
+        if (!$factoryValue instanceof Array_ || 2 !== count($factoryValue->items)) {
+            return null;
+        }
+
+        [$targetArrayItem, $methodArrayItem] = $factoryValue->items;
+
+        if (null !== $targetArrayItem->key || null !== $methodArrayItem->key) {
+            return null;
+        }
+
+        if (!$methodArrayItem->value instanceof String_) {
+            return null;
+        }
+
+        return $this->createFactoryPairExpr($targetArrayItem->value, new String_($methodArrayItem->value->value));
+    }
+
+    /**
+     * The factory target is a service, referenced by a leading "@", or a class the method is called on.
+     */
+    private function createFactoryPairExpr(Node $targetValue, String_ $methodName): ?Expr
+    {
+        if ($targetValue instanceof String_ && str_starts_with($targetValue->value, '@')) {
+            $targetExpr = $this->createConfiguratorFuncCall(self::SERVICE_FUNCTION_NAME, substr($targetValue->value, 1));
+        } else {
+            $className = $this->matchClassName($targetValue);
+            if (!$className instanceof String_) {
+                return null;
+            }
+
+            $targetExpr = new ClassConstFetch(new Name($className->value), 'class');
+        }
+
+        return new Array_([new ArrayItem($targetExpr), new ArrayItem($methodName)]);
+    }
+
+    /**
+     * The factory arguments keep their positions, as there is no constructor parameter to name them after.
+     *
+     * @return Array_|null null when an argument cannot be re-created
+     */
+    private function createFactoryArguments(?Node $argumentsValue): ?Array_
+    {
+        $argumentValues = $this->resolveArgumentValues($argumentsValue);
+        if (null === $argumentValues) {
+            return null;
+        }
+
+        $arrayItems = [];
+
+        foreach ($argumentValues as $argumentValue) {
+            $argumentExpr = $this->createArgumentExpr($argumentValue);
+            if (!$argumentExpr instanceof Expr) {
+                return null;
+            }
+
+            $arrayItems[] = new ArrayItem($argumentExpr);
+        }
+
+        return new Array_($arrayItems);
+    }
+
+    /**
+     * The "serviceAlias" and its plural "serviceAliases" name the aliases the service is reachable by,
+     * "serviceAliases" only being looked at when there is no "serviceAlias", see ServicePass::process().
+     *
+     * @return string[]|null null when an alias name cannot be resolved
+     */
+    private function resolveServiceAliases(Array_ $definitionArray, string $serviceName): ?array
+    {
+        $serviceAliasValue = $this->matchArrayValueByKey($definitionArray, 'serviceAlias');
+        if (null !== $serviceAliasValue) {
+            if (!$serviceAliasValue instanceof String_) {
+                return null;
+            }
+
+            $aliasName = $this->createAliasName($serviceAliasValue->value, $serviceName);
+
+            return null === $aliasName ? null : [$aliasName];
+        }
+
+        $serviceAliasesValue = $this->matchArrayValueByKey($definitionArray, 'serviceAliases');
+        if (null === $serviceAliasesValue) {
+            return [];
+        }
+
+        if (!$serviceAliasesValue instanceof Array_) {
+            return null;
+        }
+
+        $aliasNames = [];
+
+        foreach ($serviceAliasesValue->items as $serviceAliasArrayItem) {
+            if (null !== $serviceAliasArrayItem->key || !$serviceAliasArrayItem->value instanceof String_) {
+                return null;
+            }
+
+            $aliasName = $this->createAliasName($serviceAliasArrayItem->value->value, $serviceName);
+            if (null === $aliasName) {
+                return null;
+            }
+
+            $aliasNames[] = $aliasName;
+        }
+
+        return $aliasNames;
+    }
+
+    /**
+     * The alias name is an sprintf() pattern the service name is filled into, e.g. "%s.api",
+     * its escaped placeholders fixed up first, see ServicePass::process().
+     */
+    private function createAliasName(string $aliasPattern, string $serviceName): ?string
+    {
+        $aliasPattern = str_replace('%%', '%', $aliasPattern);
+
+        if (!str_contains($aliasPattern, '%')) {
+            return $aliasPattern;
+        }
+
+        // "%mautic.some_parameter%" and friends are no placeholder sprintf() could fill
+        if (1 !== substr_count($aliasPattern, '%') || !str_contains($aliasPattern, '%s')) {
+            return null;
+        }
+
+        return sprintf($aliasPattern, $serviceName);
     }
 
     /**
@@ -1056,6 +1273,15 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             new Arg(new ClassConstFetch(new Name($serviceDefinition->getClassName()), 'class')),
         ]);
 
+        $serviceFactory = $serviceDefinition->getServiceFactory();
+        if ($serviceFactory instanceof ServiceFactory) {
+            $methodCall = new MethodCall($methodCall, 'factory', [new Arg($serviceFactory->getValue())]);
+
+            if ($serviceFactory->hasArguments()) {
+                $methodCall = new MethodCall($methodCall, 'args', [new Arg($serviceFactory->getArguments())]);
+            }
+        }
+
         foreach ($serviceDefinition->getServiceArguments() as $serviceArgument) {
             $methodCall = new MethodCall($methodCall, 'arg', [
                 new Arg(new String_($serviceArgument->getName())),
@@ -1083,10 +1309,10 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
         return new Expression($methodCall);
     }
 
-    private function createServiceAliasStmt(string $serviceName, string $className): Expression
+    private function createServiceAliasStmt(Expr $aliasName, string $serviceName): Expression
     {
         $methodCall = new MethodCall(new Variable(self::SERVICES_VARIABLE_NAME), 'alias', [
-            new Arg(new ClassConstFetch(new Name($className), 'class')),
+            new Arg($aliasName),
             new Arg(new String_($serviceName)),
         ]);
 
