@@ -252,6 +252,7 @@ rules:
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
+	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
 
 #services:
 #	-

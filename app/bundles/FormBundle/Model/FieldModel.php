@@ -2,49 +2,46 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<Field>
  */
 class FieldModel extends CommonFormModel
 {
-    public function __construct(
-        protected LeadFieldModel $leadFieldModel,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly RequestStack $requestStack,
-        private readonly ColumnSchemaHelper $columnSchemaHelper,
-        private readonly FieldRepository $fieldRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected LeadFieldModel $leadFieldModel;
+
+    private RequestStack $requestStack;
+
+    private ColumnSchemaHelper $columnSchemaHelper;
+
+    private FieldRepository $fieldRepository;
+
+    #[Required]
+    public function autowireFieldModel(
+        LeadFieldModel $leadFieldModel,
+        RequestStack $requestStack,
+        ColumnSchemaHelper $columnSchemaHelper,
+        FieldRepository $fieldRepository,
+    ): void {
+        $this->leadFieldModel     = $leadFieldModel;
+        $this->requestStack       = $requestStack;
+        $this->columnSchemaHelper = $columnSchemaHelper;
+        $this->fieldRepository    = $fieldRepository;
     }
 
     private function getSession(): SessionInterface

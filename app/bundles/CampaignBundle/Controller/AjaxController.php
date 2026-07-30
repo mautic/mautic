@@ -2,27 +2,20 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
 {
+<<<<<<< HEAD
     public function __construct(
         private readonly DateHelper $dateHelper,
         private readonly EventLogModel $eventLogModel,
@@ -39,6 +32,27 @@ final class AjaxController extends CommonAjaxController
         private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+=======
+    private DateHelper $dateHelper;
+
+    private EventLogModel $eventLogModel;
+
+    private LeadModel $leadModel;
+
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
+
+    #[Required]
+    public function autowireCampaignAjaxController(
+        DateHelper $dateHelper,
+        EventLogModel $eventLogModel,
+        LeadModel $leadModel,
+        \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->dateHelper             = $dateHelper;
+        $this->eventLogModel          = $eventLogModel;
+        $this->leadModel              = $leadModel;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+>>>>>>> e346b540a8 ([phpstan] add rule to avoid ctor forwarding)
     }
 
     public function updateConnectionsAction(Request $request): JsonResponse
