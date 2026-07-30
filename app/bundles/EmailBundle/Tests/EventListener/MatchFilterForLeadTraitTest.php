@@ -684,7 +684,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     }
 }
 
-class MatchFilterForLeadTraitTestable
+final class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 

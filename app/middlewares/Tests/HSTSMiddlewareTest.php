@@ -11,7 +11,7 @@ use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HSTSMiddlewareTest extends AbstractMauticTestCase
+final class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
     public const HSTS_KEY = 'strict-transport-security';
 

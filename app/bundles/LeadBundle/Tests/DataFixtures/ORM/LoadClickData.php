@@ -12,7 +12,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
 
-class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly ListModel $listModel,

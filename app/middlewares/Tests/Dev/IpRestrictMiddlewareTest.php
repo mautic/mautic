@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
+final class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
 {
     private mixed $originalDdevTldValue;
 
