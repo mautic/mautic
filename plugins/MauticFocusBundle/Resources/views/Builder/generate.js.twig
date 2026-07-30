@@ -12,7 +12,7 @@
 {%- if trackingOnly -%}
 (function (window) {
     var item = window.MauticFocusItems && window.MauticFocusItems[{{ focus.id }}];
-    if (!item || !item.runtimeReady || typeof item.activateTracking !== 'function') {
+    if (!item || typeof item.activateTracking !== 'function') {
         return;
     }
 
@@ -43,22 +43,34 @@
         }
     };
 
-    item.activateTracking({
-        install: installTrackingHandlers,
-        hooks: {
-            onEngage: function () {
-                installTrackingHandlers();
-                if (item.trackingViewSent) {
-                    return;
-                }
+    var activate = function () {
+        item.activateTracking({
+            install: installTrackingHandlers,
+            hooks: {
+                onEngage: function () {
+                    installTrackingHandlers();
+                    if (item.trackingViewSent) {
+                        return;
+                    }
 
-                item.trackingViewSent = true;
-                item.trackingPixel = new window.Image();
-                item.trackingPixel.src = '{{ trackingPixelUrl|e('js') }}';
-            },
-            onConvert: installTrackingHandlers
+                    item.trackingViewSent = true;
+                    item.trackingPixel = new window.Image();
+                    item.trackingPixel.src = '{{ trackingPixelUrl|e('js') }}';
+                },
+                onConvert: installTrackingHandlers
+            }
+        });
+    };
+
+    if (!item.runtimeReady) {
+        if (typeof item.queueTrackingActivation === 'function') {
+            item.queueTrackingActivation(activate);
         }
-    });
+
+        return;
+    }
+
+    activate();
 })(window);
 {%- else -%}
 {%- set style = focus.style -%}
@@ -119,8 +131,10 @@
             initialized: false,
             runtimeReady: false,
             trackingLoading: false,
+            trackingRequested: false,
             trackingEnabled: {% if trackingEnabled %}true{% else %}false{% endif %},
             trackingScript: null,
+            pendingTrackingActivation: null,
             trackingHooks: {
                 onEngage: function () {},
                 onConvert: function () {}
@@ -131,12 +145,18 @@
                     return Focus.trackingScript;
                 }
 
+                Focus.trackingRequested = true;
+                if (!Focus.runtimeReady) {
+                    return null;
+                }
+
                 Focus.trackingLoading = true;
                 Focus.trackingScript = document.createElement('script');
                 Focus.trackingScript.async = true;
                 Focus.trackingScript.src = '{{ trackingUrl|e('js') }}';
                 Focus.trackingScript.onerror = function () {
                     Focus.trackingLoading = false;
+                    Focus.trackingRequested = false;
                     if (Focus.trackingScript.parentNode) {
                         Focus.trackingScript.parentNode.removeChild(Focus.trackingScript);
                     }
@@ -158,7 +178,19 @@
                 config.install();
                 Focus.trackingHooks = config.hooks;
                 Focus.trackingLoading = false;
+                Focus.trackingRequested = false;
                 Focus.trackingEnabled = true;
+
+                return true;
+            },
+
+            queueTrackingActivation: function (activate) {
+                if (Focus.trackingEnabled || Focus.pendingTrackingActivation) {
+                    return false;
+                }
+
+                Focus.trackingRequested = true;
+                Focus.pendingTrackingActivation = activate;
 
                 return true;
             },
@@ -187,17 +219,21 @@
 
                 try {
                     Focus.insertStyleIntoHead();
+                    Focus.runtimeReady = true;
+                    if (Focus.pendingTrackingActivation) {
+                        var activateTracking = Focus.pendingTrackingActivation;
+                        Focus.pendingTrackingActivation = null;
+                        activateTracking();
+                    }
+                    if (Focus.trackingRequested && !Focus.trackingEnabled) {
+                        Focus.loadTracking();
+                    }
                     Focus.registerFocusEvent();
 
                     // Add class to body
                     Focus.addClass(document.body, 'MauticFocus{{ style|capitalize }}');
 
-                    Focus.runtimeReady = true;
                     Focus.initialized = true;
-                    if (window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[{{ focus.id }}]) {
-                        window.MauticFocusTrackingQueue[{{ focus.id }}] = false;
-                        Focus.loadTracking();
-                    }
                 } catch (error) {
                     Focus.runtimeReady = false;
                     delete window.MauticFocusItems[{{ focus.id }}];

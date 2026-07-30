@@ -71,13 +71,18 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString("mf-bar-collapser-{$id}", $displayContent);
         $this->assertStringContainsString('privacysafe.example', $displayContent);
         $this->assertStringContainsString('window.MauticFocusItems', $displayContent);
-        $this->assertStringContainsString('window.MauticFocusTrackingQueue', $displayContent);
         $this->assertStringContainsString('loadTracking', $displayContent);
+        $this->assertStringContainsString('queueTrackingActivation', $displayContent);
         $this->assertStringContainsString('DOMContentLoaded', $displayContent);
         $this->assertStringContainsString('initialized', $displayContent);
         $this->assertStringContainsString('delete window.MauticFocusItems', $displayContent);
         $this->assertMatchesRegularExpression('/trackingLoading:(?:false|!1)/', $displayContent);
+        $this->assertMatchesRegularExpression('/trackingRequested:(?:false|!1)/', $displayContent);
         $this->assertMatchesRegularExpression('/trackingEnabled:(?:false|!1)/', $displayContent);
+        $this->assertStringContainsString('if(!Focus.runtimeReady){return null}', $displayContent);
+        $this->assertStringContainsString('if(Focus.pendingTrackingActivation)', $displayContent);
+        $this->assertStringContainsString('if(Focus.trackingRequested&&!Focus.trackingEnabled){Focus.loadTracking()}', $displayContent);
+        $this->assertMatchesRegularExpression('/activateTracking\(\).*Focus\.registerFocusEvent\(\)/s', $displayContent);
         $this->assertStringContainsString('tracking.js', $displayContent);
         $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
         $this->assertStringNotContainsString('mauticform[focusId]', $displayContent);
@@ -97,6 +102,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('window.MauticFocusItems', $trackingContent);
         $this->assertStringContainsString('runtimeReady', $trackingContent);
         $this->assertStringContainsString('activateTracking', $trackingContent);
+        $this->assertStringContainsString('queueTrackingActivation', $trackingContent);
         $this->assertStringContainsString('mauticform[focusId]', $trackingContent);
         $this->assertStringContainsString('.mauticform_wrapper > form[data-mautic-form]', $trackingContent);
         $this->assertStringContainsString('viewpixel.gif', $trackingContent);
