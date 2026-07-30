@@ -442,7 +442,7 @@ CODE_SAMPLE;
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
-    public function testSkipServiceWithoutArgumentToWireBy(): void
+    public function testMovesServiceWithoutArgumentToWireByAsNotAutowired(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
@@ -460,8 +460,16 @@ CODE_SAMPLE;
 
         $this->createFile('services.php', self::SERVICES_FILE);
 
-        $this->assertNull($this->refactorConfigFile($configFileContent));
-        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // there is nothing to fill the constructor with, so the service is registered the way ServicePass does it:
+        // with no arguments and no autowiring to trip over them
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.parameter_aware_helper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ParameterAwareHelper::class)
+        ->autowire(false);
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $this->readServicesFile());
     }
 
     public function testSkipServiceWithUnknownClass(): void
@@ -862,6 +870,106 @@ CODE_SAMPLE;
 
         $this->assertNull($this->refactorConfigFile($configFileContent));
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+    }
+
+    public function testMovesServiceWithClassConstantTagArgument(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.logout_handler' => [
+                'class'        => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'tag'          => 'kernel.event_listener',
+                'tagArguments' => [
+                    'event' => Symfony\Component\Security\Http\Event\LogoutEvent::class,
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // an event name is spelled out by a class constant, not by a plain string
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.logout_handler', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('kernel.event_listener', ['event' => Symfony\Component\Security\Http\Event\LogoutEvent::class]);",
+            $this->readServicesFile()
+        );
+    }
+
+    public function testMovesServiceNamedByClassConstant(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'tag'   => 'validator.constraint_validator',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $printedFileContent = $this->refactorConfigFile($configFileContent);
+        $this->assertIsString($printedFileContent);
+        $this->assertStringNotContainsString('validator.constraint_validator', $printedFileContent);
+
+        $servicesFileContent = $this->readServicesFile();
+
+        // the service is its own class, so it needs neither a name of its own nor a class alias
+        $this->assertStringContainsString(
+            '$services->set('.self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('validator.constraint_validator');",
+            $servicesFileContent
+        );
+
+        $this->assertStringNotContainsString('$services->alias('.self::AUTOWIRABLE_HELPER_CLASS, $servicesFileContent);
+    }
+
+    public function testMovesServiceWithArrayConstructorArgument(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.username_mapper' => [
+                'class'     => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ArrayAwareHelper::class,
+                'arguments' => [
+                    [
+                        'email'    => '%mautic.some_email_attribute%',
+                        'username' => 'plain_value',
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // an array argument is handed over as it is, only its parameters being resolved
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.username_mapper', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\ArrayAwareHelper::class)
+        ->arg('$attributes', ['email' => param('mautic.some_email_attribute'), 'username' => 'plain_value']);
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $this->readServicesFile());
     }
 
     public function testSkipConfigWithoutServices(): void

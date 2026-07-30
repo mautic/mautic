@@ -307,7 +307,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
                     continue;
                 }
 
-                $serviceName = $serviceArrayItem->key;
+                $serviceName = $this->matchServiceName($serviceArrayItem);
                 if (!$serviceName instanceof String_) {
                     continue;
                 }
@@ -376,7 +376,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
      */
     private function wrapPrintedStmt(string $printedStmt, string $indentation): string
     {
-        $wrappedMethodNames = ['->factory(', '->arg(', '->args(', '->call('];
+        $wrappedMethodNames = ['->autowire(', '->factory(', '->arg(', '->args(', '->call('];
 
         $isWrapped = false;
         foreach ($wrappedMethodNames as $wrappedMethodName) {
@@ -588,11 +588,17 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             }
 
             $firstArg = $setMethodCall->getArgs()[0] ?? null;
-            if (!$firstArg instanceof Arg || !$firstArg->value instanceof String_) {
+            if (!$firstArg instanceof Arg) {
                 continue;
             }
 
-            $serviceNames[] = $firstArg->value->value;
+            // a set(SomeService::class) call names the service by its class
+            $serviceName = $this->matchClassName($firstArg->value);
+            if (!$serviceName instanceof String_) {
+                continue;
+            }
+
+            $serviceNames[] = $serviceName->value;
         }
 
         return $serviceNames;
@@ -640,12 +646,20 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
         $serviceFactory   = null;
         $serviceArguments = [];
+        $isAutowired      = true;
 
         if (null === $factoryValue) {
             // the moved service is autowired, whatever autowiring cannot fill becomes an explicit ->arg() call
             $serviceArguments = $this->resolveServiceArguments($className->value, $argumentsValue);
             if (null === $serviceArguments) {
-                return null;
+                // a definition of no arguments at all is the one ServicePass builds here too, so autowiring
+                // has to be turned off - it would only trip over the very constructor nothing can fill
+                if (null !== $argumentsValue || !$this->reflectionProvider->hasClass($className->value)) {
+                    return null;
+                }
+
+                $serviceArguments = [];
+                $isAutowired      = false;
             }
         } else {
             // the arguments feed the factory call, so there is no constructor to pair them with
@@ -685,7 +699,7 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
             return null;
         }
 
-        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags, $serviceMethodCalls, $serviceAliases, $serviceFactory);
+        return new ServiceDefinition($className->value, $serviceArguments, $serviceTags, $serviceMethodCalls, $serviceAliases, $serviceFactory, $isAutowired);
     }
 
     /**
@@ -1319,10 +1333,18 @@ final class ConfigServiceToAutowiredServiceRector extends AbstractRector
 
     private function createServiceSetStmt(string $serviceName, ServiceDefinition $serviceDefinition): Expression
     {
-        $methodCall = new MethodCall(new Variable(self::SERVICES_VARIABLE_NAME), 'set', [
-            new Arg(new String_($serviceName)),
-            new Arg(new ClassConstFetch(new Name($serviceDefinition->getClassName()), 'class')),
-        ]);
+        $classConstFetch = new ClassConstFetch(new Name($serviceDefinition->getClassName()), 'class');
+
+        // a service named after its very own class needs no name of its own, set() takes the class for both
+        $setArgs = $serviceName === $serviceDefinition->getClassName()
+            ? [new Arg($classConstFetch)]
+            : [new Arg(new String_($serviceName)), new Arg($classConstFetch)];
+
+        $methodCall = new MethodCall(new Variable(self::SERVICES_VARIABLE_NAME), 'set', $setArgs);
+
+        if (!$serviceDefinition->isAutowired()) {
+            $methodCall = new MethodCall($methodCall, 'autowire', [new Arg(new ConstFetch(new Name('false')))]);
+        }
 
         $serviceFactory = $serviceDefinition->getServiceFactory();
         if ($serviceFactory instanceof ServiceFactory) {

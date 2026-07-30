@@ -19,7 +19,17 @@ final readonly class ServiceDefinition
         private array $serviceMethodCalls,
         private array $serviceAliases,
         private ?ServiceFactory $serviceFactory,
+        private bool $isAutowired,
     ) {
+    }
+
+    /**
+     * A service whose constructor autowiring cannot fill is registered the way ServicePass registers it:
+     * with no arguments and no autowiring.
+     */
+    public function isAutowired(): bool
+    {
+        return $this->isAutowired;
     }
 
     public function getClassName(): string

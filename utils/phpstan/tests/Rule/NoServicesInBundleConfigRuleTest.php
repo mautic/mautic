@@ -28,5 +28,8 @@ final class NoServicesInBundleConfigRuleTest extends RuleTestCase
         ]);
 
         $this->analyse([__DIR__.'/Fixture/BundleWithoutServices/config.php'], []);
+
+        // a menu is no service of its own, ServicePass builds it out of the KnpMenu builder
+        $this->analyse([__DIR__.'/Fixture/BundleWithMenus/config.php'], []);
     }
 }

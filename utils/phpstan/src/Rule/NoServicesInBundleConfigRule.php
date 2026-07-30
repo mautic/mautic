@@ -15,6 +15,9 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
  *
+ * The "menus" group is left alone - a menu is no service of its own, ServicePass builds it out of the KnpMenu builder
+ * and gives it a renderer of its own, see Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass.
+ *
  * @implements Rule<Return_>
  */
 final class NoServicesInBundleConfigRule implements Rule
@@ -28,6 +31,11 @@ final class NoServicesInBundleConfigRule implements Rule
      * @var string
      */
     private const SERVICES_KEY_NAME = 'services';
+
+    /**
+     * @var string
+     */
+    private const MENUS_KEY_NAME = 'menus';
 
     public function getNodeType(): string
     {
@@ -58,6 +66,10 @@ final class NoServicesInBundleConfigRule implements Rule
                 continue;
             }
 
+            if ($this->hasMenusOnly($arrayItem->value)) {
+                return [];
+            }
+
             $ruleError = RuleErrorBuilder::message(sprintf(
                 'Config file must not define the "%s" key. Register the services in the autowired Config/services.php instead.',
                 self::SERVICES_KEY_NAME
@@ -70,5 +82,23 @@ final class NoServicesInBundleConfigRule implements Rule
         }
 
         return [];
+    }
+
+    /**
+     * A "services" key made of the "menus" group alone defines no service at all.
+     */
+    private function hasMenusOnly(Node $servicesValue): bool
+    {
+        if (!$servicesValue instanceof Array_ || [] === $servicesValue->items) {
+            return false;
+        }
+
+        foreach ($servicesValue->items as $groupArrayItem) {
+            if (!$groupArrayItem->key instanceof String_ || self::MENUS_KEY_NAME !== $groupArrayItem->key->value) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
