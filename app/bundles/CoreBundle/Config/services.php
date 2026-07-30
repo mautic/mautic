@@ -168,9 +168,11 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$bundles', param('mautic.bundles'))
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
     $services->alias(Mautic\CoreBundle\Security\Permissions\CorePermissions::class, 'mautic.security');
+
     $services->set('mautic.exception.listener', Mautic\CoreBundle\EventListener\ExceptionListener::class)
         ->arg('$controller', 'Mautic\CoreBundle\Controller\ExceptionController::showAction')
         ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException', 'priority' => 253]);
+
     $services->alias(Mautic\CoreBundle\EventListener\ExceptionListener::class, 'mautic.exception.listener');
     $services->set('mautic.helper.cookie', Mautic\CoreBundle\Helper\CookieHelper::class)
         ->arg('$path', param('mautic.cookie_path'))
