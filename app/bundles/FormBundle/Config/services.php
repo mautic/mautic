@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -24,6 +26,18 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.form.type.field', Mautic\FormBundle\Form\Type\FieldType::class)
+        ->call('setFieldModel', [service('mautic.form.model.field')])
+        ->call('setFormModel', [service('mautic.form.model.form')]);
+    $services->alias(Mautic\FormBundle\Form\Type\FieldType::class, 'mautic.form.type.field');
+    $services->set('mautic.form.type.form_submitaction_sendemail', Mautic\FormBundle\Form\Type\SubmitActionEmailType::class)
+        ->call('setFieldModel', [service('mautic.form.model.field')])
+        ->call('setFormModel', [service('mautic.form.model.form')]);
+    $services->alias(Mautic\FormBundle\Form\Type\SubmitActionEmailType::class, 'mautic.form.type.form_submitaction_sendemail');
+    $services->set('mautic.form.type.form_submitaction_repost', Mautic\FormBundle\Form\Type\SubmitActionRepostType::class)
+        ->call('setFieldModel', [service('mautic.form.model.field')])
+        ->call('setFormModel', [service('mautic.form.model.form')]);
+    $services->alias(Mautic\FormBundle\Form\Type\SubmitActionRepostType::class, 'mautic.form.type.form_submitaction_repost');
     $services->set('mautic.form.fixture.form', Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
     $services->alias(Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class, 'mautic.form.fixture.form');
     $services->set('mautic.form.fixture.form_result', Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
@@ -47,8 +61,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\FormBundle\Helper\PropertiesAccessor::class, 'mautic.form.helper.properties.accessor');
     $services->set('mautic.form.validator.upload_field_validator', Mautic\FormBundle\Validator\UploadFieldValidator::class);
     $services->alias(Mautic\FormBundle\Validator\UploadFieldValidator::class, 'mautic.form.validator.upload_field_validator');
-    $services->set('mautic.form.validator.constraint.file_extension_constraint_validator', Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)->tag('validator.constraint_validator')->tag('file_extension_constraint_validator');
-    $services->alias(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class, 'mautic.form.validator.constraint.file_extension_constraint_validator');
+
+    $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
+        ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);
+
     $services->set('mautic.form.command.form_submissions_records_clean', Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class)->tag('console.command');
     $services->alias(Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class, 'mautic.form.command.form_submissions_records_clean');
     $services->set('mautic.form.command.form_submissions_table_clean', Mautic\FormBundle\Command\DeleteOrphanFormResultsTableCommand::class)->tag('console.command');

@@ -1107,7 +1107,7 @@ class SubmissionModel extends CommonFormModel
                     sprintf('%d:%s', $stage->getId(), $stage->getName()),
                     $this->translator->trans(
                         'mautic.stage.import.action.name',
-                        ['%name%' => $this->userHelper->getUser()->getUsername()]
+                        ['%name%' => $this->userHelper->getUser()->getUserIdentifier()]
                     )
                 );
             } else {
