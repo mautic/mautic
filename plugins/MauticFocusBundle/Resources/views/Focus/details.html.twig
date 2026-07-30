@@ -255,11 +255,53 @@
               {% endset %}
 
               {% set belowFoldContent %}
-                  <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
-                  <div class="alert alert-warning" role="alert">
-                      {{ 'mautic.focus.install.tracking.warning'|trans }}
-                  </div>
-                  <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="&lt;script src=&quot;{{ url('mautic_focus_generate', {'id': item.id}, true) }}&quot; type=&quot;text/javascript&quot; charset=&quot;utf-8&quot; async=&quot;async&quot;&gt;&lt;/script&gt;"/>
+                   {% set displayUrl = url('mautic_focus_generate_display', {'id': item.id}, true) %}
+                   {% set legacyUrl = url('mautic_focus_generate', {'id': item.id}, true) %}
+                   {% set displaySnippet = '<script src="' ~ displayUrl ~ '" type="text/javascript" charset="utf-8" async="async"></script>' %}
+                   {% set trackingSnippet = '<script>\nfunction enableMauticFocusTracking' ~ item.id ~ '() {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n\n    if (window.MauticFocusItems && window.MauticFocusItems[' ~ item.id ~ ']) {\n        window.MauticFocusItems[' ~ item.id ~ '].loadTracking();\n    }\n}\n</script>' %}
+                   {% set fullSnippet = '<script>\n(function () {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n\n    var display = document.createElement(\'script\');\n    display.src = \'' ~ displayUrl ~ '\';\n    document.head.appendChild(display);\n}());\n</script>' %}
+                   {% set legacySnippet = '<script src="' ~ legacyUrl ~ '" type="text/javascript" charset="utf-8" async="async"></script>' %}
+
+                   <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                   <div class="alert alert-warning" role="alert">
+                       {{ 'mautic.focus.install.custom_content.warning'|trans }}
+                   </div>
+
+                   <h5 class="mt-lg mb-sm fw-sb">{{ 'mautic.focus.install.display.header'|trans }}</h5>
+                   <p>{{ 'mautic.focus.install.display.description'|trans }}</p>
+                   <div id="focus-display-snippet">
+                       {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                           variant: 'single',
+                           innerText: displaySnippet,
+                       }) }}
+                   </div>
+
+                   <h5 class="mt-lg mb-sm fw-sb">{{ 'mautic.focus.install.tracking.header'|trans }}</h5>
+                   <p>{{ 'mautic.focus.install.tracking.description'|trans({'%callback%': 'enableMauticFocusTracking' ~ item.id}) }}</p>
+                   <div id="focus-tracking-snippet">
+                       {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                           variant: 'single',
+                           innerText: trackingSnippet,
+                       }) }}
+                   </div>
+
+                   <h5 class="mt-lg mb-sm fw-sb">{{ 'mautic.focus.install.full.header'|trans }}</h5>
+                   <p>{{ 'mautic.focus.install.full.description'|trans }}</p>
+                   <div id="focus-full-snippet">
+                       {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                           variant: 'single',
+                           innerText: fullSnippet,
+                       }) }}
+                   </div>
+
+                   <h5 class="mt-lg mb-sm fw-sb">{{ 'mautic.focus.install.legacy.header'|trans }}</h5>
+                   <p>{{ 'mautic.focus.install.legacy.description'|trans }}</p>
+                   <div id="focus-legacy-snippet">
+                       {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                           variant: 'single',
+                           innerText: legacySnippet,
+                       }) }}
+                   </div>
               {% endset %}
 
               {{ include('@MauticCore/Components/tile.html.twig', {

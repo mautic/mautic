@@ -81,10 +81,11 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('/trackingLoading:(?:false|!1)/', $displayContent);
         $this->assertMatchesRegularExpression('/trackingRequested:(?:false|!1)/', $displayContent);
         $this->assertMatchesRegularExpression('/trackingEnabled:(?:false|!1)/', $displayContent);
+        $this->assertMatchesRegularExpression('/waitingForTracking:(?:false|!1)/', $displayContent);
         $this->assertStringContainsString('if(!Focus.runtimeReady){return null}', $displayContent);
         $this->assertStringContainsString('if(Focus.pendingTrackingActivation)', $displayContent);
-        $this->assertStringContainsString('if(Focus.trackingRequested&&!Focus.trackingEnabled){Focus.loadTracking()}', $displayContent);
-        $this->assertMatchesRegularExpression('/activateTracking\(\).*Focus\.registerFocusEvent\(\)/s', $displayContent);
+        $this->assertMatchesRegularExpression('/Focus\.trackingRequested&&!Focus\.trackingEnabled.*Focus\.waitingForTracking=(?:true|!0).*Focus\.loadTracking\(\)/s', $displayContent);
+        $this->assertMatchesRegularExpression('/finishInitialization:function\(\).*Focus\.registerFocusEvent\(\)/s', $displayContent);
         $this->assertStringContainsString('tracking.js', $displayContent);
         $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
         $this->assertStringNotContainsString('mauticform[focusId]', $displayContent);

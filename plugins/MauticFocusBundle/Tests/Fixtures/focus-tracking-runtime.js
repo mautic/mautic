@@ -100,6 +100,29 @@ function item(browser) {
 
     assert.strictEqual(browser.appendedScripts.length, 1, 'queued consent must load tracking once');
     assert.strictEqual(browser.window.MauticFocusTrackingQueue[focusId], undefined, 'queued consent must be consumed');
+    assert.strictEqual(item(browser).initialized, false, 'queued consent must delay engagement until tracking loads');
+
+    let trackingEnabledAtRegistration = false;
+    item(browser).registerFocusEvent = function () {
+        trackingEnabledAtRegistration = item(browser).trackingEnabled;
+        item(browser).trackingHooks.onEngage();
+    };
+    execute(trackingScript, browser);
+    assert.strictEqual(item(browser).trackingEnabled, true, 'queued tracking must activate before engagement');
+    browser.appendedScripts[0].onload();
+    assert.strictEqual(item(browser).initialized, true, 'display must initialize after tracking activation');
+    assert.strictEqual(trackingEnabledAtRegistration, true, 'initial engagement must register after tracking activation');
+    assert.strictEqual(browser.images.length, 1, 'initial post-consent engagement must send one view');
+}
+
+{
+    const browser = createBrowser();
+    browser.window.MauticFocusTrackingQueue = {[focusId]: true};
+    execute(displayScript, browser);
+
+    browser.appendedScripts[0].onerror();
+    assert.strictEqual(item(browser).initialized, true, 'failed queued tracking must not block display');
+    assert.strictEqual(item(browser).trackingEnabled, false);
 }
 
 {

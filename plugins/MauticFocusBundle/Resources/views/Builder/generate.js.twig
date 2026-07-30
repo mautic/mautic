@@ -133,6 +133,7 @@
             trackingLoading: false,
             trackingRequested: false,
             trackingEnabled: {% if trackingEnabled %}true{% else %}false{% endif %},
+            waitingForTracking: false,
             trackingScript: null,
             pendingTrackingActivation: null,
             trackingHooks: {
@@ -161,9 +162,15 @@
                         Focus.trackingScript.parentNode.removeChild(Focus.trackingScript);
                     }
                     Focus.trackingScript = null;
+                    if (Focus.waitingForTracking) {
+                        Focus.finishInitialization();
+                    }
                 };
                 Focus.trackingScript.onload = function () {
                     Focus.trackingLoading = false;
+                    if (Focus.waitingForTracking) {
+                        Focus.finishInitialization();
+                    }
                 };
                 (document.head || document.getElementsByTagName('head')[0]).appendChild(Focus.trackingScript);
 
@@ -195,9 +202,25 @@
                 return true;
             },
 
+            finishInitialization: function () {
+                if (Focus.initialized) {
+                    return false;
+                }
+
+                Focus.waitingForTracking = false;
+                Focus.registerFocusEvent();
+
+                // Add class to body
+                Focus.addClass(document.body, 'MauticFocus{{ style|capitalize }}');
+
+                Focus.initialized = true;
+
+                return true;
+            },
+
             // Initialize the focus
             initialize: function () {
-                if (Focus.initializing || Focus.initialized) {
+                if (Focus.initializing || Focus.initialized || Focus.waitingForTracking) {
                     return false;
                 }
 
@@ -226,14 +249,14 @@
                         activateTracking();
                     }
                     if (Focus.trackingRequested && !Focus.trackingEnabled) {
+                        Focus.waitingForTracking = true;
                         Focus.loadTracking();
+                        if (!Focus.trackingEnabled) {
+                            return false;
+                        }
+                        Focus.waitingForTracking = false;
                     }
-                    Focus.registerFocusEvent();
-
-                    // Add class to body
-                    Focus.addClass(document.body, 'MauticFocus{{ style|capitalize }}');
-
-                    Focus.initialized = true;
+                    Focus.finishInitialization();
                 } catch (error) {
                     Focus.runtimeReady = false;
                     delete window.MauticFocusItems[{{ focus.id }}];
