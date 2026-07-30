@@ -21,6 +21,10 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
+    $services->alias(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class, 'mautic.sms.twilio.transport');
+    $services->alias('sms_api', 'mautic.sms.twilio.transport');
+    $services->alias('mautic.sms.api', 'mautic.sms.twilio.transport');
     $services->set('mautic.helper.sms', Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
     $services->alias(Mautic\SmsBundle\Helper\SmsHelper::class, 'mautic.helper.sms');
     $services->set('mautic.sms.transport_chain', Mautic\SmsBundle\Sms\TransportChain::class)
