@@ -38,7 +38,8 @@
                 lead.permissionUser
             ),
         },
-        'targetLabel'     : 'mautic.lead.leads'|trans
+        'targetLabel'     : returnUrl is not empty ? 'mautic.form.form.results'|trans : 'mautic.lead.leads'|trans,
+        'closeUrl'        : returnUrl|default(null),
     }
 ) -}}
 {% endblock %}
