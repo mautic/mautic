@@ -2,6 +2,6 @@
 
 namespace Mautic\LeadBundle\Event;
 
-class CompanyBuildSearchEvent extends LeadBuildSearchEvent
+final class CompanyBuildSearchEvent extends LeadBuildSearchEvent
 {
 }

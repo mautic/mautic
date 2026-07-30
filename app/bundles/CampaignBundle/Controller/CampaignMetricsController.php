@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignMetricsController extends AbstractController
+final class CampaignMetricsController extends AbstractController
 {
     public function __construct(
         private readonly Translator $translator,

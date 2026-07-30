@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Form\Type\ConfigType;
 use Mautic\LeadBundle\Form\Type\SegmentConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -41,6 +41,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             $segmentParameters['company_columns'],
             $segmentParameters['background_import_if_more_rows_than'],
             $segmentParameters['contact_export_in_background'],
+            $segmentParameters['contact_export_notify_admins'],
             $segmentParameters['contact_export_limit'],
             $segmentParameters['contact_allow_multiple_companies']
         );

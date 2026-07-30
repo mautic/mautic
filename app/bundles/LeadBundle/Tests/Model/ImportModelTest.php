@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
@@ -80,15 +80,6 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenMore(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $model->expects($this->once())
-            ->method('getParallelImportLimit')
-            ->willReturn(4);
-
         $repository = $this->getMockBuilder(ImportRepository::class)
             ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
@@ -98,10 +89,16 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->willReturn(4);
+
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
         $result = $model->checkParallelImportLimit();
 
         $this->assertFalse($result);
@@ -110,7 +107,7 @@ final class ImportModelTest extends StandardImportTestHelper
     public function testCheckParallelImportLimitWhenEqual(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -127,9 +124,7 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(4);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 
@@ -139,7 +134,7 @@ final class ImportModelTest extends StandardImportTestHelper
     public function testCheckParallelImportLimitWhenLess(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -156,9 +151,7 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 
@@ -435,15 +428,6 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository->expects($this->exactly(3))->method('getValue')
             ->willReturnOnConsecutiveCalls(true, false, false);
 
-        $this->entityManager->expects($this->atLeast(2))
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [LeadEventLog::class, $logRepository],
-                    [Import::class, $importRepository],
-                ]
-            );
-
         $this->entityManager
             ->method('isOpen')
             ->willReturn(true);
@@ -497,7 +481,9 @@ final class ImportModelTest extends StandardImportTestHelper
             $translator,
             $userHelper,
             $this->createStub(LoggerInterface::class),
-            new ProcessSignalService()
+            new ProcessSignalService(),
+            $importRepository,
+            $logRepository,
         );
 
         $this->setUpBeforeClass();

@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailUtmTagsType extends AbstractType
+final class EmailUtmTagsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

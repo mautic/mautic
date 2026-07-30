@@ -16,12 +16,13 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly DynamicContentModel $dynamicContentModel,
-        protected CacheProvider $cache,
-        private readonly EventDispatcherInterface $dispatcher,
+        private DynamicContentModel $dynamicContentModel,
+        private CacheProvider $cache,
+        private EventDispatcherInterface $dispatcher,
+        private readonly \Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 
@@ -93,7 +94,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             return false;
         }
 
-        $defaultDwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        $defaultDwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
 
         if ($defaultDwc instanceof DynamicContent) {
             // Set the default content in case none of the actions return data
@@ -118,7 +119,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $slot = $item->get();
 
-        $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        $dwc = $this->dynamicContentRepository->getEntity($eventConfig['dynamicContent']);
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available

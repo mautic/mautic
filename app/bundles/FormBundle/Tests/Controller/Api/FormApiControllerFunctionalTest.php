@@ -7,7 +7,9 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -90,7 +92,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $expectedResponse
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formDataProvider')]
+    #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request('POST', '/api/forms/new', $payload);
@@ -415,7 +417,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertSame('john@doe.test', $contact->getEmail());
         $this->assertSame('Czech Republic', $contact->getCountry());

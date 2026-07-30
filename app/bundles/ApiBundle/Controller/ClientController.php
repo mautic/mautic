@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ClientController extends AbstractStandardFormController
+final class ClientController extends AbstractStandardFormController
 {
     public function __construct(
         private readonly ClientModel $clientModel,
@@ -185,10 +185,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param mixed $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             $this->throwAccessDenied();

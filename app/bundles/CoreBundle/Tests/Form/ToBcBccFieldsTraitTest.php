@@ -103,7 +103,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
 /**
  * @extends AbstractType<mixed>
  */
-class ToBcBccStubFormType extends AbstractType
+final class ToBcBccStubFormType extends AbstractType
 {
     use ToBcBccFieldsTrait;
 

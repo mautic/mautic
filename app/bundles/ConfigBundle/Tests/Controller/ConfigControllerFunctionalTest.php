@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -87,7 +88,10 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = static::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
     }
 
     /**
@@ -235,6 +239,41 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         $this->assertSame($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         $this->assertSame($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testContactExportAdminNotificationsConfigDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]'                     => 'https://mautic-community.local',
+                'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'           => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[leadconfig][contact_export_notify_admins]' => '0',
+            ]
+        );
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('contact_export_notify_admins', $configParameters);
+        $this->assertFalse((bool) $configParameters['contact_export_notify_admins']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
     public function testUserAndSystemLocale(): void

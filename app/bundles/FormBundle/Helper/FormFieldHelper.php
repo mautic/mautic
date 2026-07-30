@@ -78,16 +78,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translator = $translator;
 
         if (null === $validator) {
-            $validator = $validator = Validation::createValidator();
+            $validator = Validation::createValidator();
         }
         $this->validator = $validator;
 
         parent::__construct();
     }
 
-    /**
-     * Set the translation key prefix.
-     */
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';

@@ -5,23 +5,24 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
  */
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 final class InstallWorkflowTest extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
-
     protected $useCleanupRollback = false;
 
     private string $localConfigPath;
@@ -31,7 +32,9 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->localConfigPath    = static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel                   = static::getContainer()->get(KernelInterface::class);
+        $this->localConfigPath    = $kernel->getLocalConfigFile();
         $this->defaultMemoryLimit = ini_get('memory_limit');
 
         if (file_exists($this->localConfigPath)) {
@@ -109,7 +112,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     public function testInstallRequirementsAndRecommendations(): void
     {
         $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
-        $expectedMemoryMessage = static::getContainer()->get('translator')->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+        $expectedMemoryMessage = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
 
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));

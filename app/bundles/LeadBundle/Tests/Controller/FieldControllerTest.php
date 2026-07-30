@@ -8,6 +8,8 @@ use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FieldControllerTest extends MauticMysqlTestCase
@@ -49,7 +51,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $field->setAlias('field_to_be_cloned');
         $field->setType('text');
 
-        $this->em->getRepository(LeadField::class)->saveEntity($field);
+        self::getContainer()->get(LeadFieldRepository::class)->saveEntity($field);
         $this->em->clear();
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => 'field_to_be_cloned']);
@@ -77,7 +79,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(404);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
+    #[DataProvider('getStringTypeFieldsArray')]
     public function testMaxCharLengthFieldValidationOnStringTypeWhenAddingCustomFieldFailure(string $label, string $type): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
@@ -95,7 +97,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $this->assertSame($maxCharLimitErrorMessage, $errorMessage);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]
+    #[DataProvider('getStringTypeFieldsArray')]
     public function testMaxCharLengthFieldValidationOnStringTypeWhenAddingCustomFieldSuccess(string $label, string $type): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
@@ -120,7 +122,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         yield ['test_text', 'text'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getCustomFields')]
+    #[DataProvider('getCustomFields')]
     public function testCustomFieldCharacterLengthLimit(string $label, string $type): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
@@ -135,7 +137,7 @@ final class FieldControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(LeadField::class, $field);
 
         /** @var ColumnSchemaHelper $helper */
-        $helper = $this->getContainer()->get('mautic.schema.helper.column');
+        $helper = $this->getContainer()->get(ColumnSchemaHelper::class);
 
         // Table name to check the fields.
         $name         = 'leads';

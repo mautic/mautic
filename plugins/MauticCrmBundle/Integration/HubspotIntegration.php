@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -17,9 +17,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,6 +28,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -37,12 +38,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    private StageRepository $stageRepository;
+
+    #[Required]
+    public function autowireHubspotIntegration(
+        StageRepository $stageRepository,
+    ): void {
+        $this->stageRepository = $stageRepository;
+    }
+
     public const ACCESS_KEY = 'accessKey';
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         RequestStack $requestStack,
         RouterInterface $router,
         TranslatorInterface $translator,
@@ -504,7 +514,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository(Stage::class)->getStageByName($stageName);
+                $stage = $this->stageRepository->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -602,10 +612,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
 
             if (!empty($leadData['vid'])) {
-                /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
-                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity     = (empty($integrationId)) ?
+                $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
+                $integrationEntity = (empty($integrationId)) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],
@@ -613,10 +621,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $lead->getId(),
                         [],
                         false
-                    ) : $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                    ) : $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
 
                 $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                $this->getIntegrationEntityRepository()->saveEntity($integrationEntity);
+                $this->integrationEntityRepository->saveEntity($integrationEntity);
                 $this->em->detach($integrationEntity);
             }
 

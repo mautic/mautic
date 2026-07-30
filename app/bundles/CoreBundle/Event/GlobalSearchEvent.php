@@ -5,16 +5,13 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class GlobalSearchEvent extends Event
+final class GlobalSearchEvent extends Event
 {
     public const RESULTS_LIMIT = 3;
 
-    /**
-     * @var array
-     */
-    protected $results = [];
+    private array $results = [];
 
-    protected string $searchString;
+    private readonly string $searchString;
 
     /**
      * @param string     $searchString
@@ -22,7 +19,7 @@ class GlobalSearchEvent extends Event
      */
     public function __construct(
         $searchString,
-        protected $translator,
+        private $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }
@@ -50,10 +47,8 @@ class GlobalSearchEvent extends Event
 
     /**
      * Returns the results.
-     *
-     * @return array
      */
-    public function getResults()
+    public function getResults(): array
     {
         uksort($this->results, strnatcmp(...));
 

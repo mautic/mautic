@@ -14,12 +14,13 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function __construct(
         private readonly FieldCollectorInterface $fieldCollector,
@@ -33,6 +34,7 @@ class AjaxController extends CommonAjaxController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        private readonly FormModel $formModel,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -91,9 +93,8 @@ class AjaxController extends CommonAjaxController
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
-        $model      = $this->getModel('form');
-        $entity     = $model->getEntity($formId);
-        $formFields = empty($entity) ? [] : $entity->getFields();
+        $entity     = $this->formModel->getEntity($formId);
+        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {
