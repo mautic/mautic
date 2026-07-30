@@ -604,7 +604,7 @@ CODE_SAMPLE;
         );
     }
 
-    public function testSkipServiceWithAlias(): void
+    public function testMovesServiceWithAliasAsTagArgument(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
@@ -624,8 +624,105 @@ CODE_SAMPLE;
 
         $this->createFile('services.php', self::SERVICES_FILE);
 
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // ServicePass hands the "alias" over as a tag argument, not as a service alias
+        $this->assertStringContainsString(
+            "\$services->set('mautic.some.translation_loader', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('translation.loader', ['alias' => 'mautic']);",
+            $this->readServicesFile()
+        );
+    }
+
+    public function testMovesHelperWithAliasOnGroupDefaultTag(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'helpers' => [
+            'mautic.helper.twig.some' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'alias' => 'some_helper',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        // the "helpers" group tag is the one carrying the alias
+        $this->assertStringContainsString(
+            "\$services->set('mautic.helper.twig.some', ".self::AUTOWIRABLE_HELPER_CLASS."::class)->tag('twig.helper', ['alias' => 'some_helper']);",
+            $this->readServicesFile()
+        );
+    }
+
+    public function testSkipServiceWithAliasWithoutTagToCarryIt(): void
+    {
+        // "events" gets its tag from autoconfigure(), so there is no tag here the alias could ride on
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'events' => [
+            'mautic.some.subscriber' => [
+                'class' => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'alias' => 'some_subscriber',
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
         $this->assertNull($this->refactorConfigFile($configFileContent));
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+    }
+
+    public function testMovesServiceWithMethodCalls(): void
+    {
+        $configFileContent = <<<'CODE_SAMPLE'
+<?php
+
+return [
+    'services' => [
+        'other' => [
+            'mautic.some.subscriber' => [
+                'class'       => Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class,
+                'methodCalls' => [
+                    'setFieldModel' => ['mautic.form.model.field'],
+                    'setSecret'     => ['%mautic.some_secret%'],
+                ],
+            ],
+        ],
+    ],
+];
+CODE_SAMPLE;
+
+        $this->createFile('services.php', self::SERVICES_FILE);
+
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $servicesFileContent = $this->readServicesFile();
+
+        $expectedSetStmt = <<<'CODE_SAMPLE'
+    $services->set('mautic.some.subscriber', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class)
+        ->call('setFieldModel', [service('mautic.form.model.field')])
+        ->call('setSecret', [param('mautic.some_secret')]);
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmt, $servicesFileContent);
+
+        $this->assertStringContainsString(
+            'use function Symfony\Component\DependencyInjection\Loader\Configurator\service;',
+            $servicesFileContent
+        );
     }
 
     public function testSkipConfigWithoutServices(): void
@@ -650,7 +747,7 @@ CODE_SAMPLE;
         $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
     }
 
-    public function testSkipThirdPartyClassOverride(): void
+    public function testMovesThirdPartyClassOverride(): void
     {
         $configFileContent = <<<'CODE_SAMPLE'
 <?php
@@ -668,8 +765,14 @@ CODE_SAMPLE;
 
         $this->createFile('services.php', self::SERVICES_FILE);
 
-        $this->assertNull($this->refactorConfigFile($configFileContent));
-        $this->assertSame(self::SERVICES_FILE, $this->readServicesFile());
+        $this->assertIsString($this->refactorConfigFile($configFileContent));
+
+        $expectedSetStmts = <<<'CODE_SAMPLE'
+    $services->set('oneup_uploader.controller.dropzone.class', Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class);
+    $services->alias(Utils\Rector\Tests\ConfigServiceToAutowiredServiceRector\Source\AutowirableHelper::class, 'oneup_uploader.controller.dropzone.class');
+CODE_SAMPLE;
+
+        $this->assertStringContainsString($expectedSetStmts, $this->readServicesFile());
     }
 
     private function createFile(string $fileName, string $fileContent): string
