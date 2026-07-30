@@ -34,7 +34,7 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        // A permission object is picked up by PermissionsPass through this tag, no need to spell it out
+        // a permission object is collected by CorePermissions through this tag, the base class makes it one
         $container->registerForAutoconfiguration(AbstractPermissions::class)
             ->addTag('mautic.permissions');
 

@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use Mautic\CoreBundle\Update\Step\UpdateTranslationsStep;
 use Mautic\CoreBundle\Update\StepProvider;
-use Psr\Container\ContainerInterface;
 
 final class UpdateStepSmokeTest extends AbstractContainerSmokeTestCase
 {
@@ -60,12 +59,12 @@ final class UpdateStepSmokeTest extends AbstractContainerSmokeTestCase
 
     private function resolveStepProvider(): StepProvider
     {
-        /** @var ContainerInterface $testContainer */
-        $testContainer = $this->buildContainer()->get('test.service_container');
+        foreach ($this->createAllServices() as $service) {
+            if ($service instanceof StepProvider) {
+                return $service;
+            }
+        }
 
-        $stepProvider = $testContainer->get(StepProvider::class);
-        \assert($stepProvider instanceof StepProvider);
-
-        return $stepProvider;
+        $this->fail('The StepProvider is not in the container');
     }
 }
