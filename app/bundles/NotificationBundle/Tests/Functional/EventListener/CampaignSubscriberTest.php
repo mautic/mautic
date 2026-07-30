@@ -423,7 +423,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
         $subscriber = new class(static::getContainer()->get(IntegrationHelper::class), static::getContainer()->get(NotificationModel::class), static::getContainer()->get(OneSignalApi::class), static::getContainer()->get(EventDispatcherInterface::class), static::getContainer()->get(DoNotContactModel::class), static::getContainer()->get(TranslatorInterface::class)) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
-        static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
+        static::getContainer()->set(CampaignSubscriber::class, $subscriber);
 
         $notification = $this->createNotification($this->em);
         $this->em->flush();

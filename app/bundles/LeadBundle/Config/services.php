@@ -124,7 +124,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\LeadBundle\Field\LeadFieldSaver::class);
     $services->set(Mautic\LeadBundle\Field\Settings\BackgroundSettings::class);
     $services->set(Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class);
-    $services->alias('mautic.lead.field.notification.custom_field', Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class);
     $services->set('mautic.lead.query.builder.basic', Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.foreign.value', Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder::class);
     $services->set('mautic.lead.query.builder.foreign.func', Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder::class);

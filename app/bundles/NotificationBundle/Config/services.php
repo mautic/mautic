@@ -23,7 +23,6 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->set(Mautic\NotificationBundle\EventListener\CampaignSubscriber::class)
         ->arg('$notificationApi', service('mautic.notification.api'));
-    $services->alias('mautic.notification.campaignbundle.subscriber', Mautic\NotificationBundle\EventListener\CampaignSubscriber::class);
     $services->set(Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
     $services->alias('mautic.integration.onesignal', Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
 
