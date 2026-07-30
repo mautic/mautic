@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Summary>
  */
-class SummaryRepository extends CommonRepository
+final class SummaryRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
