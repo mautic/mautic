@@ -12,9 +12,9 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles/AssetBundle/Config/config.php',
         // __DIR__.'/app/bundles/CampaignBundle/Config/config.php',
         __DIR__.'/app/bundles/CoreBundle/Config/config.php',
-        __DIR__.'/app/bundles/FormBundle/Config/config.php',
+        // __DIR__.'/app/bundles/FormBundle/Config/config.php',
         __DIR__.'/app/bundles/LeadBundle/Config/config.php',
-        __DIR__.'/app/bundles/SmsBundle/Config/config.php',
+//        __DIR__.'/app/bundles/SmsBundle/Config/config.php',
         __DIR__.'/app/bundles/UserBundle/Config/config.php',
     ])
     ->withRules([
