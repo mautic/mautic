@@ -25,7 +25,7 @@ final class WebhookController extends FormController
     /**
      * @var array<string, mixed>
      */
-    protected array $listFilters = [];
+    private array $listFilters = [];
 
     public function __construct(
         FormFactoryInterface $formFactory,

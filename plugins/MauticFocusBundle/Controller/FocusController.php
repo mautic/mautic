@@ -32,7 +32,7 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    protected array $listFilters = [];
+    private array $listFilters = [];
 
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
