@@ -17,16 +17,16 @@ use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Company;
 use MauticPlugin\MauticClearbitBundle\Services\Clearbit_Person;
 use Psr\Log\LoggerInterface;
 
-class LookupHelper
+final class LookupHelper
 {
-    protected ?ClearbitIntegration $integration = null;
+    private ?ClearbitIntegration $integration = null;
 
     public function __construct(
         IntegrationsHelper $integrationsHelper,
-        protected UserHelper $userHelper,
-        protected LoggerInterface $logger,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        private UserHelper $userHelper,
+        private LoggerInterface $logger,
+        private LeadModel $leadModel,
+        private CompanyModel $companyModel,
     ) {
         try {
             /** @var ClearbitIntegration $integration */
@@ -153,7 +153,7 @@ class LookupHelper
     /**
      * @param bool $person
      */
-    protected function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
+    private function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
@@ -165,7 +165,7 @@ class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache($entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class SearchStringHelper
+final class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;
 
@@ -13,7 +13,7 @@ class SearchStringHelper
     /**
      * @var array
      */
-    protected $needsParsing = [
+    private $needsParsing = [
         ' ',
         '(',
         ')',
@@ -22,7 +22,7 @@ class SearchStringHelper
     /**
      * @var array
      */
-    protected $needsClosing = [
+    private $needsClosing = [
         'quote'       => '"',
         'parenthesis' => '(',
     ];
@@ -30,7 +30,7 @@ class SearchStringHelper
     /**
      * @var array
      */
-    protected $closingChars = [
+    private $closingChars = [
         'quote'       => '"',
         'parenthesis' => ')',
     ];
@@ -86,7 +86,7 @@ class SearchStringHelper
         }
     }
 
-    protected function addFilterCommand(&$filters, $mergeFilter): void
+    private function addFilterCommand(&$filters, $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {
@@ -107,7 +107,7 @@ class SearchStringHelper
     /**
      * @param string $input
      */
-    protected function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
+    private function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
     {
         $keyCount                                 = 0;
         $command                                  = $overrideCommand;

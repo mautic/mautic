@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
-class AssetGenerationHelper
+final class AssetGenerationHelper
 {
     // Temporary array of libraries to load from node_modules before we switch
     // to Symfony Encore. This is the first step to load libraries from NPM.
@@ -243,7 +243,7 @@ class AssetGenerationHelper
      *
      * @return array<string, false|int>
      */
-    protected function findAssets(string $dir, string $ext, string $env, array &$assets): array
+    private function findAssets(string $dir, string $ext, string $env, array &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -327,7 +327,7 @@ class AssetGenerationHelper
     /**
      * Find asset overrides in the template.
      */
-    protected function findOverrides($env, array &$assets): array
+    private function findOverrides($env, array &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');

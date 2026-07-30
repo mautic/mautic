@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Security\SAML;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class Helper
+final class Helper
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

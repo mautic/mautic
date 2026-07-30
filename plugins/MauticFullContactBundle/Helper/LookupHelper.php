@@ -16,20 +16,20 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LookupHelper
+final class LookupHelper
 {
     /**
      * @var bool|FullContactIntegration
      */
-    protected $integration;
+    private $integration;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected Router $router,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        private UserHelper $userHelper,
+        private Logger $logger,
+        private Router $router,
+        private LeadModel $leadModel,
+        private CompanyModel $companyModel,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -165,7 +165,7 @@ class LookupHelper
         return false;
     }
 
-    protected function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
+    private function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;
@@ -177,7 +177,7 @@ class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache($entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

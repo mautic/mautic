@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ReplyHelper
+final class ReplyHelper
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,

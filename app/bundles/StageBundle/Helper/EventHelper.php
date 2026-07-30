@@ -4,7 +4,7 @@ namespace Mautic\StageBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-class EventHelper
+final class EventHelper
 {
     /**
      * @param Lead  $lead

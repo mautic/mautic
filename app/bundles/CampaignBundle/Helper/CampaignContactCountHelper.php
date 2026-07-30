@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class CampaignContactCountHelper
+final class CampaignContactCountHelper
 {
     private const CACHE_TTL = 43200;
 

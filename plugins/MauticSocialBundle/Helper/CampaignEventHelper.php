@@ -11,19 +11,19 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
     /**
      * @var array
      */
-    protected $clickthrough = [];
+    private $clickthrough = [];
 
     public function __construct(
-        protected IntegrationHelper $integrationHelper,
-        protected TrackableModel $trackableModel,
-        protected PageTokenHelper $pageTokenHelper,
-        protected AssetTokenHelper $assetTokenHelper,
-        protected TweetModel $tweetModel,
+        private IntegrationHelper $integrationHelper,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private TweetModel $tweetModel,
     ) {
     }
 
@@ -84,7 +84,7 @@ class CampaignEventHelper
      *
      * @return string|string[]
      */
-    protected function parseTweetText($text, array $lead, $channelId = -1): array|string
+    private function parseTweetText($text, array $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [

@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Caution: none of the methods persist data.
  */
-class ReloadHelper
+final class ReloadHelper
 {
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,

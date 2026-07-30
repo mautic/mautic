@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 
-class PointEventHelper
+final class PointEventHelper
 {
     public function __construct(
         private readonly EmailModel $emailModel,

@@ -5,7 +5,7 @@ namespace Mautic\PluginBundle\Helper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
-class EventHelper
+final class EventHelper
 {
     use PushToIntegrationTrait;
 

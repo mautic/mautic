@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Doctrine\DBAL\Connection;
 
-class CompanyHelper
+final class CompanyHelper
 {
     public function __construct(
         private readonly Connection $connection,
