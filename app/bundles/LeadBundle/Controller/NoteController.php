@@ -18,8 +18,9 @@ final class NoteController extends FormController
     private NoteModel $noteModel;
 
     #[Required]
-    public function autowireNoteController(NoteModel $noteModel): void
-    {
+    public function autowireNoteController(
+        NoteModel $noteModel,
+    ): void {
         $this->noteModel = $noteModel;
     }
 

@@ -21,6 +21,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.helper.sms', Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
+    $services->alias(Mautic\SmsBundle\Helper\SmsHelper::class, 'mautic.helper.sms');
     $services->set('mautic.sms.transport_chain', Mautic\SmsBundle\Sms\TransportChain::class)
         ->arg('$primaryTransport', param('mautic.sms_transport'));
     $services->alias(Mautic\SmsBundle\Sms\TransportChain::class, 'mautic.sms.transport_chain');

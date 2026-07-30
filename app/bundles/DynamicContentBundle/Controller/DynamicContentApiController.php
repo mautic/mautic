@@ -18,8 +18,9 @@ class DynamicContentApiController extends CommonController
     private PageModel $pageModel;
 
     #[Required]
-    public function autowireDynamicContentApiController(PageModel $pageModel): void
-    {
+    public function autowireDynamicContentApiController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 
