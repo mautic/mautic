@@ -40,7 +40,10 @@ final class ServiceNameUsageResolver
 
     /**
      * A used name is either the service id itself or the format an id is built by at runtime, e.g. the
-     * "mautic.integration.%s" of IntegrationHelper covers "mautic.integration.hubspot".
+     * "mautic.integration.%1$s" of IntegrationHelper covers "mautic.integration.hubspot".
+     *
+     * A placeholder repeated under the same number stands for one and the same value, so "mautic.%1$s.%1$s"
+     * covers "mautic.project.project" but never "mautic.asset.permissions".
      */
     private function isMatchingName(string $usedName, string $serviceName): bool
     {
@@ -48,11 +51,30 @@ final class ServiceNameUsageResolver
             return true;
         }
 
-        if (!str_contains($usedName, '%s')) {
+        if (0 === preg_match_all('#%(\d+)\$s#', $usedName, $matches)) {
             return false;
         }
 
-        $pattern = str_replace(preg_quote('%s', '#'), '[a-zA-Z0-9_]+', preg_quote($usedName, '#'));
+        $seenNumbers = [];
+        $pattern = '';
+        $offset = 0;
+
+        foreach ($matches[0] as $matchIndex => $placeholder) {
+            $placeholderOffset = strpos($usedName, $placeholder, $offset);
+            $pattern .= preg_quote(substr($usedName, $offset, $placeholderOffset - $offset), '#');
+
+            $placeholderNumber = $matches[1][$matchIndex];
+            if (isset($seenNumbers[$placeholderNumber])) {
+                $pattern .= '\\'.$seenNumbers[$placeholderNumber];
+            } else {
+                $seenNumbers[$placeholderNumber] = count($seenNumbers) + 1;
+                $pattern .= '([a-zA-Z0-9_]+)';
+            }
+
+            $offset = $placeholderOffset + strlen($placeholder);
+        }
+
+        $pattern .= preg_quote(substr($usedName, $offset), '#');
 
         return 1 === preg_match('#^'.$pattern.'$#', $serviceName);
     }
