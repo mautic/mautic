@@ -24,7 +24,8 @@ final class PublicController extends FormController
 
     #[Required]
     public function autowirePublicController(
-        UserModel $userModel, \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        UserModel $userModel,
+        \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;

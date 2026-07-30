@@ -29,8 +29,9 @@ class AjaxController extends CommonController
     private NotificationModel $notificationModel;
 
     #[Required]
-    public function autowireCoreAjaxController(NotificationModel $notificationModel): void
-    {
+    public function autowireCoreAjaxController(
+        NotificationModel $notificationModel,
+    ): void {
         $this->notificationModel = $notificationModel;
     }
 
