@@ -14,12 +14,15 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Collectors\Collector;
 
 /**
- * Collects the service aliases registered in bundle Config/services.php files,
- * e.g. $services->alias('mautic.some.helper', SomeHelper::class).
+ * Collects the aliases of bundle Config/services.php files that name a class after a service id,
+ * e.g. $services->alias(DropzoneErrorHandler::class, 'mautic.asset.upload.error.handler').
  *
- * @implements Collector<MethodCall, array{string, int, int}>
+ * An alias the other way around, e.g. $services->alias('mautic.some.helper', SomeHelper::class), and an alias
+ * of an interface to its implementation are left out, those are the shapes that carry their weight.
+ *
+ * @implements Collector<MethodCall, array{string, string, int}>
  */
-final class ServiceAliasCollector implements Collector
+final class ClassNameServiceAliasCollector implements Collector
 {
     /**
      * @var string
@@ -32,7 +35,8 @@ final class ServiceAliasCollector implements Collector
     }
 
     /**
-     * @return array{string, int, int}|null the alias name with the first and the last line of the alias() call
+     * @return array{string, string, int}|null the class name aliased and the service id it points at,
+     *                                         with the line of the alias() call
      */
     public function processNode(Node $node, Scope $scope): ?array
     {
@@ -44,28 +48,21 @@ final class ServiceAliasCollector implements Collector
             return null;
         }
 
-        $firstArg = $node->getArgs()[0] ?? null;
-        if (!$firstArg instanceof Node\Arg) {
+        $args = $node->getArgs();
+        if (2 !== count($args)) {
             return null;
         }
 
-        $aliasName = $this->matchAliasName($firstArg->value);
-        if (null === $aliasName) {
+        $className = $this->matchClassName($args[0]->value);
+        if (null === $className || !$args[1]->value instanceof String_) {
             return null;
         }
 
-        return [$aliasName, $node->getStartLine(), $node->getEndLine()];
+        return [$className, $args[1]->value->value, $node->getStartLine()];
     }
 
-    /**
-     * An alias is named either by a service id string or by a class name, e.g. SomeHelper::class.
-     */
-    private function matchAliasName(Node $aliasValue): ?string
+    private function matchClassName(Node $aliasValue): ?string
     {
-        if ($aliasValue instanceof String_) {
-            return $aliasValue->value;
-        }
-
         if (!$aliasValue instanceof ClassConstFetch || !$aliasValue->class instanceof Name) {
             return null;
         }

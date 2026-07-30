@@ -22,6 +22,7 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias('mautic.point.model.point', Mautic\PointBundle\Model\PointModel::class);
+    $services->alias('mautic.point.model.triggerevent', Mautic\PointBundle\Model\TriggerEventModel::class);
     $services->alias('mautic.point.model.trigger', Mautic\PointBundle\Model\TriggerModel::class);
     $services->alias('mautic.point.model.group', Mautic\PointBundle\Model\PointGroupModel::class);
     $services->alias('mautic.point.model.insight', Mautic\PointBundle\Model\InsightModel::class);

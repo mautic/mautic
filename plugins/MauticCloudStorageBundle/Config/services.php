@@ -17,6 +17,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticCloudStorageBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    $services->set('mautic.integration.amazons3', MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class);
-    $services->alias(MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class, 'mautic.integration.amazons3');
+    $services->set(MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class);
+    $services->alias('mautic.integration.amazons3', MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class);
 };

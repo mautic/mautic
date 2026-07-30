@@ -8,9 +8,9 @@ use PHPStan\Collectors\Collector;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 use Utils\PHPStan\Collector\ServiceAliasCollector;
-use Utils\PHPStan\Collector\ServiceModelKeyUsageCollector;
 use Utils\PHPStan\Collector\ServiceNameUsageCollector;
 use Utils\PHPStan\Rule\NoUnusedServiceAliasRule;
+use Utils\PHPStan\ServiceNameUsageResolver;
 
 /**
  * @extends RuleTestCase<NoUnusedServiceAliasRule>
@@ -19,7 +19,7 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new NoUnusedServiceAliasRule();
+        return new NoUnusedServiceAliasRule(new ServiceNameUsageResolver());
     }
 
     /**
@@ -29,7 +29,6 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
     {
         return [
             new ServiceAliasCollector(),
-            new ServiceModelKeyUsageCollector(),
             new ServiceNameUsageCollector(),
         ];
     }
@@ -46,12 +45,8 @@ final class NoUnusedServiceAliasRuleTest extends RuleTestCase
             __DIR__.'/Fixture/AliasBundle/UnusedAliasHelper.php',
         ], [
             [
-                'Service alias "mautic.alias.model.not_a_model" is never used, remove it.',
-                21,
-            ],
-            [
                 'Service alias "mautic.alias.legacy_unused_helper" is never used, remove it.',
-                25,
+                22,
             ],
         ]);
     }
