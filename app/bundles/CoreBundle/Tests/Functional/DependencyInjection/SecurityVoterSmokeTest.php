@@ -30,7 +30,7 @@ final class SecurityVoterSmokeTest extends AbstractContainerSmokeTestCase
         $securityVoterClasses = array_unique($securityVoterClasses);
         sort($securityVoterClasses);
 
-        $this->assertSame(self::EXPECTED_SECURITY_VOTER_CLASSES, array_values($securityVoterClasses));
+        $this->assertSame(self::EXPECTED_SECURITY_VOTER_CLASSES, $securityVoterClasses);
     }
 
     /**
