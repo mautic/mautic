@@ -27,7 +27,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
 TXT
 )]
-class InstallCommand extends Command
+final class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 

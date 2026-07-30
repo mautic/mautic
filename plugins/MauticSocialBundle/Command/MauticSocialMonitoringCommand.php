@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'mautic:social:monitoring',
     description: 'Looks at the records of monitors and iterates through them.'
 )]
-class MauticSocialMonitoringCommand extends Command
+final class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
         private readonly \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository,
