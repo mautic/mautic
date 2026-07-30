@@ -351,6 +351,7 @@ final class ProjectController extends AbstractFormController
         }
 
         $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
+        $editableTypes   = $entityLoader->getEntityTypesWithEditPermissions();
         $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
 
         return $this->delegateView([
@@ -359,6 +360,7 @@ final class ProjectController extends AbstractFormController
                 'project'         => $project,
                 'projectEntities' => $projectEntities,
                 'entityTypes'     => $entityTypes,
+                'editableTypes'   => $editableTypes,
             ],
             'contentTemplate' => '@MauticProject/Project/details.html.twig',
             'passthroughVars' => [

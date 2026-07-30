@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -107,6 +108,27 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($project->getName(), (string) $clientResponseContent, 'The return must contain project');
+    }
+
+    public function testViewActionUsesTheOnlyEditableEntityType(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        /** @var ProjectEntityLoaderService $entityLoader */
+        $entityLoader = self::getContainer()->get(ProjectEntityLoaderService::class);
+        $editableTypes = $entityLoader->getEntityTypesWithEditPermissions();
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        if (1 === count($editableTypes)) {
+            $editableType = array_key_first($editableTypes);
+            $this->assertStringContainsString('/s/projects/addEntity/', $content);
+            $this->assertStringContainsString('entityType='.$editableType, $content);
+        } else {
+            $this->assertStringContainsString('/s/projects/selectEntityType/', $content);
+        }
     }
 
     public function testViewActionNotFound(): void
