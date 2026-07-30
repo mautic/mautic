@@ -228,6 +228,8 @@ parameters:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
 		- vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
+		- tests/_support/_generated/AcceptanceTesterActions.php
+		- tests/_support/AcceptanceTester.php
 	doctrine:
 		objectManagerLoader: tests/object-manager.php
 		allowNullablePropertyForRequiredField: true
