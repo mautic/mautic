@@ -36,15 +36,9 @@ final class EventLogApiController extends FetchCommonApiController
 
     private const LOG_SERIALIZATION = 30;
 
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var Lead
-     */
-    protected $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var EventLogModel|null
