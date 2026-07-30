@@ -12,7 +12,7 @@ use Twig\TwigFunction;
 final class LeadExtension extends AbstractExtension
 {
     public function __construct(
-        protected AvatarHelper $avatarHelper,
+        private readonly AvatarHelper $avatarHelper,
     ) {
     }
 

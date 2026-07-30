@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class ContentExtension extends AbstractExtension
 {
     public function __construct(
-        protected ContentHelper $contentHelper,
+        private readonly ContentHelper $contentHelper,
     ) {
     }
 

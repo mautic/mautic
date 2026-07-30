@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class SearchCommandListExtension extends AbstractExtension
 {
     public function __construct(
-        protected SearchCommandListInterface $searchCommandList,
+        private readonly SearchCommandListInterface $searchCommandList,
     ) {
     }
 

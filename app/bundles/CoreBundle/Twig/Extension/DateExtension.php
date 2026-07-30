@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class DateExtension extends AbstractExtension
 {
     public function __construct(
-        protected DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 

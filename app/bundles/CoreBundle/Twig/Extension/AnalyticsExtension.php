@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class AnalyticsExtension extends AbstractExtension
 {
     public function __construct(
-        protected AnalyticsHelper $helper,
+        private readonly AnalyticsHelper $helper,
     ) {
     }
 

@@ -18,7 +18,7 @@ final class StorageExtension extends AbstractExtension
     /**
      * @var array<string,mixed>
      */
-    protected array $storage = [];
+    private array $storage = [];
 
     public function getFunctions(): array
     {

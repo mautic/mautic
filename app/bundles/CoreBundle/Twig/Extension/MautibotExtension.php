@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class MautibotExtension extends AbstractExtension
 {
     public function __construct(
-        protected MautibotHelper $mautibotHelper,
+        private readonly MautibotHelper $mautibotHelper,
     ) {
     }
 

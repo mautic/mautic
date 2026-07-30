@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class AssetExtension extends AbstractExtension
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
+        private readonly AssetsHelper $assetsHelper,
     ) {
     }
 

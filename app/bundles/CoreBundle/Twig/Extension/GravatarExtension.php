@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class GravatarExtension extends AbstractExtension
 {
     public function __construct(
-        protected GravatarHelper $gravatarHelper,
+        private readonly GravatarHelper $gravatarHelper,
     ) {
     }
 
