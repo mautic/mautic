@@ -12316,12 +12316,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Integration\\FullContactIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Integration/FullContactIntegration.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Base\:\:\$_baseUri has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
