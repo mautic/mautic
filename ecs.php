@@ -14,7 +14,7 @@ return ECSConfig::configure()
     ])
     ->withRootFiles()
     ->withSkip([
-        'node_modules',
+        '*/node_modules/*',
         PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
             // in docbclock on purpose, to avoid BC return on child classes
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
@@ -29,10 +29,6 @@ return ECSConfig::configure()
         Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
-//    ->withRules([
-//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-//        Symplify\CodingStandard\Fixer\Spacing\StandaloneLineSymfonyAttributeParamFixer::class,
-//    ])
     ->withPreparedSets(
         comments: true,
         docblocks: true,
