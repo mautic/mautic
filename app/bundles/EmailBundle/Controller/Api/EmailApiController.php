@@ -35,6 +35,11 @@ final class EmailApiController extends CommonApiController
     use LeadAccessTrait;
 
     /**
+     * @var EmailModel|null
+     */
+    protected $model;
+
+    /**
      * @var array<string, mixed>
      */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
@@ -51,8 +56,9 @@ final class EmailApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected EmailModel $model,
+        EmailModel $emailModel,
     ) {
+        $this->model            = $emailModel;
         $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';

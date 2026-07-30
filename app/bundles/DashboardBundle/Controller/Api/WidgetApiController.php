@@ -28,6 +28,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class WidgetApiController extends CommonApiController
 {
+    /**
+     * @var DashboardModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -40,8 +45,9 @@ final class WidgetApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected DashboardModel $model,
+        DashboardModel $dashboardModel,
     ) {
+        $this->model            = $dashboardModel;
         $this->entityClass      = Widget::class;
         $this->entityNameOne    = 'widget';
         $this->entityNameMulti  = 'widgets';

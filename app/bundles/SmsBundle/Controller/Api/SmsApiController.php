@@ -29,6 +29,11 @@ final class SmsApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
+    /**
+     * @var SmsModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -41,8 +46,9 @@ final class SmsApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected SmsModel $model,
+        SmsModel $smsModel,
     ) {
+        $this->model           = $smsModel;
         $this->entityClass     = Sms::class;
         $this->entityNameOne   = 'sms';
         $this->entityNameMulti = 'smses';

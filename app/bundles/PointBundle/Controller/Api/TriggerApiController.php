@@ -26,6 +26,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class TriggerApiController extends CommonApiController
 {
+    /**
+     * @var TriggerModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -38,10 +43,11 @@ final class TriggerApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected TriggerModel $model,
+        TriggerModel $triggerModel,
         private readonly TriggerEventModel $triggerEventModel,
         private readonly \Mautic\PointBundle\Entity\TriggerRepository $triggerRepository,
     ) {
+        $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';
         $this->entityNameMulti  = 'triggers';

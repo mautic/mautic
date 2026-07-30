@@ -23,6 +23,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class RoleApiController extends CommonApiController
 {
+    /**
+     * @var RoleModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -35,8 +40,9 @@ final class RoleApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected RoleModel $model,
+        RoleModel $roleModel,
     ) {
+        $this->model            = $roleModel;
         $this->entityClass      = Role::class;
         $this->entityNameOne    = 'role';
         $this->entityNameMulti  = 'roles';

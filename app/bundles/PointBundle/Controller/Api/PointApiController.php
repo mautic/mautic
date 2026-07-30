@@ -30,6 +30,11 @@ final class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
+    /**
+     * @var PointModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -43,8 +48,9 @@ final class PointApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         private LeadModel $leadModel,
-        protected PointModel $model,
+        PointModel $pointModel,
     ) {
+        $this->model            = $pointModel;
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';

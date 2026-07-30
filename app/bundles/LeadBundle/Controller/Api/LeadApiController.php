@@ -47,6 +47,11 @@ final class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
+    /**
+     * @var LeadModel|null
+     */
+    protected $model;
+
     private DoNotContactModel $doNotContactModel;
 
     public function __construct(
@@ -67,13 +72,15 @@ final class LeadApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
-        protected LeadModel $model,
+        LeadModel $leadModel,
         private StageModel $stageModel,
         private UserModel $userModel,
         private DeviceModel $deviceModel,
         private NoteModel $noteModel,
     ) {
         $this->doNotContactModel = $doNotContactModel;
+
+        $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
@@ -372,7 +379,7 @@ final class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      */
-    public function getAllActivityAction(Request $request, ?Lead $lead = null): Response
+    public function getAllActivityAction(Request $request, $lead = null): Response
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers = $this->security->isGranted('lead:leads:viewother');

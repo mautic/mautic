@@ -27,6 +27,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class ReportApiController extends CommonApiController
 {
+    /**
+     * @var ReportModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -40,8 +45,9 @@ final class ReportApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         private readonly UserHelper $userHelper,
-        protected ReportModel $model,
+        ReportModel $reportModel,
     ) {
+        $this->model            = $reportModel;
         $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';

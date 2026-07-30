@@ -24,6 +24,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class PointInsightApiController extends CommonApiController
 {
+    /**
+     * @var InsightModel
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -36,8 +41,9 @@ final class PointInsightApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected InsightModel $model,
+        InsightModel $insightModel,
     ) {
+        $this->model            = $insightModel;
         $this->entityClass      = PointInsight::class;
         $this->entityNameOne    = 'insight';
         $this->entityNameMulti  = 'insights';

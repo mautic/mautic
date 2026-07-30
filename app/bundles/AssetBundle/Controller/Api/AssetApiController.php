@@ -24,6 +24,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class AssetApiController extends CommonApiController
 {
+    /**
+     * @var AssetModel|null
+     */
+    protected $model;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -37,8 +42,9 @@ final class AssetApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected AssetModel $model,
+        AssetModel $assetModel,
     ) {
+        $this->model            = $assetModel;
         $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
