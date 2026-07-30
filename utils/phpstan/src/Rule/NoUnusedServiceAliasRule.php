@@ -10,6 +10,7 @@ use PHPStan\Node\CollectedDataNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use Utils\PHPStan\Collector\ServiceAliasCollector;
+use Utils\PHPStan\Collector\ServiceClassUsageCollector;
 use Utils\PHPStan\Collector\ServiceNameUsageCollector;
 use Utils\PHPStan\Collector\ServiceTypeUsageCollector;
 
@@ -25,6 +26,13 @@ use Utils\PHPStan\Collector\ServiceTypeUsageCollector;
  */
 final class NoUnusedServiceAliasRule implements Rule
 {
+    /**
+     * Only Mautic code is analysed, so a vendor class alias can be wired by a vendor class this rule never sees.
+     *
+     * @var list<string>
+     */
+    private const ANALYSED_NAMESPACE_PREFIXES = ['Mautic\\', 'MauticPlugin\\'];
+
     public function getNodeType(): string
     {
         return CollectedDataNode::class;
@@ -53,6 +61,10 @@ final class NoUnusedServiceAliasRule implements Rule
                     continue;
                 }
 
+                if ($this->isVendorClassName($aliasName)) {
+                    continue;
+                }
+
                 if ($this->isUsedName($aliasName, $usagesByFilePath, $filePath, $startLine, $endLine)) {
                     continue;
                 }
@@ -69,6 +81,25 @@ final class NoUnusedServiceAliasRule implements Rule
         }
 
         return $ruleErrors;
+    }
+
+    /**
+     * A vendor class name alias, e.g. LightSaml\...\BuildContainer::class, is wired by vendor code alone,
+     * that is out of the analysed paths, so there is no way to tell it is unused.
+     */
+    private function isVendorClassName(string $aliasName): bool
+    {
+        if (!str_contains($aliasName, '\\')) {
+            return false;
+        }
+
+        foreach (self::ANALYSED_NAMESPACE_PREFIXES as $namespacePrefix) {
+            if (str_starts_with(ltrim($aliasName, '\\'), $namespacePrefix)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -128,6 +159,15 @@ final class NoUnusedServiceAliasRule implements Rule
                 foreach ($typeNames as $typeName) {
                     $usedTypeNames[ltrim($typeName, '\\')] = true;
                 }
+            }
+        }
+
+        /** @var array<string, list<string>> $classUsagesByFilePath */
+        $classUsagesByFilePath = $collectedDataNode->get(ServiceClassUsageCollector::class);
+
+        foreach ($classUsagesByFilePath as $classUsages) {
+            foreach ($classUsages as $className) {
+                $usedTypeNames[ltrim($className, '\\')] = true;
             }
         }
 
