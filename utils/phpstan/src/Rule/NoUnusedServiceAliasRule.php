@@ -79,12 +79,14 @@ final class NoUnusedServiceAliasRule implements Rule
         /** @var array<string, list<array{string, int}>> $usagesByFilePath */
         $usagesByFilePath = $collectedDataNode->get(ServiceNameUsageCollector::class);
 
-        /** @var array<string, list<array{string, int}>> $modelUsagesByFilePath */
+        /** @var array<string, list<list<array{string, int}>>> $modelUsagesByFilePath */
         $modelUsagesByFilePath = $collectedDataNode->get(ServiceModelKeyUsageCollector::class);
 
         foreach ($modelUsagesByFilePath as $filePath => $modelUsages) {
-            foreach ($modelUsages as $modelUsage) {
-                $usagesByFilePath[$filePath][] = $modelUsage;
+            foreach ($modelUsages as $modelUsageGroup) {
+                foreach ($modelUsageGroup as $modelUsage) {
+                    $usagesByFilePath[$filePath][] = $modelUsage;
+                }
             }
         }
 
