@@ -27,8 +27,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class);
     $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class);
+
     $services->set(Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
-    $services->alias('mautic.asset.upload.error.handler', Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class);
+
     $services->alias('mautic.asset.model.asset', Mautic\AssetBundle\Model\AssetModel::class);
     $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
 };

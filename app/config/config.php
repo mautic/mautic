@@ -248,7 +248,7 @@ $container->loadFromExtension('oneup_uploader', [
     // ),
     'mappings' => [
         'asset' => [
-            'error_handler'   => 'mautic.asset.upload.error.handler',
+            'error_handler'   => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
             'frontend'        => 'custom',
             'custom_frontend' => [
                 'class' => 'Mautic\AssetBundle\Controller\UploadController',
