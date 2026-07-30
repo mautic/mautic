@@ -6,6 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -23,7 +24,7 @@ return function (ContainerConfigurator $configurator): void {
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->set('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
-        ->arg('$logger', 'monolog.logger.mautic')
+        ->arg('$logger', service('monolog.logger.mautic'))
         ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
 
     $services->alias(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class, 'mautic.sms.twilio.transport');
