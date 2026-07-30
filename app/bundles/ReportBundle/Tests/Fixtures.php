@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests;
 
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+
 class Fixtures
 {
     /**
@@ -324,13 +326,13 @@ class Fixtures
     }
 
     /**
-     * @return array<float>
+     * @return array<float|int>
      */
     public static function getValidReportDataAggregatedTotals(): array
     {
         return [
             'SUM es.is_read' => 60,
-            'AVG es.is_read' => 0.3333,
+            'AVG es.is_read' => round(0.6666 / 2, FormatterHelper::FLOAT_PRECISION),
             'COUNT l.id'     => 160,
         ];
     }
@@ -434,6 +436,69 @@ class Fixtures
                     'paginate'       => true,
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getValidReportResultWithDateAggregatedColumns(): array
+    {
+        return [
+            'dateFrom'     => self::getDateFrom(),
+            'dateTo'       => self::getDateTo(),
+            'totalResults' => '2',
+            'data'         => [
+                [
+                    'e_id'             => '1',
+                    'e_name'           => 'Welcome',
+                    'MIN es.date_sent' => '2021-12-01 18:42:24',
+                    'MAX es.date_sent' => '2026-04-12 22:59:11',
+                    'COUNT l.email'    => '13676',
+                ],
+                [
+                    'e_id'             => '2',
+                    'e_name'           => 'Renew',
+                    'MIN es.date_sent' => '2024-02-16 00:42:17',
+                    'MAX es.date_sent' => '2026-04-12 14:21:55',
+                    'COUNT l.email'    => '26341',
+                ],
+            ],
+            'dataColumns' => [
+                'e_id'             => 'e.id',
+                'e_name'           => 'e.name',
+                'MIN es.date_sent' => 'es.date_sent',
+                'MAX es.date_sent' => 'es.date_sent',
+                'COUNT l.email'    => 'l.email',
+            ],
+            'columns' => [
+                'e.id' => [
+                    'label' => 'ID',
+                    'type'  => self::getIntegerType(),
+                    'alias' => 'e_id',
+                ],
+                'e.name' => [
+                    'label' => 'Name',
+                    'type'  => self::getStringType(),
+                    'alias' => 'e_name',
+                ],
+                'es.date_sent' => [
+                    'label' => 'Date Sent',
+                    'type'  => self::getDateType(),
+                    'alias' => 'date_sent',
+                ],
+                'l.email' => [
+                    'label' => 'Email',
+                    'type'  => self::getEmailType(),
+                    'alias' => 'email',
+                ],
+            ],
+            'aggregatorColumns' => [
+                'MIN es.date_sent' => 'es.date_sent',
+                'MAX es.date_sent' => 'es.date_sent',
+                'COUNT l.email'    => 'l.email',
+            ],
+            'limit' => 0,
         ];
     }
 
