@@ -6,8 +6,8 @@
     - trackingEnabled (bool)
     - trackingOnly (bool)
     - trackingClickUrl (string|null)
-    - trackingPixelUrl (string)
-    - trackingUrl (string)
+   - trackingPixelUrl (string)
+   - trackingUrl (string)
 #}
 {%- if trackingOnly -%}
 (function (window) {
@@ -934,6 +934,10 @@
     // Initialize
     var focusItem = MauticFocus{{ focus.id }}();
     window.MauticFocusItems[{{ focus.id }}] = focusItem;
+    if (window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[{{ focus.id }}]) {
+        delete window.MauticFocusTrackingQueue[{{ focus.id }}];
+        focusItem.loadTracking();
+    }
     focusItem.initialize();
 })(window);
 {%- endif -%}
