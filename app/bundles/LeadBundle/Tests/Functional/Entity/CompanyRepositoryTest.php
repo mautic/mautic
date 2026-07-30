@@ -58,6 +58,17 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $testEmail();
     }
 
+    public function testSearchesForUnownedCompanies(): void
+    {
+        $name = 'Automation test unowned company '.random_int(1000, 9999);
+        $this->createCompany($name);
+
+        $this->client->request(Request::METHOD_GET, '/s/companies?search=is:unowned');
+
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString($name, (string) $this->client->getResponse()->getContent());
+    }
+
     private function createCompany(string $name, string $address1 = ''): Company
     {
         /** @var CompanyModel $model */
