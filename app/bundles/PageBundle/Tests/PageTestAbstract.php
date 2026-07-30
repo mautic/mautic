@@ -164,8 +164,6 @@ abstract class PageTestAbstract extends TestCase
      */
     protected function getRedirectModel(): MockObject
     {
-        $shortener = $this->createMock(Shortener::class);
-
         $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([
                 $this->createStub(EntityManagerInterface::class),
@@ -180,7 +178,7 @@ abstract class PageTestAbstract extends TestCase
             ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirectModel->autowireRedirectModel($shortener, $this->createStub(RedirectRepository::class));
+        $mockRedirectModel->autowireRedirectModel($this->createMock(Shortener::class), $this->createStub(RedirectRepository::class));
 
         $mockRedirectModel
             ->method('createRedirectEntity')

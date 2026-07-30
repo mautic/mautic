@@ -620,9 +620,6 @@ TEXT;
             ]
         );
 
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
-
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
                 $this->createStub(EntityManagerInterface::class),
@@ -637,7 +634,7 @@ TEXT;
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
-        $mockModel->autowireTrackableModel($mockRedirectModel, $mockLeadFieldRepository, $this->createStub(TrackableRepository::class));
+        $mockModel->autowireTrackableModel($this->createMock(RedirectModel::class), $this->createMock(LeadFieldRepository::class), $this->createStub(TrackableRepository::class));
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
