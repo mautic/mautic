@@ -104,6 +104,8 @@ class PointActionHelper
 
     private function getSqlLikePattern(string $url): string
     {
+        $url = \addcslashes($url, '\\_%');
+
         if (false !== \strpbrk($url, '*?')) {
             return \str_replace(['*', '?'], ['%', '_'], $url);
         }
