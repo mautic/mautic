@@ -4,34 +4,38 @@ namespace MauticPlugin\MauticFullContactBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
-use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class LookupHelper
 {
-    /**
-     * @var bool|FullContactIntegration
-     */
-    protected $integration;
+    protected ?FullContactIntegration $integration = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
+        IntegrationsHelper $integrationsHelper,
         protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected Router $router,
+        protected LoggerInterface $logger,
+        protected RouterInterface $router,
         protected LeadModel $leadModel,
         protected CompanyModel $companyModel,
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
+        try {
+            /** @var FullContactIntegration $integration */
+            $integration       = $integrationsHelper->getIntegration('FullContact');
+            $this->integration = $integration;
+        } catch (IntegrationNotFoundException) {
+            $this->integration = null;
+        }
     }
 
     /**
@@ -167,12 +171,12 @@ class LookupHelper
 
     protected function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
-        if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
+        if (!$this->integration || !$this->integration->getIntegrationConfiguration()->getIsPublished()) {
             return false;
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->integration->getIntegrationConfiguration()->getApiKeys();
 
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }

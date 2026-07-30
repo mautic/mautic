@@ -1,115 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFullContactBundle\Integration;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-class FullContactIntegration extends AbstractIntegration
+class FullContactIntegration extends BasicIntegration implements BasicInterface
 {
     public function getName(): string
     {
         return 'FullContact';
     }
 
-    /**
-     * Return's authentication method such as oauth2, oauth1a, key, etc.
-     */
-    public function getAuthenticationType(): string
+    public function getDisplayName(): string
     {
-        return 'none';
+        return 'FullContact';
     }
 
-    /**
-     * Return array of key => label elements that will be converted to inputs to
-     * obtain from the user.
-     *
-     * @return array<string, string>
-     */
-    public function getRequiredKeyFields(): array
+    public function getIcon(): string
     {
-        // Do not rename field. fullcontact.js depends on it
-        return [
-            'apikey' => 'mautic.integration.fullcontact.apikey',
-        ];
-    }
-
-    /**
-     * @param FormBuilder|Form $builder
-     * @param array            $data
-     * @param string           $formArea
-     */
-    public function appendToForm(&$builder, $data, $formArea): void
-    {
-        if ('keys' === $formArea) {
-            $builder->add(
-                'test_api',
-                ButtonType::class,
-                [
-                    'label' => 'mautic.plugin.fullcontact.test_api',
-                    'attr'  => [
-                        'class'   => 'btn btn-primary',
-                        'style'   => 'margin-bottom: 10px',
-                        'onclick' => 'Mautic.testFullContactApi(this)',
-                    ],
-                ]
-            );
-
-            $builder->add(
-                'stats',
-                TextareaType::class,
-                [
-                    'label_attr' => ['class' => 'control-label'],
-                    'label'      => 'mautic.plugin.fullcontact.stats',
-                    'required'   => false,
-                    'attr'       => [
-                        'class'    => 'form-control',
-                        'rows'     => '6',
-                        'readonly' => 'readonly',
-                    ],
-                ]
-            );
-
-            $builder->add(
-                'auto_update',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.plugin.fullcontact.auto_update',
-                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
-                    'attr'  => [
-                        'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
-                    ],
-                ]
-            );
-        }
+        return 'plugins/MauticFullContactBundle/Assets/img/fullcontact.png';
     }
 
     public function shouldAutoUpdate(): bool
     {
-        $featureSettings = $this->getKeys();
+        $apiKeys = $this->getIntegrationSettings()?->getApiKeys() ?? [];
 
-        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
-    }
-
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
-    {
-        if ('custom' === $section) {
-            return [
-                'template'   => '@MauticFullContact/Integration/form.html.twig',
-                'parameters' => [
-                    'mauticUrl' => $this->router->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
-                ],
-            ];
-        }
-
-        return parent::getFormNotes($section);
+        return isset($apiKeys['auto_update']) && (bool) $apiKeys['auto_update'];
     }
 }
