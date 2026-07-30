@@ -41,8 +41,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     private StageRepository $stageRepository;
 
     #[Required]
-    public function autowireHubspotIntegration(StageRepository $stageRepository): void
-    {
+    public function autowireHubspotIntegration(
+        StageRepository $stageRepository,
+    ): void {
         $this->stageRepository = $stageRepository;
     }
 
