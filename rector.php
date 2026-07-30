@@ -88,7 +88,7 @@ return RectorConfig::configure()
 
         // promoting $model would type a property the untyped CommonApiController::$model already declares,
         // and PHP rejects a child adding a type to an inherited property
-        // https://github.com/rectorphp/rector-src/issues - reported upstream
+        // fixed upstream in https://github.com/rectorphp/rector-src/pull/8232, drop this once released
         ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__.'/app/bundles/*/Controller/Api/*ApiController.php',
             __DIR__.'/plugins/*/Controller/Api/*ApiController.php',
