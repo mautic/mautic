@@ -57,6 +57,11 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
         $this->assertCount(0, $this->em->getRepository(Redirect::class)->findAll());
 
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+        $trackingContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('activateTracking', $trackingContent);
+        $this->assertCount(1, $this->em->getRepository(Redirect::class)->findAll());
+
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
         $content = $this->client->getResponse()->getContent();
 
@@ -121,6 +126,21 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $contactTracker = static::getContainer()->get(ContactTracker::class);
         $contactTracker->setSystemContact($firstContact);
 
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+        $firstTrackingResponse = $this->client->getResponse();
+        $firstTrackingContent  = (string) $firstTrackingResponse->getContent();
+        $this->assertTrue($firstTrackingResponse->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($firstTrackingResponse->headers->hasCacheControlDirective('no-store'));
+
+        $contactTracker->setSystemContact($secondContact);
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+        $secondTrackingResponse = $this->client->getResponse();
+        $secondTrackingContent  = (string) $secondTrackingResponse->getContent();
+        $this->assertTrue($secondTrackingResponse->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($secondTrackingResponse->headers->hasCacheControlDirective('no-store'));
+        $this->assertNotSame($firstTrackingContent, $secondTrackingContent);
+
+        $contactTracker->setSystemContact($firstContact);
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
         $firstResponse = $this->client->getResponse();
         $firstContent  = (string) $firstResponse->getContent();

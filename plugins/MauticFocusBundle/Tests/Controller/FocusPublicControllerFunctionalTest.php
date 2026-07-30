@@ -30,6 +30,9 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString("mautic_focus_{$focus->getId()}", $content);
         $this->assertStringContainsString("mautic_focus_{$focus->getId()}_closed", $content);
         $this->assertStringContainsString("mf-bar-collapser-{$focus->getId()}", $content);
+        $this->assertStringContainsString('window.MauticFocusItems', $content);
+        $this->assertStringContainsString('loadTracking', $content);
+        $this->assertMatchesRegularExpression('/trackingEnabled:(?:true|!0)/', $content);
         $this->assertMatchesRegularExpression("/Focus\\.cookies\\.setItem\\(['\"]mautic_focus_{$focus->getId()}['\"]\\s*,\\s*-1\\s*,/", $content);
         $this->assertStringNotContainsString('MauticJS', $content);
         $this->assertStringNotContainsString('mtc_id', $content);
@@ -67,6 +70,15 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString("mautic_focus_{$id}_closed", $displayContent);
         $this->assertStringContainsString("mf-bar-collapser-{$id}", $displayContent);
         $this->assertStringContainsString('privacysafe.example', $displayContent);
+        $this->assertStringContainsString('window.MauticFocusItems', $displayContent);
+        $this->assertStringContainsString('window.MauticFocusTrackingQueue', $displayContent);
+        $this->assertStringContainsString('loadTracking', $displayContent);
+        $this->assertStringContainsString('DOMContentLoaded', $displayContent);
+        $this->assertStringContainsString('initialized', $displayContent);
+        $this->assertStringContainsString('delete window.MauticFocusItems', $displayContent);
+        $this->assertMatchesRegularExpression('/trackingLoading:(?:false|!1)/', $displayContent);
+        $this->assertMatchesRegularExpression('/trackingEnabled:(?:false|!1)/', $displayContent);
+        $this->assertStringContainsString('tracking.js', $displayContent);
         $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
         $this->assertStringNotContainsString('mauticform[focusId]', $displayContent);
         $this->assertStringNotContainsString('localStorage', $displayContent);
@@ -84,8 +96,13 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $trackingContent = (string) $this->client->getResponse()->getContent();
         $this->assertStringContainsString('window.MauticFocusItems', $trackingContent);
         $this->assertStringContainsString('runtimeReady', $trackingContent);
+        $this->assertStringContainsString('activateTracking', $trackingContent);
+        $this->assertStringContainsString('mauticform[focusId]', $trackingContent);
+        $this->assertStringContainsString('.mauticform_wrapper > form[data-mautic-form]', $trackingContent);
+        $this->assertStringContainsString('viewpixel.gif', $trackingContent);
+        $this->assertStringNotContainsString('mautic_focus_', $trackingContent);
         $this->assertStringNotContainsString('createIframe', $trackingContent);
-        $this->assertStringNotContainsString('iframeDoc', $trackingContent);
+        $this->assertStringNotContainsString('privacysafe.example', $trackingContent);
     }
 
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]

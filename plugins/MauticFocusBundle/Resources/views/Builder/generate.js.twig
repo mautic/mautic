@@ -3,7 +3,64 @@
     - focus (MauticPlugin\MauticFocusBundle\Entity\Focus)
     - preview (bool, default: false)
     - clickUrl (string)
+    - trackingEnabled (bool)
+    - trackingOnly (bool)
+    - trackingClickUrl (string|null)
+    - trackingPixelUrl (string)
+    - trackingUrl (string)
 #}
+{%- if trackingOnly -%}
+(function (window) {
+    var item = window.MauticFocusItems && window.MauticFocusItems[{{ focus.id }}];
+    if (!item || !item.runtimeReady || typeof item.activateTracking !== 'function') {
+        return;
+    }
+
+    var clickUrl = '{{ trackingClickUrl|default('')|e('js') }}';
+    var installTrackingHandlers = function () {
+        if (!item.iframeDoc) {
+            return;
+        }
+
+        if (clickUrl) {
+            var links = item.iframeDoc.getElementsByClassName('mf-link');
+            for (var linkIndex = 0; linkIndex < links.length; linkIndex++) {
+                links[linkIndex].href = clickUrl;
+            }
+        }
+
+        var forms = item.iframeDoc.querySelectorAll('.mauticform_wrapper > form[data-mautic-form]');
+        for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+            if (forms[formIndex].querySelector('input[name="mauticform[focusId]"]')) {
+                continue;
+            }
+
+            var focusId = item.iframeDoc.createElement('input');
+            focusId.type = 'hidden';
+            focusId.name = 'mauticform[focusId]';
+            focusId.value = {{ focus.id }};
+            forms[formIndex].appendChild(focusId);
+        }
+    };
+
+    item.activateTracking({
+        install: installTrackingHandlers,
+        hooks: {
+            onEngage: function () {
+                installTrackingHandlers();
+                if (item.trackingViewSent) {
+                    return;
+                }
+
+                item.trackingViewSent = true;
+                item.trackingPixel = new window.Image();
+                item.trackingPixel.src = '{{ trackingPixelUrl|e('js') }}';
+            },
+            onConvert: installTrackingHandlers
+        }
+    });
+})(window);
+{%- else -%}
 {%- set style = focus.style -%}
 {%- set props = focus.properties -%}
 {%- set useScrollEvent = (props.when in ['scroll_slight', 'scroll_middle', 'scroll_bottom']) -%}
@@ -43,6 +100,11 @@
   {%- set iframeClass = 'mf-' ~ style ~ '-iframe' -%}
 {%- endif -%}
 (function (window) {
+    window.MauticFocusItems = window.MauticFocusItems || {};
+    if (window.MauticFocusItems[{{ focus.id }}]) {
+        return;
+    }
+
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
     }
@@ -53,17 +115,98 @@
             modalsDismissed: {},
             ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion is defined and props.stop_after_conversion is not empty %}true{% else %}false{% endif %},
             ignoreClosed: {% if props.stop_after_close is defined and props.stop_after_close is not empty %}true{% else %}false{% endif %},
+            initializing: false,
+            initialized: false,
+            runtimeReady: false,
+            trackingLoading: false,
+            trackingEnabled: {% if trackingEnabled %}true{% else %}false{% endif %},
+            trackingScript: null,
+            trackingHooks: {
+                onEngage: function () {},
+                onConvert: function () {}
+            },
+
+            loadTracking: function () {
+                if (Focus.trackingEnabled || Focus.trackingLoading) {
+                    return Focus.trackingScript;
+                }
+
+                Focus.trackingLoading = true;
+                Focus.trackingScript = document.createElement('script');
+                Focus.trackingScript.async = true;
+                Focus.trackingScript.src = '{{ trackingUrl|e('js') }}';
+                Focus.trackingScript.onerror = function () {
+                    Focus.trackingLoading = false;
+                    if (Focus.trackingScript.parentNode) {
+                        Focus.trackingScript.parentNode.removeChild(Focus.trackingScript);
+                    }
+                    Focus.trackingScript = null;
+                };
+                Focus.trackingScript.onload = function () {
+                    Focus.trackingLoading = false;
+                };
+                (document.head || document.getElementsByTagName('head')[0]).appendChild(Focus.trackingScript);
+
+                return Focus.trackingScript;
+            },
+
+            activateTracking: function (config) {
+                if (!Focus.runtimeReady || Focus.trackingEnabled) {
+                    return false;
+                }
+
+                config.install();
+                Focus.trackingHooks = config.hooks;
+                Focus.trackingLoading = false;
+                Focus.trackingEnabled = true;
+
+                return true;
+            },
 
             // Initialize the focus
             initialize: function () {
+                if (Focus.initializing || Focus.initialized) {
+                    return false;
+                }
+
+                if (!document.body) {
+                    Focus.initializing = true;
+                    var initializeWhenReady = function () {
+                        document.removeEventListener('DOMContentLoaded', initializeWhenReady);
+                        Focus.initializing = false;
+                        Focus.initialize();
+                    };
+                    document.addEventListener('DOMContentLoaded', initializeWhenReady);
+
+                    return false;
+                }
+
+                Focus.initializing = true;
                 if (Focus.debug)
                     console.log('initialize()');
 
-                Focus.insertStyleIntoHead();
-                Focus.registerFocusEvent();
+                try {
+                    Focus.insertStyleIntoHead();
+                    Focus.registerFocusEvent();
 
-                // Add class to body
-                Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus{{ style|capitalize }}');
+                    // Add class to body
+                    Focus.addClass(document.body, 'MauticFocus{{ style|capitalize }}');
+
+                    Focus.runtimeReady = true;
+                    Focus.initialized = true;
+                    if (window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[{{ focus.id }}]) {
+                        window.MauticFocusTrackingQueue[{{ focus.id }}] = false;
+                        Focus.loadTracking();
+                    }
+                } catch (error) {
+                    Focus.runtimeReady = false;
+                    delete window.MauticFocusItems[{{ focus.id }}];
+                    throw error;
+                } finally {
+                    Focus.initializing = false;
+                }
+
+                return true;
             },
 
             // Register click events for toggling bar, closing windows, etc
@@ -495,6 +638,9 @@
 
                 Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
                 Focus.cookies.setItem('mautic_focus_{{ focus.id }}', now, Infinity, '/');
+                if (Focus.trackingEnabled) {
+                    Focus.trackingHooks.onEngage();
+                }
 
                 {% if 'bar' == style %}
                 var collapser = document.getElementsByClassName('mf-bar-collapser-{{ focus.id }}');
@@ -642,6 +788,10 @@
 
             // Create cookie noting visitor has been converted if applicable
             convertVisitor: function () {
+                if (Focus.trackingEnabled) {
+                    Focus.trackingHooks.onConvert();
+                }
+
                 if (Focus.ignoreConverted) {
                     if (Focus.debug)
                         console.log('Visitor converted');
@@ -746,5 +896,8 @@
     }
 
     // Initialize
-    MauticFocus{{ focus.id }}().initialize();
+    var focusItem = MauticFocus{{ focus.id }}();
+    window.MauticFocusItems[{{ focus.id }}] = focusItem;
+    focusItem.initialize();
 })(window);
+{%- endif -%}

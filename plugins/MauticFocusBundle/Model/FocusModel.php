@@ -139,17 +139,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         FocusJsScope::TRACKING,
     ]): string
     {
-        if ([FocusJsScope::TRACKING] === $acceptedScopes) {
-            return sprintf(
-                '(function () { var item = window.MauticFocusItems && window.MauticFocusItems[%d]; if (!item || !item.runtimeReady) { return; } })();',
-                $focus->getId()
-            );
-        }
-
+        $runtimeEnabled  = in_array(FocusJsScope::RUNTIME, $acceptedScopes, true);
+        $displayEnabled  = in_array(FocusJsScope::DISPLAY, $acceptedScopes, true);
         $trackingEnabled = in_array(FocusJsScope::TRACKING, $acceptedScopes, true);
+        $trackingOnly    = $trackingEnabled && !$runtimeEnabled && !$displayEnabled;
         $lead            = $trackingEnabled ? $this->contactTracker->getContact() : null;
         $focusArray      = $focus->toArray();
         $url             = $trackingEnabled ? '' : ($focusArray['properties']['content']['link_url'] ?? '');
+        $trackableUrl    = null;
 
         if ($trackingEnabled && $trackableUrl = $this->generateTrackableUrl($focus, $lead)) {
             $url = '{focusClickUrl}';
@@ -162,8 +159,27 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'preview'  => $isPreview,
                 'clickUrl' => $url,
                 'acceptedScopes' => $acceptedScopes,
+                'runtimeEnabled'  => $runtimeEnabled,
+                'displayEnabled'  => $displayEnabled,
+                'trackingEnabled' => $trackingEnabled,
+                'trackingOnly'    => $trackingOnly,
+                'trackingClickUrl' => $trackableUrl,
+                'trackingPixelUrl' => $this->router->generate(
+                    'mautic_focus_pixel',
+                    ['id' => $focus->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'trackingUrl'     => $this->router->generate(
+                    'mautic_focus_generate_tracking',
+                    ['id' => $focus->getId()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
             ]
         );
+
+        if ($trackingOnly) {
+            return (new Minify\JS($javascript))->minify();
+        }
 
         $content = $this->getContent($focusArray, $isPreview, $url, $trackingEnabled);
         $data    = [
