@@ -9,7 +9,7 @@ use Psr\Log\LogLevel;
 
 class DebugLogger
 {
-    private static ?LoggerInterface $logger = null;
+    private static ?LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
