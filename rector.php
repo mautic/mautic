@@ -81,6 +81,7 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+<<<<<<< HEAD
         // to be fixed in dev-main
         Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
             '*Command.php',
@@ -94,11 +95,11 @@ return RectorConfig::configure()
             __DIR__.'/plugins/*/Controller/Api/*ApiController.php',
         ],
 
+=======
+>>>>>>> ddc5618da4 (update config)
         Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
         ],
-
-        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
@@ -124,7 +125,6 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
-        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
