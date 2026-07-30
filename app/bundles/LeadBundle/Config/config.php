@@ -326,41 +326,6 @@ return [
             'class' => Mautic\LeadBundle\Entity\LeadList::class,
         ],
     ],
-    'services' => [
-        'events' => [
-            'mautic.lead.serializer.subscriber' => [
-                'class'     => Mautic\LeadBundle\EventListener\SerializerSubscriber::class,
-                'arguments' => [
-                    'request_stack',
-                ],
-                'tag'          => 'jms_serializer.event_subscriber',
-                'tagArguments' => [
-                    'event' => JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
-                ],
-            ],
-        ],
-        'other' => [
-            Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
-                'tag'       => 'validator.constraint_validator',
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.helper.field.alias',
-                    '@doctrine.orm.entity_manager',
-                    'translator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
-                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
-                'tag'       => 'validator.constraint_validator',
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.helper.field.alias',
-                ],
-            ],
-        ],
-    ],
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
