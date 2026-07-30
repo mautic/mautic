@@ -33,11 +33,9 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$cacheProvider', service('mautic.cache.provider'))
         ->arg('$logger', service('monolog.logger.mautic'))
         ->tag('kernel.cache_clearer');
-    $services->alias('mautic.cache.clear_cache_subscriber', Mautic\CacheBundle\EventListener\CacheClearSubscriber::class);
 
     $services->alias(Mautic\CacheBundle\Cache\CacheProviderInterface::class, Mautic\CacheBundle\Cache\CacheProvider::class);
     $services->alias('mautic.cache.provider', Mautic\CacheBundle\Cache\CacheProvider::class);
-    $services->alias('mautic.cache.provider_tag_aware', Mautic\CacheBundle\Cache\CacheProviderTagAware::class);
     $services->alias('mautic.cache.adapter.redis', Mautic\CacheBundle\Cache\Adapter\RedisAdapter::class);
     $services->alias('mautic.cache.adapter.redis_tag_aware', Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter::class);
 

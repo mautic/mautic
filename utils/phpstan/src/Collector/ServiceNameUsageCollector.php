@@ -48,6 +48,11 @@ final class ServiceNameUsageCollector implements Collector
             return null;
         }
 
+        // a service is referred to by an "@" prefix in a definition array, e.g. '@mautic.menu.builder'
+        if (str_starts_with($serviceId, '@')) {
+            $serviceId = substr($serviceId, 1);
+        }
+
         if (1 !== preg_match(self::SERVICE_ID_PATTERN, $serviceId)) {
             return null;
         }
