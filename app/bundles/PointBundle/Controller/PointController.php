@@ -20,8 +20,9 @@ final class PointController extends AbstractFormController
     private PointModel $pointModel;
 
     #[Required]
-    public function autowirePointController(PointModel $pointModel): void
-    {
+    public function autowirePointController(
+        PointModel $pointModel,
+    ): void {
         $this->pointModel = $pointModel;
     }
 

@@ -36,8 +36,9 @@ final class PageController extends FormController
     private PageModel $pageModel;
 
     #[Required]
-    public function autowirePageController(PageModel $pageModel): void
-    {
+    public function autowirePageController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 

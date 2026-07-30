@@ -41,8 +41,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     private CompanyRepository $companyRepository;
 
     #[Required]
-    public function autowireSugarcrmIntegration(CompanyRepository $companyRepository): void
-    {
+    public function autowireSugarcrmIntegration(
+        CompanyRepository $companyRepository,
+    ): void {
         $this->companyRepository = $companyRepository;
     }
 
