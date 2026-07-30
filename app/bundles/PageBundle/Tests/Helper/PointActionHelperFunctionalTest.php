@@ -172,7 +172,7 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('repositoryUrlFilterProvider')]
+    #[DataProvider('repositoryUrlFilterProvider')]
     public function testValidateUrlHitMatchesRepositoryQueries(string $pageUrlFilter, string $message): void
     {
         $lead       = $this->createLead();

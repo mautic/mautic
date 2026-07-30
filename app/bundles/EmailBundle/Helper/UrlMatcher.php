@@ -20,7 +20,7 @@ class UrlMatcher
 
             $url = self::sanitizeUrl($url);
 
-            if (self::isLegacyWildcardPattern($url) && fnmatch($url, $urlToFind, FNM_CASEFOLD)) {
+            if (self::isLegacyWildcardPattern($url) && \fnmatch($url, $urlToFind, FNM_CASEFOLD)) {
                 return true;
             }
 
@@ -60,6 +60,6 @@ class UrlMatcher
 
     private static function isLegacyWildcardPattern(string $url): bool
     {
-        return false !== strpbrk($url, '*?[');
+        return false !== \strpbrk($url, '*?[');
     }
 }

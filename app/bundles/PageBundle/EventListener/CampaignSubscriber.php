@@ -191,14 +191,14 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         if (isset($config['url']) && $config['url']) {
             $pageUrl     = html_entity_decode($eventDetails->getUrl());
             $limitToUrls = explode(',', $config['url']);
-            $limitToUrls = array_map(static fn (string $url): string => html_entity_decode(trim($url)), $limitToUrls);
+            $limitToUrls = \array_map(static fn (string $url): string => \html_entity_decode(\trim($url)), $limitToUrls);
         }
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['referer']) && $config['referer']) {
             $refererUrl      = html_entity_decode($eventDetails->getReferer());
             $limitToReferers = explode(',', $config['referer']);
-            $limitToReferers = array_map(static fn (string $referer): string => html_entity_decode(trim($referer)), $limitToReferers);
+            $limitToReferers = \array_map(static fn (string $referer): string => \html_entity_decode(\trim($referer)), $limitToReferers);
         }
 
         // **Page hit is true if:**
