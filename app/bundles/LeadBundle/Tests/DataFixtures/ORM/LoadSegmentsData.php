@@ -1067,7 +1067,7 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
         }
     }
 
-    protected function createSegment(array $listConfig, ObjectManager $manager): void
+    private function createSegment(array $listConfig, ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');
 

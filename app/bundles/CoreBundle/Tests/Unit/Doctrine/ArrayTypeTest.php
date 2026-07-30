@@ -21,7 +21,7 @@ final class ExampleClassWithProtectedProperty
     /**
      * @phpstan-ignore-next-line
      */
-    private $test = 'value';
+    private string $test = 'value';
 }
 
 final class ExampleClassWithPublicProperty

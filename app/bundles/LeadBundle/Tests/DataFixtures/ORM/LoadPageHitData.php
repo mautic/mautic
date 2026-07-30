@@ -85,7 +85,7 @@ final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInt
         }
     }
 
-    protected function createHit(array $hitConfig, ObjectManager $manager): void
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 

@@ -103,7 +103,7 @@ final class LoadClickData extends AbstractFixture implements OrderedFixtureInter
     /**
      * @param array<string,mixed> $hitConfig
      */
-    protected function createHit(array $hitConfig, ObjectManager $manager): void
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
