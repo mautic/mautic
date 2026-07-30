@@ -5,6 +5,10 @@ declare(strict_types=1);
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
+<<<<<<< HEAD
+=======
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
+>>>>>>> 78b6361c45 (add Symfony sets to Rector config)
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -38,6 +42,8 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
+        \Rector\Symfony\CodeQuality\Rector\ClassMethod\ReturnDirectJsonResponseRector::class,
+
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
@@ -46,17 +52,19 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
 
         // symfony
-        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
         Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
         // DI
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
+<<<<<<< HEAD
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
     ->withCodeQualityLevel(45)
+=======
+    ->withComposerBased(phpunit: true, symfony: true)
+    ->withCodeQualityLevel(3)
+>>>>>>> 78b6361c45 (add Symfony sets to Rector config)
     ->withSkip([
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
@@ -86,6 +94,11 @@ return RectorConfig::configure()
             __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
 
+        // fix no nullable
+        // Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector:
+        // handled in another PR, but leaving here for now to avoid conflicts
+        RecastingRemovalRector::class,
+
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
@@ -109,8 +122,18 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
         ],
 
+<<<<<<< HEAD
+=======
+        // lets handle later, once we have more type declaratoins
+        // RecastingRemovalRector::class,
+>>>>>>> 78b6361c45 (add Symfony sets to Rector config)
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-    ]);
+
+        // symfony
+        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
+    ])
+    ->reportUnusedSkips();
