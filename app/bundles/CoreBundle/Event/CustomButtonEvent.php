@@ -30,10 +30,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->location;
     }
 
-    /**
-     * @return array
-     */
-    public function getButtons()
+    public function getButtons(): array
     {
         return $this->buttons;
     }

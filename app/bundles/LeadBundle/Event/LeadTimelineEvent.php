@@ -260,7 +260,7 @@ final class LeadTimelineEvent extends Event
      *
      * @return array of available types
      */
-    public function getEventTypes()
+    public function getEventTypes(): array
     {
         natcasesort($this->eventTypes);
 

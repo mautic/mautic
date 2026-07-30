@@ -197,10 +197,7 @@ class MessageQueue
         $this->attempts = $attempts;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -461,10 +458,7 @@ class MessageQueue
         $this->options['metadata'] = $metadata;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasMetadataUpdated()
+    public function wasMetadataUpdated(): bool
     {
         return $this->metadataUpdated;
     }

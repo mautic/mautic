@@ -72,10 +72,7 @@ final class CustomContentEvent extends Event
         return $this->vars;
     }
 
-    /**
-     * @return array
-     */
-    public function getContent()
+    public function getContent(): array
     {
         return $this->content;
     }

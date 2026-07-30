@@ -543,10 +543,7 @@ class Event implements ChannelInterface, UuidInterface
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
