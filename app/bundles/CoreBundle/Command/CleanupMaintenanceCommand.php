@@ -157,7 +157,7 @@ final class CleanupMaintenanceCommand extends ModeratedCommand
      * @param array<int|string>                                   $stats
      * @param array<string|bool|int|float|array<int|string>|null> $options
      */
-    protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
+    private function storeToAuditLog(array $stats, bool $dryRun, array $options): void
     {
         $notEmptyStats = array_filter($stats);
         if (!$dryRun && count($notEmptyStats)) {

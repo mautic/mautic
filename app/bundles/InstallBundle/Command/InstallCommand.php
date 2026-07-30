@@ -358,7 +358,7 @@ final class InstallCommand extends Command
      *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, array $params, float $index = 0): array
+    private function stepAction(InstallService $installer, array $params, float $index = 0): array
     {
         if ($index - floor($index) > 0) {
             $subIndex = (int) (round($index - floor($index), 1) * 10);

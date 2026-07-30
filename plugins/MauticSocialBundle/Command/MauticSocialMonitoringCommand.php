@@ -71,7 +71,7 @@ final class MauticSocialMonitoringCommand extends Command
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    protected function getMonitors($id = null)
+    private function getMonitors($id = null)
     {
         $filter = [
             'start' => 0,
@@ -96,7 +96,7 @@ final class MauticSocialMonitoringCommand extends Command
     /**
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
+    private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

@@ -282,7 +282,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return bool
      */
-    protected function dispatchTriggerEvent(Campaign $campaign)
+    private function dispatchTriggerEvent(Campaign $campaign)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
