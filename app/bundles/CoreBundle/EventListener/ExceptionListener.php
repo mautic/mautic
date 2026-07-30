@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -25,6 +26,24 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ExceptionListener extends ErrorListener
 {
+    /**
+     * Mautic handles the exception well before the Symfony error listener does, so onKernelException runs
+     * at a high priority instead of the -128 the parent asks for.
+     *
+     * @return array<string, mixed>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::CONTROLLER_ARGUMENTS => 'onControllerArguments',
+            KernelEvents::EXCEPTION            => [
+                ['logKernelException', 0],
+                ['onKernelException', 253],
+            ],
+            KernelEvents::RESPONSE             => ['removeCspHeader', -128],
+        ];
+    }
+
     /**
      * @param string|object|mixed[]|null $controller
      */
