@@ -78,6 +78,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('DOMContentLoaded', $displayContent);
         $this->assertStringContainsString('initialized', $displayContent);
         $this->assertStringContainsString('delete window.MauticFocusItems', $displayContent);
+        $this->assertStringNotContainsString('Mautic.closeFocusModal', $displayContent);
         $this->assertMatchesRegularExpression('/trackingLoading:(?:false|!1)/', $displayContent);
         $this->assertMatchesRegularExpression('/trackingRequested:(?:false|!1)/', $displayContent);
         $this->assertMatchesRegularExpression('/trackingEnabled:(?:false|!1)/', $displayContent);
