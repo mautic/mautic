@@ -48,11 +48,11 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param string $name
+     * @param array<mixed> $arguments
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         $isSetter = str_starts_with($name, 'set');
         $isGetter = str_starts_with($name, 'get');
