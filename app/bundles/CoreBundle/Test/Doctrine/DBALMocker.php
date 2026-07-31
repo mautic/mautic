@@ -22,10 +22,6 @@ final class DBALMocker
 
     private $queryResponse;
 
-    private ?array $connectionUpdated = null;
-
-    private ?array $connectionInserted = null;
-
     private array $queryParts = [
         'select'     => [],
         'from'       => [],
@@ -43,7 +39,7 @@ final class DBALMocker
         $this->queryResponse = $queryResponse;
     }
 
-    public function getQueryParts()
+    public function getQueryParts(): array
     {
         return $this->queryParts;
     }
@@ -69,12 +65,10 @@ final class DBALMocker
 
     public function resetUpdated(): void
     {
-        $this->connectionUpdated = [];
     }
 
     public function resetInserted(): void
     {
-        $this->connectionInserted = [];
     }
 
     public function reset(): void
@@ -84,7 +78,7 @@ final class DBALMocker
         $this->resetInserted();
     }
 
-    public function getMockEm()
+    public function getMockEm(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockEm) {
             $entityManagerMockBuilder = new MockBuilder($this->testCase, EntityManager::class);
@@ -122,7 +116,7 @@ final class DBALMocker
         return $this->mockEm;
     }
 
-    public function getMockConnection()
+    public function getMockConnection(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockConnection) {
             $connectionMockBuilder = new MockBuilder($this->testCase, Connection::class);
@@ -145,16 +139,10 @@ final class DBALMocker
                 ->willReturnArgument(0);
 
             $mock->expects(new AnyInvokedCount())
-                ->method('update')
-                ->willReturnCallback(function (): void {
-                    $this->connectionUpdated[] = func_get_args();
-                });
+                ->method('update');
 
             $mock->expects(new AnyInvokedCount())
-                ->method('insert')
-                ->willReturnCallback(function (): void {
-                    $this->connectionInserted[] = func_get_args();
-                });
+                ->method('insert');
 
             $this->mockConnection = $mock;
         }
@@ -162,7 +150,7 @@ final class DBALMocker
         return $this->mockConnection;
     }
 
-    public function getMockQueryBuilder()
+    public function getMockQueryBuilder(): \PHPUnit\Framework\MockObject\MockObject
     {
         if (null === $this->mockQueryBuilder) {
             $queryBuilderMockBuilder = new MockBuilder($this->testCase, QueryBuilder::class);

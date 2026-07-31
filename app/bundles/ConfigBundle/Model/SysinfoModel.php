@@ -88,10 +88,8 @@ final class SysinfoModel
 
     /**
      * Method to get important folders with a writable flag.
-     *
-     * @return array
      */
-    public function getFolders()
+    public function getFolders(): array
     {
         if (null !== $this->folders) {
             return $this->folders;
