@@ -7,7 +7,7 @@ namespace Mautic\SmsBundle\Tests;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Sms\TransportInterface;
 
-class ArrayTransport implements TransportInterface
+final class ArrayTransport implements TransportInterface
 {
     /**
      * @var array<array{'contact': Lead, 'content': string}>

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly ListModel $listModel,
@@ -1067,7 +1067,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    protected function createSegment(array $listConfig, ObjectManager $manager): void
+    private function createSegment(array $listConfig, ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');
 
