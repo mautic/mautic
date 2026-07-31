@@ -240,10 +240,10 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $expectedIds = [$noPublishUp->getId(), $pastPublishUp->getId()];
         sort($expectedIds);
 
-        Assert::assertSame($expectedIds, $broadcastIds);
-        Assert::assertNotContains($futurePublishUp->getId(), $broadcastIds);
-        Assert::assertNotContains($unpublished->getId(), $broadcastIds);
-        Assert::assertNotContains($template->getId(), $broadcastIds);
+        $this->assertSame($expectedIds, $broadcastIds);
+        $this->assertNotContains($futurePublishUp->getId(), $broadcastIds);
+        $this->assertNotContains($unpublished->getId(), $broadcastIds);
+        $this->assertNotContains($template->getId(), $broadcastIds);
     }
 
     private function createSegmentEmail(string $name, bool $isPublished, ?\DateTimeInterface $publishUp): Email
