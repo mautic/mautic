@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -57,22 +58,30 @@ final class PageSubscriberTest extends TestCase
         ], $event->getTokens());
     }
 
-    public function testPageDisplayUsesTokenHelperReplacements(): void
+    public function testPageDisplayReplacesDisplayTrackingAndUnqualifiedTokens(): void
     {
-        $content      = '{focus=1} {focus=2|display}';
-        $replacements = [
-            '{focus=1}'         => '<script src="legacy"></script>',
-            '{focus=2|display}' => '<script src="display"></script>',
-        ];
+        $focusItem = new Focus();
+        $focusItem->setIsPublished(true);
 
-        $tokenHelper = $this->createMock(TokenHelper::class);
-        $tokenHelper->expects($this->once())
-            ->method('findFocusTokens')
-            ->with($content)
-            ->willReturn($replacements);
+        $model = $this->createMock(FocusModel::class);
+        $model->expects($this->exactly(3))
+            ->method('getEntity')
+            ->willReturn($focusItem);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->exactly(3))
+            ->method('generate')
+            ->willReturnCallback(static fn (string $route, array $parameters): string => match ($route) {
+                'mautic_focus_generate'         => 'https://example.test/focus/'.$parameters['id'].'.js',
+                'mautic_focus_generate_display' => 'https://example.test/focus/'.$parameters['id'].'/display.js',
+                default                         => throw new \UnexpectedValueException($route),
+            });
+
+        $tokenHelper = new TokenHelper($model, $router, $this->createStub(CorePermissions::class));
+        $content     = '{focus=1|tracking} {focus=2|display} {focus=3} {focus=4|legacy}';
 
         $subscriber = new PageSubscriber(
-            $this->createStub(FocusModel::class),
+            $model,
             $tokenHelper,
             $this->createStub(BuilderTokenHelperFactory::class),
             $this->createStub(TranslatorInterface::class),
@@ -81,6 +90,11 @@ final class PageSubscriberTest extends TestCase
 
         $subscriber->onPageDisplay($event);
 
-        $this->assertSame(strtr($content, $replacements), $event->getContent());
+        $this->assertSame(
+            '<script src="https://example.test/focus/1.js" type="text/javascript" charset="utf-8" async="async"></script> '
+            .'<script src="https://example.test/focus/2/display.js" type="text/javascript" charset="utf-8" async="async"></script> '
+            .'<script src="https://example.test/focus/3.js" type="text/javascript" charset="utf-8" async="async"></script> ',
+            $event->getContent(),
+        );
     }
 }
