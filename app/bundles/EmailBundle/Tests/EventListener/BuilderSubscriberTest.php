@@ -314,11 +314,12 @@ final class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(fn (string $route): string => match ($route) {
-                'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
-                'mautic_email_webview'     => '/email/webview/'.$emailHash,
-                'mautic_email_preview'     => '/email/preview/111',
-                default                    => '',
+            ->willReturnCallback(fn (string $route, array $routeParams = []): string => match (true) {
+                'mautic_email_validate_email_form' === $route && ($routeParams['action'] ?? '') === 'unsubscribe' => '/email/validate/unsubscribe/'.$emailHash.'/hash',
+                'mautic_email_validate_email_form' === $route                                                    => '/email/validate/resubscribe/'.$emailHash.'/hash',
+                'mautic_email_webview' === $route                                                               => '/email/webview/'.$emailHash,
+                'mautic_email_preview' === $route                                                               => '/email/preview/111',
+                default                                                                                         => '',
             });
 
         $this->translator->method('trans')
@@ -326,7 +327,7 @@ final class BuilderSubscriberTest extends TestCase
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
-            '<a href="/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash.'">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
+            '<a href="/email/validate/unsubscribe/'.$emailHash.'/hash">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
             $event->getTokens()['{unsubscribe_text}']
         );
     }
