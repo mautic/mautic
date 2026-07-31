@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 
 #[AsMessageHandler]
-class PageHitNotificationHandler
+final class PageHitNotificationHandler
 {
     public function __construct(
         private readonly PageRepository $pageRepository,

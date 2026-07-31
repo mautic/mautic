@@ -9,7 +9,7 @@ use Mautic\MessengerBundle\Message\TestEmail;
 use Mautic\MessengerBundle\Message\TestFailed;
 use Mautic\MessengerBundle\Message\TestHit;
 
-class TestMessageFactory
+final class TestMessageFactory
 {
     public function __construct(
         private readonly UserHelper $userHelper,

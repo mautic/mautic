@@ -6,16 +6,16 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
-class MailboxOrganizer
+final class MailboxOrganizer
 {
     /**
      * @var MailboxContainer[]
      */
-    protected $containers = [];
+    private $containers = [];
 
     public function __construct(
-        protected ParseEmailEvent $event,
-        protected array $mailboxes,
+        private ParseEmailEvent $event,
+        private array $mailboxes,
     ) {
     }
 
@@ -62,7 +62,7 @@ class MailboxOrganizer
     /**
      * @return MailboxContainer
      */
-    protected function getContainer(ConfigAccessor $config)
+    private function getContainer(ConfigAccessor $config)
     {
         $key = $config->getKey();
         if (!isset($this->containers[$key])) {
