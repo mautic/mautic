@@ -14,19 +14,19 @@ use PHPUnit\Framework\TestCase;
 
 final class DBALMocker
 {
-    private $mockEm;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockEm = null;
 
-    private $mockConnection;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockConnection = null;
 
-    private $mockQueryBuilder;
+    private ?\PHPUnit\Framework\MockObject\MockObject $mockQueryBuilder = null;
 
     private $queryResponse;
 
-    private $connectionUpdated;
+    private ?array $connectionUpdated = null;
 
-    private $connectionInserted;
+    private ?array $connectionInserted = null;
 
-    private $queryParts = [
+    private array $queryParts = [
         'select'     => [],
         'from'       => [],
         'where'      => [],
@@ -34,7 +34,7 @@ final class DBALMocker
     ];
 
     public function __construct(
-        private TestCase $testCase,
+        private readonly TestCase $testCase,
     ) {
     }
 

@@ -18,6 +18,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class VideoModel extends FormModel
 {
+<<<<<<< HEAD
     protected IpLookupHelper $ipLookupHelper;
 
     protected ContactTracker $contactTracker;
@@ -33,6 +34,22 @@ final class VideoModel extends FormModel
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->contactTracker     = $contactTracker;
         $this->videoHitRepository = $videoHitRepository;
+=======
+    public function __construct(
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly ContactTracker $contactTracker,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private readonly VideoHitRepository $videoHitRepository,
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+>>>>>>> a96628aab6 (refactor: apply rector and cs-fixer follow-ups unlocked by final)
     }
 
     public function getHitRepository(): VideoHitRepository

@@ -26,10 +26,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class EventLogModel extends AbstractCommonModel
 {
     public function __construct(
-        protected EventModel $eventModel,
-        protected CampaignModel $campaignModel,
-        protected IpLookupHelper $ipLookupHelper,
-        protected EventScheduler $eventScheduler,
+        private readonly EventModel $eventModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly EventScheduler $eventScheduler,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

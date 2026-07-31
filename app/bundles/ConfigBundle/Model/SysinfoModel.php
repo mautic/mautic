@@ -20,13 +20,13 @@ final class SysinfoModel
     /**
      * @var array<string,bool>|null
      */
-    private $folders;
+    private ?array $folders = null;
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
         private readonly TranslatorInterface $translator,
-        private Connection $connection,
+        private readonly Connection $connection,
         private readonly InstallService $installService,
         private readonly CheckStep $checkStep,
     ) {
