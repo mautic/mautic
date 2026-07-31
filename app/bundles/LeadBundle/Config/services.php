@@ -34,6 +34,10 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->set('mautic.lead.serializer.subscriber', Mautic\LeadBundle\EventListener\SerializerSubscriber::class)->tag('jms_serializer.event_subscriber', ['event' => JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE]);
+    $services->alias(Mautic\LeadBundle\EventListener\SerializerSubscriber::class, 'mautic.lead.serializer.subscriber');
+    $services->set(Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class)->tag('validator.constraint_validator');
+    $services->set(Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.validator.leadlistaccess', Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class)->tag('validator.constraint_validator', ['alias' => 'leadlist_access']);
     $services->alias(Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class, 'mautic.validator.leadlistaccess');
     $services->set('mautic.lead.constraint.alias', Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class)->tag('validator.constraint_validator', ['alias' => 'uniqueleadlist']);
