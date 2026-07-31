@@ -114,6 +114,43 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('privacysafe.example', $trackingContent);
     }
 
+    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function testYesNoIntegerFlagsRenderCorrectBooleans(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = static::getContainer()->get(FocusModel::class);
+
+        $focusOff = $this->createFocus('flags-off');
+        $focusOff->setProperties(array_merge($focusOff->getProperties(), [
+            'animate'               => 0,
+            'link_activation'       => 0,
+            'stop_after_close'      => 0,
+            'stop_after_conversion' => 0,
+        ]));
+        $focusModel->saveEntity($focusOff);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$focusOff->getId()}/display.js");
+        $offContent = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        // Twig "is not empty" treats integer 0 as not empty; YesNo fields must use truthiness.
+        $this->assertMatchesRegularExpression('/ignoreClosed:(?:false|!1)/', $offContent);
+        $this->assertMatchesRegularExpression('/ignoreConverted:(?:false|!1)/', $offContent);
+
+        $focusOn = $this->createFocus('flags-on');
+        $focusOn->setProperties(array_merge($focusOn->getProperties(), [
+            'stop_after_close'      => 1,
+            'stop_after_conversion' => 1,
+        ]));
+        $focusModel->saveEntity($focusOn);
+
+        $this->client->request(Request::METHOD_GET, "/focus/{$focusOn->getId()}/display.js");
+        $onContent = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        $this->assertMatchesRegularExpression('/ignoreClosed:(?:true|!0)/', $onContent);
+        $this->assertMatchesRegularExpression('/ignoreConverted:(?:true|!0)/', $onContent);
+    }
+
     public function testTrackingActivationRuntime(): void
     {
         /** @var FocusModel $focusModel */

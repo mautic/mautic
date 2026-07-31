@@ -78,8 +78,8 @@
 {%- set useScrollEvent = (props.when in ['scroll_slight', 'scroll_middle', 'scroll_bottom']) -%}
 {%- set useUnloadEvent = ('leave' == props.when) -%}
 {%- set useTimeout = props.timeout|default(0) -%}
-{%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty) -%}
-{%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty) -%}
+{%- set animate = props.animate is not defined or props.animate -%}
+{%- set linkActivation = props.link_activation is not defined or props.link_activation -%}
 {%- set clickUrl = clickUrl|default(props.content.link_url) -%}
 
 {%- if '5seconds' == props.when -%}
@@ -125,8 +125,8 @@
         var Focus = {
             debug: {{ ('dev' == app.environment) ? 'true' : 'false' }},
             modalsDismissed: {},
-            ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion is defined and props.stop_after_conversion is not empty %}true{% else %}false{% endif %},
-            ignoreClosed: {% if props.stop_after_close is defined and props.stop_after_close is not empty %}true{% else %}false{% endif %},
+            ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion|default(false) %}true{% else %}false{% endif %},
+            ignoreClosed: {% if props.stop_after_close|default(false) %}true{% else %}false{% endif %},
             initializing: false,
             initialized: false,
             runtimeReady: false,
