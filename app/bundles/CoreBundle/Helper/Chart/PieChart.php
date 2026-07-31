@@ -6,10 +6,8 @@ final class PieChart extends AbstractChart implements ChartInterface
 {
     /**
      * Holds the suma of the all dataset values.
-     *
-     * @var float
      */
-    protected $totalCount = 0;
+    private int $totalCount = 0;
 
     /**
      * @return array{labels: mixed[], datasets: mixed[]}

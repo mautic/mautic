@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 final class SeriesPieChart extends AbstractChart implements ChartInterface
 {
-    protected int|float $totalCount = 0;
+    private int|float $totalCount = 0;
 
     /**
      * @var int[][]
