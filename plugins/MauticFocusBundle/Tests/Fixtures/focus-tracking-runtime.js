@@ -55,7 +55,11 @@ function createBrowser(body = {className: ''}) {
         createTextNode(text) {
             return {text};
         },
-        dispatchEvent() {},
+        dispatchEvent(event) {
+            if (documentListeners[event.type]) {
+                documentListeners[event.type](event);
+            }
+        },
         getElementsByClassName() {
             return [];
         },
@@ -65,7 +69,7 @@ function createBrowser(body = {className: ''}) {
     };
     const browserGlobal = {
         addEventListener() {},
-        CustomEvent: function () {},
+        CustomEvent: function (type) { this.type = type; },
         Date,
         console,
         decodeURIComponent,
@@ -137,6 +141,33 @@ function item(browser) {
     browser.appendedScripts[0].onerror();
     focus.loadTracking();
     assert.strictEqual(browser.appendedScripts.length, 2, 'failed activation must be retryable');
+}
+
+{
+    const browser = createBrowser();
+    execute(displayScript, browser);
+
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    assert.strictEqual(browser.appendedScripts.length, 0, 'MTC tracking must not imply Focus consent');
+}
+
+{
+    const browser = createBrowser();
+    browser.window.MauticFocusUseMauticTrackingConsent = true;
+    execute(displayScript, browser);
+
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    browser.document.dispatchEvent(new browser.window.CustomEvent('mautic:tracking-enabled'));
+    assert.strictEqual(browser.appendedScripts.length, 1, 'explicit MTC consent bridge must load tracking once');
+}
+
+{
+    const browser = createBrowser();
+    browser.window.MauticFocusUseMauticTrackingConsent = true;
+    browser.window.MauticJS = {trackingEnabled: true};
+    execute(displayScript, browser);
+
+    assert.strictEqual(browser.appendedScripts.length, 1, 'display loaded after MTC tracking must consume opt-in state');
 }
 
 {

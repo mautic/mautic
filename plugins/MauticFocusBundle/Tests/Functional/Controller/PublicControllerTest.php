@@ -66,6 +66,8 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('DisplayFocusContact', $displayContent);
         $this->assertStringContainsString('anonymous.example', $displayContent);
         $this->assertStringContainsString('visitor', $displayContent);
+        $this->assertStringContainsString('MauticFocusUseMauticTrackingConsent', $displayContent);
+        $this->assertStringContainsString('mautic:tracking-enabled', $displayContent);
         $this->assertStringNotContainsString('contactfield', $displayContent);
         $this->assertCount(0, $this->em->getRepository(Redirect::class)->findAll());
 

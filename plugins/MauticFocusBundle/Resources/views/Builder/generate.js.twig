@@ -957,6 +957,17 @@
     // Initialize
     var focusItem = MauticFocus{{ focus.id }}();
     window.MauticFocusItems[{{ focus.id }}] = focusItem;
+    {% if not trackingEnabled %}
+    var enableTrackingFromMautic = function () {
+        if (window.MauticFocusUseMauticTrackingConsent === true) {
+            focusItem.loadTracking();
+        }
+    };
+    document.addEventListener('mautic:tracking-enabled', enableTrackingFromMautic);
+    if (window.MauticJS && window.MauticJS.trackingEnabled === true) {
+        enableTrackingFromMautic();
+    }
+    {% endif %}
     if (window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[{{ focus.id }}]) {
         delete window.MauticFocusTrackingQueue[{{ focus.id }}];
         focusItem.loadTracking();
