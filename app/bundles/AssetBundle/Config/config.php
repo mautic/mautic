@@ -54,15 +54,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'others' => [
-            // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => [
-                'class'     => Mautic\AssetBundle\Controller\UploadController::class,
-            ],
-        ],
-    ],
-
     'parameters' => [
         'upload_dir'          => '%mautic.application_dir%/media/files',
         'max_size'            => '6',
