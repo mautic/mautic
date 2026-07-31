@@ -17,16 +17,15 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Controller\AjaxController;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
-use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Http\Client;
@@ -201,14 +200,7 @@ final class WebhookControllerTest extends TestCase
         $logRepository->expects($this->never())
             ->method('getSuccessVsErrorStatusCodeRatio');
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->atLeast(3))->method('getRepository')
-            ->willReturnMap([
-                [Event::class, $webhookEventRepository],
-                [WebhookQueue::class, $webhookQueueRepository],
-                [Webhook::class, $webhookRepository],
-                [Log::class, $logRepository],
-            ]);
+        $em = $this->createStub(EntityManager::class);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('serialize')
@@ -255,11 +247,15 @@ final class WebhookControllerTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(WebhookService::class)
+            $this->createStub(WebhookService::class),
+            $webhookRepository, // $webhookRepository
+            $webhookQueueRepository, // $webhookQueueRepository
+            $webhookEventRepository, // $eventRepository
+            $logRepository, // $logRepository
         );
         $leadModel = $this->createStub(LeadModel::class);
 
-        $subscriber = new WebhookSubscriber($webhookModel, $leadModel);
+        $subscriber = new WebhookSubscriber($webhookModel, $leadModel, $this->createStub(LeadRepository::class));
         $subscriber->onLeadNewUpdate($event);
     }
 

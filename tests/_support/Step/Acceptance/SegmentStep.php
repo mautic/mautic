@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\SegmentsPage;
 
-class SegmentStep extends \AcceptanceTester
+final class SegmentStep extends \AcceptanceTester
 {
     /**
      * Create a contact segment with the given name.

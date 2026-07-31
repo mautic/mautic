@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
@@ -76,7 +77,7 @@ final class ScheduledExecutionerTest extends TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -150,7 +151,7 @@ final class ScheduledExecutionerTest extends TestCase
             ->method('hydrateContacts');
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Two events were evaluated
         $this->assertEquals(2, $counter->getTotalEvaluated());
@@ -225,7 +226,7 @@ final class ScheduledExecutionerTest extends TestCase
             ->method('hydrateContacts');
 
         $counter = $this->getExecutioner()->executeByIds([1, 2]);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Two events were evaluated but not executed because campaign was unpublished
         $this->assertEquals(2, $counter->getTotalEvaluated());

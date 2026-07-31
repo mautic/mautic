@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class UserListType extends AbstractType
+final class UserListType extends AbstractType
 {
     /**
      * @var array<string,int>
@@ -35,7 +35,7 @@ class UserListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

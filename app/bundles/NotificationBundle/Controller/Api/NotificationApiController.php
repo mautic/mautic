@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
@@ -38,10 +39,9 @@ class NotificationApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        NotificationModel $notificationModel,
+        private readonly LeadModel $leadModel,
     ) {
-        $notificationModel    = $modelFactory->getModel('notification');
-        \assert($notificationModel instanceof NotificationModel);
-
         $this->model           = $notificationModel;
         $this->entityClass     = Notification::class;
         $this->entityNameOne   = 'notification';
@@ -57,12 +57,9 @@ class NotificationApiController extends CommonApiController
     {
         $osid = $request->get('osid');
         if ($osid) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
-
             if ($currentLead = $this->contactTracker->getContact()) {
                 $currentLead->addPushIDEntry($osid);
-                $leadModel->saveEntity($currentLead);
+                $this->leadModel->saveEntity($currentLead);
             }
 
             return new JsonResponse(['success' => true, 'osid' => $osid], 200, ['Access-Control-Allow-Origin' => '*']);

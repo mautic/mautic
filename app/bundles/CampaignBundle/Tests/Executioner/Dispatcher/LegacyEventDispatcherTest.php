@@ -446,7 +446,6 @@ final class LegacyEventDispatcherTest extends TestCase
      */
     private function getLegacyEventDispatcher(): LegacyEventDispatcher
     {
-        /** @phpstan-ignore new.deprecated */
         return new LegacyEventDispatcher(
             $this->dispatcher,
             $this->scheduler,

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -230,7 +231,7 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($tokenList[$token]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidateToken')]
+    #[DataProvider('dataValidateToken')]
     public function testValidToken(string $content, bool $expected): void
     {
         $this->assertSame($expected, TokenHelper::validToken($content));
@@ -247,7 +248,7 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['firstname', false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetTokenFieldAlias')]
+    #[DataProvider('dataGetTokenFieldAlias')]
     public function testGetTokenFieldAlias(string $content, string $expected): void
     {
         $this->assertSame($expected, TokenHelper::getTokenFieldAlias($content));
@@ -264,7 +265,7 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataLabelProvider')]
+    #[DataProvider('dataLabelProvider')]
     public function testLabelFormatForSelect(string $token, string|int $result): void
     {
         $lead         = $this->lead;

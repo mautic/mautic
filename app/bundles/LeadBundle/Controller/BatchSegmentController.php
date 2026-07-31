@@ -17,8 +17,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
-class BatchSegmentController extends AbstractFormController
+final class BatchSegmentController extends AbstractFormController
 {
     public function __construct(
         private readonly SegmentActionModel $segmentActionModel,
@@ -72,7 +73,7 @@ class BatchSegmentController extends AbstractFormController
     /**
      * View for batch action.
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_segment_batch_contact_set');
         $lists = $this->segmentModel->getUserLists();

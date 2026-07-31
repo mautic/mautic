@@ -26,8 +26,8 @@ class RedisTagAwareAdapter extends TagAwareAdapter
         int $lifetime,
 
         #[Autowire(env: 'bool:MAUTIC_REDIS_PRIMARY_ONLY')]
-        bool $primaryOnly)
-    {
+        bool $primaryOnly,
+    ) {
         $client = $this->createClient($servers, $primaryOnly);
 
         parent::__construct(

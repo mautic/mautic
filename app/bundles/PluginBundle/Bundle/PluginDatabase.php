@@ -41,23 +41,22 @@ class PluginDatabase
 
         $schemaTool     = new SchemaTool($this->em);
         $installQueries = $schemaTool->getCreateSchemaSql(array_values($metadata));
-        $connection     = $this->connection;
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
             if (self::isDDLStatement($q)) {
                 // Execute DDL statements outside of a transaction
-                $connection->executeStatement($q);
+                $this->connection->executeStatement($q);
             } else {
                 // For non-DDL statements, use transactions
                 try {
-                    $connection->beginTransaction();
-                    $connection->executeStatement($q);
-                    $connection->commit();
+                    $this->connection->beginTransaction();
+                    $this->connection->executeStatement($q);
+                    $this->connection->commit();
                 } catch (\Exception $e) {
                     // Rollback only for non-DDL statements
-                    if ($connection->isTransactionActive()) {
-                        $connection->rollBack();
+                    if ($this->connection->isTransactionActive()) {
+                        $this->connection->rollBack();
                     }
                     throw $e;
                 }

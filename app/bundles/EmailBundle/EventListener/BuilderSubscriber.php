@@ -20,7 +20,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
@@ -35,6 +35,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         private readonly TranslatorInterface $translator,
         private readonly MailHashHelper $mailHash,
         private readonly FromEmailHelper $fromEmailHelper,
+        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
+        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
     ) {
     }
 
@@ -286,16 +288,13 @@ class BuilderSubscriber implements EventSubscriberInterface
             $this->convertedContent[$cacheKey] = [$content, $trackables];
 
             foreach ($trackables as $trackable) {
-                $trackableRepository = $this->pageTrackableModel->getRepository();
-                $redirectRepository  = $this->pageRedirectModel->getRepository();
-
                 if ($trackable instanceof Trackable) {
-                    $trackableRepository->detachEntity($trackable);
-                    $redirectRepository->detachEntity($trackable->getRedirect());
-                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                    $this->trackableRepository->detachEntity($trackable);
+                    $this->redirectRepository->detachEntity($trackable->getRedirect());
+                    $this->trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
                 } else {
-                    $redirectRepository->detachEntity($trackable);
-                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                    $this->redirectRepository->detachEntity($trackable);
+                    $this->trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
                 }
             }
         }

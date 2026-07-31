@@ -74,7 +74,7 @@ class MaxMindDoNotSellDownloadHelper
             return false;
         }
 
-        return (bool) file_put_contents($this->getLocalDataStoreFilepath(), $responseContent);
+        return (bool) file_put_contents($this->listPath, $responseContent);
     }
 
     /**

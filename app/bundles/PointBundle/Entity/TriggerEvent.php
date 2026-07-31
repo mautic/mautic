@@ -156,7 +156,7 @@ class TriggerEvent implements UuidInterface
             ->build();
     }
 
-    private function isChanged(string $prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
         if ($this->{$prop} != $val) {
             $this->changes[$prop] = [$this->{$prop}, $val];
@@ -318,6 +318,6 @@ class TriggerEvent implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getTrigger()->getCreatedBy();
+        return $this->trigger->getCreatedBy();
     }
 }

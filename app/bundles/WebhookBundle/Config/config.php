@@ -40,19 +40,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'others' => [
-            'mautic.webhook.campaign.helper' => [
-                'class'     => Mautic\WebhookBundle\Helper\CampaignHelper::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.lead.model.company',
-                    'event_dispatcher',
-                ],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'webhook_limit'                            => 10, // How many entities can be sent in one webhook
         'webhook_time_limit'                       => 600, // How long the webhook processing can run in seconds

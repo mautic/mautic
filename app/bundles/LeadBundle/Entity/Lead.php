@@ -550,7 +550,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param mixed      $val
      * @param mixed|null $oldValue
      */
-    protected function isChanged($prop, $val, $oldValue = null)
+    protected function isChanged($prop, $val, $oldValue = null): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $oldValue ?? $this->{$getter}();
@@ -664,7 +664,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPermissionUser()
     {
-        return $this->getOwner() ?? $this->getCreatedBy();
+        return $this->owner ?? $this->getCreatedBy();
     }
 
     public function addIpAddress(IpAddress $ipAddress): self
@@ -704,8 +704,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getName($lastFirst = false)
     {
-        $firstName = $this->getFirstname();
-        $lastName  = $this->getLastname();
+        $firstName = $this->firstname;
+        $lastName  = $this->lastname;
 
         $fullName = '';
         if ($lastFirst && $firstName && $lastName) {
@@ -749,16 +749,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         if ($name = $this->getName($lastFirst)) {
             return $name;
         }
-        if ($this->getCompany()) {
-            return $this->getCompany();
+        if ($this->company) {
+            return $this->company;
         }
-        if ($this->getEmail()) {
-            return $this->getEmail();
+        if ($this->email) {
+            return $this->email;
         }
         if ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
         }
-        if (count($ips = $this->getIpAddresses())) {
+        if (count($ips = $this->ipAddresses)) {
             return $ips->first()->getIpAddress();
         }
 
@@ -772,8 +772,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getSecondaryIdentifier()
     {
-        if ($this->getCompany()) {
-            return $this->getCompany();
+        if ($this->company) {
+            return $this->company;
         }
 
         return '';
@@ -786,16 +786,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         $location = '';
 
-        if ($this->getCity()) {
-            $location .= $this->getCity().', ';
+        if ($this->city) {
+            $location .= $this->city.', ';
         }
 
-        if ($this->getState()) {
-            $location .= $this->getState().', ';
+        if ($this->state) {
+            $location .= $this->state.', ';
         }
 
-        if ($this->getCountry()) {
-            $location .= $this->getCountry().', ';
+        if ($this->country) {
+            $location .= $this->country.', ';
         }
 
         return rtrim($location, ', ');
@@ -1171,10 +1171,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function isAnonymous(): bool
     {
         return !($this->getName()
-            || $this->getFirstname()
-            || $this->getLastname()
-            || $this->getCompany()
-            || $this->getEmail()
+            || $this->firstname
+            || $this->lastname
+            || $this->company
+            || $this->email
             || $this->getFirstSocialIdentity()
         );
     }
@@ -1578,7 +1578,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getLeadPhoneNumber()
     {
-        return $this->getMobile() ?: $this->getPhone();
+        return $this->mobile ?: $this->phone;
     }
 
     /**
@@ -1760,8 +1760,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function getChannelRules()
     {
         if (null === $this->channelRules) {
-            $frequencyRules = $this->getFrequencyRules()->toArray();
-            $dnc            = $this->getDoNotContact();
+            $frequencyRules = $this->frequencyRules->toArray();
+            $dnc            = $this->doNotContact;
             $dncChannels    = [];
             /** @var DoNotContact $record */
             foreach ($dnc as $record) {

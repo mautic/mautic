@@ -55,7 +55,7 @@ class ImportValidateEvent extends Event
      */
     public function importIsForRouteObject(string $routeObject): bool
     {
-        return $this->getRouteObjectName() === $routeObject;
+        return $this->routeObjectName === $routeObject;
     }
 
     public function getRouteObjectName(): string

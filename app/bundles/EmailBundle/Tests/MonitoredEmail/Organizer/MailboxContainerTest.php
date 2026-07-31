@@ -7,22 +7,24 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ConfigAccessor::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(MailboxContainer::class)]
+#[CoversClass(ConfigAccessor::class)]
+#[CoversClass(MailboxContainer::class)]
 final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, string>
      */
-    protected array $config = [
+    private array $config = [
         'imap_path' => 'path',
         'user'      => 'user',
         'host'      => 'host',
         'folder'    => 'folder',
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Container\'s path should be config\'s path for services that don\'t have access
+    #[TestDox('Container\'s path should be config\'s path for services that don\'t have access
          to the config but need to set the path')]
     public function testPathMatches(): void
     {
@@ -32,7 +34,7 @@ final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($configAccessor->getPath(), $mailboxContainer->getPath());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Criteria should be returned correctly')]
+    #[TestDox('Criteria should be returned correctly')]
     public function testCriteriaIsSetAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
@@ -55,7 +57,7 @@ final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($criteria, $mailboxContainer->getCriteria());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Keep as unseen flag should be correctly returned when set')]
+    #[TestDox('Keep as unseen flag should be correctly returned when set')]
     public function testUnseenFlagIsReturnedAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
