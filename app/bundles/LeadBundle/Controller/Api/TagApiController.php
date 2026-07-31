@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tag>
  */
-class TagApiController extends CommonApiController
+final class TagApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

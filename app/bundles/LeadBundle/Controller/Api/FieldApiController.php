@@ -26,14 +26,14 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadField>
  */
-class FieldApiController extends CommonApiController
+final class FieldApiController extends CommonApiController
 {
     /**
      * Can have value of 'contact' or 'company'.
      *
      * @var string
      */
-    protected $fieldObject;
+    private $fieldObject;
 
     /**
      * @var FieldModel|null

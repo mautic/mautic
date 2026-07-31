@@ -29,7 +29,7 @@ use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SecurityController extends CommonController implements EventSubscriberInterface
+final class SecurityController extends CommonController implements EventSubscriberInterface
 {
     public function __construct(
         ManagerRegistry $doctrine,
@@ -107,13 +107,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 'sessionExpired' => true,
             ],
         ]);
-    }
-
-    /**
-     * Do nothing.
-     */
-    public function loginCheckAction(): void
-    {
     }
 
     /**

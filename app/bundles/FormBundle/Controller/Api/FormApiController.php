@@ -29,7 +29,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Form>
  */
-class FormApiController extends CommonApiController
+final class FormApiController extends CommonApiController
 {
     /**
      * @var FormModel|null
@@ -292,7 +292,7 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createActionEntityForm(Action $entity, array $action)
+    protected function createActionEntityForm(Action $entity, array $action): FormInterface
     {
         $components = $this->formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
@@ -314,7 +314,7 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity)
+    protected function createFieldEntityForm($entity): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Trigger>
  */
-class TriggerApiController extends CommonApiController
+final class TriggerApiController extends CommonApiController
 {
     /**
      * @var TriggerModel|null
