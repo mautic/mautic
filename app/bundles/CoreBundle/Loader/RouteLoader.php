@@ -86,10 +86,7 @@ class RouteLoader extends Loader
         return $collection;
     }
 
-    /**
-     * @param mixed $resource
-     */
-    public function supports($resource, $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'mautic' === $type;
     }
