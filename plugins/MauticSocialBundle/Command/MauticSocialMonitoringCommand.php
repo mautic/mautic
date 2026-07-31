@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private readonly \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository $monitoringRepository,
+        private readonly MonitoringRepository $monitoringRepository,
     ) {
         parent::__construct();
     }

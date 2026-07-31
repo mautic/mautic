@@ -17,7 +17,7 @@ use PHPStan\Collectors\Collector;
  * Collects the service aliases registered in bundle Config/services.php files,
  * e.g. $services->alias('mautic.some.helper', SomeHelper::class).
  *
- * @implements Collector<MethodCall, array{string, int, int}>
+ * @implements Collector<MethodCall, array{string, string, int, int}>
  */
 final class ServiceAliasCollector implements Collector
 {
@@ -32,7 +32,8 @@ final class ServiceAliasCollector implements Collector
     }
 
     /**
-     * @return array{string, int, int}|null the alias name with the first and the last line of the alias() call
+     * @return array{string, string, int, int}|null the alias name and the service it points at,
+     *                                              with the first and the last line of the alias() call
      */
     public function processNode(Node $node, Scope $scope): ?array
     {
@@ -44,17 +45,18 @@ final class ServiceAliasCollector implements Collector
             return null;
         }
 
-        $firstArg = $node->getArgs()[0] ?? null;
-        if (!$firstArg instanceof Node\Arg) {
+        $args = $node->getArgs();
+        if (2 !== count($args)) {
             return null;
         }
 
-        $aliasName = $this->matchAliasName($firstArg->value);
-        if (null === $aliasName) {
+        $aliasName = $this->matchAliasName($args[0]->value);
+        $aliasTarget = $this->matchAliasName($args[1]->value);
+        if (null === $aliasName || null === $aliasTarget) {
             return null;
         }
 
-        return [$aliasName, $node->getStartLine(), $node->getEndLine()];
+        return [$aliasName, $aliasTarget, $node->getStartLine(), $node->getEndLine()];
     }
 
     /**
