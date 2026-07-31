@@ -1,25 +1,6 @@
 <?php
 
 return [
-    'services' => [
-        'other' => [
-            'mautic.sms.twilio.transport' => [
-                'class'        => Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
-                'arguments'    => [
-                    'mautic.sms.twilio.configuration',
-                    'monolog.logger.mautic',
-                ],
-                'tag'          => 'mautic.sms_transport',
-                'tagArguments' => [
-                    'integrationAlias' => 'Twilio',
-                ],
-                'serviceAliases' => [
-                    'sms_api',
-                    'mautic.sms.api',
-                ],
-            ],
-        ],
-    ],
     'routes' => [
         'main' => [
             'mautic_sms_index' => [
