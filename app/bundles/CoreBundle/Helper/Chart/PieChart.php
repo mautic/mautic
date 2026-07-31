@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-class PieChart extends AbstractChart implements ChartInterface
+final class PieChart extends AbstractChart implements ChartInterface
 {
     /**
      * Holds the suma of the all dataset values.

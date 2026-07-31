@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 /**
  * Line chart requires the same data as Bar chart.
  */
-class LineChart extends AbstractChart implements ChartInterface
+final class LineChart extends AbstractChart implements ChartInterface
 {
     /**
      * Match date/time unit to a humanly readable label

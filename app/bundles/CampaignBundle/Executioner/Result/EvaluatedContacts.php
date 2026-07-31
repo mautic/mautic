@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Executioner\Result;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-class EvaluatedContacts
+final class EvaluatedContacts
 {
     private readonly ArrayCollection $passed;
 

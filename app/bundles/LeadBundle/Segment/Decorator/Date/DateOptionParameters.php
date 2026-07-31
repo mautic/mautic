@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
-class DateOptionParameters
+final class DateOptionParameters
 {
     private readonly bool $hasTimePart;
 
