@@ -62,7 +62,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return false;
     }
 
-    public function updateTimestamp($sessionId, $data): bool
+    public function updateTimestamp(string $sessionId, string $data): bool
     {
         $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
 
