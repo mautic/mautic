@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ZohoApi>
  */
-class ZohoIntegration extends CrmAbstractIntegration
+final class ZohoIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file.

@@ -24,7 +24,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadDevice>
  */
-class DeviceModel extends FormModel
+final class DeviceModel extends FormModel
 {
     public function __construct(
         private readonly LeadDeviceRepository $leadDeviceRepository,

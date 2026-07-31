@@ -8,7 +8,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 /**
  * @property SugarcrmIntegration $integration
  */
-class SugarcrmApi extends CrmApi
+final class SugarcrmApi extends CrmApi
 {
     protected $object = 'Leads';
 

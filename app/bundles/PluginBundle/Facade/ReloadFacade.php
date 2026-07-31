@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Helper\ReloadHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReloadFacade
+final class ReloadFacade
 {
     public function __construct(
         private readonly PluginModel $pluginModel,

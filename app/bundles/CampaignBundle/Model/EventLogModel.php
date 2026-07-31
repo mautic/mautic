@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends AbstractCommonModel<LeadEventLog>
  */
-class EventLogModel extends AbstractCommonModel
+final class EventLogModel extends AbstractCommonModel
 {
     public function __construct(
         protected EventModel $eventModel,

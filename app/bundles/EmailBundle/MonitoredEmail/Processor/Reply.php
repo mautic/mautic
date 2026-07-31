@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Reply implements ProcessorInterface
+final class Reply implements ProcessorInterface
 {
     public function __construct(
         private readonly EmailStatModel $emailStatModel,
@@ -105,7 +105,7 @@ class Reply implements ProcessorInterface
     /**
      * @param string $messageId
      */
-    protected function createReply(Stat $stat, $messageId): void
+    private function createReply(Stat $stat, $messageId): void
     {
         $replies = $stat->getReplies()->filter(
             fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId

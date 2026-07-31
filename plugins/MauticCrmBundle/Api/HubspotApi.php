@@ -9,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 /**
  * @property HubspotIntegration $integration
  */
-class HubspotApi extends CrmApi
+final class HubspotApi extends CrmApi
 {
     protected $requestSettings = [
         'encode_parameters' => 'json',

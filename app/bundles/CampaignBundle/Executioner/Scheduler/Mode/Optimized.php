@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 
-class Optimized implements ScheduleModeInterface
+final class Optimized implements ScheduleModeInterface
 {
     public const OPTIMIZED_TIME         = 0;
 

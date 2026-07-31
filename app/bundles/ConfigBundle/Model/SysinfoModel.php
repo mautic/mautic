@@ -10,23 +10,23 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SysinfoModel
+final class SysinfoModel
 {
     /**
      * @var string|null
      */
-    protected $phpInfo;
+    private $phpInfo;
 
     /**
      * @var array<string,bool>|null
      */
-    protected $folders;
+    private $folders;
 
     public function __construct(
-        protected PathsHelper $pathsHelper,
-        protected CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
+        private CoreParametersHelper $coreParametersHelper,
         private readonly TranslatorInterface $translator,
-        protected Connection $connection,
+        private Connection $connection,
         private readonly InstallService $installService,
         private readonly CheckStep $checkStep,
     ) {

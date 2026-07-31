@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class TagDependencies
+final class TagDependencies
 {
     public function __construct(
         private readonly CampaignModel $campaignModel,

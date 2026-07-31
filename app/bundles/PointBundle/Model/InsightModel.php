@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends CommonFormModel<PointInsight>
  */
-class InsightModel extends CommonFormModel
+final class InsightModel extends CommonFormModel
 {
     public function __construct(
         protected LeadModel $leadModel,

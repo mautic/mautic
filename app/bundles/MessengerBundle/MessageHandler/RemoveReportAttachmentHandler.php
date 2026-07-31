@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Email;
 
 #[AsMessageHandler(priority: -1000)]
-class RemoveReportAttachmentHandler
+final class RemoveReportAttachmentHandler
 {
     public function __construct(
         private readonly ExportHandler $exportHandler,

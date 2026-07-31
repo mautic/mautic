@@ -7,7 +7,7 @@ use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use LightSaml\Store\Id\IdStoreInterface;
 use Mautic\UserBundle\Entity\IdEntry;
 
-class IdStore implements IdStoreInterface
+final class IdStore implements IdStoreInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $manager,

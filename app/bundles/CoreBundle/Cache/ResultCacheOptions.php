@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Cache;
 
-class ResultCacheOptions
+final class ResultCacheOptions
 {
     /**
      * @param string  $namespace mainly used for invalidation

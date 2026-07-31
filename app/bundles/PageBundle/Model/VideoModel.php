@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends FormModel<VideoHit>
  */
-class VideoModel extends FormModel
+final class VideoModel extends FormModel
 {
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,

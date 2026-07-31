@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class IcontactApi extends EmailMarketingApi
+final class IcontactApi extends EmailMarketingApi
 {
     protected function request($endpoint, $parameters = [], $method = 'GET')
     {

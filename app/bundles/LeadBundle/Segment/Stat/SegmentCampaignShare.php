@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
-class SegmentCampaignShare
+final class SegmentCampaignShare
 {
     public function __construct(
         private readonly CampaignModel $campaignModel,

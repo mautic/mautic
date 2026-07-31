@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadNote>
  */
-class NoteModel extends FormModel
+final class NoteModel extends FormModel
 {
     public function __construct(
         EntityManagerInterface $em,

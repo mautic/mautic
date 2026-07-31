@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class EmailPeriodMetrics
+final class EmailPeriodMetrics
 {
     private const CAMPAIGN_EVENT_SOURCE = 'campaign.event';
 

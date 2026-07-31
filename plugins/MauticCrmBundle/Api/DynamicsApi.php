@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Psr\Http\Message\ResponseInterface;
 
-class DynamicsApi extends CrmApi
+final class DynamicsApi extends CrmApi
 {
     private function getUrl(): string
     {

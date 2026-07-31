@@ -6,29 +6,29 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Progress
+final class Progress
 {
     /**
      * Total number of items representing 100%.
      *
      * @var int
      */
-    protected $total = 0;
+    private $total = 0;
 
     /**
      * Currently proccessed items.
      *
      * @var int
      */
-    protected $done = 0;
+    private $done = 0;
 
     /**
      * @var ProgressBar|null
      */
-    protected $bar;
+    private $bar;
 
     public function __construct(
-        protected ?OutputInterface $output = null,
+        private ?OutputInterface $output = null,
     ) {
     }
 

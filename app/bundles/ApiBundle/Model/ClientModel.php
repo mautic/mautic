@@ -27,7 +27,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Client>
  */
-class ClientModel extends FormModel implements GlobalSearchInterface
+final class ClientModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var string

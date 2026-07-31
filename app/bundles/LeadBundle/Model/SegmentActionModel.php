@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
-class SegmentActionModel
+final class SegmentActionModel
 {
     public function __construct(
         private readonly LeadModel $contactModel,

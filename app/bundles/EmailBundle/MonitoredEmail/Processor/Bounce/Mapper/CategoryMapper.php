@@ -7,12 +7,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\Category as CategoryObject;
 
-class CategoryMapper
+final class CategoryMapper
 {
     /**
      * @var array
      */
-    protected static $mappings = [
+    private static $mappings = [
         Category::ANTISPAM       => ['permanent' => false, 'bounce_type' => Type::BLOCKED],
         Category::AUTOREPLY      => ['permanent' => false, 'bounce_type' => Type::AUTOREPLY],
         Category::CONCURRENT     => ['permanent' => false, 'bounce_type' => Type::SOFT],

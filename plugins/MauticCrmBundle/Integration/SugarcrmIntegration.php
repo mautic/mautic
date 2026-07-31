@@ -36,7 +36,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends CrmAbstractIntegration<SugarcrmApi>
  */
-class SugarcrmIntegration extends CrmAbstractIntegration
+final class SugarcrmIntegration extends CrmAbstractIntegration
 {
     private CompanyRepository $companyRepository;
 

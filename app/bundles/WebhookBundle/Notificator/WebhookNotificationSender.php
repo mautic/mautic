@@ -16,7 +16,7 @@ use Mautic\WebhookBundle\Event\WebhookNotificationEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class WebhookNotificationSender
+final class WebhookNotificationSender
 {
     public function __construct(
         private readonly Environment $twig,
