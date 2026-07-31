@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class VtigerApi extends CrmApi
+final class VtigerApi extends CrmApi
 {
     protected $element = 'Leads';
 

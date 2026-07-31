@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 
-class Mapper
+final class Mapper
 {
     private array $contact = [];
 

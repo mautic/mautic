@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ConstantContactApi extends EmailMarketingApi
+final class ConstantContactApi extends EmailMarketingApi
 {
     private string $version = 'v2';
 

@@ -13,7 +13,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 /**
  * @property SalesforceIntegration $integration
  */
-class SalesforceApi extends CrmApi
+final class SalesforceApi extends CrmApi
 {
     /**
      * This regular expression parses missing field's name from the error message.

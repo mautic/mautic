@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ZohoApi extends CrmApi
+final class ZohoApi extends CrmApi
 {
     /**
      * @param string $operation

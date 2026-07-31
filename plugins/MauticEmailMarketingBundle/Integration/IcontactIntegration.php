@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-class IcontactIntegration extends EmailAbstractIntegration
+final class IcontactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {

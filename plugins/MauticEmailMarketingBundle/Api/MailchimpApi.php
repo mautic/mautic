@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class MailchimpApi extends EmailMarketingApi
+final class MailchimpApi extends EmailMarketingApi
 {
     private string $version = '3.0';
 
