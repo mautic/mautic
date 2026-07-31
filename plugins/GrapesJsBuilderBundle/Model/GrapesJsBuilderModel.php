@@ -20,43 +20,25 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
-<<<<<<< HEAD
-    public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly EmailModel $emailModel,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
-        private readonly EmailRepository $emailRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
-=======
     private RequestStack $requestStack;
 
     private EmailModel $emailModel;
 
     private GrapesJsBuilderRepository $grapesJsBuilderRepository;
 
-    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+    private EmailRepository $emailRepository;
 
     #[Required]
     public function autowireGrapesJsBuilderModel(
         RequestStack $requestStack,
         EmailModel $emailModel,
         GrapesJsBuilderRepository $grapesJsBuilderRepository,
-        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        EmailRepository $emailRepository,
     ): void {
         $this->requestStack              = $requestStack;
         $this->emailModel                = $emailModel;
         $this->grapesJsBuilderRepository = $grapesJsBuilderRepository;
         $this->emailRepository           = $emailRepository;
->>>>>>> e346b540a8 ([phpstan] add rule to avoid ctor forwarding)
     }
 
     public function getRepository(): GrapesJsBuilderRepository

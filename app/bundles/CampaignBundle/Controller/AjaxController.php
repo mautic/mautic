@@ -15,44 +15,25 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
 {
-<<<<<<< HEAD
-    public function __construct(
-        private readonly DateHelper $dateHelper,
-        private readonly EventLogModel $eventLogModel,
-        private readonly LeadModel $leadModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
-=======
     private DateHelper $dateHelper;
 
     private EventLogModel $eventLogModel;
 
     private LeadModel $leadModel;
 
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
+    private LeadEventLogRepository $leadEventLogRepository;
 
     #[Required]
     public function autowireCampaignAjaxController(
         DateHelper $dateHelper,
         EventLogModel $eventLogModel,
         LeadModel $leadModel,
-        \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository,
+        LeadEventLogRepository $leadEventLogRepository,
     ): void {
         $this->dateHelper             = $dateHelper;
         $this->eventLogModel          = $eventLogModel;
         $this->leadModel              = $leadModel;
         $this->leadEventLogRepository = $leadEventLogRepository;
->>>>>>> e346b540a8 ([phpstan] add rule to avoid ctor forwarding)
     }
 
     public function updateConnectionsAction(Request $request): JsonResponse

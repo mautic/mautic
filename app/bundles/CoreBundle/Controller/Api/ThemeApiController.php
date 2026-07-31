@@ -17,31 +17,13 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class ThemeApiController extends CommonApiController
 {
-<<<<<<< HEAD
-    public function __construct(
-        CorePermissions $security,
-        Translator $translator,
-        EntityResultHelper $entityResultHelper,
-        RouterInterface $router,
-        FormFactoryInterface $formFactory,
-        AppVersion $appVersion,
-        private readonly ThemeHelper $themeHelper,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        EventDispatcherInterface $dispatcher,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
-=======
-    protected ThemeHelper $themeHelper;
+    private readonly ThemeHelper $themeHelper;
 
     #[Required]
     public function autowireThemeApiController(
         ThemeHelper $themeHelper,
     ): void {
         $this->themeHelper = $themeHelper;
->>>>>>> e346b540a8 ([phpstan] add rule to avoid ctor forwarding)
     }
 
     /**

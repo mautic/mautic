@@ -45,45 +45,25 @@ final class ImportController extends FormController
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
-<<<<<<< HEAD
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        private readonly LoggerInterface $logger,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        private readonly RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly ImportModel $importModel,
-        private readonly ImportRepository $importRepository,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
-=======
     private LoggerInterface $logger;
 
     private RequestStack $requestStack;
 
     private ImportModel $importModel;
 
-    private \Mautic\LeadBundle\Entity\ImportRepository $importRepository;
+    private ImportRepository $importRepository;
 
     #[Required]
     public function autowireImportController(
         LoggerInterface $logger,
         RequestStack $requestStack,
         ImportModel $importModel,
-        \Mautic\LeadBundle\Entity\ImportRepository $importRepository,
+        ImportRepository $importRepository,
     ): void {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
         $this->importModel = $importModel;
         $this->importRepository = $importRepository;
->>>>>>> e346b540a8 ([phpstan] add rule to avoid ctor forwarding)
     }
 
     /**
