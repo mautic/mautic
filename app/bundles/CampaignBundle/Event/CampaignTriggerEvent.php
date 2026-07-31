@@ -5,15 +5,12 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CampaignTriggerEvent extends Event
+final class CampaignTriggerEvent extends Event
 {
-    /**
-     * @var bool
-     */
-    protected $triggerCampaign = true;
+    private bool $triggerCampaign = true;
 
     public function __construct(
-        protected Campaign $campaign,
+        private readonly Campaign $campaign,
     ) {
     }
 
@@ -25,10 +22,7 @@ class CampaignTriggerEvent extends Event
         return $this->campaign;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldTrigger()
+    public function shouldTrigger(): bool
     {
         return $this->triggerCampaign;
     }

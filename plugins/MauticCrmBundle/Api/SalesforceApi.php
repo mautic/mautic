@@ -366,7 +366,7 @@ class SalesforceApi extends CrmApi
         $fields = array_unique($fields);
 
         $ignoreConvertedLeads = ('Lead' === $object) ? ' and ConvertedContactId = NULL' : '';
-        if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
+        if (!$this->optOutFieldAccessible) { // If not opt-out is supported; unset it
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
         }
 
@@ -558,7 +558,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function processError(array $error, $isRetry)
+    private function processError(array $error, bool $isRetry)
     {
         switch ($error['errorCode']) {
             case 'INVALID_SESSION_ID':
@@ -580,7 +580,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function revalidateSession($isRetry): void
+    private function revalidateSession(bool $isRetry): void
     {
         if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
             throw new ApiErrorException($refreshError);

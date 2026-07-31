@@ -29,10 +29,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+final class ResultController extends CommonFormController
 {
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private readonly FormModel $formModel,
+        private readonly SubmissionResultLoader $submissionResultLoader,
+        private readonly SubmissionModel $submissionModel,
+    ) {
         $this->setStandardParameters(
             'form.submission', // model name
             'form:forms', // permission base
@@ -44,19 +58,16 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
     {
-        /** @var FormModel $formModel */
-        $formModel      = $this->getModel('form.form');
-        $form           = $formModel->getEntity($objectId);
+        $form           = $this->formModel->getEntity($objectId);
         $session        = $request->getSession();
         $formPage       = $session->get('mautic.form.page', 1);
         $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
-        $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         if (null === $form) {
             // redirect back to form list
@@ -106,7 +117,6 @@ class ResultController extends CommonFormController
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
-        $model      = $this->getModel('form.submission');
 
         if ($request->query->has('result')) {
             // Force ID
@@ -115,7 +125,7 @@ class ResultController extends CommonFormController
         }
 
         // get the results
-        $entities = $model->getEntities(
+        $entities = $this->submissionModel->getEntities(
             [
                 'start'          => $start,
                 'limit'          => $limit,
@@ -191,9 +201,7 @@ class ResultController extends CommonFormController
 
     public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
-        /** @var SubmissionResultLoader $submissionResultLoader */
-        $submissionResultLoader = $this->getModel('form.submission_result_loader');
-        $submission             = $submissionResultLoader->getSubmissionWithResult($submissionId);
+        $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 
         if (!$submission) {
             throw $this->createNotFoundException();
@@ -232,7 +240,7 @@ class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 
@@ -269,8 +277,7 @@ class ResultController extends CommonFormController
      */
     public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
-        $formModel = $this->getModel('form.form');
-        $form      = $formModel->getEntity($objectId);
+        $form      = $this->formModel->getEntity($objectId);
         $session   = $request->getSession();
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
@@ -321,10 +328,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var SubmissionModel $model */
-        $model = $this->getModel('form.submission');
-
-        return $model->exportResults($format, $form, $args);
+        return $this->submissionModel->exportResults($format, $form, $args);
     }
 
     /**
@@ -339,11 +343,8 @@ class ResultController extends CommonFormController
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('form.submission');
-            \assert($model instanceof SubmissionModel);
-
             // Find the result
-            $entity = $model->getEntity($objectId);
+            $entity = $this->submissionModel->getEntity($objectId);
 
             if (null === $entity) {
                 $flashes[] = [
@@ -355,7 +356,7 @@ class ResultController extends CommonFormController
                 $this->throwAccessDenied();
             } else {
                 $id = $entity->getId();
-                $model->deleteEntity($entity);
+                $this->submissionModel->deleteEntity($entity);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -449,8 +450,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = $parameters['objectId'] ?? 0;
-            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
+            $objectId = (int) ($parameters['objectId'] ?? 0);
+            $formId   = $parameters['formId'] ?? $request->query->getInt('formId', $objectId);
         }
 
         return $formId;

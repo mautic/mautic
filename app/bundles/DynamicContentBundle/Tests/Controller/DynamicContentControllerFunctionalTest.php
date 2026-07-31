@@ -13,6 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
@@ -168,7 +169,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
@@ -232,5 +233,35 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
+    }
+
+    public function testLocaleAndTimezoneFilterValidation(): void
+    {
+        $this->createAndLoginUser(self::PERMISSION_CREATE);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        self::assertResponseIsSuccessful();
+
+        $formHtml = $crawler->html();
+
+        $this->assertStringContainsString('preferred_locale', $formHtml);
+        $this->assertStringContainsString('timezone', $formHtml);
+
+        $buttonCrawler = $crawler->selectButton('Save');
+        $form          = $buttonCrawler->form();
+        $form->setValues([
+            'dwc[name]'    => 'Test Locale Timezone Filter Validation',
+            'dwc[content]' => 'Test content for locale and timezone filter validation',
+        ]);
+        $crawler = $this->client->submit($form);
+
+        $content = $crawler->text();
+
+        $this->assertStringNotContainsString('This value is not valid', $content);
+        $this->assertStringNotContainsString('form-error', $crawler->html());
+
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Edit Dynamic Content', $content);
+        $this->assertStringContainsString('Test Locale Timezone Filter Validation', $content);
     }
 }

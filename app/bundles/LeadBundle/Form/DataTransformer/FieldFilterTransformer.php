@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @implements DataTransformerInterface<mixed, array<mixed>|mixed>
  */
-class FieldFilterTransformer implements DataTransformerInterface
+final class FieldFilterTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]

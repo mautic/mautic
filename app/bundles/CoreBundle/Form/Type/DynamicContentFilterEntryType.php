@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentFilterEntryType extends AbstractType
+final class DynamicContentFilterEntryType extends AbstractType
 {
     /**
      * @var mixed[]

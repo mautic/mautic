@@ -10,6 +10,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -27,6 +28,8 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -47,7 +50,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = static::getContainer()->get(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
@@ -142,7 +145,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
@@ -567,7 +570,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        static::getContainer()->get('event_dispatcher')->dispatch(
+        static::getContainer()->get(EventDispatcherInterface::class)->dispatch(
             new ListChangeEvent($contacts[2], $segment, true),
             LeadEvents::LEAD_LIST_CHANGE
         );
@@ -587,7 +590,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $listModel = static::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -609,7 +612,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $listModel = static::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -641,7 +644,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         yield 'Default Frequency Rules' => [null];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataFrequencyRules')]
+    #[DataProvider('dataFrequencyRules')]
     public function testFrequencyRulesAreAppliedWhenSendToDncIsNo(): void
     {
         $contact = $this->createContact();
@@ -654,7 +657,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailIsPostponed($email, $contact);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataFrequencyRules')]
+    #[DataProvider('dataFrequencyRules')]
     public function testFrequencyRulesAreNotAppliedWhenSendToDncIsTrue(): void
     {
         $contact = $this->createContact();
@@ -669,7 +672,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailIsNotPostponed();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataFrequencyRules')]
+    #[DataProvider('dataFrequencyRules')]
     public function testEmailsWithSendToDncSetToYesAreNotCountedTowardsFrequencyRules(): void
     {
         $contact     = $this->createContact();
@@ -781,7 +784,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $winnerReloaded = $this->em->getRepository(Email::class)->find($winner->getId());
 
         $this->assertInstanceOf(Email::class, $winnerReloaded);
-        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $winnerReloaded->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());
         $this->assertSame('2026-01-01 00:00:00', $winnerReloaded->getPublishUp()?->format('Y-m-d H:i:s'));
         $this->assertSame('2026-01-31 23:59:59', $winnerReloaded->getPublishDown()?->format('Y-m-d H:i:s'));
         $this->assertTrue($winnerReloaded->getContinueSending());

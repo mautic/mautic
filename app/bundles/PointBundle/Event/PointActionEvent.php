@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Point;
 
-class PointActionEvent extends CommonEvent
+final class PointActionEvent extends CommonEvent
 {
     public function __construct(
-        protected Point $point,
-        protected Lead $lead,
+        private Point $point,
+        private Lead $lead,
     ) {
     }
 

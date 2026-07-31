@@ -20,12 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadFieldValueType extends AbstractType
+final class CampaignEventLeadFieldValueType extends AbstractType
 {
     public function __construct(
-        protected Translator $translator,
-        protected LeadModel $leadModel,
-        protected FieldModel $fieldModel,
+        private readonly Translator $translator,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 
@@ -50,7 +50,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -155,7 +155,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'required'    => true,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'auto_initialize' => false,
@@ -192,7 +192,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'attr'        => $attr,
                         'constraints' => ($supportsValue) ? [
                             new NotBlank(
-                                ['message' => 'mautic.core.value.required']
+                                message: 'mautic.core.value.required'
                             ),
                         ] : [],
                     ]

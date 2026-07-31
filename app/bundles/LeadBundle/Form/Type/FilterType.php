@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FilterType extends AbstractType
+final class FilterType extends AbstractType
 {
     public function __construct(
         private readonly FormAdjustmentsProviderInterface $formAdjustmentsProvider,

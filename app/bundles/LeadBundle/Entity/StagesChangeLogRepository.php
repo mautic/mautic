@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -42,16 +43,26 @@ class StagesChangeLogRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param int $fromLeadId
-     * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(string $fromLeadId, string $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', ':to')
+            ->where('lead_id = :from')
+            ->setParameter('to', $toLeadId)
+            ->setParameter('from', $fromLeadId)
+            ->executeStatement();
+    }
+
+    public function updateStage(int $fromStageId, int $toStageId): void
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
+            ->set('stage_id', ':to')
+            ->where('stage_id = :from')
+            ->setParameter('to', $toStageId, ParameterType::INTEGER)
+            ->setParameter('from', $fromStageId, ParameterType::INTEGER)
             ->executeStatement();
     }
 

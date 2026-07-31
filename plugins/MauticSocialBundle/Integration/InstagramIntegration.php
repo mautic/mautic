@@ -101,7 +101,7 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'full_name' => ['type' => 'string'],

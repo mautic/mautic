@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -56,11 +56,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ListModel $leadListModel,
-        protected RouterInterface $router,
-        protected TranslatorInterface $translator,
-        protected DateHelper $dateHelper,
+        private readonly LeadModel $leadModel,
+        private readonly ListModel $leadListModel,
+        private readonly RouterInterface $router,
+        private readonly TranslatorInterface $translator,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 

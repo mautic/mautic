@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class LeadControllerListingPageTest extends MauticMysqlTestCase
 {
@@ -22,7 +23,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
      *
      * @throws ORMException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForContactListing')]
+    #[DataProvider('dataForContactListing')]
     public function testContactListingForLocation(array $location, string $expected): void
     {
         $this->createContact($location);

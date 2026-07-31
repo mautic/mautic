@@ -2,7 +2,6 @@
 
 namespace Mautic\ChannelBundle\Form\Type;
 
-use Mautic\ChannelBundle\Model\MessageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,11 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class MessageSendType extends AbstractType
+final class MessageSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
-        protected MessageModel $messageModel,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -33,7 +31,7 @@ class MessageSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.channel.choosemessage.notblank']
+                        message: 'mautic.channel.choosemessage.notblank'
                     ),
                 ],
             ]

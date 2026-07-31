@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Enum\RepublishBehavior;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
@@ -15,9 +17,10 @@ use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\Lead as Contact;
-use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
@@ -32,7 +35,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = static::getContainer()->get(SegmentCountCacheHelper::class);
     }
 
     public function beforeTearDown(): void
@@ -704,11 +707,11 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
      */
     public function testCampaignInfiniteLoop(): void
     {
-        $campaignMemberRepo = $this->em->getRepository(Lead::class);
+        $campaignMemberRepo = self::getContainer()->get(LeadRepository::class);
 
-        $segmentMemberRepo = $this->em->getRepository(ListLead::class);
+        $segmentMemberRepo = self::getContainer()->get(ListLeadRepository::class);
 
-        $campaignRepo = $this->em->getRepository(Campaign::class);
+        $campaignRepo = self::getContainer()->get(CampaignRepository::class);
 
         // Clear the campaign and segment members as those are manually_added.
         $campaignMemberRepo->deleteEntities($campaignMemberRepo->findAll());
@@ -815,7 +818,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
      * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
      * @param array<int, array<string, string>>                                          $expectedTriggerDateLog
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('republishBehaviorProvider')]
+    #[DataProvider('republishBehaviorProvider')]
     public function testTriggerCampaignCommandWithRepublishBehavior(
         string $republishBehavior,
         string $triggerMode,

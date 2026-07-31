@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class FileUploadException extends \Exception
+final class FileUploadException extends \Exception
 {
 }

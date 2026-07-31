@@ -35,6 +35,11 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
      */
     private array $fromNames = [];
 
+    /**
+     * @var string[]
+     */
+    private array $replyToAddresses = [];
+
     private ?MauticMessage $message = null;
 
     public function __construct(
@@ -70,9 +75,10 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
             }
         }
 
-        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
-        $this->message         = $message;
+        $this->fromAddresses[]    = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]        = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+        $this->replyToAddresses[] = !empty($message->getReplyTo()) ? $message->getReplyTo()[0]->getAddress() : null;
+        $this->message            = $message;
     }
 
     public function getMaxBatchLimit(): int
@@ -99,6 +105,14 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     public function getFromNames(): array
     {
         return $this->fromNames;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getReplyToAddresses(): array
+    {
+        return $this->replyToAddresses;
     }
 
     public function getMessage(): ?MauticMessage

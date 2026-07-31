@@ -25,8 +25,8 @@ class RedisAdapter extends SymfonyRedisAdapter
         int $lifetime,
 
         #[Autowire(env: 'bool:MAUTIC_REDIS_PRIMARY_ONLY')]
-        bool $primaryOnly)
-    {
+        bool $primaryOnly,
+    ) {
         parent::__construct($this->createClient($servers, $primaryOnly), $namespace, $lifetime);
     }
 }

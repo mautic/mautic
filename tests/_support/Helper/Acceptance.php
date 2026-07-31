@@ -4,6 +4,6 @@ namespace Helper;
 
 use Codeception\Module;
 
-class Acceptance extends Module
+final class Acceptance extends Module
 {
 }

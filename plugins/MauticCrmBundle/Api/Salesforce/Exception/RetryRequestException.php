@@ -2,6 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception;
 
-class RetryRequestException extends \Exception
+final class RetryRequestException extends \Exception
 {
 }

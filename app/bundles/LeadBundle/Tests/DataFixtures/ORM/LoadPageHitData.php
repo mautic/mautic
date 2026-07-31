@@ -85,7 +85,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit(array $hitConfig, ObjectManager $manager)
+    protected function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 

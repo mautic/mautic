@@ -4,14 +4,19 @@
         {{ include('@MauticLead/Note/note.html.twig', {
             'note': note,
             'lead': lead,
-            'permissions': permissions,
+            'permissions': notePermissions[note.id] ?? note.permissions ?? permissions,
         }) }}
     {% endfor %}
 </ul>
-{% if notes|length > 0 %}
+
+{% set totalNotes = notes|length %}
+
+{% if totalNotes == 0 %}
+  {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% else %}
   <div class="notes-pagination">
       {{ include('@MauticCore/Helper/pagination.html.twig', {
-          'totalItems': notes|length,
+          'totalItems': totalNotes,
           'target': '#NoteList',
           'page': page,
           'limit': limit,
