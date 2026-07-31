@@ -172,11 +172,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('Contact', $settings);
     }
@@ -184,7 +184,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
