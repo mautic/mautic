@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
-class ReportCleanup
+final class ReportCleanup
 {
     public const KEEP_FILE_DAYS = 7;
 

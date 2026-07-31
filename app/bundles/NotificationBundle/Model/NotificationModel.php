@@ -30,7 +30,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Notification>
  */
-class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 

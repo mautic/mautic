@@ -12,21 +12,21 @@ use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use PHPUnit\Framework\TestCase;
 
-class DBALMocker
+final class DBALMocker
 {
-    protected $mockEm;
+    private $mockEm;
 
-    protected $mockConnection;
+    private $mockConnection;
 
-    protected $mockQueryBuilder;
+    private $mockQueryBuilder;
 
-    protected $queryResponse;
+    private $queryResponse;
 
-    protected $connectionUpdated;
+    private $connectionUpdated;
 
-    protected $connectionInserted;
+    private $connectionInserted;
 
-    protected $queryParts = [
+    private $queryParts = [
         'select'     => [],
         'from'       => [],
         'where'      => [],
@@ -34,7 +34,7 @@ class DBALMocker
     ];
 
     public function __construct(
-        protected TestCase $testCase,
+        private TestCase $testCase,
     ) {
     }
 

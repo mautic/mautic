@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Migration;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
-class Engine
+final class Engine
 {
     private readonly string $migrationsPath;
 

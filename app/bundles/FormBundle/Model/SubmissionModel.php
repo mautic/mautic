@@ -71,7 +71,7 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Submission>
  */
-class SubmissionModel extends CommonFormModel
+final class SubmissionModel extends CommonFormModel
 {
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,

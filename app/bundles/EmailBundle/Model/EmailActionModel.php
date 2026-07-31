@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailActionModel
+final class EmailActionModel
 {
     public function __construct(
         private readonly EmailModel $emailModel,
