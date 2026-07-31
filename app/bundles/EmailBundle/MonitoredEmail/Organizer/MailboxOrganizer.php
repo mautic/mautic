@@ -54,7 +54,7 @@ final class MailboxOrganizer
     /**
      * @return MailboxContainer[]
      */
-    public function getContainers()
+    public function getContainers(): array
     {
         return $this->containers;
     }
