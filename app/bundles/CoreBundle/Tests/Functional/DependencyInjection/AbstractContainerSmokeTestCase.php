@@ -51,7 +51,6 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         \Mautic\LeadBundle\Controller\Api\FieldApiController::class,
         'fos_oauth_server.controller.authorize',
         'mautic.helper.token_builder',
-        'oneup_uploader.controller.dropzone.class',
     ];
 
     /**
