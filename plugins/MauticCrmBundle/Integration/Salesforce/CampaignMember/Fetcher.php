@@ -22,7 +22,7 @@ class Fetcher
 
     private array $knownContactIds = [];
 
-    private array $unknownContactIds;
+    private array $unknownContactIds = [];
 
     private array $mauticIds = [];
 

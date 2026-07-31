@@ -75,12 +75,12 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
-        // promoting $model would type a property the untyped CommonApiController::$model already declares,
-        // and PHP rejects a child adding a type to an inherited property
-        // fixed upstream in https://github.com/rectorphp/rector-src/pull/8232, drop this once released
-        ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__.'/app/bundles/*/Controller/Api/*ApiController.php',
-            __DIR__.'/plugins/*/Controller/Api/*ApiController.php',
+        // static property is read from static log() before any instance is constructed,
+        // dropping the default would make it uninitialized
+        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
+            // buggy
+            __DIR__ . '/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [

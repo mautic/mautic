@@ -238,6 +238,7 @@ parameters:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 
+
 rules:
 	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
 	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
