@@ -53,7 +53,7 @@ final class PageSubscriber implements EventSubscriberInterface
                 }
 
                 $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_DISPLAY)] = $label.' '.$this->translator->trans('mautic.focus.token.display');
-                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_LEGACY)]   = $label.' '.$this->translator->trans('mautic.focus.token.legacy');
+                $tokens[$this->tokenHelper->formatToken($parsedToken['id'], TokenHelper::MODE_TRACKING)] = $label.' '.$this->translator->trans('mautic.focus.token.tracking');
             }
 
             if ([] !== $tokens) {

@@ -13,7 +13,7 @@ class TokenHelper
 
     public const MODE_DISPLAY = 'display';
 
-    public const MODE_LEGACY = 'legacy';
+    public const MODE_TRACKING = 'tracking';
 
     public function __construct(
         protected FocusModel $model,
@@ -67,17 +67,17 @@ class TokenHelper
     }
 
     /**
-     * @return array{id: int, mode: 'display'|'legacy'}|null
+     * @return array{id: int, mode: 'display'|'tracking'}|null
      */
     public function parseToken(string $token): ?array
     {
-        if (1 !== preg_match('/^{focus=([1-9]\d*)(?:\s*\|\s*(display)\s*)?}$/i', $token, $matches)) {
+        if (1 !== preg_match('/^{focus=([1-9]\d*)(?:\s*\|\s*(display|tracking)\s*)?}$/i', $token, $matches)) {
             return null;
         }
 
         return [
             'id'   => (int) $matches[1],
-            'mode' => isset($matches[2]) ? self::MODE_DISPLAY : self::MODE_LEGACY,
+            'mode' => isset($matches[2]) && self::MODE_DISPLAY === strtolower($matches[2]) ? self::MODE_DISPLAY : self::MODE_TRACKING,
         ];
     }
 
@@ -85,7 +85,7 @@ class TokenHelper
     {
         return match ($mode) {
             self::MODE_DISPLAY => '{focus='.$id.'|display}',
-            self::MODE_LEGACY  => '{focus='.$id.'}',
+            self::MODE_TRACKING => '{focus='.$id.'|tracking}',
             default            => throw new \InvalidArgumentException('Unknown Focus token mode.'),
         };
     }
@@ -94,7 +94,7 @@ class TokenHelper
     {
         return match ($mode) {
             self::MODE_DISPLAY => 'mautic_focus_generate_display',
-            self::MODE_LEGACY  => 'mautic_focus_generate',
+            self::MODE_TRACKING => 'mautic_focus_generate',
             default            => throw new \InvalidArgumentException('Unknown Focus token mode.'),
         };
     }

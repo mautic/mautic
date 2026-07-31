@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriberTest extends TestCase
 {
-    public function testPickerProvidesDisplayTokenFirstAndExplicitLegacyToken(): void
+    public function testPickerProvidesDisplayTokenFirstAndTrackingToken(): void
     {
         $model = $this->createStub(FocusModel::class);
         $model->method('getPermissionBase')->willReturn('focus:items');
@@ -35,9 +35,9 @@ final class PageSubscriberTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
             static fn (string $key): string => match ($key) {
-                'mautic.focus.token.display' => '(display only)',
-                'mautic.focus.token.legacy'  => '(legacy aggregate)',
-                default                      => $key,
+                'mautic.focus.token.display'  => '(display only)',
+                'mautic.focus.token.tracking' => '(tracking)',
+                default                        => $key,
             },
         );
 
@@ -53,7 +53,7 @@ final class PageSubscriberTest extends TestCase
 
         $this->assertSame([
             '{focus=7|display}' => 'Focus Item: Test (display only)',
-            '{focus=7}'         => 'Focus Item: Test (legacy aggregate)',
+            '{focus=7|tracking}' => 'Focus Item: Test (tracking)',
         ], $event->getTokens());
     }
 
