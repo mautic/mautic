@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class MainEntryPoint implements AuthenticationEntryPointInterface
+final class MainEntryPoint implements AuthenticationEntryPointInterface
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,

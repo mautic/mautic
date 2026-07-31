@@ -12,7 +12,7 @@ use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class PluginDatabase
+final class PluginDatabase
 {
     private readonly string $mauticDbPrefix;
 

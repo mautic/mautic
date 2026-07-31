@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\InvalidStateException;
 
-class ProcessSignalState implements \Stringable
+final class ProcessSignalState implements \Stringable
 {
     private const START_TAG = '<<<StartOfState>>>';
 

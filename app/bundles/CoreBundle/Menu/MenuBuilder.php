@@ -9,7 +9,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MenuBuilder
+final class MenuBuilder
 {
     public function __construct(
         private readonly FactoryInterface $factory,

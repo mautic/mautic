@@ -6,7 +6,7 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Symfony\Component\Routing\RouterInterface;
 
-class RouteProvider
+final class RouteProvider
 {
     public const ROUTE_LIST = 'mautic_marketplace_list';
 
