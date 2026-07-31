@@ -230,9 +230,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Get available fields for choices in the config UI.
      *
-     * @param array $settings
+     * @param array<string, mixed> $settings
      */
-    public function getFormLeadFields($settings = []): array
+    public function getFormLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
