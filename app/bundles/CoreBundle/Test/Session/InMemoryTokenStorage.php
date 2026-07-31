@@ -33,7 +33,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
             throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
         }
 
-        return (string) $this->store[$this->namespace][$tokenId];
+        return $this->store[$this->namespace][$tokenId];
     }
 
     public function setToken(string $tokenId, #[\SensitiveParameter] string $token): void
@@ -52,7 +52,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
             return null;
         }
 
-        $token = (string) $this->store[$this->namespace][$tokenId];
+        $token = $this->store[$this->namespace][$tokenId];
 
         unset($this->store[$this->namespace][$tokenId]);
 
