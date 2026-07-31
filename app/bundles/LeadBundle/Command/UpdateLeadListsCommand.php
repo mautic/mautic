@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Update contacts in smart segments based on new contact data.',
     aliases: ['mautic:segments:rebuild']
 )]
-class UpdateLeadListsCommand extends ModeratedCommand
+final class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 

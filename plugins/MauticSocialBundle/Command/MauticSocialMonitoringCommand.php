@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'mautic:social:monitoring',
     description: 'Looks at the records of monitors and iterates through them.'
 )]
-class MauticSocialMonitoringCommand extends Command
+final class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
         private readonly MonitoringRepository $monitoringRepository,
@@ -72,7 +72,7 @@ class MauticSocialMonitoringCommand extends Command
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    protected function getMonitors($id = null)
+    private function getMonitors($id = null)
     {
         $filter = [
             'start' => 0,
@@ -97,7 +97,7 @@ class MauticSocialMonitoringCommand extends Command
     /**
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
+    private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

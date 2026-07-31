@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:trigger',
     description: 'Trigger timed events for published campaigns.'
 )]
-class TriggerCampaignCommand extends ModeratedCommand
+final class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
@@ -283,7 +283,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return bool
      */
-    protected function dispatchTriggerEvent(Campaign $campaign)
+    private function dispatchTriggerEvent(Campaign $campaign)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
