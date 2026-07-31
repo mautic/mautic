@@ -103,9 +103,12 @@ final class SortableValueLabelListTypeTest extends TestCase
         $this->assertEquals([], $view->vars['postaddon']);
     }
 
+<<<<<<< HEAD
     /**
      * @param MockObject&FormBuilderInterface $builder
      */
+=======
+>>>>>>> 87617771d8 (misc)
     private function getEventListenerFromBuildForm(SortableValueLabelListType $type, MockObject $builder): callable
     {
         $eventListener = null;
