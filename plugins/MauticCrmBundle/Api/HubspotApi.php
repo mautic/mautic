@@ -11,11 +11,11 @@ use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
  */
 final class HubspotApi extends CrmApi
 {
-    protected $requestSettings = [
+    private array $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
-    protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
+    private function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
         if ('oauth2' === $this->integration->getAuthenticationType()) {
             $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);

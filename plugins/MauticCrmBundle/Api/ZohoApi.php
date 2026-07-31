@@ -8,14 +8,12 @@ final class ZohoApi extends CrmApi
 {
     /**
      * @param string $operation
-     * @param string $method
-     * @param bool   $json
      *
      * @return array
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $json = false, array $settings = [])
+    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
     {
         $tokenData = $this->integration->getKeys();
 
