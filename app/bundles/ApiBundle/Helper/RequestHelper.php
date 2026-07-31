@@ -4,7 +4,7 @@ namespace Mautic\ApiBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestHelper
+final class RequestHelper
 {
     public static function hasBasicAuth(Request $request): bool
     {

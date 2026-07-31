@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -54,6 +55,7 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(WidgetRepository::class), // $widgetRepository
         );
     }
 
@@ -123,6 +125,7 @@ final class DashboardModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $logger,
             $this->createStub(CacheProviderTagAwareInterface::class),
+            $this->createStub(WidgetRepository::class), // $widgetRepository
         );
 
         // Pass timezone to skip userHelper->getUser()->getTimezone()

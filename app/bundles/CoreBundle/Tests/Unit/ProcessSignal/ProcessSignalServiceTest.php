@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ProcessSignalServiceTest extends TestCase
@@ -47,7 +48,7 @@ final class ProcessSignalServiceTest extends TestCase
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testRegisterSignalHandler(int $signal, array $signals): void
     {
         $beforeCallbackCalled = false;
@@ -65,7 +66,7 @@ final class ProcessSignalServiceTest extends TestCase
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testRestoreSignalHandler(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);
@@ -78,7 +79,7 @@ final class ProcessSignalServiceTest extends TestCase
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testIsSignalCaught(int $signal, array $signals): void
     {
         $this->assertFalse($this->processSignalService->isSignalCaught());
@@ -93,7 +94,7 @@ final class ProcessSignalServiceTest extends TestCase
     /**
      * @param int[] $signals
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSignals')]
+    #[DataProvider('dataSignals')]
     public function testThrowExceptionIfSignalIsCaught(int $signal, array $signals): void
     {
         $this->processSignalService->registerSignalHandler(null, $signals);

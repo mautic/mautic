@@ -5,12 +5,12 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\VideoHit;
 
-class VideoHitEvent extends CommonEvent
+final class VideoHitEvent extends CommonEvent
 {
     public function __construct(
         VideoHit $hit,
-        protected $request,
-        protected $code,
+        private $request,
+        private $code,
     ) {
         $this->entity  = $hit;
     }

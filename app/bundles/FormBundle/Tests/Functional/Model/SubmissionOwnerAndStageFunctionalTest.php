@@ -9,6 +9,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -100,7 +101,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         $submission = $submissions[0];
         $contact    = $submission->getLead();
 
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact, "Contact was not created for test: {$testName}");
+        $this->assertInstanceOf(Lead::class, $contact, "Contact was not created for test: {$testName}");
         $this->assertSame($contactEmail, $contact->getEmail());
 
         if ($expectedOwnerId) {

@@ -31,7 +31,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
         /** @var ListModel $listModel */
-        $listModel = $this->getContainer()->get('mautic.lead.model.list');
+        $listModel = $this->getContainer()->get(ListModel::class);
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
         $this->assertSame(5, $leadCount);
 
@@ -66,7 +66,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update');
 
         /** @var ListModel $listModel */
-        $listModel = $this->getContainer()->get('mautic.lead.model.list');
+        $listModel = $this->getContainer()->get(ListModel::class);
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentBId);
         $this->assertSame(5, $leadCount);
 

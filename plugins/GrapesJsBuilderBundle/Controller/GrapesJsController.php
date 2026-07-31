@@ -231,9 +231,7 @@ class GrapesJsController extends CommonController
      */
     private function checkForMjmlTemplate(string $template): ?string
     {
-        $twig = $this->container->get('twig');
-
-        if ($twig->getLoader()->exists($template)) {
+        if ($this->twig->getLoader()->exists($template)) {
             return $template;
         }
 

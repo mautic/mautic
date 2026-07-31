@@ -103,8 +103,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * gets leads.
-     *
      * @return mixed
      */
     public function getLeads(array $params)
@@ -113,8 +111,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * gets companies.
-     *
      * @param string $id
      *
      * @return mixed

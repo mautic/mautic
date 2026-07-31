@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * @param string $callbackUrl

@@ -7,10 +7,12 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -28,7 +30,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private LeadListRepository $listRepo;
 
-    protected SegmentCountCacheHelper $segmentCountCacheHelper;
+    private SegmentCountCacheHelper $segmentCountCacheHelper;
 
     private LeadRepository $leadRepo;
 
@@ -41,18 +43,18 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
-        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->listModel = static::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
         $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = static::getContainer()->get(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
         $this->assertInstanceOf(LeadRepository::class, $this->leadRepo);
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator              = self::getContainer()->get('translator');
+        $this->translator              = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
     }
 
@@ -876,7 +878,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
@@ -892,14 +894,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact2->setFirstname('DNC');
         $this->em->persist($contact2);
         $this->em->flush();
-        $segmentContact1 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact1 = new ListLead();
         $segmentContact1->setList($segment);
         $segmentContact1->setLead($contact1);
         $segmentContact1->setDateAdded(new \DateTime());
         $segmentContact1->setManuallyAdded(false);
         $segmentContact1->setManuallyRemoved(false);
         $this->em->persist($segmentContact1);
-        $segmentContact2 = new \Mautic\LeadBundle\Entity\ListLead();
+        $segmentContact2 = new ListLead();
         $segmentContact2->setList($segment);
         $segmentContact2->setLead($contact2);
         $segmentContact2->setDateAdded(new \DateTime());
@@ -907,10 +909,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentContact2->setManuallyRemoved(false);
         $this->em->persist($segmentContact2);
         $this->em->flush();
-        $dnc = new \Mautic\LeadBundle\Entity\DoNotContact();
+        $dnc = new DoNotContact();
         $dnc->setChannel('email');
         $dnc->setLead($contact2);
-        $dnc->setReason(\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED);
+        $dnc->setReason(DoNotContact::UNSUBSCRIBED);
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();

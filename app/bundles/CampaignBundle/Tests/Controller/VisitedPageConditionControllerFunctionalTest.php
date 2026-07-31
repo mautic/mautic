@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
@@ -16,7 +17,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
      * @param array<mixed,mixed> $accumulativeTime
      * @param array<mixed,mixed> $page
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
+    #[DataProvider('fieldAndValueProvider')]
     public function testCreatePageHitConditionForm(
         array $pageUrl,
         array $startDate,

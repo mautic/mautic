@@ -80,7 +80,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     public function getAddColumnSql(): string
     {
-        return "ADD {$this->getColumnName()} {$this->getColumnDefinition()}";
+        return "ADD {$this->columnName} {$this->getColumnDefinition()}";
     }
 
     public function getAddIndexSql(): string

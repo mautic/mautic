@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 
@@ -68,7 +69,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
      * @param mixed[] $parameters
      * @param mixed[] $settings
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
+    #[DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
         /** @var MockObject&AbstractIntegration $integration */

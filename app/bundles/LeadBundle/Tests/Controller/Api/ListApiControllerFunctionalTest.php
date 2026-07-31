@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected ListModel $listModel;
+    private ListModel $listModel;
 
     private string $prefix;
 
@@ -37,9 +37,9 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->listModel  = static::getContainer()->get('mautic.lead.model.list');
+        $this->listModel  = static::getContainer()->get(ListModel::class);
         $this->prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator = static::getContainer()->get('translator');
+        $this->translator = static::getContainer()->get(TranslatorInterface::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -642,7 +642,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
         $this->client->request(Request::METHOD_GET, '/api/segments');

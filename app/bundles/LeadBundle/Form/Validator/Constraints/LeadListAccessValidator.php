@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class LeadListAccessValidator extends ConstraintValidator
+final class LeadListAccessValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly ListModel $segmentModel,

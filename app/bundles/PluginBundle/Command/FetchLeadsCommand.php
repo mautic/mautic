@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:synccontacts',
     ]
 )]
-class FetchLeadsCommand extends Command
+final class FetchLeadsCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

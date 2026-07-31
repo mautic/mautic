@@ -3,7 +3,7 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -30,7 +30,7 @@ class EventLogModel extends AbstractCommonModel
         protected CampaignModel $campaignModel,
         protected IpLookupHelper $ipLookupHelper,
         protected EventScheduler $eventScheduler,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -38,13 +38,14 @@ class EventLogModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string

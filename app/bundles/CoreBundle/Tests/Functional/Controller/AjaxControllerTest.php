@@ -31,11 +31,14 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
@@ -43,12 +46,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearch')]
+    #[DataProvider('dataForGlobalSearch')]
     public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
     {
         $this->em->persist($entity);
@@ -301,7 +299,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     /**
      * @param array<string, string|int> $roleData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGlobalSearchForNonAdminUser')]
+    #[DataProvider('dataForGlobalSearchForNonAdminUser')]
     public function testGlobalSearchForNonAdminUser(
         string $searchString,
         mixed $entity,
@@ -446,7 +444,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $content = \json_decode($response->getContent(), true);
 
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertStringContainsString('s/contacts?search='.$searchString, (string) $content['newContent']);
         $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
@@ -460,7 +458,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $content = \json_decode($response->getContent(), true);
 
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertStringContainsString('s/credentials?search='.$searchString, (string) $content['newContent']);
         $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
@@ -575,7 +573,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 

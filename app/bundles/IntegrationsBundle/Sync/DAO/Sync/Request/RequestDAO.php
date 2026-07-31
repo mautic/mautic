@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
-class RequestDAO
+final class RequestDAO
 {
     private readonly int $syncIteration;
 

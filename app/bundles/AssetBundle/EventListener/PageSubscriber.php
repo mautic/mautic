@@ -7,7 +7,7 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

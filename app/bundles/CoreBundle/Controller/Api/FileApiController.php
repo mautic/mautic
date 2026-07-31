@@ -23,17 +23,28 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<object>
  */
-class FileApiController extends CommonApiController
+final class FileApiController extends CommonApiController
 {
     /**
      * Holds array of allowed file extensions.
      *
      * @var array
      */
-    protected $allowedExtensions = [];
+    private $allowedExtensions = [];
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+    ) {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
         $this->allowedExtensions = $coreParametersHelper->get('allowed_extensions');

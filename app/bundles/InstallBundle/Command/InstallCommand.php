@@ -22,9 +22,12 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 #[AsCommand(
     name: InstallCommand::COMMAND,
-    description: 'Installs Mautic'
+    description: 'Installs Mautic',
+    help: <<<'TXT'
+This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.
+TXT
 )]
-class InstallCommand extends Command
+final class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
@@ -41,8 +44,6 @@ class InstallCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -357,7 +358,7 @@ class InstallCommand extends Command
      *
      * @throws \Exception
      */
-    protected function stepAction(InstallService $installer, array $params, float $index = 0): array
+    private function stepAction(InstallService $installer, array $params, float $index = 0): array
     {
         if ($index - floor($index) > 0) {
             $subIndex = (int) (round($index - floor($index), 1) * 10);

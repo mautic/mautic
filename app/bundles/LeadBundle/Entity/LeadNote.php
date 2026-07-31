@@ -130,7 +130,7 @@ class LeadNote extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
-            ['message' => 'mautic.lead.note.text.notblank']
+            message: 'mautic.lead.note.text.notblank'
         ));
     }
 

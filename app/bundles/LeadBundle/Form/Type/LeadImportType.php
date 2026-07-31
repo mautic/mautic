@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadImportType extends AbstractType
+final class LeadImportType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -28,12 +28,7 @@ class LeadImportType extends AbstractType
                     'class'  => 'form-control',
                 ],
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/*', 'application/octet-stream', 'application/csv'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/*', 'application/octet-stream', 'application/csv'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                     new EncodingValidation(
                         [
                             'encodingFormat'        => ['UTF-8'],
@@ -41,7 +36,7 @@ class LeadImportType extends AbstractType
                         ]
                     ),
                     new NotBlank(
-                        ['message' => 'mautic.import.file.required']
+                        message: 'mautic.import.file.required'
                     ),
                 ],
                 'error_bubbling' => true,
@@ -50,7 +45,7 @@ class LeadImportType extends AbstractType
 
         $constraints = [
             new NotBlank(
-                ['message' => 'mautic.core.value.required']
+                message: 'mautic.core.value.required'
             ),
         ];
 

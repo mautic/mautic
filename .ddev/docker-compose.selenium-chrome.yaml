@@ -4,7 +4,7 @@
 #
 services:
   selenium-chrome:
-    image: seleniarm/standalone-chromium:4.1.4-20220429
+    image: selenium/standalone-chromium:150.0
     container_name: ddev-${DDEV_SITENAME}-selenium-chrome
     expose:
       #      The internal noVNC port, which operates over HTTP so it can be exposed

@@ -25,8 +25,10 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -86,7 +88,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->contactRepository = $this->em->getRepository(Lead::class);
+        $this->contactRepository = self::getContainer()->get(LeadRepository::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -191,7 +193,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var LeadModel $model */
-        $model = self::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
 
         foreach ($contacts as $contact) {
             $model->setTags($contact, [$tag->getId()]);
@@ -259,8 +261,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($contacts as $contact) {
             $args['lead'] = $this->contactRepository->getEntity($contact->getId());
 
-            $event      = new CampaignExecutionEvent($args, true); // @phpstan-ignore new.deprecated
-            $dispatcher = static::getContainer()->get('event_dispatcher');
+            $event      = new CampaignExecutionEvent($args, true);
+            $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
             $result     = $dispatcher->dispatch(
                 $event,
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
@@ -436,7 +438,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $contactId3 = $lead3->getId();
 
         /** @var LeadModel $leadModel */
-        $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
+        $leadModel = $this->getContainer()->get(LeadModel::class);
 
         $leadModel->setFieldValues($lead1, [
             'bool1' => null,
@@ -1056,8 +1058,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        $event           = new CampaignExecutionEvent($args, false, $log); // @phpstan-ignore new.deprecated
-        $eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $event           = new CampaignExecutionEvent($args, false, $log);
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 
         $leadManipulator = $lead->getManipulator();
@@ -1076,7 +1078,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $campaign->addLead($lead->getId(), $campaignLead);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
+    #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
         $this->useCleanupRollback = false;
@@ -1092,7 +1094,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         // Create a contact and set the custom field value
         $contact   = $this->createContact('john.doe@example.com');
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get(LeadModel::class);
         $leadModel->setFieldValues($contact, ['test_date' => $fieldValue]);
         $leadModel->saveEntity($contact);
 
@@ -1120,7 +1122,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         // @phpstan-ignore-next-line new.deprecated
         $event = new CampaignExecutionEvent($eventArgs, true);
 
-        $dispatcher = static::getContainer()->get('event_dispatcher');
+        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
 
         // The test passes if no exception is thrown and the result is as expected
         $dispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
@@ -1129,7 +1131,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Clean up
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $field      = $fieldModel->getEntityByAlias('test_date');
         if ($field) {
             $fieldModel->deleteEntity($field);

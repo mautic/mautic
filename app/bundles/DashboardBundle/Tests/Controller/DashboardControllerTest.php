@@ -38,11 +38,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $translatorMock;
 
     /**
-     * @var MockObject&ModelFactory
-     */
-    private MockObject $modelFactoryMock;
-
-    /**
      * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModelMock;
@@ -67,14 +62,12 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
-        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $requestStack             = new RequestStack();
+        $requestStack             = new RequestStack([$this->requestMock]);
 
-        $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
             $this->createStub(ManagerRegistry::class),
-            $this->modelFactoryMock,
+            $this->createStub(ModelFactory::class),
             $this->createStub(UserHelper::class),
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -83,7 +76,9 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $requestStack,
             $this->createStub(CorePermissions::class)
         );
+
         $this->controller->setContainer($this->containerMock);
+        $this->controller->autowireDashboardController($this->dashboardModelMock);
     }
 
     public function testSaveWithGetWillCallAccessDenied(): void
@@ -137,11 +132,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('dashboard')
-            ->willReturn($this->dashboardModelMock);
-
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
             ->with('mockName');
@@ -172,11 +162,6 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('dashboard')
-            ->willReturn($this->dashboardModelMock);
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
