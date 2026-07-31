@@ -12,6 +12,15 @@ return [
                 'controller' => 'Mautic\ProjectBundle\Controller\ProjectController::executeAction',
             ],
         ],
+        'api' => [
+            'mautic_api_projectsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'projects',
+                'path'            => '/projects',
+                'controller'      => Mautic\ProjectBundle\Controller\Api\ProjectApiController::class,
+                'methods'         => 'GET',
+            ],
+        ],
     ],
     'menu' => [
         'main' => [
