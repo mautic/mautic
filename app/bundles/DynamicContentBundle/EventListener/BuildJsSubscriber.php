@@ -35,6 +35,9 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     public function onBuildJs(BuildJsEvent $event): void
     {
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $focusUrlPattern = $event->acceptsScope(BuildJsScope::TRACKING)
+            ? '/\\/focus\\//'
+            : '/\\/focus\\/[1-9]\\d*\\/display\\.js(?:[?#]|$)/';
 
         $js = <<<JS
         
@@ -87,7 +90,7 @@ MauticJS.enhanceDynamicContent = function(dwcContent) {
     var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;
 
     while (m = regEx.exec(dwcContent)) {
-        if ((m[1]).search("/focus/") > 0) {
+        if ({$focusUrlPattern}.test(m[1])) {
             MauticJS.insertScript(m[1]);
         }
     }

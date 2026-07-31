@@ -95,6 +95,82 @@ final class TokenHelperTest extends TestCase
         );
     }
 
+    public function testLegacyModeKeepsLegacyEndpoint(): void
+    {
+        $focusItem = new Focus();
+        $focusItem->setIsPublished(true);
+
+        $this->model->expects($this->once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($focusItem);
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'mautic_focus_generate',
+                ['id' => 1],
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            )
+            ->willReturn('https://example.test/focus/1.js');
+
+        $helper = new TokenHelper($this->model, $router, $this->security);
+
+        $this->assertSame(
+            ['{focus=1}' => '<script src="https://example.test/focus/1.js" type="text/javascript" charset="utf-8" async="async"></script>'],
+            $helper->findFocusTokens('content {focus=1}'),
+        );
+    }
+
+    /**
+     * @param array{id: int, mode: string}|null $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('tokenProvider')]
+    public function testParseToken(string $token, ?array $expected): void
+    {
+        $this->assertSame($expected, $this->helper->parseToken($token));
+    }
+
+    public static function tokenProvider(): iterable
+    {
+        yield 'legacy' => ['{focus=12}', ['id' => 12, 'mode' => TokenHelper::MODE_LEGACY]];
+        yield 'display' => ['{focus=12|display}', ['id' => 12, 'mode' => TokenHelper::MODE_DISPLAY]];
+        yield 'case and mode whitespace' => ['{FOCUS=12 | DISPLAY }', ['id' => 12, 'mode' => TokenHelper::MODE_DISPLAY]];
+        yield 'zero' => ['{focus=0}', null];
+        yield 'negative' => ['{focus=-1}', null];
+        yield 'non-decimal' => ['{focus=1.5}', null];
+        yield 'unknown mode' => ['{focus=12|tracking}', null];
+        yield 'missing ID' => ['{focus=|display}', null];
+    }
+
+    public function testInvalidModesResolveToEmptyWithoutLoadingFocusItem(): void
+    {
+        $this->model->expects($this->never())
+            ->method('getEntity');
+
+        $this->assertSame(
+            ['{focus=1|tracking}' => '', '{focus=invalid}' => ''],
+            $this->helper->findFocusTokens('{focus=1|tracking} {focus=invalid}'),
+        );
+    }
+
+    public function testDuplicateTokensAreResolvedOnce(): void
+    {
+        $focusItem = new Focus();
+        $focusItem->setIsPublished(true);
+
+        $this->model->expects($this->once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($focusItem);
+
+        $this->assertSame(
+            ['{focus=1|display}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'],
+            $this->helper->findFocusTokens('{focus=1|display} {focus=1|display}'),
+        );
+    }
+
     public function testFindFocusTokensFoundAddScriptByAccessCheck(): void
     {
         $focusItemId = 1;
@@ -120,5 +196,22 @@ final class TokenHelperTest extends TestCase
             ->willReturn(true);
 
         $this->assertSame(['{focus=1}' => '<script src="" type="text/javascript" charset="utf-8" async="async"></script>'], $this->helper->findFocusTokens($content));
+    }
+
+    public function testUnpublishedUnauthorizedFocusItemResolvesToEmpty(): void
+    {
+        $focusItem = new Focus();
+        $focusItem->setIsPublished(false);
+        $focusItem->setCreatedBy(2);
+
+        $this->model->expects($this->once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($focusItem);
+        $this->security->expects($this->once())
+            ->method('hasEntityAccess')
+            ->willReturn(false);
+
+        $this->assertSame(['{focus=1}' => ''], $this->helper->findFocusTokens('{focus=1}'));
     }
 }

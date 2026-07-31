@@ -57,7 +57,8 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringContainsString('media/js/mautic-form.js', $js);
         $this->assertStringContainsString("typeof MauticSDKLoaded == 'undefined'", $js);
         $this->assertStringContainsString('MauticSDK.onLoad();', $js);
-        $this->assertStringContainsString('search("/focus/")', $js);
+        $this->assertStringContainsString('/display\\.js(?:[?#]|$)/.test(m[1])', $js);
+        $this->assertStringNotContainsString('/\\/focus\\//.test(m[1])', $js);
         $this->assertStringNotContainsString('MauticJS.setTrackedContact(response)', $js);
         $this->assertSame(2, substr_count($js, 'MauticJS.replaceDynamicContent'));
     }
@@ -74,7 +75,7 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringContainsString('MauticJS.setTrackedContact(response)', $js);
         $this->assertStringNotContainsString('MauticJS.replaceDynamicContent = function', $js);
         $this->assertStringNotContainsString('mautic-form.js', $js);
-        $this->assertStringNotContainsString('search("/focus/")', $js);
+        $this->assertStringNotContainsString('/display\\.js(?:[?#]|$)/.test(m[1])', $js);
     }
 
     public function testLegacyBuildHasOneReplacementAndOneEnhancementPass(): void
@@ -88,6 +89,8 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertSame(1, substr_count($js, 'MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);'));
         $this->assertSame(1, substr_count($js, "MauticJS.makeCORSRequest('GET', url"));
         $this->assertSame(1, substr_count($js, 'MauticJS.enhanceDynamicContent(dwcContent);'));
+        $this->assertStringContainsString('/\\/focus\\//.test(m[1])', $js);
+        $this->assertStringNotContainsString('/display\\.js(?:[?#]|$)/.test(m[1])', $js);
         $this->assertLessThan(strpos($js, 'MauticJS.setTrackedContact(response)'), strpos($js, 'MauticJS.replaceDynamicContent = function'));
     }
 }
