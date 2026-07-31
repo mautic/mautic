@@ -7,10 +7,11 @@ use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreAuthorizationEventListener
+class PreAuthorizationEventListener implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -18,6 +19,17 @@ class PreAuthorizationEventListener
         private readonly CorePermissions $mauticSecurity,
         private readonly TranslatorInterface $translator,
     ) {
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            OAuthEvent::PRE_AUTHORIZATION_PROCESS  => 'onPreAuthorizationProcess',
+            OAuthEvent::POST_AUTHORIZATION_PROCESS => 'onPostAuthorizationProcess',
+        ];
     }
 
     /**

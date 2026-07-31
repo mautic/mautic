@@ -88,6 +88,12 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         'kernel.controller' => [
             ControllerSubscriber::class,
         ],
+        \FOS\OAuthServerBundle\Event\OAuthEvent::PRE_AUTHORIZATION_PROCESS => [
+            \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
+        ],
+        \FOS\OAuthServerBundle\Event\OAuthEvent::POST_AUTHORIZATION_PROCESS => [
+            \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
+        ],
         'security.interactive_login' => [
             CoreSubscriber::class,
         ],
