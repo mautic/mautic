@@ -9,22 +9,22 @@
 
 {% set list = {} %}
 {% if onlyYesLabel %}
-    {% set list = {'1': yesLabel} %}
+    {% set list = [{'value': '1', 'label': yesLabel}] %}
     {% set inputType = 'checkbox' %}
     {% set isCheckboxMode = true %}
 {% elseif onlyNoLabel %}
-    {% set list = {'0': noLabel} %}
+    {% set list = [{'value': '0', 'label': noLabel}] %}
     {% set inputType = 'checkbox' %}
     {% set isCheckboxMode = true %}
 {% else %}
     {% if noLabel is not empty %}
-        {% set list = {'0': noLabel} %}
+        {% set list = [{'value': '0', 'label': noLabel}] %}
     {% endif %}
     {% if yesLabel is not empty %}
         {% if noLabel is not empty %}
-            {% set list = list|merge({'1': yesLabel}) %}
+            {% set list = list|merge([{'value': '1', 'label': yesLabel}]) %}
         {% else %}
-            {% set list = {'1': yesLabel} %}
+            {% set list = [{'value': '1', 'label': yesLabel}] %}
         {% endif %}
     {% endif %}
     {% set inputType = 'radio' %}
