@@ -80,7 +80,7 @@ return RectorConfig::configure()
         Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
             // buggy
-            __DIR__ . '/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
+            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [

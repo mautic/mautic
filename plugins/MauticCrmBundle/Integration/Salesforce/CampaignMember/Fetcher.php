@@ -16,7 +16,7 @@ class Fetcher
 
     private array $knownLeadIds = [];
 
-    private array $unknownLeadIds;
+    private array $unknownLeadIds = [];
 
     private array $contacts;
 

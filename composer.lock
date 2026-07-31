@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "88b222f4cb93e94d0fab8af7f6a6c5ae",
-=======
-    "content-hash": "2b374c1dbc8549fa68f982fc667cb37e",
->>>>>>> 8faa29a5a3 (bump to rector 2.5.9)
+    "content-hash": "8fc167806138b53da9c8329a194ff49a",
     "packages": [
         {
             "name": "api-platform/core",

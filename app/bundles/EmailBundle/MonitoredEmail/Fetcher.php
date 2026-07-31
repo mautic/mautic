@@ -9,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class unknownContactIdsFetcher
+class Fetcher
 {
     private ?array $mailboxes = null;
 
