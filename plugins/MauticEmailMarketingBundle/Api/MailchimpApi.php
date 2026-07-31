@@ -15,7 +15,7 @@ final class MailchimpApi extends EmailMarketingApi
      *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, array $parameters = [], $method = 'GET')
+    private function request($endpoint, array $parameters = [], $method = 'GET')
     {
         if (isset($this->keys['password'])) {
             // Extract the dc from the key

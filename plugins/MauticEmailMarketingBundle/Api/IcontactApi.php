@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 final class IcontactApi extends EmailMarketingApi
 {
-    protected function request($endpoint, $parameters = [], $method = 'GET')
+    private function request(string $endpoint, array $parameters = [], string $method = 'GET')
     {
         $url = sprintf('%s/%s/c/%s/%s', $this->integration->getApiUrl(), $this->keys['accountId'], $this->keys['clientFolderId'], $endpoint);
 
