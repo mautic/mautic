@@ -3,13 +3,11 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
@@ -72,33 +70,18 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
-        Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
-        ],
-
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
-        // to be fixed in dev-main
-        Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector::class => [
-            '*Command.php',
+        // static property is read from static log() before any instance is constructed,
+        // dropping the default would make it uninitialized
+        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
+            // buggy
+            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
-
-        // promoting $model would type a property the untyped CommonApiController::$model already declares,
-        // and PHP rejects a child adding a type to an inherited property
-        // fixed upstream in https://github.com/rectorphp/rector-src/pull/8232, drop this once released
-        ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__.'/app/bundles/*/Controller/Api/*ApiController.php',
-            __DIR__.'/plugins/*/Controller/Api/*ApiController.php',
-        ],
-
-        Rector\TypeDeclaration\Rector\ClassMethod\ScalarParamTypeByMethodCallTypeRector::class => [
-            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
-        ],
-
-        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
@@ -114,7 +97,6 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -124,16 +106,8 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
-        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-
-        StringReturnTypeFromStrictStringReturnsRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
-        ],
-
-        // handle later with full PHP 8.0 upgrade
-        OptionalParametersAfterRequiredRector::class,
     ]);
