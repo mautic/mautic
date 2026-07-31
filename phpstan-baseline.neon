@@ -1063,12 +1063,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getMarketingMessagesEventLogs\(\) has parameter \$dateFrom with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2830,12 +2824,6 @@ parameters:
 			path: app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Loader\\RouteLoader\:\:supports\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Loader/RouteLoader.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Menu\\MenuHelper\:\:getParameter\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3291,12 +3279,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:isPublished\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
@@ -7555,12 +7537,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Helper/NotificationHelper.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Model/NotificationModel.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getNotificationClickStats\(\) has parameter \$notificationId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9575,12 +9551,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:createStatEntry\(\) has parameter \$source with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Model/SmsModel.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/Model/SmsModel.php
@@ -12854,12 +12824,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Model/PostCountModel.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Model\\TweetModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Model/TweetModel.php
 
 		-
 			message: '#^Parameter \#1 \$monitoring of class MauticPlugin\\MauticSocialBundle\\Event\\SocialEvent constructor expects MauticPlugin\\MauticSocialBundle\\Entity\\Monitoring, MauticPlugin\\MauticSocialBundle\\Entity\\Tweet given\.$#'
