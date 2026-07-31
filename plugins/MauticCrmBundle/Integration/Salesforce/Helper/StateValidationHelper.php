@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper;
 
-class StateValidationHelper
+final class StateValidationHelper
 {
     /**
      * @var string[]

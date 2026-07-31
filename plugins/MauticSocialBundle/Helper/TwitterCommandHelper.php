@@ -13,7 +13,7 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TwitterCommandHelper
+final class TwitterCommandHelper
 {
     private ?OutputInterface $output = null;
 

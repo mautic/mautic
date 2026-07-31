@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
  *
  * Build from modified https://github.com/iamcal/php-emoji
  */
-class EmojiHelper
+final class EmojiHelper
 {
     /**
      * Convert to html.

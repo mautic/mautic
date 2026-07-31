@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class EmailAddressHelper
+final class EmailAddressHelper
 {
     /**
      * Clean the email for comparison.
