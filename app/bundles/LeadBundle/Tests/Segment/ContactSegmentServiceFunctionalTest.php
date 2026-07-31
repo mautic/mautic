@@ -99,7 +99,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     private function clearLoggedInUser(): void
     {
-        $tokenStorage = static::getContainer()->get('security.token_storage');
+        $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
         $this->assertInstanceOf(TokenStorageInterface::class, $tokenStorage);
 
         $tokenStorage->setToken(null);
