@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
@@ -66,7 +67,7 @@ final class ImportController extends FormController
         private readonly RequestStack $requestStack,
         CorePermissions $security,
         private readonly ImportModel $importModel,
-        private readonly \Mautic\LeadBundle\Entity\ImportRepository $importRepository,
+        private readonly ImportRepository $importRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

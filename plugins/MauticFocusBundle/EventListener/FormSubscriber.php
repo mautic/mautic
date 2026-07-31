@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -11,7 +12,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FocusModel $model,
-        private readonly \MauticPlugin\MauticFocusBundle\Entity\FocusRepository $focusRepository,
+        private readonly FocusRepository $focusRepository,
     ) {
     }
 
