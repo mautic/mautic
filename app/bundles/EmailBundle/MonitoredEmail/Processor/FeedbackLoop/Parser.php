@@ -6,10 +6,10 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
-final class Parser
+final readonly class Parser
 {
     public function __construct(
-        private readonly Message $message,
+        private Message $message,
     ) {
     }
 

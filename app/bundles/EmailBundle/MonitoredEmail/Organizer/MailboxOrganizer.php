@@ -11,11 +11,11 @@ final class MailboxOrganizer
     /**
      * @var MailboxContainer[]
      */
-    private $containers = [];
+    private array $containers = [];
 
     public function __construct(
-        private ParseEmailEvent $event,
-        private array $mailboxes,
+        private readonly ParseEmailEvent $event,
+        private readonly array $mailboxes,
     ) {
     }
 

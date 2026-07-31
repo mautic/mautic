@@ -57,7 +57,7 @@ final class ConfigAccessor
     /**
      * @return string|null
      */
-    private function getProperty($property)
+    private function getProperty(string $property)
     {
         return $this->config[$property] ?? null;
     }

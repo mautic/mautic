@@ -45,7 +45,7 @@ final class Message
     /**
      * @var Attachment[]
      */
-    private $attachments = [];
+    private array $attachments = [];
 
     public function addAttachment(Attachment $attachment): void
     {
