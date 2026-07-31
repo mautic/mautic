@@ -14,7 +14,7 @@ final class ContactColumnsDictionary
     private array $fieldList = [];
 
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
         private readonly TranslatorInterface $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
     ) {

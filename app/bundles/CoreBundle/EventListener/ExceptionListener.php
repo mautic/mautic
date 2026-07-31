@@ -48,7 +48,7 @@ final class ExceptionListener extends ErrorListener
      * @param string|object|mixed[]|null $controller
      */
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
         string|object|array|null $controller,
         LoggerInterface $logger,
     ) {

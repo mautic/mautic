@@ -11,13 +11,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PreAuthorizationEventListener implements EventSubscriberInterface
+final readonly class PreAuthorizationEventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly UserRepository $userRepository,
-        private readonly CorePermissions $mauticSecurity,
-        private readonly TranslatorInterface $translator,
+        private EntityManagerInterface $em,
+        private UserRepository $userRepository,
+        private CorePermissions $mauticSecurity,
+        private TranslatorInterface $translator,
     ) {
     }
 

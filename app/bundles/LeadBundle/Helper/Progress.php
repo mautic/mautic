@@ -10,34 +10,25 @@ final class Progress
 {
     /**
      * Total number of items representing 100%.
-     *
-     * @var int
      */
-    private $total = 0;
+    private int $total = 0;
 
     /**
      * Currently proccessed items.
-     *
-     * @var int
      */
-    private $done = 0;
+    private int $done = 0;
 
-    /**
-     * @var ProgressBar|null
-     */
-    private $bar;
+    private ?ProgressBar $bar = null;
 
     public function __construct(
-        private ?OutputInterface $output = null,
+        private readonly ?OutputInterface $output = null,
     ) {
     }
 
     /**
      * Returns count of all items.
-     *
-     * @return int
      */
-    public function getTotal()
+    public function getTotal(): int
     {
         return $this->total;
     }
@@ -61,10 +52,8 @@ final class Progress
 
     /**
      * Returns count of processed items.
-     *
-     * @return int
      */
-    public function getDone()
+    public function getDone(): int
     {
         return $this->done;
     }

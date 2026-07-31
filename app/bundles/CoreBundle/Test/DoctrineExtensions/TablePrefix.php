@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 final class TablePrefix
 {
-    private string $prefix;
+    private readonly string $prefix;
 
     /**
      * @param string $prefix
