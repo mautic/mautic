@@ -417,7 +417,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         yield 'legacy wildcard'      => ['*example.com*'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pageUrlFilterProvider')]
+    #[DataProvider('pageUrlFilterProvider')]
     public function testOnCampaignTriggerConditionLeadPageUrlHitMatchesUrlFilter(string $pageUrlFilter): void
     {
         $lead = new Lead();
