@@ -31,7 +31,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function addViolation($message, array $parameters = []): void
+            public function addViolation(string|\Stringable $message, array $parameters = []): void
             {
                 ++$this->violationCount;
             }
@@ -93,7 +93,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function addViolation($message, array $parameters = []): void
+            public function addViolation(string|\Stringable $message, array $parameters = []): void
             {
                 ++$this->violationCount;
                 ($this->violationResult)($message, $parameters);

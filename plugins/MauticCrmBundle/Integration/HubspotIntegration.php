@@ -173,11 +173,11 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -185,7 +185,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if ($fields = parent::getAvailableLeadFields()) {
             return $fields;
