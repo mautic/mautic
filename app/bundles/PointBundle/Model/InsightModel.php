@@ -22,8 +22,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class InsightModel extends CommonFormModel
 {
-<<<<<<< HEAD
-    protected LeadModel $leadModel;
+    private LeadModel $leadModel;
 
     private PointInsightRepository $pointInsightRepository;
 
@@ -34,21 +33,6 @@ final class InsightModel extends CommonFormModel
     ): void {
         $this->leadModel              = $leadModel;
         $this->pointInsightRepository = $pointInsightRepository;
-=======
-    public function __construct(
-        private readonly LeadModel $leadModel,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly PointInsightRepository $pointInsightRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
->>>>>>> a96628aab6 (refactor: apply rector and cs-fixer follow-ups unlocked by final)
     }
 
     public function getRepository(): PointInsightRepository

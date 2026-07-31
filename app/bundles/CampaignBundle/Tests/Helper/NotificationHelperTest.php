@@ -208,8 +208,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $user  = $this->createMock(User::class);
-        $this->prepareCommonMocks($event, $user);
+        $this->prepareCommonMocks($event, $this->createMock(User::class));
 
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper->expects($this->exactly(2))

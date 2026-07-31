@@ -34,8 +34,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 {
     use TranslationModelTrait;
 
-<<<<<<< HEAD
-    protected TrackableModel $pageTrackableModel;
+    private TrackableModel $pageTrackableModel;
 
     private NotificationRepository $notificationRepository;
 
@@ -50,22 +49,6 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         $this->pageTrackableModel     = $pageTrackableModel;
         $this->notificationRepository = $notificationRepository;
         $this->statRepository         = $statRepository;
-=======
-    public function __construct(
-        private TrackableModel $pageTrackableModel,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly NotificationRepository $notificationRepository,
-        private readonly StatRepository $statRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
->>>>>>> a96628aab6 (refactor: apply rector and cs-fixer follow-ups unlocked by final)
     }
 
     public function getRepository(): NotificationRepository
