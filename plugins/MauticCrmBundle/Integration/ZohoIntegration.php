@@ -685,7 +685,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      */
-    public function getFormLeadFields($settings = []): array
+    public function getFormLeadFields(array $settings = []): array
     {
         $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
         $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
