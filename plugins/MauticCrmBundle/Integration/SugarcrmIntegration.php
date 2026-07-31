@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CrmAbstractIntegration<SugarcrmApi>
  */
-class SugarcrmIntegration extends CrmAbstractIntegration
+final class SugarcrmIntegration extends CrmAbstractIntegration
 {
     private CompanyRepository $companyRepository;
 

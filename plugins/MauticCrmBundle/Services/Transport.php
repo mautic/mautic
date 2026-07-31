@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Services;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
-class Transport implements TransportInterface
+final class Transport implements TransportInterface
 {
     public function __construct(
         private readonly Client $client,
