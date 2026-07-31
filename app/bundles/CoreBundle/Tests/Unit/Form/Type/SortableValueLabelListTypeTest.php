@@ -55,7 +55,7 @@ final class SortableValueLabelListTypeTest extends TestCase
 
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->isType('callable'));
+            ->with(FormEvents::PRE_SUBMIT, $this->isCallable());
 
         $type->buildForm($builder, []);
     }
@@ -102,7 +102,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         $this->assertEquals([], $view->vars['postaddon']);
     }
 
-    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, FormBuilderInterface $builder): callable
+    /**
+     * @param FormBuilderInterface&\PHPUnit\Framework\MockObject\MockObject $builder
+     */
+    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, \PHPUnit\Framework\MockObject\MockObject $builder): callable
     {
         $eventListener = null;
         // @phpstan-ignore-next-line
@@ -126,8 +129,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createStub(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -177,8 +179,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createStub(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
         $event         = $this->createMock(FormEvent::class);
 
         $data = ['label' => $input, 'value' => ''];

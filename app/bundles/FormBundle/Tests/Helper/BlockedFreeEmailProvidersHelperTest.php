@@ -17,7 +17,7 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
 
         $this->assertIsArray($providers);
         $this->assertNotEmpty($providers);
-        $this->assertContainsOnly('string', $providers);
+        $this->assertContainsOnlyString($providers);
     }
 
     public function testLoadReturnsArrayOfStrings(): void
