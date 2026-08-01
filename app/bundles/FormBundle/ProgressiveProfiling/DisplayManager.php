@@ -5,13 +5,13 @@ namespace Mautic\FormBundle\ProgressiveProfiling;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-class DisplayManager
+final readonly class DisplayManager
 {
-    private readonly DisplayCounter $displayCounter;
+    private DisplayCounter $displayCounter;
 
     public function __construct(
-        private readonly Form $form,
-        private readonly array $viewOnlyFields = [],
+        private Form $form,
+        private array $viewOnlyFields = [],
     ) {
         $this->displayCounter = new DisplayCounter($form);
     }

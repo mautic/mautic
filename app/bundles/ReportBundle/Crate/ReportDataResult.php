@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Crate;
 
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
-class ReportDataResult
+final class ReportDataResult
 {
     private readonly int $totalResults;
 
