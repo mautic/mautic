@@ -24,6 +24,6 @@ final class AnalyticsExtension extends AbstractExtension
 
     public function getCode(): string
     {
-        return (string) $this->helper->getCode();
+        return $this->helper->getCode();
     }
 }
