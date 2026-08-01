@@ -307,7 +307,7 @@ final class InputHelper
             // should be caught by FILTER_VALIDATE_URL if the host has invalid characters
             (!empty($parts['host']) ? $parts['host'] : '').
             // type cast to int
-            (!empty($parts['port']) ? ':'.(int) $parts['port'] : '').
+            (!empty($parts['port']) ? ':'.$parts['port'] : '').
             // strip tags that could be embedded in a path
             (!empty($parts['path']) ? strip_tags($parts['path']) : '').
             // cleaned through the parse_str (urldecode) and http_build_query (urlencode) above
