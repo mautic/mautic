@@ -13,7 +13,7 @@ use Twig\TwigFunction;
 final class FormExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly ?FormRendererInterface $formRenderer = null,
+        private readonly FormRendererInterface $formRenderer,
     ) {
     }
 
@@ -69,7 +69,7 @@ final class FormExtension extends AbstractExtension
      */
     public function rowIfExists(FormView $form, string $fieldName, array $variables = []): string
     {
-        if (!isset($form[$fieldName]) || null === $this->formRenderer) {
+        if (!isset($form[$fieldName])) {
             return '';
         }
 
