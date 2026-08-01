@@ -10,6 +10,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -31,7 +32,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
-            $translator        = static::getContainer()->get('translator');
+            $translator        = static::getContainer()->get(TranslatorInterface::class);
             $restrictionHelper = new RestrictionHelper(
                 $translator,
                 ['upload_dir'],
