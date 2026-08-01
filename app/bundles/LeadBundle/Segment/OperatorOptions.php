@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-class OperatorOptions
+final class OperatorOptions
 {
     public const EQUAL_TO              = '=';
 
