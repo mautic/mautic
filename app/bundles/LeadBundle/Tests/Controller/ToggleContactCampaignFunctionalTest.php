@@ -10,6 +10,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
@@ -111,7 +112,7 @@ class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
             ->setRole($role);
 
         $hasher = self::getContainer()
-            ->get('security.password_hasher_factory')
+            ->get(PasswordHasherFactoryInterface::class)
             ->getPasswordHasher($user);
 
         \assert($hasher instanceof PasswordHasherInterface);
