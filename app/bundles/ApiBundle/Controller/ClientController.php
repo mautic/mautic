@@ -2,45 +2,27 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ClientController extends AbstractStandardFormController
+final class ClientController extends AbstractStandardFormController
 {
-    public function __construct(
-        private readonly ClientModel $clientModel,
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private ClientModel $clientModel;
+
+    #[Required]
+    public function autowireClientController(
+        ClientModel $clientModel,
+    ): void {
+        $this->clientModel = $clientModel;
     }
 
     /**
@@ -185,10 +167,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * @param mixed $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             $this->throwAccessDenied();

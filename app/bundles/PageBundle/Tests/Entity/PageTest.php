@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array<string, array<int, mixed>> $changes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
+    #[DataProvider('setIsPreferenceCenterDataProvider')]
     public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
@@ -37,7 +38,7 @@ final class PageTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string, array<int, mixed>> $changes
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
+    #[DataProvider('setNoIndexDataProvider')]
     public function testSetNoIndex(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
@@ -84,7 +85,7 @@ final class PageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($script, $page->getFooterScript());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsDuplicateDataProvider')]
+    #[DataProvider('setIsDuplicateDataProvider')]
     public function testIsDuplicate(bool $isDuplicate): void
     {
         $page = new Page();

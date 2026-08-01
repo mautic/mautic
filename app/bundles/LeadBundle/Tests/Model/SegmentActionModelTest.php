@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
+use PHPUnit\Framework\Exception;
 
 final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,7 +60,7 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
                     return true;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())
@@ -97,7 +98,7 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
                     return true;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->contactModelMock->expects($this->once())

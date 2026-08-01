@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use GuzzleHttp\Psr7\Query;
 use Joomla\Filter\InputFilter;
 
-class InputHelper
+final class InputHelper
 {
     /**
      * String filter.

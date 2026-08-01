@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Security\SAML\Store;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use LightSaml\Store\Id\IdStoreInterface;
 use Mautic\UserBundle\Entity\IdEntry;
@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\IdEntry;
 class IdStore implements IdStoreInterface
 {
     public function __construct(
-        private readonly ObjectManager $manager,
+        private readonly EntityManagerInterface $manager,
         private readonly TimeProviderInterface $timeProvider,
     ) {
     }

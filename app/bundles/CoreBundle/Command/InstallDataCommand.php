@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,9 +17,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:install:data',
-    description: 'Installs Mautic with sample data'
+    description: 'Installs Mautic with sample data',
+    help: <<<'TXT'
+The <info>%command.name%</info> command re-installs Mautic with sample data.
+
+<info>php %command.full_name%</info>
+
+You can optionally specify to bypass the verification check with the --force option:
+
+<info>php %command.full_name% --force</info>
+TXT
 )]
-class InstallDataCommand extends Command
+final class InstallDataCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -33,17 +43,7 @@ class InstallDataCommand extends Command
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
                 ),
-            ])
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command re-installs Mautic with sample data.
-
-<info>php %command.full_name%</info>
-
-You can optionally specify to bypass the verification check with the --force option:
-
-<info>php %command.full_name% --force</info>
-EOT
-            );
+            ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -52,6 +52,7 @@ EOT
         $force   = $options['force'];
 
         if (!$force) {
+            /** @var QuestionHelper $helper */
             $helper         = $this->getHelper('question');
             $questionString = $this->translator->trans('mautic.core.command.install_data_confirm').' (y = '.$this->translator->trans('mautic.core.form.yes').', n = '.$this->translator->trans('mautic.core.form.no').'): ';
             $question       = new ConfirmationQuestion($questionString, false);

@@ -34,7 +34,7 @@ trait CampaignEntitiesTrait
         $field->setAlias($fieldDetails['alias']);
         $field->setProperties($fieldDetails['properties']);
 
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }
@@ -99,7 +99,7 @@ trait CampaignEntitiesTrait
                     ],
                 ],
             ]);
-            $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+            $leadModel = self::getContainer()->get(LeadModel::class);
             \assert($leadModel instanceof LeadModel);
             $leadModel->setFieldValues($lead, [$customField['alias'] => $customField['value']]);
         }
@@ -126,7 +126,7 @@ trait CampaignEntitiesTrait
                     ],
                 ],
             ]);
-            $companyModel = self::getContainer()->get('mautic.lead.model.company');
+            $companyModel = self::getContainer()->get(CompanyModel::class);
             \assert($companyModel instanceof CompanyModel);
             $companyModel->setFieldValues($company, [$customField['alias'] => $customField['value']]);
         }

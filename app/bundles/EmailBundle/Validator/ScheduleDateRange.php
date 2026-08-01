@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
-class ScheduleDateRange extends Constraint
+final class ScheduleDateRange extends Constraint
 {
     public string $message = 'mautic.form.date_time_range.invalid_range';
 

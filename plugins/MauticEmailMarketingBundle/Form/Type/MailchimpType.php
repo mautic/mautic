@@ -20,13 +20,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MailchimpType extends AbstractType
+final class MailchimpType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
         private readonly PluginModel $pluginModel,
-        protected RequestStack $requestStack,
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

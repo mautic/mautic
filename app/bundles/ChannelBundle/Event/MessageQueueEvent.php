@@ -5,7 +5,7 @@ namespace Mautic\ChannelBundle\Event;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class MessageQueueEvent extends CommonEvent
+final class MessageQueueEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

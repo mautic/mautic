@@ -10,6 +10,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 final class FocusFormAutoFillTest extends MauticMysqlTestCase
 {
@@ -80,12 +81,12 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
 
         // Step 4: Track the contact using setSystemContact (bypasses HTTP request requirement)
         /** @var ContactTracker $contactTracker */
-        $contactTracker = self::getContainer()->get('mautic.tracker.contact');
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
         $contactTracker->setSystemContact($contact);
 
         // Step 5: Generate Focus content directly
-        /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel */
-        $focusModel = self::getContainer()->get('mautic.focus.model.focus');
+        /** @var FocusModel $focusModel */
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $content    = $focusModel->getContent($focus->toArray());
 
         // Step 6: Verify the generated form HTML contains auto-filled email value

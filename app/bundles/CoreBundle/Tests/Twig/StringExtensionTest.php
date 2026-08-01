@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Extra\String\StringExtension;
 use Twig\Loader\ArrayLoader;
+use Twig\TwigFilter;
 
 final class StringExtensionTest extends TestCase
 {
@@ -59,7 +60,7 @@ final class StringExtensionTest extends TestCase
 
     public function testGetFiltersContainsUFilter(): void
     {
-        $filterNames = array_map(static fn (\Twig\TwigFilter $filter): string => $filter->getName(), $this->extension->getFilters());
+        $filterNames = array_map(static fn (TwigFilter $filter): string => $filter->getName(), $this->extension->getFilters());
 
         $this->assertContains('u', $filterNames);
     }

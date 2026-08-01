@@ -18,9 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
     description: 'Fetch and process monitored email.',
     aliases: [
         'mautic:emails:fetch',
-    ]
+    ],
+    help: <<<'TXT'
+                The <info>%command.name%</info> command is used to fetch and process messages such as bounces and unsubscribe requests. Configure the Monitored Email settings in Mautic's Configuration.
+
+<info>php %command.full_name%</info>
+TXT
 )]
-class ProcessFetchEmailCommand extends Command
+final class ProcessFetchEmailCommand extends Command
 {
     public function __construct(
         private readonly CoreParametersHelper $parametersHelper,
@@ -32,14 +37,7 @@ class ProcessFetchEmailCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to fetch and process messages such as bounces and unsubscribe requests. Configure the Monitored Email settings in Mautic's Configuration.
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

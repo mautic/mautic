@@ -55,7 +55,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
