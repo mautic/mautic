@@ -7,7 +7,7 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
 
-class ApiMetadataDriver implements DriverInterface
+final class ApiMetadataDriver implements DriverInterface
 {
     private ?ClassMetadata $metadata = null;
 

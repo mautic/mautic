@@ -8,7 +8,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+final class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
     protected ?\Mautic\UserBundle\Entity\User $user;
 

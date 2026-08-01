@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
+final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
     /**
      * @var array<mixed>

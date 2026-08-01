@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormController extends CommonFormController
+final class FormController extends CommonFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,

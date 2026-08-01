@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class SegmentUsedInCampaigns extends Constraint
+final class SegmentUsedInCampaigns extends Constraint
 {
     public function getTargets(): string|array
     {

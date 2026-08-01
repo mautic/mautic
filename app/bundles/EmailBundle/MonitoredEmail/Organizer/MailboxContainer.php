@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
-class MailboxContainer
+final class MailboxContainer
 {
     /**
      * @var array

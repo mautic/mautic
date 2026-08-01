@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-class PlainTextHelper
+final class PlainTextHelper
 {
     public const ENCODING = 'UTF-8';
 

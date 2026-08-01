@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelper
+final class IdentifyCompanyHelper
 {
     /**
      * @param mixed $lead
