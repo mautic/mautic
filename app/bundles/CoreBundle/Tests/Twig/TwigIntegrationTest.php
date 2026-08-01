@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\Form\FormRendererInterface;
 use Twig\Extension\ExtensionInterface;
 
 /**
@@ -31,6 +32,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 
         /** @var PathsHelper&MockObject $pathHelperMock */
         $pathHelperMock = $this->createMock(PathsHelper::class);
+        $formRenderer   = $this->createMock(FormRendererInterface::class);
 
         $packagesMock->method('getUrl')
             ->willReturnCallback(function (string $path): string {
@@ -48,7 +50,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new AppExtension(),
             new AssetExtension($assetsHelper),
             new ClassExtension(),
-            new FormExtension(),
+            new FormExtension($formRenderer),
         ];
     }
 }
