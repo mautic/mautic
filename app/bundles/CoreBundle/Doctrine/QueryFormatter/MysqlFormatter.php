@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 /**
  * Help generate SQL statements to format column data.
  */
-class MysqlFormatter extends AbstractFormatter
+final class MysqlFormatter extends AbstractFormatter
 {
     /**
      * Format field to datetime.
