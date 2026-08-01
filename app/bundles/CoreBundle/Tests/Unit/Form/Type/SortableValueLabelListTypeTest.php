@@ -140,11 +140,15 @@ final class SortableValueLabelListTypeTest extends TestCase
     {
         $type          = new SortableValueLabelListType();
 <<<<<<< HEAD
+<<<<<<< HEAD
         $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
 =======
 
         $builder       = $this->createMock(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+=======
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
+>>>>>>> a82f771195 (use bare assign)
 
 >>>>>>> cb246aa537 (mocks)
         $event         = $this->createMock(FormEvent::class);
@@ -197,11 +201,15 @@ final class SortableValueLabelListTypeTest extends TestCase
     {
         $type          = new SortableValueLabelListType();
 <<<<<<< HEAD
+<<<<<<< HEAD
         $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
 =======
 
         $builder       = $this->createMock(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+=======
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
+>>>>>>> a82f771195 (use bare assign)
 
 >>>>>>> cb246aa537 (mocks)
         $event         = $this->createMock(FormEvent::class);
