@@ -107,7 +107,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): \Symfony\Component\HttpFoundation\Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }

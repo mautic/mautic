@@ -4,7 +4,6 @@ namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
-use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
 
 final class ApiMetadataDriver implements DriverInterface
@@ -25,7 +24,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * @throws \ReflectionException
      */
-    public function loadMetadataForClass(\ReflectionClass $class): \JMS\Serializer\Metadata\ClassMetadata
+    public function loadMetadataForClass(\ReflectionClass $class): ClassMetadata
     {
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());

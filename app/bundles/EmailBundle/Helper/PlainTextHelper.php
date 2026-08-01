@@ -22,7 +22,6 @@ final class PlainTextHelper
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $replace.
      *
-     *
      * @see $replace
      */
     private array $search = [
@@ -52,7 +51,6 @@ final class PlainTextHelper
 
     /**
      * List of pattern replacements corresponding to patterns searched.
-     *
      *
      * @see $search
      */
@@ -85,7 +83,6 @@ final class PlainTextHelper
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $entReplace.
      *
-     *
      * @see $entReplace
      */
     private array $entSearch = [
@@ -97,7 +94,6 @@ final class PlainTextHelper
 
     /**
      * List of pattern replacements corresponding to patterns searched.
-     *
      *
      * @see $entSearch
      */
@@ -124,7 +120,6 @@ final class PlainTextHelper
      * List of preg* regular expression patterns to search for in PRE body,
      * used in conjunction with $preReplace.
      *
-     *
      * @see $preReplace
      */
     private array $preSearch = [
@@ -137,7 +132,6 @@ final class PlainTextHelper
 
     /**
      * List of pattern replacements corresponding to patterns searched for PRE body.
-     *
      *
      * @see $preSearch
      */
@@ -156,7 +150,6 @@ final class PlainTextHelper
 
     /**
      * Indicates whether content in the $html variable has been converted yet.
-     *
      *
      * @see $html, $text
      */

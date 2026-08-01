@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
 final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
@@ -30,7 +29,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): \Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);

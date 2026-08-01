@@ -4,7 +4,6 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Event\LogoutEvent;
-use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
