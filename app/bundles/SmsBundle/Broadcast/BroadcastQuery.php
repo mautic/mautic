@@ -3,21 +3,21 @@
 namespace Mautic\SmsBundle\Broadcast;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 
-class BroadcastQuery
+final class BroadcastQuery
 {
     use ContactLimiterTrait;
 
     private QueryBuilder $query;
 
     public function __construct(
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private SmsModel $smsModel,
     ) {
     }

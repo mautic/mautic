@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Integration;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-class TagManagerIntegration extends AbstractIntegration
+class TagManagerIntegration extends BasicIntegration implements BasicInterface
 {
     public const PLUGIN_NAME = 'TagManager';
 
@@ -18,12 +21,8 @@ class TagManagerIntegration extends AbstractIntegration
         return 'Tag Manager';
     }
 
-    /**
-     * Return's authentication method such as oauth2, oauth1a, key, etc.
-     */
-    public function getAuthenticationType(): string
+    public function getIcon(): string
     {
-        // Just use none for now and I'll build in "basic" later
-        return 'none';
+        return 'plugins/MauticTagManagerBundle/Assets/img/tagmanager.png';
     }
 }

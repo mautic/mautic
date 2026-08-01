@@ -24,8 +24,9 @@ class MonitoringModel extends FormModel
     private MonitoringRepository $monitoringRepository;
 
     #[Required]
-    public function autowireMonitoringModel(MonitoringRepository $monitoringRepository): void
-    {
+    public function autowireMonitoringModel(
+        MonitoringRepository $monitoringRepository,
+    ): void {
         $this->monitoringRepository = $monitoringRepository;
     }
 

@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -23,10 +23,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tweet>
  */
-class TweetType extends AbstractType
+final class TweetType extends AbstractType
 {
     public function __construct(
-        protected EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 

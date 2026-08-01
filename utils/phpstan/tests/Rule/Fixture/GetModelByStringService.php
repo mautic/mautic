@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
 // not a controller - must be skipped
-class GetModelByStringService
+final class GetModelByStringService
 {
     public function run(): void
     {

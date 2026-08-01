@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Stats;
 
 use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
 use Mautic\EmailBundle\Stats\Helper\StatHelperInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class StatHelperContainer
 {
@@ -12,9 +13,13 @@ class StatHelperContainer
      */
     private array $helpers = [];
 
-    public function addHelper(StatHelperInterface $helper): void
-    {
-        $this->helpers[$helper->getName()] = $helper;
+    public function __construct(
+        #[AutowireIterator(tag: 'mautic.email_stat_helper')]
+        iterable $helpersIterator,
+    ) {
+        foreach ($helpersIterator as $helper) {
+            $this->helpers[$helper->getName()] = $helper;
+        }
     }
 
     /**

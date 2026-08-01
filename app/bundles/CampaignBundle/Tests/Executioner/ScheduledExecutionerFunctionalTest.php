@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -23,7 +24,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->scheduledExecutioner = self::getContainer()->get('mautic.campaign.executioner.scheduled');
+        $this->scheduledExecutioner = self::getContainer()->get(TestScheduledExecutioner::class);
         $this->assertInstanceOf(ScheduledExecutioner::class, $this->scheduledExecutioner);
     }
 

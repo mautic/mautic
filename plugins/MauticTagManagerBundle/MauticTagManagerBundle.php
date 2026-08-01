@@ -4,6 +4,6 @@ namespace MauticPlugin\MauticTagManagerBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-class MauticTagManagerBundle extends PluginBundleBase
+final class MauticTagManagerBundle extends PluginBundleBase
 {
 }

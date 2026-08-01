@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -140,7 +140,7 @@ class LeadModel extends FormModel
         private ContactTracker $contactTracker,
         private DeviceTracker $deviceTracker,
         private IpAddressModel $ipAddressModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -1289,7 +1289,7 @@ class LeadModel extends FormModel
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -2131,10 +2131,7 @@ class LeadModel extends FormModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();

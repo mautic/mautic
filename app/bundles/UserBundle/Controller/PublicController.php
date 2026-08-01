@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Form\Type\UserInviteRegistrationType;
@@ -18,13 +19,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
 {
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     private UserModel $userModel;
 
     #[Required]
     public function autowirePublicController(
-        UserModel $userModel, \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        UserModel $userModel,
+        UserRepository $userRepository,
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;

@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -66,7 +66,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         protected FieldModel $leadFieldModel,
         protected EmailValidator $emailValidator,
         protected CompanyDeduper $companyDeduper,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -557,15 +557,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param string                   $type
      * @param string|array<int,string> $filter
-     * @param int                      $limit
-     * @param int                      $start
      * @param array<string, mixed>     $options
      *
      * @return array<mixed>
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, array $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -804,7 +801,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
-        \assert($company instanceof Company);
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;
@@ -821,7 +817,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {

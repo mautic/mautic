@@ -86,7 +86,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
     public function testSMimeWithEncryptedPrivateKey(): void
     {
         /** @var EncryptionHelper $encryptionHelper */
-        $encryptionHelper = self::getContainer()->get('mautic.helper.encryption');
+        $encryptionHelper = self::getContainer()->get(EncryptionHelper::class);
         $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
 
         $certPath       = $this->sMimeHelper->getSMimeCertificatePath();

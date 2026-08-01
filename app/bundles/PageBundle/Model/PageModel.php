@@ -3,7 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -105,7 +105,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
         private VariantConverterService $variantConverterService,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -614,43 +614,41 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $trackingId = $hit->getTrackingId();
         $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($this->limitString($page->getLanguage()));
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->pageTrackableModel->getRepository()->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
                     );
                 }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV !== 'prod') {
-                        throw $exception;
-                    }
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
-                    );
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV !== 'prod') {
+                    throw $exception;
                 }
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
             }
         }
 

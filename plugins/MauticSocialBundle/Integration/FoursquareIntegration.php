@@ -217,7 +217,7 @@ class FoursquareIntegration extends SocialIntegration
         return parent::matchFieldName($field, $subfield);
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],

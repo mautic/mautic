@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class NotConfiguredException extends \Exception
+final class NotConfiguredException extends \Exception
 {
 }

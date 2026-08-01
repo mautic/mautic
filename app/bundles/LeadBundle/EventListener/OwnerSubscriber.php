@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
@@ -25,8 +25,8 @@ final class OwnerSubscriber implements EventSubscriberInterface
     private ?array $owners = null;
 
     public function __construct(
-        private readonly LeadModel $leadModel,
         private readonly TranslatorInterface $translator,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -157,7 +157,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
     private function getOwner(int $ownerId)
     {
         if (!isset($this->owners[$ownerId])) {
-            $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);
+            $this->owners[$ownerId] = $this->leadRepository->getLeadOwner($ownerId);
         }
 
         return $this->owners[$ownerId];

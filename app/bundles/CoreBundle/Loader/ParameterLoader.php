@@ -18,7 +18,7 @@ class ParameterLoader
     /**
      * @var array<string, mixed>
      */
-    private array $localParameters = [];
+    private array $localParameters;
 
     /**
      * @var array<string, mixed>

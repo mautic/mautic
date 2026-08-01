@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationSyncSettingsObjectFieldType extends AbstractType
+final class IntegrationSyncSettingsObjectFieldType extends AbstractType
 {
     /**
      * @throws InvalidFormOptionException

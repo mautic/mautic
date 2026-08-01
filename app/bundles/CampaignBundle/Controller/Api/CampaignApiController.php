@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @extends CommonApiController<Campaign>
  */
-class CampaignApiController extends CommonApiController
+final class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -271,7 +271,6 @@ class CampaignApiController extends CommonApiController
             $errors = [];
             foreach ($eventViolations as $violationList) {
                 foreach ($violationList as $violation) {
-                    \assert($violation instanceof ConstraintViolationInterface);
                     $errors[] = [
                         'code'    => $violation->getCode(),
                         'message' => $violation->getMessage(),

@@ -20,12 +20,12 @@ class ReportDataResult
     /**
      * @var array<string>
      */
-    private array $columnKeys = [];
+    private readonly array $columnKeys;
 
     /**
      * @var array<mixed>
      */
-    private array $graphs = [];
+    private readonly array $graphs;
 
     private readonly ?\DateTime $dateFrom;
 
