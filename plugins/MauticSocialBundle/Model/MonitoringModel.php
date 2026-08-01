@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Monitoring>
  */
-class MonitoringModel extends FormModel
+final class MonitoringModel extends FormModel
 {
     private MonitoringRepository $monitoringRepository;
 
