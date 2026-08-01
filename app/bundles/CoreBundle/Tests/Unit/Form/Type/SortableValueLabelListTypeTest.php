@@ -103,18 +103,9 @@ final class SortableValueLabelListTypeTest extends TestCase
         $this->assertEquals([], $view->vars['postaddon']);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     /**
      * @param MockObject&FormBuilderInterface $builder
      */
-=======
->>>>>>> 87617771d8 (misc)
-=======
-    /**
-     * @param MockObject&FormBuilderInterface $builder
-     */
->>>>>>> cb246aa537 (mocks)
     private function getEventListenerFromBuildForm(SortableValueLabelListType $type, MockObject $builder): callable
     {
         $eventListener = null;
@@ -139,18 +130,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-<<<<<<< HEAD
-<<<<<<< HEAD
         $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
-=======
 
-        $builder       = $this->createMock(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
-=======
-        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
->>>>>>> a82f771195 (use bare assign)
-
->>>>>>> cb246aa537 (mocks)
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -200,18 +181,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-<<<<<<< HEAD
-<<<<<<< HEAD
         $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
-=======
-
-        $builder       = $this->createMock(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
-=======
-        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
->>>>>>> a82f771195 (use bare assign)
-
->>>>>>> cb246aa537 (mocks)
         $event         = $this->createMock(FormEvent::class);
 
         $data = ['label' => $input, 'value' => ''];

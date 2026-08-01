@@ -60,11 +60,7 @@ trait TwigIntegrationTestTrait
      * @param array<mixed>          $outputs
      * @param string                $deprecation
      */
-<<<<<<< HEAD
     #[DataProvider('integrationTestDataProvider')]
-=======
-    #[\PHPUnit\Framework\Attributes\DataProvider('integrationTestDataProvider')]
->>>>>>> 87617771d8 (misc)
     public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, $deprecation = ''): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs, $deprecation);
