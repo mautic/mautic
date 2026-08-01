@@ -205,7 +205,7 @@ final class RestrictionHelperTest extends TypeTestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that adjacent restricted sibling fields are all removed')]
+    #[TestDox('Test that adjacent restricted sibling fields are all removed')]
     public function testAdjacentRestrictedSiblingFieldsAreRemoved(): void
     {
         $this->restrictedFields = [
