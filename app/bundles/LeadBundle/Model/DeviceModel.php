@@ -17,7 +17,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<LeadDevice>
  */
-class DeviceModel extends FormModel
+final class DeviceModel extends FormModel
 {
     private LeadDeviceRepository $leadDeviceRepository;
 

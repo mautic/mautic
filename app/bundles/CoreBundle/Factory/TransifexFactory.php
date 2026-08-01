@@ -14,7 +14,7 @@ use Mautic\Transifex\Transifex;
 use Mautic\Transifex\TransifexInterface;
 use Psr\Http\Client\ClientInterface;
 
-class TransifexFactory
+final class TransifexFactory
 {
     private ?TransifexInterface $transifex = null;
 

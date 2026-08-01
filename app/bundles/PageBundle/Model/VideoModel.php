@@ -16,11 +16,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<VideoHit>
  */
-class VideoModel extends FormModel
+final class VideoModel extends FormModel
 {
-    protected IpLookupHelper $ipLookupHelper;
+    private IpLookupHelper $ipLookupHelper;
 
-    protected ContactTracker $contactTracker;
+    private ContactTracker $contactTracker;
 
     private VideoHitRepository $videoHitRepository;
 

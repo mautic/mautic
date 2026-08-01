@@ -20,7 +20,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Client>
  */
-class ClientModel extends FormModel implements GlobalSearchInterface
+final class ClientModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var string

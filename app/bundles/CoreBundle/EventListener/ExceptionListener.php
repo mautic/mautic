@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class ExceptionListener extends ErrorListener
+final class ExceptionListener extends ErrorListener
 {
     /**
      * Mautic handles the exception well before the Symfony error listener does, so onKernelException runs
@@ -48,7 +48,7 @@ class ExceptionListener extends ErrorListener
      * @param string|object|mixed[]|null $controller
      */
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
         string|object|array|null $controller,
         LoggerInterface $logger,
     ) {

@@ -14,7 +14,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
  * The issue was mostly that the session was not started in the test environment.
  * And when started it was different in each request.
  */
-class InMemoryTokenStorage implements ClearableTokenStorageInterface
+final class InMemoryTokenStorage implements ClearableTokenStorageInterface
 {
     /**
      * @var array<string,string[]>
