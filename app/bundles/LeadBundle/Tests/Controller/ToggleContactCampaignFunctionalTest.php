@@ -13,18 +13,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
+final class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     private const PASS                    = 'Maut1cR0cks!';
+
     private const PERMISSION_CAMPAIGN_OWN = 298;
+
     private const PERMISSION_LEAD_OWN     = 1024;
 
     public function testContactCampaignToggleModal(): void
     {
         $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $lead  = $this->createLead('John', 'Doe', 'john-doe@mautic.org');
+        $this->assertInstanceOf(User::class, $admin);
 
         // Campaign by admin
         $campaignOne = $this->createCampaign('Campaign By Admin')
@@ -75,6 +78,7 @@ class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/logout');
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $username);
         $this->client->setServerParameter('PHP_AUTH_PW', self::PASS);
@@ -115,7 +119,7 @@ class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
             ->get(PasswordHasherFactoryInterface::class)
             ->getPasswordHasher($user);
 
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash(self::PASS));
 
         $this->em->persist($user);

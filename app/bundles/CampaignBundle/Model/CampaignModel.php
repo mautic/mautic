@@ -575,11 +575,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param bool $forList
-     *
      * @return mixed
      */
-    public function getLeadCampaigns(?Lead $lead = null, $forList = false)
+    public function getLeadCampaigns(?Lead $lead = null, bool $forList = false)
     {
         static $campaigns = [];
 
