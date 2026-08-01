@@ -6,23 +6,12 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
 final class MailboxContainer
 {
-    /**
-     * @var array
-     */
-    protected $criteria = [];
+    private array $criteria = [];
 
-    /**
-     * @var bool
-     */
-    protected $markAsSeen = true;
-
-    /**
-     * @var array
-     */
-    protected $messages = [];
+    private bool $markAsSeen = true;
 
     public function __construct(
-        protected ConfigAccessor $config,
+        private readonly ConfigAccessor $config,
     ) {
     }
 

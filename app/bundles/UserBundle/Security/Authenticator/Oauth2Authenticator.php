@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
 {
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         // needed until the oAuth2 library will not be updated to 4.0.5
         return null !== $this->serverService->getBearerToken($request);
@@ -30,7 +30,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): \Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);

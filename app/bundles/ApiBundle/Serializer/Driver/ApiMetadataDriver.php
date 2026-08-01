@@ -25,7 +25,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * @throws \ReflectionException
      */
-    public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata
+    public function loadMetadataForClass(\ReflectionClass $class): \JMS\Serializer\Metadata\ClassMetadata
     {
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());
@@ -272,7 +272,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * @throws \Exception
      */
-    protected function getCurrentPropertyName(): string
+    private function getCurrentPropertyName(): string
     {
         if (empty($this->currentPropertyName)) {
             throw new \Exception('Current property is not set');

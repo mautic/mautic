@@ -58,7 +58,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
         ], $options);
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         return $this->authenticator->supports($request);
     }
@@ -107,7 +107,7 @@ final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, 
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): \Symfony\Component\HttpFoundation\Response
     {
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }
