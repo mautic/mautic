@@ -17,11 +17,11 @@ final class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const PASS                    = 'Maut1cR0cks!';
+    private const PASS = 'Maut1cR0cks!';
 
-    private const PERMISSION_CAMPAIGN_OWN = 298;
+    private const PERMISSION_CAMPAIGN_LEADS_ADD_OWN = 2;
 
-    private const PERMISSION_LEAD_OWN     = 1024;
+    private const PERMISSION_LEAD_FULL = 1024;
 
     public function testContactCampaignToggleModal(): void
     {
@@ -31,15 +31,15 @@ final class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
 
         // Campaign by admin
         $campaignOne = $this->createCampaign('Campaign By Admin')
-            ->setCreatedByUser($admin);
+            ->setCreatedBy($admin);
         $this->em->persist($campaignOne);
 
-        // Role + user with "own" permission
+        // Role + user with permission to add contacts to own campaigns only.
         $roleOwn = $this->createRoleWithPermissions(
             'user_with_own_campaign',
             [
-                ['campaign', 'campaigns', self::PERMISSION_CAMPAIGN_OWN],
-                ['lead', 'leads', self::PERMISSION_LEAD_OWN],
+                ['campaign', 'leads', self::PERMISSION_CAMPAIGN_LEADS_ADD_OWN],
+                ['lead', 'leads', self::PERMISSION_LEAD_FULL],
             ]
         );
 
@@ -71,6 +71,8 @@ final class ToggleContactCampaignFunctionalTest extends MauticMysqlTestCase
 
         // Verify only own campaign is visible
         $this->assertCount(1, $crawler->filterXPath("//li[contains(@class, 'list-group-item')]"));
+        $this->assertStringNotContainsString('Campaign By Admin', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Campaign By Another user', (string) $this->client->getResponse()->getContent());
     }
 
     private function loginAs(string $username): void
