@@ -187,8 +187,8 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
-        $user     = $this->createMock(User::class);
-        $this->prepareCommonMocks($event, $user);
+        $user     = $this->createStub(User::class);
+        $this->prepareCommonMocks($event);
 
         $this->coreParametersHelper
             ->method('get')
@@ -208,7 +208,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $this->prepareCommonMocks($event, $this->createMock(User::class));
+        $this->prepareCommonMocks($event);
 
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper->expects($this->exactly(2))
@@ -228,10 +228,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfUnpublish($event);
     }
 
-    /**
-     * @param User&\PHPUnit\Framework\MockObject\MockObject $user
-     */
-    private function prepareCommonMocks(Event $event, \PHPUnit\Framework\MockObject\MockObject $user): void
+    private function prepareCommonMocks(Event $event): void
     {
         $campaign = new Campaign();
         $event->setCampaign($campaign);
