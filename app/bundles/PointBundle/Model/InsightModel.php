@@ -20,9 +20,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<PointInsight>
  */
-class InsightModel extends CommonFormModel
+final class InsightModel extends CommonFormModel
 {
-    protected LeadModel $leadModel;
+    private LeadModel $leadModel;
 
     private PointInsightRepository $pointInsightRepository;
 

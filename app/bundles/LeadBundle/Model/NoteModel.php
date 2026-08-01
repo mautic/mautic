@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<LeadNote>
  */
-class NoteModel extends FormModel
+final class NoteModel extends FormModel
 {
     private RequestStack $requestStack;
 

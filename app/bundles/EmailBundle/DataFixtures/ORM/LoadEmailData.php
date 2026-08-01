@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly EmailModel $emailModel,
