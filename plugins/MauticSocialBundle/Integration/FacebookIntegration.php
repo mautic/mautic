@@ -81,7 +81,7 @@ class FacebookIntegration extends SocialIntegration
         $accessToken          = $this->getContactAccessToken($socialCache);
 
         if (!isset($accessToken['access_token'])) {
-            return;
+            return null;
         }
 
         $url    = $this->getApiUrl('v2.8/me');
