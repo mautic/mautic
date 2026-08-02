@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Exception\EventNotFoundExcepti
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
-final class EventAccessor
+class EventAccessor
 {
     private array $actions = [];
 

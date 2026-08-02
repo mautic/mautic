@@ -9,13 +9,13 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-final readonly class DateAnniversary implements FilterDecoratorInterface
+class DateAnniversary implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 
     public function __construct(
-        private DateDecorator $dateDecorator,
-        private DateOptionParameters $dateOptionParameters,
+        private readonly DateDecorator $dateDecorator,
+        private readonly DateOptionParameters $dateOptionParameters,
     ) {
     }
 

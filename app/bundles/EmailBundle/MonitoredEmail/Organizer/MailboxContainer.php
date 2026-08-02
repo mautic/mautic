@@ -32,10 +32,7 @@ final class MailboxContainer
         $this->markAsSeen = false;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldMarkAsSeen()
+    public function shouldMarkAsSeen(): bool
     {
         return $this->markAsSeen;
     }
@@ -48,10 +45,7 @@ final class MailboxContainer
         return $this->config->getPath();
     }
 
-    /**
-     * @return array
-     */
-    public function getCriteria()
+    public function getCriteria(): array
     {
         return $this->criteria;
     }

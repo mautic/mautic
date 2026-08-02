@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class ReportExportOptions
+class ReportExportOptions
 {
     /**
      * @var int

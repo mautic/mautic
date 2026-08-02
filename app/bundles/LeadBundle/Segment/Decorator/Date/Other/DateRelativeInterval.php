@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
-final class DateRelativeInterval implements FilterDecoratorInterface
+class DateRelativeInterval implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 

@@ -12,15 +12,15 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<string, array>
  */
-final readonly class DsnTransformer implements DataTransformerInterface
+class DsnTransformer implements DataTransformerInterface
 {
     private const PASSWORD_MASK = '🔒';
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EscapeTransformer $escapeTransformer,
-        private string $configKey,
-        private bool $allowEmpty,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EscapeTransformer $escapeTransformer,
+        private readonly string $configKey,
+        private readonly bool $allowEmpty,
     ) {
     }
 
