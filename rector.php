@@ -65,6 +65,8 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
 
         __DIR__.'/plugins/*/node_modules/*',
+        // test fixtures
+        __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
             // tests
