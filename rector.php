@@ -56,7 +56,7 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
-    ->withCodeQualityLevel(40)
+    ->withCodeQualityLevel(45)
     ->withSkip([
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
@@ -69,8 +69,8 @@ return RectorConfig::configure()
         ],
 
         // streamed response above
-        \Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
-            __DIR__ . '/app/bundles/ReportBundle/Model/ReportModel.php',
+        Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
+            __DIR__.'/app/bundles/ReportBundle/Model/ReportModel.php',
         ],
 
         // static property is read from static log() before any instance is constructed,
