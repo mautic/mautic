@@ -45,7 +45,6 @@ return RectorConfig::configure()
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
-        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
         // symfony
         Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
@@ -58,8 +57,11 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
-    ->withCodeQualityLevel(25)
+    ->withCodeQualityLevel(35)
     ->withSkip([
+        // to be deprecated as depends on personal preference
+        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+
         __DIR__.'/plugins/*/node_modules/*',
 
         UnserializeToSerializerDecodeRector::class => [
@@ -81,8 +83,8 @@ return RectorConfig::configure()
         ],
 
         // fixed in dev-main
-        \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
-            __DIR__ . '/app/bundles/LeadBundle/Model/LeadModel.php',
+        Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
         // modified with reflection
