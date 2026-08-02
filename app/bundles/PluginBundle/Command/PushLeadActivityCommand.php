@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:pushactivity',
     ]
 )]
-class PushLeadActivityCommand extends Command
+final class PushLeadActivityCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -26,7 +26,7 @@ class PushLeadActivityCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(

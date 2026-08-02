@@ -12,10 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class NotificationSendType extends AbstractType
+final class NotificationSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -35,7 +35,7 @@ class NotificationSendType extends AbstractType
                 'multiple'    => false,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.notification.choosenotification.notblank']
+                        message: 'mautic.notification.choosenotification.notblank'
                     ),
                 ],
             ]

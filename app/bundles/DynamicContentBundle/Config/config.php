@@ -48,31 +48,4 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'forms' => [
-            'mautic.form.type.dwc_entry_filters' => [
-                'class'     => Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.lead.model.list',
-                ],
-                'methodCalls' => [
-                    'setConnection' => [
-                        'database_connection',
-                    ],
-                ],
-            ],
-        ],
-        'other' => [
-            'mautic.helper.dynamicContent' => [
-                'class'     => Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class,
-                'arguments' => [
-                    'mautic.dynamicContent.model.dynamicContent',
-                    'mautic.campaign.executioner.realtime',
-                    'event_dispatcher',
-                    'mautic.lead.model.lead',
-                ],
-            ],
-        ],
-    ],
 ];

@@ -9,7 +9,7 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
-class PasswordStrengthEstimatorModel
+final readonly class PasswordStrengthEstimatorModel
 {
     public const MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
 
@@ -22,10 +22,11 @@ class PasswordStrengthEstimatorModel
         'company',
     ];
 
-    private readonly PasswordStrengthEstimator $passwordStrengthEstimator;
+    private PasswordStrengthEstimator $passwordStrengthEstimator;
 
-    public function __construct(private readonly EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+    ) {
         $this->passwordStrengthEstimator = new PasswordStrengthEstimator();
     }
 

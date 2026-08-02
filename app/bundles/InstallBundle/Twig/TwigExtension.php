@@ -8,14 +8,14 @@ use Twig\TwigFilter;
 /**
  * TwigExtension class.
  */
-class TwigExtension extends AbstractExtension
+final class TwigExtension extends AbstractExtension
 {
     /**
      * getFilters function.
      *
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('phpversion', $this->phpversion(...)),

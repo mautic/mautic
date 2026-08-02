@@ -45,12 +45,12 @@ class TrackableRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
-            ->innerJoin("$alias.redirect", 'r');
+            ->innerJoin("{$alias}.redirect", 'r');
 
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq("$alias.channel", ':channel'),
-                $q->expr()->eq("$alias.channelId", (int) $channelId),
+                $q->expr()->eq("{$alias}.channel", ':channel'),
+                $q->expr()->eq("{$alias}.channelId", (int) $channelId),
                 $q->expr()->eq('r.url', ':url')
             )
         )
@@ -71,12 +71,12 @@ class TrackableRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
-            ->innerJoin("$alias.redirect", 'r');
+            ->innerJoin("{$alias}.redirect", 'r');
 
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq("$alias.channel", ':channel'),
-                $q->expr()->eq("$alias.channelId", (int) $channelId),
+                $q->expr()->eq("{$alias}.channel", ':channel'),
+                $q->expr()->eq("{$alias}.channelId", (int) $channelId),
                 $q->expr()->in('r.url', ':urls')
             )
         )
@@ -87,8 +87,6 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int  $increaseBy
      * @param bool $unique
      */

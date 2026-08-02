@@ -5,11 +5,16 @@ namespace Mautic\LeadBundle\Entity;
 interface CustomFieldEntityInterface
 {
     /**
+     * @return int
+     */
+    public function getId();
+
+    /**
      * @param mixed[] $fields
      *
      * @return mixed
      */
-    public function setFields($fields);
+    public function setFields(array $fields);
 
     /**
      * @return mixed

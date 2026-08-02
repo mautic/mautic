@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignLeadSourceType extends AbstractType
+final class CampaignLeadSourceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -38,9 +38,7 @@ class CampaignLeadSourceType extends AbstractType
                         ],
                         'constraints' => [
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.core.value.required',
-                                ]
+                                message: 'mautic.core.value.required'
                             ),
                         ],
                     ]
@@ -60,9 +58,7 @@ class CampaignLeadSourceType extends AbstractType
                         ],
                         'constraints' => [
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.core.value.required',
-                                ]
+                                message: 'mautic.core.value.required'
                             ),
                         ],
                     ]

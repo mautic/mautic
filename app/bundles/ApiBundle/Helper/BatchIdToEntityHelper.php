@@ -4,7 +4,7 @@ namespace Mautic\ApiBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class BatchIdToEntityHelper
+final class BatchIdToEntityHelper
 {
     private array $ids = [];
 
@@ -72,7 +72,7 @@ class BatchIdToEntityHelper
                     fn ($entity): bool => $id == $entity->getPreviousId()
                 );
 
-                if ($hasPreviousId) {
+                if ([] !== $hasPreviousId) {
                     $orderedEntities[$key] = array_shift($hasPreviousId);
                 }
 

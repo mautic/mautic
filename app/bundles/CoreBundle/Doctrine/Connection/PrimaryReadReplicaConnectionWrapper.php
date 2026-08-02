@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Doctrine\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Exception;
 
-class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
+final class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
 {
     /**
      * @param array<string, string> $dbParams
@@ -27,6 +27,6 @@ class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
         $params['dbname']   = $dbParams['name'];
         $params['user']     = $dbParams['user'];
         $params['password'] = $dbParams['password'];
-        $this->__construct($params, $this->_driver, $this->_config, $this->_eventManager);
+        $this->__construct($params, $this->_driver, $this->_config);
     }
 }

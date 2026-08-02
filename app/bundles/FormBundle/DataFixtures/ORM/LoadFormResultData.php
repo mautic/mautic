@@ -10,7 +10,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,
@@ -38,7 +38,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                             if ('page' == $col) {
                                 $submission->setReferer($this->pageModel->generateUrl($entity));
                             }
-                            $submission->$setter($entity);
+                            $submission->{$setter}($entity);
                             unset($rows[$col]);
                         } else {
                             // the rest are custom field values
@@ -61,7 +61,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $importResults($results2);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 9;
     }

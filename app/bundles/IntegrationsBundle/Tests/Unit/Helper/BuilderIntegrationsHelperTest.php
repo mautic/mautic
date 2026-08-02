@@ -9,19 +9,10 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class BuilderIntegrationsHelperTest extends TestCase
 {
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    protected function setUp(): void
-    {
-        $integrationsHelper              = $this->createMock(IntegrationsHelper::class);
-        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($integrationsHelper);
-    }
-
     public function testBuilderNotFoundIfFeatureSupportedButNotEnabled(): void
     {
         $builder     = $this->createMock(BuilderInterface::class);
@@ -36,11 +27,11 @@ final class BuilderIntegrationsHelperTest extends TestCase
             ->method('getIntegrationConfiguration')
             ->willReturn($integration);
 
-        $this->builderIntegrationsHelper->addIntegration($builder);
+        $builderIntegrationsHelper = $this->createBuilderIntegrationsHelper($builder);
 
         $this->expectException(IntegrationNotFoundException::class);
 
-        $this->builderIntegrationsHelper->getBuilder('page');
+        $builderIntegrationsHelper->getBuilder('page');
     }
 
     public function testBuilderNotFoundIfFeatureIsNotSupported(): void
@@ -54,11 +45,11 @@ final class BuilderIntegrationsHelperTest extends TestCase
         $builder->expects($this->never())
             ->method('getIntegrationConfiguration');
 
-        $this->builderIntegrationsHelper->addIntegration($builder);
+        $builderIntegrationsHelper = $this->createBuilderIntegrationsHelper($builder);
 
         $this->expectException(IntegrationNotFoundException::class);
 
-        $this->builderIntegrationsHelper->getBuilder('page');
+        $builderIntegrationsHelper->getBuilder('page');
     }
 
     public function testBuilderFoundIfFeatureIsSupportedAndBuilderEnabled(): void
@@ -77,11 +68,11 @@ final class BuilderIntegrationsHelperTest extends TestCase
             ->method('getIntegrationConfiguration')
             ->willReturn($integration);
 
-        $this->builderIntegrationsHelper->addIntegration($builder);
+        $builderIntegrationsHelper = $this->createBuilderIntegrationsHelper($builder);
 
-        $foundBuilder = $this->builderIntegrationsHelper->getBuilder('page');
+        $foundBuilder = $builderIntegrationsHelper->getBuilder('page');
 
-        Assert::assertSame($builder, $foundBuilder);
+        $this->assertSame($builder, $foundBuilder);
     }
 
     public function testBuilderNamesAreReturned(): void
@@ -93,7 +84,6 @@ final class BuilderIntegrationsHelperTest extends TestCase
         $builder1->expects($this->once())
             ->method('getDisplayName')
             ->willReturn('Builder One');
-        $this->builderIntegrationsHelper->addIntegration($builder1);
 
         $builder2 = $this->createMock(BuilderInterface::class);
         $builder2->expects($this->exactly(2))
@@ -102,14 +92,17 @@ final class BuilderIntegrationsHelperTest extends TestCase
         $builder2->expects($this->once())
             ->method('getDisplayName')
             ->willReturn('Builder Two');
-        $this->builderIntegrationsHelper->addIntegration($builder2);
 
-        Assert::assertSame(
-            [
-                'builder1' => 'Builder One',
-                'builder2' => 'Builder Two',
-            ],
-            $this->builderIntegrationsHelper->getBuilderNames()
-        );
+        $builderIntegrationsHelper = $this->createBuilderIntegrationsHelper($builder1, $builder2);
+
+        $this->assertSame([
+            'builder1' => 'Builder One',
+            'builder2' => 'Builder Two',
+        ], $builderIntegrationsHelper->getBuilderNames());
+    }
+
+    private function createBuilderIntegrationsHelper(BuilderInterface ...$builders): BuilderIntegrationsHelper
+    {
+        return new BuilderIntegrationsHelper($this->createStub(IntegrationsHelper::class), $builders);
     }
 }

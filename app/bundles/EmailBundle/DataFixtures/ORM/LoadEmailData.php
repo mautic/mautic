@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly EmailModel $emailModel,
@@ -31,7 +31,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
                     if (in_array($col, ['content', 'variantSettings'])) {
                         $val = Serializer::decode(stripslashes($val));
                     }
-                    $email->$setter($val);
+                    $email->{$setter}($val);
                 }
             }
             $email->addList($this->getReference('lead-list'));
@@ -41,10 +41,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 9;
     }

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -29,7 +30,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject&EntityManagerInterface $entityManger;
+    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManger;
 
     private \PHPUnit\Framework\MockObject\Stub&LeadModel $leadModel;
 
@@ -51,6 +52,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
 
+    private MockObject&SmsRepository $smsRepository;
+
     private SmsModel $smsModel;
 
     protected function setUp(): void
@@ -58,7 +61,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->pageTrackableModel   = $this->createStub(TrackableModel::class);
         $this->leadModel            = $this->createStub(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
-        $this->entityManger         = $this->createMock(EntityManagerInterface::class);
+        $this->entityManger         = $this->createStub(EntityManagerInterface::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
         $this->urlGenerator         = $this->createStub(UrlGeneratorInterface::class);
@@ -66,6 +69,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->userHelper           = $this->createStub(UserHelper::class);
         $this->logger               = $this->createStub(LoggerInterface::class);
         $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $this->smsRepository        = $this->createMock(SmsRepository::class);
         $this->dispatcher->method('dispatch')
             ->willReturnArgument(0);
         $this->smsModel             = new SmsModel(
@@ -80,7 +84,10 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->logger,
-            $this->coreParametersHelper
+            $this->coreParametersHelper,
+            $this->smsRepository, // $smsRepository
+            $this->createStub(StatRepository::class), // $statRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
         );
     }
 
@@ -91,15 +98,9 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [['name' => 'Mautic', 'id' => 1, 'language' => 'cs'], ['name' => 'Mautic MMS', 'id' => 2, 'media' => ['test.jpg'], 'language' => 'cs']];
 
-        /** @var MockObject|SmsRepository $repositoryMock */
-        $repositoryMock = $this->createMock(SmsRepository::class);
-        $repositoryMock->method('getSmsList')
-            ->with('', 10, 0, true, false)
+        $this->smsRepository->method('getSmsList')
+            ->with('', 10, 0, true, null)
             ->willReturn($entities);
-
-        $this->entityManger->method('getRepository')
-            ->with(Sms::class)
-            ->willReturn($repositoryMock);
 
         $this->security->method('isGranted')
             ->with('sms:smses:viewother')
@@ -122,8 +123,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setId(1);
         $results = $this->smsModel->sendSms($sms, $lead);
-        self::assertFalse((bool) $results[1]['sent']);
-        self::assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);
+        $this->assertFalse((bool) $results[1]['sent']);
+        $this->assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);
     }
 
     public function testSendSMSTest(): void
@@ -138,9 +139,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private function sendMessage(bool $isMMS = false): void
     {
-        $repositoryMock     = $this->createMock(SmsRepository::class);
-        $statRepositoryMock = $this->createMock(StatRepository::class);
-
         $sms = new Sms();
         ReflectionHelper::setValue($sms, 'id', 1);
         $sms->setMessage('test');
@@ -155,6 +153,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $lead2 = new Lead();
         $lead2->setMobile('+123456790');
         $lead2->setId(2);
+
+        $smsRepo = $this->createMock(SmsRepository::class);
 
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)
@@ -171,11 +171,12 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
+                $smsRepo,
+                $this->createStub(StatRepository::class),
+                $this->createStub(DoNotContactRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
             ->getMock();
-        $smsModel->method('getRepository')
-            ->willReturn($smsRepo = $this->createMock(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
             ->willReturn($this->createStub(StatRepository::class));
@@ -185,10 +186,10 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             ->with($sms->getId(), 'sent', 2);
 
         $smsModel->method('getRepository')
-            ->willReturn($repositoryMock);
+            ->willReturn($this->createStub(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
-            ->willReturn($statRepositoryMock);
+            ->willReturn($this->createStub(StatRepository::class));
 
         if ($isMMS) {
             $this->transport->expects($this->once())

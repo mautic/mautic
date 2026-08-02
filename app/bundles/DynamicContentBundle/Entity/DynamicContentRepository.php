@@ -10,7 +10,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<DynamicContent>
  */
-class DynamicContentRepository extends CommonRepository
+final class DynamicContentRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
@@ -62,8 +62,8 @@ class DynamicContentRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):

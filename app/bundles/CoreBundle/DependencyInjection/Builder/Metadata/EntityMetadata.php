@@ -6,7 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\Finder\Finder;
 
-class EntityMetadata
+final class EntityMetadata
 {
     private array $ormConfig = [];
 
@@ -51,7 +51,7 @@ class EntityMetadata
             if (empty($this->serializerConfig) && $reflectionClass->hasMethod('loadApiMetadata')) {
                 $this->serializerConfig = [
                     'namespace_prefix' => $bundleNamespace.'\\Entity',
-                    'path'             => "@$bundleName/Entity",
+                    'path'             => "@{$bundleName}/Entity",
                 ];
             }
 

@@ -67,7 +67,7 @@ class FacebookIntegration extends SocialIntegration
 
     public function getApiUrl($endpoint): string
     {
-        return "https://graph.facebook.com/$endpoint";
+        return "https://graph.facebook.com/{$endpoint}";
     }
 
     /**
@@ -121,7 +121,7 @@ class FacebookIntegration extends SocialIntegration
         return null;
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'about'       => ['type' => 'string'],

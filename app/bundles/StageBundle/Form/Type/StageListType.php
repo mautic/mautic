@@ -11,15 +11,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Stage>
  */
-class StageListType extends AbstractType
+final class StageListType extends AbstractType
 {
     /**
      * @var array<string,int>
      */
     private array $choices = [];
 
-    public function __construct(private readonly StageModel $stageModel)
-    {
+    public function __construct(
+        private readonly StageModel $stageModel,
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -33,7 +34,7 @@ class StageListType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<FailedLeadEventLog>
  */
-class FailedLeadEventLogRepository extends CommonRepository
+final class FailedLeadEventLogRepository extends CommonRepository
 {
     /**
      * @param array<string|int> $ids
      */
     public function deleteByIds(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

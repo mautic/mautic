@@ -8,10 +8,10 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-class SAMLSubscriber implements EventSubscriberInterface
+final readonly class SAMLSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RouterInterface $router,
+        private RouterInterface $router,
     ) {
     }
 
@@ -34,7 +34,7 @@ class SAMLSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
         $route   = (string) $request->attributes->get('_route');
-        $url     = (string) $request->getRequestUri();
+        $url     = $request->getRequestUri();
         if (!str_contains($route, 'lightsaml') && !str_contains($url, '/saml/')) {
             return;
         }

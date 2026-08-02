@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
-class DateOptionParameters
+final class DateOptionParameters
 {
     private readonly bool $hasTimePart;
 
@@ -83,6 +83,6 @@ class DateOptionParameters
 
     private function setDateTimeHelper(TimezoneResolver $timezoneResolver): void
     {
-        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart);
     }
 }

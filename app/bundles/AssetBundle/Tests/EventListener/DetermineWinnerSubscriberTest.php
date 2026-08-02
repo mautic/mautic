@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -15,9 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&EntityManagerInterface
+     * @var MockObject&DownloadRepository
      */
-    private MockObject $em;
+    private MockObject $downloadRepository;
 
     /**
      * @var MockObject&TranslatorInterface
@@ -30,9 +29,9 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->em         = $this->createMock(EntityManagerInterface::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
+        $this->downloadRepository = $this->createMock(DownloadRepository::class);
+        $this->translator         = $this->createMock(TranslatorInterface::class);
+        $this->subscriber         = new DetermineWinnerSubscriber($this->downloadRepository, $this->translator);
     }
 
     public function testOnDetermineDownloadRateWinner(): void
@@ -40,7 +39,6 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $parentMock    = $this->createMock(Page::class);
         $childMock     = $this->createMock(Page::class);
         $children      = [2 => $childMock];
-        $repoMock      = $this->createMock(DownloadRepository::class);
         $parameters    = ['parent' => $parentMock, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
         $startDate     = new \DateTime();
@@ -66,23 +64,19 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transDownloads, $transHits);
 
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repoMock);
-
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('isPublished')
             ->willReturn(true);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('getId')
             ->willReturn(2);
 
@@ -90,7 +84,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $repoMock->expects($this->once())
+        $this->downloadRepository->expects($this->once())
             ->method('getDownloadCountsByPage')
             ->with([1, 2], $startDate)
             ->willReturn($counts);

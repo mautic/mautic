@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Command\CleanupCommand;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Command\Command;
 
 final class CleanupCommandTest extends MauticMysqlTestCase
@@ -16,23 +15,23 @@ final class CleanupCommandTest extends MauticMysqlTestCase
     public function testOrphanFieldChangeRecordDeleted(): void
     {
         $lead                    = $this->createLead();
-        $fieldChangeExistLead    = $this->createFieldChange((int) $lead->getId());
+        $fieldChangeExistLead    = $this->createFieldChange($lead->getId());
         $fieldChangeNonExistLead = $this->createFieldChange(9999);
         $response                = $this->testSymfonyCommand(CleanupCommand::NAME);
-        Assert::assertSame(Command::SUCCESS, $response->getStatusCode());
-        Assert::assertStringContainsString('1 records deleted.', $response->getDisplay());
+        $this->assertSame(Command::SUCCESS, $response->getStatusCode());
+        $this->assertStringContainsString('1 records deleted.', $response->getDisplay());
 
         $fieldChangeRecordDeleted = $this->em->getRepository(FieldChange::class)->findOneBy(['id' => $fieldChangeNonExistLead->getId()]);
-        Assert::assertNull($fieldChangeRecordDeleted);
+        $this->assertNotInstanceOf(FieldChange::class, $fieldChangeRecordDeleted);
         $fieldChangeRecordShouldNotDeleted = $this->em->getRepository(FieldChange::class)->findOneBy(['id' => $fieldChangeExistLead->getId()]);
-        Assert::assertNotNull($fieldChangeRecordShouldNotDeleted);
+        $this->assertInstanceOf(FieldChange::class, $fieldChangeRecordShouldNotDeleted);
     }
 
     public function testWhenNoRecordsToDelete(): void
     {
         $response = $this->testSymfonyCommand(CleanupCommand::NAME);
-        Assert::assertSame(Command::SUCCESS, $response->getStatusCode());
-        Assert::assertStringContainsString('0 records deleted.', $response->getDisplay());
+        $this->assertSame(Command::SUCCESS, $response->getStatusCode());
+        $this->assertStringContainsString('0 records deleted.', $response->getDisplay());
     }
 
     private function createFieldChange(int $objectID): FieldChange

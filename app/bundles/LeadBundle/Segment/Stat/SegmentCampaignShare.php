@@ -2,26 +2,25 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
-class SegmentCampaignShare
+final readonly class SegmentCampaignShare
 {
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly CacheStorageHelper $cacheStorageHelper,
-        private readonly EntityManager $entityManager,
+        private CampaignModel $campaignModel,
+        private CacheStorageHelper $cacheStorageHelper,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param mixed[] $campaignIds
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $campaigns = $this->campaignModel->getRepository()->getCampaignsSegmentShare($segmentId, $campaignIds);
         foreach ($campaigns as $campaign) {

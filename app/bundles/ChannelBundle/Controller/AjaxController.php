@@ -7,21 +7,29 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+
+    private MessageQueueModel $messageQueueModel;
+
+    #[Required]
+    public function autowireChannelAjaxController(
+        MessageQueueModel $messageQueueModel,
+    ): void {
+        $this->messageQueueModel = $messageQueueModel;
+    }
 
     public function cancelQueuedMessageEventAction(Request $request): JsonResponse
     {
         $dataArray      = ['success' => 0];
         $messageQueueId = (int) $request->request->get('channelId');
-        $queueModel     = $this->getModel('channel.queue');
-        \assert($queueModel instanceof MessageQueueModel);
-        $queuedMessage  = $queueModel->getEntity($messageQueueId);
+        $queuedMessage  = $this->messageQueueModel->getEntity($messageQueueId);
         if ($queuedMessage) {
             $queuedMessage->setStatus('cancelled');
-            $queueModel->saveEntity($queuedMessage);
+            $this->messageQueueModel->saveEntity($queuedMessage);
             $dataArray = ['success' => 1];
         }
 

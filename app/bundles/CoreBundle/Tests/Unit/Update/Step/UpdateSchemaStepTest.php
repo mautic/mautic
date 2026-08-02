@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
@@ -44,7 +43,6 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $kernel               = $this->createMock(KernelInterface::class);
-        $helperSet            = $this->createMock(HelperSet::class);
         $kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -57,7 +55,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn($helperSet);
+            ->willReturn($this->createStub(HelperSet::class));
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -97,7 +95,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
         $kernel->method('getContainer')
             ->willReturn($container);
 
-        $this->step = new UpdateSchemaStep($this->translator, $container);
+        $this->step = new UpdateSchemaStep($this->translator, $kernel);
     }
 
     public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
@@ -120,14 +118,13 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    #[DoesNotPerformAssertions]
     public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')
@@ -146,7 +143,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

@@ -8,18 +8,16 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignListType extends AbstractType
+final class CampaignListType extends AbstractType
 {
-    private bool $canViewOther;
+    private readonly bool $canViewOther;
 
     public function __construct(
         private readonly CampaignModel $model,
-        protected TranslatorInterface $translator,
         CorePermissions $security,
     ) {
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
@@ -55,7 +53,7 @@ class CampaignListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
-class StatCollection
+final class StatCollection
 {
     private readonly StatsDAO $stats;
 
@@ -85,7 +85,7 @@ class StatCollection
 
     public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime): Calculator
     {
-        if (is_null($this->calculator)) {
+        if (null === $this->calculator) {
             $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
         }
 

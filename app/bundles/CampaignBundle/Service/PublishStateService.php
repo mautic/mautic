@@ -20,8 +20,9 @@ class PublishStateService
      */
     private array $cachedRangesByCampaign = [];
 
-    public function __construct(private readonly AuditLogRepository $auditLogRepository)
-    {
+    public function __construct(
+        private readonly AuditLogRepository $auditLogRepository,
+    ) {
     }
 
     public function getUnublishedSecondsSince(Campaign $campaign, \DateTimeInterface $eventLogCreatedDate): int
@@ -40,11 +41,11 @@ class PublishStateService
                 continue;
             }
             if ($range->getFromDate() <= $eventLogCreatedDate && $range->getToDate() >= $eventLogCreatedDate) {
-                $unpublishedSeconds += (int) $range->getToDate()->getTimestamp() - (int) $eventLogCreatedDate->getTimestamp();
+                $unpublishedSeconds += $range->getToDate()->getTimestamp() - $eventLogCreatedDate->getTimestamp();
                 continue;
             }
             if ($range->getFromDate() >= $eventLogCreatedDate) {
-                $unpublishedSeconds += (int) $range->getToDate()->getTimestamp() - (int) $range->getFromDate()->getTimestamp();
+                $unpublishedSeconds += $range->getToDate()->getTimestamp() - $range->getFromDate()->getTimestamp();
             }
         }
 

@@ -2,22 +2,12 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,25 +15,23 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class MessageController extends AbstractStandardFormController
+final class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        private RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private RequestStack $requestStack;
+
+    private MessageModel $messageModel;
+
+    #[Required]
+    public function autowireMessageController(
+        RequestStack $requestStack,
+        MessageModel $messageModel,
+    ): void {
+        $this->requestStack = $requestStack;
+        $this->messageModel = $messageModel;
     }
 
     /**
@@ -64,10 +52,8 @@ class MessageController extends AbstractStandardFormController
 
     /**
      * @param bool $ignorePost
-     *
-     * @return Response|JsonResponse
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }
@@ -98,8 +84,6 @@ class MessageController extends AbstractStandardFormController
      */
     protected function getViewArguments(array $args, $action): array
     {
-        /** @var MessageModel $model */
-        $model          = $this->getModel($this->getModelName());
         $viewParameters = [];
         switch ($action) {
             case 'index':
@@ -132,11 +116,11 @@ class MessageController extends AbstractStandardFormController
                 $chart                   = new LineChart(null, $dateFrom, $dateTo);
 
                 /** @var Channel[] $channels */
-                $channels        = $model->getChannels();
+                $channels        = $this->messageModel->getChannels();
                 $messageChannels = $message->getChannels();
                 $chart->setDataset(
                     $this->translator->trans('mautic.core.all'),
-                    $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
+                    $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
                 );
 
                 $messagedLeads = [
@@ -155,7 +139,7 @@ class MessageController extends AbstractStandardFormController
                     if ($channel->isEnabled() && isset($channels[$channel->getChannel()])) {
                         $chart->setDataset(
                             $channels[$channel->getChannel()]['label'],
-                            $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
+                            $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
                         );
 
                         $messagedLeads[$channel->getChannel()] = $this->forward(
@@ -175,7 +159,7 @@ class MessageController extends AbstractStandardFormController
 
                 $viewParameters = [
                     'channels'        => $channels,
-                    'channelContents' => $model->getMessageChannels($message->getId()),
+                    'channelContents' => $this->messageModel->getMessageChannels($message->getId()),
                     'dateRangeForm'   => $dateRangeForm->createView(),
                     'eventCounts'     => $chart->render(),
                     'messagedLeads'   => $messagedLeads,
@@ -184,7 +168,7 @@ class MessageController extends AbstractStandardFormController
             case 'new':
             case 'edit':
                 $viewParameters = [
-                    'channels' => $model->getChannels(),
+                    'channels' => $this->messageModel->getChannels(),
                 ];
 
                 break;

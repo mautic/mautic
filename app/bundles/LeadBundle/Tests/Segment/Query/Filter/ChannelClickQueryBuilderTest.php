@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,11 +41,10 @@ final class ChannelClickQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $dispatcherMock
+            $this->createStub(EventDispatcherInterface::class)
         );
 
         $this->connectionMock->method('quote')
@@ -71,7 +70,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
         yield ['neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
+    #[DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -86,7 +85,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -118,7 +117,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @param array<string, mixed> $batchLimiters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryWithBatchLimitersMinMaxBoth')]
+    #[DataProvider('dataApplyQueryWithBatchLimitersMinMaxBoth')]
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -133,7 +132,7 @@ final class ChannelClickQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**

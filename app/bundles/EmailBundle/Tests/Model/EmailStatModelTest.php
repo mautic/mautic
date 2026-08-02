@@ -30,15 +30,15 @@ final class EmailStatModelTest extends TestCase
             ->method('saveEntities')
             ->willReturnCallback(
                 function (array $entities): void {
-                    Assert::assertCount(1, $entities);
-                    Assert::assertInstanceOf(StatTest::class, $entities[0]);
+                    $this->assertCount(1, $entities);
+                    $this->assertInstanceOf(StatTest::class, $entities[0]);
 
                     // Emulate database adding the entity some autoincrement ID.
                     $entities[0]->setId('123');
                 }
             );
 
-        $dispatcher = new class extends EventDispatcher {
+        $dispatcher = new class() extends EventDispatcher {
             public int $dispatchMethodCounter = 0;
 
             public function dispatch(object $event, ?string $eventName = null): object
@@ -62,17 +62,17 @@ final class EmailStatModelTest extends TestCase
             }
         };
 
-        $emailStatModel = new EmailStatModel($entityManager, $dispatcher);
+        $emailStatModel = new EmailStatModel($dispatcher, $statRepository);
 
         $emailStat = new StatTest();
 
         $emailStatModel->saveEntity($emailStat);
 
-        Assert::assertSame(2, $dispatcher->dispatchMethodCounter);
+        $this->assertSame(2, $dispatcher->dispatchMethodCounter);
     }
 }
 
-class StatTest extends Stat
+final class StatTest extends Stat
 {
     private ?string $id = null;
 

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
 
-class SegmentDependencyTreeFactory
+final class SegmentDependencyTreeFactory
 {
     /**
      * @var int[]
@@ -61,7 +61,7 @@ class SegmentDependencyTreeFactory
             fn (array $filter): bool => 'leadlist' === $filter['type']
         );
 
-        if (!$segmentMembershipFilters) {
+        if ([] === $segmentMembershipFilters) {
             return [];
         }
 

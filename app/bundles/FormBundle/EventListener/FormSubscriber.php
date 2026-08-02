@@ -23,17 +23,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
-    private readonly MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
-        private readonly LanguageHelper $languageHelper,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -281,7 +281,7 @@ class FormSubscriber implements EventSubscriberInterface
 
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $emails     = $emails     = $this->getEmailsFromString($email);
+                $emails     = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])
@@ -321,7 +321,7 @@ class FormSubscriber implements EventSubscriberInterface
             $body = $json;
         } else {
             parse_str($body, $output);
-            if ($output) {
+            if ([] !== $output) {
                 $body = $output;
             }
         }
@@ -362,11 +362,11 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    private function postToHtml($post): string
+    private function postToHtml(array $post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
-            $output .= "<tr><td style='vertical-align: top'><strong>$key</strong></td><td>";
+            $output .= "<tr><td style='vertical-align: top'><strong>{$key}</strong></td><td>";
             if (is_array($row)) {
                 $output .= $this->postToHtml($row);
             } else {
@@ -381,7 +381,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @return array<string, null>
      */
-    private function getEmailsFromString($emailString): array
+    private function getEmailsFromString(?string $emailString): array
     {
         return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }

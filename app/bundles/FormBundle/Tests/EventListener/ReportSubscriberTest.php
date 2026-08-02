@@ -22,7 +22,6 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -64,16 +63,15 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->reportHelper         = new ReportHelper($this->createStub(EventDispatcher::class));
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $coreParametersHelper,
+            $this->createStub(CoreParametersHelper::class),
             $this->createStub(TranslatorInterface::class),
-            $dncReportService
+            $this->createStub(DncReportService::class),
+            $this->formRepository
         );
     }
 
@@ -164,7 +162,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $this->subscriber->onReportBuilder($reportBuilderEvent);
 
-        Assert::assertCount(0, $reportBuilderEvent->getTables());
+        $this->assertCount(0, $reportBuilderEvent->getTables());
     }
 
     public function testOnReportBuilderAddsFormAndFormResultReports(): void
@@ -190,10 +188,6 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $field->setForm($form);
 
         $this->formModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->formRepository);
-
-        $this->formModel->expects($this->once())
             ->method('getCustomComponents')
             ->willReturn(['viewOnlyFields' => ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak', 'plugin.loginSocial']]);
 
@@ -209,9 +203,9 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
 
         $tables = $reportBuilderEvent->getTables();
 
-        Assert::assertCount(2, $tables);
-        Assert::assertArrayHasKey('form.results.test', $tables);
-        Assert::assertCount(3, $tables['form.results.test']['columns']);
+        $this->assertCount(2, $tables);
+        $this->assertArrayHasKey('form.results.test', $tables);
+        $this->assertCount(3, $tables['form.results.test']['columns']);
     }
 
     public function testOnReportGenerateFormsContext(): void
@@ -331,7 +325,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $mockQueryBuilder = $this->createStub(QueryBuilder::class);
         $mockChartQuery   = $this->createMock(ChartQuery::class);
 
-        $mockTrans->expects($this->any())
+        $mockTrans
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -339,15 +333,15 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('getQueryBuilder')
             ->willReturn($mockQueryBuilder);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('loadAndBuildTimeData')
             ->willReturn(['a', 'b', 'c']);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCount')
             ->willReturn(2);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCountDateDiff')
             ->willReturn(2);
 
@@ -362,7 +356,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('checkContext')
             ->willReturn(true);
 
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getOptions')
             ->willReturn($graphOptions);
 

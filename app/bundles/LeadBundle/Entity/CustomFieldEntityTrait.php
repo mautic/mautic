@@ -48,11 +48,11 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param string $name
+     * @param array<mixed> $arguments
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         $isSetter = str_starts_with($name, 'set');
         $isGetter = str_starts_with($name, 'get');
@@ -69,7 +69,10 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    public function setFields($fields): void
+    /**
+     * @param array<string, mixed> $fields
+     */
+    public function setFields(array $fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }
@@ -123,7 +126,7 @@ trait CustomFieldEntityTrait
             if ('' === $value) {
                 $value = null;
             }
-            $this->$setter($value);
+            $this->{$setter}($value);
         }
 
         if (is_string($value)) {
@@ -262,7 +265,7 @@ trait CustomFieldEntityTrait
         return $this;
     }
 
-    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
+    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions): void
     {
         foreach ($fields as $fieldProperty) {
             $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;

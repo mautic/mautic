@@ -50,12 +50,12 @@ class GeobytesLookup extends AbstractRemoteDataLookup
         return "http://getcitydetails.geobytes.com/GetCityDetails?fqcn={$this->ip}";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
         foreach ($data as $key => $value) {
             $key        = str_replace('geobytes', '', $key);
-            $this->$key = $value;
+            $this->{$key} = $value;
         }
     }
 }

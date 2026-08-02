@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NormalizeFormExtension extends AbstractTypeExtension
+final class NormalizeFormExtension extends AbstractTypeExtension
 {
     /**
      * @param array<mixed> $options

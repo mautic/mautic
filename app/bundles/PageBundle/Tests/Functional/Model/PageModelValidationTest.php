@@ -11,9 +11,9 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageModelValidationTest extends MauticMysqlTestCase
@@ -24,7 +24,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     {
         $this->configParams['validate_page_hit_required_data'] = true;
         parent::setUp();
-        $this->pageHitRepository = self::getContainer()->get('mautic.page.repository.hit');
+        $this->pageHitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testPageHitWhenRequiredValuesValidationPass(): void
@@ -38,7 +38,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $ct           = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct           = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
         $requestParam = '?ct='.$ct.'&page_title='.$page->getTitle();
 
         // hitPage() tracks only anonymous requests.
@@ -47,7 +47,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        Assert::assertNotEmpty($pageHit, 'page hit should not be empty');
+        $this->assertInstanceOf(Hit::class, $pageHit, 'page hit should not be empty');
     }
 
     public function testPageHitWhenRequiredValuesValidationFails(): void
@@ -58,7 +58,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
         // Use tracking pixel endpoint without page_title to trigger validation failure
         // This will have no page, no redirect, and no urlTitle (since page_title is missing)
         $requestParam = '?ct='.$ct;
@@ -70,7 +70,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
 
         // Verify no Hit was persisted due to validation failure
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        Assert::assertNull($pageHit, 'page hit should not be persisted when validation fails');
+        $this->assertNotInstanceOf(Hit::class, $pageHit, 'page hit should not be persisted when validation fails');
     }
 
     /**

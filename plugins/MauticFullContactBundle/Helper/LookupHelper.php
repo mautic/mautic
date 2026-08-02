@@ -16,20 +16,20 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LookupHelper
+final class LookupHelper
 {
     /**
      * @var bool|FullContactIntegration
      */
-    protected $integration;
+    private $integration;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected Router $router,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        private readonly UserHelper $userHelper,
+        private readonly Logger $logger,
+        private readonly Router $router,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -44,8 +44,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Person $fullcontact */
-        if ($fullcontact = $this->getFullContact()) {
+        $fullcontact = $this->getFullContact();
+        if ($fullcontact instanceof FullContact_Person) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
@@ -90,8 +90,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact(false)) {
+        $fullcontact = $this->getFullContact(false);
+        if ($fullcontact instanceof FullContact_Company) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($website);
@@ -165,7 +165,7 @@ class LookupHelper
         return false;
     }
 
-    protected function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
+    private function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;
@@ -177,7 +177,7 @@ class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

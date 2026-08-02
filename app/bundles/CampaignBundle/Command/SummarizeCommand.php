@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: SummarizeCommand::NAME,
     description: 'Builds historical campaign summary statistics if they do not already exist.'
 )]
-class SummarizeCommand extends ModeratedCommand
+final class SummarizeCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
@@ -65,7 +66,7 @@ class SummarizeCommand extends ModeratedCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $batchLimit = (int) $input->getOption('batch-limit');
@@ -80,6 +81,6 @@ class SummarizeCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

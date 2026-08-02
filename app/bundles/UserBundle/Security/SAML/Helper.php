@@ -7,10 +7,12 @@ namespace Mautic\UserBundle\Security\SAML;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class Helper
+final readonly class Helper
 {
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly RequestStack $request)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private RequestStack $request,
+    ) {
     }
 
     public function isSamlSession(): bool

@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DateExtension extends AbstractExtension
+final class DateExtension extends AbstractExtension
 {
     public function __construct(
-        protected DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('dateToText', $this->toText(...), ['is_safe' => ['all']]),

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -22,11 +23,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriber implements EventSubscriberInterface
+final class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
-
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
     public function __construct(
         private LeadModel $leadModel,
@@ -37,8 +36,8 @@ class SearchSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private Environment $twig,
         private GlobalSearch $globalSearch,
+        private readonly LeadRepository $leadRepository,
     ) {
-        $this->leadRepo        = $leadModel->getRepository();
     }
 
     public static function getSubscribedEvents(): array
@@ -66,8 +65,8 @@ class SearchSubscriber implements EventSubscriberInterface
         $filter    = ['string' => $str, 'force' => ''];
 
         // only show results that are not anonymous so as to not clutter up things
-        if (!str_contains($str, "$anonymous")) {
-            $filter['force'] = " !$anonymous";
+        if (!str_contains($str, "{$anonymous}")) {
+            $filter['force'] = " !{$anonymous}";
         }
 
         $permissions = $this->security->isGranted(
@@ -78,7 +77,7 @@ class SearchSubscriber implements EventSubscriberInterface
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
             // only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
 
             $results = $this->leadModel->getEntities(
@@ -380,7 +379,7 @@ class SearchSubscriber implements EventSubscriberInterface
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
         ));
 
-        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+        $this->leadRepository->applySearchQueryRelationship($q, $tables, true, $expr);
         $event->setReturnParameters(true);
         $event->setStrict(true);
         $event->setSearchStatus(true);
@@ -516,7 +515,7 @@ class SearchSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+        $this->leadRepository->applySearchQueryRelationship($q, $tables, true, $expr);
 
         $event->setReturnParameters(true); // replace search string
         $event->setStrict(true);           // don't use like

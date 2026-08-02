@@ -19,8 +19,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class GenerateABTestType extends AbstractType
 {
-    public function __construct(private readonly EmailModel $emailModel, private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly EmailModel $emailModel,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -39,7 +41,7 @@ final class GenerateABTestType extends AbstractType
 
             if ($options['is_parent']) {
                 $constraints[] = new NotBlank(
-                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                    message: 'mautic.core.ab_test.winner_criteria.not_blank'
                 );
             }
 
@@ -82,10 +84,7 @@ final class GenerateABTestType extends AbstractType
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr + ['postaddon_text' => $this->translator->trans('mautic.core.time.hours')],
-            'constraints' => new Range([
-                'min' => 1,
-                'max' => 24,
-            ]),
+            'constraints' => new Range(min: 1, max: 24),
             'data'        => $options['data']['sendWinnerDelay'] ?? VariantType::DEFAULT_WINNER_DELAY,
         ]);
 
@@ -93,10 +92,7 @@ final class GenerateABTestType extends AbstractType
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr + ['postaddon_text' => '%'],
-            'constraints' => new Range([
-                'min' => 1,
-                'max' => 50,
-            ]),
+            'constraints' => new Range(min: 1, max: 50),
             'data'        => $options['data']['totalWeight'] ?? VariantType::DEFAULT_WEIGHT,
         ]);
 

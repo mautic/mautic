@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -61,7 +62,7 @@ final class ConfigMetadataTest extends TestCase
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',
-                    'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+                    'class'        => ExtremeIpLookup::class,
                 ],
             ],
             $configMetadata->getIpLookupServices()
@@ -78,8 +79,8 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertTrue(isset($config['services']['helpers']['mautic.helper.bundle']));
-        $this->assertTrue(isset($config['parameters']['log_path']));
+        $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
+        $this->assertArrayHasKey('log_path', $config['parameters']);
     }
 
     public function testOptionalMissingServicesAreIgnored(): void
@@ -92,7 +93,7 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertFalse(isset($config['services']['fixtures']['mautic.test.fixture']));
+        $this->assertArrayNotHasKey('mautic.test.fixture', $config['services']['fixtures']);
     }
 
     public function testParameterArgumentsAreEncoded(): void
@@ -105,7 +106,7 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertTrue(isset($config['services']['helpers']['mautic.helper.bundle']));
+        $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
 
         $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
     }
@@ -120,7 +121,7 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertTrue(isset($config['parameters']['log_path']));
+        $this->assertArrayHasKey('log_path', $config['parameters']);
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
     }
@@ -135,7 +136,7 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertTrue(isset($config['parameters']['log_path']));
+        $this->assertArrayHasKey('log_path', $config['parameters']);
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
         $this->assertEquals(7, $config['parameters']['max_log_files']);

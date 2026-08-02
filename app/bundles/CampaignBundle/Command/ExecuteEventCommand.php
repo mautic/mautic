@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:execute',
     description: 'Execute specific scheduled events.'
 )]
-class ExecuteEventCommand extends Command
+final class ExecuteEventCommand extends Command
 {
     use WriteCountTrait;
 
@@ -27,7 +27,7 @@ class ExecuteEventCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(

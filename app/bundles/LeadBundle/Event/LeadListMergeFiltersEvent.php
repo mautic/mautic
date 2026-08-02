@@ -4,13 +4,14 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class LeadListMergeFiltersEvent extends CommonEvent
+final class LeadListMergeFiltersEvent extends CommonEvent
 {
     /**
      * @param mixed[] $filters
      */
-    public function __construct(private array $filters)
-    {
+    public function __construct(
+        private array $filters,
+    ) {
     }
 
     /**

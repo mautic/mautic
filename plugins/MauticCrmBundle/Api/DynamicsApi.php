@@ -85,22 +85,24 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param Lead $lead
+     * @param mixed[] $data
+     * @param Lead    $lead
      */
-    public function createLead($data, $lead, $object = 'contacts'): ResponseInterface
+    public function createLead(array $data, $lead, $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
 
-    public function updateLead($data, $objectId): ResponseInterface
+    /**
+     * @param mixed[] $data
+     */
+    public function updateLead(array $data, string $objectId): ResponseInterface
     {
         //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
         return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);
     }
 
     /**
-     * gets leads.
-     *
      * @return mixed
      */
     public function getLeads(array $params)
@@ -109,8 +111,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * gets companies.
-     *
      * @param string $id
      *
      * @return mixed
@@ -210,7 +210,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
@@ -224,7 +224,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // loop data blocks
         foreach ($a_blocks as $block) {

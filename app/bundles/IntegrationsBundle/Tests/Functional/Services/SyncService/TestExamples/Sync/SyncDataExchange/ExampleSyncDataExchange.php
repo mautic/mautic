@@ -15,7 +15,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 
-class ExampleSyncDataExchange implements SyncDataExchangeInterface
+final class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
     public const OBJECT_LEAD = 'integration_lead';
 
@@ -47,7 +47,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
     private array $payload = ['create' => [], 'update' => []];
 
-    private ValueNormalizer $valueNormalizer;
+    private readonly ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {

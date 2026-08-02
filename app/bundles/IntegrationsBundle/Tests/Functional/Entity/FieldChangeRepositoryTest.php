@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class FieldChangeRepositoryTest extends MauticMysqlTestCase
 {
@@ -23,7 +22,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repository = $this->em->getRepository(FieldChange::class);
+        $this->repository = self::getContainer()->get(FieldChangeRepository::class);
     }
 
     public function testThatFindChangesBeforeMethodReturnsChangesInCorrectOrder(): void
@@ -33,10 +32,10 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $lead3        = $this->createLead();
         $lead4        = $this->createLead();
         $fieldChanges = $this->generateFieldChanges(4);
-        $fieldChanges[0]->setObjectId((int) $lead3->getId());
-        $fieldChanges[1]->setObjectId((int) $lead4->getId());
-        $fieldChanges[2]->setObjectId((int) $lead1->getId());
-        $fieldChanges[3]->setObjectId((int) $lead2->getId());
+        $fieldChanges[0]->setObjectId($lead3->getId());
+        $fieldChanges[1]->setObjectId($lead4->getId());
+        $fieldChanges[2]->setObjectId($lead1->getId());
+        $fieldChanges[3]->setObjectId($lead2->getId());
 
         foreach ($fieldChanges as $fieldChange) {
             $this->em->persist($fieldChange);
@@ -54,8 +53,8 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
             2
         );
 
-        Assert::assertEquals($lead1->getId(), $changes[0]['object_id']);
-        Assert::assertEquals($lead3->getId(), $changes[1]['object_id'], 'Lead 2 record is not fetched as lead 2 is deleted');
+        $this->assertEquals($lead1->getId(), $changes[0]['object_id']);
+        $this->assertEquals($lead3->getId(), $changes[1]['object_id'], 'Lead 2 record is not fetched as lead 2 is deleted');
     }
 
     public function testThatItDoesntDeleteObjectsThatCameDuringInternalSynchronization(): void
@@ -79,8 +78,8 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         );
 
         $remainingChanges = $this->repository->findAll();
-        Assert::assertCount(1, $remainingChanges);
-        Assert::assertSame($fieldChanges[1]->getId(), $remainingChanges[0]->getId());
+        $this->assertCount(1, $remainingChanges);
+        $this->assertSame($fieldChanges[1]->getId(), $remainingChanges[0]->getId());
     }
 
     /**

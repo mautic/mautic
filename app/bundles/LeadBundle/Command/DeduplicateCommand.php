@@ -18,9 +18,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 #[AsCommand(
     name: DeduplicateCommand::NAME,
-    description: 'Merge contacts based on same unique identifiers'
+    description: 'Merge contacts based on same unique identifiers',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
+
+<info>php %command.full_name%</info>
+TXT
 )]
-class DeduplicateCommand extends Command
+final class DeduplicateCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate';
 
@@ -55,13 +60,6 @@ class DeduplicateCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.',
                 1
-            )
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will dedpulicate contacts based on unique identifier values. 
-
-<info>php %command.full_name%</info>
-EOT
             );
     }
 

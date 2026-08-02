@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 
-class PreferenceBuilder
+final class PreferenceBuilder
 {
     /**
      * @var ChannelPreferences[]
@@ -59,7 +59,7 @@ class PreferenceBuilder
             return;
         }
 
-        $this->logger->debug("MARKETING MESSAGE: Set $channel as priority $priority for contact ID #".$log->getLead()->getId());
+        $this->logger->debug("MARKETING MESSAGE: Set {$channel} as priority {$priority} for contact ID #".$log->getLead()->getId());
 
         $channelPreferences->addLog($log, $priority);
     }

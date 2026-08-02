@@ -6,10 +6,12 @@ use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class NotifyOfFailureEvent extends Event
+final class NotifyOfFailureEvent extends Event
 {
-    public function __construct(private readonly Lead $lead, private readonly CampaignEvent $failedEvent)
-    {
+    public function __construct(
+        private readonly Lead $lead,
+        private readonly CampaignEvent $failedEvent,
+    ) {
     }
 
     public function getLead(): Lead

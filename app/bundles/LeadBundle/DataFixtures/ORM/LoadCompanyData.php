@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly CompanyModel $companyModel,
@@ -32,10 +32,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 4;
     }

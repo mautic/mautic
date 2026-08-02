@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class PathsHelper
@@ -36,8 +37,13 @@ class PathsHelper
 
     private readonly string $importCampaignDir;
 
-    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
-    {
+    public function __construct(
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        string $cacheDir,
+        string $logsDir,
+        string $rootDir,
+    ) {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();
@@ -133,7 +139,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }
@@ -206,7 +212,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 

@@ -2,19 +2,25 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
-class BroadcastResult
+final class BroadcastResult
 {
     private int $sentCount = 0;
 
     private int $failedCount = 0;
 
+    /**
+     * @var array<int, string>
+     */
+    private array $failedContacts = [];
+
     public function process(array $results): void
     {
-        foreach ($results as $result) {
+        foreach ($results as $lead_id => $result) {
             if (isset($result['sent']) && true === $result['sent']) {
                 $this->sent();
             } else {
                 $this->failed();
+                $this->failedContacts[$lead_id] = $result['status'];
             }
         }
     }
@@ -37,5 +43,13 @@ class BroadcastResult
     public function getFailedCount(): int
     {
         return $this->failedCount;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getFailedContacts(): array
+    {
+        return $this->failedContacts;
     }
 }

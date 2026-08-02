@@ -9,9 +9,19 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerEventController extends CommonFormController
+final class TriggerEventController extends CommonFormController
 {
+    private TriggerModel $triggerModel;
+
+    #[Required]
+    public function autowireTriggerEventController(
+        TriggerModel $triggerModel,
+    ): void {
+        $this->triggerModel = $triggerModel;
+    }
+
     /**
      * Generates new form and processes post data.
      */
@@ -46,12 +56,7 @@ class TriggerEventController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the builder event
-        /** @var TriggerModel $pointTriggerModel */
-        $pointTriggerModel = $this->getModel('point.trigger');
-        \assert($pointTriggerModel instanceof TriggerModel);
-        $events = $pointTriggerModel->getEvents();
+        $events = $this->triggerModel->getEvents();
         $form   = $this->formFactory->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
@@ -152,9 +157,7 @@ class TriggerEventController extends CommonFormController
 
         if (null !== $triggerEvent) {
             $eventType         = $triggerEvent['type'];
-            $pointTriggerModel = $this->getModel('point.trigger');
-            \assert($pointTriggerModel instanceof TriggerModel);
-            $events                   = $pointTriggerModel->getEvents();
+            $events                   = $this->triggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             // ajax only for form fields
@@ -259,10 +262,8 @@ class TriggerEventController extends CommonFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');
@@ -320,10 +321,8 @@ class TriggerEventController extends CommonFormController
      * Undeletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse
      */
-    public function undeleteAction(Request $request, $objectId)
+    public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $session   = $request->getSession();
         $triggerId = $request->get('triggerId');

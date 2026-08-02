@@ -46,7 +46,7 @@ class BuilderTokenHelper
         ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
-        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
+        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "{$modelName}:{$modelName}s";
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
         $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
@@ -99,7 +99,7 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if ($expr instanceof CompositeExpression && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
@@ -107,7 +107,7 @@ class BuilderTokenHelper
 
         if (!empty($filter)) {
             $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
-            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
+            $expr       = $expr instanceof CompositeExpression ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',

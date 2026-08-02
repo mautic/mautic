@@ -90,7 +90,7 @@ final class ImportTest extends StandardImportTestHelper
         $import->increaseIgnoredCount();
         $import->increaseIgnoredCount();
 
-        $expectedCount = (int) (2 + $expectedCount);
+        $expectedCount = 2 + $expectedCount;
         $this->assertSame($expectedCount, $import->getProcessedRows()); // @phpstan-ignore argument.unresolvableType (I don't see anything wrong)
     }
 
@@ -99,7 +99,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity()
             ->setLineCount(100);
 
-        $this->assertSame(0.0, $import->getProgressPercentage());
+        $this->assertEqualsWithDelta(0.0, $import->getProgressPercentage(), PHP_FLOAT_EPSILON);
 
         $import->setIgnoredCount(3);
 
@@ -116,7 +116,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateStarted());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateStarted());
 
         // Date started will be set when the start is called for the first time.
         $import->start();
@@ -137,7 +137,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateEnded());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateEnded());
 
         $import->start()->end(false);
 
@@ -149,7 +149,7 @@ final class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertNull($import->getRunTime());
+        $this->assertNotInstanceOf(\DateInterval::class, $import->getRunTime());
 
         $import->end(false);
 
@@ -177,26 +177,26 @@ final class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(0.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
 
         $import->setInsertedCount(900);
         $import->end(false);
 
         $this->fakeImportStartDate($import, 600);
 
-        $this->assertSame(1.5, $import->getSpeed());
+        $this->assertEqualsWithDelta(1.5, $import->getSpeed(), PHP_FLOAT_EPSILON);
     }
 
     public function testGetSpeedWhenRunTimeIsUnderOneSecond(): void
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertSame(0.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(0.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
 
         $import->setInsertedCount(3);
         $import->end(false);
 
-        $this->assertSame(3.0, $import->getSpeed());
+        $this->assertEqualsWithDelta(3.0, $import->getSpeed(), PHP_FLOAT_EPSILON);
     }
 
     /**
@@ -207,6 +207,7 @@ final class ImportTest extends StandardImportTestHelper
     protected function fakeImportStartDate(Import $import, int $runtime = 600): void
     {
         $dateEnded   = $import->getDateEnded();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateEnded);
         $dateStarted = new \DateTime($dateEnded->format('Y-m-d H:i:s.u'), $dateEnded->getTimezone());
         $dateStarted->modify('-'.$runtime.' seconds');
         $import->setDateStarted($dateStarted);

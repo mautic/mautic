@@ -7,15 +7,15 @@ namespace Mautic\IntegrationsBundle\Migration;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
-class Engine
+final readonly class Engine
 {
-    private readonly string $migrationsPath;
+    private string $migrationsPath;
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly string $tablePrefix,
+        private EntityManagerInterface $entityManager,
+        private string $tablePrefix,
         string $pluginPath,
-        private readonly string $bundleName,
+        private string $bundleName,
     ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
     }
@@ -31,7 +31,7 @@ class Engine
             return;
         }
 
-        if (!$migrationClasses) {
+        if ([] === $migrationClasses) {
             return;
         }
 

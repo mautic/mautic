@@ -11,17 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ButtonExtension extends AbstractExtension
+final class ButtonExtension extends AbstractExtension
 {
     public function __construct(
-        protected ButtonHelper $buttonHelper,
-        protected RequestStack $requestStack,
-        protected UrlGeneratorInterface $router,
-        protected TranslatorInterface $translator,
+        private readonly ButtonHelper $buttonHelper,
+        private readonly RequestStack $requestStack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),
@@ -145,7 +145,7 @@ class ButtonExtension extends AbstractExtension
                             'confirm' => [
                                 'message' => $this->translator->trans(
                                     'mautic.'.$langVar.'.form.confirmdelete',
-                                    ['%name%' => $item->$nameGetter().' ('.$item->getId().')']
+                                    ['%name%' => $item->{$nameGetter}().' ('.$item->getId().')']
                                 ),
                                 'confirmAction' => $this->router->generate(
                                     $actionRoute,

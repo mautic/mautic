@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
-    class ErrorHandler
+    final class ErrorHandler
     {
         public static $handler;
 
@@ -115,11 +115,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param string $file
          * @param int    $line
-         * @param array  $context
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
+        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -141,13 +140,13 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $logLevel = LogLevel::ERROR;
                 }
 
-                $message = 'PHP '.$this->getErrorName($level)." - $message";
+                $message = 'PHP '.$this->getErrorName($level)." - {$message}";
                 if (LogLevel::DEBUG === $logLevel) {
-                    $this->log($logLevel, "$message - in file $file - at line $line", $context);
+                    $this->log($logLevel, "{$message} - in file {$file} - at line {$line}", $context);
                 } elseif ($this->displayErrors) {
                     throw new \ErrorException($message, 0, $level, $file, $line);
                 } else {
-                    $this->log($logLevel, "$message - in file $file - at line $line", $context);
+                    $this->log($logLevel, "{$message} - in file {$file} - at line {$line}", $context);
                 }
             }
 
@@ -163,7 +162,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $content = $this->generateResponse($error, $inTemplate);
 
             $message = $error['logMessage'] ?? $error['message'];
-            $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
+            $this->log(LogLevel::ERROR, "{$message} - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
                 return $content;
@@ -197,7 +196,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     if (!$handlingFatal) {
                         // Prevent fatal loop
                         $handlingFatal = true;
-                        $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
+                        $this->log(LogLevel::ERROR, "PHP {$name}: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
                         if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
                             $exception = new OutOfMemoryError(
@@ -282,13 +281,21 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            $handlingException = true;
-            $line              = $exception->getLine();
-            $file              = $exception->getFile();
-            $trace             = $exception->getTrace();
-            $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
+            $context = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'showExceptionDetails', 'previous']);
+            return [
+                'inline' => $inline,
+                'type' => $type,
+                'message' => $message,
+                'logMessage' => $logMessage,
+                'line' => $exception->getLine(),
+                'file' => $exception->getFile(),
+                'trace' => $exception->getTrace(),
+                'context' => $context,
+                'showExceptionMessage' => $showExceptionMessage,
+                'showExceptionDetails' => $showExceptionDetails,
+                'previous' => $previous,
+            ];
         }
 
         /**
@@ -364,9 +371,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param array $context
+         * @param mixed[] $context
          */
-        protected function log($logLevel, $message, $context = [], $debugTrace = null)
+        private function log(string $logLevel, string $message, array $context = [], $debugTrace = null): void
         {
             $message = strip_tags($message);
             if ($this->logger) {
@@ -451,7 +458,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             if ('dev' == self::$environment || $this->displayErrors) {
                 $error['file']          = str_replace(self::$root, '', $error['file']);
                 $errorMessage           = $error['logMessage'] ?? $error['message'];
-                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['message']       = "{$errorMessage} - in file {$error['file']} - at line {$error['line']}";
             } else {
                 if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
@@ -517,7 +524,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $content;
         }
 
-        private function getErrorName($bit): string
+        private function getErrorName(int $bit): string
         {
             return match ($bit) {
                 E_PARSE => 'Parse Error',

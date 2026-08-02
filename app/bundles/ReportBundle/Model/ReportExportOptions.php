@@ -57,7 +57,7 @@ class ReportExportOptions
      */
     public function getNumberOfProcessedResults(): int|float
     {
-        return $this->page * $this->getBatchSize();
+        return $this->page * $this->batchSize;
     }
 
     /**
