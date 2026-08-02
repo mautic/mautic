@@ -40,9 +40,9 @@ final class AssetListType extends AbstractType
     {
         $choices   = [];
         $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');
-        $repo      = $this->assetRepository;
-        $repo->setCurrentUser($this->userHelper->getUser());
-        $assets = $repo->getAssetList('', 0, 0, $viewOther);
+
+        $this->assetRepository->setCurrentUser($this->userHelper->getUser());
+        $assets = $this->assetRepository->getAssetList('', 0, 0, $viewOther);
 
         foreach ($assets as $asset) {
             $choices[$asset['language']][$asset['title']] = $asset['id'];
