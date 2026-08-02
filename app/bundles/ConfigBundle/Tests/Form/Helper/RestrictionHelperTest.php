@@ -27,7 +27,6 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
-use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -235,8 +234,6 @@ final class RestrictionHelperTest extends TypeTestCase
 
         $pageRepoMock = $this->createMock(PageRepository::class);
         $pageRepoMock->method('getPageList')->willReturn([]);
-        $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock->method('getRepository')->willReturn($pageRepoMock);
 
         return [
             // register the type instances with the PreloadedExtension
@@ -252,7 +249,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
                     new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
-                    new PreferenceCenterListType($pageModelMock, $this->createStub(CorePermissions::class)),
+                    new PreferenceCenterListType($this->createStub(CorePermissions::class), $pageRepoMock),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),
                     new ConfigType($restrictionHelper, $escapeTransformer),
