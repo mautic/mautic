@@ -44,7 +44,6 @@ return RectorConfig::configure()
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
-        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
 
         // symfony
         Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
@@ -57,7 +56,7 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
-    ->withCodeQualityLevel(35)
+    ->withCodeQualityLevel(40)
     ->withSkip([
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,

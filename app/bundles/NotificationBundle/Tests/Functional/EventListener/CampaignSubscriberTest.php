@@ -543,14 +543,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
      */
     private function getExpectedResponsePushIds(array $pushIds, Notification $notification): array
     {
-        return array_merge(
-            ['include_player_ids' => $pushIds],
-            [
-                'contents' => ['en' => $notification->getMessage()],
-                'headings' => ['en' => $notification->getHeading()],
-                'app_id'   => self::API_ID,
-            ]
-        );
+        return ['include_player_ids' => $pushIds, 'contents' => ['en' => $notification->getMessage()], 'headings' => ['en' => $notification->getHeading()], 'app_id' => self::API_ID];
     }
 
     private function noMoreRequestAssertion(): callable
