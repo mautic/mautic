@@ -42,8 +42,6 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
-        \Rector\Symfony\CodeQuality\Rector\ClassMethod\ReturnDirectJsonResponseRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
@@ -81,6 +79,7 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+<<<<<<< HEAD
         // streamed response above
         Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
             __DIR__.'/app/bundles/ReportBundle/Model/ReportModel.php',
@@ -94,10 +93,17 @@ return RectorConfig::configure()
             __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
 
+=======
+>>>>>>> 61ef020d90 (apply symfony rules)
         // fix no nullable
         // Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector:
         // handled in another PR, but leaving here for now to avoid conflicts
         RecastingRemovalRector::class,
+
+        // bug fixed in dev-main;
+        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
+            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
+        ],
 
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
