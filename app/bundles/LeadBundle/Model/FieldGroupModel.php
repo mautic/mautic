@@ -23,18 +23,25 @@ final class FieldGroupModel extends FormModel
 {
     private FieldGroupAliasHelper $aliasHelper;
 
+    private FieldGroupRepository $fieldGroupRepository;
+
     #[Required]
-    public function setAliasHelper(FieldGroupAliasHelper $aliasHelper): void
-    {
+    public function setAliasHelper(
+        FieldGroupAliasHelper $aliasHelper,
+    ): void {
         $this->aliasHelper = $aliasHelper;
+    }
+
+    #[Required]
+    public function autowireFieldGroupModel(
+        FieldGroupRepository $fieldGroupRepository,
+    ): void {
+        $this->fieldGroupRepository = $fieldGroupRepository;
     }
 
     public function getRepository(): FieldGroupRepository
     {
-        $repo = $this->em->getRepository(FieldGroup::class);
-        \assert($repo instanceof FieldGroupRepository);
-
-        return $repo;
+        return $this->fieldGroupRepository;
     }
 
     public function getPermissionBase(): string
@@ -96,14 +103,13 @@ final class FieldGroupModel extends FormModel
             $groups[$alias] = $this->translator->trans('mautic.lead.field.group.'.$alias);
         }
 
-        $customGroups = $this->getRepository()->getEntities([
+        $customGroups = $this->fieldGroupRepository->getEntities([
             'ignore_paginator' => true,
             'orderBy'          => 'fg.order',
             'orderByDir'       => 'ASC',
         ]);
 
         foreach ($customGroups as $entity) {
-            \assert($entity instanceof FieldGroup);
             $alias = $entity->getAlias();
             if ($alias && !isset($groups[$alias])) {
                 $groups[$alias] = $entity->getName() ?? $alias;
@@ -124,7 +130,7 @@ final class FieldGroupModel extends FormModel
             $this->aliasHelper->makeAliasUnique($entity);
 
             if (!$entity->getId() && !$entity->getOrder()) {
-                $entity->setOrder($this->getRepository()->getMaxOrder() + 1);
+                $entity->setOrder($this->fieldGroupRepository->getMaxOrder() + 1);
             }
         }
 
@@ -146,7 +152,7 @@ final class FieldGroupModel extends FormModel
 
         // All groups except the one being moved, in their current order.
         $others = array_values(array_filter(
-            $this->getRepository()->findBy([], ['order' => 'ASC']),
+            $this->fieldGroupRepository->findBy([], ['order' => 'ASC']),
             fn (FieldGroup $group): bool => $group->getId() !== $entity->getId()
         ));
 
@@ -223,7 +229,7 @@ final class FieldGroupModel extends FormModel
      */
     public function getFieldCountPerGroup(): array
     {
-        return $this->getRepository()->getFieldCountPerGroup();
+        return $this->fieldGroupRepository->getFieldCountPerGroup();
     }
 
     /**
@@ -249,6 +255,6 @@ final class FieldGroupModel extends FormModel
     {
         $id = $entity->getId();
 
-        return null === $id || !$this->getRepository()->hasFields($id);
+        return null === $id || !$this->fieldGroupRepository->hasFields($id);
     }
 }

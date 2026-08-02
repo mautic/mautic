@@ -15,11 +15,14 @@ use Twig\TwigFunction;
  */
 final class FieldGroupExtension extends AbstractExtension
 {
-    /** @var array<string, array<string, string>> */
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $labelCache = [];
 
-    public function __construct(private FieldGroupModel $fieldGroupModel)
-    {
+    public function __construct(
+        private readonly FieldGroupModel $fieldGroupModel,
+    ) {
     }
 
     public function getFunctions(): array

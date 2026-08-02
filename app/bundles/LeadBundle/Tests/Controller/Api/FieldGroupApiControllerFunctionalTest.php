@@ -70,15 +70,13 @@ final class FieldGroupApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testApiDeleteIsBlockedWhenGroupHasFields(): void
     {
-        /** @var FieldGroupModel $fieldGroupModel */
-        $fieldGroupModel = self::getContainer()->get('mautic.lead.model.field_group');
+        $fieldGroupModel = self::getContainer()->get(FieldGroupModel::class);
         $group           = new FieldGroup();
         $group->setName('Api Guarded');
         $fieldGroupModel->saveEntity($group);
         $groupId = $group->getId();
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = new LeadField();
         $field->setLabel('Api Guard Field');
         $field->setAlias('api_guard_field');

@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class FieldGroupType extends AbstractType
 {
     public function __construct(
-        private FieldGroupRepository $fieldGroupRepository,
+        private readonly FieldGroupRepository $fieldGroupRepository,
     ) {
     }
 

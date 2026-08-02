@@ -29,9 +29,7 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        /** @var FieldGroupModel $fieldGroupModel */
-        $fieldGroupModel       = self::getContainer()->get('mautic.lead.model.field_group');
-        $this->fieldGroupModel = $fieldGroupModel;
+        $this->fieldGroupModel = self::getContainer()->get(FieldGroupModel::class);
     }
 
     private function createFieldGroup(string $name): FieldGroup
@@ -45,8 +43,7 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
 
     private function createLeadFieldInGroup(string $alias, string $groupAlias): LeadField
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setLabel(ucfirst($alias));
@@ -88,7 +85,7 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $group = $this->fieldGroupModel->getRepository()->findOneBy(['name' => 'Sales Group']);
-        $this->assertNotNull($group);
+        $this->assertInstanceOf(FieldGroup::class, $group);
         $this->assertSame('sales_group', $group->getAlias());
     }
 
@@ -116,6 +113,7 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
         $updated = $this->fieldGroupModel->getRepository()->find($group->getId());
+        $this->assertInstanceOf(FieldGroup::class, $updated);
         $this->assertSame('Completely Renamed', $updated->getName());
         $this->assertSame($originalAlias, $updated->getAlias(), 'Alias must not change when the group is renamed.');
     }
@@ -131,7 +129,7 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $this->assertNull($this->fieldGroupModel->getRepository()->find($groupId));
+        $this->assertNotInstanceOf(FieldGroup::class, $this->fieldGroupModel->getRepository()->find($groupId));
     }
 
     public function testDeleteActionIsBlockedWhenGroupHasFields(): void
@@ -147,7 +145,8 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('still has fields assigned', $crawler->text());
 
         $this->em->clear();
-        $this->assertNotNull(
+        $this->assertInstanceOf(
+            FieldGroup::class,
             $this->fieldGroupModel->getRepository()->find($groupId),
             'A group that still has fields must not be deleted.'
         );
@@ -168,8 +167,8 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $this->assertNull($this->fieldGroupModel->getRepository()->find($ids[0]));
-        $this->assertNull($this->fieldGroupModel->getRepository()->find($ids[1]));
+        $this->assertNotInstanceOf(FieldGroup::class, $this->fieldGroupModel->getRepository()->find($ids[0]));
+        $this->assertNotInstanceOf(FieldGroup::class, $this->fieldGroupModel->getRepository()->find($ids[1]));
     }
 
     /**
@@ -194,8 +193,9 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
         $repo = $this->fieldGroupModel->getRepository();
-        $this->assertNull($repo->find($emptyId), 'Empty group should be batch-deleted.');
-        $this->assertNotNull(
+        $this->assertNotInstanceOf(FieldGroup::class, $repo->find($emptyId), 'Empty group should be batch-deleted.');
+        $this->assertInstanceOf(
+            FieldGroup::class,
             $repo->find($withFieldId),
             'A group that still has fields must not be batch-deleted.'
         );

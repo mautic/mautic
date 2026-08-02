@@ -18,10 +18,14 @@ class FieldGroup extends FormEntity
 
     public const ENTITY_NAME = 'lead_field_group';
 
-    /** Default groups for lead object. */
+    /**
+     * Default groups for lead object.
+     */
     public const DEFAULT_LEAD_GROUPS = ['core', 'social', 'personal', 'professional'];
 
-    /** Default groups for company object. */
+    /**
+     * Default groups for company object.
+     */
     public const DEFAULT_COMPANY_GROUPS = ['core', 'professional', 'other'];
 
     private ?int $id = null;
@@ -60,24 +64,14 @@ class FieldGroup extends FormEntity
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('name', new Assert\Regex([
-            'pattern' => '/^[\p{L}\p{N}\p{S}\s]+$/u',
-            'match'   => true,
-            'message' => 'mautic.lead.field_group.name.help',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\Regex(pattern: '/^[\p{L}\p{N}\p{S}\s]+$/u', match: true, message: 'mautic.lead.field_group.name.help'));
 
         // The alias (auto-generated from the name) is unique in the DB; validate
         // it here so a duplicate or near-duplicate name returns a form error on
         // the name field instead of an unhandled UniqueConstraintViolationException.
-        $metadata->addConstraint(new UniqueEntity([
-            'fields'    => ['alias'],
-            'errorPath' => 'name',
-            'message'   => 'mautic.lead.field_group.name.unique',
-        ]));
+        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], errorPath: 'name', message: 'mautic.lead.field_group.name.unique'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

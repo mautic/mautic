@@ -8,9 +8,19 @@ use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\LeadBundle\Model\FieldGroupModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class FieldGroupController extends AbstractStandardFormController
 {
+    private FieldGroupModel $fieldGroupModel;
+
+    #[Required]
+    public function autowireFieldGroupController(
+        FieldGroupModel $fieldGroupModel,
+    ): void {
+        $this->fieldGroupModel = $fieldGroupModel;
+    }
+
     protected function getTemplateBase(): string
     {
         return '@MauticLead/FieldGroup';
@@ -62,11 +72,9 @@ final class FieldGroupController extends AbstractStandardFormController
      */
     public function deleteAction(Request $request, int $objectId): Response
     {
-        /** @var FieldGroupModel $model */
-        $model  = $this->getModel('lead.field_group');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->fieldGroupModel->getEntity($objectId);
 
-        if (null !== $entity && $entity->getId() && !$model->canDelete($entity)) {
+        if (null !== $entity && $entity->getId() && !$this->fieldGroupModel->canDelete($entity)) {
             $this->addFlashMessage('mautic.lead.field_group.error.has_fields', [], 'error');
 
             $page = $request->getSession()->get('mautic.lead.field_group.page', 1);
@@ -91,13 +99,11 @@ final class FieldGroupController extends AbstractStandardFormController
      */
     public function batchDeleteAction(Request $request): Response
     {
-        /** @var FieldGroupModel $model */
-        $model     = $this->getModel('lead.field_group');
         $ids       = json_decode($request->query->get('ids', '[]')) ?: [];
-        $deletable = array_values(array_filter($ids, function ($id) use ($model): bool {
-            $entity = $model->getEntity((int) $id);
+        $deletable = array_values(array_filter($ids, function ($id): bool {
+            $entity = $this->fieldGroupModel->getEntity((int) $id);
 
-            return null === $entity || $model->canDelete($entity);
+            return null === $entity || $this->fieldGroupModel->canDelete($entity);
         }));
 
         if (count($deletable) !== count($ids)) {
@@ -117,9 +123,7 @@ final class FieldGroupController extends AbstractStandardFormController
     protected function getViewArguments(array $args, mixed $action): array
     {
         if ('index' === $action) {
-            /** @var FieldGroupModel $model */
-            $model                                 = $this->getModel('lead.field_group');
-            $args['viewParameters']['fieldCounts'] = $model->getFieldCountPerGroup();
+            $args['viewParameters']['fieldCounts'] = $this->fieldGroupModel->getFieldCountPerGroup();
             $args['viewParameters']['isAdmin']     = $this->security->isAdmin();
         }
 

@@ -14,19 +14,24 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 final class FieldGroupApiController extends CommonApiController
 {
-    /** @var class-string<FieldGroup> */
+    /**
+     * @var class-string<FieldGroup>
+     */
     protected $entityClass = FieldGroup::class;
 
     protected $entityNameOne = 'fieldGroup';
 
     protected $entityNameMulti = 'fieldGroups';
 
-    /** @var array<int, string> */
+    /**
+     * @var array<int, string>
+     */
     protected $serializerGroups = ['fieldGroupDetails', 'fieldGroupList'];
 
     #[Required]
-    public function setFieldGroupModel(FieldGroupModel $fieldGroupModel): void
-    {
+    public function autowireFieldGroupApiController(
+        FieldGroupModel $fieldGroupModel,
+    ): void {
         $this->model          = $fieldGroupModel;
         $this->permissionBase = $fieldGroupModel->getPermissionBase();
     }

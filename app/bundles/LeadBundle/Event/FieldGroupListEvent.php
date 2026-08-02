@@ -22,13 +22,17 @@ final class FieldGroupListEvent extends Event
     ) {
     }
 
-    /** @return array<string, string> */
+    /**
+     * @return array<string, string>
+     */
     public function getGroups(): array
     {
         return $this->groups;
     }
 
-    /** @param array<string, string> $groups */
+    /**
+     * @param array<string, string> $groups
+     */
     public function setGroups(array $groups): void
     {
         $this->groups = $groups;

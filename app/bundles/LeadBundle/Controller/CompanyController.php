@@ -36,17 +36,21 @@ final class CompanyController extends FormController
 
     private LeadModel $leadModel;
 
+    private FieldGroupModel $fieldGroupModel;
+
     #[Required]
     public function autowireCompanyController(
         LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
+        FieldGroupModel $fieldGroupModel,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+        $this->fieldGroupModel = $fieldGroupModel;
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
@@ -296,9 +300,7 @@ final class CompanyController extends FormController
             }
         }
 
-        $fieldGroupModel = $this->getModel('lead.field_group');
-        \assert($fieldGroupModel instanceof FieldGroupModel);
-        $fields   = $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'company');
+        $fields   = $this->fieldGroupModel->sortGroupedFields($this->companyModel->organizeFieldsByGroup($fields), 'company');
         $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
@@ -310,7 +312,7 @@ final class CompanyController extends FormController
                     'form'             => $form->createView(),
                     'fields'           => $fields,
                     'groups'           => $groups,
-                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('company'),
+                    'translatedGroups' => $this->fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -485,9 +487,7 @@ final class CompanyController extends FormController
             $this->companyModel->lockEntity($entity);
         }
 
-        $fieldGroupModel = $this->getModel('lead.field_group');
-        \assert($fieldGroupModel instanceof FieldGroupModel);
-        $fields   = $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'company');
+        $fields   = $this->fieldGroupModel->sortGroupedFields($this->companyModel->organizeFieldsByGroup($fields), 'company');
         $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
@@ -499,7 +499,7 @@ final class CompanyController extends FormController
                     'form'             => $form->createView(),
                     'fields'           => $fields,
                     'groups'           => $groups,
-                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('company'),
+                    'translatedGroups' => $this->fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
