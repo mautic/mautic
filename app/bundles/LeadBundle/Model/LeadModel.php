@@ -328,7 +328,7 @@ class LeadModel extends FormModel
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
         for ($i = 0; $i < count($contactIds); ++$i) {
-            $contactId = (int) $contactIds[$i];
+            $contactId = $contactIds[$i];
             if (empty($entities[$contactId])) {
                 if ($entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
                     $entity->setPreviousId($contactId);

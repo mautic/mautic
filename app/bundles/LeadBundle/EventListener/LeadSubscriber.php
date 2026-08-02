@@ -190,7 +190,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
             return;
         }
-        $leadId     = (int) $event->getLead()->getId();
+        $leadId     = $event->getLead()->getId();
         $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
 
         foreach ($segmentIds as $segmentId) {
