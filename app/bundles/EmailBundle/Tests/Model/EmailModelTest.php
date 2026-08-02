@@ -742,7 +742,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->companyModel,
             $this->createStub(MessageQueueRepository::class),
-            $this->frequencyRepository
+            $this->frequencyRepository,
+            $this->createStub(LeadRepository::class)
         );
 
         $emailModel = new EmailModel(
