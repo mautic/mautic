@@ -34,11 +34,6 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
     private MessageQueue $message;
 
     /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject&EntityManagerInterface
      */
     private MockObject $entityManager;
@@ -55,7 +50,6 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->leadModel              = $this->createMock(LeadModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
@@ -71,7 +65,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CoreParametersHelper::class),
         );
         $this->messageQueue->autowireMessageQueueModel(
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->createStub(CompanyModel::class),
             $this->messageQueueRepository,
             $this->createStub(FrequencyRuleRepository::class),
