@@ -544,10 +544,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
-                $repo             = $this->formRepository;
-                $repo->setCurrentUser($this->userHelper->getUser());
+                $this->formRepository->setCurrentUser($this->userHelper->getUser());
 
-                $forms = $repo->getFormList('', 0, 0, $viewOther);
+                $forms = $this->formRepository->getFormList('', 0, 0, $viewOther);
 
                 foreach ($forms as $form) {
                     $choices['forms'][$form['id']] = $form['name'];

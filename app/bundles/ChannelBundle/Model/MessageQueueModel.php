@@ -21,7 +21,6 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageQueueModel extends FormModel
 {
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
     /**
      * @var string A default message reschedule interval
      */
@@ -34,6 +33,8 @@ class MessageQueueModel extends FormModel
     private MessageQueueRepository $messageQueueRepository;
 
     private FrequencyRuleRepository $frequencyRuleRepository;
+
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
     #[Required]
     public function autowireMessageQueueModel(

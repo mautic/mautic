@@ -68,7 +68,8 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->createStub(CompanyModel::class),
             $this->messageQueueRepository,
-            $this->createStub(FrequencyRuleRepository::class)
+            $this->createStub(FrequencyRuleRepository::class),
+            $this->createStub(LeadRepository::class)
         );
 
         $message      = new MessageQueue();

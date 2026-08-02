@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
-use Mautic\SmsBundle\Model\SmsModel;
 
 final class BroadcastQuery
 {
@@ -18,7 +17,6 @@ final class BroadcastQuery
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private SmsModel $smsModel,
         private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
     ) {
     }
