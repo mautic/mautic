@@ -62,7 +62,7 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
         // DI
-        // ModelGetRepositoryToRepositoryServiceRector::class,
+        ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)

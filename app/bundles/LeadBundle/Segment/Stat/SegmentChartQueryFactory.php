@@ -7,9 +7,14 @@ use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
 class SegmentChartQueryFactory
 {
+    public function __construct(
+        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+    ) {
+    }
+
     public function getContactsTotal(SegmentContactsLineChartQuery $query, ListModel $listModel): array
     {
-        $total = $listModel->getRepository()->getLeadCount($query->getSegmentId());
+        $total = $this->leadListRepository->getLeadCount($query->getSegmentId());
 
         return $query->getTotalStats($total);
     }

@@ -27,6 +27,8 @@ final class LookupHelper
         private readonly LoggerInterface $logger,
         private readonly LeadModel $leadModel,
         private readonly CompanyModel $companyModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
         try {
             /** @var ClearbitIntegration $integration */
@@ -63,7 +65,7 @@ final class LookupHelper
                         $lead->setSocialCache($cache);
 
                         if ($checkAuto) {
-                            $this->leadModel->getRepository()->saveEntity($lead);
+                            $this->leadRepository->saveEntity($lead);
                         } else {
                             $this->leadModel->saveEntity($lead);
                         }
@@ -101,7 +103,7 @@ final class LookupHelper
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
-                            $this->companyModel->getRepository()->saveEntity($company);
+                            $this->companyRepository->saveEntity($company);
                         } else {
                             $this->companyModel->saveEntity($company);
                         }

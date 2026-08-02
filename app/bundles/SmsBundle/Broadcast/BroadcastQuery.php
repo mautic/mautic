@@ -19,6 +19,7 @@ final class BroadcastQuery
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SmsModel $smsModel,
+        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
     ) {
     }
 
@@ -44,7 +45,7 @@ final class BroadcastQuery
 
     public function getBasicQuery(Sms $sms): QueryBuilder
     {
-        $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
+        $this->query = $this->smsRepository->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
             $this->query->expr()->or(
                 $this->query->expr()->or(

@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Services;
 use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\CoreBundle\Helper\Tree\NodeInterface;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
 
 final class SegmentDependencyTreeFactory
@@ -18,8 +17,8 @@ final class SegmentDependencyTreeFactory
     private array $usedSegmentIds = [];
 
     public function __construct(
-        private readonly ListModel $segmentModel,
         private readonly RouterInterface $router,
+        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
     ) {
     }
 
@@ -75,7 +74,7 @@ final class SegmentDependencyTreeFactory
             }
         }
 
-        return $this->segmentModel->getRepository()->findBy(['id' => $childSegmentIds]);
+        return $this->leadListRepository->findBy(['id' => $childSegmentIds]);
     }
 
     private function generateSegmentDetailRoute(LeadList $segment): string

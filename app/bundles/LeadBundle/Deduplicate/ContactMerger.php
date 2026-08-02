@@ -35,6 +35,7 @@ class ContactMerger
         protected EventDispatcherInterface $dispatcher,
         protected LoggerInterface $logger,
         protected CompanyLeadRepository $companyLeadRepository,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
     }
 
@@ -126,11 +127,11 @@ class ContactMerger
 
         // It may happen that the Lead entities doesn't have fields fill in. Fill them in if not.
         if (!$newest->hasFields()) {
-            $newest->setFields($this->leadModel->getRepository()->getFieldValues($newest->getId()));
+            $newest->setFields($this->leadRepository->getFieldValues($newest->getId()));
         }
 
         if (!$oldest->hasFields()) {
-            $oldest->setFields($this->leadModel->getRepository()->getFieldValues($oldest->getId()));
+            $oldest->setFields($this->leadRepository->getFieldValues($oldest->getId()));
         }
 
         $newestFields = $newest->getProfileFields();

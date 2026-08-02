@@ -164,6 +164,7 @@ class LeadModel extends FormModel
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -2294,7 +2295,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($entities)) {
-            $this->companyModel->getRepository()->saveEntities($entities);
+            $this->companyRepository->saveEntities($entities);
         }
 
         return $success;

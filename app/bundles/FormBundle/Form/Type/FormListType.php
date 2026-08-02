@@ -19,10 +19,14 @@ final class FormListType extends AbstractType
 
     private readonly \Mautic\FormBundle\Entity\FormRepository $repo;
 
-    public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
-    {
+    public function __construct(
+        CorePermissions $security,
+        FormModel $model,
+        UserHelper $userHelper,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+    ) {
         $this->viewOther = $security->isGranted('form:forms:viewother');
-        $this->repo      = $model->getRepository();
+        $this->repo      = $this->formRepository;
 
         $this->repo->setCurrentUser($userHelper->getUser());
     }

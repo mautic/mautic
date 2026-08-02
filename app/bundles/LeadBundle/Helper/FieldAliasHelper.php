@@ -9,6 +9,7 @@ class FieldAliasHelper
 {
     public function __construct(
         private readonly FieldModel $fieldModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -29,7 +30,7 @@ class FieldAliasHelper
         $alias = $this->fieldModel->cleanAlias($alias, 'f_', 25);
 
         // make sure alias is not already taken
-        $repo      = $this->fieldModel->getRepository();
+        $repo      = $this->leadFieldRepository;
         $testAlias = $alias;
         $aliases   = $repo->getAliases($field->getId(), false, true, null);
         $count     = (int) in_array($testAlias, $aliases);

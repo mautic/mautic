@@ -21,6 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 class MessageQueueModel extends FormModel
 {
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
     /**
      * @var string A default message reschedule interval
      */
@@ -40,11 +41,13 @@ class MessageQueueModel extends FormModel
         CompanyModel $companyModel,
         MessageQueueRepository $messageQueueRepository,
         FrequencyRuleRepository $frequencyRuleRepository,
+        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ): void {
         $this->leadModel               = $leadModel;
         $this->companyModel            = $companyModel;
         $this->messageQueueRepository  = $messageQueueRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
+        $this->leadRepository = $leadRepository;
     }
 
     public function getRepository(): MessageQueueRepository
@@ -212,7 +215,7 @@ class MessageQueueModel extends FormModel
             }
         }
         if (!empty($contacts)) {
-            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+            $contactData = $this->leadRepository->getContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }

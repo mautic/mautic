@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -14,22 +13,21 @@ final class PreferenceCenterListType extends AbstractType
     private readonly bool $canViewOther;
 
     public function __construct(
-        private readonly PageModel $model,
         CorePermissions $corePermissions,
+        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $model        = $this->model;
         $canViewOther = $this->canViewOther;
 
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($model, $canViewOther): array {
+                'choices' => function (Options $options) use ($canViewOther): array {
                     $choices = [];
-                    $pages   = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
+                    $pages   = $this->pageRepository->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
                     foreach ($pages as $page) {
                         if ($page['isPreferenceCenter']) {
                             $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];

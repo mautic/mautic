@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
@@ -25,7 +24,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
     public function __construct(
         private readonly Translator $translator,
         private readonly LeadModel $leadModel,
-        private readonly FieldModel $fieldModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -67,7 +66,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
             $operator    = '=';
 
             if (isset($data['field'])) {
-                $field    = $this->fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+                $field    = $this->leadFieldRepository->findOneBy(['alias' => $data['field']]);
                 $operator = $data['operator'];
 
                 if ($field) {

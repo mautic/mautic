@@ -8,7 +8,6 @@ use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -22,8 +21,8 @@ final class CampaignHelper
 
     public function __construct(
         private readonly Client $client,
-        private readonly CompanyModel $companyModel,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
     }
 
@@ -141,7 +140,7 @@ final class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
-            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyRepository->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];

@@ -30,7 +30,6 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
-use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -56,12 +55,12 @@ final class EmailType extends AbstractType
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly EntityManagerInterface $em,
-        private readonly StageModel $stageModel,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly ThemeHelperInterface $themeHelper,
         private readonly CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
         private readonly EmailDefaultsHelper $defaultsHelper,
+        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
@@ -683,7 +682,7 @@ final class EmailType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $stages       = $this->stageModel->getRepository()->getSimpleList();
+        $stages       = $this->stageRepository->getSimpleList();
         $stageChoices = [];
 
         foreach ($stages as $stage) {

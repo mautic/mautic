@@ -13,7 +13,6 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,11 +22,11 @@ final readonly class Reply implements ProcessorInterface
     public function __construct(
         private EmailStatModel $emailStatModel,
         private ContactFinder $contactFinder,
-        private LeadModel $leadModel,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
         private EmailAddressHelper $addressHelper,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
     }
 
@@ -69,7 +68,7 @@ final readonly class Reply implements ProcessorInterface
         $this->dispatchEvent($stat);
 
         if (null !== $stat->getLead()) {
-            $this->leadModel->getRepository()->detachEntity($stat->getLead());
+            $this->leadRepository->detachEntity($stat->getLead());
         }
         $this->emailStatModel->getRepository()->detachEntity($stat);
     }

@@ -140,6 +140,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -542,7 +543,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
-                $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
+                $this->leadRepository->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
     }
@@ -1613,7 +1614,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $mailer            = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
-            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($lead['id']);
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
@@ -2194,8 +2195,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $contact;
         }
 
-        $companies = $this->companyModel
-            ->getRepository()
+        $companies = $this->companyRepository
             ->getCompaniesForContacts([$contact['id']]);
 
         $contact['companies'] = $companies[$contact['id']] ?? [];

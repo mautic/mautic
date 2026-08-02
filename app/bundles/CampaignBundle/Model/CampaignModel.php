@@ -70,6 +70,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly StatRepository $statRepository,
+        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -543,7 +544,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
-                $repo             = $this->formModel->getRepository();
+                $repo             = $this->formRepository;
                 $repo->setCurrentUser($this->userHelper->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther);

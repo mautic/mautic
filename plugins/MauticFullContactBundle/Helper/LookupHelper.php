@@ -30,6 +30,8 @@ final class LookupHelper
         private readonly Router $router,
         private readonly LeadModel $leadModel,
         private readonly CompanyModel $companyModel,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -68,7 +70,7 @@ final class LookupHelper
                         $lead->setSocialCache($cache);
 
                         if ($checkAuto) {
-                            $this->leadModel->getRepository()->saveEntity($lead);
+                            $this->leadRepository->saveEntity($lead);
                         } else {
                             $this->leadModel->saveEntity($lead);
                         }
@@ -114,7 +116,7 @@ final class LookupHelper
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
-                            $this->companyModel->getRepository()->saveEntity($company);
+                            $this->companyRepository->saveEntity($company);
                         } else {
                             $this->companyModel->saveEntity($company);
                         }

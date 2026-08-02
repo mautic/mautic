@@ -20,13 +20,14 @@ final class BroadcastExecutioner
         private readonly BroadcastQuery $broadcastQuery,
         private readonly TranslatorInterface $translator,
         private readonly LeadRepository $leadRepository,
+        private readonly \Mautic\SmsBundle\Entity\SmsRepository $smsRepository,
     ) {
     }
 
     public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $smses = $this->smsModel->getRepository()->getPublishedBroadcastsIterable($event->getId());
+        $smses = $this->smsRepository->getPublishedBroadcastsIterable($event->getId());
         foreach ($smses as $sms) {
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], $event->getThreadId(), $event->getMaxThreads(), $event->getLimit());
             $this->result         = new BroadcastResult();

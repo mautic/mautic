@@ -8,12 +8,11 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Model\EmailModel;
 
 final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
+        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
     ) {
     }
 
@@ -36,7 +35,7 @@ final class LoadEmailData extends AbstractFixture implements OrderedFixtureInter
             }
             $email->addList($this->getReference('lead-list'));
 
-            $this->emailModel->getRepository()->saveEntity($email);
+            $this->emailRepository->saveEntity($email);
             $this->setReference('email-'.$key, $email);
         }
     }

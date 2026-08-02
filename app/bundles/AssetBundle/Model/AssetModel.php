@@ -72,6 +72,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly EmailRepository $emailRepository,
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
+        private readonly \Mautic\CategoryBundle\Entity\CategoryRepository $categoryRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -395,7 +396,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryRepository->getCategoryList($filter, $limit, 0);
                 break;
         }
 

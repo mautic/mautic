@@ -7,8 +7,6 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
@@ -17,9 +15,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 final class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly CompanyModel $companyModel,
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
     ) {
     }
 
@@ -88,7 +86,7 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
      */
     private function getLeadFieldsValid(Lead $lead, array $fieldsData): array
     {
-        $leadRepository = $this->leadModel->getRepository();
+        $leadRepository = $this->leadRepository;
         if ('orWhere' === $leadRepository->getUniqueIdentifiersWherePart()) {
             $fieldsValidation = [];
             foreach ($fieldsData as $field => $data) {
@@ -113,7 +111,7 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
      */
     private function getCompanyFieldsValid(Company $company, array $fieldsData): array
     {
-        $companyRepository = $this->companyModel->getRepository();
+        $companyRepository = $this->companyRepository;
         if ('orWhere' === $companyRepository->getUniqueIdentifiersWherePart()) {
             $fieldsValidation = [];
             foreach ($fieldsData as $field => $data) {
