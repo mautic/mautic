@@ -17,6 +17,9 @@ use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
+use PHPStan\Node\InClassNode;
+use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\Php\PhpMethodReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -43,7 +46,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  *         return $this->getEntitiesAction($request);
  *     }
  *
- * @implements Rule<Class_>
+ * @implements Rule<InClassNode>
  */
 final class NoServiceJugglingRule implements Rule
 {
@@ -64,24 +67,31 @@ final class NoServiceJugglingRule implements Rule
 
     public function getNodeType(): string
     {
-        return Class_::class;
+        return InClassNode::class;
     }
 
     /**
-     * @param Class_ $node
+     * @param InClassNode $node
      *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        $injectedServiceTypes = $this->resolveInjectedServiceTypes($node);
+        $class = $node->getOriginalNode();
+        if (!$class instanceof Class_) {
+            return [];
+        }
+
+        $classReflection = $node->getClassReflection();
+
+        $injectedServiceTypes = $this->resolveInjectedServiceTypes($class);
         if ([] === $injectedServiceTypes) {
             return [];
         }
 
         $ruleErrors = [];
 
-        foreach ($node->getMethods() as $classMethod) {
+        foreach ($class->getMethods() as $classMethod) {
             foreach ($this->resolveLocalCalls($classMethod) as $call) {
                 // "$this->toText(...)" has no arguments to look at
                 if ($call->isFirstClassCallable()) {
@@ -90,6 +100,10 @@ final class NoServiceJugglingRule implements Rule
 
                 $calledMethodName = $call->name instanceof Identifier ? $call->name->toString() : null;
                 if (null === $calledMethodName) {
+                    continue;
+                }
+
+                if ($this->isDeclaredInTrait($this->resolveCalledClassReflection($call, $classReflection), $calledMethodName)) {
                     continue;
                 }
 
@@ -235,6 +249,41 @@ final class NoServiceJugglingRule implements Rule
         });
 
         return array_values($calls);
+    }
+
+    /**
+     * The class the called method is looked up in: the current one for "$this->", the parent one for "parent::".
+     *
+     * @param MethodCall|StaticCall $call
+     */
+    private function resolveCalledClassReflection(Node $call, ClassReflection $classReflection): ?ClassReflection
+    {
+        if ($call instanceof StaticCall) {
+            return $classReflection->getParentClass();
+        }
+
+        return $classReflection;
+    }
+
+    /**
+     * A trait has no constructor to inject into, so its methods can only take the service as a parameter.
+     */
+    private function isDeclaredInTrait(?ClassReflection $classReflection, string $methodName): bool
+    {
+        if (!$classReflection instanceof ClassReflection) {
+            return false;
+        }
+
+        if (!$classReflection->hasNativeMethod($methodName)) {
+            return false;
+        }
+
+        $methodReflection = $classReflection->getNativeMethod($methodName);
+        if (!$methodReflection instanceof PhpMethodReflection) {
+            return false;
+        }
+
+        return $methodReflection->getDeclaringTrait() instanceof ClassReflection;
     }
 
     /**
