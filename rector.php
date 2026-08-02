@@ -61,6 +61,9 @@ return RectorConfig::configure()
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
 
+        // opinionated
+        Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
+
         __DIR__.'/plugins/*/node_modules/*',
 
         UnserializeToSerializerDecodeRector::class => [
