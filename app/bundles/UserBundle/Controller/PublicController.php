@@ -102,7 +102,7 @@ final class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $this->userModel, $hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $hasher, $data);
             }
         }
 
@@ -112,7 +112,7 @@ final class PublicController extends FormController
     /**
      * @param array<string, mixed> $data
      */
-    private function handlePasswordResetConfirm(Request $request, UserModel $model, UserPasswordHasherInterface $hasher, array $data): ?Response
+    private function handlePasswordResetConfirm(Request $request, UserPasswordHasherInterface $hasher, array $data): ?Response
     {
         $response = null;
         $user     = $this->userRepository->findByIdentifier($data['identifier']);
@@ -125,10 +125,10 @@ final class PublicController extends FormController
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
 
             $response = $this->redirectToRoute('mautic_user_passwordresetconfirm');
-        } elseif ($model->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
-            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
+        } elseif ($this->userModel->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
+            $encodedPassword = $this->userModel->checkNewPassword($user, $hasher, $data['plainPassword']);
             $user->setPassword($encodedPassword);
-            $model->saveEntity($user);
+            $this->userModel->saveEntity($user);
 
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
             $request->getSession()->remove('resetToken');

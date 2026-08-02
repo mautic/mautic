@@ -19,7 +19,6 @@ use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\InClassNode;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\Php\PhpMethodReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -274,16 +273,13 @@ final class NoServiceJugglingRule implements Rule
             return false;
         }
 
-        if (!$classReflection->hasNativeMethod($methodName)) {
-            return false;
+        foreach ($classReflection->getTraits(true) as $traitReflection) {
+            if ($traitReflection->hasNativeMethod($methodName)) {
+                return true;
+            }
         }
 
-        $methodReflection = $classReflection->getNativeMethod($methodName);
-        if (!$methodReflection instanceof PhpMethodReflection) {
-            return false;
-        }
-
-        return $methodReflection->getDeclaringTrait() instanceof ClassReflection;
+        return false;
     }
 
     /**
