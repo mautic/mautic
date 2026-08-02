@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -31,6 +32,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -156,6 +158,9 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(HitRepository::class), // $hitRepository
             $this->createStub(EmailRepository::class), // $emailRepository
             $this->createStub(UtmTagRepository::class), // $utmTagRepository
+            $this->createStub(RedirectRepository::class),
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(LeadRepository::class)
         );
     }
 
