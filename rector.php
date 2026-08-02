@@ -3,13 +3,8 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
-use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
-use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
-use Utils\Rector\ModelGetRepositoryToRepositoryServiceRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -48,9 +43,6 @@ return RectorConfig::configure()
 
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
-        TypedPropertyFromAssignsRector::class,
-        ClassPropertyAssignToConstructorPromotionRector::class,
-        SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
@@ -66,7 +58,7 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true)
-    ->withCodingStyleLevel(3)
+    ->withCodeQualityLevel(25)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
@@ -88,6 +80,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
         ],
 
+        // fixed in dev-main
+        \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
+            __DIR__ . '/app/bundles/LeadBundle/Model/LeadModel.php',
+        ],
+
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
@@ -95,17 +92,12 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
 
-        // too many changes
-        Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
         ],
 
-        // lets handle later, once we have more type declaratoins
-        RecastingRemovalRector::class,
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
