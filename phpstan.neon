@@ -222,16 +222,10 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 		-
 			identifier: typePerfect.noArrayAccessOnObject
-		# the service is picked per call, so it is an argument of its own, not a dependency of the called method
+		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
 		-
 			identifier: mautic.noServiceJuggling
-			paths:
-				# a different model per batch: events and contacts
-				- app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-				# FormModel::createForm() takes the form factory of whoever builds the form
-				- app/bundles/LeadBundle/Model/LeadModel.php
-				# the same query runs on the unbuffered connection and on the active one
-				- app/bundles/StageBundle/Entity/LeadStageLogRepository.php
+			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading

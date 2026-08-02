@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\StaticCall;
@@ -88,40 +89,35 @@ final class NoServiceJugglingRule implements Rule
             return [];
         }
 
+        $ownMethodCalls = $this->resolveOwnMethodCalls($class, $classReflection);
+        if ([] === $ownMethodCalls) {
+            return [];
+        }
+
+        $constantArgumentKeys = $this->resolveConstantArgumentKeys($ownMethodCalls);
+
         $ruleErrors = [];
 
-        foreach ($class->getMethods() as $classMethod) {
-            foreach ($this->resolveLocalCalls($classMethod) as $call) {
-                // "$this->toText(...)" has no arguments to look at
-                if ($call->isFirstClassCallable()) {
+        foreach ($ownMethodCalls as [$call, $calledMethodName]) {
+            foreach ($call->getArgs() as $position => $arg) {
+                $propertyName = $this->matchThisPropertyName($arg->value);
+                if (null === $propertyName || !isset($injectedServiceTypes[$propertyName])) {
                     continue;
                 }
 
-                $calledMethodName = $call->name instanceof Identifier ? $call->name->toString() : null;
-                if (null === $calledMethodName) {
+                if (!isset($constantArgumentKeys[$this->createArgumentKey($call, $calledMethodName, $arg, $position)])) {
                     continue;
                 }
 
-                if ($this->isDeclaredInTrait($this->resolveCalledClassReflection($call, $classReflection), $calledMethodName)) {
-                    continue;
-                }
-
-                foreach ($call->getArgs() as $arg) {
-                    $propertyName = $this->matchThisPropertyName($arg->value);
-                    if (null === $propertyName || !isset($injectedServiceTypes[$propertyName])) {
-                        continue;
-                    }
-
-                    $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                        'Service "$this->%s" is passed to "%s()" as an argument. Inject "%s" in the constructor of the class that uses it instead.',
-                        $propertyName,
-                        $calledMethodName,
-                        $injectedServiceTypes[$propertyName]
-                    ))
-                        ->identifier('mautic.noServiceJuggling')
-                        ->line($arg->getStartLine())
-                        ->build();
-                }
+                $ruleErrors[] = RuleErrorBuilder::message(sprintf(
+                    'Service "$this->%s" is passed to "%s()" as an argument. Inject "%s" in the constructor of the class that uses it instead.',
+                    $propertyName,
+                    $calledMethodName,
+                    $injectedServiceTypes[$propertyName]
+                ))
+                    ->identifier('mautic.noServiceJuggling')
+                    ->line($arg->getStartLine())
+                    ->build();
             }
         }
 
@@ -251,17 +247,98 @@ final class NoServiceJugglingRule implements Rule
     }
 
     /**
-     * The class the called method is looked up in: the current one for "$this->", the parent one for "parent::".
+     * The calls to a method the class itself owns, so the dependency can be moved into a constructor.
+     *
+     * @return list<array{MethodCall|StaticCall, string}>
+     */
+    private function resolveOwnMethodCalls(Class_ $class, ClassReflection $classReflection): array
+    {
+        $ownMethodCalls = [];
+
+        foreach ($class->getMethods() as $classMethod) {
+            foreach ($this->resolveLocalCalls($classMethod) as $call) {
+                // "$this->toText(...)" has no arguments to look at
+                if ($call->isFirstClassCallable()) {
+                    continue;
+                }
+
+                $calledMethodName = $call->name instanceof Identifier ? $call->name->toString() : null;
+                if (null === $calledMethodName) {
+                    continue;
+                }
+
+                if (!$this->isOwnMethod($call, $class, $classReflection, $calledMethodName)) {
+                    continue;
+                }
+
+                $ownMethodCalls[] = [$call, $calledMethodName];
+            }
+        }
+
+        return $ownMethodCalls;
+    }
+
+    /**
+     * A method the class can change: one declared right here, or the one of the parent an explicit "parent::" targets.
+     *
+     * An inherited method reached through "$this->" is left out: it is shared by every child, so the service is an
+     * argument of the call, not a dependency of the method - e.g. FormModel::createForm() takes the form factory of
+     * whoever builds the form. The same goes for a method brought in by a trait, as a trait has no constructor.
      *
      * @param MethodCall|StaticCall $call
      */
-    private function resolveCalledClassReflection(Node $call, ClassReflection $classReflection): ?ClassReflection
+    private function isOwnMethod(Node $call, Class_ $class, ClassReflection $classReflection, string $methodName): bool
     {
         if ($call instanceof StaticCall) {
-            return $classReflection->getParentClass();
+            return !$this->isDeclaredInTrait($classReflection->getParentClass(), $methodName);
         }
 
-        return $classReflection;
+        return $class->getMethod($methodName) instanceof ClassMethod;
+    }
+
+    /**
+     * The argument positions that always get the very same value, as only those stand for a fixed dependency.
+     *
+     * A position filled differently by another call is a parameter of its own: LeadStageLogRepository runs the same
+     * query on the injected unbuffered connection and on the active one, EventLogApiController fetches one batch
+     * with the event model and the next one with the contact model.
+     *
+     * @param list<array{MethodCall|StaticCall, string}> $ownMethodCalls
+     *
+     * @return array<string, true>
+     */
+    private function resolveConstantArgumentKeys(array $ownMethodCalls): array
+    {
+        $argumentValues = [];
+
+        foreach ($ownMethodCalls as [$call, $calledMethodName]) {
+            foreach ($call->getArgs() as $position => $arg) {
+                $argumentKey = $this->createArgumentKey($call, $calledMethodName, $arg, $position);
+
+                $argumentValues[$argumentKey][$this->matchThisPropertyName($arg->value) ?? '#other'] = true;
+            }
+        }
+
+        $constantArgumentKeys = [];
+
+        foreach ($argumentValues as $argumentKey => $values) {
+            if (1 === count($values)) {
+                $constantArgumentKeys[$argumentKey] = true;
+            }
+        }
+
+        return $constantArgumentKeys;
+    }
+
+    /**
+     * @param MethodCall|StaticCall $call
+     */
+    private function createArgumentKey(Node $call, string $calledMethodName, Arg $arg, int $position): string
+    {
+        $callKind = $call instanceof StaticCall ? 'parent' : 'this';
+        $argName  = $arg->name instanceof Identifier ? $arg->name->toString() : (string) $position;
+
+        return $callKind.'::'.$calledMethodName.'#'.$argName;
     }
 
     /**

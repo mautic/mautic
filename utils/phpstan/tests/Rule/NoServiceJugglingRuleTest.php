@@ -39,5 +39,11 @@ final class NoServiceJugglingRuleTest extends RuleTestCase
 
         $this->analyse([__DIR__.'/Fixture/ServiceJuggling/SkippedJugglingService.php'], []);
         $this->analyse([__DIR__.'/Fixture/ServiceJuggling/TraitJugglingService.php'], []);
+        $this->analyse([__DIR__.'/Fixture/ServiceJuggling/VaryingArgumentJugglingService.php'], []);
+
+        $this->analyse([
+            __DIR__.'/Fixture/ServiceJuggling/ParentJugglingService.php',
+            __DIR__.'/Fixture/ServiceJuggling/InheritedMethodJugglingService.php',
+        ], []);
     }
 }
