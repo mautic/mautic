@@ -68,6 +68,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+        // streamed response above
+        \Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
+            __DIR__ . '/app/bundles/ReportBundle/Model/ReportModel.php',
+        ],
+
         // static property is read from static log() before any instance is constructed,
         // dropping the default would make it uninitialized
         Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
