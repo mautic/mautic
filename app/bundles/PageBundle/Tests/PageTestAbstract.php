@@ -157,10 +157,10 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(PageRepository::class), // $pageRepository
             $this->createStub(HitRepository::class), // $hitRepository
             $this->createStub(EmailRepository::class), // $emailRepository
-            $this->createStub(UtmTagRepository::class), // 48:16$utmTagRepository
+            $this->createStub(UtmTagRepository::class), // $utmTagRepository
             $this->createStub(RedirectRepository::class),
-            $this->createMock(TrackableRepository::class),
-            $this->createMock(LeadRepository::class)
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(LeadRepository::class)
         );
     }
 

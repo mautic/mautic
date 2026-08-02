@@ -48,11 +48,17 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $messageQueueRepository;
 
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
+
     protected function setUp(): void
     {
         $this->leadModel              = $this->createMock(LeadModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->entityManager,
@@ -69,7 +75,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CompanyModel::class),
             $this->messageQueueRepository,
             $this->createStub(FrequencyRuleRepository::class),
-            $this->createStub(LeadRepository::class)
+            $this->leadRepository
         );
 
         $message      = new MessageQueue();
@@ -128,9 +134,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
         $this->entityManager->expects($this->exactly(1))
             ->method('detach');
@@ -154,9 +158,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
         $this->messageQueue->processMessageQueue($this->message);
         $this->assertArrayNotHasKey('companies', $this->message->getLead()->getFields());

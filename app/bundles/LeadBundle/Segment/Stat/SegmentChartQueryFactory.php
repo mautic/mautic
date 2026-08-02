@@ -2,13 +2,14 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
 class SegmentChartQueryFactory
 {
     public function __construct(
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
     }
 

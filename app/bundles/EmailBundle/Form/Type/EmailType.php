@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -60,7 +61,7 @@ final class EmailType extends AbstractType
         private readonly CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
         private readonly EmailDefaultsHelper $defaultsHelper,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }

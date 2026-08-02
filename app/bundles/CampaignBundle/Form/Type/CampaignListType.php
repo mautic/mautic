@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,7 +18,7 @@ final class CampaignListType extends AbstractType
 
     public function __construct(
         CorePermissions $security,
-        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
+        private readonly CampaignRepository $campaignRepository,
     ) {
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }

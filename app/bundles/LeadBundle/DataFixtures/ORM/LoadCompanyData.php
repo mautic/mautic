@@ -7,11 +7,12 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 
 final class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 

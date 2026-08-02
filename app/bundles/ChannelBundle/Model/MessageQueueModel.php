@@ -11,6 +11,7 @@ use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -34,7 +35,7 @@ class MessageQueueModel extends FormModel
 
     private FrequencyRuleRepository $frequencyRuleRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     #[Required]
     public function autowireMessageQueueModel(
@@ -42,7 +43,7 @@ class MessageQueueModel extends FormModel
         CompanyModel $companyModel,
         MessageQueueRepository $messageQueueRepository,
         FrequencyRuleRepository $frequencyRuleRepository,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->leadModel               = $leadModel;
         $this->companyModel            = $companyModel;

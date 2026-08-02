@@ -6,6 +6,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -47,7 +48,7 @@ final class DynamicContentFilterEntryType extends AbstractType
     public function __construct(
         ListModel $listModel,
         private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
-        private readonly \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        private readonly StageRepository $stageRepository,
     ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 

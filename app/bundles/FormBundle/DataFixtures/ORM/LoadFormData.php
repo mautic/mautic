@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -36,9 +39,9 @@ final class LoadFormData extends AbstractFixture implements OrderedFixtureInterf
     public function __construct(
         private readonly FormModel $formModel,
         EventDispatcherInterface $eventDispatcher,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
-        private readonly \Mautic\FormBundle\Entity\FieldRepository $fieldRepository,
-        private readonly \Mautic\FormBundle\Entity\ActionRepository $actionRepository,
+        private readonly FormRepository $formRepository,
+        private readonly FieldRepository $fieldRepository,
+        private readonly ActionRepository $actionRepository,
     ) {
         // this will load the data before fixtures are loaded
         $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event): void {

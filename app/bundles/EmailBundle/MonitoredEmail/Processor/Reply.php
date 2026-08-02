@@ -13,6 +13,7 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -26,7 +27,7 @@ final readonly class Reply implements ProcessorInterface
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
         private EmailAddressHelper $addressHelper,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
@@ -49,7 +50,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private readonly EventDispatcherInterface $dispatcher,
         private readonly DoNotContactModel $doNotContact,
         private readonly TranslatorInterface $translator,
-        private readonly \Mautic\NotificationBundle\Entity\NotificationRepository $notificationRepository,
+        private readonly NotificationRepository $notificationRepository,
     ) {
     }
 

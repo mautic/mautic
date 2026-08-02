@@ -45,12 +45,10 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->leadRepository              = $this->createMock(LeadRepository::class);
+        $this->leadRepository  = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
-
-        // $this->leadModel->method('getRepository')->willReturn($leadRepo);
 
         $this->leadRepository->method('getFieldValues')->willReturn([]);
     }

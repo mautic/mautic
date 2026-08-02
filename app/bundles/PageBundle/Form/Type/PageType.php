@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
@@ -46,7 +47,7 @@ final class PageType extends AbstractType
         UserHelper $userHelper,
         private readonly ThemeHelperInterface $themeHelper,
         private readonly PageConfigInterface $pageConfig,
-        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
+        private readonly PageRepository $pageRepository,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();

@@ -6,11 +6,12 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 
 final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly \Mautic\CategoryBundle\Entity\CategoryRepository $categoryRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
     }
 

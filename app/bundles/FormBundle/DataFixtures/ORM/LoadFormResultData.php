@@ -7,13 +7,14 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\PageBundle\Model\PageModel;
 
 final class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,
-        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
+        private readonly SubmissionRepository $submissionRepository,
     ) {
     }
 

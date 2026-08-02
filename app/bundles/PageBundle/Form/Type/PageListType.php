@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Entity\PageRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -17,7 +18,7 @@ final class PageListType extends AbstractType
 
     public function __construct(
         CorePermissions $corePermissions,
-        private readonly \Mautic\PageBundle\Entity\PageRepository $pageRepository,
+        private readonly PageRepository $pageRepository,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }

@@ -5,7 +5,9 @@ namespace MauticPlugin\MauticFullContactBundle\Helper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -30,8 +32,8 @@ final class LookupHelper
         private readonly Router $router,
         private readonly LeadModel $leadModel,
         private readonly CompanyModel $companyModel,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }

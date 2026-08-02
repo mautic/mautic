@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\FormRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -19,7 +20,7 @@ final class FormListType extends AbstractType
     public function __construct(
         CorePermissions $security,
         UserHelper $userHelper,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly FormRepository $formRepository,
     ) {
         $this->viewOther = $security->isGranted('form:forms:viewother');
 

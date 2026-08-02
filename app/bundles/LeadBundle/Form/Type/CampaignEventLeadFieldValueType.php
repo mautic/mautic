@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -24,7 +25,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
     public function __construct(
         private readonly Translator $translator,
         private readonly LeadModel $leadModel,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

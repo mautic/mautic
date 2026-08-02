@@ -8,11 +8,12 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 
 final class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 

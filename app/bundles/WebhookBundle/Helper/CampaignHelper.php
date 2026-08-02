@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
@@ -22,7 +23,7 @@ final class CampaignHelper
     public function __construct(
         private readonly Client $client,
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 

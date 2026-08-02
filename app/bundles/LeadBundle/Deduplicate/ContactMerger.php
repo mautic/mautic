@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -35,7 +36,7 @@ class ContactMerger
         protected EventDispatcherInterface $dispatcher,
         protected LoggerInterface $logger,
         protected CompanyLeadRepository $companyLeadRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

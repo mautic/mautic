@@ -322,6 +322,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(EmailRepository::class),
                 $this->createStub(AssetRepository::class),
                 $this->createStub(DownloadRepository::class),
+                $this->createStub(CategoryRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

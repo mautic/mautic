@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
@@ -16,7 +17,7 @@ final class AssetListType extends AbstractType
     public function __construct(
         private readonly CorePermissions $corePermissions,
         private readonly UserHelper $userHelper,
-        private readonly \Mautic\AssetBundle\Entity\AssetRepository $assetRepository,
+        private readonly AssetRepository $assetRepository,
     ) {
     }
 

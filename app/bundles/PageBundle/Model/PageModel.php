@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -45,6 +46,8 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -119,9 +122,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly HitRepository $hitRepository,
         private readonly EmailRepository $emailRepository,
         private readonly UtmTagRepository $utmTagRepository,
-        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 

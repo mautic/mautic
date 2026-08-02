@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Services;
 use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\CoreBundle\Helper\Tree\NodeInterface;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Routing\RouterInterface;
 
 final class SegmentDependencyTreeFactory
@@ -18,7 +19,7 @@ final class SegmentDependencyTreeFactory
 
     public function __construct(
         private readonly RouterInterface $router,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
     }
 

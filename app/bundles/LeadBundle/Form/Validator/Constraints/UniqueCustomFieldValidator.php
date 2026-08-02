@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,8 +18,8 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 

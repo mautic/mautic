@@ -3,13 +3,14 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
     public function __construct(
         private readonly FieldModel $fieldModel,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
