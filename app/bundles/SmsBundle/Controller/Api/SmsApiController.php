@@ -47,6 +47,8 @@ final class SmsApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         SmsModel $smsModel,
+        private readonly TransportChain $transportChain,
+        private readonly LoggerInterface $mauticLogger,
     ) {
         $this->model           = $smsModel;
         $this->entityClass     = Sms::class;
@@ -63,9 +65,9 @@ final class SmsApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId): JsonResponse|Response
+    public function sendAction($id, $contactId): JsonResponse|Response
     {
-        if (!$transportChain->getEnabledTransports()) {
+        if (!$this->transportChain->getEnabledTransports()) {
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
         }
 
@@ -81,12 +83,12 @@ final class SmsApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $mauticLogger->debug("Sending SMS #{$id} to contact #{$contactId}", ['originator' => 'api']);
+        $this->mauticLogger->debug("Sending SMS #{$id} to contact #{$contactId}", ['originator' => 'api']);
 
         try {
             $response = $this->model->sendSms($message, $contact, ['channel' => 'api'])[$contact->getId()];
         } catch (\Exception $e) {
-            $mauticLogger->error($e->getMessage(), ['error' => (array) $e]);
+            $this->mauticLogger->error($e->getMessage(), ['error' => (array) $e]);
 
             return new Response('Interval server error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -94,7 +96,7 @@ final class SmsApiController extends CommonApiController
         $success = !empty($response['sent']);
 
         if (!$success) {
-            $mauticLogger->error('Failed to send SMS.', ['error' => $response['status']]);
+            $this->mauticLogger->error('Failed to send SMS.', ['error' => $response['status']]);
         }
 
         $view = $this->view(

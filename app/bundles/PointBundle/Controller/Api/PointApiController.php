@@ -49,6 +49,7 @@ final class PointApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private LeadModel $leadModel,
         PointModel $pointModel,
+        private readonly IpLookupHelper $ipLookupHelper,
     ) {
         $this->model            = $pointModel;
         $this->entityClass      = Point::class;
@@ -83,7 +84,7 @@ final class PointApiController extends CommonApiController
      *
      * @return Response
      */
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
+    public function adjustPointsAction(Request $request, $leadId, $operator, $delta)
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {
@@ -91,7 +92,7 @@ final class PointApiController extends CommonApiController
         }
 
         try {
-            $this->logApiPointChange($request, $ipLookupHelper, $lead, $delta, $operator);
+            $this->logApiPointChange($request, $this->ipLookupHelper, $lead, $delta, $operator);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }

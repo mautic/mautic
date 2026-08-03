@@ -18,6 +18,24 @@ final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected CorePermissions $security,
+        private readonly CorePermissions $corePermissions,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     public function getLookupChoiceListAction(Request $request, ProjectModel $projectModel): JsonResponse
     {
         $entityType  = $request->query->get('entityType');
@@ -49,16 +67,16 @@ final class AjaxController extends CommonAjaxController
         return new JsonResponse($dataArray);
     }
 
-    public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository, CorePermissions $corePermissions): JsonResponse
+    public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository): JsonResponse
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
             $this->throwAccessDenied();
         }
 
         $existingProjectIds = json_decode($request->request->get('existingProjectIds'), true);
         $newProjectNames    = json_decode($request->request->get('newProjectNames'), true);
 
-        if ($corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
+        if ($this->corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
             foreach ($newProjectNames as $projectName) {
                 $project = new Project();
                 $project->setName($projectName);

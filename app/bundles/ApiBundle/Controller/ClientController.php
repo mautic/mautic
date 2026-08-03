@@ -17,18 +17,24 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ClientController extends AbstractStandardFormController
 {
     private ClientModel $clientModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private TokenStorageInterface $tokenStorage;
 
     #[Required]
     public function autowireClientController(
         ClientModel $clientModel,
+        PageHelperFactoryInterface $pageHelperFactory,
+        TokenStorageInterface $tokenStorage,
     ): void {
         $this->clientModel = $clientModel;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * Generate's default client list.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
             $this->throwAccessDenied();
@@ -36,7 +42,7 @@ final class ClientController extends AbstractStandardFormController
 
         $this->setListFilters();
 
-        $pageHelper= $pageHelperFactory->make('mautic.api.client', $page);
+        $pageHelper= $this->pageHelperFactory->make('mautic.api.client', $page);
         $limit     = $pageHelper->getLimit();
         $start     = $pageHelper->getStart();
         $orderBy   = $request->getSession()->get('mautic.api.client.orderby', 'c.name');
@@ -112,9 +118,9 @@ final class ClientController extends AbstractStandardFormController
         );
     }
 
-    public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
+    public function authorizedClientsAction(): Response
     {
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
         $clients = $this->clientModel->getUserClients($me);
 

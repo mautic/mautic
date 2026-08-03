@@ -19,21 +19,27 @@ final class AjaxController extends CommonAjaxController
     use VariantAjaxControllerTrait;
 
     private PageModel $pageModel;
+    private FormFactoryInterface $formFactory;
+    private Environment $twig;
 
     #[Required]
     public function autowirePageAjaxController(
         PageModel $pageModel,
+        FormFactoryInterface $formFactory,
+        Environment $twig,
     ): void {
         $this->pageModel = $pageModel;
+        $this->formFactory = $formFactory;
+        $this->twig = $twig;
     }
 
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, PageModel $pageModel, Environment $twig): JsonResponse
+    public function getAbTestFormAction(Request $request, PageModel $pageModel): JsonResponse
     {
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $pageModel,
-            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
+            fn ($formType, $formOptions): FormInterface => $this->formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $this->twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
             'page'
         ));

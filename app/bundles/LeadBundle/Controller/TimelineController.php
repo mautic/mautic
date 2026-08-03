@@ -14,6 +14,25 @@ final class TimelineController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly DateHelper $dateHelper,
+        private readonly ExportHelper $exportHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
@@ -187,7 +206,7 @@ final class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
+    public function batchExportAction(Request $request, $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -223,7 +242,7 @@ final class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function (array $event) use ($dateHelper): array {
+        $resultsCallback = function (array $event): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
@@ -232,7 +251,7 @@ final class TimelineController extends CommonController
             return [
                 'eventName'      => $eventLabel,
                 'eventType'      => $event['eventType'] ?? '',
-                'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $this->dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 
@@ -267,6 +286,6 @@ final class TimelineController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $exportHelper);
+        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $this->exportHelper);
     }
 }

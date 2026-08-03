@@ -15,15 +15,21 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class PointController extends AbstractFormController
 {
     private PointModel $pointModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowirePointController(
         PointModel $pointModel,
+        PageHelperFactoryInterface $pageHelperFactory,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->pointModel = $pointModel;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->formFactory = $formFactory;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -40,7 +46,7 @@ final class PointController extends AbstractFormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.point', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.point', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
@@ -104,7 +110,7 @@ final class PointController extends AbstractFormController
      *
      * @param Point $entity
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Point) {
             /** @var Point $entity */
@@ -122,7 +128,7 @@ final class PointController extends AbstractFormController
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
         $actions    = $this->pointModel->getPointActions();
-        $form       = $this->pointModel->createForm($entity, $formFactory, $action, [
+        $form       = $this->pointModel->createForm($entity, $this->formFactory, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -151,7 +157,7 @@ final class PointController extends AbstractFormController
                         $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $formFactory, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -206,7 +212,7 @@ final class PointController extends AbstractFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         $entity = $this->pointModel->getEntity($objectId);
 
@@ -255,7 +261,7 @@ final class PointController extends AbstractFormController
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $actions = $this->pointModel->getPointActions();
-        $form    = $this->pointModel->createForm($entity, $formFactory, $action, [
+        $form    = $this->pointModel->createForm($entity, $this->formFactory, $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
@@ -334,7 +340,7 @@ final class PointController extends AbstractFormController
     /**
      * @param int $objectId
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 
@@ -347,7 +353,7 @@ final class PointController extends AbstractFormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($request, $formFactory, $entity);
+        return $this->newAction($request, $entity);
     }
 
     /**

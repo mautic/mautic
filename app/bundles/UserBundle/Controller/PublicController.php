@@ -22,20 +22,26 @@ final class PublicController extends FormController
     private UserRepository $userRepository;
 
     private UserModel $userModel;
+    private LoggerInterface $logger;
+    private UserPasswordHasherInterface $hasher;
 
     #[Required]
     public function autowirePublicController(
         UserModel $userModel,
         UserRepository $userRepository,
+        LoggerInterface $logger,
+        UserPasswordHasherInterface $hasher,
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;
+        $this->logger = $logger;
+        $this->hasher = $hasher;
     }
 
     /**
      * Generates a new password for the user and emails it to them.
      */
-    public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
+    public function passwordResetAction(Request $request): RedirectResponse|Response
     {
         $data   = ['identifier' => ''];
         $action = $this->generateUrl('mautic_user_passwordreset');
@@ -61,7 +67,7 @@ final class PublicController extends FormController
                     }
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
                 } catch (\RuntimeException $e) {
-                    $logger->error($this->translator->trans('mautic.user.password.reset.email.failed', [], 'messages').': '.$e->getMessage());
+                    $this->logger->error($this->translator->trans('mautic.user.password.reset.email.failed', [], 'messages').': '.$e->getMessage());
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
 
@@ -87,7 +93,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): RedirectResponse|Response
+    public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
         $form     = $this->formFactory->create(PasswordResetConfirmType::class, [], ['action' => $action]);
@@ -102,7 +108,7 @@ final class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $this->hasher, $data);
             }
         }
 
@@ -152,7 +158,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function inviteAction(Request $request, UserPasswordHasherInterface $hasher, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
+    public function inviteAction(Request $request, UserModel $model): RedirectResponse|Response
     {
         $token    = $request->attributes->getString('token');
         $invite   = $model->getInvite($token);
@@ -189,14 +195,14 @@ final class PublicController extends FormController
                         $formUser          = $request->request->all()['user_invite_registration'] ?? [];
                         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
 
-                        $user->setPassword($model->checkNewPassword($user, $hasher, $submittedPassword));
+                        $user->setPassword($model->checkNewPassword($user, $this->hasher, $submittedPassword));
                         $model->markInviteUsed($invite);
                         $model->saveEntity($user);
                         $this->addFlashMessage('mautic.user.invite.account_created', [], 'notice', 'flashes');
 
                         $response = $this->redirectToRoute('login');
                     } catch (\Doctrine\DBAL\Exception $e) {
-                        $logger->error($this->translator->trans('mautic.user.invite.registration.database.error', [], 'messages').': '.$e->getMessage());
+                        $this->logger->error($this->translator->trans('mautic.user.invite.registration.database.error', [], 'messages').': '.$e->getMessage());
                         $this->addFlashMessage('mautic.user.invite.error.database', [], 'error', 'flashes');
                     }
                 }

@@ -34,6 +34,10 @@ final class CompanyController extends FormController
     private CompanyModel $companyModel;
 
     private LeadModel $leadModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private CompanyColumnsDictionary $companyColumnsDictionary;
+    private CustomFieldFindReplace $findReplace;
+    private ExportHelper $exportHelper;
 
     #[Required]
     public function autowireCompanyController(
@@ -41,14 +45,22 @@ final class CompanyController extends FormController
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
+        PageHelperFactoryInterface $pageHelperFactory,
+        CompanyColumnsDictionary $companyColumnsDictionary,
+        CustomFieldFindReplace $findReplace,
+        ExportHelper $exportHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->companyColumnsDictionary = $companyColumnsDictionary;
+        $this->findReplace = $findReplace;
+        $this->exportHelper = $exportHelper;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -70,7 +82,7 @@ final class CompanyController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.company', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.company', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
@@ -124,7 +136,7 @@ final class CompanyController extends FormController
                 'viewParameters' => [
                     'searchValue' => $search,
                     'leadCounts'  => $leadCounts,
-                    'columns'     => $companyColumnsDictionary->getColumns(),
+                    'columns'     => $this->companyColumnsDictionary->getColumns(),
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -819,7 +831,7 @@ final class CompanyController extends FormController
     /**
      * Bulk find and replace company field values.
      */
-    public function batchFindReplaceAction(Request $request, CompanyModel $model, CustomFieldFindReplace $findReplace): JsonResponse|Response
+    public function batchFindReplaceAction(Request $request, CompanyModel $model): JsonResponse|Response
     {
         $permissions = $this->security->isGranted(
             [
@@ -839,10 +851,10 @@ final class CompanyController extends FormController
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->processCompanyFindReplace($request, $model, $findReplace);
+            return $this->processCompanyFindReplace($request, $model, $this->findReplace);
         }
 
-        return $this->createCompanyFindReplaceFormResponse($request, $findReplace);
+        return $this->createCompanyFindReplaceFormResponse($request, $this->findReplace);
     }
 
     private function processCompanyFindReplace(Request $request, CompanyModel $model, CustomFieldFindReplace $findReplace): JsonResponse
@@ -1147,7 +1159,7 @@ final class CompanyController extends FormController
     /**
      * Export company's data.
      */
-    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function companyExportAction(Request $request, $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -1177,6 +1189,6 @@ final class CompanyController extends FormController
             ];
         }
 
-        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $exportHelper);
+        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $this->exportHelper);
     }
 }

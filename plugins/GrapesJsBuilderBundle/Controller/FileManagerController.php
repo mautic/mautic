@@ -17,10 +17,28 @@ final class FileManagerController extends AjaxController
 
     private const DEFAULT_LIMIT = 20;
 
-    public function uploadAction(Request $request, FileManager $fileManager): Response
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly FileManager $fileManager,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function uploadAction(Request $request): Response
     {
         try {
-            $response = $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
+            $response = $this->sendJsonResponse(['data'=> $this->fileManager->uploadFiles($request)]);
         } catch (FileUploadException $error) {
             return new Response($error->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -28,16 +46,16 @@ final class FileManagerController extends AjaxController
         return $response;
     }
 
-    public function deleteAction(Request $request, FileManager $fileManager): JsonResponse
+    public function deleteAction(Request $request): JsonResponse
     {
         $fileName = basename($request->get('filename'));
-        $filePath = $fileManager->getCompleteFilePath($fileName);
+        $filePath = $this->fileManager->getCompleteFilePath($fileName);
 
         if (!file_exists($filePath) || !exif_imagetype($filePath)) {
             return $this->sendJsonResponse(['success'=> false]);
         }
 
-        $fileManager->deleteFile($fileName);
+        $this->fileManager->deleteFile($fileName);
 
         return $this->sendJsonResponse(['success'=> true]);
     }
@@ -45,18 +63,18 @@ final class FileManagerController extends AjaxController
     /**
      * @deprecated since Mautic 5.2, to be removed in 6.0. Use FileManagerController::getMediaAction instead
      */
-    public function assetsAction(FileManager $fileManager): JsonResponse
+    public function assetsAction(): JsonResponse
     {
         return $this->sendJsonResponse([
-            'data' => $fileManager->getImages(),
+            'data' => $this->fileManager->getImages(),
         ]);
     }
 
-    public function getMediaAction(Request $request, FileManager $fileManager): JsonResponse
+    public function getMediaAction(Request $request): JsonResponse
     {
         $page  = $request->query->getInt('page', self::DEFAULT_PAGE);
         $limit = $request->query->getInt('limit', self::DEFAULT_LIMIT);
 
-        return $this->sendJsonResponse($fileManager->getMediaFiles($page, $limit));
+        return $this->sendJsonResponse($this->fileManager->getMediaFiles($page, $limit));
     }
 }

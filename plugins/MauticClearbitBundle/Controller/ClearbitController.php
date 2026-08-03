@@ -20,14 +20,17 @@ final class ClearbitController extends FormController
     private CompanyModel $companyModel;
 
     private LeadModel $leadModel;
+    private LookupHelper $lookupHelper;
 
     #[Required]
     public function autowireClearbitController(
         LeadModel $leadModel,
         CompanyModel $companyModel,
+        LookupHelper $lookupHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->lookupHelper = $lookupHelper;
     }
 
     /**
@@ -37,7 +40,7 @@ final class ClearbitController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupPersonAction(Request $request, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['clearbit_lookup'] ?? [];
@@ -98,7 +101,7 @@ final class ClearbitController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             try {
-                $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
+                $this->lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
                 $this->addFlashMessage(
                     'mautic.lead.batch_leads_affected',
                     [
@@ -129,7 +132,7 @@ final class ClearbitController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
+    public function batchLookupPersonAction(Request $request): JsonResponse|Response
     {
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['clearbit_batch_lookup'] ?? [];
@@ -244,7 +247,7 @@ final class ClearbitController extends FormController
             foreach ($lookupEmails as $id => $lookupEmail) {
                 if ($lead = $this->leadModel->getEntity($id)) {
                     try {
-                        $lookupHelper->lookupContact($lead, $notify);
+                        $this->lookupHelper->lookupContact($lead, $notify);
                     } catch (\Exception $ex) {
                         $this->addFlashMessage(
                             $ex->getMessage(),
@@ -285,7 +288,7 @@ final class ClearbitController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupCompanyAction(Request $request, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['clearbit_lookup'] ?? [];
@@ -345,7 +348,7 @@ final class ClearbitController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             try {
-                $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
+                $this->lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
                 $this->addFlashMessage(
                     'mautic.company.batch_companies_affected',
                     [
@@ -376,7 +379,7 @@ final class ClearbitController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
+    public function batchLookupCompanyAction(Request $request): JsonResponse|Response
     {
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['clearbit_batch_lookup'] ?? [];
@@ -490,7 +493,7 @@ final class ClearbitController extends FormController
             foreach ($lookupWebsites as $id => $lookupWebsite) {
                 if ($company = $this->companyModel->getEntity($id)) {
                     try {
-                        $lookupHelper->lookupCompany($company, $notify);
+                        $this->lookupHelper->lookupCompany($company, $notify);
                     } catch (\Exception $ex) {
                         $this->addFlashMessage(
                             $ex->getMessage(),

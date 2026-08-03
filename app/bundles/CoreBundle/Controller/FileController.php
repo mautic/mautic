@@ -21,20 +21,39 @@ final class FileController extends AjaxController
     private int $statusCode = Response::HTTP_OK;
 
     /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly PathsHelper $pathsHelper,
+        private readonly FileUploader $fileUploader,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    /**
      * Uploads a file.
      *
      * @throws FileUploadException
      */
-    public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
+    public function uploadAction(Request $request): JsonResponse
     {
         $editor   = $request->get('editor');
-        $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
+        $mediaDir = $this->getMediaAbsolutePath();
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {
                 /** @var UploadedFile $file */
                 try {
-                    $fileUploader->validateImage($file);
-                    $fileName = $fileUploader->upload($mediaDir, $file);
+                    $this->fileUploader->validateImage($file);
+                    $fileName = $this->fileUploader->upload($mediaDir, $file);
                     $this->successfulResponse($request, $fileName, $editor);
                 } catch (FileUploadException) {
                     $this->failureResponse($editor);
@@ -48,18 +67,18 @@ final class FileController extends AjaxController
     /**
      * List the files in /media directory.
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
+    public function listAction(Request $request): JsonResponse
     {
-        $fnames = scandir($this->getMediaAbsolutePath($pathsHelper));
+        $fnames = scandir($this->getMediaAbsolutePath());
 
         if ($fnames) {
             foreach ($fnames as $name) {
-                $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.$name;
+                $imagePath = $this->getMediaAbsolutePath().'/'.$name;
                 $imageUrl  = $this->getMediaUrl($request).'/'.$name;
                 $imageFile = new File($imagePath, checkPath: false);
                 if (!is_dir($name)) {
                     try {
-                        $fileUploader->validateImage($imageFile);
+                        $this->fileUploader->validateImage($imageFile);
                         $this->response[] = [
                             'url'   => $imageUrl,
                             'thumb' => $imageUrl,
@@ -79,10 +98,10 @@ final class FileController extends AjaxController
     /**
      * Delete a file from /media directory.
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper): JsonResponse
+    public function deleteAction(Request $request): JsonResponse
     {
         $src       = InputHelper::clean($request->request->get('src'));
-        $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
+        $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
@@ -103,15 +122,13 @@ final class FileController extends AjaxController
      *
      * @return string
      */
-    public function getMediaAbsolutePath(PathsHelper $pathsHelper): string|false
+    public function getMediaAbsolutePath(): string|false
     {
-        $mediaDir = realpath($pathsHelper->getSystemPath('images', true));
-
+        $mediaDir = realpath($this->pathsHelper->getSystemPath('images', true));
         if (false === $mediaDir) {
             $this->response['error'] = 'Media dir does not exist';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
-
         if (false === is_writable($mediaDir)) {
             $this->response['error'] = 'Media dir is not writable';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;

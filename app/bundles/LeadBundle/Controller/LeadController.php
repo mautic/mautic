@@ -102,6 +102,19 @@ final class LeadController extends FormController
     private DoNotContactRepository $doNotContactRepository;
 
     private EmailRepository $emailRepository;
+    private ContactColumnsDictionary $contactColumnsDictionary;
+    private TokenStorageInterface $tokenStorage;
+    private IntegrationHelper $integrationHelper;
+    private CoreParametersHelper $coreParametersHelper;
+    private UserHelper $userHelper;
+    private AvatarHelper $avatarHelper;
+    private ContactMerger $contactMerger;
+    private MailHelper $mailHelper;
+    private MembershipManager $membershipManager;
+    private CustomFieldFindReplace $findReplace;
+    private ExportHelper $exportHelper;
+    private EventDispatcherInterface $dispatcher;
+    private IpLookupHelper $ipLookupHelper;
 
     #[Required]
     public function autowireLeadController(
@@ -120,6 +133,19 @@ final class LeadController extends FormController
         UserRepository $userRepository,
         DoNotContactRepository $doNotContactRepository,
         EmailRepository $emailRepository,
+        ContactColumnsDictionary $contactColumnsDictionary,
+        TokenStorageInterface $tokenStorage,
+        IntegrationHelper $integrationHelper,
+        CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
+        AvatarHelper $avatarHelper,
+        ContactMerger $contactMerger,
+        MailHelper $mailHelper,
+        MembershipManager $membershipManager,
+        CustomFieldFindReplace $findReplace,
+        ExportHelper $exportHelper,
+        EventDispatcherInterface $dispatcher,
+        IpLookupHelper $ipLookupHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -136,6 +162,19 @@ final class LeadController extends FormController
         $this->userRepository = $userRepository;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->emailRepository = $emailRepository;
+        $this->contactColumnsDictionary = $contactColumnsDictionary;
+        $this->tokenStorage = $tokenStorage;
+        $this->integrationHelper = $integrationHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->userHelper = $userHelper;
+        $this->avatarHelper = $avatarHelper;
+        $this->contactMerger = $contactMerger;
+        $this->mailHelper = $mailHelper;
+        $this->membershipManager = $membershipManager;
+        $this->findReplace = $findReplace;
+        $this->exportHelper = $exportHelper;
+        $this->dispatcher = $dispatcher;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -144,7 +183,6 @@ final class LeadController extends FormController
     public function indexAction(
         Request $request,
         DoNotContactModel $leadDNCModel,
-        ContactColumnsDictionary $contactColumnsDictionary,
         $page = 1,
     ): Response {
         // set some permissions
@@ -281,7 +319,7 @@ final class LeadController extends FormController
             [
                 'viewParameters' => [
                     'searchValue'      => $search,
-                    'columns'          => $contactColumnsDictionary->getColumns(),
+                    'columns'          => $this->contactColumnsDictionary->getColumns(),
                     'items'            => $leads,
                     'page'             => $page,
                     'totalItems'       => $count,
@@ -307,7 +345,7 @@ final class LeadController extends FormController
         );
     }
 
-    public function quickAddAction(Request $request, TokenStorageInterface $tokenStorage): Response
+    public function quickAddAction(Request $request): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -373,7 +411,7 @@ final class LeadController extends FormController
         $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
-        $currentUser = $tokenStorage->getToken()->getUser();
+        $currentUser = $this->tokenStorage->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -398,7 +436,7 @@ final class LeadController extends FormController
     /**
      * Loads a specific lead into the detailed panel.
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
+    public function viewAction(Request $request, PointGroupModel $pointGroupModel, $objectId): Response
     {
         $lead = $this->leadModel->getEntity($objectId);
 
@@ -455,13 +493,13 @@ final class LeadController extends FormController
         }
 
         $fields            = $lead->getFields();
-        $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
-        $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
+        $socialProfiles    = (array) $this->integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex(false);
 
         $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         foreach ($socialProfiles as $integration => &$details) {
-            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+            if ($integrationObject = $this->integrationHelper->getIntegrationObject($integration)) {
                 if ($template = $integrationObject->getSocialProfileTemplate()) {
                     $details['social_profile_template'] = $template;
                 }
@@ -515,7 +553,7 @@ final class LeadController extends FormController
                     //    ]
                     // )->getContent(),
                 ],
-                'allowMultipleCompanies' => $coreParametersHelper->get('contact_allow_multiple_companies'),
+                'allowMultipleCompanies' => $this->coreParametersHelper->get('contact_allow_multiple_companies'),
                 'contentTemplate'        => '@MauticLead/Lead/lead.html.twig',
                 'passthroughVars'        => [
                     'activeLink'    => '#mautic_contact_index',
@@ -535,7 +573,7 @@ final class LeadController extends FormController
     /**
      * Generates new form and processes post data.
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage): Response
+    public function newAction(Request $request): Response
     {
         $lead  = $this->leadModel->getEntity();
 
@@ -581,7 +619,7 @@ final class LeadController extends FormController
                         'lead',
                         'lead',
                         null,
-                        $userHelper->getUser()->getName()
+                        $this->userHelper->getUser()->getName()
                     ));
 
                     // Save here as we need the entity with an ID for the company code bellow.
@@ -599,7 +637,7 @@ final class LeadController extends FormController
                     if ('custom' === $image) {
                         // Check for a file
                         if ($form['custom_avatar']->getData()) {
-                            $this->uploadAvatar($request, $avatarHelper, $lead);
+                            $this->uploadAvatar($request, $this->avatarHelper, $lead);
                         }
                     }
 
@@ -634,11 +672,11 @@ final class LeadController extends FormController
                         $returnUrl = $this->generateUrl('mautic_contact_action', $viewParameters);
                         $template  = 'Mautic\LeadBundle\Controller\LeadController::viewAction';
                     } else {
-                        return $this->editAction($request, $userHelper, $avatarHelper, $lead->getId(), true);
+                        return $this->editAction($request, $lead->getId(), true);
                     }
                 } else {
                     if ($request->get('qf', false)) {
-                        return $this->quickAddAction($request, $tokenStorage);
+                        return $this->quickAddAction($request);
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
@@ -670,7 +708,7 @@ final class LeadController extends FormController
             }
         } else {
             // set the default owner to the currently logged in user
-            $currentUser = $tokenStorage->getToken()->getUser();
+            $currentUser = $this->tokenStorage->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
 
@@ -701,7 +739,7 @@ final class LeadController extends FormController
      *
      * @param bool|false $ignorePost
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 
@@ -783,7 +821,7 @@ final class LeadController extends FormController
                         'lead',
                         'lead',
                         $objectId,
-                        $userHelper->getUser()->getName()
+                        $this->userHelper->getUser()->getName()
                     ));
                     $this->leadModel->modifyCompanies($lead, $companies);
                     $this->leadModel->saveEntity($lead, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
@@ -794,7 +832,7 @@ final class LeadController extends FormController
                         // Check for a file
                         $file = $form['custom_avatar']->getData();
                         if ($file instanceof UploadedFile) {
-                            $this->uploadAvatar($request, $avatarHelper, $lead);
+                            $this->uploadAvatar($request, $this->avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update
                             $request->getSession()->set('mautic.lead.avatar.updated', true);
@@ -902,7 +940,7 @@ final class LeadController extends FormController
     /**
      * Generates merge form and action.
      */
-    public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId): Response
+    public function mergeAction(Request $request, $objectId): Response
     {
         $mainLead = $this->leadModel->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
@@ -1026,7 +1064,7 @@ final class LeadController extends FormController
 
                     // Both leads are good so now we merge them
                     try {
-                        $mainLead = $contactMerger->merge($mainLead, $secLead);
+                        $mainLead = $this->contactMerger->merge($mainLead, $secLead);
                     } catch (SameContactException) {
                     }
                 }
@@ -1402,7 +1440,7 @@ final class LeadController extends FormController
     /**
      * @param int $objectId
      */
-    public function emailAction(Request $request, UserHelper $userHelper, MailHelper $mailHelper, LeadModel $leadModel, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
+    public function emailAction(Request $request, LeadModel $leadModel, EmailModel $emailModel, $objectId = 0): JsonResponse|Response
     {
         $valid = $cancelled = false;
 
@@ -1426,7 +1464,7 @@ final class LeadController extends FormController
         $mailerIsOwner    = $this->coreParametersHelper->get('mailer_is_owner');
 
         // Set onwer ID to be the current user ID so it will use his signature
-        $leadFields['owner_id'] = $userHelper->getUser()->getId();
+        $leadFields['owner_id'] = $this->userHelper->getUser()->getId();
 
         $inList = ('GET' === $request->getMethod())
             ? $request->get('list', 0)
@@ -1464,7 +1502,7 @@ final class LeadController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $email = $form->getData();
 
-                    $mailer      = $mailHelper->getMailer();
+                    $mailer      = $this->mailHelper->getMailer();
                     $emailEntity = null;
                     $subject     = $email['subject'];
 
@@ -1593,7 +1631,7 @@ final class LeadController extends FormController
      *
      * @param int $objectId
      */
-    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
+    public function batchCampaignsAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data  = $request->request->all()['lead_batch'] ?? [];
@@ -1644,13 +1682,13 @@ final class LeadController extends FormController
 
                 if (!empty($add)) {
                     foreach ($add as $cid) {
-                        $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        $this->membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid]);
                     }
                 }
 
                 if (!empty($remove)) {
                     foreach ($remove as $cid) {
-                        $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid]);
+                        $this->membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid]);
                     }
                 }
             }
@@ -1973,7 +2011,7 @@ final class LeadController extends FormController
     /**
      * Bulk find and replace contact field values.
      */
-    public function batchFindReplaceAction(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace): JsonResponse|Response
+    public function batchFindReplaceAction(Request $request, LeadModel $model): JsonResponse|Response
     {
         $permissions = $this->security->isGranted(
             [
@@ -1993,10 +2031,10 @@ final class LeadController extends FormController
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->processContactFindReplace($request, $model, $findReplace, $permissions);
+            return $this->processContactFindReplace($request, $model, $this->findReplace, $permissions);
         }
 
-        return $this->createContactFindReplaceFormResponse($request, $findReplace);
+        return $this->createContactFindReplaceFormResponse($request, $this->findReplace);
     }
 
     /**
@@ -2159,7 +2197,7 @@ final class LeadController extends FormController
      *
      * @throws \Exception
      */
-    public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
+    public function batchExportAction(Request $request): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2241,20 +2279,20 @@ final class LeadController extends FormController
         }
 
         if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
-            return $this->contactExportCSVScheduler($dispatcher, $permissions);
+            return $this->contactExportCSVScheduler($this->dispatcher, $permissions);
         }
 
         $iterator = new IteratorExportDataModel(
             $this->leadModel,
             $args,
-            fn (Lead $contact): array => $exportHelper->parseLeadToExport($contact)
+            fn (Lead $contact): array => $this->exportHelper->parseLeadToExport($contact)
         );
-        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $this->exportHelper);
 
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportEvent($details, 'ContactExports'),
             LeadEvents::POST_CONTACT_EXPORT
         );
@@ -2262,7 +2300,7 @@ final class LeadController extends FormController
         return $response;
     }
 
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function contactExportAction(Request $request, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2299,12 +2337,12 @@ final class LeadController extends FormController
             ];
         }
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportEvent($args, 'ContactExport'),
             LeadEvents::POST_CONTACT_EXPORT
         );
 
-        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
+        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $this->exportHelper);
     }
 
     public function downloadExportAction(string $fileName = ''): Response
@@ -2374,7 +2412,6 @@ final class LeadController extends FormController
         Request $request,
         LeadModel $model,
         PointGroupModel $pointGroupModel,
-        IpLookupHelper $ipLookupHelper,
         int $objectId): Response
     {
         $lead  = $model->getEntity($objectId);
@@ -2432,7 +2469,7 @@ final class LeadController extends FormController
                             $log->setType('manual');
                             $log->setEventName($this->translator->trans('mautic.point.event.manual_change'));
                             $log->setActionName('');
-                            $log->setIpAddress($ipLookupHelper->getIpAddress());
+                            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
                             $log->setDateAdded(new \DateTime());
                             $log->setGroup($group);
                             $lead->addPointsChangeLog($log);

@@ -14,7 +14,25 @@ final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel, FormFactoryInterface $formFactory): JsonResponse
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly FormFactoryInterface $formFactory,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel): JsonResponse
     {
         // get the form type
         $type = InputHelper::clean($request->request->get('networkType'));
@@ -31,7 +49,7 @@ final class AjaxController extends CommonAjaxController
             $formType = $monitoringModel->getFormByType($type);
 
             // get the network type form
-            $form = $formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
+            $form = $this->formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
                 '@MauticSocial/FormTheme/'.$type.'_widget.html.twig',

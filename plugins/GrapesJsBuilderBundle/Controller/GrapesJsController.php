@@ -19,6 +19,25 @@ class GrapesJsController extends CommonController
 {
     public const OBJECT_TYPE = ['email', 'page'];
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly LoggerInterface $mauticLogger,
+        private readonly ThemeHelper $themeHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     private function isAuthorizedObjectType(string $objectType): bool
     {
         return in_array($objectType, self::OBJECT_TYPE, true);
@@ -103,8 +122,6 @@ class GrapesJsController extends CommonController
 
     public function builderAction(
         Request $request,
-        LoggerInterface $mauticLogger,
-        ThemeHelper $themeHelper,
         string $objectType,
         string $objectId,
     ): Response {
@@ -147,7 +164,7 @@ class GrapesJsController extends CommonController
         $template         = InputHelper::clean($request->query->get('template'));
         $resetEditorState = $request->query->getBoolean('resetEditorState', false);
         if (!$template) {
-            $mauticLogger->warning('Grapesjs: no template in query');
+            $this->mauticLogger->warning('Grapesjs: no template in query');
 
             return $this->json(false);
         }
@@ -159,13 +176,13 @@ class GrapesJsController extends CommonController
         if ($logicalName = $this->checkForMjmlTemplate($templateName.'.mjml.twig')) {
             $type        = 'mjml';
         } else {
-            $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate($templateName.'.html.twig');
         }
 
         // Replace short codes to emoji
         $content = array_map(fn (string $text): string => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $themeHelper->renderThemeTemplate(
+        $renderedTemplate =  $this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'     => $isNew,

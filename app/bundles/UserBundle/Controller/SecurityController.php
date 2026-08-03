@@ -25,42 +25,58 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SecurityController extends CommonController implements EventSubscriberInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
+    private RequestEvent $event;
+    private AuthenticationUtils $authenticationUtils;
+    private IntegrationHelper $integrationHelper;
+    private TranslatorInterface $translator;
+    private SAMLHelper $samlHelper;
+    private SessionInterface $session;
 
     #[Required]
     public function autowireSecurityController(
         AuthorizationCheckerInterface $authorizationChecker,
+        RequestEvent $event,
+        AuthenticationUtils $authenticationUtils,
+        IntegrationHelper $integrationHelper,
+        TranslatorInterface $translator,
+        SAMLHelper $samlHelper,
+        SessionInterface $session,
     ): void {
         $this->authorizationChecker = $authorizationChecker;
+        $this->event = $event;
+        $this->authenticationUtils = $authenticationUtils;
+        $this->integrationHelper = $integrationHelper;
+        $this->translator = $translator;
+        $this->samlHelper = $samlHelper;
+        $this->session = $session;
     }
 
-    public function onRequest(RequestEvent $event): void
+    public function onRequest(): void
     {
-        $controller = $event->getRequest()->attributes->get('_controller');
+        $controller = $this->event->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
-
         if (!str_contains($controller, self::class)) {
             return;
         }
-
         // redirect user if they are already authenticated
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')
             || $this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
-            $event->setResponse(new RedirectResponse($redirectUrl));
+            $this->event->setResponse(new RedirectResponse($redirectUrl));
         }
     }
 
     /**
      * Generates login form and processes login.
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
+    public function loginAction(Request $request): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
+        $error = $this->authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
             if ($error instanceof WeakPasswordException) {
-                $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
+                $this->addFlash(FlashBag::LEVEL_ERROR, $this->translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 
                 return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
             }
@@ -80,11 +96,11 @@ final class SecurityController extends CommonController implements EventSubscrib
         $request->query->set('tmpl', 'login');
 
         // Get a list of SSO integrations
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
+        $integrations = $this->integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
         return $this->delegateView([
             'viewParameters' => [
-                'last_username' => $authenticationUtils->getLastUsername(),
+                'last_username' => $this->authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
             'contentTemplate' => '@MauticUser/Security/login.html.twig',
@@ -114,13 +130,13 @@ final class SecurityController extends CommonController implements EventSubscrib
         return new RedirectResponse($this->generateUrl('login'));
     }
 
-    public function samlLoginRetryAction(Request $request, SAMLHelper $samlHelper, SessionInterface $session): Response
+    public function samlLoginRetryAction(Request $request): Response
     {
-        if (!$samlHelper->isSamlEnabled()) {
+        if (!$this->samlHelper->isSamlEnabled()) {
             return new RedirectResponse($this->generateUrl('login'));
         }
 
-        $session->invalidate();
+        $this->session->invalidate();
 
         $this->addFlashMessage('mautic.user.security.saml.clearsession', [], FlashBag::LEVEL_ERROR);
 

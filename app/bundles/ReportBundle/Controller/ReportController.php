@@ -24,15 +24,18 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ReportController extends FormController
 {
     private ReportModel $reportModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireReportController(
         ReportModel $reportModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->reportModel = $reportModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -56,7 +59,7 @@ final class ReportController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper        = $pageHelperFactory->make('mautic.report', $page);
+        $pageHelper        = $this->pageHelperFactory->make('mautic.report', $page);
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();

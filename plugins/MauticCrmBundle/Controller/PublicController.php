@@ -11,7 +11,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PublicController extends CommonController
 {
-    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper): Response
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly LoggerInterface $mauticLogger,
+        private readonly IntegrationHelper $integrationHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function contactDataAction(Request $request): Response
     {
         $content = $request->getContent();
         if (!empty($content)) {
@@ -22,7 +41,7 @@ final class PublicController extends CommonController
 
         $integration = 'Hubspot';
 
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         \assert($integrationObject instanceof HubspotIntegration);
 
         foreach ($data as $info) {
@@ -40,7 +59,7 @@ final class PublicController extends CommonController
                         break;
                 }
             } catch (\Exception $ex) {
-                $mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
+                $this->mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
             }
         }
 

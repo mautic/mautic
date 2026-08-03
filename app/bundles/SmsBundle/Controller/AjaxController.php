@@ -23,17 +23,23 @@ final class AjaxController extends CommonAjaxController
     private EmailModel $emailModel;
 
     private SmsModel $smsModel;
+    private BroadcastQuery $broadcastQuery;
+    private CacheStorageHelper $cacheStorageHelper;
 
     #[Required]
     public function autowireSmsAjaxController(
         EmailModel $emailModel,
         SmsModel $smsModel,
+        BroadcastQuery $broadcastQuery,
+        CacheStorageHelper $cacheStorageHelper,
     ): void {
         $this->emailModel = $emailModel;
         $this->smsModel = $smsModel;
+        $this->broadcastQuery = $broadcastQuery;
+        $this->cacheStorageHelper = $cacheStorageHelper;
     }
 
-    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper): JsonResponse
+    public function getSmsCountStatsAction(Request $request): JsonResponse
     {
         $id  = $request->get('id');
         $ids = $request->query->all()['ids'] ?? [];
@@ -50,8 +56,8 @@ final class AjaxController extends CommonAjaxController
                     continue;
                 }
 
-                $pending = $broadcastQuery->getPendingCount($sms);
-                $cacheStorageHelper->set(sprintf('%s|%s|%s', 'sms', $sms->getId(), 'pending'), $pending);
+                $pending = $this->broadcastQuery->getPendingCount($sms);
+                $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'sms', $sms->getId(), 'pending'), $pending);
                 if (!$pending) {
                     continue;
                 }

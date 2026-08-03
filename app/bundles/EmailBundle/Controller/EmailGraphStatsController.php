@@ -13,6 +13,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class EmailGraphStatsController extends AbstractController
 {
+    public function __construct(
+        private readonly FormFactoryInterface $formFactory,
+        private readonly CorePermissions $security,
+    ) {
+    }
+
     /**
      * Loads a specific form into the detailed panel.
      *
@@ -26,8 +32,6 @@ final class EmailGraphStatsController extends AbstractController
     public function viewAction(
         Request $request,
         EmailModel $model,
-        FormFactoryInterface $formFactory,
-        CorePermissions $security,
         $objectId,
         $isVariant,
         $dateFrom = null,
@@ -39,9 +43,9 @@ final class EmailGraphStatsController extends AbstractController
         // Init the date range filter form
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if (null === $email || !$security->hasEntityAccess(
+        if (null === $email || !$this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()

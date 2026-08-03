@@ -18,17 +18,20 @@ final class TriggerController extends FormController
     private TriggerEventModel $triggerEventModel;
 
     private TriggerModel $triggerModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireTriggerController(
         TriggerEventModel $triggerEventModel,
         TriggerModel $triggerModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->triggerEventModel = $triggerEventModel;
         $this->triggerModel      = $triggerModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -45,7 +48,7 @@ final class TriggerController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.point.trigger', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.point.trigger', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();

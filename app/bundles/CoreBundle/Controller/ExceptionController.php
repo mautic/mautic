@@ -12,7 +12,25 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 final class ExceptionController extends CommonController
 {
-    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, ?DebugLoggerInterface $logger = null): JsonResponse|Response
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly ThemeHelper $themeHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function showAction(Request $request, \Throwable $exception, ?DebugLoggerInterface $logger = null): JsonResponse|Response
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();
@@ -71,7 +89,7 @@ final class ExceptionController extends CommonController
         $anonymous    = $this->security->isAnonymous();
         $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
-            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
+            if ($templatePage = $this->themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
                 $baseTemplate = $templatePage;
             }
         }

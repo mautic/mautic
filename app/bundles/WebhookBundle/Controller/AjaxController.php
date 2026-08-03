@@ -13,10 +13,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AjaxController extends CommonAjaxController
 {
-    public function sendHookTestAction(Request $request, Client $client, PathsHelper $pathsHelper): JsonResponse
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly Client $client,
+        private readonly PathsHelper $pathsHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function sendHookTestAction(Request $request): JsonResponse
     {
         try {
-            return $this->processWebhookTest($request, $client, $pathsHelper);
+            return $this->processWebhookTest($request, $this->client, $this->pathsHelper);
         } catch (PrivateAddressException) {
             return $this->createErrorResponse(
                 'mautic.webhook.error.private_address'
@@ -44,7 +63,7 @@ final class AjaxController extends CommonAjaxController
             throw new \InvalidArgumentException('mautic.webhook.label.no.events');
         }
 
-        $payloadPaths = $this->getPayloadPaths($selectedTypes, $pathsHelper);
+        $payloadPaths = $this->getPayloadPaths($selectedTypes);
         $payload      = $this->loadPayloads($payloadPaths);
         $secret       = InputHelper::string($request->request->get('secret'));
         $response     = $client->post($url, $payload, $secret);
@@ -100,7 +119,7 @@ final class AjaxController extends CommonAjaxController
      *
      * @return non-falsy-string[]
      */
-    public function getPayloadPaths($types, PathsHelper $pathsHelper): array
+    public function getPayloadPaths($types): array
     {
         $payloadPaths = [];
 
@@ -119,12 +138,12 @@ final class AjaxController extends CommonAjaxController
             $eventName = implode('_', $typePath);
 
             // default the path to core
-            $payloadPath = $pathsHelper->getSystemPath('bundles', true);
+            $payloadPath = $this->pathsHelper->getSystemPath('bundles', true);
 
             // if plugin is in first part of the string this is an addon
             // input is plugin.bundlename or mautic.bundlename
             if (strpos('plugin.', $prefix)) {
-                $payloadPath = $pathsHelper->getSystemPath('plugins', true);
+                $payloadPath = $this->pathsHelper->getSystemPath('plugins', true);
             }
 
             $prefixParts = explode('.', $prefix);

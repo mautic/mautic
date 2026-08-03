@@ -15,15 +15,21 @@ use Twig\Environment;
 final class AjaxController extends CommonAjaxController
 {
     private StageModel $stageModel;
+    private FormFactoryInterface $formFactory;
+    private Environment $twig;
 
     #[Required]
     public function autowireStageAjaxController(
         StageModel $stageModel,
+        FormFactoryInterface $formFactory,
+        Environment $twig,
     ): void {
         $this->stageModel = $stageModel;
+        $this->formFactory = $formFactory;
+        $this->twig = $twig;
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
+    public function getActionFormAction(Request $request): JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -42,9 +48,9 @@ final class AjaxController extends CommonAjaxController
                 $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericstage_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
 
-                $form = $formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
+                $form = $this->formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html = $this->renderView('@MauticStage/Stage/actionform.html.twig', [
-                    'form' => $this->setFormTheme($form, $twig, $themes),
+                    'form' => $this->setFormTheme($form, $this->twig, $themes),
                 ]);
 
                 $html                 = str_replace('stageaction', 'stage', $html);

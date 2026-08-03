@@ -13,12 +13,30 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController extends CommonController
 {
-    public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): Response
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly AuthIntegrationsHelper $authIntegrationsHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    public function callbackAction(string $integration, Request $request): Response
     {
         $authenticationError = false;
 
         try {
-            $authIntegration = $authIntegrationsHelper->getIntegration($integration);
+            $authIntegration = $this->authIntegrationsHelper->getIntegration($integration);
             $message         = $authIntegration->authenticateIntegration($request);
         } catch (UnauthorizedException $exception) {
             $message             = $exception->getMessage();

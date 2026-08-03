@@ -41,6 +41,7 @@ final class SubmissionApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         SubmissionModel $formSubmissionModel,
         private readonly FormModel $formModel,
+        private readonly UserHelper $userHelper,
     ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
@@ -83,7 +84,7 @@ final class SubmissionApiController extends CommonApiController
      * @param int $formId
      * @param int $contactId
      */
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
+    public function getEntitiesForContactAction(Request $request, $formId, $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -99,7 +100,7 @@ final class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($request, $userHelper, $formId);
+        return $this->getEntitiesAction($request, $this->userHelper, $formId);
     }
 
     /**

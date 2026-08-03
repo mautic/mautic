@@ -16,12 +16,15 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class AjaxController extends CommonAjaxController
 {
     private AssetModel $assetModel;
+    private IntegrationHelper $integrationHelper;
 
     #[Required]
     public function autowireAssetAjaxController(
         AssetModel $assetModel,
+        IntegrationHelper $integrationHelper,
     ): void {
         $this->assetModel = $assetModel;
+        $this->integrationHelper = $integrationHelper;
     }
 
     public function categoryListAction(Request $request): JsonResponse
@@ -42,7 +45,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * @throws \Exception
      */
-    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function fetchRemoteFilesAction(Request $request): JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
@@ -52,7 +55,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */
-        $integration = $integrationHelper->getIntegrationObject($provider);
+        $integration = $this->integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);
         $this->dispatcher->dispatch($event, $name);

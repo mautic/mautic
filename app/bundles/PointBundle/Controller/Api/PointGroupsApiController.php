@@ -48,6 +48,7 @@ final class PointGroupsApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         PointGroupModel $pointGroupModel,
         private readonly LeadModel $leadModel,
+        private readonly IpLookupHelper $ipLookupHelper,
     ) {
         $this->model            = $pointGroupModel;
         $this->entityClass      = Group::class;
@@ -116,7 +117,7 @@ final class PointGroupsApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $contactId, int $groupId, string $operator, int $value): Response
+    public function adjustGroupPointsAction(Request $request, int $contactId, int $groupId, string $operator, int $value): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -149,7 +150,7 @@ final class PointGroupsApiController extends CommonApiController
             name: $eventName,
             action: $actionName,
             pointChanges: $delta,
-            ip: $ipLookupHelper->getIpAddress(),
+            ip: $this->ipLookupHelper->getIpAddress(),
             group: $pointGroup
         );
         $this->leadModel->saveEntity($contact, false);

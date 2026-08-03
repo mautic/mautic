@@ -44,6 +44,8 @@ final class FileApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LoggerInterface $mauticLogger,
     ) {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
@@ -57,10 +59,10 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function createAction(Request $request, $dir)
     {
         try {
-            $path = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir, true);
+            $path = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -96,10 +98,10 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function listAction(Request $request, $dir)
     {
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir);
+            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -127,12 +129,12 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
+    public function deleteAction(Request $request, $dir, $file)
     {
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }

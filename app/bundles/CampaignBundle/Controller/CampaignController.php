@@ -116,6 +116,8 @@ class CampaignController extends AbstractStandardFormController
         private readonly CampaignRepository $campaignRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly ExportHelper $exportHelper,
+        private readonly PageHelperFactoryInterface $pageHelperFactory,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -175,7 +177,7 @@ class CampaignController extends AbstractStandardFormController
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
     }
 
-    public function exportAction(ExportHelper $exportHelper, CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
+    public function exportAction(CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
@@ -204,10 +206,10 @@ class CampaignController extends AbstractStandardFormController
         $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
         $assetList      = $assetListEvent->getList();
 
-        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
-    public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response
+    public function batchExportAction(Request $request): JsonResponse|BinaryFileResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -281,7 +283,7 @@ class CampaignController extends AbstractStandardFormController
 
         $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
 
-        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
     /**
@@ -293,7 +295,6 @@ class CampaignController extends AbstractStandardFormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
         $count = null,
@@ -311,7 +312,7 @@ class CampaignController extends AbstractStandardFormController
 
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             $permissions,

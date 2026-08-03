@@ -51,6 +51,8 @@ return RectorConfig::configure()
         Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
 
+        Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector::class,
+
         // DI
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])

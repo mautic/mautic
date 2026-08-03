@@ -34,6 +34,7 @@ final class CampaignMapStatsController extends AbstractController
 
     public function __construct(
         private readonly CampaignModel $model,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -47,9 +48,9 @@ final class CampaignMapStatsController extends AbstractController
         return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }
 
-    public function hasAccess(CorePermissions $security, Campaign $entity): bool
+    public function hasAccess(Campaign $entity): bool
     {
-        return $security->hasEntityAccess(
+        return $this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $entity->getCreatedBy()
@@ -79,14 +80,13 @@ final class CampaignMapStatsController extends AbstractController
      * @throws \Exception
      */
     public function viewAction(
-        CorePermissions $security,
         int $objectId,
         string $dateFrom = '',
         string $dateTo = '',
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (!$entity instanceof Campaign || !$this->hasAccess($security, $entity)) {
+        if (!$entity instanceof Campaign || !$this->hasAccess($entity)) {
             throw new AccessDeniedHttpException();
         }
 

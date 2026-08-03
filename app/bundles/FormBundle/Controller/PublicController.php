@@ -35,6 +35,11 @@ final class PublicController extends CommonFormController
     private SubmissionModel $submissionModel;
 
     private FormModel $formModel;
+    private DateHelper $dateTemplateHelper;
+    private PageTokenHelper $pageTokenHelper;
+    private AnalyticsHelper $analyticsHelper;
+    private AssetsHelper $assetsHelper;
+    private ThemeHelper $themeHelper;
 
     #[Required]
     public function autowirePublicController(
@@ -42,11 +47,21 @@ final class PublicController extends CommonFormController
         SubmissionModel $submissionModel,
         FieldRepository $fieldRepository,
         CompanyRepository $companyRepository,
+        DateHelper $dateTemplateHelper,
+        PageTokenHelper $pageTokenHelper,
+        AnalyticsHelper $analyticsHelper,
+        AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
         $this->fieldRepository = $fieldRepository;
         $this->companyRepository = $companyRepository;
+        $this->dateTemplateHelper = $dateTemplateHelper;
+        $this->pageTokenHelper = $pageTokenHelper;
+        $this->analyticsHelper = $analyticsHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->themeHelper = $themeHelper;
     }
 
     private array $tokens = [];
@@ -56,8 +71,6 @@ final class PublicController extends CommonFormController
      */
     public function submitAction(
         Request $request,
-        DateHelper $dateTemplateHelper,
-        PageTokenHelper $pageTokenHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
     ) {
@@ -66,7 +79,7 @@ final class PublicController extends CommonFormController
         }
 
         $context          = $this->createSubmitContext($request);
-        $submissionResult = $this->processSubmittedForm($request, $context, $dateTemplateHelper, $notificationModel, $userRepository);
+        $submissionResult = $this->processSubmittedForm($request, $context, $this->dateTemplateHelper, $notificationModel, $userRepository);
 
         if ($submissionResult['response'] instanceof Response) {
             return $submissionResult['response'];
@@ -74,7 +87,7 @@ final class PublicController extends CommonFormController
 
         if ($submissionResult['submissionEvent'] instanceof SubmissionEvent && !empty($submissionResult['postActionProperty'])) {
             // Replace post action property with tokens to support custom redirects, etc
-            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent'], $pageTokenHelper);
+            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent'], $this->pageTokenHelper);
         }
 
         return ($context['messengerMode'] || $context['isAjax'])
@@ -493,7 +506,7 @@ final class PublicController extends CommonFormController
     /**
      * Displays a message.
      */
-    public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
+    public function messageAction(Request $request): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
@@ -501,15 +514,15 @@ final class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        $analytics = $analyticsHelper->getCode();
+        $analytics = $this->analyticsHelper->getCode();
 
         if (!empty($analytics)) {
-            $assetsHelper->addCustomDeclaration($analytics);
+            $this->assetsHelper->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig');
 
-        return new Response($themeHelper->renderThemeTemplate($logicalName, [
+        return new Response($this->themeHelper->renderThemeTemplate($logicalName, [
             'message'  => $msg,
             'type'     => $msgType,
             'template' => $this->coreParametersHelper->get('theme'),
@@ -522,7 +535,7 @@ final class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
+    public function previewAction(Request $request, int $id = 0): Response
     {
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
         $css               = InputHelper::string((string) $request->get('css'));
@@ -551,7 +564,7 @@ final class PublicController extends CommonFormController
         // Use form specific template or system-wide default theme
         $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
         if (!empty($template)) {
-            $theme = $themeHelper->getTheme($template);
+            $theme = $this->themeHelper->getTheme($template);
             if ($theme->getTheme() != $template) {
                 $config = $theme->getConfig();
                 if (in_array('form', $config['features'])) {
@@ -565,21 +578,21 @@ final class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName  = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
-            $analytics    = $analyticsHelper->getCode();
+            $logicalName  = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+            $analytics    = $this->analyticsHelper->getCode();
 
             foreach ($customStylesheets as $css) {
-                $assetsHelper->addStylesheet($css);
+                $this->assetsHelper->addStylesheet($css);
             }
 
             if (!empty($analytics)) {
-                $assetsHelper->addCustomDeclaration($analytics);
+                $this->assetsHelper->addCustomDeclaration($analytics);
             }
             if ($form->getNoIndex()) {
-                $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+                $this->assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return new Response($themeHelper->renderThemeTemplate($logicalName, $viewParams));
+            return new Response($this->themeHelper->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);

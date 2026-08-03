@@ -14,12 +14,15 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class AjaxController extends CommonAjaxController
 {
     private PointModel $pointModel;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowirePointAjaxController(
         PointModel $pointModel,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->pointModel = $pointModel;
+        $this->formFactory = $formFactory;
     }
 
     public function reorderTriggerEventsAction(Request $request): JsonResponse
@@ -40,7 +43,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
+    public function getActionFormAction(Request $request): JsonResponse
     {
         $type      = InputHelper::clean($request->request->get('actionType'));
         $dataArray = [
@@ -60,7 +63,7 @@ final class AjaxController extends CommonAjaxController
 
                 $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : null;
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
-                $form            = $formFactory->create(PointActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
+                $form            = $this->formFactory->create(PointActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html            = $this->renderView('@MauticPoint/Point/actionform.html.twig', [
                     'form'       => $form->createView(),
                     'formThemes' => $themes,

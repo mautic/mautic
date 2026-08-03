@@ -20,22 +20,33 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ProfileController extends FormController
 {
     private UserModel $userModel;
+    private LanguageHelper $languageHelper;
+    private UserPasswordHasherInterface $hasher;
+    private TokenStorageInterface $tokenStorage;
+    private SAMLHelper $samlHelper;
 
     #[Required]
     public function autowireProfileController(
         UserModel $userModel,
+        LanguageHelper $languageHelper,
+        UserPasswordHasherInterface $hasher,
+        TokenStorageInterface $tokenStorage,
+        SAMLHelper $samlHelper,
     ): void {
         $this->userModel = $userModel;
+        $this->languageHelper = $languageHelper;
+        $this->hasher = $hasher;
+        $this->tokenStorage = $tokenStorage;
+        $this->samlHelper = $samlHelper;
     }
 
     /**
      * Generate's account profile.
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher,
-        TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
+    public function indexAction(Request $request): Response|RedirectResponse
     {
         // get current user
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
 
         // set some permissions
@@ -160,7 +171,7 @@ final class ProfileController extends FormController
             // check to see if the password needs to be rehashed
             $formUser              = $request->request->all()['user'] ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $overrides['password'] = $this->userModel->checkNewPassword($me, $hasher, $submittedPassword);
+            $overrides['password'] = $this->userModel->checkNewPassword($me, $this->hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
@@ -172,10 +183,10 @@ final class ProfileController extends FormController
                     $this->userModel->saveEntity($me);
 
                     // check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $languageHelper->getSupportedLanguages();
+                    $installedLanguages = $this->languageHelper->getSupportedLanguages();
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
-                        $fetchLanguage = $languageHelper->extractLanguagePackage($me->getLocale());
+                        $fetchLanguage = $this->languageHelper->extractLanguagePackage($me->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
                         if ($fetchLanguage['error']) {
@@ -233,7 +244,7 @@ final class ProfileController extends FormController
         }
         $request->getSession()->set('formProcessed', 0);
 
-        $isSamlUser    = $samlHelper->isSamlSession();
+        $isSamlUser    = $this->samlHelper->isSamlSession();
         if ($isSamlUser) {
             $form->remove('plainPassword');
         }

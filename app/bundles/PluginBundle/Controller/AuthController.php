@@ -13,17 +13,34 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController extends FormController
 {
+    public function __construct(
+        protected \Symfony\Component\Form\FormFactoryInterface $formFactory,
+        protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper,
+        \Doctrine\Persistence\ManagerRegistry $managerRegistry,
+        \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        \Mautic\CoreBundle\Translation\Translator $translator,
+        \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly IntegrationHelper $integrationHelper,
+    ) {
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     /**
      * @param string $integration
      *
      * @return JsonResponse
      */
-    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
+    public function authCallbackAction(Request $request, $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();
 
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
         // check to see if the service exists
         if (!$integrationObject) {
@@ -95,9 +112,9 @@ final class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
+    public function authUserAction($integration): RedirectResponse
     {
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();

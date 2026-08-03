@@ -18,10 +18,27 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldPaginationController extends CommonController
 {
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function __construct(
+        protected \Doctrine\Persistence\ManagerRegistry $doctrine,
+        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        private \Mautic\CoreBundle\Service\FlashBag $flashBag,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
+        protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly ConfigIntegrationsHelper $integrationsHelper,
+    ) {
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     public function paginateAction(
         Request $request,
-        FormFactoryInterface $formFactory,
-        ConfigIntegrationsHelper $integrationsHelper,
         string $integration,
         string $object,
         int $page,
@@ -34,7 +51,7 @@ final class FieldPaginationController extends CommonController
         // Find the integration
         try {
             /** @var ConfigFormSyncInterface $integrationObject */
-            $integrationObject        = $integrationsHelper->getIntegration($integration);
+            $integrationObject        = $this->integrationsHelper->getIntegration($integration);
             $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException) {
             return $this->notFound();
@@ -52,7 +69,7 @@ final class FieldPaginationController extends CommonController
         }
 
         // Create the form
-        $form = $formFactory->create(
+        $form = $this->formFactory->create(
             IntegrationSyncSettingsObjectFieldMappingType::class,
             $currentFields,
             [
