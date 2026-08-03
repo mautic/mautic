@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Role>
  */
-class RoleModel extends FormModel implements GlobalSearchInterface
+final class RoleModel extends FormModel implements GlobalSearchInterface
 {
     private UserRepository $userRepository;
 

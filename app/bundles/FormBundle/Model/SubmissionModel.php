@@ -71,19 +71,19 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Submission>
  */
-class SubmissionModel extends CommonFormModel
+final class SubmissionModel extends CommonFormModel
 {
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected Environment $twig,
-        protected FormModel $formModel,
-        protected PageModel $pageModel,
-        protected LeadModel $leadModel,
-        protected CampaignModel $campaignModel,
-        protected MembershipManager $membershipManager,
-        protected LeadFieldModel $leadFieldModel,
-        protected CompanyModel $companyModel,
-        protected FormFieldHelper $fieldHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly Environment $twig,
+        private readonly FormModel $formModel,
+        private readonly PageModel $pageModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly MembershipManager $membershipManager,
+        private readonly LeadFieldModel $leadFieldModel,
+        private readonly CompanyModel $companyModel,
+        private readonly FormFieldHelper $fieldHelper,
         private readonly UploadFieldValidator $uploadFieldValidator,
         private readonly FormUploader $formUploader,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,

@@ -5,7 +5,9 @@ namespace MauticPlugin\MauticFullContactBundle\Controller;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
@@ -18,9 +20,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
 {
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+    private CompanyRepository $companyRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private CompanyModel $companyModel;
 
@@ -36,8 +38,8 @@ final class PublicController extends FormController
         CompanyModel $companyModel,
         NotificationModel $notificationModel,
         UserModel $userModel,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        LeadRepository $leadRepository,
+        CompanyRepository $companyRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;

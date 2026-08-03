@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
@@ -22,7 +23,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class TagController extends FormController
 {
-    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
+    private TagRepository $tagRepository;
 
     private TagModel $leadTagModel;
 
@@ -32,7 +33,7 @@ final class TagController extends FormController
     public function autowireTagController(
         TagModel $leadTagModel,
         TagManagerModel $tagManagerModel,
-        \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
+        TagRepository $tagRepository,
     ): void {
         $this->leadTagModel = $leadTagModel;
         $this->tagManagerModel = $tagManagerModel;

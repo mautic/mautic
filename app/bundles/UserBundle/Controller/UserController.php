@@ -6,6 +6,7 @@ namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Form\Type\UserInviteType;
@@ -29,9 +31,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class UserController extends FormController
 {
-    private \Mautic\UserBundle\Entity\RoleRepository $roleRepository;
+    private RoleRepository $roleRepository;
 
-    private \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository;
+    private AuditLogRepository $auditLogRepository;
 
     private UserModel $userModel;
 
@@ -42,8 +44,8 @@ final class UserController extends FormController
         UserModel $userModel,
         AuditLogModel $auditLogModel,
         RoleModel $roleModel,
-        \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository,
-        \Mautic\UserBundle\Entity\RoleRepository $roleRepository,
+        AuditLogRepository $auditLogRepository,
+        RoleRepository $roleRepository,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;

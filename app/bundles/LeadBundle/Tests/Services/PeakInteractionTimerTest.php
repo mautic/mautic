@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class TestablePeakInteractionTimer extends PeakInteractionTimer
+final class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
     private \DateTime $testTime;
 
