@@ -59,7 +59,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
         $router        = self::getContainer()->get(RouterInterface::class);
         $translator    = self::getContainer()->get(TranslatorInterface::class);
-        $displayUrl    = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $displayUrl    = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $legacyUrl     = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
         $configUrl     = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
         $landingPages  = $crawler->filter('#focus-implementation-landing-pages');
@@ -90,11 +90,21 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $configLink);
         $this->assertSame($configUrl, $configLink->attr('href'));
         $this->assertSame($translator->trans('mautic.config.tab.trackingconfig'), trim($configLink->text()));
-        $this->assertStringContainsString($displayUrl, $displaySnippet);
-        $this->assertStringContainsString('window.MauticFocusTrackingQueue['.$focus->getId().'] = true;', $trackingSnippet);
-        $this->assertStringContainsString('window.MauticFocusItems['.$focus->getId().'].loadTracking();', $trackingSnippet);
+        $this->assertStringContainsString('window.MauticFocus.enableTracking = window.MauticFocus.enableTracking || function (id)', $displaySnippet);
+        $this->assertStringContainsString('var item = window.MauticFocusItems && window.MauticFocusItems[id];', $displaySnippet);
+        $this->assertStringContainsString('item.loadTracking();', $displaySnippet);
+        $this->assertStringContainsString('window.MauticFocusTrackingQueue[id] = true;', $displaySnippet);
+        $this->assertStringContainsString("document.getElementById('mautic-focus-display-script-".$focus->getId()."')", $displaySnippet);
+        $this->assertStringContainsString("document.createElement('script')", $displaySnippet);
+        $this->assertStringContainsString("display.id = 'mautic-focus-display-script-".$focus->getId()."';", $displaySnippet);
+        $this->assertStringContainsString('display.async = true;', $displaySnippet);
+        $this->assertStringContainsString("display.src = '".$displayUrl."';", $displaySnippet);
+        $this->assertSame(1, substr_count($displaySnippet, '<script>'));
+        $this->assertSame('window.MauticFocus.enableTracking('.$focus->getId().');', $trackingSnippet);
         $this->assertStringContainsString($displayUrl, $fullSnippet);
-        $this->assertMatchesRegularExpression('/MauticFocusTrackingQueue\['.$focus->getId().'\].*'.preg_quote($displayUrl, '/').'/s', $fullSnippet);
+        $this->assertMatchesRegularExpression('/MauticFocus\.enableTracking\('.$focus->getId().'\).*'.preg_quote($displayUrl, '/').'/s', $fullSnippet);
+        $this->assertSame(1, substr_count($fullSnippet, '<script>'));
+        $this->assertStringContainsString('window.MauticFocus.enableTracking('.$focus->getId().')', (string) $crawler->text());
         $this->assertStringNotContainsString($legacyUrl, $responseHtml);
         $this->assertCount(0, $crawler->filter('#focus-legacy-snippet'));
         $this->assertStringContainsString('Mautic does not record or verify consent.', (string) $crawler->text());
