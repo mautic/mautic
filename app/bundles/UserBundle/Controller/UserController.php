@@ -6,6 +6,7 @@ namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Form\Type\UserInviteType;
@@ -25,15 +27,30 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class UserController extends FormController
+final class UserController extends FormController
 {
+    private RoleRepository $roleRepository;
+
+    private AuditLogRepository $auditLogRepository;
+
     private UserModel $userModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireUserController(UserModel $userModel): void
-    {
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireUserController(
+        UserModel $userModel,
+        AuditLogModel $auditLogModel,
+        RoleModel $roleModel,
+        AuditLogRepository $auditLogRepository,
+        RoleRepository $roleRepository,
+    ): void {
         $this->userModel = $userModel;
+        $this->auditLogModel = $auditLogModel;
+        $this->auditLogRepository = $auditLogRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     /**
@@ -60,7 +77,7 @@ class UserController extends FormController
         // do some default filtering
         $filter = ['string' => $search, 'force' => ''];
         $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $users  = $this->getModel('user.user')->getEntities(
+        $users  = $this->userModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -316,18 +333,12 @@ class UserController extends FormController
                 ],
             ]);
         }
+
         $oldEmail = $user->getEmail();
 
-        /** @var AuditLogModel $auditLogModel */
-        $auditLogModel      = $this->getModel('core.auditlog');
-        $auditLogRepository = $auditLogModel->getRepository();
-        $userActivity       = $auditLogRepository->getLogsForUser($user);
+        $userActivity       = $this->auditLogRepository->getLogsForUser($user);
         $users              = $this->userModel->getEntities();
-
-        $roleModel = $this->getModel('user.role');
-        \assert($roleModel instanceof RoleModel);
-        $roleRepository     = $roleModel->getRepository();
-        $roles              = $roleRepository->getEntities();
+        $roles              = $this->roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
@@ -522,8 +533,7 @@ class UserController extends FormController
      */
     public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        $user  = $this->userModel->getEntity($objectId);
 
         // user not found
         if (null === $user) {
@@ -589,9 +599,7 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
                     ];
-                    $auditLogModel = $this->getModel('core.auditlog');
-                    \assert($auditLogModel instanceof AuditLogModel);
-                    $auditLogModel->writeToLog($log);
+                    $this->auditLogModel->writeToLog($log);
 
                     $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }

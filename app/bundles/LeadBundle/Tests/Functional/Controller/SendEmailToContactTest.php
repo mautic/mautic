@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Message;
 
 final class SendEmailToContactTest extends MauticMysqlTestCase
 {
@@ -85,7 +86,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
     public function testSMimeWithEncryptedPrivateKey(): void
     {
         /** @var EncryptionHelper $encryptionHelper */
-        $encryptionHelper = self::getContainer()->get('mautic.helper.encryption');
+        $encryptionHelper = self::getContainer()->get(EncryptionHelper::class);
         $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
 
         $certPath       = $this->sMimeHelper->getSMimeCertificatePath();
@@ -212,8 +213,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $messages = self::getMailerMessages();
         $this->assertCount(1, $messages, 'Expected exactly one email message to be sent');
         $rawMessage = $messages[0];
-        $this->assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
-        $this->assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
+        $this->assertInstanceOf(Message::class, $rawMessage);
+        $this->assertInstanceOf(Message::class, $rawMessage);
 
         // For signed messages, use toString() instead of getBody()
         $email   = $rawMessage->toString();

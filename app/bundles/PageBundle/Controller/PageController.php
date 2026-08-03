@@ -25,10 +25,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PageController extends FormController
+final class PageController extends FormController
 {
     use FormErrorMessagesTrait;
+
+    private PageModel $pageModel;
+
+    #[Required]
+    public function autowirePageController(
+        PageModel $pageModel,
+    ): void {
+        $this->pageModel = $pageModel;
+    }
 
     public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
     {
@@ -96,12 +106,10 @@ class PageController extends FormController
             ];
         }
 
-        $translator = $this->translator;
-
         // do not list variants in the main list
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
-        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
+        $langSearchCommand = $this->translator->trans('mautic.core.searchcommand.lang');
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
@@ -783,14 +791,12 @@ class PageController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var PageModel $model */
-            $model     = $this->getModel('page');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->pageModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -802,7 +808,7 @@ class PageController extends FormController
                     'page:pages:deleteown', 'page:pages:deleteother', $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->pageModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'page', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -811,7 +817,7 @@ class PageController extends FormController
 
             // Delete everything we are able to
             if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+                $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',

@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
@@ -17,33 +12,32 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Entity\PointInsightRepository;
 use Mautic\PointBundle\Form\Type\PointInsightType;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonFormModel<PointInsight>
  */
-class InsightModel extends CommonFormModel
+final class InsightModel extends CommonFormModel
 {
-    public function __construct(
-        protected LeadModel $leadModel,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private LeadModel $leadModel;
+
+    private PointInsightRepository $pointInsightRepository;
+
+    #[Required]
+    public function autowireInsightModel(
+        LeadModel $leadModel,
+        PointInsightRepository $pointInsightRepository,
+    ): void {
+        $this->leadModel              = $leadModel;
+        $this->pointInsightRepository = $pointInsightRepository;
     }
 
     public function getRepository(): PointInsightRepository
     {
-        return $this->em->getRepository(PointInsight::class);
+        return $this->pointInsightRepository;
     }
 
     public function getPermissionBase(): string
@@ -54,12 +48,12 @@ class InsightModel extends CommonFormModel
     /**
      * @param array<string, mixed> $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof PointInsight) {
-            throw new \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException(['PointInsight']);
+            throw new MethodNotAllowedHttpException(['PointInsight']);
         }
 
         if (!empty($action)) {
@@ -80,7 +74,7 @@ class InsightModel extends CommonFormModel
 
     public function executePointInsights(Lead $contact, Group $changedGroup): void
     {
-        $insights = $this->getRepository()->findBy([
+        $insights = $this->pointInsightRepository->findBy([
             'isPublished'   => true,
             'insightType'   => PointInsight::INSIGHT_TYPE_COMPARE_POINT_GROUPS,
             'insightAction' => PointInsight::INSIGHT_ACTION_SET_CUSTOM_FIELD,

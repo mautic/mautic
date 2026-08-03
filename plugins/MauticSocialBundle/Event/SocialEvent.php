@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-class SocialEvent extends CommonEvent
+final class SocialEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

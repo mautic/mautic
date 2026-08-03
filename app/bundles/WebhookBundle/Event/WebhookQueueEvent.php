@@ -6,14 +6,14 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 
-class WebhookQueueEvent extends CommonEvent
+final class WebhookQueueEvent extends CommonEvent
 {
     /**
      * @param bool $isNew
      */
     public function __construct(
         WebhookQueue $webhookQueue,
-        protected Webhook $webhook,
+        private Webhook $webhook,
         $isNew = false,
     ) {
         $this->entity  = $webhookQueue;

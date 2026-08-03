@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CompanyMergeType extends AbstractType
+final class CompanyMergeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -27,7 +27,7 @@ class CompanyMergeType extends AbstractType
                 'model_lookup_method' => $options['model_lookup_method'],
                 'constraints'         => [
                     new NotBlank(
-                        ['message' => 'mautic.company.choosecompany.notblank']
+                        message: 'mautic.company.choosecompany.notblank'
                     ),
                 ],
             ]

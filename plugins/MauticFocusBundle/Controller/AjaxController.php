@@ -8,14 +8,16 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private FocusModel $focusModel;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireAjaxController(FocusModel $focusModel): void
-    {
+    #[Required]
+    public function autowireMauticFocusAjaxController(
+        FocusModel $focusModel,
+    ): void {
         $this->focusModel = $focusModel;
     }
 

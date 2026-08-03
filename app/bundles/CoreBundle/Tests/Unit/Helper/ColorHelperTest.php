@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ColorHelper::class)]
+#[CoversClass(ColorHelper::class)]
 final class ColorHelperTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly')]
+    #[TestDox('The helper is instantiated correctly')]
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly(): void
     {
         $helper = new ColorHelper();
@@ -18,7 +20,7 @@ final class ColorHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(0, $helper->getBlue());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('A color hex hash can be set and the correct RGB representations filled')]
+    #[TestDox('A color hex hash can be set and the correct RGB representations filled')]
     public function testThatColorHexAreSetCorrectly(): void
     {
         $colors = [
@@ -38,7 +40,7 @@ final class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('A color hex hash can be set and received in the correct and valid hex format')]
+    #[TestDox('A color hex hash can be set and received in the correct and valid hex format')]
     public function testThatColorHexAreConvertedBackToHexCorrectly(): void
     {
         $colors = [
@@ -57,7 +59,7 @@ final class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('A color hex hash can be set and received in the correct and valid rgb format')]
+    #[TestDox('A color hex hash can be set and received in the correct and valid rgb format')]
     public function testThatColorHexAreConvertedToRgbCorrectly(): void
     {
         $colors = [
@@ -103,7 +105,7 @@ final class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('A color hex hash can be set and received in the correct and valid rgba format')]
+    #[TestDox('A color hex hash can be set and received in the correct and valid rgba format')]
     public function testThatColorHexAreConvertedToRgbaCorrectly(): void
     {
         $colors = [
@@ -122,7 +124,7 @@ final class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The random color is within borders and not 0, 0, 0')]
+    #[TestDox('The random color is within borders and not 0, 0, 0')]
     public function testThatRandomColorIsWithinBorders(): void
     {
         $helper = new ColorHelper();

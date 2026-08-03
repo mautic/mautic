@@ -145,23 +145,21 @@ class Focus extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'type',
             new NotBlank(
-                ['message' => 'mautic.focus.error.select_type']
+                message: 'mautic.focus.error.select_type'
             )
         );
 
         $metadata->addPropertyConstraint(
             'style',
             new NotBlank(
-                ['message' => 'mautic.focus.error.select_style']
+                message: 'mautic.focus.error.select_style'
             )
         );
     }

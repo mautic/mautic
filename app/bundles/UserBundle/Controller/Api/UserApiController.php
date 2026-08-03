@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * @extends CommonApiController<User>
  */
-class UserApiController extends CommonApiController
+final class UserApiController extends CommonApiController
 {
     /**
      * @var UserModel|null
@@ -151,7 +151,7 @@ class UserApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         switch ($action) {
             case 'new':

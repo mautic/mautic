@@ -9,6 +9,7 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -285,7 +286,7 @@ final class ReportGeneratorEventTest extends TestCase
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('applyFilterProvider')]
+    #[DataProvider('applyFilterProvider')]
     public function testApplyFilters(bool $dateOnly, string $condition, string $dateFormat): void
     {
         $tablePrefix = 't';
@@ -338,7 +339,7 @@ final class ReportGeneratorEventTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('applyFilterWithoutNullValuesProvider')]
+    #[DataProvider('applyFilterWithoutNullValuesProvider')]
     public function testApplyFiltersWithoutNullValues(bool $dateOnly, string $condition, string $dateFormat): void
     {
         $tablePrefix = 't';

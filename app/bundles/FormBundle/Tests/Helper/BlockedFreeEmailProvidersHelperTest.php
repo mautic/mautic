@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(BlockedFreeEmailProvidersHelper::class)]
+#[CoversClass(BlockedFreeEmailProvidersHelper::class)]
 final class BlockedFreeEmailProvidersHelperTest extends TestCase
 {
     public function testLoadReturnsArrayFromValidJsonFile(): void
@@ -16,7 +17,6 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
 
         $this->assertIsArray($providers);
         $this->assertNotEmpty($providers);
-        $this->assertContainsOnly('string', $providers);
     }
 
     public function testLoadReturnsArrayOfStrings(): void

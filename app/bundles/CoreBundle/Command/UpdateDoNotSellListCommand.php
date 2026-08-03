@@ -11,27 +11,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
     name: 'mautic:donotsell:download',
-    description: 'Fetch remote do not sell list from MaxMind'
+    description: 'Fetch remote do not sell list from MaxMind',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
+
+<info>php %command.full_name%</info>
+TXT
 )]
-class UpdateDoNotSellListCommand extends Command
+final class UpdateDoNotSellListCommand extends Command
 {
     public function __construct(
         private readonly MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
         private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
-
-<info>php %command.full_name%</info>
-EOT
-            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PluginFactory implements AuthenticatorFactoryInterface
+final class PluginFactory implements AuthenticatorFactoryInterface
 {
     public const PRIORITY = -30;
 

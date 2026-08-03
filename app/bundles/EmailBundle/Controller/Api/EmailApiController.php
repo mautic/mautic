@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Email>
  */
-class EmailApiController extends CommonApiController
+final class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -44,11 +44,20 @@ class EmailApiController extends CommonApiController
      */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $emailModel = $modelFactory->getModel('email');
-        \assert($emailModel instanceof EmailModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        EmailModel $emailModel,
+    ) {
         $this->model            = $emailModel;
         $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';

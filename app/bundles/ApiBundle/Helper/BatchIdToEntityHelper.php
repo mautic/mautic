@@ -4,7 +4,7 @@ namespace Mautic\ApiBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class BatchIdToEntityHelper
+final class BatchIdToEntityHelper
 {
     private array $ids = [];
 

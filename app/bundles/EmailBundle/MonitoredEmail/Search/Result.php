@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Search;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 
-class Result
+final class Result
 {
     private ?Stat $stat = null;
 

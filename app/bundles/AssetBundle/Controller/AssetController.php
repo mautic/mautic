@@ -13,9 +13,19 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AssetController extends FormController
+final class AssetController extends FormController
 {
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireAssetController(
+        AuditLogModel $auditLogModel,
+    ): void {
+        $this->auditLogModel = $auditLogModel;
+    }
+
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
@@ -165,11 +175,7 @@ class AssetController extends FormController
         if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs          = $this->auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,

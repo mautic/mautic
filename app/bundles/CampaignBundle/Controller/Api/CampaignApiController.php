@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -36,7 +37,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @extends CommonApiController<Campaign>
  */
-class CampaignApiController extends CommonApiController
+final class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -61,10 +62,9 @@ class CampaignApiController extends CommonApiController
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
+        CampaignModel $campaignModel,
+        private LeadModel $leadModel,
     ) {
-        $campaignModel = $modelFactory->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';
@@ -124,8 +124,7 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $lead = $this->leadModel->getEntity($leadId);
 
             if (null == $lead) {
                 return $this->notFound();
@@ -272,7 +271,6 @@ class CampaignApiController extends CommonApiController
             $errors = [];
             foreach ($eventViolations as $violationList) {
                 foreach ($violationList as $violation) {
-                    \assert($violation instanceof ConstraintViolationInterface);
                     $errors[] = [
                         'code'    => $violation->getCode(),
                         'message' => $violation->getMessage(),

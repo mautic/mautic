@@ -153,7 +153,7 @@ class LeadDeviceRepository extends CommonRepository
         return $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
             ->where('lead_id = :leadId')
-            ->setParameter('leadId', (int) $lead->getId())
+            ->setParameter('leadId', $lead->getId())
             ->orderBy('date_added', 'desc')
             ->executeQuery()
             ->fetchAllAssociative();

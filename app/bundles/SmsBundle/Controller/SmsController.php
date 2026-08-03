@@ -18,16 +18,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SmsController extends FormController
+final class SmsController extends FormController
 {
     use EntityContactsTrait;
+
+    private AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
 
     #[Required]
-    public function autowireSmsController(SmsModel $smsModel): void
-    {
+    public function autowireSmsController(
+        SmsModel $smsModel,
+        AuditLogModel $auditLogModel,
+    ): void {
         $this->smsModel = $smsModel;
+        $this->auditLogModel = $auditLogModel;
     }
 
     /**
@@ -181,11 +186,7 @@ class SmsController extends FormController
         ) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs = $auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        $logs = $this->auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
@@ -255,10 +256,8 @@ class SmsController extends FormController
      * Generates new form and processes post data.
      *
      * @param Sms $entity
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Sms) {
             /** @var Sms $entity */
@@ -389,10 +388,8 @@ class SmsController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): JsonResponse|RedirectResponse|Response
     {
         $method  = $request->getMethod();
         $entity  = $this->smsModel->getEntity($objectId);

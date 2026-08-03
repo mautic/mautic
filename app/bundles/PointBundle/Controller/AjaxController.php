@@ -5,12 +5,24 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PointBundle\Form\Type\PointActionType;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    public function reorderTriggerEventsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    private PointModel $pointModel;
+
+    #[Required]
+    public function autowirePointAjaxController(
+        PointModel $pointModel,
+    ): void {
+        $this->pointModel = $pointModel;
+    }
+
+    public function reorderTriggerEventsAction(Request $request): JsonResponse
     {
         $dataArray   = ['success' => 0];
         $session     = $request->getSession();
@@ -28,7 +40,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
     {
         $type      = InputHelper::clean($request->request->get('actionType'));
         $dataArray = [
@@ -37,10 +49,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         if (!empty($type)) {
-            // get the HTML for the form
-            /** @var \Mautic\PointBundle\Model\PointModel $model */
-            $model   = $this->getModel('point');
-            $actions = $model->getPointActions();
+            $actions = $this->pointModel->getPointActions();
 
             if (isset($actions['actions'][$type])) {
                 $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];

@@ -8,21 +8,20 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 
-class TransportCallback
+final readonly class TransportCallback
 {
     public function __construct(
-        private readonly DoNotContact $dncModel,
-        private readonly ContactFinder $finder,
-        private readonly EmailStatModel $emailStatModel,
+        private DoNotContact $dncModel,
+        private ContactFinder $finder,
+        private EmailStatModel $emailStatModel,
     ) {
     }
 
     /**
      * @param string $hashId
-     * @param string $comments
      * @param int    $dncReason
      */
-    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED): void
+    public function addFailureByHashId($hashId, ?string $comments, $dncReason = DNC::BOUNCED): void
     {
         $result = $this->finder->findByHash($hashId);
 
@@ -65,7 +64,7 @@ class TransportCallback
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    private function updateStatDetails(Stat $stat, $comments, $dncReason): void
+    private function updateStatDetails(Stat $stat, ?string $comments, int $dncReason): void
     {
         if (DNC::BOUNCED === $dncReason) {
             $stat->setIsFailed(true);

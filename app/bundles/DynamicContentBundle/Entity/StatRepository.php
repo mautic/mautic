@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Stat>
  */
-class StatRepository extends CommonRepository
+final class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -142,9 +142,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * Delete a stat.
-     */
     public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);

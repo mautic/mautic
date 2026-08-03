@@ -16,12 +16,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Webhook>
  */
-class WebhookApiController extends CommonApiController
+final class WebhookApiController extends CommonApiController
 {
     /**
      * @var WebhookModel|null
@@ -66,7 +67,7 @@ class WebhookApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         $eventsToKeep = [];
 
@@ -86,7 +87,7 @@ class WebhookApiController extends CommonApiController
         }
     }
 
-    public function getTriggersAction(): \Symfony\Component\HttpFoundation\Response
+    public function getTriggersAction(): Response
     {
         return $this->handleView(
             $this->view(
