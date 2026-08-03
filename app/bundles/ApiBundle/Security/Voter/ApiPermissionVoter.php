@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ApiPermissionVoter extends Voter
+final class ApiPermissionVoter extends Voter
 {
     public function __construct(
         private readonly CorePermissions $security,

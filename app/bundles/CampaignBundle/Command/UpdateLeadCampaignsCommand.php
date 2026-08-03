@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Rebuild campaigns based on contact segments.',
     aliases: ['mautic:campaigns:update']
 )]
-class UpdateLeadCampaignsCommand extends ModeratedCommand
+final class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private int $runLimit = 0;
 

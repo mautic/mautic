@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
 
-class SegmentDependencyTreeFactory
+final class SegmentDependencyTreeFactory
 {
     /**
      * @var int[]

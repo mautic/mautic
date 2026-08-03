@@ -2,11 +2,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -71,8 +73,8 @@ final class ReportSubscriber implements EventSubscriberInterface
         private readonly FieldsBuilder $fieldsBuilder,
         private readonly Translator $translator,
         private readonly DncReportService $dncReportService,
-        private readonly \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
-        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
+        private readonly CompanyRepository $companyRepository,
+        private readonly CampaignRepository $campaignRepository,
     ) {
     }
 
