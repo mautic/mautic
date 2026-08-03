@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Migration for removing online status.
  */
-class Version20200513162918 extends AbstractMauticMigration
+final class Version20200513162918 extends AbstractMauticMigration
 {
     /**
      * @throws SkipMigration

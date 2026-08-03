@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DateExtension extends AbstractExtension
+final class DateExtension extends AbstractExtension
 {
     public function __construct(
-        protected DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 

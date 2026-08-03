@@ -24,10 +24,26 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private array $cachedTypeOperatorsChoices = [];
 
+    /**
+     * A context in which the operators are being used.
+     */
+    private string $context = '';
+
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
+    }
+
+    public function setContext(string $context): void
+    {
+        $this->context                    = $context;
+        $this->cachedTypeOperatorsChoices = [];
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
     }
 
     public function getOperatorsIncluding(array $operators): array
@@ -61,7 +77,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     public function getAllTypeOperators(): array
     {
         if (empty($this->cachedTypeOperators)) {
-            $event = new TypeOperatorsEvent();
+            $event = new TypeOperatorsEvent($this->context);
 
             $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE);
 

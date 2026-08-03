@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Plugin>
  */
-class PluginRepository extends CommonRepository
+final class PluginRepository extends CommonRepository
 {
     /**
      * Find an addon record by bundle name.

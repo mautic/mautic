@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class AnalyticsExtension extends AbstractExtension
+final class AnalyticsExtension extends AbstractExtension
 {
     public function __construct(
-        protected AnalyticsHelper $helper,
+        private readonly AnalyticsHelper $helper,
     ) {
     }
 
@@ -24,6 +24,6 @@ class AnalyticsExtension extends AbstractExtension
 
     public function getCode(): string
     {
-        return (string) $this->helper->getCode();
+        return $this->helper->getCode();
     }
 }

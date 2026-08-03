@@ -12,13 +12,13 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-    private array $leads = [];
+    private array $leads;
 
     private array $knownLeadIds = [];
 
     private array $unknownLeadIds = [];
 
-    private array $contacts = [];
+    private array $contacts;
 
     private array $knownContactIds = [];
 

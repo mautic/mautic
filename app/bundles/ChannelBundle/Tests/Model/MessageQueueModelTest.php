@@ -55,9 +55,6 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
 
         $this->messageQueue = new MessageQueueModel(
-            $this->leadModel,
-            $this->createStub(CompanyModel::class),
-            $this->createStub(CoreParametersHelper::class),
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -65,8 +62,13 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $this->messageQueue->autowireMessageQueueModel(
+            $this->leadModel,
+            $this->createStub(CompanyModel::class),
             $this->messageQueueRepository,
-            $this->createStub(FrequencyRuleRepository::class) // $frequencyRuleRepository
+            $this->createStub(FrequencyRuleRepository::class)
         );
 
         $message      = new MessageQueue();

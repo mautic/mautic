@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail;
 
-class Attachment
+final class Attachment
 {
     public $id;
 

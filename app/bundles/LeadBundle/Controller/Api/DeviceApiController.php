@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadDevice>
  */
-class DeviceApiController extends CommonApiController
+final class DeviceApiController extends CommonApiController
 {
     use LeadAccessTrait;
 

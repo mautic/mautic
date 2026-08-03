@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
@@ -26,7 +27,7 @@ final class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
+    private CompanyRepository $companyRepository;
 
     private FieldModel $fieldModel;
 
@@ -39,7 +40,7 @@ final class CompanyController extends FormController
         LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
-        \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository,
+        CompanyRepository $companyRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;

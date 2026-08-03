@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * Helper class custom field operations.
  */
-class CustomFieldHelper
+final class CustomFieldHelper
 {
     public const TYPE_BOOLEAN = 'boolean';
 

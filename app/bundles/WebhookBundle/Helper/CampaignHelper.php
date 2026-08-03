@@ -13,7 +13,7 @@ use Mautic\WebhookBundle\Event\WebhookRequestEvent;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignHelper
+final class CampaignHelper
 {
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
@@ -21,8 +21,8 @@ class CampaignHelper
     private array $contactsValues = [];
 
     public function __construct(
-        protected Client $client,
-        protected CompanyModel $companyModel,
+        private readonly Client $client,
+        private readonly CompanyModel $companyModel,
         private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
