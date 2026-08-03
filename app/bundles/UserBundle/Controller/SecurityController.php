@@ -20,40 +20,31 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Service\Attribute\Required;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SecurityController extends CommonController implements EventSubscriberInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
-    private RequestEvent $event;
     private AuthenticationUtils $authenticationUtils;
     private IntegrationHelper $integrationHelper;
-    private TranslatorInterface $translator;
+
     private SAMLHelper $samlHelper;
-    private SessionInterface $session;
 
     #[Required]
     public function autowireSecurityController(
         AuthorizationCheckerInterface $authorizationChecker,
-        RequestEvent $event,
         AuthenticationUtils $authenticationUtils,
         IntegrationHelper $integrationHelper,
-        TranslatorInterface $translator,
         SAMLHelper $samlHelper,
-        SessionInterface $session,
     ): void {
         $this->authorizationChecker = $authorizationChecker;
-        $this->event = $event;
         $this->authenticationUtils = $authenticationUtils;
         $this->integrationHelper = $integrationHelper;
-        $this->translator = $translator;
         $this->samlHelper = $samlHelper;
-        $this->session = $session;
     }
 
-    public function onRequest(): void
+    public function onRequest(RequestEvent $requestEvent): void
     {
-        $controller = $this->event->getRequest()->attributes->get('_controller');
+        $controller = $requestEvent->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
         if (!str_contains($controller, self::class)) {
             return;
@@ -63,7 +54,7 @@ final class SecurityController extends CommonController implements EventSubscrib
             || $this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
-            $this->event->setResponse(new RedirectResponse($redirectUrl));
+            $requestEvent->setResponse(new RedirectResponse($redirectUrl));
         }
     }
 
@@ -130,13 +121,13 @@ final class SecurityController extends CommonController implements EventSubscrib
         return new RedirectResponse($this->generateUrl('login'));
     }
 
-    public function samlLoginRetryAction(Request $request): Response
+    public function samlLoginRetryAction(SessionInterface $session): Response
     {
         if (!$this->samlHelper->isSamlEnabled()) {
             return new RedirectResponse($this->generateUrl('login'));
         }
 
-        $this->session->invalidate();
+        $session->invalidate();
 
         $this->addFlashMessage('mautic.user.security.saml.clearsession', [], FlashBag::LEVEL_ERROR);
 

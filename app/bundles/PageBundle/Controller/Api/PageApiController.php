@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Page;
@@ -57,7 +56,7 @@ final class PageApiController extends CommonApiController
     /**
      * Obtains a list of pages.
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         // get parent level only
         $this->listFilters[] = [
@@ -70,6 +69,6 @@ final class PageApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 }

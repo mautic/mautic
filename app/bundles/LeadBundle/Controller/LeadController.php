@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -105,7 +104,6 @@ final class LeadController extends FormController
     private ContactColumnsDictionary $contactColumnsDictionary;
     private TokenStorageInterface $tokenStorage;
     private IntegrationHelper $integrationHelper;
-    private CoreParametersHelper $coreParametersHelper;
     private UserHelper $userHelper;
     private AvatarHelper $avatarHelper;
     private ContactMerger $contactMerger;
@@ -113,7 +111,6 @@ final class LeadController extends FormController
     private MembershipManager $membershipManager;
     private CustomFieldFindReplace $findReplace;
     private ExportHelper $exportHelper;
-    private EventDispatcherInterface $dispatcher;
     private IpLookupHelper $ipLookupHelper;
 
     #[Required]
@@ -136,7 +133,6 @@ final class LeadController extends FormController
         ContactColumnsDictionary $contactColumnsDictionary,
         TokenStorageInterface $tokenStorage,
         IntegrationHelper $integrationHelper,
-        CoreParametersHelper $coreParametersHelper,
         UserHelper $userHelper,
         AvatarHelper $avatarHelper,
         ContactMerger $contactMerger,
@@ -144,7 +140,6 @@ final class LeadController extends FormController
         MembershipManager $membershipManager,
         CustomFieldFindReplace $findReplace,
         ExportHelper $exportHelper,
-        EventDispatcherInterface $dispatcher,
         IpLookupHelper $ipLookupHelper,
     ): void {
         $this->leadModel = $leadModel;
@@ -165,7 +160,6 @@ final class LeadController extends FormController
         $this->contactColumnsDictionary = $contactColumnsDictionary;
         $this->tokenStorage = $tokenStorage;
         $this->integrationHelper = $integrationHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->userHelper = $userHelper;
         $this->avatarHelper = $avatarHelper;
         $this->contactMerger = $contactMerger;
@@ -173,7 +167,6 @@ final class LeadController extends FormController
         $this->membershipManager = $membershipManager;
         $this->findReplace = $findReplace;
         $this->exportHelper = $exportHelper;
-        $this->dispatcher = $dispatcher;
         $this->ipLookupHelper = $ipLookupHelper;
     }
 

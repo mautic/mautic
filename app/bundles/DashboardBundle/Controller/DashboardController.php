@@ -24,7 +24,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class DashboardController extends AbstractFormController
 {
@@ -34,7 +33,6 @@ final class DashboardController extends AbstractFormController
     private PathsHelper $pathsHelper;
     private RouterInterface $urlGenerator;
     private WidgetService $widgetService;
-    private Environment $twig;
 
     #[Required]
     public function autowireDashboardController(
@@ -44,7 +42,6 @@ final class DashboardController extends AbstractFormController
         PathsHelper $pathsHelper,
         RouterInterface $urlGenerator,
         WidgetService $widgetService,
-        Environment $twig,
     ): void {
         $this->dashboardModel = $dashboardModel;
         $this->widget = $widget;
@@ -52,7 +49,6 @@ final class DashboardController extends AbstractFormController
         $this->pathsHelper = $pathsHelper;
         $this->urlGenerator = $urlGenerator;
         $this->widgetService = $widgetService;
-        $this->twig = $twig;
     }
 
     /**

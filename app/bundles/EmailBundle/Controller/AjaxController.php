@@ -24,7 +24,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
@@ -33,7 +32,6 @@ final class AjaxController extends CommonAjaxController
 
     private EmailModel $emailModel;
     private FormFactoryInterface $formFactory;
-    private Environment $twig;
     private Mailbox $mailbox;
     private TransportInterface $transport;
     private UserHelper $userHelper;
@@ -45,7 +43,6 @@ final class AjaxController extends CommonAjaxController
     public function autowireEmailAjaxController(
         EmailModel $emailModel,
         FormFactoryInterface $formFactory,
-        Environment $twig,
         Mailbox $mailbox,
         TransportInterface $transport,
         UserHelper $userHelper,
@@ -55,7 +52,6 @@ final class AjaxController extends CommonAjaxController
     ): void {
         $this->emailModel = $emailModel;
         $this->formFactory = $formFactory;
-        $this->twig = $twig;
         $this->mailbox = $mailbox;
         $this->transport = $transport;
         $this->userHelper = $userHelper;

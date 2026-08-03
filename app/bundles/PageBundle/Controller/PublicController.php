@@ -37,7 +37,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 final class PublicController extends AbstractFormController
 {
@@ -59,7 +58,6 @@ final class PublicController extends AbstractFormController
         private readonly AnalyticsHelper $analyticsHelper,
         private readonly AssetsHelper $assetsHelper,
         private readonly ThemeHelper $themeHelper,
-        private readonly RouterInterface $router,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,
         private readonly PageConfig $pageConfig,
         private readonly TrackingHelper $trackingHelper,

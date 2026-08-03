@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
@@ -20,17 +19,14 @@ final class AjaxController extends CommonAjaxController
 
     private PageModel $pageModel;
     private FormFactoryInterface $formFactory;
-    private Environment $twig;
 
     #[Required]
     public function autowirePageAjaxController(
         PageModel $pageModel,
         FormFactoryInterface $formFactory,
-        Environment $twig,
     ): void {
         $this->pageModel = $pageModel;
         $this->formFactory = $formFactory;
-        $this->twig = $twig;
     }
 
     public function getAbTestFormAction(Request $request, PageModel $pageModel): JsonResponse

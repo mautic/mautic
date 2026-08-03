@@ -8,11 +8,9 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
@@ -35,9 +33,7 @@ final class PageController extends FormController
     private PageConfig $pageConfig;
     private PageHelperFactoryInterface $pageHelperFactory;
     private AssetsHelper $assetsHelper;
-    private Translator $translator;
     private RouterInterface $routerHelper;
-    private CoreParametersHelper $coreParametersHelper;
     private ThemeHelper $themeHelper;
 
     #[Required]
@@ -46,18 +42,14 @@ final class PageController extends FormController
         PageConfig $pageConfig,
         PageHelperFactoryInterface $pageHelperFactory,
         AssetsHelper $assetsHelper,
-        Translator $translator,
         RouterInterface $routerHelper,
-        CoreParametersHelper $coreParametersHelper,
         ThemeHelper $themeHelper,
     ): void {
         $this->pageModel = $pageModel;
         $this->pageConfig = $pageConfig;
         $this->pageHelperFactory = $pageHelperFactory;
         $this->assetsHelper = $assetsHelper;
-        $this->translator = $translator;
         $this->routerHelper = $routerHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->themeHelper = $themeHelper;
     }
 

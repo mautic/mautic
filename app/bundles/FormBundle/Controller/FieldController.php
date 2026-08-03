@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment;
 
 final class FieldController extends CommonFormController
 {
@@ -44,7 +43,6 @@ final class FieldController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private readonly Environment $twig,
     ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;

@@ -75,16 +75,16 @@ final class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $this->userHelper);
     }
 
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
         $this->serializerGroups[]                        = 'leadBasicList';
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -136,7 +136,7 @@ final class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction($request, $this->userHelper);
+        return $this->getEntitiesAction($request);
     }
 
     /**

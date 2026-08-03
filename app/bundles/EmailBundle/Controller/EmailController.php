@@ -52,7 +52,6 @@ final class EmailController extends FormController
     private EmailConfig $emailConfig;
     private ThemeHelper $themeHelper;
     private CorePermissions $corePermissions;
-    private CorePermissions $security;
     private FakeContactHelper $fakeLeadHelper;
     private PageHelperFactoryInterface $pageHelperFactory;
 
@@ -64,7 +63,6 @@ final class EmailController extends FormController
         LeadRepository $leadRepository,
         EmailConfig $emailConfig,
         ThemeHelper $themeHelper,
-        CorePermissions $corePermissions,
         CorePermissions $security,
         FakeContactHelper $fakeLeadHelper,
         PageHelperFactoryInterface $pageHelperFactory,
@@ -75,7 +73,6 @@ final class EmailController extends FormController
         $this->leadRepository = $leadRepository;
         $this->emailConfig = $emailConfig;
         $this->themeHelper = $themeHelper;
-        $this->corePermissions = $corePermissions;
         $this->security = $security;
         $this->fakeLeadHelper = $fakeLeadHelper;
         $this->pageHelperFactory = $pageHelperFactory;

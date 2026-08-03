@@ -10,23 +10,19 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
     private StageModel $stageModel;
     private FormFactoryInterface $formFactory;
-    private Environment $twig;
 
     #[Required]
     public function autowireStageAjaxController(
         StageModel $stageModel,
         FormFactoryInterface $formFactory,
-        Environment $twig,
     ): void {
         $this->stageModel = $stageModel;
         $this->formFactory = $formFactory;
-        $this->twig = $twig;
     }
 
     public function getActionFormAction(Request $request): JsonResponse

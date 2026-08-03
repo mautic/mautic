@@ -63,7 +63,6 @@ final class PublicController extends CommonFormController
     private IntegrationHelper $integrationHelper;
     private MailHelper $mailer;
     private LoggerInterface $mauticLogger;
-    private TranslatorInterface $translator;
 
     #[Required]
     public function autowirePublicController(
@@ -83,7 +82,6 @@ final class PublicController extends CommonFormController
         IntegrationHelper $integrationHelper,
         MailHelper $mailer,
         LoggerInterface $mauticLogger,
-        TranslatorInterface $translator,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
@@ -101,7 +99,6 @@ final class PublicController extends CommonFormController
         $this->integrationHelper = $integrationHelper;
         $this->mailer = $mailer;
         $this->mauticLogger = $mauticLogger;
-        $this->translator = $translator;
     }
 
     public function indexAction(Request $request, $idHash): Response

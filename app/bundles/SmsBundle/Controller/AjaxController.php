@@ -11,7 +11,6 @@ use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -23,8 +22,12 @@ final class AjaxController extends CommonAjaxController
     private EmailModel $emailModel;
 
     private SmsModel $smsModel;
+
     private BroadcastQuery $broadcastQuery;
+
     private CacheStorageHelper $cacheStorageHelper;
+
+    private TokenSorter $tokenSorter;
 
     #[Required]
     public function autowireSmsAjaxController(
@@ -32,11 +35,13 @@ final class AjaxController extends CommonAjaxController
         SmsModel $smsModel,
         BroadcastQuery $broadcastQuery,
         CacheStorageHelper $cacheStorageHelper,
+        TokenSorter $tokenSorter,
     ): void {
         $this->emailModel = $emailModel;
         $this->smsModel = $smsModel;
         $this->broadcastQuery = $broadcastQuery;
         $this->cacheStorageHelper = $cacheStorageHelper;
+        $this->tokenSorter = $tokenSorter;
     }
 
     public function getSmsCountStatsAction(Request $request): JsonResponse
@@ -84,14 +89,16 @@ final class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    public function getBuilderTokensAction(Request $request, TokenSorter $tokenSorter, ?EventDispatcherInterface $eventDispatcher = null): JsonResponse
+    public function getBuilderTokensAction(Request $request): JsonResponse
     {
         $query = $request->query->get('query', '');
 
         $tokens = $this->getBuilderTokens($query);
         $event  = new TokensBuildEvent($tokens);
-        $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
-        $sortedTokens = $tokenSorter->sortTokens($event->getTokens());
+
+        $this->dispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
+
+        $sortedTokens = $this->tokenSorter->sortTokens($event->getTokens());
 
         return $this->sendJsonResponse(['tokens' => $sortedTokens]);
     }

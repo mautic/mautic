@@ -58,7 +58,7 @@ final class SubmissionApiController extends CommonApiController
      *
      * @param int $formId
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null): Response
+    public function getEntitiesAction(Request $request, $formId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -75,7 +75,7 @@ final class SubmissionApiController extends CommonApiController
             ]
         );
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 
     /**
