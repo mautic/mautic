@@ -494,7 +494,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     {
         return preg_replace_callback(
             LeadTokenHelper::REGEX,
-            static fn(array $matches): string => explode('|', $matches[2])[1] ?? '',
+            static fn (array $matches): string => explode('|', $matches[2])[1] ?? '',
             $content
         );
     }
