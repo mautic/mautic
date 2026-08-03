@@ -76,7 +76,7 @@ final class FacebookIntegration extends SocialIntegration
      *
      * @return ResponseInterface|null
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): ?object
     {
         $this->persistNewLead = false;
         $accessToken          = $this->getContactAccessToken($socialCache);
