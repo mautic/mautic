@@ -33,6 +33,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -164,6 +165,7 @@ class LeadModel extends FormModel
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -2295,7 +2297,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($entities)) {
-            $this->companyModel->getRepository()->saveEntities($entities);
+            $this->companyRepository->saveEntities($entities);
         }
 
         return $success;
