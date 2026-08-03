@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Security\Authenticator\Passport\Badge;
 
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
-class PasswordStrengthBadge implements BadgeInterface
+final class PasswordStrengthBadge implements BadgeInterface
 {
     private bool $resolved = false;
 

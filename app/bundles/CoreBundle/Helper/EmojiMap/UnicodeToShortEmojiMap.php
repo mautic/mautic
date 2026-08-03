@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
-class UnicodeToShortEmojiMap
+final class UnicodeToShortEmojiMap
 {
     public static $map = [
         "\xc2\xa9"                                                                                                     => ':copyright:',

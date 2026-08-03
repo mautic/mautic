@@ -99,7 +99,7 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if ($expr instanceof CompositeExpression && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
@@ -107,7 +107,7 @@ class BuilderTokenHelper
 
         if (!empty($filter)) {
             $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
-            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
+            $expr       = $expr instanceof CompositeExpression ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',

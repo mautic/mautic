@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class TagModel extends BaseTagModel implements GlobalSearchInterface
+final class TagModel extends BaseTagModel implements GlobalSearchInterface
 {
     private TagRepository $tagRepository;
 
