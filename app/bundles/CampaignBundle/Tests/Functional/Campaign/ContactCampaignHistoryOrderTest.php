@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
@@ -68,11 +67,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
             $historyOrder[] = trim(explode('/', $timelineEvent['eventLabel']['label'])[0]);
         }
 
-        Assert::assertSame(
-            $expectedOrder,
-            $historyOrder,
-            'The campaign history is not sorted by creation order in '.$orderByDir
-        );
+        $this->assertSame($expectedOrder, $historyOrder, 'The campaign history is not sorted by creation order in '.$orderByDir);
     }
 
     /**

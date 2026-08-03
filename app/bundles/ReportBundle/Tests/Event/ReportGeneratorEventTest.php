@@ -328,15 +328,10 @@ final class ReportGeneratorEventTest extends TestCase
         $this->reportGeneratorEvent->applyDateFilters($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
     }
 
-    /**
-     * @return \Iterator<(int|string), mixed>
-     */
     public static function applyFilterProvider(): \Iterator
     {
-        return [
-            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s.u'],
-            [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'],
-        ];
+        yield [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s.u'];
+        yield [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'];
     }
 
     #[DataProvider('applyFilterWithoutNullValuesProvider')]
@@ -380,14 +375,9 @@ final class ReportGeneratorEventTest extends TestCase
         $this->reportGeneratorEvent->applyDateFiltersWithoutNullValues($this->queryBuilder, $dateColumn, $tablePrefix, $dateOnly);
     }
 
-    /**
-     * @return \Iterator<(int|string), mixed>
-     */
     public static function applyFilterWithoutNullValuesProvider(): \Iterator
     {
-        return [
-            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s.u'],
-            [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'],
-        ];
+        yield [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s.u'];
+        yield [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'];
     }
 }

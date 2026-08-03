@@ -36,7 +36,7 @@ final class UTCDateTimeTypeTest extends TestCase
                 ->willReturn($expectedSql);
         }
 
-        $this->assertEquals($expectedSql, $this->type->getSQLDeclaration($column, $platform));
+        $this->assertSame($expectedSql, $this->type->getSQLDeclaration($column, $platform));
     }
 
     /**
