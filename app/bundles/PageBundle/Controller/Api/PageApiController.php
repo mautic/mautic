@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Page>
  */
-class PageApiController extends CommonApiController
+final class PageApiController extends CommonApiController
 {
     /**
      * @var PageModel|null

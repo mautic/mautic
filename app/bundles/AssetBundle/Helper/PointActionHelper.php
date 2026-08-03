@@ -2,7 +2,7 @@
 
 namespace Mautic\AssetBundle\Helper;
 
-class PointActionHelper
+final class PointActionHelper
 {
     public static function validateAssetDownload($eventDetails, array $action): bool
     {

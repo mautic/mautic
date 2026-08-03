@@ -2,6 +2,6 @@
 
 namespace Mautic\ReportBundle\Builder;
 
-class InvalidReportQueryException extends \Exception
+final class InvalidReportQueryException extends \Exception
 {
 }

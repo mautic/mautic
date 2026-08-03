@@ -10,9 +10,11 @@ return ECSConfig::configure()
         __DIR__.'/config',
         __DIR__.'/plugins',
         __DIR__.'/tests',
+        __DIR__.'/utils',
     ])
     ->withRootFiles()
     ->withSkip([
+        'node_modules',
         PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
             // in docbclock on purpose, to avoid BC return on child classes
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',

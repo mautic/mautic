@@ -10,8 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 // container fetch must be reported
 class ContainerGetService
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
     }
 
     public function viaProperty(): void

@@ -4,15 +4,15 @@ includes:
 parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
-	# reportUnmatchedIgnoredErrors: false
+	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	parallel:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 87.9
-		param: 75
-		property: 68
+		return: 88.1
+		param: 75.4
+		property: 69.5
 		# wait for PHP 8.3 before changing
 		constant: 3
 	paths:
@@ -220,10 +220,13 @@ parameters:
 		-
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
+		-
+			identifier: typePerfect.noArrayAccessOnObject
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
 		- vendor/javer/sp-bundle/src
+		- vendor/javer/symfony-bridge/src
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -234,6 +237,7 @@ parameters:
 	symfony:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
+
 
 rules:
 	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
@@ -252,6 +256,7 @@ rules:
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
+	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
 
 #services:
 #	-

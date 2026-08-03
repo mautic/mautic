@@ -8,6 +8,8 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
@@ -22,8 +24,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private FormFieldHelper $formFieldHelper,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
-        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
+        private readonly FormRepository $formRepository,
+        private readonly SubmissionRepository $submissionRepository,
     ) {
     }
 

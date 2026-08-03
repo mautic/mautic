@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Monolog;
 
 use Monolog\LogRecord;
 
-class LogProcessor
+final class LogProcessor
 {
     public function __invoke(LogRecord $record): LogRecord
     {
