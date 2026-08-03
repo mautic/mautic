@@ -36,7 +36,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $userIds = $this->notificationBuilder->getUserIds('lead', (int) $lead->getId());
+        $userIds = $this->notificationBuilder->getUserIds('lead', $lead->getId());
         $this->assertInstanceOf(User::class, $user);
 
         $this->assertSame([$user->getId()], $userIds);

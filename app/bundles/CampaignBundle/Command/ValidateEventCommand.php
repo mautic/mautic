@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:validate',
     description: 'Validate if a contact has been inactive for a decision and execute events if so.'
 )]
-class ValidateEventCommand extends Command
+final class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
 

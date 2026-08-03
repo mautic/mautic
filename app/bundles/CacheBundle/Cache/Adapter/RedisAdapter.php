@@ -7,7 +7,7 @@ namespace Mautic\CacheBundle\Cache\Adapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter as SymfonyRedisAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class RedisAdapter extends SymfonyRedisAdapter
+final class RedisAdapter extends SymfonyRedisAdapter
 {
     use RedisAdapterTrait;
 

@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 
-class CampaignData extends AbstractFixture implements OrderedFixtureInterface
+final class CampaignData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

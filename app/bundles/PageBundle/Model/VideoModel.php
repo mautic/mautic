@@ -2,43 +2,37 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<VideoHit>
  */
-class VideoModel extends FormModel
+final class VideoModel extends FormModel
 {
-    public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected ContactTracker $contactTracker,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly VideoHitRepository $videoHitRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private IpLookupHelper $ipLookupHelper;
+
+    private ContactTracker $contactTracker;
+
+    private VideoHitRepository $videoHitRepository;
+
+    #[Required]
+    public function autowireVideoModel(
+        IpLookupHelper $ipLookupHelper,
+        ContactTracker $contactTracker,
+        VideoHitRepository $videoHitRepository,
+    ): void {
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->contactTracker     = $contactTracker;
+        $this->videoHitRepository = $videoHitRepository;
     }
 
     public function getHitRepository(): VideoHitRepository

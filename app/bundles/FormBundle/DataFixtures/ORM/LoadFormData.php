@@ -16,7 +16,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
     public const FORM_PREFIX = 'form-';
 

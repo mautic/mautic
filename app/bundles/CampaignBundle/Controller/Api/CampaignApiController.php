@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @extends CommonApiController<Campaign>
  */
-class CampaignApiController extends CommonApiController
+final class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
