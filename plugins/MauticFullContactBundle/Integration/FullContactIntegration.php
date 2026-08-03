@@ -96,10 +96,7 @@ final class FullContactIntegration extends AbstractIntegration
         return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [

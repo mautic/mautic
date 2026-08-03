@@ -163,10 +163,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [

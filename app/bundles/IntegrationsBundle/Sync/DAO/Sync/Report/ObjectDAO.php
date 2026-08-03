@@ -60,13 +60,9 @@ final class ObjectDAO
     }
 
     /**
-     * @param string $name
-     *
-     * @return FieldDAO|null
-     *
      * @throws FieldNotFoundException
      */
-    public function getField($name)
+    public function getField(string $name): FieldDAO
     {
         if (!isset($this->fields[$name])) {
             throw new FieldNotFoundException($name, $this->object);

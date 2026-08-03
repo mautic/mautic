@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<string, array>
  */
-final class DsnTransformer implements DataTransformerInterface
+class DsnTransformer implements DataTransformerInterface
 {
     private const PASSWORD_MASK = '🔒';
 

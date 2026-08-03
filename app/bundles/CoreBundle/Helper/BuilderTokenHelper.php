@@ -14,15 +14,11 @@ final class BuilderTokenHelper
 {
     private bool $isConfigured = false;
 
-    protected $permissionSet;
+    private ?array $permissionSet = null;
 
-    protected $modelName;
+    private ?string $modelName = null;
 
-    protected $viewPermissionBase;
-
-    protected $langVar;
-
-    protected $bundleName;
+    private ?string $viewPermissionBase = null;
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -42,13 +38,9 @@ final class BuilderTokenHelper
     public function configure(
         string $modelName,
         ?string $viewPermissionBase = null,
-        ?string $bundleName = null,
-        ?string $langVar = null,
     ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "{$modelName}:{$modelName}s";
-        $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
-        $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
         $this->permissionSet = [
             $this->viewPermissionBase.':viewown',
@@ -78,7 +70,7 @@ final class BuilderTokenHelper
         ?CompositeExpression $expr = null,
     ): ?array {
         if (!$this->isConfigured) {
-            throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
+            throw new \BadMethodCallException('You must call the "'.self::class.'::configure()" method first.');
         }
 
         // set some permissions
