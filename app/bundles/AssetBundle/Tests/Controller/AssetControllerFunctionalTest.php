@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
@@ -324,11 +326,10 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testAssetUploadPathTraversal(): void
     {
-        $client    = $this->client;
         $container = $this->getContainer();
 
         // Get CSRF token
-        $csrfToken = $container->get('security.csrf.token_manager')->getToken('mautic_ajax_post')->getValue();
+        $csrfToken = $container->get(CsrfTokenManagerInterface::class)->getToken('mautic_ajax_post')->getValue();
 
         // Create a temporary file
         $tempFile = tempnam(sys_get_temp_dir(), 'test_');
@@ -344,7 +345,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         );
 
         $tmpDir = 'tmp_'.substr(md5(uniqid()), 0, 13);
-        $client->request(
+
+        $this->client->request(
             'POST',
             '/s/_uploader/asset/upload',
             ['tempId' => '../../'.$tmpDir],
@@ -355,7 +357,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             ]
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
 
         // Assert response is successful
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -396,7 +398,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()
@@ -410,7 +412,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

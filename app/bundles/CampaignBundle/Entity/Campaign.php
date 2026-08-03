@@ -221,9 +221,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $metadata->addPropertyConstraint(
             'name',
             new Assert\NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
@@ -424,7 +422,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
                 Criteria::expr()->isNull('deleted')
             )
         );
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->events->matching($criteria);
 
         return $this->reindexEventsByIdKey($events);
     }
@@ -432,7 +430,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function getInactionBasedEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->events->matching($criteria);
 
         return $this->reindexEventsByIdKey($events);
     }
@@ -445,7 +443,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function getEventsByType($type): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->events->matching($criteria);
 
         return $this->reindexEventsByIdKey($events);
     }
@@ -456,7 +454,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function getEmailSendEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
-        $events   = $this->getEvents()->matching($criteria);
+        $events   = $this->events->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693
@@ -472,7 +470,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public function isEmailCampaign(): bool
     {
         $criteria     = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'))->setMaxResults(1);
-        $emailEvent   = $this->getEvents()->matching($criteria);
+        $emailEvent   = $this->events->matching($criteria);
 
         return !$emailEvent->isEmpty();
     }
@@ -635,7 +633,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->getCanvasSettings();
+        $canvasSettings = $this->canvasSettings;
 
         if (empty($canvasSettings['nodes'])) {
             return false;
@@ -662,7 +660,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function getAllowRestart(): bool
     {
-        return (bool) $this->allowRestart;
+        return $this->allowRestart;
     }
 
     public function allowRestart(): bool

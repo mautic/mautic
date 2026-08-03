@@ -9,10 +9,10 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IntegrationHelper $helper,
+        private IntegrationHelper $helper,
     ) {
     }
 

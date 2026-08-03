@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
-class DataExporterHelper
+final class DataExporterHelper
 {
     /**
      * Standard function to generate an array of data via any model's "getEntities" method.

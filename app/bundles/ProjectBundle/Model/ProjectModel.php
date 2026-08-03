@@ -4,42 +4,30 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ProjectModel extends FormModel implements AjaxLookupModelInterface
 {
-    public function __construct(
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly ProjectEntityLoaderService $entityLoaderService,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
+    private ProjectEntityLoaderService $entityLoaderService;
+
+    private ProjectRepository $projectRepository;
+
+    #[Required]
+    public function autowireProjectModel(
+        ProjectEntityLoaderService $entityLoaderService,
+        ProjectRepository $projectRepository,
+    ): void {
+        $this->entityLoaderService = $entityLoaderService;
+        $this->projectRepository   = $projectRepository;
     }
 
     public function getRepository(): ProjectRepository
     {
-        $repository = $this->em->getRepository(Project::class);
-        \assert($repository instanceof ProjectRepository);
-
-        return $repository;
+        return $this->projectRepository;
     }
 
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array

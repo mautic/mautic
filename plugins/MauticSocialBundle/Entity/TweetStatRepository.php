@@ -7,6 +7,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<TweetStat>
  */
-class TweetStatRepository extends CommonRepository
+final class TweetStatRepository extends CommonRepository
 {
 }

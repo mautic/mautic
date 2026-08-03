@@ -8,10 +8,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterFactory
+final class ContactSegmentFilterFactory
 {
     public const CUSTOM_OPERATOR = 'custom_operator';
 
@@ -22,7 +22,7 @@ class ContactSegmentFilterFactory
 
     public function __construct(
         private readonly TableSchemaColumnsCache $schemaCache,
-        private readonly Container $container,
+        private readonly ContainerInterface $container,
         private readonly DecoratorFactory $decoratorFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {

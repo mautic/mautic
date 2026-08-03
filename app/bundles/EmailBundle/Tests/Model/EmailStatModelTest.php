@@ -62,7 +62,7 @@ final class EmailStatModelTest extends TestCase
             }
         };
 
-        $emailStatModel = new EmailStatModel($entityManager, $dispatcher);
+        $emailStatModel = new EmailStatModel($dispatcher, $statRepository);
 
         $emailStat = new StatTest();
 
@@ -72,7 +72,7 @@ final class EmailStatModelTest extends TestCase
     }
 }
 
-class StatTest extends Stat
+final class StatTest extends Stat
 {
     private ?string $id = null;
 

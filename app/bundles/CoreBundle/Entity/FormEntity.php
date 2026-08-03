@@ -247,7 +247,7 @@ class FormEntity extends CommonEntity
             return 'published' === $status;
         }
 
-        return $this->getIsPublished();
+        return $this->isPublished;
     }
 
     /**
@@ -405,11 +405,11 @@ class FormEntity extends CommonEntity
     /**
      * Check the publish status of an entity based on publish up and down datetimes.
      *
-     * @return string early|expired|published|unpublished
+     * @return "early"|"expired"|"published"|"unpublished"
      *
      * @throws \BadMethodCallException
      */
-    public function getPublishStatus()
+    public function getPublishStatus(): string
     {
         $dt      = new DateTimeHelper();
         $current = $dt->getLocalDateTime();

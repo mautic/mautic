@@ -12,10 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TrackingPixelSendType extends AbstractType
+final class TrackingPixelSendType extends AbstractType
 {
     public function __construct(
-        protected TrackingHelper $trackingHelper,
+        private readonly TrackingHelper $trackingHelper,
     ) {
     }
 
@@ -35,7 +35,7 @@ class TrackingPixelSendType extends AbstractType
             'placeholder' => 'mautic.core.form.chooseone',
             'constraints' => [
                 new NotBlank(
-                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                    message: 'mautic.core.ab_test.winner_criteria.not_blank'
                 ),
             ],
         ]);

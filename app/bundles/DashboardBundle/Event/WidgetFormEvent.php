@@ -5,11 +5,11 @@ namespace Mautic\DashboardBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\DashboardBundle\Entity\Widget;
 
-class WidgetFormEvent extends CommonEvent
+final class WidgetFormEvent extends CommonEvent
 {
-    protected $form;
+    private $form;
 
-    protected $type;
+    private $type;
 
     /**
      * Set the widget type.

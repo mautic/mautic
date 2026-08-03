@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -24,6 +25,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private PointGroupModel $pointGroupModel,
         private EntityManagerInterface $entityManager,
+        private GroupRepository $groupRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private DenormalizerInterface $serializer,
@@ -76,7 +78,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $group = $this->entityManager->getRepository(Group::class)->findOneBy(['uuid' => $element['uuid']]);
+            $group = $this->groupRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew = !$group;
 
             $group ??= new Group();
@@ -117,7 +119,7 @@ final class GroupImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Group::class)->find($id);
+            $entity = $this->groupRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

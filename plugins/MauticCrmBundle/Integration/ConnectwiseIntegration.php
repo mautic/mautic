@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
@@ -173,11 +172,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('Contact', $settings);
     }
@@ -185,7 +184,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
@@ -463,7 +462,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if ([] !== $integrationEntities) {
-                    $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->integrationEntityRepository->saveEntities($integrationEntities);
                     $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
@@ -535,9 +534,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
-        $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
+        $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
             $object,
             $mauticObjectReference,
@@ -613,7 +610,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->integrationEntityRepository->saveEntities($integrationEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
@@ -848,7 +845,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
                 $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
                 $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
-                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
+                $contacts             = $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
@@ -912,7 +909,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         if ([] !== $persistEntities) {
-            $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
+            $this->integrationEntityRepository->saveEntities($persistEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
         }

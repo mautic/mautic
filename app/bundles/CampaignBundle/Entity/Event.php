@@ -218,10 +218,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -546,10 +543,7 @@ class Event implements ChannelInterface, UuidInterface
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -716,7 +710,7 @@ class Event implements ChannelInterface, UuidInterface
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
             ->setMaxResults(1);
 
-        $log = $this->getLog()->matching($criteria);
+        $log = $this->log->matching($criteria);
 
         if (count($log)) {
             return $log->first();
@@ -1204,6 +1198,6 @@ class Event implements ChannelInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getCampaign()->getCreatedBy();
+        return $this->campaign->getCreatedBy();
     }
 }

@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,11 +17,11 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldLength')]
+    #[DataProvider('provideFieldLength')]
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
@@ -32,7 +33,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewMultiSelectField(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get(FieldModel::class);
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
@@ -65,7 +66,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testFieldDeleteValidationUsedInSegment(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel       = static::getContainer()->get(FieldModel::class);
         $field_first      = $this->createField('First');
         $fieldModel->saveEntity($field_first);
 
@@ -149,7 +150,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanField')]
+    #[DataProvider('dataForCreatingNewBooleanField')]
     public function testCreatingNewBooleanField(array $properties, string $expectedMessage): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');

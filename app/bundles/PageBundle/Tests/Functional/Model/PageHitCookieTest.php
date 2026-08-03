@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Functional\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageHitCookieTest extends MauticMysqlTestCase
@@ -20,7 +20,7 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         $this->configParams['messenger_dsn_email'] = 'sync://';
 
         parent::setUp();
-        $this->hitRepository = $this->em->getRepository(Hit::class);
+        $this->hitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testPageHitCookieContainsValidHitIdAndUpdatesDateLeft(): void
@@ -45,7 +45,7 @@ final class PageHitCookieTest extends MauticMysqlTestCase
         // Verify the cookie was set
         $cookieJar   = $this->client->getCookieJar();
         $cookie      = $cookieJar->get('mautic_referer_id');
-        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $cookie, 'Cookie mautic_referer_id should be set');
+        $this->assertInstanceOf(Cookie::class, $cookie, 'Cookie mautic_referer_id should be set');
 
         $cookieValue = $cookie->getValue();
         $this->assertNotSame('', $cookieValue, 'Cookie value should not be empty');

@@ -26,27 +26,31 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Point>
  */
-class PointApiController extends CommonApiController
+final class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
-
-    protected LeadModel $leadModel;
 
     /**
      * @var PointModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $leadModel = $modelFactory->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-
-        $pointModel = $modelFactory->getModel('point');
-        \assert($pointModel instanceof PointModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        private LeadModel $leadModel,
+        PointModel $pointModel,
+    ) {
         $this->model            = $pointModel;
-        $this->leadModel        = $leadModel;
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
@@ -58,7 +62,7 @@ class PointApiController extends CommonApiController
     /**
      * Return array of available point action types.
      */
-    public function getPointActionTypesAction()
+    public function getPointActionTypesAction(): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':view', $this->permissionBase.':viewown'])) {
             return $this->accessDenied();
@@ -100,12 +104,11 @@ class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)
+    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
     {
-        $trans      = $this->translator;
         $ip         = $ipLookupHelper->getIpAddress();
-        $eventName  = InputHelper::clean($request->request->get('eventName', $trans->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
-        $actionName = InputHelper::clean($request->request->get('actionName', $trans->trans('mautic.lead.event.api')));
+        $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
+        $actionName = InputHelper::clean($request->request->get('actionName', $this->translator->trans('mautic.lead.event.api')));
 
         $lead->adjustPoints($delta, $operator);
         $lead->addPointsChangeLogEntry('API', $eventName, $actionName, $delta, $ip);

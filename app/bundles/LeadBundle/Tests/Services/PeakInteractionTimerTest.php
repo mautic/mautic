@@ -11,11 +11,12 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\PageBundle\Entity\HitRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class TestablePeakInteractionTimer extends PeakInteractionTimer
+final class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
     private \DateTime $testTime;
 
@@ -110,7 +111,7 @@ final class PeakInteractionTimerTest extends TestCase
             ->willReturn(true);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeWithTimezoneProvider')]
+    #[DataProvider('defaultDateTimeWithTimezoneProvider')]
     public function testGetDefaultOptimalTime(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -156,7 +157,7 @@ final class PeakInteractionTimerTest extends TestCase
         yield ['2024-03-12 11:00:00', '2024-03-12 11:00:00', null];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('defaultDateTimeAndDayWithTimezoneProvider')]
+    #[DataProvider('defaultDateTimeAndDayWithTimezoneProvider')]
     public function testGetDefaultOptimalTimeAndDay(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
@@ -215,7 +216,7 @@ final class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeDataProvider')]
+    #[DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createStub(Lead::class);
@@ -311,7 +312,7 @@ final class PeakInteractionTimerTest extends TestCase
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
      * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeAndDayDataProvider')]
+    #[DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createStub(Lead::class);

@@ -9,7 +9,7 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BroadcastExecutioner
+final class BroadcastExecutioner
 {
     private ?ContactLimiter $contactLimiter = null;
 

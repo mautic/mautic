@@ -4,22 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -27,23 +19,18 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SecurityController extends CommonController implements EventSubscriberInterface
+final class SecurityController extends CommonController implements EventSubscriberInterface
 {
-    public function __construct(
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        ?RequestStack $requestStack,
-        ?CorePermissions $security,
-        private readonly AuthorizationCheckerInterface $authorizationChecker,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private AuthorizationCheckerInterface $authorizationChecker;
+
+    #[Required]
+    public function autowireSecurityController(
+        AuthorizationCheckerInterface $authorizationChecker,
+    ): void {
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function onRequest(RequestEvent $event): void
@@ -107,13 +94,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 'sessionExpired' => true,
             ],
         ]);
-    }
-
-    /**
-     * Do nothing.
-     */
-    public function loginCheckAction(): void
-    {
     }
 
     /**

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  *
  * @see \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator
  */
-class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
+final class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {

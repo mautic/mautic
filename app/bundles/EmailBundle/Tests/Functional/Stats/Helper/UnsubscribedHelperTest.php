@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Tests email unsubscribe statistics generation with various filters and permissions.
@@ -41,14 +42,14 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->unsubscribedHelper = static::getContainer()->get('mautic.email.stats.helper_unsubscribed');
+        $this->unsubscribedHelper = static::getContainer()->get(UnsubscribedHelper::class);
 
         $this->createUsers();
         $this->createEmailAndCampaign();
         $this->createLeadsAndStats();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('statsFilterProvider')]
+    #[DataProvider('statsFilterProvider')]
     public function testStatsWithFilters(
         bool $canViewOthers,
         bool $useCampaignFilter,

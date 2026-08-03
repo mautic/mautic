@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Import;
 
-class ImportEvent extends CommonEvent
+final class ImportEvent extends CommonEvent
 {
     /**
      * @param bool $isNew
