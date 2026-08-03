@@ -50,7 +50,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var LeadModel $contactModal */
-        $contactModal = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModal = static::getContainer()->get(LeadModel::class);
 
         $filters = [
             'search'        => '',
@@ -148,7 +148,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ListModel $listModel */
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $listModel = static::getContainer()->get(ListModel::class);
         $listModel->addLead($contact, $segment);
         $this->em->flush();
 
