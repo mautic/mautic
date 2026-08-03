@@ -1,0 +1,84 @@
+{% extends "@MauticCore/Theme/message.html.twig" %}
+
+{% block message_content %}
+    <div class="row as-center jc-center validation-row">
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+            {% block validation_content %}
+                <div class="well validation-card">
+                    <h1 class="text-center">{{ header|default('mautic.email.address.validate.header'|trans) }}</h1>
+                    <p>{{ message|default('mautic.email.address.validate.message'|trans) }}</p>
+                    {{ form_start(form) }}
+                    {{ form_label(form.emailAddress) }}
+                    <div class="input-group {% if not form.emailAddress.vars.valid %}has-error{% endif %}">
+                        {{ form_widget(form.emailAddress) }}
+                        <span class="input-group-btn">
+                            {{ form_row(form.submit) }}
+                        </span>
+                    </div>
+                    {% if form.emailAddress.vars.errors|length > 0 %}
+                        {% block validation_error %}
+                            <div class="validate-alert" role="alert" aria-live="polite">
+                                {{ form_errors(form.emailAddress) }}
+                            </div>
+                        {% endblock %}
+                    {% endif %}
+                    {{ form_end(form) }}
+                </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    {% block validation_enhancements %}
+        <style>
+            .validation-row {
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+
+            .validation-card {
+                margin-top: 30px;
+            }
+
+            .validate-alert {
+                margin-top: 10px;
+                padding: 10px 12px;
+                border: 1px solid #ebccd1;
+                border-radius: 4px;
+                background: #fdf2f2;
+                color: #a94442;
+            }
+
+            @media (min-width: 992px) {
+                .validation-card {
+                    margin-top: 50px;
+                }
+            }
+        </style>
+
+        <script>
+            (function () {
+                var formElement = document.querySelector('form');
+                if (!formElement) {
+                    return;
+                }
+
+                formElement.addEventListener('submit', function () {
+                    var submitButton = formElement.querySelector('button[type="submit"], input[type="submit"]');
+                    if (!submitButton || submitButton.disabled) {
+                        return;
+                    }
+
+                    var loadingLabel = '{{ "mautic.core.loading"|trans|e('js') }}';
+                    if (submitButton.tagName.toLowerCase() === 'button') {
+                        submitButton.textContent = loadingLabel;
+                    } else {
+                        submitButton.value = loadingLabel;
+                    }
+
+                    submitButton.disabled = true;
+                    submitButton.setAttribute('aria-busy', 'true');
+                });
+            })();
+        </script>
+    {% endblock %}
+{% endblock %}

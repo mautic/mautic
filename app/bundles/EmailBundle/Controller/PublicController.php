@@ -192,15 +192,13 @@ final class PublicController extends CommonFormController
             );
         }
 
-        return $this->delegateView(
+        return new Response($this->themeHelper->renderThemeTemplate(
+            $contentTemplate,
             [
-                'viewParameters' => [
-                    'form'     => $form->createView(),
-                    'template' => $themeName,
-                ],
-                'contentTemplate' => $contentTemplate,
+                'form'     => $form->createView(),
+                'template' => $themeName,
             ]
-        );
+        ));
     }
 
     /**
