@@ -955,7 +955,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $field->setAlias('company_created_at');
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
 
         $timeStamp = new \DateTime();
