@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterFactory
+final class ContactSegmentFilterFactory
 {
     public const CUSTOM_OPERATOR = 'custom_operator';
 

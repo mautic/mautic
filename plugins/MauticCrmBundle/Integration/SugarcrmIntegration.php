@@ -2,36 +2,21 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Service\Attribute\Required;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends CrmAbstractIntegration<SugarcrmApi>
@@ -43,8 +28,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     #[Required]
     public function autowireSugarcrmIntegration(
         CompanyRepository $companyRepository,
+        DoNotContact $doNotContactModel,
+        UserModel $userModel,
     ): void {
         $this->companyRepository = $companyRepository;
+        $this->doNotContactModel = $doNotContactModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -63,44 +52,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $authorizationError;
 
-    public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        CacheStorageHelper $cacheStorageHelper,
-        EntityManagerInterface $entityManager,
-        RequestStack $requestStack,
-        RouterInterface $router,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        protected DoNotContact $doNotContactModel,
-        private readonly UserModel $userModel,
-    ) {
-        parent::__construct(
-            $eventDispatcher,
-            $cacheStorageHelper,
-            $entityManager,
-            $requestStack,
-            $router,
-            $translator,
-            $logger,
-            $encryptionHelper,
-            $leadModel,
-            $companyModel,
-            $pathsHelper,
-            $notificationModel,
-            $fieldModel,
-            $integrationEntityModel,
-            $doNotContactModel,
-            $fieldsWithUniqueIdentifier
-        );
-    }
+    protected DoNotContact $doNotContactModel;
+
+    private UserModel $userModel;
 
     /**
      * Returns the name of the social integration that must match the name of the file.

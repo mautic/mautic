@@ -9,13 +9,13 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MenuBuilder
+final readonly class MenuBuilder
 {
     public function __construct(
-        private readonly FactoryInterface $factory,
-        private readonly MatcherInterface $matcher,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly MenuHelper $menuHelper,
+        private FactoryInterface $factory,
+        private MatcherInterface $matcher,
+        private EventDispatcherInterface $dispatcher,
+        private MenuHelper $menuHelper,
     ) {
     }
 
