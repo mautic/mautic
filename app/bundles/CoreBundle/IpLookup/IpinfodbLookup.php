@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IpinfodbLookup extends AbstractRemoteDataLookup
+final class IpinfodbLookup extends AbstractRemoteDataLookup
 {
     public string $statusCode    = '';
 

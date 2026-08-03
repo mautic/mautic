@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
 
-class FacebookIntegration extends SocialIntegration
+final class FacebookIntegration extends SocialIntegration
 {
     public function getName(): string
     {
