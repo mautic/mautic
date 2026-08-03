@@ -183,15 +183,13 @@ final class PublicController extends CommonFormController
             );
         }
 
-        return $this->delegateView(
+        return new Response($this->themeHelper->renderThemeTemplate(
+            $contentTemplate,
             [
-                'viewParameters' => [
-                    'form'     => $form->createView(),
-                    'template' => $themeName,
-                ],
-                'contentTemplate' => $contentTemplate,
+                'form'     => $form->createView(),
+                'template' => $themeName,
             ]
-        );
+        ));
     }
 
     public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, EmailDefaultsHelper $emailDefaultsHelper, string $idHash, ?string $secretHash = null, ?string $urlEmail = null): Response
