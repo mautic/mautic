@@ -734,10 +734,8 @@ class MailHelper
      *
      * @param string $template
      * @param bool   $returnContent
-     *
-     * @return void|string
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -749,6 +747,8 @@ class MailHelper
 
         $this->setBody($content, 'text/html', $charset);
         unset($content);
+
+        return null;
     }
 
     public function setSubject($subject): void

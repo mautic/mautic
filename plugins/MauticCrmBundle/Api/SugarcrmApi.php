@@ -296,10 +296,8 @@ final class SugarcrmApi extends CrmApi
 
     /**
      *                TODO 7.x.
-     *
-     * @return array|mixed|string
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object): ?array
     {
         $tokenData = $this->integration->getKeys();
 
@@ -420,6 +418,8 @@ final class SugarcrmApi extends CrmApi
 
             return [];
         }
+
+        return null;
     }
 
     /**
