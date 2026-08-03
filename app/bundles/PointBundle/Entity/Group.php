@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Group extends FormEntity implements UuidInterface
 {
@@ -21,6 +20,7 @@ class Group extends FormEntity implements UuidInterface
 
     private ?int $id             = null;
 
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private ?string $name        = '';
 
     private ?string $description = '';
@@ -38,11 +38,6 @@ class Group extends FormEntity implements UuidInterface
         static::addUuidField($builder);
 
         $builder->addIdColumns();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

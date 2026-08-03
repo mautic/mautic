@@ -90,6 +90,10 @@ class Asset extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[Sequentially([
+        new Assert\Url(message: 'mautic.asset.validation.error.url'),
+        new SafeRemoteUrl(),
+    ])]
     private $remotePath;
 
     /**
@@ -292,10 +296,6 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Upload());
-        $metadata->addPropertyConstraint('remotePath', new Sequentially([
-            new Assert\Url(message: 'mautic.asset.validation.error.url'),
-            new SafeRemoteUrl(),
-        ]));
     }
 
     /**
