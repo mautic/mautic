@@ -195,8 +195,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
