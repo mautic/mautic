@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CheckStep implements StepInterface
+final class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.

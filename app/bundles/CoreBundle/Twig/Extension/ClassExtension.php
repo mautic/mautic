@@ -11,7 +11,7 @@ use Twig\TwigTest;
 /**
  * Helper for getting a class reference from a Twig template.
  */
-class ClassExtension extends AbstractExtension
+final class ClassExtension extends AbstractExtension
 {
     /**
      * @return TwigFunction[]

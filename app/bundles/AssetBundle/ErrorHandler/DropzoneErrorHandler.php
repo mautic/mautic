@@ -5,7 +5,7 @@ namespace Mautic\AssetBundle\ErrorHandler;
 use Oneup\UploaderBundle\Uploader\ErrorHandler\ErrorHandlerInterface;
 use Oneup\UploaderBundle\Uploader\Response\AbstractResponse;
 
-class DropzoneErrorHandler implements ErrorHandlerInterface
+final class DropzoneErrorHandler implements ErrorHandlerInterface
 {
     public function addException(AbstractResponse $response, \Exception $exception): void
     {

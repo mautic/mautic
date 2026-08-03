@@ -1149,7 +1149,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fromDate,
             $toDate
         ) : 0;
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -2695,7 +2695,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'company'
         );
 
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToProcess = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {

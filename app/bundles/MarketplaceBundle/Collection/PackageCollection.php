@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\PackageBase;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class PackageCollection implements \Iterator, \Countable, \ArrayAccess
+final class PackageCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var PackageBase[]

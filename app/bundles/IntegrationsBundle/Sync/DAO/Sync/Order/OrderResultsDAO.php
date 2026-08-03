@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-class OrderResultsDAO
+final class OrderResultsDAO
 {
     /**
      * @var ObjectMapping[][]

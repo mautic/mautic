@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
-class HtmlToUnicodeEmojiMap
+final class HtmlToUnicodeEmojiMap
 {
     public static $map = [
         "<span class=\x22emoji-outer emoji-sizer\x22><span class=\x22emoji-inner emojia9\x22></span></span>"                                  => "\xc2\xa9",
