@@ -9,7 +9,7 @@ use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
 use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
 
-class PluginCollector
+final class PluginCollector
 {
     /**
      * @var AllowlistEntry[]

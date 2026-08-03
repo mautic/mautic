@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 
-class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly CategoryModel $categoryModel,

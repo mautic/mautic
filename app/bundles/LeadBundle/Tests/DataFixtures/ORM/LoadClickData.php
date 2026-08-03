@@ -12,7 +12,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
 
-class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
 {
     use ManagedLeadTrait;
 
@@ -105,7 +105,7 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
     /**
      * @param array<string,mixed> $hitConfig
      */
-    protected function createHit(array $hitConfig, ObjectManager $manager): void
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 

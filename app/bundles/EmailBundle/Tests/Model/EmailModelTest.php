@@ -727,9 +727,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         $messageModel = new MessageQueueModel(
-            $this->leadModel,
-            $this->companyModel,
-            $coreParametersHelper,
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->eventDispatcher,
@@ -737,8 +734,13 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->createStub(LoggerInterface::class),
-            $this->createStub(MessageQueueRepository::class), // $messageQueueRepository
-            $this->frequencyRepository // $frequencyRuleRepository
+            $coreParametersHelper,
+        );
+        $messageModel->autowireMessageQueueModel(
+            $this->leadModel,
+            $this->companyModel,
+            $this->createStub(MessageQueueRepository::class),
+            $this->frequencyRepository
         );
 
         $emailModel = new EmailModel(

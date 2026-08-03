@@ -12,7 +12,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class UserCreator implements UserCreatorInterface
+final class UserCreator implements UserCreatorInterface
 {
     private readonly int $defaultRole;
 

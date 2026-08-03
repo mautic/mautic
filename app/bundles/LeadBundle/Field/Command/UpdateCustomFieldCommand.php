@@ -26,7 +26,7 @@ The <info>%command.name%</info> command will create a column in a lead_fields ta
 <info>php %command.full_name%</info>
 TXT
 )]
-class UpdateCustomFieldCommand extends Command
+final class UpdateCustomFieldCommand extends Command
 {
     public function __construct(
         private readonly BackgroundService $backgroundService,
