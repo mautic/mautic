@@ -17,9 +17,8 @@ final class TypeOperatorsEvent extends Event
     private array $operators = [];
 
     public function __construct(
-        private readonly string $context = ''
-    )
-    {
+        private readonly string $context = '',
+    ) {
     }
 
     /**
