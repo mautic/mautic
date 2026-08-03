@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-class EncodedValueDAO
+final class EncodedValueDAO
 {
     public const STRING_TYPE   = 'string';
 

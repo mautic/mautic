@@ -12,13 +12,13 @@ use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class PluginDatabase
+final readonly class PluginDatabase
 {
-    private readonly string $mauticDbPrefix;
+    private string $mauticDbPrefix;
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly Connection $connection,
+        private EntityManagerInterface $em,
+        private Connection $connection,
         #[Autowire(env: 'MAUTIC_TABLE_PREFIX')]
         ?string $mauticDbPrefix,
     ) {

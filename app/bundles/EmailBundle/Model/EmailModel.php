@@ -1048,7 +1048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $ids[] = $email->getId();
         }
 
-        $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+        $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;

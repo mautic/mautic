@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class YearStat implements StatInterface
+final class YearStat implements StatInterface
 {
     /**
      * @var MonthStat[]

@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Accessor;
 
-class ConfigAccessor
+final class ConfigAccessor
 {
     /**
      * @param mixed[] $config
@@ -57,7 +57,7 @@ class ConfigAccessor
     /**
      * @return string|null
      */
-    protected function getProperty($property)
+    private function getProperty(string $property)
     {
         return $this->config[$property] ?? null;
     }

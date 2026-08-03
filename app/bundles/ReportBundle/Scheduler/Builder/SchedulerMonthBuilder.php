@@ -10,7 +10,7 @@ use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
 use Recurr\Rule;
 
-class SchedulerMonthBuilder implements BuilderInterface
+final class SchedulerMonthBuilder implements BuilderInterface
 {
     /**
      * @throws InvalidSchedulerException

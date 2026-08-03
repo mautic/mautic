@@ -185,7 +185,7 @@ final class PageModelTest extends PageTestAbstract
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
             if (str_contains($key, 'utm_')) {
-                $this->assertStringContainsString((string) $key, $value, sprintf('%s not found in %s', $key, $value));
+                $this->assertStringContainsString($key, $value, sprintf('%s not found in %s', $key, $value));
             }
         }
     }

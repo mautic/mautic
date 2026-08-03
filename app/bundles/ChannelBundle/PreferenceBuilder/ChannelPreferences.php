@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class ChannelPreferences
+final class ChannelPreferences
 {
     /**
      * @var ArrayCollection[]

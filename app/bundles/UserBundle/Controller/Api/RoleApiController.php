@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Role>
  */
-class RoleApiController extends CommonApiController
+final class RoleApiController extends CommonApiController
 {
     /**
      * @var RoleModel|null

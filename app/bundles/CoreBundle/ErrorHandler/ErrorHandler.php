@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
-    class ErrorHandler
+    final class ErrorHandler
     {
         public static $handler;
 
@@ -373,7 +373,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param mixed[] $context
          */
-        protected function log($logLevel, $message, array $context = [], $debugTrace = null): void
+        private function log(string $logLevel, string $message, array $context = [], $debugTrace = null): void
         {
             $message = strip_tags($message);
             if ($this->logger) {
