@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,7 +33,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         private AuthorizationCheckerInterface $securityContext,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        private readonly UserRepository $userRepository,
     ) {
     }
 

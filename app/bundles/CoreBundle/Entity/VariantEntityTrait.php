@@ -174,7 +174,7 @@ trait VariantEntityTrait
             return null !== $parent;
         }
 
-        return !empty($parent) || count($children);
+        return $parent instanceof VariantEntityInterface || count($children);
     }
 
     public function isParent(): bool
@@ -205,7 +205,7 @@ trait VariantEntityTrait
     public function getVariants(): array
     {
         $parent = $this->getVariantParent();
-        if (empty($parent)) {
+        if (!$parent instanceof VariantEntityInterface) {
             $parent = $this;
         }
 

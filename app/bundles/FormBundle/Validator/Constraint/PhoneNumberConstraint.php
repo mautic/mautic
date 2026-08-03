@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Phone number constraint.
  */
-class PhoneNumberConstraint extends Constraint
+final class PhoneNumberConstraint extends Constraint
 {
     public $message;
 

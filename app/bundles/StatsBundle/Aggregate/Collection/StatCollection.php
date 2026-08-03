@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
-class StatCollection
+final class StatCollection
 {
     private readonly StatsDAO $stats;
 

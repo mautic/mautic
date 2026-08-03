@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class UpdateIpDataStoreCommand extends Command
+final class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
