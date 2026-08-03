@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Event>
  */
-class EventApiController extends CommonApiController
+final class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 

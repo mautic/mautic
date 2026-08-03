@@ -11,7 +11,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {

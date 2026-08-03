@@ -41,7 +41,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Lead>
  */
-class LeadApiController extends CommonApiController
+final class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;

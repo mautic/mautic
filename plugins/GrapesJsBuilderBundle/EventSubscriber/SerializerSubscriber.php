@@ -10,13 +10,14 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Mautic\EmailBundle\Entity\Email;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 
 final readonly class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Config $config,
-        private readonly \MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 

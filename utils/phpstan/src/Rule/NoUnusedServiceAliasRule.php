@@ -41,14 +41,14 @@ final class NoUnusedServiceAliasRule implements Rule
 
         $ruleErrors = [];
 
-        /** @var array<string, list<array{string, int, int}>> $aliasesByFilePath */
+        /** @var array<string, list<array{string, string, int, int}>> $aliasesByFilePath */
         $aliasesByFilePath = $node->get(ServiceAliasCollector::class);
 
         /** @var array<string, list<array{string, int}>> $usagesByFilePath */
         $usagesByFilePath = $node->get(ServiceNameUsageCollector::class);
 
         foreach ($aliasesByFilePath as $filePath => $aliases) {
-            foreach ($aliases as [$aliasName, $startLine, $endLine]) {
+            foreach ($aliases as [$aliasName, , $startLine, $endLine]) {
                 if (isset($usedTypeNames[ltrim($aliasName, '\\')])) {
                     continue;
                 }

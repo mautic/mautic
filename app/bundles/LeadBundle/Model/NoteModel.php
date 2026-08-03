@@ -2,45 +2,36 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<LeadNote>
  */
-class NoteModel extends FormModel
+final class NoteModel extends FormModel
 {
-    public function __construct(
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly RequestStack $requestStack,
-        private readonly LeadNoteRepository $leadNoteRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private RequestStack $requestStack;
+
+    private LeadNoteRepository $leadNoteRepository;
+
+    #[Required]
+    public function autowireNoteModel(
+        RequestStack $requestStack,
+        LeadNoteRepository $leadNoteRepository,
+    ): void {
+        $this->requestStack       = $requestStack;
+        $this->leadNoteRepository = $leadNoteRepository;
     }
 
     public function getRepository(): LeadNoteRepository

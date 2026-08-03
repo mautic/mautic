@@ -614,43 +614,41 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $trackingId = $hit->getTrackingId();
         $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($this->limitString($page->getLanguage()));
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->pageTrackableModel->getRepository()->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
                     );
                 }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV !== 'prod') {
-                        throw $exception;
-                    }
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
-                    );
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV !== 'prod') {
+                    throw $exception;
                 }
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
             }
         }
 
@@ -1129,13 +1127,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         // Use the current URL
         $isPageEvent = false;
-        if (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

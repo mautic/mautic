@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class MonthStat implements StatInterface
+final class MonthStat implements StatInterface
 {
     /**
      * @var DayStat[]

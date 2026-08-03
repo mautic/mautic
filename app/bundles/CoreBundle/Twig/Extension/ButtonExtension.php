@@ -11,13 +11,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ButtonExtension extends AbstractExtension
+final class ButtonExtension extends AbstractExtension
 {
     public function __construct(
-        protected ButtonHelper $buttonHelper,
-        protected RequestStack $requestStack,
-        protected UrlGeneratorInterface $router,
-        protected TranslatorInterface $translator,
+        private readonly ButtonHelper $buttonHelper,
+        private readonly RequestStack $requestStack,
+        private readonly UrlGeneratorInterface $router,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
