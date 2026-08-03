@@ -11,7 +11,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 
-class BatchTransport extends AbstractTransport implements TokenTransportInterface
+final class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
     use TokenTransportTrait;
 

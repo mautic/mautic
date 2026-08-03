@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends AbstractCommonModel<ContactExportScheduler>
  */
-class ContactExportSchedulerModel extends AbstractCommonModel
+final class ContactExportSchedulerModel extends AbstractCommonModel
 {
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
 

@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticClearbitBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -115,7 +116,7 @@ final class LookupHelperTest extends TestCase
         $this->integrationsHelper->method('getIntegration')->with('Clearbit')
             ->willReturn($this->makeIntegration(true, ['apikey' => 'abc123']));
 
-        $company = $this->createMock(\Mautic\LeadBundle\Entity\Company::class);
+        $company = $this->createMock(Company::class);
         $company->method('getFieldValue')->with('companywebsite')->willReturn(null);
 
         $this->companyModel->expects($this->never())->method('saveEntity');
