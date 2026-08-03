@@ -61,8 +61,10 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $translator   = self::getContainer()->get(TranslatorInterface::class);
         $displayUrl   = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
         $legacyUrl    = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $configUrl    = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
         $consentTab   = $crawler->filter('li.active a[href="#focus-installation-consent"]');
         $fullTab      = $crawler->filter('a[href="#focus-installation-full"]');
+        $configLink   = $crawler->filter('#focus-shared-consent-note a');
         $responseHtml = (string) $this->client->getResponse()->getContent();
 
         $displaySnippet  = (string) $crawler->filter('#focus-display-snippet [data-copy]')->attr('data-copy');
@@ -80,6 +82,9 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('#focus-installation-tabs[role="tablist"]'));
         $this->assertCount(1, $crawler->filter('#focus-installation-consent.active.in'));
         $this->assertCount(0, $crawler->filter('#focus-installation-full.active'));
+        $this->assertCount(1, $configLink);
+        $this->assertSame($configUrl, $configLink->attr('href'));
+        $this->assertSame($translator->trans('mautic.config.tab.trackingconfig'), trim($configLink->text()));
         $this->assertStringContainsString($displayUrl, $displaySnippet);
         $this->assertStringContainsString('window.MauticFocusTrackingQueue['.$focus->getId().'] = true;', $trackingSnippet);
         $this->assertStringContainsString('window.MauticFocusItems['.$focus->getId().'].loadTracking();', $trackingSnippet);
@@ -87,7 +92,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('/MauticFocusTrackingQueue\['.$focus->getId().'\].*'.preg_quote($displayUrl, '/').'/s', $fullSnippet);
         $this->assertStringNotContainsString($legacyUrl, $responseHtml);
         $this->assertCount(0, $crawler->filter('#focus-legacy-snippet'));
-        $this->assertStringContainsString('Mautic does not collect, store, or prove consent.', (string) $crawler->text());
+        $this->assertStringContainsString('Mautic does not record or verify consent.', (string) $crawler->text());
     }
 
     private function createFocus(): Focus

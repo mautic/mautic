@@ -274,10 +274,18 @@
                     </ul>
                     <div class="tab-content pa-md">
                         <div class="tab-pane bdr-w-0 active in" id="focus-installation-consent" role="tabpanel">
-                            <p class="mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
-                            <div class="alert alert-warning" role="alert">
-                                {{ 'mautic.focus.install.custom_content.warning'|trans }}
-                            </div>
+                            <p class="mb-sm">{{ 'mautic.focus.install.description'|trans }}</p>
+                            <p class="mb-lg" id="focus-shared-consent-note">
+                                {{ 'mautic.focus.install.shared_consent_note'|trans({
+                                    '%option%': 'mautic.page.config.tracking.script.focus_shared_consent.label'|trans,
+                                    '%settings%': 'mautic.config.tab.trackingconfig'|trans,
+                                    '%url%': path('mautic_config_action', {'objectAction': 'edit', 'tab': 'trackingconfig'}),
+                                })|purify }}
+                            </p>
+                            <details class="mb-lg">
+                                <summary>{{ 'mautic.focus.install.details.summary'|trans }}</summary>
+                                <p class="mt-sm mb-0">{{ 'mautic.focus.install.details.description'|trans }}</p>
+                            </details>
 
                             <h5 class="mt-lg mb-sm fw-sb">{{ 'mautic.focus.install.display.header'|trans }}</h5>
                             <p>{{ 'mautic.focus.install.display.description'|trans }}</p>
