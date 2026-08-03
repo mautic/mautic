@@ -10,7 +10,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<PostCount>
  */
-class PostCountModel extends AbstractCommonModel
+final class PostCountModel extends AbstractCommonModel
 {
     private PostCountRepository $postCountRepository;
 

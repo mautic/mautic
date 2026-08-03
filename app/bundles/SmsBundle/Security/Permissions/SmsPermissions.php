@@ -5,7 +5,7 @@ namespace Mautic\SmsBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class SmsPermissions extends AbstractPermissions
+final class SmsPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

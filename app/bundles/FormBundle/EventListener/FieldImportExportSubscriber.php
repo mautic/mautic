@@ -107,7 +107,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
                     $this->mergeExportData($data, $subEvent);
 
                     $event->addDependencyEntity(Form::ENTITY_NAME, [
-                        Field::ENTITY_NAME       => (int) $fieldId,
+                        Field::ENTITY_NAME       => $fieldId,
                         LeadField::ENTITY_NAME   => (int) $object->getId(),
                     ]);
                 }

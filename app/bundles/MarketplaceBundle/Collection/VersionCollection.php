@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\Version;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class VersionCollection implements \Iterator, \Countable, \ArrayAccess
+final class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var Version[]
