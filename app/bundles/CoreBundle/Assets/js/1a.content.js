@@ -1245,7 +1245,7 @@ Mautic.activateModalEmbeddedForms = function(container) {
         mQuery(modal).on('show.bs.modal', function () {
             // Don't allow submitting with enter key
             mQuery(this).on("keydown.embeddedForm", ":input:not(textarea)", function(event) {
-                if (event.keyCode == 13) {
+                if (Mautic.Keyboard.isEnter(Mautic.Keyboard.getKey(event))) {
                     event.preventDefault();
                     if (event.metaKey || event.ctrlKey) {
                         // Submit the modal
@@ -1438,16 +1438,16 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
     mQuery(el).on('change keyup paste', {}, function (event) {
         // Prevent LiveSearch from re-triggering on navigation keys
-        if (Mautic.isLiveSearchNavigationKey(event)) {
+        if (Mautic.Keyboard.isLiveSearchNavigation(event)) {
             return;
         }
 
         var searchStr = mQuery(el).val().trim();
 
-        const key = Mautic.getEventKey(event);
-        const spaceKeyPressed = Mautic.isSpaceKey(key);
-        const enterKeyPressed = Mautic.isEnterKey(key);
-        const deleteKeyPressed = Mautic.isBackspaceKey(key);
+        const key = Mautic.Keyboard.getKey(event);
+        const spaceKeyPressed = Mautic.Keyboard.isSpace(key);
+        const enterKeyPressed = Mautic.Keyboard.isEnter(key);
+        const deleteKeyPressed = Mautic.Keyboard.isBackspace(key);
 
         if (!enterKeyPressed && Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
             return;
@@ -1554,9 +1554,9 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         mQuery(el).off('keydown.globalSearchNav');
 
         mQuery(el).on('keydown.globalSearchNav', function (e) {
-            const key = Mautic.getEventKey(e);
+            const key = Mautic.Keyboard.getKey(e);
 
-            if (Mautic.isEscapeKey(key)) {
+            if (Mautic.Keyboard.isEscape(key)) {
                 mQuery('#gsearchModal').modal('hide');
                 return;
             }
@@ -1565,19 +1565,19 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             if (!items.length) return;
 
             switch (true) {
-                case Mautic.isArrowDownKey(key):
-                case Mautic.isTabKey(key) && !e.shiftKey:
+                case Mautic.Keyboard.isArrowDown(key):
+                case Mautic.Keyboard.isTab(key) && !e.shiftKey:
                     e.preventDefault();
                     activeIndex = (activeIndex + 1) % items.length;
                     break;
 
-                case Mautic.isArrowUpKey(key):
-                case Mautic.isTabKey(key) && e.shiftKey:
+                case Mautic.Keyboard.isArrowUp(key):
+                case Mautic.Keyboard.isTab(key) && e.shiftKey:
                     e.preventDefault();
                     activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
                     break;
 
-                case Mautic.isEnterKey(key): {
+                case Mautic.Keyboard.isEnter(key): {
                     if (activeIndex < 0 || activeIndex >= items.length) {
                         return;
                     }
@@ -1798,7 +1798,7 @@ Mautic.activateTypeahead = function (el, options) {
         },
         dataset
     ).on('keypress', function (event) {
-        if ((event.keyCode || event.which) == 13) {
+        if (Mautic.Keyboard.isEnter(Mautic.Keyboard.getKey(event))) {
             mQuery(el).typeahead('close');
         }
     }).on('focus', function() {
