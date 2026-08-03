@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 
-class ObjectDAO
+final class ObjectDAO
 {
     /**
      * @var FieldDAO[]

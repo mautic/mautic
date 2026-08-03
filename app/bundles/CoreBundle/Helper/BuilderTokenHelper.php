@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderTokenHelper
+final class BuilderTokenHelper
 {
     private bool $isConfigured = false;
 

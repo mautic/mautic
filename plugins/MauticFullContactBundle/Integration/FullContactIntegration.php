@@ -10,7 +10,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FullContactIntegration extends AbstractIntegration
+final class FullContactIntegration extends AbstractIntegration
 {
     public function getName(): string
     {

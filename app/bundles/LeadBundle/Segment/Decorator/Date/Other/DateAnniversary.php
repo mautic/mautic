@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateAnniversary implements FilterDecoratorInterface
+final class DateAnniversary implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 

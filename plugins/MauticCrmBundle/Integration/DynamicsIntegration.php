@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<DynamicsApi>
  */
-class DynamicsIntegration extends CrmAbstractIntegration
+final class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
     {
