@@ -172,7 +172,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $trackingContent = (string) $this->client->getResponse()->getContent();
 
         $temporaryDirectory = sys_get_temp_dir().'/mautic-focus-'.bin2hex(random_bytes(8));
-        self::assertTrue(mkdir($temporaryDirectory));
+        $this->assertTrue(mkdir($temporaryDirectory));
         $displayPath  = $temporaryDirectory.'/display.js';
         $trackingPath = $temporaryDirectory.'/tracking.js';
         file_put_contents($displayPath, $displayContent);
@@ -187,7 +187,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
                 (string) $id,
             ]);
             $process->mustRun();
-            self::assertSame('', $process->getErrorOutput());
+            $this->assertSame('', $process->getErrorOutput());
         } finally {
             unlink($displayPath);
             unlink($trackingPath);
