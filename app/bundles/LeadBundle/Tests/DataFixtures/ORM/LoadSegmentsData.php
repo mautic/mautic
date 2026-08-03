@@ -1060,6 +1060,46 @@ final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureIn
                 ],
                 'populate' => false,
             ],
+            [ // ID 53
+                'name'    => 'segment with In The Last Filter',
+                'alias'   => 'segment-test-with-in-the-last-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inLast',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 54
+                'name'    => 'segment with In The Next Filter',
+                'alias'   => 'segment-test-with-in-the-next-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inNext',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
