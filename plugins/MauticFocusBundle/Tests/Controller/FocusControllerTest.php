@@ -57,31 +57,36 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $router       = self::getContainer()->get(RouterInterface::class);
-        $translator   = self::getContainer()->get(TranslatorInterface::class);
-        $displayUrl   = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $legacyUrl    = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $configUrl    = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $consentTab   = $crawler->filter('li.active a[href="#focus-installation-consent"]');
-        $fullTab      = $crawler->filter('a[href="#focus-installation-full"]');
-        $configLink   = $crawler->filter('#focus-shared-consent-note a');
-        $responseHtml = (string) $this->client->getResponse()->getContent();
+        $router        = self::getContainer()->get(RouterInterface::class);
+        $translator    = self::getContainer()->get(TranslatorInterface::class);
+        $displayUrl    = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $legacyUrl     = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $configUrl     = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $landingPages  = $crawler->filter('#focus-implementation-landing-pages');
+        $external      = $crawler->filter('#focus-implementation-external-websites');
+        $consentButton = $external->filter('[data-target="#modal-focus-consent-installation"]');
+        $fullButton    = $external->filter('[data-target="#modal-focus-full-installation"]');
+        $configLink    = $crawler->filter('#focus-shared-consent-note a');
+        $responseHtml  = (string) $this->client->getResponse()->getContent();
 
         $displaySnippet  = (string) $crawler->filter('#focus-display-snippet [data-copy]')->attr('data-copy');
         $trackingSnippet = (string) $crawler->filter('#focus-tracking-snippet [data-copy]')->attr('data-copy');
         $fullSnippet     = (string) $crawler->filter('#focus-full-snippet [data-copy]')->attr('data-copy');
 
-        $this->assertCount(1, $consentTab);
-        $this->assertSame($translator->trans('mautic.focus.install.consent.tab'), trim($consentTab->text()));
-        $this->assertSame('focus-installation-consent', $consentTab->attr('aria-controls'));
-        $this->assertSame('true', $consentTab->attr('aria-expanded'));
-        $this->assertCount(1, $fullTab);
-        $this->assertSame($translator->trans('mautic.focus.install.full.tab'), trim($fullTab->text()));
-        $this->assertSame('focus-installation-full', $fullTab->attr('aria-controls'));
-        $this->assertSame('false', $fullTab->attr('aria-expanded'));
-        $this->assertCount(1, $crawler->filter('#focus-installation-tabs[role="tablist"]'));
-        $this->assertCount(1, $crawler->filter('#focus-installation-consent.active.in'));
-        $this->assertCount(0, $crawler->filter('#focus-installation-full.active'));
+        $this->assertCount(1, $landingPages);
+        $this->assertStringContainsString($translator->trans('mautic.focus.install.landing_pages.description'), $landingPages->text());
+        $this->assertCount(1, $external);
+        $this->assertCount(1, $consentButton);
+        $this->assertSame($translator->trans('mautic.focus.install.consent.tab'), trim($consentButton->text()));
+        $this->assertCount(1, $fullButton);
+        $this->assertSame($translator->trans('mautic.focus.install.full.tab'), trim($fullButton->text()));
+        $this->assertCount(1, $crawler->filter('#modal-focus-consent-installation'));
+        $this->assertCount(1, $crawler->filter('#modal-focus-full-installation'));
+        $this->assertCount(0, $crawler->filter('#focus-installation-tabs'));
+        $this->assertCount(1, $crawler->filter('#focus-display-snippet .code-snippet--multi'));
+        $this->assertCount(1, $crawler->filter('#focus-tracking-snippet .code-snippet--multi'));
+        $this->assertCount(1, $crawler->filter('#focus-full-snippet .code-snippet--multi'));
+        $this->assertCount(0, $crawler->filter('#focus-display-snippet script, #focus-tracking-snippet script, #focus-full-snippet script'));
         $this->assertCount(1, $configLink);
         $this->assertSame($configUrl, $configLink->attr('href'));
         $this->assertSame($translator->trans('mautic.config.tab.trackingconfig'), trim($configLink->text()));

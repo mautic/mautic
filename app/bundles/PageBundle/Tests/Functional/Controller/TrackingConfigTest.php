@@ -12,26 +12,35 @@ final class TrackingConfigTest extends MauticMysqlTestCase
 {
     public function testTrackingScriptOptionsAreRendered(): void
     {
+        $this->saveSharedFocusConsentSetting(false);
+
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit?tab=trackingconfig');
 
         self::assertResponseIsSuccessful();
 
         $getSnippet = static function (string $ariaLabel, ?string $focusConsent = null) use ($crawler): string {
-            $selector = sprintf('pre[aria-label="%s"]', $ariaLabel);
+            $selectorPrefix = '';
             if (null !== $focusConsent) {
-                $selector = sprintf('[data-focus-consent-snippet="%s"] %s', $focusConsent, $selector);
+                $selectorPrefix = sprintf('[data-focus-consent-snippet="%s"] ', $focusConsent);
             }
 
-            $snippet = $crawler->filter($selector);
+            $selector   = $selectorPrefix.sprintf('pre[aria-label="%s"]', $ariaLabel);
+            $snippet    = $crawler->filter($selector);
+            $copyButton = $crawler->filter($selector.' ~ [data-copy]');
             Assert::assertCount(1, $snippet);
+            Assert::assertCount(1, $copyButton);
+            $snippetText = $snippet->text(null, false);
+            Assert::assertSame($snippetText, $copyButton->attr('data-copy'));
+            Assert::assertStringNotContainsString('&lt;', $snippetText);
 
-            return $snippet->text();
+            return $snippetText;
         };
 
         $independentConsent = $crawler->filter('#config_trackingconfig_focus_uses_mautic_tracking_consent_0');
         $sharedConsent      = $crawler->filter('#config_trackingconfig_focus_uses_mautic_tracking_consent_1');
         $this->assertCount(1, $independentConsent);
         $this->assertCount(1, $sharedConsent);
+        $this->assertCount(0, $crawler->filter('.code-snippet--multi script'));
         $this->assertNotNull($independentConsent->attr('checked'));
         $this->assertNull($sharedConsent->attr('checked'));
         $this->assertStringContainsString('Mautic.toggleFocusTrackingConsentSnippets(this)', (string) $sharedConsent->attr('onchange'));
