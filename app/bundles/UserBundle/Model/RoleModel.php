@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Role>
  */
-class RoleModel extends FormModel implements GlobalSearchInterface
+final class RoleModel extends FormModel implements GlobalSearchInterface
 {
     private UserRepository $userRepository;
 
@@ -30,8 +30,11 @@ class RoleModel extends FormModel implements GlobalSearchInterface
     private RoleRepository $roleRepository;
 
     #[Required]
-    public function autowireRoleModel(RoleRepository $roleRepository, PermissionRepository $permissionRepository, UserRepository $userRepository): void
-    {
+    public function autowireRoleModel(
+        RoleRepository $roleRepository,
+        PermissionRepository $permissionRepository,
+        UserRepository $userRepository,
+    ): void {
         $this->roleRepository = $roleRepository;
         $this->permissionRepository = $permissionRepository;
         $this->userRepository = $userRepository;

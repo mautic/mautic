@@ -94,7 +94,7 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
             foreach ($fieldsData as $field => $data) {
                 $leads = $leadRepository->getLeadIdsByUniqueFields([$field => $data]);
 
-                $fieldsValidation[] = $this->isValid($leads, [$field], (int) $lead->getId());
+                $fieldsValidation[] = $this->isValid($leads, [$field], $lead->getId());
             }
 
             return array_merge(...$fieldsValidation);
@@ -103,7 +103,7 @@ final class UniqueCustomFieldValidator extends ConstraintValidator
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
         $leads = $leadRepository->getLeadIdsByUniqueFields($fieldsData);
 
-        return $this->isValid($leads, array_keys($fieldsData), (int) $lead->getId());
+        return $this->isValid($leads, array_keys($fieldsData), $lead->getId());
     }
 
     /**

@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,

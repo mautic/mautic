@@ -1048,7 +1048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $ids[] = $email->getId();
         }
 
-        $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+        $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
@@ -2146,13 +2146,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string $type
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {

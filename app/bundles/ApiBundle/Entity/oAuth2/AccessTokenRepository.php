@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<AccessToken>
  */
-class AccessTokenRepository extends CommonRepository
+final class AccessTokenRepository extends CommonRepository
 {
     public function getTableAlias(): string
     {

@@ -23,26 +23,26 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Tweet>
  */
-class TweetModel extends FormModel implements AjaxLookupModelInterface
+final class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     private TweetStatRepository $tweetStatRepository;
 
     private TweetRepository $tweetRepository;
 
     #[Required]
-    public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
-    {
+    public function autowireTweetModel(
+        TweetRepository $tweetRepository,
+        TweetStatRepository $tweetStatRepository,
+    ): void {
         $this->tweetRepository = $tweetRepository;
         $this->tweetStatRepository = $tweetStatRepository;
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
 

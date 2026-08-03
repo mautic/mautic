@@ -9,7 +9,7 @@ use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DoctrineStep implements StepInterface
+final class DoctrineStep implements StepInterface
 {
     /**
      * Database driver.

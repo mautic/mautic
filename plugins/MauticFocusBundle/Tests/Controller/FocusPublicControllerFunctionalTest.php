@@ -7,13 +7,15 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Process;
 
 final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testGenerateFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
@@ -43,8 +45,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('/mautic-tracking.js', $content);
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testScopedEndpointContracts(): void
     {
         /** @var FocusModel $focusModel */
@@ -115,8 +117,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('privacysafe.example', $trackingContent);
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testYesNoIntegerFlagsRenderCorrectBooleans(): void
     {
         /** @var FocusModel $focusModel */

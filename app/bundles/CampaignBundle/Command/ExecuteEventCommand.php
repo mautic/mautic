@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:execute',
     description: 'Execute specific scheduled events.'
 )]
-class ExecuteEventCommand extends Command
+final class ExecuteEventCommand extends Command
 {
     use WriteCountTrait;
 

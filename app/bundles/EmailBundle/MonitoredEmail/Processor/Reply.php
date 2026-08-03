@@ -18,16 +18,16 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Reply implements ProcessorInterface
+final readonly class Reply implements ProcessorInterface
 {
     public function __construct(
-        private readonly EmailStatModel $emailStatModel,
-        private readonly ContactFinder $contactFinder,
-        private readonly LeadModel $leadModel,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly LoggerInterface $logger,
-        private readonly ContactTracker $contactTracker,
-        private readonly EmailAddressHelper $addressHelper,
+        private EmailStatModel $emailStatModel,
+        private ContactFinder $contactFinder,
+        private LeadModel $leadModel,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker,
+        private EmailAddressHelper $addressHelper,
     ) {
     }
 
@@ -105,7 +105,7 @@ class Reply implements ProcessorInterface
     /**
      * @param string $messageId
      */
-    protected function createReply(Stat $stat, $messageId): void
+    private function createReply(Stat $stat, $messageId): void
     {
         $replies = $stat->getReplies()->filter(
             fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId

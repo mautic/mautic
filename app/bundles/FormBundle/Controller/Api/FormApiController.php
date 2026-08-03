@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -28,7 +29,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Form>
  */
-class FormApiController extends CommonApiController
+final class FormApiController extends CommonApiController
 {
     /**
      * @var FormModel|null
@@ -50,7 +51,7 @@ class FormApiController extends CommonApiController
         private readonly FormModel $formModel,
         private readonly FieldModel $fieldModel,
         private readonly ActionModel $actionModel,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly FormRepository $formRepository,
     ) {
         $this->model            = $formModel;
         $this->entityClass      = Form::class;
@@ -291,7 +292,7 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createActionEntityForm(Action $entity, array $action)
+    protected function createActionEntityForm(Action $entity, array $action): FormInterface
     {
         $components = $this->formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
@@ -313,7 +314,7 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity)
+    protected function createFieldEntityForm($entity): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,

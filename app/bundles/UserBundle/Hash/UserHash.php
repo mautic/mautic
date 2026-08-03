@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Hash;
 
-class UserHash
+final class UserHash
 {
     public const FAKE_USER_HASH = 'xxxxxxxxxxxxxx';
 

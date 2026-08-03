@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
@@ -31,7 +32,7 @@ final class ListController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository;
+    private LeadListRepository $leadListRepository;
 
     private ListModel $listModel;
 
@@ -41,7 +42,7 @@ final class ListController extends FormController
     public function autowireListController(
         LeadModel $leadModel,
         ListModel $listModel,
-        \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        LeadListRepository $leadListRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->listModel = $listModel;
@@ -52,10 +53,7 @@ final class ListController extends FormController
 
     public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
-    /**
-     * @var array
-     */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * Generate's default list view.

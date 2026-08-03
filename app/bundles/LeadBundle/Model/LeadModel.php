@@ -1289,7 +1289,7 @@ class LeadModel extends FormModel
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -2131,10 +2131,7 @@ class LeadModel extends FormModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();

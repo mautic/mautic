@@ -36,7 +36,7 @@ To force install a local package, pass the full path to the package as follows:
 <info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
 TXT
 )]
-class ApplyUpdatesCommand extends Command
+final class ApplyUpdatesCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

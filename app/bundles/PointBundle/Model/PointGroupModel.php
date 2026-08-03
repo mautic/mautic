@@ -27,8 +27,9 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
     private GroupRepository $groupRepository;
 
     #[Required]
-    public function autowirePointGroupModel(GroupRepository $groupRepository): void
-    {
+    public function autowirePointGroupModel(
+        GroupRepository $groupRepository,
+    ): void {
         $this->groupRepository = $groupRepository;
     }
 
@@ -44,13 +45,12 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * @param object               $entity
-     * @param FormFactoryInterface $formFactory
      * @param string|null          $action
      * @param array<string,string> $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
