@@ -242,11 +242,10 @@
       <!--/ left section -->
 
       {% set displayUrl = url('mautic_focus_generate_display', {'id': item.id}) %}
-      {% set trackingApi = '    window.MauticFocus = window.MauticFocus || {};\n    window.MauticFocus.enableTracking = window.MauticFocus.enableTracking || function (id) {\n        var item = window.MauticFocusItems && window.MauticFocusItems[id];\n\n        if (item) {\n            item.loadTracking();\n            return;\n        }\n\n        window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n        window.MauticFocusTrackingQueue[id] = true;\n    };' %}
       {% set displayLoader = '    if (document.getElementById(\'mautic-focus-display-script-' ~ item.id ~ '\')) {\n        return;\n    }\n\n    var display = document.createElement(\'script\');\n    var firstScript = document.getElementsByTagName(\'script\')[0];\n    display.id = \'mautic-focus-display-script-' ~ item.id ~ '\';\n    display.async = true;\n    display.src = \'' ~ displayUrl ~ '\';\n    firstScript.parentNode.insertBefore(display, firstScript);' %}
-      {% set displaySnippet = '<script>\n(function (window, document) {\n' ~ trackingApi ~ '\n\n' ~ displayLoader ~ '\n}(window, document));\n</script>' %}
-      {% set trackingSnippet = 'window.MauticFocus.enableTracking(' ~ item.id ~ ');' %}
-      {% set fullSnippet = '<script>\n(function (window, document) {\n' ~ trackingApi ~ '\n    window.MauticFocus.enableTracking(' ~ item.id ~ ');\n\n' ~ displayLoader ~ '\n}(window, document));\n</script>' %}
+      {% set displaySnippet = '<script async src="' ~ displayUrl ~ '"></script>' %}
+      {% set trackingSnippet = 'if (window.MauticFocus && window.MauticFocus.enableTracking) {\n    window.MauticFocus.enableTracking(' ~ item.id ~ ');\n} else {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n}' %}
+      {% set fullSnippet = '<script>\n(function (window, document) {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n\n' ~ displayLoader ~ '\n}(window, document));\n</script>' %}
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">

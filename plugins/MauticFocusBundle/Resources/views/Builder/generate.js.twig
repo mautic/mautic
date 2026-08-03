@@ -112,6 +112,19 @@
   {%- set iframeClass = 'mf-' ~ style ~ '-iframe' -%}
 {%- endif -%}
 (function (window) {
+    window.MauticFocus = window.MauticFocus || {};
+    window.MauticFocus.enableTracking = window.MauticFocus.enableTracking || function (id) {
+        var item = window.MauticFocusItems && window.MauticFocusItems[id];
+
+        if (item) {
+            item.loadTracking();
+            return;
+        }
+
+        window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};
+        window.MauticFocusTrackingQueue[id] = true;
+    };
+
     window.MauticFocusItems = window.MauticFocusItems || {};
     if (window.MauticFocusItems[{{ focus.id }}]) {
         return;

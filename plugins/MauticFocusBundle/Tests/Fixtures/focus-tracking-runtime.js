@@ -134,8 +134,9 @@ function item(browser) {
     execute(displayScript, browser);
     const focus = item(browser);
 
-    focus.loadTracking();
-    focus.loadTracking();
+    assert.strictEqual(typeof browser.window.MauticFocus.enableTracking, 'function', 'display must expose the tracking API');
+    browser.window.MauticFocus.enableTracking(focusId);
+    browser.window.MauticFocus.enableTracking(focusId);
     assert.strictEqual(browser.appendedScripts.length, 1, 'concurrent activation must share one request');
 
     browser.appendedScripts[0].onerror();

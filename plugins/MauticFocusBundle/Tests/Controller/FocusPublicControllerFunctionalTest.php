@@ -73,6 +73,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString("mautic_focus_{$id}_closed", $displayContent);
         $this->assertStringContainsString("mf-bar-collapser-{$id}", $displayContent);
         $this->assertStringContainsString('privacysafe.example', $displayContent);
+        $this->assertStringContainsString('window.MauticFocus', $displayContent);
+        $this->assertStringContainsString('enableTracking', $displayContent);
         $this->assertStringContainsString('window.MauticFocusItems', $displayContent);
         $this->assertStringContainsString('loadTracking', $displayContent);
         $this->assertStringContainsString('queueTrackingActivation', $displayContent);
