@@ -10,7 +10,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,

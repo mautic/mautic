@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper\ListParser;
 
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 
-class JsonListParser implements ListParserInterface
+final class JsonListParser implements ListParserInterface
 {
     public function parse($list): array
     {

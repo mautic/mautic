@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,

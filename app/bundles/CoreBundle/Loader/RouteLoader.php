@@ -9,7 +9,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteLoader extends Loader
+final class RouteLoader extends Loader
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,

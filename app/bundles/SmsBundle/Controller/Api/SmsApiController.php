@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Sms>
  */
-class SmsApiController extends CommonApiController
+final class SmsApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
