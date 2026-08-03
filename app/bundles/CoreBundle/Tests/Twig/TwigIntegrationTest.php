@@ -32,7 +32,6 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 
         /** @var PathsHelper&MockObject $pathHelperMock */
         $pathHelperMock = $this->createMock(PathsHelper::class);
-        $formRenderer   = $this->createMock(FormRendererInterface::class);
 
         $packagesMock->method('getUrl')
             ->willReturnCallback(function (string $path): string {
@@ -50,7 +49,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new AppExtension(),
             new AssetExtension($assetsHelper),
             new ClassExtension(),
-            new FormExtension($formRenderer),
+            new FormExtension($this->createStub(FormRendererInterface::class)),
         ];
     }
 }
