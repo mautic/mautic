@@ -1353,59 +1353,65 @@ Mautic.activateSearchAutocomplete = function (elId, modelName) {
     }
 };
 
-Mautic.isEnterKey = function (key) {
-    return key === 'Enter' || key === 13;
-};
+Mautic.Keyboard = {
+    /**
+     * Extract the key from a keyboard event safely.
+     * @param {KeyboardEvent} event
+     * @returns {string|number}
+     */
+    getKey: function (event) {
+        return event.key || event.which || event.keyCode;
+    },
 
-Mautic.isEscapeKey = function (key) {
-    return key === 'Escape' || key === 'Esc' || key === 27;
-};
+    isEnter: function (key) {
+        return key === 'Enter' || key === 13;
+    },
 
-Mautic.isArrowDownKey = function (key) {
-    return key === 'ArrowDown' || key === 40;
-};
+    isEscape: function (key) {
+        return key === 'Escape' || key === 'Esc' || key === 27;
+    },
 
-Mautic.isArrowUpKey = function (key) {
-    return key === 'ArrowUp' || key === 38;
-};
+    isArrowDown: function (key) {
+        return key === 'ArrowDown' || key === 40;
+    },
 
-Mautic.isTabKey = function (key) {
-    return key === 'Tab' || key === 9;
-};
+    isArrowUp: function (key) {
+        return key === 'ArrowUp' || key === 38;
+    },
 
-Mautic.isSpaceKey = function (key) {
-    return key === ' ' || key === 'Spacebar' || key === 'Space' || key === 32;
-};
+    isTab: function (key) {
+        return key === 'Tab' || key === 9;
+    },
 
-Mautic.isBackspaceKey = function (key) {
-    return key === 'Backspace' || key === 8;
-};
+    isSpace: function (key) {
+        return key === ' ' || key === 'Spacebar' || key === 'Space' || key === 32;
+    },
 
-Mautic.getEventKey = function (event) {
-    return event.key || event.which || event.keyCode;
+    isBackspace: function (key) {
+        return key === 'Backspace' || key === 8;
+    },
+
+    /**
+     * Check whether the key event is a navigation key
+     * that should not trigger live search.
+     *
+     * @param {KeyboardEvent} event
+     * @returns {boolean}
+     */
+    isLiveSearchNavigation: function (event) {
+        const key = this.getKey(event);
+
+        return (
+            this.isArrowDown(key) ||
+            this.isArrowUp(key)   ||
+            this.isTab(key)       ||
+            this.isEscape(key)
+        );
+    }
 };
 
 Mautic.isGlobalSearchInput = function (el) {
     return mQuery(el).attr('id') === 'globalSearchInput';
-};
-
-
-/**
- * Check whether the key event is a navigation key
- * that should not trigger live search.
- *
- * @param {KeyboardEvent} event
- * @returns {boolean}
- */
-Mautic.isLiveSearchNavigationKey = function (event) {
-    const key = Mautic.getEventKey(event);
-
-    return (
-        Mautic.isArrowDownKey(key) ||
-        Mautic.isArrowUpKey(key)   ||
-        Mautic.isTabKey(key)       ||
-        Mautic.isEscapeKey(key)
-    );
 };
 
 
