@@ -74,7 +74,7 @@ final class FacebookIntegration extends SocialIntegration
     /**
      * Get public data.
      *
-     * @return array|ResponseInterface|null
+     * @return ResponseInterface|null
      */
     public function getUserData($identifier, &$socialCache)
     {
