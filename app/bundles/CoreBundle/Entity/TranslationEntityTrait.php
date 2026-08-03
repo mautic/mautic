@@ -133,7 +133,7 @@ trait TranslationEntityTrait
             return null !== $parent;
         }
 
-        return !empty($parent) || ($children && count($children));
+        return $parent instanceof TranslationEntityInterface || ($children && count($children));
     }
 
     /**
@@ -161,7 +161,7 @@ trait TranslationEntityTrait
     {
         $parent = $this->getTranslationParent();
 
-        if (empty($parent)) {
+        if (!$parent instanceof TranslationEntityInterface) {
             $parent = $this;
         }
 

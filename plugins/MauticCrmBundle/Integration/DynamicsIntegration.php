@@ -714,7 +714,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $progress      = false;
         $totalToUpdate = array_sum($this->integrationEntityRepository->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
         $totalToCreate = $this->integrationEntityRepository->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {

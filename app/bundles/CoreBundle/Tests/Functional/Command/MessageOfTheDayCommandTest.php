@@ -51,7 +51,7 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
     #[DataProvider('provideCachedMotdPayloads')]
     public function testItReadsAndRendersCachedMotd(array $payload, bool $expectMessage, string $expectedCategory, string $expectedContent): void
     {
-        $json = (string) json_encode($payload, JSON_THROW_ON_ERROR);
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
 
         file_put_contents($this->cachePath, $json);
 

@@ -10,7 +10,7 @@ use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 
-class BroadcastQuery
+final class BroadcastQuery
 {
     use ContactLimiterTrait;
 

@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Intl\Locales;
 
-class FormFieldHelper extends AbstractFormFieldHelper
+final class FormFieldHelper extends AbstractFormFieldHelper
 {
     private static array $types = [
         'text' => [

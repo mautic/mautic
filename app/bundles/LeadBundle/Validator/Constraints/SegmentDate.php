@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class SegmentDate extends Constraint
+final class SegmentDate extends Constraint
 {
     public string $message;
 

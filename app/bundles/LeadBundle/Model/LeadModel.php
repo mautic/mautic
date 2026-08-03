@@ -2131,10 +2131,7 @@ class LeadModel extends FormModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();

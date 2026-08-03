@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ExceptionExtension extends AbstractExtension
+final class ExceptionExtension extends AbstractExtension
 {
     /**
      * @return TwigFunction[]
