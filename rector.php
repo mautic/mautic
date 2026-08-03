@@ -5,10 +5,6 @@ declare(strict_types=1);
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-<<<<<<< HEAD
-=======
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
->>>>>>> 78b6361c45 (add Symfony sets to Rector config)
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -55,14 +51,9 @@ return RectorConfig::configure()
         // DI
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
-<<<<<<< HEAD
     ->reportUnusedSkips()
-    ->withComposerBased(phpunit: true)
     ->withCodeQualityLevel(45)
-=======
     ->withComposerBased(phpunit: true, symfony: true)
-    ->withCodeQualityLevel(3)
->>>>>>> 78b6361c45 (add Symfony sets to Rector config)
     ->withSkip([
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
@@ -70,8 +61,8 @@ return RectorConfig::configure()
         // opinionated
         Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
 
-        __DIR__.'/plugins/*/node_modules/*',
         // test fixtures
+        __DIR__.'/plugins/*/node_modules/*',
         __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
@@ -79,29 +70,13 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
-<<<<<<< HEAD
         // streamed response above
         Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector::class => [
             __DIR__.'/app/bundles/ReportBundle/Model/ReportModel.php',
         ],
 
-        // static property is read from static log() before any instance is constructed,
-        // dropping the default would make it uninitialized
         Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
             // buggy
-            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
-        ],
-
-=======
->>>>>>> 61ef020d90 (apply symfony rules)
-        // fix no nullable
-        // Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeDeclarationRector:
-        // handled in another PR, but leaving here for now to avoid conflicts
-        RecastingRemovalRector::class,
-
-        // bug fixed in dev-main;
-        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
             __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
         ],
 
@@ -128,18 +103,9 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
         ],
 
-<<<<<<< HEAD
-=======
-        // lets handle later, once we have more type declaratoins
-        // RecastingRemovalRector::class,
->>>>>>> 78b6361c45 (add Symfony sets to Rector config)
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-
-        // symfony
-        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
     ])
     ->reportUnusedSkips();
