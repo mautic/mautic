@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class MauticSocialPermissions extends AbstractPermissions
+final class MauticSocialPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

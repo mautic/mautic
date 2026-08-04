@@ -21,9 +21,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CrmAbstractIntegration<SugarcrmApi>
  */
-class SugarcrmIntegration extends CrmAbstractIntegration
+final class SugarcrmIntegration extends CrmAbstractIntegration
 {
     private CompanyRepository $companyRepository;
+
+    private DoNotContact $doNotContactModel;
+
+    private UserModel $userModel;
 
     #[Required]
     public function autowireSugarcrmIntegration(
@@ -51,10 +55,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
 
     private $authorizationError;
-
-    protected DoNotContact $doNotContactModel;
-
-    private UserModel $userModel;
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -1315,7 +1315,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
      *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
-    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
+    public function getObjectDataToUpdate($checkEmailsInSugar, array &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
     {
         $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ('Leads' == $object) ? 'checkemail' : 'checkemail_contacts';
@@ -1408,10 +1408,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
 
-    /**
-     * @return array
-     */
-    public function getSugarLeadId($lead)
+    public function getSugarLeadId($lead): array
     {
         // try searching for lead as this has been changed before in updated done to the plugin
         $result = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
@@ -1419,7 +1416,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $result;
     }
 
-    protected function getOwnerEmail(array $lead)
+    private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
             /** @var \Mautic\UserBundle\Entity\User $user */
@@ -1431,7 +1428,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
+    private function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, string $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null): void
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1476,7 +1473,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $response
      */
-    protected function processCompositeResponse($response): array
+    private function processCompositeResponse($response): array
     {
         $created         = 0;
         $errored         = 0;
