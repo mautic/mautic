@@ -1,6 +1,6 @@
-const assert = require('assert');
-const fs = require('fs');
-const vm = require('vm');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const vm = require('node:vm');
 
 const displayScript = fs.readFileSync(process.argv[2], 'utf8');
 const trackingScript = fs.readFileSync(process.argv[3], 'utf8');

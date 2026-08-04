@@ -223,7 +223,7 @@
 
     var originalAppendChild = Node.prototype.appendChild;
     Node.prototype.appendChild = function (node) {
-        if (node && node.tagName && ['SCRIPT', 'LINK'].indexOf(node.tagName) !== -1 && (node.src || node.href)) {
+        if (node && node.tagName && ['SCRIPT', 'LINK'].includes(node.tagName) && (node.src || node.href)) {
             window.focusFixture.recordRequest(node.tagName.toLowerCase(), node.src || node.href);
             var finish = window.focusFixture.startPendingRequest();
             node.addEventListener('load', finish, {once: true});
