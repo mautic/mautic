@@ -603,7 +603,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $id                    = $personData['id'];
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
-                if (isset($config['push_activities']) and true == $config['push_activities']) {
+                if (isset($config['push_activities']) && true == $config['push_activities']) {
                     $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
                     if ($savedEntity instanceof IntegrationEntity) {
                         $integrationEntities[] = $savedEntity;
@@ -970,7 +970,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
     {
-        if ($cwContactId and !empty($config['activity_name'])) {
+        if ($cwContactId && !empty($config['activity_name'])) {
             $activity = [
                 'name'     => $config['activity_name'],
                 'type'     => ['id' => $config['campaign_activity_type']],

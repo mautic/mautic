@@ -473,7 +473,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
+            defined('MAUTIC_OFFLINE') || define('MAUTIC_OFFLINE', 1);
 
             try {
                 // Get the URLs base path
