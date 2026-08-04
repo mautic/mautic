@@ -278,9 +278,6 @@ class PlainTextHelper
         $this->converted = true;
     }
 
-    /**
-     * @phpstan-impure
-     */
     protected function converter(&$text): void
     {
         $this->convertBlockquotes($text);

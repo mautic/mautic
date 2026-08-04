@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<DynamicContent>
  */
-class DynamicContentApiController extends CommonApiController
+final class DynamicContentApiController extends CommonApiController
 {
     public function __construct(
         CorePermissions $security,

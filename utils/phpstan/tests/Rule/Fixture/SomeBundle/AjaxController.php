@@ -10,7 +10,8 @@ use Utils\PHPStan\Tests\Rule\Fixture\SomeModel;
 final class AjaxController
 {
     #[Required]
-    public function autowireAjaxController(SomeModel $someModel): void
-    {
+    public function autowireAjaxController(
+        SomeModel $someModel,
+    ): void {
     }
 }

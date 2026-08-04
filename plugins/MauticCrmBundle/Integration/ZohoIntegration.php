@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ZohoApi>
  */
-class ZohoIntegration extends CrmAbstractIntegration
+final class ZohoIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -807,7 +807,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->integrationEntityRepository->findLeadsToUpdate('Zoho', 'lead', $fields, 0, $params['start'], $params['end'], ['Contacts', 'Leads'])
         );
         $totalToCreate = $this->integrationEntityRepository->findLeadsToCreate('Zoho', $fields, 0, $params['start'], $params['end']);
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {

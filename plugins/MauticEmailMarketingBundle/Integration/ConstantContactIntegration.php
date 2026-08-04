@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
-class ConstantContactIntegration extends EmailAbstractIntegration
+final class ConstantContactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {

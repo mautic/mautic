@@ -72,10 +72,6 @@ abstract class CampaignTestAbstract extends TestCase
             ->setConstructorArgs([12 => $entityManager])
             ->getMock();
 
-        $formModel
-            ->method('getRepository')
-            ->willReturn($formRepository);
-
         return new CampaignModel(
             $leadListModel,
             $formModel,
@@ -96,6 +92,7 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->createStub(StatRepository::class), // $statRepository
+            $formRepository, // $formRepository
         );
     }
 }

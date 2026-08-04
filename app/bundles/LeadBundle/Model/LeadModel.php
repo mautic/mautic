@@ -33,6 +33,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -164,6 +165,7 @@ class LeadModel extends FormModel
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -327,7 +329,8 @@ class LeadModel extends FormModel
     {
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
-        for ($i = 0; $i < count($contactIds); ++$i) {
+        $counter = count($contactIds);
+        for ($i = 0; $i < $counter; ++$i) {
             $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {
                 if ($entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
@@ -2131,10 +2134,7 @@ class LeadModel extends FormModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();
@@ -2297,7 +2297,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($entities)) {
-            $this->companyModel->getRepository()->saveEntities($entities);
+            $this->companyRepository->saveEntities($entities);
         }
 
         return $success;

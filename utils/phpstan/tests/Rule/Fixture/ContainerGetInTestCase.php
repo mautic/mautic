@@ -10,8 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 // in a test only a string service name must be reported
 class ContainerGetInTestCase
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+    ) {
     }
 
     public function viaStringName(): void
