@@ -16,6 +16,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 final class InstallCommandTest extends AbstractMauticTestCase
 {
@@ -36,7 +37,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
     private MockObject&UserModel $userModel;
 
-    private MockObject&UserRepository $userRepository;
+    private Stub&UserRepository $userRepository;
 
     private string $packageName;
 
@@ -47,7 +48,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $this->packageModel      = $this->createMock(PackageModel::class);
         $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->userModel         = $this->createMock(UserModel::class);
-        $this->userRepository    = $this->createMock(UserRepository::class);
+        $this->userRepository    = $this->createStub(UserRepository::class);
         $this->packageName       = 'koco/mautic-recaptcha-bundle';
 
         $user = $this->createMock(User::class);
