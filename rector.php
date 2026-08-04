@@ -49,7 +49,7 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withCodeQualityLevel(45)
+    ->withCodeQualityLevel(60)
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // @todo move to "twig" group
@@ -62,12 +62,10 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
 
+        // preference to compare null over object
+        Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
+
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
-<<<<<<< HEAD
-=======
-            // handle in rector
-            __DIR__.'/plugins/GrapesJsBuilderBundle/Helper/FileManager.php',
->>>>>>> ab45e23259 ([solid] flip isset to direct property value check, as property exists and is explicitly defined)
             // doctrine magic
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
