@@ -57,6 +57,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -219,8 +220,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
-
         $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
 
         $metadata->addConstraint(new ReportAssert\ScheduleIsValid());

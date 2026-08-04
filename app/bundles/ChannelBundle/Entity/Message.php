@@ -56,6 +56,7 @@ class Message extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -117,11 +118,6 @@ class Message extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'message_projects_xref', 'message_id');
-    }
-
-    public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
