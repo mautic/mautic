@@ -33,7 +33,7 @@ final class LeadPointLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($actions)) {
+        if ([] !== $actions) {
             $q->andWhere(
                 $q->expr()->notIn('point_id', ':actions')
             )

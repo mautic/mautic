@@ -82,7 +82,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
@@ -120,7 +120,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);

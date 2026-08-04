@@ -218,7 +218,7 @@ final class SyncProcess
         // Relation objects we need to synchronize
         $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
-        if (!empty($objectsToSynchronize)) {
+        if ([] !== $objectsToSynchronize) {
             $this->synchronizeMissingObjects($objectsToSynchronize, $syncReport);
         }
     }

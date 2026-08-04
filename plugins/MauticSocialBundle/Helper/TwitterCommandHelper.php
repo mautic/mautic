@@ -129,7 +129,7 @@ final class TwitterCommandHelper
         }
         unset($expr);
 
-        if (!empty($usersByHandles)) {
+        if ([] !== $usersByHandles) {
             $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [

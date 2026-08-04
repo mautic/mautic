@@ -562,7 +562,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity = (empty($integrationId)) ?
+                $integrationEntity = ([] === $integrationId) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],

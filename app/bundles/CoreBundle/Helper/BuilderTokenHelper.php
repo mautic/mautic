@@ -134,7 +134,7 @@ final class BuilderTokenHelper
     ): array {
         $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr) ?? [];
 
-        if (empty($tokens)) {
+        if ([] === $tokens) {
             return [];
         }
 

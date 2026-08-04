@@ -206,16 +206,16 @@ final class EmailController extends FormController
             $session->set('mautic.email.filter', $search);
             $filter['string'] = $search;
 
-            if (!empty($listAliases)) {
+            if ([] !== $listAliases) {
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
                 $ignoreListJoin    = false;
             }
 
-            if (!empty($catIds)) {
+            if ([] !== $catIds) {
                 $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
             }
 
-            if (!empty($templates)) {
+            if ([] !== $templates) {
                 $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
             }
         }
@@ -1597,7 +1597,7 @@ final class EmailController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->emailModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
