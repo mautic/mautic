@@ -50,6 +50,7 @@ final class ImportController extends AbstractFormController
     private PathsHelper $pathsHelper;
 
     private FormFactoryInterface $formFactory;
+    private ImportHelper $importHelper;
 
     #[Required]
     public function autowireImportController(
@@ -58,12 +59,14 @@ final class ImportController extends AbstractFormController
         LoggerInterface $logger,
         PathsHelper $pathsHelper,
         FormFactoryInterface $formFactory,
+        ImportHelper $importHelper,
     ): void {
         $this->userHelper   = $userHelper;
         $this->requestStack = $requestStack;
         $this->logger       = $logger;
         $this->pathsHelper  = $pathsHelper;
         $this->formFactory  = $formFactory;
+        $this->importHelper = $importHelper;
     }
 
     public function newAction(): Response
@@ -237,13 +240,12 @@ final class ImportController extends AbstractFormController
         return $fileName;
     }
 
-    public function progressAction(ImportHelper $importHelper): Response
+    public function progressAction(): Response
     {
         $session       = $this->requestStack->getSession();
         $session->get('mautic.campaign.import.progress', 0);
         $step          = $session->get('mautic.campaign.import.step', self::STEP_PROGRESS_BAR);
         $fullPath      = $session->get('mautic.campaign.import.file');
-
         // If there's no valid file, show an error
         if (!$fullPath || !file_exists($fullPath)) {
             if (self::STEP_UPLOAD_ZIP !== $step) {
@@ -253,9 +255,8 @@ final class ImportController extends AbstractFormController
 
             return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
         }
-
         if (self::STEP_PROGRESS_BAR === $step) {
-            $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
+            $analyzeSummary = $this->analyzeData($fullPath);
 
             if (empty($analyzeSummary)) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
@@ -277,13 +278,13 @@ final class ImportController extends AbstractFormController
             ]);
         }
         try {
-            $fileData      = $importHelper->readZipFile($fullPath);
+            $fileData      = $this->importHelper->readZipFile($fullPath);
             $userId        = $this->userHelper->getUser()->getId();
             $importSummary = [];
 
             $importActions = $this->requestStack->getCurrentRequest()->get('importAction', []);
 
-            $importHelper->recursiveRemoveEmailaddress($fileData);
+            $this->importHelper->recursiveRemoveEmailaddress($fileData);
 
             // Loop through importActions and clean UUIDs for 'create' actions
             foreach ($fileData as &$group) {
@@ -382,10 +383,10 @@ final class ImportController extends AbstractFormController
     /**
      * @return array<int|string, array<string, mixed>>
      */
-    private function analyzeData(ImportHelper $importHelper, string $fullPath): array
+    private function analyzeData(string $fullPath): array
     {
         try {
-            $fileData = $importHelper->readZipFile($fullPath);
+            $fileData = $this->importHelper->readZipFile($fullPath);
         } catch (\RuntimeException $e) {
             $this->logger->error($e->getMessage());
             $this->removeImportFile($fullPath);

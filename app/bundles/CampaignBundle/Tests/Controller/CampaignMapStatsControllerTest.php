@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\MapHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -29,7 +30,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class));
+        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class), $this->createStub(CorePermissions::class));
     }
 
     /**

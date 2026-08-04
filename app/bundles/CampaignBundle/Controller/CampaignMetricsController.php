@@ -22,11 +22,12 @@ final class CampaignMetricsController extends AbstractController
     public function __construct(
         private readonly Translator $translator,
         private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EmailPeriodMetrics $emailPeriodMetrics,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
     public function emailWeekdaysAction(
-        EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
         int $objectId,
         string $dateFrom = '',
@@ -39,7 +40,7 @@ final class CampaignMetricsController extends AbstractController
 
         $dateTimeHelper        = new DateTimeHelper();
         $defaultTimezoneOffset = $dateTimeHelper->getLocalDateTime()->format('Z');
-        $stats                 = $emailPeriodMetrics->emailMetricsPerWeekdayByCampaignEvents($eventsIds, $dateFromObject, $dateToObject, $defaultTimezoneOffset);
+        $stats                 = $this->emailPeriodMetrics->emailMetricsPerWeekdayByCampaignEvents($eventsIds, $dateFromObject, $dateToObject, $defaultTimezoneOffset);
 
         $chart  = new BarChart([
             $this->translator->trans('mautic.core.date.monday'),
@@ -66,7 +67,6 @@ final class CampaignMetricsController extends AbstractController
     }
 
     public function emailHoursAction(
-        EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
         int $objectId,
         string $dateFrom = '',
@@ -80,7 +80,7 @@ final class CampaignMetricsController extends AbstractController
         $dateTimeHelper        = new DateTimeHelper();
         $defaultTimezoneOffset = $dateTimeHelper->getLocalDateTime()->format('Z');
 
-        $stats = $emailPeriodMetrics->emailMetricsPerHourByCampaignEvents($eventsIds, $dateFromObject, $dateToObject, $defaultTimezoneOffset);
+        $stats = $this->emailPeriodMetrics->emailMetricsPerHourByCampaignEvents($eventsIds, $dateFromObject, $dateToObject, $defaultTimezoneOffset);
 
         $hoursRange = range(0, 23);
         $labels     = [];
@@ -110,7 +110,6 @@ final class CampaignMetricsController extends AbstractController
     }
 
     public function eventDetailsAction(
-        EventDispatcherInterface $eventDispatcher,
         EventModel $eventModel,
         int $objectId,
     ): JsonResponse {
@@ -123,7 +122,7 @@ final class CampaignMetricsController extends AbstractController
         }
 
         $eventDetailsAction = new EventPreview($event);
-        $eventDispatcher->dispatch($eventDetailsAction);
+        $this->eventDispatcher->dispatch($eventDetailsAction);
 
         return $this->json($eventDetailsAction->eventStats);
     }

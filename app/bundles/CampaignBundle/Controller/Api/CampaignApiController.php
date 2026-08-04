@@ -59,11 +59,13 @@ final class CampaignApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        private UserHelper $userHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
         CampaignModel $campaignModel,
         private LeadModel $leadModel,
+        private ImportHelper $importHelper,
     ) {
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
@@ -426,7 +428,7 @@ final class CampaignApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
+    public function importCampaignAction(Request $request): Response
     {
         // Check if user has permission to import campaigns
         if (!$this->security->isGranted('campaign:imports:create')) {
@@ -468,7 +470,7 @@ final class CampaignApiController extends CommonApiController
             }
 
             try {
-                $data = $importHelper->readZipFile($zipPath);
+                $data = $this->importHelper->readZipFile($zipPath);
             } catch (\RuntimeException $e) {
                 unlink($zipPath);
 
@@ -477,8 +479,8 @@ final class CampaignApiController extends CommonApiController
                 );
             }
         }
-        $importHelper->recursiveRemoveEmailaddress($data);
-        $userId = $userHelper->getUser()->getId();
+        $this->importHelper->recursiveRemoveEmailaddress($data);
+        $userId = $this->userHelper->getUser()->getId();
 
         foreach ($data as $entity) {
             $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
