@@ -40,10 +40,6 @@ final class DynamicContentTypeTest extends TestCase
 
         $leadRepositoryMock = $this->createMock(LeadRepository::class);
 
-        $leadModelMock->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($leadRepositoryMock);
-
         $leadRepositoryMock->expects($this->once())
             ->method('getCustomFieldList')
             ->with('lead')
@@ -61,6 +57,7 @@ final class DynamicContentTypeTest extends TestCase
             $leadModelMock,
             new TypeList(),
             $relativeDateMock,
+            $leadRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
