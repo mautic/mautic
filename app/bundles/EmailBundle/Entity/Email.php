@@ -96,8 +96,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
-    #[\Symfony\Component\Validator\Constraints\Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')]
+    #[NotBlank(message: 'mautic.core.name.required')]
+    #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')]
     private $name;
 
     /**
@@ -110,8 +110,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.subject.required')]
-    #[\Symfony\Component\Validator\Constraints\Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
+    #[NotBlank(message: 'mautic.core.subject.required')]
+    #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
     private $subject;
 
     /**
@@ -124,7 +124,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    #[\Symfony\Component\Validator\Constraints\Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')]
+    #[Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')]
     private ?string $preheaderText = null;
 
     /**

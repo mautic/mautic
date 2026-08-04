@@ -78,7 +78,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var string
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.title.required')]
+    #[NotBlank(message: 'mautic.core.title.required')]
     private $title;
 
     /**

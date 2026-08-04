@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -64,7 +63,7 @@ class Action implements UuidInterface
      * @var string
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
     private $type;
 
     /**
