@@ -63,6 +63,11 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
+<<<<<<< HEAD
+=======
+            // handle in rector
+            __DIR__.'/plugins/GrapesJsBuilderBundle/Helper/FileManager.php',
+>>>>>>> ab45e23259 ([solid] flip isset to direct property value check, as property exists and is explicitly defined)
             // doctrine magic
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
