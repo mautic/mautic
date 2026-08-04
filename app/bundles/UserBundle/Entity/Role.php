@@ -56,6 +56,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var string
      */
     #[Groups(['role:read', 'role:write'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -124,13 +125,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
             ->build();
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            message: 'mautic.core.name.required'
-        ));
     }
 
     /**
