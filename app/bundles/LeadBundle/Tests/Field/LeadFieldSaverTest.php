@@ -45,11 +45,13 @@ final class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
 
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPreSaveEvent')
-            ->with($leadField, true);
+            ->with($leadField, true)
+            ->willReturn(new LeadFieldEvent($leadField));
 
         $fieldSaveDispatcher->expects($this->once())
             ->method('dispatchPostSaveEvent')
-            ->with($leadField, true);
+            ->with($leadField, true)
+            ->willReturn(new LeadFieldEvent($leadField));
 
         $leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
 
