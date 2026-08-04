@@ -32,22 +32,32 @@ class PropertiesAccessor
     }
 
     /**
-     * @param string|array<string, string>|list<array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
+     * @param string|array<string, string>|list<string|array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
      *
      * @return array<string, string>
      */
     public function getChoices($options): array
     {
-        $choices = [];
+        if (is_string($options)) {
+            return $this->getChoicesFromList(explode('|', $options));
+        }
 
         // A missing first numeric index means we already have an associative value=>label map.
-        if (is_array($options) && !isset($options[0])) {
+        if (!array_is_list($options)) {
             return array_flip($options);
         }
 
-        if (!is_array($options)) {
-            $options = explode('|', (string) $options);
-        }
+        return $this->getChoicesFromList($options);
+    }
+
+    /**
+     * @param list<string|array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
+     *
+     * @return array<string, string>
+     */
+    private function getChoicesFromList(array $options): array
+    {
+        $choices = [];
 
         foreach ($options as $option) {
             if (is_array($option)) {
