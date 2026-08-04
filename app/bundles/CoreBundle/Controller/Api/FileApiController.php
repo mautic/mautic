@@ -23,14 +23,14 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<object>
  */
-class FileApiController extends CommonApiController
+final class FileApiController extends CommonApiController
 {
     /**
      * Holds array of allowed file extensions.
      *
      * @var array
      */
-    protected $allowedExtensions = [];
+    private $allowedExtensions = [];
 
     public function __construct(
         CorePermissions $security,

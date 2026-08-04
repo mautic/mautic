@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * This constraint makes sure all entities with same slot name have the same type.
  */
-class SlotNameType extends Constraint
+final class SlotNameType extends Constraint
 {
     public string $message = 'mautic.dynamicContent.slot_name_type';
 

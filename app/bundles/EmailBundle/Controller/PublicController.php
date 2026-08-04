@@ -21,6 +21,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -44,7 +45,7 @@ final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
 
@@ -54,7 +55,7 @@ final class PublicController extends CommonFormController
     public function autowirePublicController(
         LeadModel $leadModel,
         EmailModel $emailModel,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;

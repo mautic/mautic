@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date\Month;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class DateMonthThis extends DateMonthAbstract
+final class DateMonthThis extends DateMonthAbstract
 {
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {

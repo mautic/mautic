@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -45,6 +46,8 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -119,6 +122,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly HitRepository $hitRepository,
         private readonly EmailRepository $emailRepository,
         private readonly UtmTagRepository $utmTagRepository,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -614,43 +620,41 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $trackingId = $hit->getTrackingId();
         $isUnique   = $this->hitRepository->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($this->limitString($page->getLanguage()));
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($this->limitString($page->getLanguage()));
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->redirectRepository->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->trackableRepository->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
                     );
                 }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV !== 'prod') {
-                        throw $exception;
-                    }
-                    $this->logger->error(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
-                    );
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV !== 'prod') {
+                    throw $exception;
                 }
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
             }
         }
 
@@ -708,7 +712,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         if (null !== $hitDate) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
-                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+                    $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
                     $data = [
                         'unique'             => ($isUnique ? 'true' : 'false'),
@@ -1129,13 +1133,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         // Use the current URL
         $isPageEvent = false;
-        if (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

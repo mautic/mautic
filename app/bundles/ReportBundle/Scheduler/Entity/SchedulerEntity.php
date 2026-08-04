@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Scheduler\Entity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
-class SchedulerEntity implements SchedulerInterface
+final class SchedulerEntity implements SchedulerInterface
 {
     /**
      * @param bool        $isScheduled

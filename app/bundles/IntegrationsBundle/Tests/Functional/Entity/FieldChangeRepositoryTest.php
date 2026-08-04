@@ -32,10 +32,10 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $lead3        = $this->createLead();
         $lead4        = $this->createLead();
         $fieldChanges = $this->generateFieldChanges(4);
-        $fieldChanges[0]->setObjectId((int) $lead3->getId());
-        $fieldChanges[1]->setObjectId((int) $lead4->getId());
-        $fieldChanges[2]->setObjectId((int) $lead1->getId());
-        $fieldChanges[3]->setObjectId((int) $lead2->getId());
+        $fieldChanges[0]->setObjectId($lead3->getId());
+        $fieldChanges[1]->setObjectId($lead4->getId());
+        $fieldChanges[2]->setObjectId($lead1->getId());
+        $fieldChanges[3]->setObjectId($lead2->getId());
 
         foreach ($fieldChanges as $fieldChange) {
             $this->em->persist($fieldChange);

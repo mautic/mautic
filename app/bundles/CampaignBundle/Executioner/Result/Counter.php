@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Result;
 
-class Counter
+final class Counter
 {
     private int $rescheduled = 0;
 

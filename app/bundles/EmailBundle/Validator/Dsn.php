@@ -6,6 +6,6 @@ namespace Mautic\EmailBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
-class Dsn extends Constraint
+final class Dsn extends Constraint
 {
 }

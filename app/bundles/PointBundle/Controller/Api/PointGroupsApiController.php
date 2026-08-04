@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Group>
  */
-class PointGroupsApiController extends CommonApiController
+final class PointGroupsApiController extends CommonApiController
 {
     /**
      * @var PointGroupModel

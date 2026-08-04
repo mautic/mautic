@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * @extends CommonApiController<User>
  */
-class UserApiController extends CommonApiController
+final class UserApiController extends CommonApiController
 {
     /**
      * @var UserModel|null

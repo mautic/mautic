@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Form\Type\StageMergeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\Security\Permissions\StagePermissions;
@@ -21,14 +22,14 @@ final class StageController extends AbstractFormController
 {
     use CategoryListFiltersTrait;
 
-    private \Mautic\StageBundle\Entity\StageRepository $stageRepository;
+    private StageRepository $stageRepository;
 
     private StageModel $stageModel;
 
     #[Required]
     public function autowireStageController(
         StageModel $stageModel,
-        \Mautic\StageBundle\Entity\StageRepository $stageRepository,
+        StageRepository $stageRepository,
     ): void {
         $this->stageModel      = $stageModel;
         $this->stageRepository = $stageRepository;

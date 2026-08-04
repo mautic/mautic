@@ -26,6 +26,7 @@ use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -42,7 +43,7 @@ final class EmailController extends FormController
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
 
@@ -55,7 +56,7 @@ final class EmailController extends FormController
         ListModel $listModel,
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
@@ -1803,7 +1804,7 @@ final class EmailController extends FormController
                         // Send to current user
                         $error = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
                         if (count($error)) {
-                            array_push($errors, $error[0]);
+                            $errors[] = $error[0];
                         }
                     }
                 }

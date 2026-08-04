@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class FormExtension extends AbstractExtension
+final class FormExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {

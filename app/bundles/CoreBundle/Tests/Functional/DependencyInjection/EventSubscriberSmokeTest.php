@@ -4,7 +4,44 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
+use Mautic\ApiBundle\EventListener\ApiSubscriber;
+use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
+use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\CoreBundle\EventListener\AssetsSubscriber;
+use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
+use Mautic\CoreBundle\EventListener\CoreSubscriber;
+use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
+use Mautic\CoreBundle\EventListener\ErrorHandlingListener;
+use Mautic\CoreBundle\EventListener\ExceptionListener;
+use Mautic\CoreBundle\EventListener\RequestSubscriber;
+use Mautic\CoreBundle\EventListener\RouterSubscriber;
+use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\EmailBundle\EventListener\DateTimeTokenSubscriber;
+use Mautic\EmailBundle\EventListener\PointSubscriber;
+use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
+use Mautic\EmailBundle\EventListener\TokenSubscriber;
+use Mautic\FormBundle\EventListener\FormValidationSubscriber;
+use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
+use Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber;
+use Mautic\LeadBundle\EventListener\OwnerSubscriber;
+use Mautic\LeadBundle\EventListener\ReportDevicesSubscriber;
+use Mautic\LeadBundle\EventListener\ReportDNCSubscriber;
+use Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber;
+use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
+use Mautic\LeadBundle\EventListener\SegmentReportSubscriber;
+use Mautic\SmsBundle\EventListener\CampaignReplySubscriber;
+use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
+use Mautic\UserBundle\Controller\SecurityController;
+use Mautic\UserBundle\EventListener\ApiUserSubscriber;
+use Mautic\UserBundle\EventListener\LogoutListener;
+use Mautic\UserBundle\EventListener\PasswordStrengthSubscriber;
+use Mautic\UserBundle\EventListener\PasswordSubscriber;
+use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
+use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
 {
@@ -19,66 +56,72 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
      * @var array<string, string[]>
      */
     private const EXPECTED_EVENT_SUBSCRIBER_CLASSES = [
-        \Symfony\Component\Security\Http\Event\LogoutEvent::class => [
-            \Mautic\UserBundle\EventListener\LogoutListener::class,
+        LogoutEvent::class => [
+            LogoutListener::class,
         ],
-        \Symfony\Component\Security\Http\Event\CheckPassportEvent::class => [
-            \Mautic\UserBundle\EventListener\ApiUserSubscriber::class,
-            \Mautic\UserBundle\EventListener\PasswordStrengthSubscriber::class,
-            \Mautic\UserBundle\EventListener\PasswordSubscriber::class,
+        CheckPassportEvent::class => [
+            ApiUserSubscriber::class,
+            PasswordStrengthSubscriber::class,
+            PasswordSubscriber::class,
         ],
-        \Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent::class => [
-            \Mautic\UserBundle\EventListener\ApiUserSubscriber::class,
+        AuthenticationTokenCreatedEvent::class => [
+            ApiUserSubscriber::class,
         ],
         'kernel.request' => [
-            \MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber::class,
-            \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
-            \Mautic\CoreBundle\EventListener\AssetsSubscriber::class,
-            \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
-            \Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
-            \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
-            \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
-            \Mautic\UserBundle\Controller\SecurityController::class,
+            FocusSubscriber::class,
+            ApiSubscriber::class,
+            AssetsSubscriber::class,
+            EnvironmentSubscriber::class,
+            ErrorHandlingListener::class,
+            RequestSubscriber::class,
+            RouterSubscriber::class,
+            SecurityController::class,
         ],
         'kernel.response' => [
-            \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
-            \Mautic\CoreBundle\EventListener\ExceptionListener::class,
-            \Mautic\CoreBundle\Helper\CookieHelper::class,
+            ApiSubscriber::class,
+            ExceptionListener::class,
+            CookieHelper::class,
         ],
         'kernel.exception' => [
-            \Mautic\CoreBundle\EventListener\ExceptionListener::class,
+            ExceptionListener::class,
         ],
         'kernel.controller' => [
-            \Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class,
+            ControllerSubscriber::class,
+        ],
+        \FOS\OAuthServerBundle\Event\OAuthEvent::PRE_AUTHORIZATION_PROCESS => [
+            \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
+        ],
+        \FOS\OAuthServerBundle\Event\OAuthEvent::POST_AUTHORIZATION_PROCESS => [
+            \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
         ],
         'security.interactive_login' => [
-            \Mautic\CoreBundle\EventListener\CoreSubscriber::class,
+            CoreSubscriber::class,
         ],
         'mautic.campaign_on_build' => [
             \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
             \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
             \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
-            \Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber::class,
-            \Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber::class,
+            CampaignActionChangeMembershipSubscriber::class,
+            CampaignActionJumpToEventSubscriber::class,
             \Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
             \Mautic\DynamicContentBundle\EventListener\CampaignSubscriber::class,
             \Mautic\EmailBundle\EventListener\CampaignConditionSubscriber::class,
             \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
             \Mautic\FormBundle\EventListener\CampaignSubscriber::class,
-            \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
-            \Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber::class,
+            CampaignActionDNCSubscriber::class,
+            CampaignActionDeleteContactSubscriber::class,
             \Mautic\LeadBundle\EventListener\CampaignSubscriber::class,
             \Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber::class,
             \Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
             \Mautic\PageBundle\EventListener\CampaignSubscriber::class,
             \Mautic\PluginBundle\EventListener\CampaignSubscriber::class,
-            \Mautic\SmsBundle\EventListener\CampaignReplySubscriber::class,
-            \Mautic\SmsBundle\EventListener\CampaignSendSubscriber::class,
+            CampaignReplySubscriber::class,
+            CampaignSendSubscriber::class,
             \Mautic\StageBundle\EventListener\CampaignSubscriber::class,
             \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
         ],
         'mautic.report_on_build' => [
-            \MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber::class,
+            FocusSubscriber::class,
             \MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber::class,
             \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
@@ -86,12 +129,12 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\CoreBundle\EventListener\ReportSubscriber::class,
             \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
             \Mautic\FormBundle\EventListener\ReportSubscriber::class,
-            \Mautic\LeadBundle\EventListener\ReportDNCSubscriber::class,
-            \Mautic\LeadBundle\EventListener\ReportDevicesSubscriber::class,
+            ReportDNCSubscriber::class,
+            ReportDevicesSubscriber::class,
             \Mautic\LeadBundle\EventListener\ReportSubscriber::class,
-            \Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber::class,
-            \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber::class,
-            \Mautic\LeadBundle\EventListener\SegmentReportSubscriber::class,
+            ReportUtmTagSubscriber::class,
+            SegmentLogReportSubscriber::class,
+            SegmentReportSubscriber::class,
             \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
             \Mautic\PageBundle\EventListener\ReportSubscriber::class,
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
@@ -102,7 +145,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
-            \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
+            ConfigThemeSubscriber::class,
             \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,
             \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
             \Mautic\LeadBundle\EventListener\ConfigSubscriber::class,
@@ -126,15 +169,15 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         'mautic.email_on_send' => [
             \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
             \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
-            \Mautic\EmailBundle\EventListener\DateTimeTokenSubscriber::class,
+            DateTimeTokenSubscriber::class,
             \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
-            \Mautic\EmailBundle\EventListener\PointSubscriber::class,
-            \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
-            \Mautic\EmailBundle\EventListener\TokenSubscriber::class,
+            PointSubscriber::class,
+            ProcessUnsubscribeSubscriber::class,
+            TokenSubscriber::class,
             \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
             \Mautic\IntegrationsBundle\EventListener\EmailSubscriber::class,
             \Mautic\LeadBundle\EventListener\EmailSubscriber::class,
-            \Mautic\LeadBundle\EventListener\OwnerSubscriber::class,
+            OwnerSubscriber::class,
             \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
         ],
         'mautic.form_on_build' => [
@@ -142,7 +185,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\AssetBundle\EventListener\FormSubscriber::class,
             \Mautic\EmailBundle\EventListener\FormSubscriber::class,
             \Mautic\FormBundle\EventListener\FormSubscriber::class,
-            \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
+            FormValidationSubscriber::class,
             \Mautic\LeadBundle\EventListener\FormSubscriber::class,
             \Mautic\PluginBundle\EventListener\FormSubscriber::class,
         ],

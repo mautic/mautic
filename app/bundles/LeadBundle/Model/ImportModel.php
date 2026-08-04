@@ -118,13 +118,13 @@ class ImportModel extends FormModel
      * Check if there are some IN_PROGRESS imports which got stuck for a while.
      * Set those as failed.
      */
-    public function setGhostImportsAsFailed()
+    public function setGhostImportsAsFailed(): void
     {
         $ghostDelay = 2;
         $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
         if (empty($imports)) {
-            return null;
+            return;
         }
 
         foreach ($imports as $import) {

@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Email>
  */
-class EmailApiController extends CommonApiController
+final class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 

@@ -21,6 +21,8 @@ use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
@@ -53,8 +55,8 @@ class FormController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly AuditLogModel $auditLogModel,
         private readonly SubmissionModel $submissionModel,
-        private readonly \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository,
-        private readonly \Mautic\FormBundle\Entity\FormRepository $formRepository,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

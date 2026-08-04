@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<PointInsight>
  */
-class PointInsightRepository extends CommonRepository
+final class PointInsightRepository extends CommonRepository
 {
     public function getEntities(array $args = [])
     {

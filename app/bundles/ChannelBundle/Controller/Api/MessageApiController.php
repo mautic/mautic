@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Message>
  */
-class MessageApiController extends CommonApiController
+final class MessageApiController extends CommonApiController
 {
     /**
      * @var MessageModel|null

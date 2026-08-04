@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
@@ -12,7 +13,7 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TwitterCommandHelper
+final class TwitterCommandHelper
 {
     private ?OutputInterface $output = null;
 
@@ -34,7 +35,7 @@ class TwitterCommandHelper
         private readonly Translator $translator,
         private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));

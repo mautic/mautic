@@ -2,14 +2,9 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Uri;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
@@ -17,9 +12,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<Trackable>
@@ -61,20 +54,21 @@ class TrackableModel extends AbstractCommonModel
 
     private ?array $contactFieldUrlTokens = null;
 
-    public function __construct(
-        protected RedirectModel $redirectModel,
-        private readonly LeadFieldRepository $leadFieldRepository,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-        private readonly TrackableRepository $trackableRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected RedirectModel $redirectModel;
+
+    private LeadFieldRepository $leadFieldRepository;
+
+    private TrackableRepository $trackableRepository;
+
+    #[Required]
+    public function autowireTrackableModel(
+        RedirectModel $redirectModel,
+        LeadFieldRepository $leadFieldRepository,
+        TrackableRepository $trackableRepository,
+    ): void {
+        $this->redirectModel        = $redirectModel;
+        $this->leadFieldRepository  = $leadFieldRepository;
+        $this->trackableRepository  = $trackableRepository;
     }
 
     public function getRepository(): TrackableRepository
@@ -242,7 +236,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{string|string[],Redirect[]|Trackable[]}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, $channelId = null, $usingClickthrough = true): array
+    public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 

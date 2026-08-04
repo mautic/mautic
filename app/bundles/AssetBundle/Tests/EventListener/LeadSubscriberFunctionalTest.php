@@ -90,7 +90,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($download);
         $this->em->flush();
 
-        return [(int) $lead->getId(), (int) $download->getId()];
+        return [$lead->getId(), $download->getId()];
     }
 
     /**

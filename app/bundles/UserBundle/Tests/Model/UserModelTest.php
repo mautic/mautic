@@ -247,7 +247,7 @@ final class UserModelTest extends TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('mautic_user_invite_register', $this->isType('array'), UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('mautic_user_invite_register', $this->isArray(), UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn($link);
 
         $this->translator->expects($this->exactly(2))

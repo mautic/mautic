@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -20,7 +21,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public function __construct(
         private WebhookModel $webhookModel,
         private LeadModel $leadModel,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

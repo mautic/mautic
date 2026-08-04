@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -33,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:trigger',
     description: 'Trigger timed events for published campaigns.'
 )]
-class TriggerCampaignCommand extends ModeratedCommand
+final class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
@@ -65,7 +66,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         PathsHelper $pathsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private ProcessSignalService $processSignalService,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -282,7 +283,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return bool
      */
-    protected function dispatchTriggerEvent(Campaign $campaign)
+    private function dispatchTriggerEvent(Campaign $campaign)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */

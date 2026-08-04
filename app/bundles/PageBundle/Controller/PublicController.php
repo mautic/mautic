@@ -499,7 +499,7 @@ final class PublicController extends AbstractFormController
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $logger->warning(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');

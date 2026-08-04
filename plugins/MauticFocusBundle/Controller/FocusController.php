@@ -2,28 +2,18 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class FocusController extends AbstractStandardFormController
 {
@@ -34,23 +24,21 @@ final class FocusController extends AbstractStandardFormController
      */
     private array $listFilters = [];
 
-    public function __construct(
-        private readonly CacheProviderTagAwareInterface $cacheProvider,
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly FocusModel $focusModel,
-        private readonly TrackableModel $trackableModel,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private CacheProviderTagAwareInterface $cacheProvider;
+
+    private FocusModel $focusModel;
+
+    private TrackableModel $trackableModel;
+
+    #[Required]
+    public function autowireFocusController(
+        CacheProviderTagAwareInterface $cacheProvider,
+        FocusModel $focusModel,
+        TrackableModel $trackableModel,
+    ): void {
+        $this->cacheProvider = $cacheProvider;
+        $this->focusModel = $focusModel;
+        $this->trackableModel = $trackableModel;
     }
 
     protected function getTemplateBase(): string

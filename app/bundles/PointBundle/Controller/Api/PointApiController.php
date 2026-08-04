@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Point>
  */
-class PointApiController extends CommonApiController
+final class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -47,7 +47,7 @@ class PointApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        protected LeadModel $leadModel,
+        private LeadModel $leadModel,
         PointModel $pointModel,
     ) {
         $this->model            = $pointModel;

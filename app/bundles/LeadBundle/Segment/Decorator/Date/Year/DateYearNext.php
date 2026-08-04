@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date\Year;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class DateYearNext extends DateYearAbstract
+final class DateYearNext extends DateYearAbstract
 {
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {

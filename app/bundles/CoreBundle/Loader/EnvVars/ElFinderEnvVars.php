@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Loader\EnvVars;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ElFinderEnvVars implements EnvVarsInterface
+final class ElFinderEnvVars implements EnvVarsInterface
 {
     public static function load(ParameterBag $config, ParameterBag $defaultConfig, ParameterBag $envVars): void
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-class PrivateAddressChecker
+final class PrivateAddressChecker
 {
     private const PRIVATE_IP_RANGES = [
         '10.0.0.0/8',      // RFC1918

@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tweet>
  */
-class TweetApiController extends CommonApiController
+final class TweetApiController extends CommonApiController
 {
     /**
      * @var TweetModel|null

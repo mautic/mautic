@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Widget>
  */
-class WidgetApiController extends CommonApiController
+final class WidgetApiController extends CommonApiController
 {
     /**
      * @var DashboardModel|null

@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 <info>php %command.full_name%</info>
 TXT
 )]
-class UpdateDoNotSellListCommand extends Command
+final class UpdateDoNotSellListCommand extends Command
 {
     public function __construct(
         private readonly MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,

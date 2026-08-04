@@ -9,15 +9,15 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class SegmentDependencies
+final readonly class SegmentDependencies
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
-        private readonly CampaignModel $campaignModel,
-        private readonly ActionModel $actionModel,
-        private readonly ListModel $listModel,
-        private readonly TriggerEventModel $triggerEventModel,
-        private readonly ReportModel $reportModel,
+        private EmailModel $emailModel,
+        private CampaignModel $campaignModel,
+        private ActionModel $actionModel,
+        private ListModel $listModel,
+        private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel,
     ) {
     }
 

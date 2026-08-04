@@ -54,6 +54,7 @@ use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -140,6 +141,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -542,7 +544,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
-                $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
+                $this->leadRepository->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
     }
@@ -1048,7 +1050,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $ids[] = $email->getId();
         }
 
-        $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+        $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
@@ -1613,7 +1615,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $mailer            = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
-            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($lead['id']);
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
@@ -2194,8 +2196,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $contact;
         }
 
-        $companies = $this->companyModel
-            ->getRepository()
+        $companies = $this->companyRepository
             ->getCompaniesForContacts([$contact['id']]);
 
         $contact['companies'] = $companies[$contact['id']] ?? [];

@@ -6,7 +6,7 @@ namespace Mautic\MessengerBundle\Exceptions;
 
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 
-class InvalidPayloadException extends MauticMessengerException implements UnrecoverableExceptionInterface
+final class InvalidPayloadException extends MauticMessengerException implements UnrecoverableExceptionInterface
 {
     /**
      * @param array<mixed> $payload

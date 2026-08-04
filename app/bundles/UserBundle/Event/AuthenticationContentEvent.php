@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class AuthenticationContentEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $content = [];
+    private array $content = [];
 
     /**
      * @var bool

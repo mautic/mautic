@@ -85,7 +85,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                         $this->mergeExportData($data, $subEvent);
 
                         $event->addDependencyEntity(LeadList::ENTITY_NAME, [
-                            LeadList::ENTITY_NAME   => (int) $leadListId,
+                            LeadList::ENTITY_NAME   => $leadListId,
                             LeadField::ENTITY_NAME  => (int) $field->getId(),
                         ]);
                     }

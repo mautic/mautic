@@ -6,6 +6,7 @@ use Doctrine\DBAL\Cache\CacheException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
@@ -114,7 +115,7 @@ class CampaignController extends AbstractStandardFormController
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
         private CategoryModel $categoryModel,
-        private readonly \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository,
+        private readonly CampaignRepository $campaignRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {

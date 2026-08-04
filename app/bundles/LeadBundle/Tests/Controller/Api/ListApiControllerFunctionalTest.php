@@ -6,11 +6,18 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +30,8 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     private string $prefix;
 
     private TranslatorInterface $translator;
+
+    protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
@@ -797,6 +806,132 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
+    #[DataProvider('operatorProvider')]
+    public function testInTheLastAndInTheNextFilter(string $operator, int $expected): void
+    {
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'date_modified',
+                'object'      => 'lead',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $contactD = new Lead();
+        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+
+        $contactE = new Lead();
+        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->persist($contactE);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        $this->assertCount($expected, $members);
+
+        $expectedMembersForOperator = [
+            OperatorOptions::IN_LAST => [$contactA->getId(), $contactC->getId()],
+            OperatorOptions::IN_NEXT => [$contactA->getId(), $contactB->getId()],
+        ];
+
+        $expectedMembers = $expectedMembersForOperator[$operator];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
+    #[DataProvider('operatorProvider')]
+    public function testInLastAndInNextFilterForCompanyCustomField(string $operator, int $expectedCount): void
+    {
+        $company = $this->createCompanyWithDateCustomField('CompanyABC', $operator);
+
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'company_created_at',
+                'object'      => 'company',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+
+        $this->createCompanyLeadRelation($company, $contactB);
+        $this->createCompanyLeadRelation($company, $contactC);
+
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        $this->assertCount($expectedCount, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
+    public static function operatorProvider(): \Generator
+    {
+        yield [OperatorOptions::IN_LAST, 2];
+        yield [OperatorOptions::IN_NEXT, 2];
+    }
+
     /**
      * @param array<int, array<string, mixed>> $filters
      */
@@ -805,6 +940,62 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segment ??= new LeadList();
         $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
+
+        return $segment;
+    }
+
+    private function createCompanyWithDateCustomField(string $name, ?string $operator = null): Company
+    {
+        // create datetime company field
+        $field = new LeadField();
+        $field->setType('datetime');
+        $field->setObject('company');
+        $field->setGroup('core');
+        $field->setLabel('Company Created At');
+        $field->setAlias('company_created_at');
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
+
+        $timeStamp = new \DateTime();
+        if (OperatorOptions::IN_LAST === $operator) {
+            $timeStamp->modify('-1 day');
+        } elseif (OperatorOptions::IN_NEXT === $operator) {
+            $timeStamp->modify('+1 day');
+        }
+
+        /** @var CompanyRepository $companyRepo */
+        $companyRepo = $this->em->getRepository(Company::class);
+        $company     = new Company();
+        $company->setName($name);
+        $company->addUpdatedField('company_created_at', $timeStamp->format('Y-m-d H:i:s'));
+        $companyRepo->saveEntity($company);
+
+        return $company;
+    }
+
+    private function createCompanyLeadRelation(Company $company, Lead $lead): void
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
+    }
+
+    /**
+     * @param array<mixed> $filter
+     */
+    private function createSegment(array $filter): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName('Segment A');
+        $segment->setPublicName($segment->getName());
+        $segment->setAlias('segment-a');
+        $segment->setFilters($filter);
+        $this->em->persist($segment);
 
         return $segment;
     }

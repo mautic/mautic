@@ -13,7 +13,7 @@ use Twig\TwigFunction;
  * The main goal of this extension is to move a lot of PHP logic that was previously
  * present in PHP templates into an extension, which can then be parsed by Twig.
  */
-class CoreHelpersExtension extends AbstractExtension
+final class CoreHelpersExtension extends AbstractExtension
 {
     public function __construct(
         private readonly TranslatorInterface $translate,

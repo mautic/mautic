@@ -927,6 +927,84 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param array<mixed> $filter
+     */
+    #[DataProvider('relativeDateInvalidIntervalValues')]
+    public function testSegmentRelativeDateFilterOnlySupportPositiveNumber(string $operator, array $filter, string $interval, string $message): void
+    {
+        $filterData = [[
+            'glue'        => 'and',
+            'field'       => 'date_identified',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => $operator,
+            'properties'  => [
+                'filter' => $filter,
+            ],
+        ]];
+        $list = $this->saveSegment('s1', 's1', $filterData);
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list->getId()]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[filters][0][properties][filter][interval]']->setValue($interval);
+
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(1, $rows);
+    }
+
+    public static function relativeDateInvalidIntervalValues(): iterable
+    {
+        yield [
+            'inLast',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            '-2',
+            'This value should be positive.',
+        ];
+
+        yield [
+            'inNext',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            'foo',
+            'Please enter an integer.',
+        ];
+
+        yield [
+            'inLast',
+            [
+                'interval' => '1',
+                'unit'     => 'day',
+            ],
+            '2.5',
+            'Please enter an integer.',
+        ];
+
+        yield [
+            'inLast',
+            [
+                'interval' => '',
+                'unit'     => 'day',
+            ],
+            '',
+            'This value should not be blank.',
+        ];
+    }
+
+    /**
      * @return array<mixed>
      */
     private function defaultFilter(): array

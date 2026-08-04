@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -22,7 +23,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CacheProvider $cache,
         private EventDispatcherInterface $dispatcher,
-        private readonly \Mautic\DynamicContentBundle\Entity\DynamicContentRepository $dynamicContentRepository,
+        private readonly DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 

@@ -16,10 +16,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Container with all registered events types.
-     *
-     * @var array
      */
-    private $eventTypes = [];
+    private array $eventTypes = [];
 
     /**
      * Array of filters
@@ -262,7 +260,7 @@ final class LeadTimelineEvent extends Event
      *
      * @return array of available types
      */
-    public function getEventTypes()
+    public function getEventTypes(): array
     {
         natcasesort($this->eventTypes);
 

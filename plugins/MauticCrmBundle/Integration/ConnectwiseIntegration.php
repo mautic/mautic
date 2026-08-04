@@ -845,7 +845,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
                 $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
                 $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
-                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
+                $contacts             = $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,

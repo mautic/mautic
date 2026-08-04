@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleEvent;
@@ -126,7 +125,6 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    #[DoesNotPerformAssertions]
     public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')

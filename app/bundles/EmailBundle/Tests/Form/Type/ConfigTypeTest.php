@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
+use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;
 use Mautic\ConfigBundle\Form\Type\DsnType;
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
@@ -51,10 +53,21 @@ final class ConfigTypeTest extends TypeTestCase
         $permsMock = $this->createMock(CorePermissions::class);
         $permsMock->method('isGranted')->willReturn(false);
 
+        $dsnTransformerFactoryMock = $this->createMock(DsnTransformerFactory::class);
+        $dsnTransformerFactoryMock->method('create')->willReturnCallback(
+            fn (string $configKey, bool $allowEmpty): DsnTransformer => new DsnTransformer(
+                $this->createStub(CoreParametersHelper::class),
+                new EscapeTransformer([]),
+                '',
+                false
+            )
+        );
+
         $dsnType              = new DsnType(
-            $this->createStub(DsnTransformerFactory::class),
+            $dsnTransformerFactoryMock,
             $this->createStub(CoreParametersHelper::class),
         );
+
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,7 +23,7 @@ final class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
-    private \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository;
+    private PostCountRepository $postCountRepository;
 
     private AuditLogModel $auditLogModel;
 
@@ -32,7 +33,7 @@ final class MonitoringController extends FormController
     public function autowireMonitoringController(
         MonitoringModel $monitoringModel,
         AuditLogModel $auditLogModel,
-        \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountRepository,
+        PostCountRepository $postCountRepository,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
