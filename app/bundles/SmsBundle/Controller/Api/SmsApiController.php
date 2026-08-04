@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -48,6 +49,7 @@ final class SmsApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         SmsModel $smsModel,
     ) {
         $this->model           = $smsModel;
@@ -62,7 +64,7 @@ final class SmsApiController extends CommonApiController
             'leadListList',
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     public function sendAction($id, $contactId): JsonResponse|Response

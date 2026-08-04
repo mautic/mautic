@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -42,6 +43,7 @@ final class MessageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         MessageModel $messageModel,
     ) {
         $this->model            = $messageModel;
@@ -50,7 +52,7 @@ final class MessageApiController extends CommonApiController
         $this->entityNameMulti  = 'messages';
         $this->serializerGroups = ['messageDetails', 'messageChannelList', 'categoryList', 'publishDetails'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void

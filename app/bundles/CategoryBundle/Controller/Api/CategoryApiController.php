@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -34,6 +35,7 @@ final class CategoryApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         CategoryModel $categoryModel,
     ) {
         $this->model            = $categoryModel;
@@ -42,7 +44,7 @@ final class CategoryApiController extends CommonApiController
         $this->entityNameMulti  = 'categories';
         $this->serializerGroups = ['categoryDetails'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     /**

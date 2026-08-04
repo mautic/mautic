@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -40,6 +41,7 @@ final class DeviceApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         DeviceModel $leadDeviceModel,
     ) {
         $this->model           = $leadDeviceModel;
@@ -47,7 +49,7 @@ final class DeviceApiController extends CommonApiController
         $this->entityNameOne   = 'device';
         $this->entityNameMulti = 'devices';
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     /**

@@ -61,6 +61,7 @@ final class CampaignApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
@@ -81,7 +82,7 @@ final class CampaignApiController extends CommonApiController
             'formList',
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     public function getEntitiesAction(Request $request): Response

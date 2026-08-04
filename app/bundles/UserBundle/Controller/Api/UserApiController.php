@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -47,6 +48,7 @@ final class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         UserModel $userModel,
     ) {
         $this->model            = $userModel;
@@ -56,7 +58,7 @@ final class UserApiController extends CommonApiController
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
         $this->dataInputMasks   = ['signature' => 'html'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     /**

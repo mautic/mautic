@@ -42,6 +42,7 @@ final class PageApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         PageModel $pageModel,
     ) {
         $this->model            = $pageModel;
@@ -51,7 +52,7 @@ final class PageApiController extends CommonApiController
         $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails'];
         $this->dataInputMasks   = ['customHtml' => 'html'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 
     /**

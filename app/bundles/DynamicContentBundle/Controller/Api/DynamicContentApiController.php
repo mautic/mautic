@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -34,6 +35,7 @@ final class DynamicContentApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserHelper $userHelper,
         DynamicContentModel $dynamicContentModel,
     ) {
         $this->model            = $dynamicContentModel;
@@ -42,6 +44,6 @@ final class DynamicContentApiController extends CommonApiController
         $this->entityNameMulti  = 'dynamicContents';
         $this->serializerGroups = ['dwcDetails', 'categoryList'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
     }
 }
