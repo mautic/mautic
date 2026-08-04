@@ -10,7 +10,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Client extends BaseClient
 {
@@ -22,7 +21,7 @@ class Client extends BaseClient
     /**
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     protected $name;
 
     /**
@@ -42,7 +41,7 @@ class Client extends BaseClient
     /**
      * @var array<string>
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
+    #[Assert\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
     protected array $redirectUris = [];
 
     /**

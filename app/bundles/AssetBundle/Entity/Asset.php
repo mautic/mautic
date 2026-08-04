@@ -90,7 +90,7 @@ class Asset extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    #[\Symfony\Component\Validator\Constraints\Sequentially([
+    #[Sequentially([
         new Assert\Url(message: 'mautic.asset.validation.error.url'),
         new SafeRemoteUrl(),
     ])]
