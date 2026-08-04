@@ -172,13 +172,17 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $displayContent = (string) $this->client->getResponse()->getContent();
         $this->client->request(Request::METHOD_GET, "/focus/{$id}/tracking.js");
         $trackingContent = (string) $this->client->getResponse()->getContent();
+        $this->client->request(Request::METHOD_GET, "/focus/{$id}.js");
+        $aggregateContent = (string) $this->client->getResponse()->getContent();
 
         $temporaryDirectory = sys_get_temp_dir().'/mautic-focus-'.bin2hex(random_bytes(8));
         $this->assertTrue(mkdir($temporaryDirectory));
-        $displayPath  = $temporaryDirectory.'/display.js';
-        $trackingPath = $temporaryDirectory.'/tracking.js';
+        $displayPath   = $temporaryDirectory.'/display.js';
+        $trackingPath  = $temporaryDirectory.'/tracking.js';
+        $aggregatePath = $temporaryDirectory.'/aggregate.js';
         file_put_contents($displayPath, $displayContent);
         file_put_contents($trackingPath, $trackingContent);
+        file_put_contents($aggregatePath, $aggregateContent);
 
         try {
             $process = new Process([
@@ -186,6 +190,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
                 __DIR__.'/../Fixtures/focus-tracking-runtime.js',
                 $displayPath,
                 $trackingPath,
+                $aggregatePath,
                 (string) $id,
             ]);
             $process->mustRun();
@@ -193,6 +198,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         } finally {
             unlink($displayPath);
             unlink($trackingPath);
+            unlink($aggregatePath);
             rmdir($temporaryDirectory);
         }
     }

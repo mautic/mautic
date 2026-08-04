@@ -4,7 +4,8 @@ const vm = require('node:vm');
 
 const displayScript = fs.readFileSync(process.argv[2], 'utf8');
 const trackingScript = fs.readFileSync(process.argv[3], 'utf8');
-const focusId = process.argv[4];
+const aggregateScript = fs.readFileSync(process.argv[4], 'utf8');
+const focusId = process.argv[5];
 
 function createBrowser(body = {className: ''}) {
     const documentListeners = {};
@@ -226,4 +227,21 @@ function item(browser) {
     assert.strictEqual(browser.window.MauticFocusItems, undefined, 'tracking without display must fail closed');
     assert.strictEqual(browser.appendedScripts.length, 0);
     assert.strictEqual(browser.images.length, 0);
+}
+
+{
+    const browser = createBrowser();
+    execute(displayScript, browser);
+    const focus = item(browser);
+
+    execute(displayScript, browser);
+    assert.strictEqual(item(browser), focus, 'duplicate display must preserve the existing item');
+    assert.strictEqual(browser.appendedScripts.length, 0, 'duplicate display must not load tracking');
+
+    execute(aggregateScript, browser);
+    assert.strictEqual(item(browser), focus, 'aggregate tracking must preserve the existing display item');
+    assert.strictEqual(browser.appendedScripts.length, 1, 'aggregate tracking must load the tracking add-on');
+
+    execute(trackingScript, browser);
+    assert.strictEqual(focus.trackingEnabled, true, 'aggregate tracking must upgrade the existing display item');
 }

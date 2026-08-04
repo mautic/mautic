@@ -127,6 +127,9 @@
 
     window.MauticFocusItems = window.MauticFocusItems || {};
     if (window.MauticFocusItems[{{ focus.id }}]) {
+        {% if trackingEnabled %}
+        window.MauticFocusItems[{{ focus.id }}].loadTracking();
+        {% endif %}
         return;
     }
 
