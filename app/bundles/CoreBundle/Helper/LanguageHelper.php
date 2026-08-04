@@ -205,8 +205,10 @@ class LanguageHelper
 
     /**
      * Fetches a language package from the remote server.
+     *
+     * @param string $languageCode
      */
-    public function fetchPackage(string $languageCode): array
+    public function fetchPackage($languageCode): array
     {
         // Check if we have a cache file, generate it if not
         if (!is_readable($this->cacheFile)) {
