@@ -22,6 +22,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ResourceInstallerTest extends AbstractMauticTestCase
 {
+    private const PACKAGE = 'vendor/pkg';
+
     private MockObject&Connection $marketplaceConnection;
 
     private MockObject&ClientInterface $httpClient;
@@ -69,21 +71,21 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     public function testIsInstalledReturnsFalseWhenStateFileIsMissing(): void
     {
-        Assert::assertFalse($this->installer->isInstalled('vendor/pkg'));
+        Assert::assertFalse($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testIsInstalledReturnsTrueForPreviouslyInstalledPackage(): void
     {
-        $this->writeInstalledState(['vendor/pkg' => []]);
+        $this->writeInstalledState([self::PACKAGE => []]);
 
-        Assert::assertTrue($this->installer->isInstalled('vendor/pkg'));
+        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testIsInstalledMigratesLegacyFlatArrayFormat(): void
     {
-        $this->writeInstalledState(['vendor/pkg']);
+        $this->writeInstalledState([self::PACKAGE]);
 
-        Assert::assertTrue($this->installer->isInstalled('vendor/pkg'));
+        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testInstallReturnsErrorWhenPackageHasNoDownloadableVersion(): void
@@ -92,7 +94,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
             'package' => ['versions' => []],
         ]);
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertFalse($result['success']);
         Assert::assertStringContainsString('No downloadable version', $result['errors'][0]);
@@ -110,7 +112,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $this->httpClient->expects($this->never())->method('request');
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertFalse($result['success']);
         Assert::assertStringContainsString('Refusing to download', $result['errors'][0]);
@@ -137,7 +139,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->httpClient->method('request')
             ->willThrowException(new TransferException('connection refused'));
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertFalse($result['success']);
         Assert::assertStringContainsString('Failed to download', $result['errors'][0]);
@@ -154,7 +156,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
                 return $this->successfulResponse();
             });
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertFalse($result['success']);
         Assert::assertStringContainsString('Failed to download', $result['errors'][0]);
@@ -172,7 +174,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
                 return $this->successfulResponse();
             });
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertFalse($result['success']);
         Assert::assertStringContainsString('Import failed', $result['errors'][0]);
@@ -204,11 +206,11 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
                 return $event;
             });
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertTrue($result['success']);
         Assert::assertNotEmpty($result['summary']);
-        Assert::assertTrue($this->installer->isInstalled('vendor/pkg'));
+        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testInstallRestoresPackagedAssetsToMediaDir(): void
@@ -240,7 +242,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
                 return $event;
             });
 
-        $result = $this->installer->install('vendor/pkg', 1);
+        $result = $this->installer->install(self::PACKAGE, 1);
 
         Assert::assertTrue($result['success']);
         Assert::assertFileExists($this->tmpRoot.'/media/files/images/logo.png');
@@ -250,7 +252,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
     {
         $this->dispatcher->expects($this->never())->method('dispatch');
 
-        $this->installer->uninstall('vendor/pkg');
+        $this->installer->uninstall(self::PACKAGE);
     }
 
     public function testUninstallDispatchesUndoEventsAndRemovesPackageFromState(): void
@@ -262,15 +264,15 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
                 ],
             ],
         ];
-        $this->writeInstalledState(['vendor/pkg' => $summary]);
+        $this->writeInstalledState([self::PACKAGE => $summary]);
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($this->isInstanceOf(EntityImportUndoEvent::class));
 
-        $this->installer->uninstall('vendor/pkg');
+        $this->installer->uninstall(self::PACKAGE);
 
-        Assert::assertFalse($this->installer->isInstalled('vendor/pkg'));
+        Assert::assertFalse($this->installer->isInstalled(self::PACKAGE));
     }
 
     /**

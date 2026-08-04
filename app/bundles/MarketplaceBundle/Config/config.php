@@ -80,7 +80,6 @@ return [
         Config::MARKETPLACE_ENABLED                => true,
         Config::MARKETPLACE_WEBSITE_URL            => 'https://marketplace.mautic.org',
         Config::MARKETPLACE_API_BASE               => 'https://marketplace-api.mautic.org',
-        // Falls back to Config::DEFAULT_API_KEY when unset. See the note there before changing this.
-        Config::MARKETPLACE_API_KEY                => '%env(default::MAUTIC_MARKETPLACE_API_KEY)%',
+        Config::MARKETPLACE_API_KEY                => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkbW5jYnBpbG54dHJod2FpdHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NTM2MzcsImV4cCI6MjA3MDIyOTYzN30.zVl0eqXdkluLAMRGqf381peTk2TWyYkd01KRPseLlss',
     ],
 ];
