@@ -99,10 +99,10 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($displayUrl, $fullSnippet);
         $this->assertMatchesRegularExpression('/MauticFocusTrackingQueue\['.$focus->getId().'\].*'.preg_quote($displayUrl, '/').'/s', $fullSnippet);
         $this->assertSame(1, substr_count($fullSnippet, '<script>'));
-        $this->assertStringContainsString('window.MauticFocus.enableTracking('.$focus->getId().')', (string) $crawler->text());
+        $this->assertStringContainsString('window.MauticFocus.enableTracking('.$focus->getId().')', $crawler->text());
         $this->assertStringNotContainsString($legacyUrl, $responseHtml);
         $this->assertCount(0, $crawler->filter('#focus-legacy-snippet'));
-        $this->assertStringContainsString('Mautic does not record or verify consent.', (string) $crawler->text());
+        $this->assertStringContainsString('Mautic does not record or verify consent.', $crawler->text());
     }
 
     private function createFocus(): Focus
