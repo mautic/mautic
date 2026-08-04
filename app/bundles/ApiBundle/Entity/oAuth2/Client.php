@@ -47,18 +47,16 @@ class Client extends BaseClient
     /**
      * @var array<string>
      */
-    protected array $allowedGrantTypes;
+    protected array $allowedGrantTypes = [
+        OAuth2::GRANT_TYPE_AUTH_CODE,
+        OAuth2::GRANT_TYPE_REFRESH_TOKEN,
+    ];
 
     protected ?Role $role = null;
 
     public function __construct()
     {
         parent::__construct();
-
-        $this->allowedGrantTypes = [
-            OAuth2::GRANT_TYPE_AUTH_CODE,
-            OAuth2::GRANT_TYPE_REFRESH_TOKEN,
-        ];
 
         $this->users     = new ArrayCollection();
         $this->authCodes = new ArrayCollection();

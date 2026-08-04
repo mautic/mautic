@@ -108,12 +108,12 @@ class Import extends FormEntity
     /**
      * @var int
      */
-    private $priority;
+    private $priority = self::LOW;
 
     /**
      * @var int
      */
-    private $status;
+    private $status = self::QUEUED;
 
     private ?\DateTimeInterface $dateStarted = null;
 
@@ -135,8 +135,6 @@ class Import extends FormEntity
 
     public function __construct()
     {
-        $this->status   = self::QUEUED;
-        $this->priority = self::LOW;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
