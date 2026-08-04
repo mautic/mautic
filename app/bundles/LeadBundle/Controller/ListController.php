@@ -37,6 +37,9 @@ final class ListController extends FormController
     private ListModel $listModel;
 
     private LeadModel $leadModel;
+    private SegmentDependencies $segmentDependencies;
+    private SegmentCampaignShare $segmentCampaignShare;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireListController(
@@ -183,7 +186,7 @@ final class ListController extends FormController
     /**
      * Generate's new form and processes post data.
      */
-    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel): Response
+    public function newAction(Request $request, ListModel $listModel, AuditLogModel $auditLogModel): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
             $this->throwAccessDenied();
@@ -195,8 +198,8 @@ final class ListController extends FormController
         return $this->createSegmentNewResponse(
             $request,
             $list,
-            $segmentDependencies,
-            $segmentCampaignShare,
+            $this->segmentDependencies,
+            $this->segmentCampaignShare,
             $listModel,
             $auditLogModel,
             [],
@@ -211,7 +214,7 @@ final class ListController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
-    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false): Response
+    public function cloneAction(Request $request, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
             $this->throwAccessDenied();
@@ -224,8 +227,8 @@ final class ListController extends FormController
             return $this->createSegmentNewResponse(
                 $request,
                 clone $segment,
-                $segmentDependencies,
-                $segmentCampaignShare,
+                $this->segmentDependencies,
+                $this->segmentCampaignShare,
                 $listModel,
                 $auditLogModel,
                 $postActionVars,
@@ -253,7 +256,7 @@ final class ListController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
-    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
+    public function editAction(Request $request, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false, bool $isNew = false): Response
     {
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
@@ -267,8 +270,8 @@ final class ListController extends FormController
             return $this->createSegmentModifyResponse(
                 $request,
                 $segment,
-                $segmentDependencies,
-                $segmentCampaignShare,
+                $this->segmentDependencies,
+                $this->segmentCampaignShare,
                 $listModel,
                 $auditLogModel,
                 $postActionVars,
@@ -360,7 +363,7 @@ final class ListController extends FormController
                 ]));
             }
             if ($valid) {
-                return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
+                return $this->editAction($request, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
 
@@ -428,7 +431,7 @@ final class ListController extends FormController
                         return $this->postActionRedirect($postActionVars);
                     }
 
-                    return $this->viewAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId());
+                    return $this->viewAction($request, $segmentModel, $auditLogModel, $segment->getId());
                 }
             } else {
                 // unlock the entity
@@ -724,7 +727,7 @@ final class ListController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      */
-    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId): Response
+    public function viewAction(Request $request, ListModel $listModel, AuditLogModel $auditLogModel, $objectId): Response
     {
         /** @var LeadList $list */
         $list = $listModel->getEntity($objectId);
@@ -796,8 +799,8 @@ final class ListController extends FormController
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
                 'logs'               => $logs,
-                'usageStats'         => $segmentDependencies->getChannelsIds($list->getId()),
-                'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
+                'usageStats'         => $this->segmentDependencies->getChannelsIds($list->getId()),
+                'campaignStats'      => $this->segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
                 'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
@@ -937,7 +940,7 @@ final class ListController extends FormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
+    public function contactsAction(Request $request, $objectId, $page = 1)
     {
         $session = $request->getSession();
         $session->set('mautic.segment.contact.page', $page);
@@ -967,7 +970,7 @@ final class ListController extends FormController
 
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             LeadPermissions::LISTS_VIEW,
@@ -982,5 +985,16 @@ final class ListController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    #[Required]
+    public function autowire(
+        SegmentDependencies $segmentDependencies,
+        SegmentCampaignShare $segmentCampaignShare,
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->segmentDependencies = $segmentDependencies;
+        $this->segmentCampaignShare = $segmentCampaignShare;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

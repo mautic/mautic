@@ -25,6 +25,8 @@ final class PublicController extends FormController
     private UserModel $userModel;
 
     private LeadModel $leadModel;
+    private LoggerInterface $mauticLogger;
+    private LookupHelper $lookupHelper;
 
     #[Required]
     public function autowirePublicController(
@@ -55,14 +57,14 @@ final class PublicController extends FormController
     /**
      * @throws \InvalidArgumentException
      */
-    public function callbackAction(Request $request, LoggerInterface $mauticLogger, LookupHelper $lookupHelper): Response
+    public function callbackAction(Request $request): Response
     {
         if (!$request->request->has('body') || !$request->request->has('id')
             || !$request->request->has('type')
             || !$request->request->has('status')
             || 200 !== $request->request->get('status')
         ) {
-            $mauticLogger->log('error', 'ERROR on Clearbit callback: Malformed request variables: '.json_encode($request->request->all(), JSON_PRETTY_PRINT));
+            $this->mauticLogger->log('error', 'ERROR on Clearbit callback: Malformed request variables: '.json_encode($request->request->all(), JSON_PRETTY_PRINT));
 
             return new Response('ERROR');
         }
@@ -70,10 +72,10 @@ final class PublicController extends FormController
         /** @var array $result */
         $result           = $request->request->all()['body'] ?? [];
         $oid              = $request->request->get('id');
-        $validatedRequest = $lookupHelper->validateRequest($oid, $request->request->get('type'));
+        $validatedRequest = $this->lookupHelper->validateRequest($oid, $request->request->get('type'));
 
         if (!$validatedRequest || !is_array($result)) {
-            $mauticLogger->log('error', 'ERROR on Clearbit callback: Wrong body or id in request: id='.$oid.' body='.json_encode($result, JSON_PRETTY_PRINT));
+            $this->mauticLogger->log('error', 'ERROR on Clearbit callback: Wrong body or id in request: id='.$oid.' body='.json_encode($result, JSON_PRETTY_PRINT));
 
             return new Response('ERROR');
         }
@@ -85,7 +87,7 @@ final class PublicController extends FormController
                 /** @var Lead $lead */
                 $lead       = $validatedRequest['entity'];
                 $currFields = $lead->getFields(true);
-                $mauticLogger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
+                $this->mauticLogger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
 
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
@@ -162,7 +164,7 @@ final class PublicController extends FormController
                     $data['country'] = $loc['country'];
                 }
 
-                $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+                $this->mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                 // Unset the nonce so that it's not used again
                 $socialCache = $lead->getSocialCache();
@@ -248,7 +250,7 @@ final class PublicController extends FormController
                         $data['companystate'] = $loc['state'];
                     }
 
-                    $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+                    $this->mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                     // Unset the nonce so that it's not used again
                     $socialCache = $company->getSocialCache();
@@ -271,7 +273,7 @@ final class PublicController extends FormController
                 }
             }
         } catch (\Exception $ex) {
-            $mauticLogger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
+            $this->mauticLogger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
                 if ($notify) {
                     if ($user = $this->userModel->getEntity($notify)) {
@@ -287,10 +289,19 @@ final class PublicController extends FormController
                     }
                 }
             } catch (\Exception $ex2) {
-                $mauticLogger->log('error', 'Clearbit: '.$ex2->getMessage());
+                $this->mauticLogger->log('error', 'Clearbit: '.$ex2->getMessage());
             }
         }
 
         return new Response('OK');
+    }
+
+    #[Required]
+    public function autowire(
+        LoggerInterface $mauticLogger,
+        LookupHelper $lookupHelper,
+    ): void {
+        $this->mauticLogger = $mauticLogger;
+        $this->lookupHelper = $lookupHelper;
     }
 }

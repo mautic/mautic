@@ -19,22 +19,24 @@ final class FileController extends AjaxController
     private array $response = [];
 
     private int $statusCode = Response::HTTP_OK;
+    private PathsHelper $pathsHelper;
+    private FileUploader $fileUploader;
 
     /**
      * Uploads a file.
      *
      * @throws FileUploadException
      */
-    public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
+    public function uploadAction(Request $request): JsonResponse
     {
         $editor   = $request->get('editor');
-        $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
+        $mediaDir = $this->getMediaAbsolutePath();
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {
                 /** @var UploadedFile $file */
                 try {
-                    $fileUploader->validateImage($file);
-                    $fileName = $fileUploader->upload($mediaDir, $file);
+                    $this->fileUploader->validateImage($file);
+                    $fileName = $this->fileUploader->upload($mediaDir, $file);
                     $this->successfulResponse($request, $fileName, $editor);
                 } catch (FileUploadException) {
                     $this->failureResponse($editor);
@@ -48,18 +50,18 @@ final class FileController extends AjaxController
     /**
      * List the files in /media directory.
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
+    public function listAction(Request $request): JsonResponse
     {
-        $fnames = scandir($this->getMediaAbsolutePath($pathsHelper));
+        $fnames = scandir($this->getMediaAbsolutePath());
 
         if ($fnames) {
             foreach ($fnames as $name) {
-                $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.$name;
+                $imagePath = $this->getMediaAbsolutePath().'/'.$name;
                 $imageUrl  = $this->getMediaUrl($request).'/'.$name;
                 $imageFile = new File($imagePath, checkPath: false);
                 if (!is_dir($name)) {
                     try {
-                        $fileUploader->validateImage($imageFile);
+                        $this->fileUploader->validateImage($imageFile);
                         $this->response[] = [
                             'url'   => $imageUrl,
                             'thumb' => $imageUrl,
@@ -79,10 +81,10 @@ final class FileController extends AjaxController
     /**
      * Delete a file from /media directory.
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper): JsonResponse
+    public function deleteAction(Request $request): JsonResponse
     {
         $src       = InputHelper::clean($request->request->get('src'));
-        $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
+        $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
@@ -103,15 +105,13 @@ final class FileController extends AjaxController
      *
      * @return string
      */
-    public function getMediaAbsolutePath(PathsHelper $pathsHelper): string|false
+    public function getMediaAbsolutePath(): string|false
     {
-        $mediaDir = realpath($pathsHelper->getSystemPath('images', true));
-
+        $mediaDir = realpath($this->pathsHelper->getSystemPath('images', true));
         if (false === $mediaDir) {
             $this->response['error'] = 'Media dir does not exist';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
-
         if (false === is_writable($mediaDir)) {
             $this->response['error'] = 'Media dir is not writable';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
@@ -151,5 +151,14 @@ final class FileController extends AjaxController
         } else {
             $this->response['error'] = $errorMsg;
         }
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        PathsHelper $pathsHelper,
+        FileUploader $fileUploader,
+    ): void {
+        $this->pathsHelper = $pathsHelper;
+        $this->fileUploader = $fileUploader;
     }
 }

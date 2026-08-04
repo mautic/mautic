@@ -27,6 +27,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class SubmissionApiController extends CommonApiController
 {
+    private UserHelper $userHelper;
+
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -83,7 +85,7 @@ final class SubmissionApiController extends CommonApiController
      * @param int $formId
      * @param int $contactId
      */
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
+    public function getEntitiesForContactAction(Request $request, $formId, $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -99,7 +101,7 @@ final class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($request, $userHelper, $formId);
+        return $this->getEntitiesAction($request, $this->userHelper, $formId);
     }
 
     /**
@@ -140,5 +142,12 @@ final class SubmissionApiController extends CommonApiController
         }
 
         return $form;
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        UserHelper $userHelper,
+    ): void {
+        $this->userHelper = $userHelper;
     }
 }

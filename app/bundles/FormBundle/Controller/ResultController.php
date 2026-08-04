@@ -31,6 +31,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ResultController extends CommonFormController
 {
+    private PageHelperFactoryInterface $pageHelperFacotry;
+    private FormUploader $formUploader;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -61,7 +64,7 @@ final class ResultController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
+    public function indexAction(Request $request, int $objectId, int $page = 1): Response
     {
         $form           = $this->formModel->getEntity($objectId);
         $session        = $request->getSession();
@@ -103,7 +106,7 @@ final class ResultController extends CommonFormController
             $this->setListFilters($request->query->get('name'));
         }
 
-        $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
+        $pageHelper        = $this->pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
         // set limits
         $limit = $pageHelper->getLimit();
@@ -199,7 +202,7 @@ final class ResultController extends CommonFormController
         );
     }
 
-    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
+    public function downloadFileAction(int $submissionId, string $field): BinaryFileResponse
     {
         $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 
@@ -223,7 +226,7 @@ final class ResultController extends CommonFormController
         }
 
         $fileName = $results[$field];
-        $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
+        $file     = $this->formUploader->getCompleteFilePath($fieldEntity, $fileName);
 
         $fs = new Filesystem();
         if (!$fs->exists($file)) {
@@ -240,7 +243,7 @@ final class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 
@@ -252,7 +255,7 @@ final class ResultController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $file = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
+        $file = $this->formUploader->getCompleteFilePath($fieldEntity, $fileName);
 
         $fs   = new Filesystem();
         if (!$fs->exists($file)) {
@@ -546,5 +549,14 @@ final class ResultController extends CommonFormController
                 'route'         => $route,
             ],
         ]);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFacotry,
+        FormUploader $formUploader,
+    ): void {
+        $this->pageHelperFacotry = $pageHelperFacotry;
+        $this->formUploader = $formUploader;
     }
 }

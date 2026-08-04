@@ -13,17 +13,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController extends FormController
 {
+    private IntegrationHelper $integrationHelper;
+
     /**
      * @param string $integration
      *
      * @return JsonResponse
      */
-    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
+    public function authCallbackAction(Request $request, $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();
 
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
         // check to see if the service exists
         if (!$integrationObject) {
@@ -95,9 +97,9 @@ final class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
+    public function authUserAction($integration): RedirectResponse
     {
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
 
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
@@ -113,5 +115,12 @@ final class AuthController extends FormController
         $oauthUrl = $event->getAuthUrl();
 
         return new RedirectResponse($oauthUrl);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
     }
 }

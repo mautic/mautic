@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 class GrapesJsController extends CommonController
 {
     public const OBJECT_TYPE = ['email', 'page'];
+    private LoggerInterface $mauticLogger;
+    private ThemeHelper $themeHelper;
 
     private function isAuthorizedObjectType(string $objectType): bool
     {
@@ -103,8 +105,6 @@ class GrapesJsController extends CommonController
 
     public function builderAction(
         Request $request,
-        LoggerInterface $mauticLogger,
-        ThemeHelper $themeHelper,
         string $objectType,
         string $objectId,
     ): Response {
@@ -147,7 +147,7 @@ class GrapesJsController extends CommonController
         $template         = InputHelper::clean($request->query->get('template'));
         $resetEditorState = $request->query->getBoolean('resetEditorState', false);
         if (!$template) {
-            $mauticLogger->warning('Grapesjs: no template in query');
+            $this->mauticLogger->warning('Grapesjs: no template in query');
 
             return $this->json(false);
         }
@@ -159,13 +159,13 @@ class GrapesJsController extends CommonController
         if ($logicalName = $this->checkForMjmlTemplate($templateName.'.mjml.twig')) {
             $type        = 'mjml';
         } else {
-            $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate($templateName.'.html.twig');
         }
 
         // Replace short codes to emoji
         $content = array_map(fn (string $text): string => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $themeHelper->renderThemeTemplate(
+        $renderedTemplate =  $this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'     => $isNew,
@@ -236,5 +236,14 @@ class GrapesJsController extends CommonController
         }
 
         return null;
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        LoggerInterface $mauticLogger,
+        ThemeHelper $themeHelper,
+    ): void {
+        $this->mauticLogger = $mauticLogger;
+        $this->themeHelper = $themeHelper;
     }
 }

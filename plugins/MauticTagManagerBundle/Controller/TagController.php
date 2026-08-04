@@ -28,6 +28,7 @@ final class TagController extends FormController
     private TagModel $leadTagModel;
 
     private TagManagerModel $tagManagerModel;
+    private TagDependencies $tagDependencies;
 
     #[Required]
     public function autowireTagController(
@@ -160,7 +161,7 @@ final class TagController extends FormController
     /**
      * Generate's new form and processes post data.
      */
-    public function newAction(Request $request, TagDependencies $tagDependencies): Response
+    public function newAction(Request $request): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             $this->throwAccessDenied();
@@ -177,7 +178,7 @@ final class TagController extends FormController
         // get the user form factory
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $this->tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -246,7 +247,7 @@ final class TagController extends FormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $tagDependencies, $tag->getId(), true);
+            $response = $this->editAction($request, $tag->getId(), true);
         } else {
             $response = null;
         }
@@ -257,7 +258,7 @@ final class TagController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, TagDependencies $tagDependencies, int $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             $this->throwAccessDenied();
@@ -269,7 +270,7 @@ final class TagController extends FormController
             return $this->createTagModifyResponse(
                 $request,
                 $this->getTag($objectId),
-                $tagDependencies,
+                $this->tagDependencies,
                 $postActionVars,
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -379,7 +380,7 @@ final class TagController extends FormController
 
                     $response = $this->postActionRedirect($postActionVars);
                 } else {
-                    $response = $this->viewAction($request, $tagDependencies, $tag->getId());
+                    $response = $this->viewAction($request, $tag->getId());
                 }
             }
         } else {
@@ -453,7 +454,7 @@ final class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      */
-    public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
+    public function viewAction(Request $request, int $objectId): Response
     {
         $tag = $this->leadTagModel->getEntity($objectId);
 
@@ -489,7 +490,7 @@ final class TagController extends FormController
             'viewParameters' => [
                 'tag'        => $tag,
                 'security'   => $this->security,
-                'usageStats' => $tagDependencies->getChannelsIds($tag),
+                'usageStats' => $this->tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [
@@ -827,5 +828,12 @@ final class TagController extends FormController
                 'flashes' => $flashes,
             ])
         );
+    }
+
+    #[Required]
+    public function autowire(
+        TagDependencies $tagDependencies,
+    ): void {
+        $this->tagDependencies = $tagDependencies;
     }
 }

@@ -34,6 +34,7 @@ final class PointApiController extends CommonApiController
      * @var PointModel|null
      */
     protected $model;
+    private IpLookupHelper $ipLookupHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -83,7 +84,7 @@ final class PointApiController extends CommonApiController
      *
      * @return Response
      */
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
+    public function adjustPointsAction(Request $request, $leadId, $operator, $delta)
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {
@@ -91,7 +92,7 @@ final class PointApiController extends CommonApiController
         }
 
         try {
-            $this->logApiPointChange($request, $ipLookupHelper, $lead, $delta, $operator);
+            $this->logApiPointChange($request, $this->ipLookupHelper, $lead, $delta, $operator);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -113,5 +114,12 @@ final class PointApiController extends CommonApiController
         $lead->adjustPoints($delta, $operator);
         $lead->addPointsChangeLogEntry('API', $eventName, $actionName, $delta, $ip);
         $this->leadModel->saveEntity($lead, false);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        IpLookupHelper $ipLookupHelper,
+    ): void {
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 }

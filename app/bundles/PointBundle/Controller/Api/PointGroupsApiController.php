@@ -33,6 +33,7 @@ final class PointGroupsApiController extends CommonApiController
      * @var PointGroupModel
      */
     protected $model;
+    private IpLookupHelper $ipLookupHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -116,7 +117,7 @@ final class PointGroupsApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $contactId, int $groupId, string $operator, int $value): Response
+    public function adjustGroupPointsAction(Request $request, int $contactId, int $groupId, string $operator, int $value): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -149,7 +150,7 @@ final class PointGroupsApiController extends CommonApiController
             name: $eventName,
             action: $actionName,
             pointChanges: $delta,
-            ip: $ipLookupHelper->getIpAddress(),
+            ip: $this->ipLookupHelper->getIpAddress(),
             group: $pointGroup
         );
         $this->leadModel->saveEntity($contact, false);
@@ -159,5 +160,12 @@ final class PointGroupsApiController extends CommonApiController
         $view->setContext($context);
 
         return $this->handleView($view);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        IpLookupHelper $ipLookupHelper,
+    ): void {
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 }

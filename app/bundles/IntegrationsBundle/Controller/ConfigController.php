@@ -44,14 +44,13 @@ final class ConfigController extends AbstractFormController
      * @var Integration
      */
     private $integrationConfiguration;
+    private ConfigIntegrationsHelper $integrationsHelper;
+    private FieldValidationHelper $fieldValidator;
+    private FormFactoryInterface $formFactory;
+    private FormExtension $formExtension;
 
     public function editAction(
         Request $request,
-        ConfigIntegrationsHelper $integrationsHelper,
-        EventDispatcherInterface $dispatcher,
-        FieldValidationHelper $fieldValidator,
-        FormFactoryInterface $formFactory,
-        FormExtension $formExtension,
         string $integration,
     ): Response {
         // Check ACL
@@ -60,27 +59,27 @@ final class ConfigController extends AbstractFormController
         }
 
         try {
-            $this->integrationObject        = $integrationsHelper->getIntegration($integration);
+            $this->integrationObject        = $this->integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 
         $event = new FormLoadEvent($this->integrationConfiguration);
-        $dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Create the form
-        $form = $this->getForm($formFactory);
+        $form = $this->getForm($this->formFactory);
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $dispatcher, $formFactory, $formExtension, $form);
+            return $this->submitForm($request, $this->integrationsHelper, $this->fieldValidator, $this->dispatcher, $this->formFactory, $this->formExtension, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
         $session = $request->getSession();
         $session->remove("{$integration}-fields");
 
-        return $this->showForm($request, $form, $formExtension);
+        return $this->showForm($request, $form, $this->formExtension);
     }
 
     /**
@@ -265,5 +264,18 @@ final class ConfigController extends AbstractFormController
     {
         $session = $request->getSession();
         $session->remove("{$this->integrationObject->getName()}-fields");
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        ConfigIntegrationsHelper $integrationsHelper,
+        FieldValidationHelper $fieldValidator,
+        FormFactoryInterface $formFactory,
+        FormExtension $formExtension,
+    ): void {
+        $this->integrationsHelper = $integrationsHelper;
+        $this->fieldValidator = $fieldValidator;
+        $this->formFactory = $formFactory;
+        $this->formExtension = $formExtension;
     }
 }

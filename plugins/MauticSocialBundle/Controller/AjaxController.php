@@ -13,8 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+    private FormFactoryInterface $formFactory;
 
-    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel, FormFactoryInterface $formFactory): JsonResponse
+    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel): JsonResponse
     {
         // get the form type
         $type = InputHelper::clean($request->request->get('networkType'));
@@ -31,7 +32,7 @@ final class AjaxController extends CommonAjaxController
             $formType = $monitoringModel->getFormByType($type);
 
             // get the network type form
-            $form = $formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
+            $form = $this->formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
                 '@MauticSocial/FormTheme/'.$type.'_widget.html.twig',
@@ -57,5 +58,12 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->formFactory = $formFactory;
     }
 }

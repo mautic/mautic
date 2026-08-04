@@ -28,6 +28,8 @@ final class MonitoringController extends FormController
     private AuditLogModel $auditLogModel;
 
     private MonitoringModel $monitoringModel;
+    private IpLookupHelper $ipLookupHelper;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireMonitoringController(
@@ -130,7 +132,7 @@ final class MonitoringController extends FormController
     /**
      * Generates new form and processes post data.
      */
-    public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper): Response
+    public function newAction(Request $request, MonitoringModel $model): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:create')) {
             $this->throwAccessDenied();
@@ -175,7 +177,7 @@ final class MonitoringController extends FormController
                     $model->saveEntity($entity);
 
                     // update the audit log
-                    $this->updateAuditLog($entity, $ipLookupHelper, 'create');
+                    $this->updateAuditLog($entity, 'create');
 
                     $this->addFlashMessage(
                         'mautic.core.notice.created',
@@ -194,7 +196,7 @@ final class MonitoringController extends FormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $ipLookupHelper, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
 
                     $viewParameters = [
@@ -247,7 +249,7 @@ final class MonitoringController extends FormController
         );
     }
 
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
             $this->throwAccessDenied();
@@ -326,7 +328,7 @@ final class MonitoringController extends FormController
                     $this->monitoringModel->saveEntity($entity, $saveSubmitButton->isClicked());
 
                     // update the audit log
-                    $this->updateAuditLog($entity, $ipLookupHelper, 'update');
+                    $this->updateAuditLog($entity, 'update');
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -497,7 +499,7 @@ final class MonitoringController extends FormController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
+    public function deleteAction(Request $request, $objectId)
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
             $this->throwAccessDenied();
@@ -532,7 +534,7 @@ final class MonitoringController extends FormController
             }
 
             // update the audit log
-            $this->updateAuditLog($entity, $ipLookupHelper, 'delete');
+            $this->updateAuditLog($entity, 'delete');
 
             // then delete the record
             $this->monitoringModel->deleteEntity($entity);
@@ -633,13 +635,12 @@ final class MonitoringController extends FormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             'mauticSocial:monitoring:view',
@@ -650,7 +651,7 @@ final class MonitoringController extends FormController
         );
     }
 
-    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
+    public function updateAuditLog(Monitoring $monitoring, $action): void
     {
         $log = [
             'bundle'    => 'plugin.mauticSocial',
@@ -658,8 +659,17 @@ final class MonitoringController extends FormController
             'objectId'  => $monitoring->getId(),
             'action'    => $action,
             'details'   => ['name' => $monitoring->getTitle()],
-            'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    #[Required]
+    public function autowire(
+        IpLookupHelper $ipLookupHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

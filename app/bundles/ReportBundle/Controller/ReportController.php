@@ -24,6 +24,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ReportController extends FormController
 {
     private ReportModel $reportModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireReportController(
@@ -32,7 +33,7 @@ final class ReportController extends FormController
         $this->reportModel = $reportModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -56,7 +57,7 @@ final class ReportController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper        = $pageHelperFactory->make('mautic.report', $page);
+        $pageHelper        = $this->pageHelperFactory->make('mautic.report', $page);
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();
@@ -900,5 +901,12 @@ final class ReportController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    #[Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

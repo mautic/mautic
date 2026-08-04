@@ -12,13 +12,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
 
     private PageModel $pageModel;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowirePageAjaxController(
@@ -27,13 +27,13 @@ final class AjaxController extends CommonAjaxController
         $this->pageModel = $pageModel;
     }
 
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, PageModel $pageModel, Environment $twig): JsonResponse
+    public function getAbTestFormAction(Request $request, PageModel $pageModel): JsonResponse
     {
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $pageModel,
-            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
+            fn ($formType, $formOptions): FormInterface => $this->formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $this->twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
             'page'
         ));
@@ -63,5 +63,12 @@ final class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         return $this->pageModel->getBuilderComponents(null, ['tokens'], $query ?? '');
+    }
+
+    #[Required]
+    public function autowire(
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->formFactory = $formFactory;
     }
 }

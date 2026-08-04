@@ -35,6 +35,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private ThemeHelper $themeHelper;
+    private AssetsHelper $assetsHelper;
+    private AnalyticsHelper $analyticsHelper;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -58,7 +63,7 @@ class FormController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -84,7 +89,7 @@ class FormController extends CommonFormController
 
         $session = $request->getSession();
 
-        $pageHelper = $pageHelperFactory->make('mautic.form', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.form', $page);
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $session->get('mautic.form.filter', ''));
@@ -889,7 +894,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      */
-    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper): Response
+    public function previewAction($objectId): Response
     {
         $form  = $this->formModel->getEntity($objectId);
 
@@ -925,7 +930,7 @@ class FormController extends CommonFormController
         // Use form specific template or system-wide default theme
         $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
         if (!empty($template)) {
-            $theme = $themeHelper->getTheme($template);
+            $theme = $this->themeHelper->getTheme($template);
             if ($theme->getTheme() != $template) {
                 $config = $theme->getConfig();
                 if (in_array('form', $config['features'])) {
@@ -939,18 +944,18 @@ class FormController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName     = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+            $logicalName     = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
 
-            $analytics = $analyticsHelper->getCode();
+            $analytics = $this->analyticsHelper->getCode();
 
             if (!empty($analytics)) {
-                $assetsHelper->addCustomDeclaration($analytics);
+                $this->assetsHelper->addCustomDeclaration($analytics);
             }
             if ($form->getNoIndex()) {
-                $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+                $this->assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return new Response($themeHelper->renderThemeTemplate($logicalName, $viewParams));
+            return new Response($this->themeHelper->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);
@@ -1179,5 +1184,18 @@ class FormController extends CommonFormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFactory,
+        ThemeHelper $themeHelper,
+        AssetsHelper $assetsHelper,
+        AnalyticsHelper $analyticsHelper,
+    ): void {
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->themeHelper = $themeHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->analyticsHelper = $analyticsHelper;
     }
 }

@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment;
 
 final class FieldController extends CommonFormController
 {
@@ -54,7 +53,7 @@ final class FieldController extends CommonFormController
     /**
      * Generates new form and processes post data.
      */
-    public function newAction(Request $request, Environment $twig): JsonResponse|Response
+    public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -166,7 +165,7 @@ final class FieldController extends CommonFormController
         } else {
             $closeModal                = false;
             $viewParams['tmpl']        = 'field';
-            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, $twig, $customParams['formTheme']) : $form->createView();
+            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, $this->twig, $customParams['formTheme']) : $form->createView();
             $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->translator->trans($customParams['label']) : $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType);
         }
 
@@ -223,7 +222,7 @@ final class FieldController extends CommonFormController
      *
      * @param int $objectId
      */
-    public function editAction(Request $request, Environment $twig, $objectId): JsonResponse|Response
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();
@@ -305,7 +304,7 @@ final class FieldController extends CommonFormController
                 $viewParams['tmpl'] = 'field';
                 $viewParams['form'] = (isset($customParams['formTheme'])) ? $this->setFormTheme(
                     $form,
-                    $twig,
+                    $this->twig,
                     $customParams['formTheme']
                 ) : $form->createView();
                 $viewParams['fieldHeader'] = (!empty($customParams))

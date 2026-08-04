@@ -44,6 +44,7 @@ final class EventLogApiController extends FetchCommonApiController
      * @var EventLogModel|null
      */
     protected $model;
+    private UserHelper $userHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -91,7 +92,7 @@ final class EventLogApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, $contactId, $campaignId = null)
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -135,7 +136,7 @@ final class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction($request, $userHelper);
+        return $this->getEntitiesAction($request, $this->userHelper);
     }
 
     /**
@@ -262,5 +263,12 @@ final class EventLogApiController extends FetchCommonApiController
         }
 
         return parent::view($data, $statusCode, $headers);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        UserHelper $userHelper,
+    ): void {
+        $this->userHelper = $userHelper;
     }
 }

@@ -25,6 +25,8 @@ final class SmsController extends FormController
     private AuditLogModel $auditLogModel;
 
     private SmsModel $smsModel;
+    private TransportChain $transportChain;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireSmsController(
@@ -38,7 +40,7 @@ final class SmsController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
+    public function indexAction(Request $request, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -134,7 +136,7 @@ final class SmsController extends FormController
                 'permissions' => $permissions,
                 'model'       => $this->smsModel,
                 'security'    => $this->security,
-                'configured'  => count($transportChain->getEnabledTransports()) > 0,
+                'configured'  => count($this->transportChain->getEnabledTransports()) > 0,
             ],
             'contentTemplate' => '@MauticSms/Sms/list.html.twig',
             'passthroughVars' => [
@@ -728,13 +730,12 @@ final class SmsController extends FormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             'sms:smses:view',
@@ -753,5 +754,14 @@ final class SmsController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    #[Required]
+    public function autowire(
+        TransportChain $transportChain,
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->transportChain = $transportChain;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

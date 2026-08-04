@@ -26,6 +26,10 @@ final class PluginController extends FormController
     private PluginRepository $pluginRepository;
 
     private PluginModel $pluginModel;
+    private IntegrationHelper $integrationHelper;
+    private EntityManagerInterface $em;
+    private LoggerInterface $mauticLogger;
+    private ReloadFacade $reloadFacade;
 
     #[Required]
     public function autowirePluginController(
@@ -36,7 +40,7 @@ final class PluginController extends FormController
         $this->pluginRepository = $pluginRepository;
     }
 
-    public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
+    public function indexAction(Request $request): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -63,7 +67,7 @@ final class PluginController extends FormController
 
         $session->set('mautic.integrations.filter', $pluginFilter);
 
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
+        $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, null, true);
         $integrations       = $foundPlugins       = [];
 
         foreach ($integrationObjects as $name => $object) {
@@ -74,7 +78,7 @@ final class PluginController extends FormController
                 $integrations[$name] = [
                     'name'     => $object->getName(),
                     'display'  => $object->getDisplayName(),
-                    'icon'     => $integrationHelper->getIconPath($object),
+                    'icon'     => $this->integrationHelper->getIconPath($object),
                     'enabled'  => $settings->isPublished(),
                     'plugin'   => $pluginId,
                     'isBundle' => false,
@@ -89,7 +93,7 @@ final class PluginController extends FormController
             $integrations[$plugin['name']] = [
                 'name'        => $plugin['bundle'],
                 'display'     => $plugin['name'],
-                'icon'        => $integrationHelper->getIconPath($plugin),
+                'icon'        => $this->integrationHelper->getIconPath($plugin),
                 'enabled'     => true,
                 'plugin'      => $plugin['id'],
                 'description' => $plugin['description'],
@@ -136,7 +140,7 @@ final class PluginController extends FormController
     /**
      * @param string $name
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
+    public function configAction(Request $request, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -151,7 +155,7 @@ final class PluginController extends FormController
         $authorize              = !empty($integrationDetailsPost['in_auth']);
 
         /** @var AbstractIntegration $integrationObject */
-        $integrationObject = $integrationHelper->getIntegrationObject($name);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($name);
 
         // Verify that the requested integration exists
         if (empty($integrationObject)) {
@@ -253,9 +257,9 @@ final class PluginController extends FormController
                     }
 
                     if ($valid || $authorize) {
-                        $mauticLogger->info('Dispatching integration config save event.');
+                        $this->mauticLogger->info('Dispatching integration config save event.');
                         if ($this->dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $mauticLogger->info('Event dispatcher has integration config save listeners.');
+                            $this->mauticLogger->info('Event dispatcher has integration config save listeners.');
                             if (!$valid && !$existingPublishedState) {
                                 $integrationObject->getIntegrationSettings()->setIsPublished(false);
                             }
@@ -266,8 +270,8 @@ final class PluginController extends FormController
                             $entity = $event->getEntity();
                         }
 
-                        $em->persist($entity);
-                        $em->flush();
+                        $this->em->persist($entity);
+                        $this->em->flush();
                     }
 
                     if ($authorize) {
@@ -366,7 +370,7 @@ final class PluginController extends FormController
         );
     }
 
-    public function infoAction(IntegrationHelper $integrationHelper, $name): Response
+    public function infoAction($name): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -388,7 +392,7 @@ final class PluginController extends FormController
             [
                 'viewParameters' => [
                     'bundle' => $bundle,
-                    'icon'   => $integrationHelper->getIconPath($bundle),
+                    'icon'   => $this->integrationHelper->getIconPath($bundle),
                 ],
                 'contentTemplate' => '@MauticPlugin/Integration/info.html.twig',
                 'passthroughVars' => [
@@ -404,14 +408,14 @@ final class PluginController extends FormController
     /**
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
      */
-    public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response
+    public function reloadAction(Request $request): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
         }
 
         $this->addFlashMessage(
-            $reloadFacade->reloadPlugins()
+            $this->reloadFacade->reloadPlugins()
         );
 
         $viewParameters = [
@@ -459,5 +463,18 @@ final class PluginController extends FormController
         $keysToRemove = array_unique(array_merge($integrationObject->getRefreshTokenKeys(), [$integrationObject->getAuthTokenKey()]));
 
         return array_diff_key($keys, array_flip($keysToRemove));
+    }
+
+    #[Required]
+    public function autowire(
+        IntegrationHelper $integrationHelper,
+        EntityManagerInterface $em,
+        LoggerInterface $mauticLogger,
+        ReloadFacade $reloadFacade,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
+        $this->em = $em;
+        $this->mauticLogger = $mauticLogger;
+        $this->reloadFacade = $reloadFacade;
     }
 }

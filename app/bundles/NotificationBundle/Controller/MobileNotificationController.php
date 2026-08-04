@@ -23,6 +23,8 @@ final class MobileNotificationController extends FormController
     private NotificationModel $notificationModel;
 
     private AuditLogModel $auditLogModel;
+    private IntegrationHelper $integrationHelper;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireMobileNotificationController(
@@ -260,7 +262,7 @@ final class MobileNotificationController extends FormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): Response
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
@@ -321,7 +323,7 @@ final class MobileNotificationController extends FormController
                         $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $integrationHelper, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -363,7 +365,7 @@ final class MobileNotificationController extends FormController
             }
         }
 
-        $integration = $integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
         return $this->delegateView(
             [
@@ -392,7 +394,7 @@ final class MobileNotificationController extends FormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
+    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false): Response
     {
         $method  = $request->getMethod();
         $entity  = $this->notificationModel->getEntity($objectId);
@@ -524,7 +526,7 @@ final class MobileNotificationController extends FormController
             $this->notificationModel->lockEntity($entity);
         }
 
-        $integration = $integrationHelper->getIntegrationObject('OneSignal');
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
         return $this->delegateView(
             [
@@ -554,7 +556,7 @@ final class MobileNotificationController extends FormController
     /**
      * Clone an entity.
      */
-    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->notificationModel->getEntity($objectId);
 
@@ -572,7 +574,7 @@ final class MobileNotificationController extends FormController
             $entity      = clone $entity;
         }
 
-        return $this->newAction($request, $integrationHelper, $entity);
+        return $this->newAction($request, $entity);
     }
 
     /**
@@ -731,13 +733,12 @@ final class MobileNotificationController extends FormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
     ) {
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             'notification:mobile_notifications:view',
@@ -746,5 +747,14 @@ final class MobileNotificationController extends FormController
             'mobile_notification',
             'notification_id'
         );
+    }
+
+    #[Required]
+    public function autowire(
+        IntegrationHelper $integrationHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

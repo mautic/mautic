@@ -17830,12 +17830,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f7ab45b9df27d0213c5a2026b61442b655c36066"
+                "reference": "9a6d4e9d82629c99ff12b0bd9d606d200ba82a4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f7ab45b9df27d0213c5a2026b61442b655c36066",
-                "reference": "f7ab45b9df27d0213c5a2026b61442b655c36066",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/9a6d4e9d82629c99ff12b0bd9d606d200ba82a4a",
+                "reference": "9a6d4e9d82629c99ff12b0bd9d606d200ba82a4a",
                 "shasum": ""
             },
             "require": {
@@ -17883,7 +17883,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-02T10:26:14+00:00"
+            "time": "2026-08-04T10:15:37+00:00"
         },
         {
             "name": "rector/type-perfect",

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+    private CorePermissions $corePermissions;
 
     public function getLookupChoiceListAction(Request $request, ProjectModel $projectModel): JsonResponse
     {
@@ -49,16 +50,16 @@ final class AjaxController extends CommonAjaxController
         return new JsonResponse($dataArray);
     }
 
-    public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository, CorePermissions $corePermissions): JsonResponse
+    public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository): JsonResponse
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
             $this->throwAccessDenied();
         }
 
         $existingProjectIds = json_decode($request->request->get('existingProjectIds'), true);
         $newProjectNames    = json_decode($request->request->get('newProjectNames'), true);
 
-        if ($corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
+        if ($this->corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
             foreach ($newProjectNames as $projectName) {
                 $project = new Project();
                 $project->setName($projectName);
@@ -92,5 +93,12 @@ final class AjaxController extends CommonAjaxController
         $projectModel->saveEntity($project);
 
         return $project->getId();
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        CorePermissions $corePermissions,
+    ): void {
+        $this->corePermissions = $corePermissions;
     }
 }

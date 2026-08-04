@@ -16,6 +16,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class AjaxController extends CommonAjaxController
 {
     private PluginModel $pluginModel;
+    private IntegrationHelper $helper;
+    private IntegrationHelper $integrationHelper;
 
     #[Required]
     public function autowirePluginAjaxController(
@@ -36,7 +38,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for list of fields.
      */
-    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): JsonResponse
+    public function getIntegrationFieldsAction(Request $request): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -46,7 +48,7 @@ final class AjaxController extends CommonAjaxController
 
         if (!empty($integration) && !empty($settings)) {
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
-            $integrationObject = $helper->getIntegrationObject($integration);
+            $integrationObject = $this->helper->getIntegrationObject($integration);
 
             if ($integrationObject) {
                 if (!$object = $request->attributes->get('object')) {
@@ -116,7 +118,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for integration properties.
      */
-    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function getIntegrationConfigAction(Request $request): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -124,7 +126,7 @@ final class AjaxController extends CommonAjaxController
 
         if (!empty($integration) && !empty($settings)) {
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $integrationHelper->getIntegrationObject($integration);
+            $object = $this->integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
                 $data           = $statusData           = [];
@@ -170,7 +172,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function getIntegrationCampaignStatusAction(Request $request): JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -179,7 +181,7 @@ final class AjaxController extends CommonAjaxController
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $integrationHelper->getIntegrationObject($integration);
+            $object = $this->integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
                 if (method_exists($object, 'getCampaignMemberStatus')) {
@@ -224,7 +226,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function matchFieldsAction(Request $request): JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');
@@ -232,7 +234,7 @@ final class AjaxController extends CommonAjaxController
         $update_mautic     = $request->request->get('updateMautic');
         $object            = $request->request->get('object');
 
-        $integration_object = $integrationHelper->getIntegrationObject($integration);
+        $integration_object = $this->integrationHelper->getIntegrationObject($integration);
         $entity             = $integration_object->getIntegrationSettings();
         $featureSettings    = $entity->getFeatureSettings();
         $doNotMatchField    = ('-1' === $mautic_field || '' === $mautic_field);
@@ -272,5 +274,14 @@ final class AjaxController extends CommonAjaxController
         $this->pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    #[Required]
+    public function autowire(
+        IntegrationHelper $helper,
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->helper = $helper;
+        $this->integrationHelper = $integrationHelper;
     }
 }

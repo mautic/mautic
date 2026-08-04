@@ -43,6 +43,8 @@ final class EmailApiController extends CommonApiController
      * @var array<string, mixed>
      */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
+    private Reply $replyService;
+    private RandomHelperInterface $randomHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -210,10 +212,10 @@ final class EmailApiController extends CommonApiController
     /**
      * @param string $trackingHash
      */
-    public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash): Response
+    public function replyAction($trackingHash): Response
     {
         try {
-            $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
+            $this->replyService->createReplyByHash($trackingHash, "api-{$this->randomHelper->generate()}");
         } catch (EntityNotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
@@ -255,5 +257,14 @@ final class EmailApiController extends CommonApiController
         }
 
         return parent::processForm($request, $entity, $parameters, $method);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        Reply $replyService,
+        RandomHelperInterface $randomHelper,
+    ): void {
+        $this->replyService = $replyService;
+        $this->randomHelper = $randomHelper;
     }
 }

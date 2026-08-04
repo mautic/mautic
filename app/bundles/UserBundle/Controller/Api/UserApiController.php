@@ -32,6 +32,7 @@ final class UserApiController extends CommonApiController
      * @var UserModel|null
      */
     protected $model;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         CorePermissions $security,
@@ -63,9 +64,9 @@ final class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction(TokenStorageInterface $tokenStorage): Response
+    public function getSelfAction(): Response
     {
-        $currentUser = $tokenStorage->getToken()->getUser();
+        $currentUser = $this->tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -221,5 +222,12 @@ final class UserApiController extends CommonApiController
         $view->setContext($context);
 
         return $this->handleView($view);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        TokenStorageInterface $tokenStorage,
+    ): void {
+        $this->tokenStorage = $tokenStorage;
     }
 }

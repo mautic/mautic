@@ -16,6 +16,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class DynamicContentApiController extends CommonController
 {
     private PageModel $pageModel;
+    private DynamicContentHelper $helper;
+    private DeviceTrackingServiceInterface $deviceTrackingService;
+    private ContactRequestHelper $contactRequestHelper;
 
     #[Required]
     public function autowireDynamicContentApiController(
@@ -45,14 +48,11 @@ final class DynamicContentApiController extends CommonController
 
     public function getAction(
         Request $request,
-        DynamicContentHelper $helper,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactRequestHelper $contactRequestHelper,
         string $objectAlias,
     ): Response {
-        $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
-        $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
-        $trackedDevice = $deviceTrackingService->getTrackedDevice();
+        $lead          = $this->contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
+        $content       = $this->helper->getDynamicContentForLead($objectAlias, $lead);
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         return empty($content)
@@ -65,5 +65,16 @@ final class DynamicContentApiController extends CommonController
                     'device_id' => $deviceId,
                 ]
             );
+    }
+
+    #[Required]
+    public function autowire(
+        DynamicContentHelper $helper,
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        ContactRequestHelper $contactRequestHelper,
+    ): void {
+        $this->helper = $helper;
+        $this->deviceTrackingService = $deviceTrackingService;
+        $this->contactRequestHelper = $contactRequestHelper;
     }
 }

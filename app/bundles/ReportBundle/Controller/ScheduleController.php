@@ -12,6 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ScheduleController extends CommonAjaxController
 {
     private ReportModel $reportModel;
+    private DateBuilder $dateBuilder;
 
     #[Required]
     public function autowireScheduleController(
@@ -20,9 +21,9 @@ final class ScheduleController extends CommonAjaxController
         $this->reportModel = $reportModel;
     }
 
-    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
+    public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {
-        $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $dates = $this->dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
         $html = $this->render(
             '@MauticReport/Schedule/index.html.twig',
@@ -82,5 +83,12 @@ final class ScheduleController extends CommonAjaxController
     private function flushFlash(): JsonResponse
     {
         return new JsonResponse(['flashes' => $this->getFlashContent()]);
+    }
+
+    #[Required]
+    public function autowire(
+        DateBuilder $dateBuilder,
+    ): void {
+        $this->dateBuilder = $dateBuilder;
     }
 }

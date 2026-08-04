@@ -18,6 +18,9 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class AssetController extends FormController
 {
     private AuditLogModel $auditLogModel;
+    private CoreParametersHelper $parametersHelper;
+    private UploaderHelper $uploaderHelper;
+    private IntegrationHelper $integrationHelper;
 
     #[Required]
     public function autowireAssetController(
@@ -26,7 +29,7 @@ final class AssetController extends FormController
         $this->auditLogModel = $auditLogModel;
     }
 
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
+    public function indexAction(Request $request, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -50,7 +53,7 @@ final class AssetController extends FormController
         // Remove the "default_assetlimit" in Mautic 8.
         $limit = $request->getSession()->get(
             'mautic.asset.limit',
-            $parametersHelper->get('default_assetlimit', $parametersHelper->get('default_pagelimit'))
+            $this->parametersHelper->get('default_assetlimit', $this->parametersHelper->get('default_pagelimit'))
         );
 
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
@@ -272,7 +275,7 @@ final class AssetController extends FormController
     /**
      * Generates new form and processes post data.
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
+    public function newAction(Request $request, AssetModel $model, $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -308,7 +311,7 @@ final class AssetController extends FormController
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', ['objectAction' => 'new']);
 
-        $uploadEndpoint = $uploaderHelper->endpoint('asset');
+        $uploadEndpoint = $this->uploaderHelper->endpoint('asset');
 
         // create the form
         $form = $model->createForm($entity, $this->formFactory, $action);
@@ -318,7 +321,7 @@ final class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $entity->setUploadDir($parametersHelper->get('upload_dir'));
+                    $entity->setUploadDir($this->parametersHelper->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
                     $entity->setDateModified(new \DateTime());
@@ -339,7 +342,7 @@ final class AssetController extends FormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $uploaderHelper, $integrationHelper, $model, $entity->getId(), true);
+                        return $this->editAction($request, $model, $entity->getId(), true);
                     }
 
                     $viewParameters = [
@@ -369,7 +372,7 @@ final class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $this->integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -402,7 +405,7 @@ final class AssetController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, AssetModel $model, $objectId, $ignorePost = false)
     {
         $entity = $model->getEntity($objectId);
 
@@ -430,7 +433,7 @@ final class AssetController extends FormController
         // set the return URL
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
 
-        $uploadEndpoint = $uploaderHelper->endpoint('asset');
+        $uploadEndpoint = $this->uploaderHelper->endpoint('asset');
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -532,7 +535,7 @@ final class AssetController extends FormController
         }
 
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $this->integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -564,7 +567,7 @@ final class AssetController extends FormController
      *
      * @param int $objectId
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId): Response
+    public function cloneAction(Request $request, AssetModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
         $clone  = null;
@@ -585,7 +588,7 @@ final class AssetController extends FormController
             $clone->setIsPublished(false);
         }
 
-        return $this->newAction($request, $parametersHelper, $uploaderHelper, $integrationHelper, $model, $clone);
+        return $this->newAction($request, $model, $clone);
     }
 
     /**
@@ -722,10 +725,10 @@ final class AssetController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
+    public function remoteAction(Request $request): Response
     {
         // Check for integrations to cloud providers
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
+        $integrations = $this->integrationHelper->getIntegrationObjects(null, ['cloud_storage']);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
@@ -751,5 +754,16 @@ final class AssetController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    #[Required]
+    public function autowire(
+        CoreParametersHelper $parametersHelper,
+        UploaderHelper $uploaderHelper,
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->parametersHelper = $parametersHelper;
+        $this->uploaderHelper = $uploaderHelper;
+        $this->integrationHelper = $integrationHelper;
     }
 }

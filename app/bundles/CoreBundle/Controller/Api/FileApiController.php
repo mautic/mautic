@@ -31,6 +31,8 @@ final class FileApiController extends CommonApiController
      * @var array
      */
     private $allowedExtensions = [];
+    private PathsHelper $pathsHelper;
+    private LoggerInterface $mauticLogger;
 
     public function __construct(
         CorePermissions $security,
@@ -57,10 +59,10 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function createAction(Request $request, $dir)
     {
         try {
-            $path = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir, true);
+            $path = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -96,10 +98,10 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function listAction(Request $request, $dir)
     {
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir);
+            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -127,12 +129,12 @@ final class FileApiController extends CommonApiController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
+    public function deleteAction(Request $request, $dir, $file)
     {
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -220,5 +222,14 @@ final class FileApiController extends CommonApiController
             .':'.$request->getPort()
             .$request->getBasePath().'/'
             .$this->coreParametersHelper->get('image_path');
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        PathsHelper $pathsHelper,
+        LoggerInterface $mauticLogger,
+    ): void {
+        $this->pathsHelper = $pathsHelper;
+        $this->mauticLogger = $mauticLogger;
     }
 }

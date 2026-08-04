@@ -20,6 +20,7 @@ final class FullContactController extends FormController
     private CompanyModel $companyModel;
 
     private LeadModel $leadModel;
+    private LookupHelper $lookupHelper;
 
     #[Required]
     public function autowireFullContactController(
@@ -37,7 +38,7 @@ final class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupPersonAction(Request $request, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -98,7 +99,7 @@ final class FullContactController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             try {
-                $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
+                $this->lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
                 $this->addFlashMessage(
                     'mautic.lead.batch_leads_affected',
                     [
@@ -129,7 +130,7 @@ final class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
+    public function batchLookupPersonAction(Request $request): JsonResponse|Response
     {
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
@@ -244,7 +245,7 @@ final class FullContactController extends FormController
             foreach ($lookupEmails as $id => $lookupEmail) {
                 if ($lead = $this->leadModel->getEntity($id)) {
                     try {
-                        $lookupHelper->lookupContact($lead, $notify);
+                        $this->lookupHelper->lookupContact($lead, $notify);
                     } catch (\Exception $ex) {
                         $this->addFlashMessage(
                             $ex->getMessage(),
@@ -285,7 +286,7 @@ final class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
+    public function lookupCompanyAction(Request $request, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -345,7 +346,7 @@ final class FullContactController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             try {
-                $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
+                $this->lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
                 $this->addFlashMessage(
                     'mautic.company.batch_companies_affected',
                     [
@@ -376,7 +377,7 @@ final class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
+    public function batchLookupCompanyAction(Request $request): JsonResponse|Response
     {
         if ('GET' === $request->getMethod()) {
             $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
@@ -490,7 +491,7 @@ final class FullContactController extends FormController
             foreach ($lookupWebsites as $id => $lookupWebsite) {
                 if ($company = $this->companyModel->getEntity($id)) {
                     try {
-                        $lookupHelper->lookupCompany($company, $notify);
+                        $this->lookupHelper->lookupCompany($company, $notify);
                     } catch (\Exception $ex) {
                         $this->addFlashMessage(
                             $ex->getMessage(),
@@ -520,5 +521,12 @@ final class FullContactController extends FormController
         }
 
         return new Response('Bad Request', 400);
+    }
+
+    #[Required]
+    public function autowire(
+        LookupHelper $lookupHelper,
+    ): void {
+        $this->lookupHelper = $lookupHelper;
     }
 }

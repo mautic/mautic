@@ -38,6 +38,8 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
+        Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector::class,
+
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 

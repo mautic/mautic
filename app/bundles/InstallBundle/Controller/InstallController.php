@@ -19,6 +19,8 @@ final class InstallController extends CommonController
     private Configurator $configurator;
 
     private InstallService $installer;
+    private EntityManagerInterface $entityManager;
+    private PathsHelper $pathsHelper;
 
     #[Required]
     public function autowireInstallController(
@@ -36,7 +38,7 @@ final class InstallController extends CommonController
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function stepAction(Request $request, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
@@ -99,7 +101,7 @@ final class InstallController extends CommonController
                          * After clearing the metadata cache, Doctrine automatically recreates it with the correct prefixes (e.g.
                          * mau_oauth2_clients), if applicable.
                          */
-                        $entityManager->getConfiguration()->getMetadataCache()->clear();
+                        $this->entityManager->getConfiguration()->getMetadataCache()->clear();
 
                         // Refresh to install schema with new connection information in the container
                         return $this->redirectToRoute('mautic_installer_step', ['index' => 1.1]);
@@ -199,7 +201,7 @@ final class InstallController extends CommonController
                     'appRoot'        => $this->coreParametersHelper->get('mautic.application_dir').'/app',
                     'cacheDir'       => $this->coreParametersHelper->get('kernel.cache_dir'),
                     'logDir'         => $this->coreParametersHelper->get('kernel.logs_dir'),
-                    'configFile'     => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
+                    'configFile'     => ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
                     'completedSteps' => $completedSteps,
                 ],
                 'contentTemplate' => $step->getTemplate(),
@@ -215,7 +217,7 @@ final class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function finalAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 
@@ -246,7 +248,7 @@ final class InstallController extends CommonController
                 'viewParameters' => [
                     'welcome_url' => $welcomeUrl,
                     'parameters'  => $this->configurator->render(),
-                    'config_path' => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
+                    'config_path' => ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
                     'is_writable' => $this->configurator->isFileWritable(),
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,
@@ -269,5 +271,14 @@ final class InstallController extends CommonController
                 default => $form[$type]->addError(new FormError($message)),
             };
         }
+    }
+
+    #[Required]
+    public function autowire(
+        EntityManagerInterface $entityManager,
+        PathsHelper $pathsHelper,
+    ): void {
+        $this->entityManager = $entityManager;
+        $this->pathsHelper = $pathsHelper;
     }
 }

@@ -11,7 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class PublicController extends CommonController
 {
-    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper): Response
+    private LoggerInterface $mauticLogger;
+    private IntegrationHelper $integrationHelper;
+
+    public function contactDataAction(Request $request): Response
     {
         $content = $request->getContent();
         if (!empty($content)) {
@@ -22,7 +25,7 @@ final class PublicController extends CommonController
 
         $integration = 'Hubspot';
 
-        $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         \assert($integrationObject instanceof HubspotIntegration);
 
         foreach ($data as $info) {
@@ -40,10 +43,19 @@ final class PublicController extends CommonController
                         break;
                 }
             } catch (\Exception $ex) {
-                $mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
+                $this->mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
             }
         }
 
         return new Response('OK');
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        LoggerInterface $mauticLogger,
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->mauticLogger = $mauticLogger;
+        $this->integrationHelper = $integrationHelper;
     }
 }

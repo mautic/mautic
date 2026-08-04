@@ -18,6 +18,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ThemeApiController extends CommonApiController
 {
     private readonly ThemeHelper $themeHelper;
+    private PathsHelper $pathsHelper;
 
     #[Required]
     public function autowireThemeApiController(
@@ -31,7 +32,7 @@ final class ThemeApiController extends CommonApiController
      *
      * @return Response
      */
-    public function newAction(Request $request, PathsHelper $pathsHelper)
+    public function newAction(Request $request)
     {
         if (!$this->security->isGranted('core:themes:create')) {
             return $this->accessDenied();
@@ -54,7 +55,7 @@ final class ThemeApiController extends CommonApiController
             );
         }
         $fileName  = InputHelper::filename($themeZip->getClientOriginalName());
-        $dir       = $pathsHelper->getSystemPath('themes', true);
+        $dir       = $this->pathsHelper->getSystemPath('themes', true);
 
         try {
             $themeZip->move($dir, $fileName);
@@ -149,5 +150,12 @@ final class ThemeApiController extends CommonApiController
         $view = $this->view($response);
 
         return $this->handleView($view);
+    }
+
+    #[Required]
+    public function autowire(
+        PathsHelper $pathsHelper,
+    ): void {
+        $this->pathsHelper = $pathsHelper;
     }
 }

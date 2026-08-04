@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -37,10 +36,22 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 final class PublicController extends AbstractFormController
 {
+    private ContactRequestHelper $contactRequestHelper;
+    private CookieHelper $cookieHelper;
+    private AnalyticsHelper $analyticsHelper;
+    private AssetsHelper $assetsHelper;
+    private ThemeHelper $themeHelper;
+    private DeviceTrackingServiceInterface $deviceTrackingService;
+    private PageConfig $pageConfig;
+    private TrackingHelper $trackingHelper;
+    private ContactTracker $contactTracker;
+    private IpLookupHelper $ipLookupHelper;
+    private LoggerInterface $logger;
+    private DeviceTrackingServiceInterface $trackedDeviceService;
+
     /**
      * @param string $slug
      *
@@ -49,14 +60,7 @@ final class PublicController extends AbstractFormController
      */
     public function indexAction(
         Request $request,
-        ContactRequestHelper $contactRequestHelper,
-        CookieHelper $cookieHelper,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
         Tracking404Model $tracking404Model,
-        RouterInterface $router,
-        DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
         $slug): RedirectResponse|Response
     {
@@ -90,7 +94,7 @@ final class PublicController extends AbstractFormController
             if (!$userAccess) {
                 // Extract the lead from the request so it can be used to determine language if applicable
                 $query = $model->getHitQuery($request, $entity);
-                $lead  = $contactRequestHelper->getContactFromQuery($query);
+                $lead  = $this->contactRequestHelper->getContactFromQuery($query);
             }
 
             // Correct the URL if it doesn't match up
@@ -209,7 +213,7 @@ final class PublicController extends AbstractFormController
                             $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
-                            $cookieHelper->setCookie(
+                            $this->cookieHelper->setCookie(
                                 'mautic_page_'.$entity->getId(),
                                 $useId,
                                 3600 * 24 * 14
@@ -243,7 +247,7 @@ final class PublicController extends AbstractFormController
             }
 
             // Generate contents
-            $analytics = $analyticsHelper->getCode();
+            $analytics = $this->analyticsHelper->getCode();
 
             $BCcontent = $entity->getContent();
             $content   = $entity->getCustomHtml();
@@ -258,12 +262,12 @@ final class PublicController extends AbstractFormController
 
                 // Add the GA code to the template assets
                 if (!empty($analytics)) {
-                    $assetsHelper->addCustomDeclaration($analytics);
+                    $this->assetsHelper->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+                $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-                $content = $themeHelper->renderThemeTemplate(
+                $content = $this->themeHelper->renderThemeTemplate(
                     $logicalName,
                     [
                         'content'  => $content,
@@ -281,8 +285,8 @@ final class PublicController extends AbstractFormController
                 }
             }
 
-            $assetsHelper->addScript(
-                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $this->assetsHelper->addScript(
+                $this->router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
@@ -296,7 +300,7 @@ final class PublicController extends AbstractFormController
 
             $response = new Response($content);
             if (!$isHitTrackable || $request->cookies->has('Blocked-Tracking')) {
-                $deviceTrackingService->clearTrackingCookies();
+                $this->deviceTrackingService->clearTrackingCookies();
             }
 
             return $response;
@@ -312,7 +316,7 @@ final class PublicController extends AbstractFormController
     /**
      * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
+    public function previewAction(Request $request, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
     {
         $page = $model->getEntity($id);
 
@@ -324,8 +328,8 @@ final class PublicController extends AbstractFormController
         if ($contactId) {
             $contact = $leadModel->getEntity($contactId);
         }
-        $draftEnabled = $pageConfig->isDraftEnabled();
-        $analytics    = $analyticsHelper->getCode();
+        $draftEnabled = $this->pageConfig->isDraftEnabled();
+        $analytics    = $this->analyticsHelper->getCode();
 
         $BCcontent     = $page->getContent();
         $content       = $page->getCustomHtml();
@@ -336,8 +340,8 @@ final class PublicController extends AbstractFormController
             $publicPreview = $page->getDraft()->isPublicPreview();
         }
 
-        if (($security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$security->isAnonymous(
-        ) && !$security->hasEntityAccess(
+        if (($this->security->isAnonymous() && (!$page->isPublished() || !$publicPreview)) || (!$this->security->isAnonymous(
+        ) && !$this->security->hasEntityAccess(
             'page:pages:viewown',
             'page:pages:viewother',
             $page->getCreatedBy()
@@ -345,7 +349,7 @@ final class PublicController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        if ($contactId && (!$security->isAdmin() || !$security->hasEntityAccess(
+        if ($contactId && (!$this->security->isAdmin() || !$this->security->hasEntityAccess(
             'lead:leads:viewown',
             'lead:leads:viewother'
         ))) {
@@ -360,12 +364,12 @@ final class PublicController extends AbstractFormController
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
-                $assetsHelper->addCustomDeclaration($analytics);
+                $this->assetsHelper->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-            $content = $themeHelper->renderThemeTemplate(
+            $content = $this->themeHelper->renderThemeTemplate(
                 $logicalName,
                 [
                     'content'  => $content,
@@ -399,9 +403,6 @@ final class PublicController extends AbstractFormController
 
     public function trackingAction(
         Request $request,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        TrackingHelper $trackingHelper,
-        ContactTracker $contactTracker,
         PageModel $model,
     ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
@@ -420,11 +421,11 @@ final class PublicController extends AbstractFormController
             return $notSuccessResponse;
         }
 
-        $lead          = $contactTracker->getContact();
-        $trackedDevice = $deviceTrackingService->getTrackedDevice();
+        $lead          = $this->contactTracker->getContact();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
-        $sessionValue   = $trackingHelper->getCacheItem(true);
+        $sessionValue   = $this->trackingHelper->getCacheItem(true);
 
         $event = new TrackingEvent($lead, $request, $sessionValue);
         $this->dispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);
@@ -445,21 +446,18 @@ final class PublicController extends AbstractFormController
      */
     public function redirectAction(
         Request $request,
-        ContactRequestHelper $contactRequestHelper,
-        IpLookupHelper $ipLookupHelper,
-        LoggerInterface $logger,
         RedirectModel $redirectModel,
         PageModel $pageModel,
         $redirectId,
     ): RedirectResponse {
-        $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
+        $this->logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         $redirect = $redirectModel->getRedirectById($redirectId);
 
-        $logger->debug('Executing Redirect: '.$redirect);
+        $this->logger->debug('Executing Redirect: '.$redirect);
 
         if (null === $redirect || !$redirect->isPublished(false)) {
-            $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
+            $this->logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
 
             $url = ($redirect) ? $redirect->getUrl() : 'n/a';
 
@@ -486,24 +484,24 @@ final class PublicController extends AbstractFormController
 
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
                 try {
-                    $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+                    $lead           = $this->contactRequestHelper->getContactFromQuery(['ct' => $ct]);
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $this->logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');
-                    $lead           = $contactRequestHelper->getContactFromQuery();
+                    $lead           = $this->contactRequestHelper->getContactFromQuery();
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
 
@@ -563,12 +561,12 @@ final class PublicController extends AbstractFormController
     /**
      * Get the ID of the currently tracked Contact.
      */
-    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
+    public function getContactIdAction(): JsonResponse
     {
         $data = [];
         if ($this->security->isAnonymous()) {
-            $lead          = $contactTracker->getContact();
-            $trackedDevice = $trackedDeviceService->getTrackedDevice();
+            $lead          = $this->contactTracker->getContact();
+            $trackedDevice = $this->trackedDeviceService->getTrackedDevice();
             $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
             $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
@@ -592,5 +590,34 @@ final class PublicController extends AbstractFormController
             'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
             'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
         ];
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        ContactRequestHelper $contactRequestHelper,
+        CookieHelper $cookieHelper,
+        AnalyticsHelper $analyticsHelper,
+        AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        PageConfig $pageConfig,
+        TrackingHelper $trackingHelper,
+        ContactTracker $contactTracker,
+        IpLookupHelper $ipLookupHelper,
+        LoggerInterface $logger,
+        DeviceTrackingServiceInterface $trackedDeviceService,
+    ): void {
+        $this->contactRequestHelper = $contactRequestHelper;
+        $this->cookieHelper = $cookieHelper;
+        $this->analyticsHelper = $analyticsHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->themeHelper = $themeHelper;
+        $this->deviceTrackingService = $deviceTrackingService;
+        $this->pageConfig = $pageConfig;
+        $this->trackingHelper = $trackingHelper;
+        $this->contactTracker = $contactTracker;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->logger = $logger;
+        $this->trackedDeviceService = $trackedDeviceService;
     }
 }

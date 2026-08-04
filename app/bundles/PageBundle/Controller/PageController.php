@@ -8,11 +8,9 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
@@ -32,6 +30,11 @@ final class PageController extends FormController
     use FormErrorMessagesTrait;
 
     private PageModel $pageModel;
+    private PageConfig $pageConfig;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private AssetsHelper $assetsHelper;
+    private RouterInterface $routerHelper;
+    private ThemeHelper $themeHelper;
 
     #[Required]
     public function autowirePageController(
@@ -40,7 +43,7 @@ final class PageController extends FormController
         $this->pageModel = $pageModel;
     }
 
-    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
+    public function indexAction(Request $request, PageModel $model, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -63,7 +66,7 @@ final class PageController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.page', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.page', $page);
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();
@@ -157,7 +160,7 @@ final class PageController extends FormController
                 'model'       => $model,
                 'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 'security'    => $this->security,
-                'pageConfig'  => $pageConfig,
+                'pageConfig'  => $this->pageConfig,
             ],
             'contentTemplate' => '@MauticPage/Page/list.html.twig',
             'passthroughVars' => [
@@ -173,7 +176,7 @@ final class PageController extends FormController
      *
      * @param int $objectId
      */
-    public function viewAction(Request $request, PageConfig $pageConfig, PageModel $model, AuditLogModel $auditLogModel, $objectId): Response
+    public function viewAction(Request $request, PageModel $model, AuditLogModel $auditLogModel, $objectId): Response
     {
         // set some permissions
         $activePage = $model->getEntity($objectId);
@@ -287,7 +290,7 @@ final class PageController extends FormController
         // get related translations
         [$translationParent, $translationChildren] = $activePage->getTranslations();
         $draftPreviewUrl                           = null;
-        if ($pageConfig->isDraftEnabled() && $activePage->hasDraft()) {
+        if ($this->pageConfig->isDraftEnabled() && $activePage->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
                 'mautic_page_preview',
                 [
@@ -370,7 +373,7 @@ final class PageController extends FormController
      *
      * @param Page|null $entity
      */
-    public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
+    public function newAction(Request $request, PageModel $model, $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();
@@ -420,7 +423,7 @@ final class PageController extends FormController
                             $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                         } else {
                             // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $pageConfig, $model, $themeHelper, $entity->getId(), true);
+                            return $this->editAction($request, $model, $entity->getId(), true);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid = false;
@@ -463,7 +466,7 @@ final class PageController extends FormController
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
-                'themes'        => $themeHelper->getInstalledThemes('page', true),
+                'themes'        => $this->themeHelper->getInstalledThemes('page', true),
                 'permissions'   => $permissions,
             ],
             'contentTemplate' => '@MauticPage/Page/form.html.twig',
@@ -485,9 +488,7 @@ final class PageController extends FormController
      */
     public function editAction(
         Request $request,
-        PageConfig $pageConfig,
         PageModel $model,
-        ThemeHelper $themeHelper,
         int $objectId,
         bool $ignorePost = false,
     ) {
@@ -552,7 +553,7 @@ final class PageController extends FormController
                         // form is valid so process the data
                         $model->saveEntity($entity, $this->isButtonClicked($form, 'save'));
 
-                        if ($pageConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        if ($this->pageConfig->isDraftEnabled() && !empty($entity->getId())) {
                             $this->dispatcher->dispatch(new PageEditSubmitEvent(
                                 $existingPage,
                                 $entity,
@@ -624,7 +625,7 @@ final class PageController extends FormController
             }
         }
 
-        $draftEnabled    = $pageConfig->isDraftEnabled() && !empty($entity->getId());
+        $draftEnabled    = $this->pageConfig->isDraftEnabled() && !empty($entity->getId());
         $draftPreviewUrl = null;
         if ($draftEnabled && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
@@ -652,7 +653,7 @@ final class PageController extends FormController
                 'isVariant'       => $entity->isVariant(true),
                 'tokens'          => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'      => $entity,
-                'themes'          => $themeHelper->getInstalledThemes('page', true),
+                'themes'          => $this->themeHelper->getInstalledThemes('page', true),
                 'previewUrl'      => $this->generateUrl('mautic_page_preview', ['id' => $objectId]),
                 'draftPreviewUrl' => $draftPreviewUrl,
                 'permissions'     => $this->security->isGranted(
@@ -682,7 +683,7 @@ final class PageController extends FormController
      *
      * @param int $objectId
      */
-    public function cloneAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
+    public function cloneAction(Request $request, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -709,7 +710,7 @@ final class PageController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $pageConfig, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $model, $entity);
+        return $this->newAction($request, $model, $entity);
     }
 
     /**
@@ -841,7 +842,7 @@ final class PageController extends FormController
      *
      * @param int $objectId
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
+    public function builderAction(Request $request, PageModel $model, $objectId): Response
     {
         // permission check
         if (str_contains((string) $objectId, 'new')) {
@@ -866,9 +867,9 @@ final class PageController extends FormController
             throw new \InvalidArgumentException('No template found');
         }
 
-        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-        return new Response($themeHelper->renderThemeTemplate(
+        return new Response($this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'       => $isNew,
@@ -884,7 +885,7 @@ final class PageController extends FormController
     /**
      * @param int $objectId
      */
-    public function abtestAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $objectId): Response
+    public function abtestAction(Request $request, PageModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -913,7 +914,7 @@ final class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($request, $pageConfig, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $themeHelper, $model, $clone);
+        return $this->newAction($request, $model, $clone);
     }
 
     /**
@@ -1200,5 +1201,20 @@ final class PageController extends FormController
             $clonedPage->addVariantChild($variantChild);
         }
         $clonedPage->setDraft($cloningPage->getDraft());
+    }
+
+    #[Required]
+    public function autowire(
+        PageConfig $pageConfig,
+        PageHelperFactoryInterface $pageHelperFactory,
+        AssetsHelper $assetsHelper,
+        RouterInterface $routerHelper,
+        ThemeHelper $themeHelper,
+    ): void {
+        $this->pageConfig = $pageConfig;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->assetsHelper = $assetsHelper;
+        $this->routerHelper = $routerHelper;
+        $this->themeHelper = $themeHelper;
     }
 }

@@ -10,11 +10,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
     private StageModel $stageModel;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowireStageAjaxController(
@@ -23,7 +23,7 @@ final class AjaxController extends CommonAjaxController
         $this->stageModel = $stageModel;
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
+    public function getActionFormAction(Request $request): JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -42,9 +42,9 @@ final class AjaxController extends CommonAjaxController
                 $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericstage_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
 
-                $form = $formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
+                $form = $this->formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html = $this->renderView('@MauticStage/Stage/actionform.html.twig', [
-                    'form' => $this->setFormTheme($form, $twig, $themes),
+                    'form' => $this->setFormTheme($form, $this->twig, $themes),
                 ]);
 
                 $html                 = str_replace('stageaction', 'stage', $html);
@@ -54,5 +54,12 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    #[Required]
+    public function autowire(
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->formFactory = $formFactory;
     }
 }

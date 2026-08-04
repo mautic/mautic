@@ -24,6 +24,7 @@ final class MessageController extends AbstractStandardFormController
     private RequestStack $requestStack;
 
     private MessageModel $messageModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireMessageController(
@@ -229,7 +230,6 @@ final class MessageController extends AbstractStandardFormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $channel,
         $page = 1,
@@ -260,7 +260,7 @@ final class MessageController extends AbstractStandardFormController
 
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             'channel:messages:view',
@@ -284,5 +284,12 @@ final class MessageController extends AbstractStandardFormController
             ],
             '.message-'.$channel
         );
+    }
+
+    #[Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

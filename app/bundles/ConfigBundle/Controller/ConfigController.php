@@ -22,24 +22,31 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class ConfigController extends FormController
 {
+    private BundleHelper $bundleHelper;
+    private Configurator $configurator;
+    private CacheHelper $cacheHelper;
+    private PathsHelper $pathsHelper;
+    private ConfigMapper $configMapper;
+    private TokenStorageInterface $tokenStorage;
+
     /**
      * Controller action for editing the application configuration.
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function editAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
             $this->throwAccessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($bundleHelper);
+        $event      = new ConfigBuilderEvent($this->bundleHelper);
         $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
-        $formConfigs = $configMapper->bindFormConfigsWithRealValues($event->getForms());
+        $formConfigs = $this->configMapper->bindFormConfigsWithRealValues($event->getForms());
 
-        $this->mergeParamsWithLocal($formConfigs, $pathsHelper);
+        $this->mergeParamsWithLocal($formConfigs, $this->pathsHelper);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
@@ -54,7 +61,7 @@ final class ConfigController extends FormController
 
         $originalNormData = $form->getNormData();
 
-        $isWritable = $configurator->isFileWritable();
+        $isWritable = $this->configurator->isFileWritable();
         $openTab    = null;
 
         // Check for a submitted form and process it
@@ -108,22 +115,22 @@ final class ConfigController extends FormController
                                 }
                             }
 
-                            $configurator->mergeParameters($object);
+                            $this->configurator->mergeParameters($object);
                         }
 
                         try {
                             // Ensure the config has a secret key
-                            $params = $configurator->getParameters();
+                            $params = $this->configurator->getParameters();
                             if (empty($params['secret_key'])) {
-                                $configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
+                                $this->configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
                             }
 
-                            $configurator->write();
+                            $this->configurator->write();
                             $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
-                            $cacheHelper->refreshConfig();
+                            $this->cacheHelper->refreshConfig();
 
                             if (!empty($formData['coreconfig']['last_shown_tab'])) {
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
@@ -132,7 +139,7 @@ final class ConfigController extends FormController
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
-                        $this->setLocale($request, $tokenStorage, $params);
+                        $this->setLocale($request, $this->tokenStorage, $params);
                     }
                 } elseif (!$isWritable) {
                     $form->addError(
@@ -180,14 +187,14 @@ final class ConfigController extends FormController
         );
     }
 
-    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId): Response
+    public function downloadAction(Request $request, $objectId): Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
             $this->throwAccessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($bundleHelper);
+        $event      = new ConfigBuilderEvent($this->bundleHelper);
         $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
@@ -215,7 +222,7 @@ final class ConfigController extends FormController
         return $this->notFound();
     }
 
-    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId): JsonResponse
+    public function removeAction($objectId): JsonResponse
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -223,18 +230,18 @@ final class ConfigController extends FormController
         }
 
         $success    = 0;
-        $event      = new ConfigBuilderEvent($bundleHelper);
+        $event      = new ConfigBuilderEvent($this->bundleHelper);
         $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
 
         if (in_array($objectId, $fileFields)) {
-            $configurator->mergeParameters([$objectId => null]);
+            $this->configurator->mergeParameters([$objectId => null]);
             try {
-                $configurator->write();
+                $this->configurator->write();
 
-                $cacheHelper->refreshConfig();
+                $this->cacheHelper->refreshConfig();
                 $success = 1;
             } catch (\Exception) {
             }
@@ -286,5 +293,22 @@ final class ConfigController extends FormController
         }
 
         $request->getSession()->set('_locale', $locale);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        BundleHelper $bundleHelper,
+        Configurator $configurator,
+        CacheHelper $cacheHelper,
+        PathsHelper $pathsHelper,
+        ConfigMapper $configMapper,
+        TokenStorageInterface $tokenStorage,
+    ): void {
+        $this->bundleHelper = $bundleHelper;
+        $this->configurator = $configurator;
+        $this->cacheHelper = $cacheHelper;
+        $this->pathsHelper = $pathsHelper;
+        $this->configMapper = $configMapper;
+        $this->tokenStorage = $tokenStorage;
     }
 }

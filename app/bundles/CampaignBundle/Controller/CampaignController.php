@@ -94,6 +94,8 @@ class CampaignController extends AbstractStandardFormController
     protected $modifiedEvents = [];
 
     protected $sessionId;
+    private ExportHelper $exportHelper;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -175,7 +177,7 @@ class CampaignController extends AbstractStandardFormController
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
     }
 
-    public function exportAction(ExportHelper $exportHelper, CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
+    public function exportAction(CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
@@ -204,10 +206,10 @@ class CampaignController extends AbstractStandardFormController
         $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
         $assetList      = $assetListEvent->getList();
 
-        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
-    public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response
+    public function batchExportAction(Request $request): JsonResponse|BinaryFileResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -281,7 +283,7 @@ class CampaignController extends AbstractStandardFormController
 
         $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
 
-        return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
     /**
@@ -293,7 +295,6 @@ class CampaignController extends AbstractStandardFormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
         $count = null,
@@ -311,7 +312,7 @@ class CampaignController extends AbstractStandardFormController
 
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             $permissions,
@@ -1306,5 +1307,14 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $campaignLogCountsProcessed;
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        ExportHelper $exportHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->exportHelper = $exportHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

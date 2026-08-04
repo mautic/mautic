@@ -13,6 +13,8 @@ final class AuditlogController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
+    private DateHelper $dateHelper;
+    private ExportHelper $exportHelper;
 
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
@@ -64,7 +66,7 @@ final class AuditlogController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function batchExportAction(Request $request, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -100,7 +102,7 @@ final class AuditlogController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function (array $event) use ($dateHelper): array {
+        $resultsCallback = function (array $event): array {
             $userName = $event['userName'] ?? $event['eventType'];
             if (is_array($userName)) {
                 $userName = $userName['label'];
@@ -109,7 +111,7 @@ final class AuditlogController extends CommonController
             return [
                 'userName'       => $userName,
                 'eventType'      => $event['eventType'] ?? '',
-                'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $this->dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 
@@ -144,6 +146,15 @@ final class AuditlogController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_auditlog', $exportHelper);
+        return $this->exportResultsAs($toExport, $dataType, 'contact_auditlog', $this->exportHelper);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        DateHelper $dateHelper,
+        ExportHelper $exportHelper,
+    ): void {
+        $this->dateHelper = $dateHelper;
+        $this->exportHelper = $exportHelper;
     }
 }

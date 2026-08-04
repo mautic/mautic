@@ -21,6 +21,8 @@ final class StageController extends AbstractFormController
     private StageRepository $stageRepository;
 
     private StageModel $stageModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowireStageController(
@@ -31,7 +33,7 @@ final class StageController extends AbstractFormController
         $this->stageRepository = $stageRepository;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -51,7 +53,7 @@ final class StageController extends AbstractFormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.stage', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.stage', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
@@ -121,7 +123,7 @@ final class StageController extends AbstractFormController
      *
      * @param Stage $entity
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Stage) {
             /** @var Stage $entity */
@@ -141,7 +143,7 @@ final class StageController extends AbstractFormController
         $actions    = $this->stageModel->getStageActions();
         $form       = $this->stageModel->createForm(
             $entity,
-            $formFactory,
+            $this->formFactory,
             $action,
             [
                 'stageActions' => $actions,
@@ -179,7 +181,7 @@ final class StageController extends AbstractFormController
                         $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $formFactory, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -242,7 +244,7 @@ final class StageController extends AbstractFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -294,7 +296,7 @@ final class StageController extends AbstractFormController
         $actions = $this->stageModel->getStageActions();
         $form    = $this->stageModel->createForm(
             $entity,
-            $formFactory,
+            $this->formFactory,
             $action,
             [
                 'stageActions' => $actions,
@@ -392,7 +394,7 @@ final class StageController extends AbstractFormController
      *
      * @param int $objectId
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -405,10 +407,10 @@ final class StageController extends AbstractFormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($request, $formFactory, $entity);
+        return $this->newAction($request, $entity);
     }
 
-    public function mergeAction(Request $request, FormFactoryInterface $formFactory, StageModel $model, int $objectId): Response
+    public function mergeAction(Request $request, StageModel $model, int $objectId): Response
     {
         $secondaryStage = $model->getEntity($objectId);
         $page           = $request->getSession()->get('mautic.stage.page', 1);
@@ -444,7 +446,7 @@ final class StageController extends AbstractFormController
 
         $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
 
-        $form = $formFactory->create(
+        $form = $this->formFactory->create(
             StageMergeType::class,
             [],
             [
@@ -707,5 +709,14 @@ final class StageController extends AbstractFormController
         }
 
         return null;
+    }
+
+    #[Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFactory,
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->formFactory = $formFactory;
     }
 }

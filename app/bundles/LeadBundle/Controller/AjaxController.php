@@ -54,6 +54,16 @@ final class AjaxController extends CommonAjaxController
     private LeadModel $leadModel;
 
     private DoNotContactRepository $doNotContactRepository;
+    private CorePermissions $corePermissions;
+    private FormFactoryInterface $formFactory;
+    private FormAdjustmentsProviderInterface $formAdjustmentsProvider;
+    private IntegrationHelper $integrationHelper;
+    private IntegrationHelper $helper;
+    private MembershipManager $membershipManager;
+    private ContactColumnsDictionary $contactColumnsDictionary;
+    private MailHelper $mailHelper;
+    private SegmentCampaignShare $segmentCampaignShareService;
+    private SegmentDependencyTreeFactory $segmentDependencyTreeFactory;
 
     #[Required]
     public function autowireLeadAjaxController(
@@ -86,12 +96,12 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function contactListAction(Request $request, LeadModel $model, CorePermissions $corePermissions): JsonResponse
+    public function contactListAction(Request $request, LeadModel $model): JsonResponse
     {
         $filter['string'] = InputHelper::clean($request->query->get('filter'));
 
         // Do not show other's contacts if do not have permission.
-        if (!$corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
+        if (!$this->corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
             $filter['force'] = ' '.$this->translator->trans('mautic.core.searchcommand.ismine');
         }
 
@@ -151,8 +161,6 @@ final class AjaxController extends CommonAjaxController
 
     public function loadSegmentFilterFormAction(
         Request $request,
-        FormFactoryInterface $formFactory,
-        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel,
     ): JsonResponse {
         $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
@@ -161,10 +169,10 @@ final class AjaxController extends CommonAjaxController
         $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
-        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+        $form = $this->formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
+            $this->formAdjustmentsProvider->adjustForm(
                 $form,
                 $fieldAlias,
                 $fieldObject,
@@ -196,7 +204,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Updates the cache and gets returns updated HTML.
      */
-    public function updateSocialProfileAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
+    public function updateSocialProfileAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
         $network   = InputHelper::clean($request->request->get('network'));
@@ -207,8 +215,8 @@ final class AjaxController extends CommonAjaxController
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields        = $lead->getFields();
-                $socialProfiles    = $integrationHelper->getUserProfiles($lead, $leadFields, true, $network);
-                $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
+                $socialProfiles    = $this->integrationHelper->getUserProfiles($lead, $leadFields, true, $network);
+                $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex(false);
                 $integrations      = [];
                 $socialCount       = count($socialProfiles);
                 if (empty($network) || empty($socialCount)) {
@@ -223,7 +231,7 @@ final class AjaxController extends CommonAjaxController
                     $dataArray['socialCount'] = $socialCount;
                 } else {
                     foreach ($socialProfiles as $name => $details) {
-                        if ($integrationObject = $integrationHelper->getIntegrationObject($name)) {
+                        if ($integrationObject = $this->integrationHelper->getIntegrationObject($name)) {
                             if ($template = $integrationObject->getSocialProfileTemplate()) {
                                 $integrations[$name]['newContent'] = $this->renderView(
                                     $template,
@@ -250,7 +258,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Clears the cache for a network.
      */
-    public function clearSocialProfileAction(Request $request, IntegrationHelper $helper): JsonResponse
+    public function clearSocialProfileAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
         $network   = InputHelper::clean($request->request->get('network'));
@@ -261,7 +269,7 @@ final class AjaxController extends CommonAjaxController
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
-                $socialProfiles       = $helper->clearIntegrationCache($lead, $network);
+                $socialProfiles       = $this->helper->clearIntegrationCache($lead, $network);
                 $socialCount          = count($socialProfiles);
 
                 if (empty($socialCount)) {
@@ -270,7 +278,7 @@ final class AjaxController extends CommonAjaxController
                         [
                             'socialProfiles'    => $socialProfiles,
                             'lead'              => $lead,
-                            'socialProfileUrls' => $helper->getSocialProfileUrlRegex(false),
+                            'socialProfileUrls' => $this->helper->getSocialProfileUrlRegex(false),
                         ]
                     );
                 }
@@ -328,7 +336,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function toggleLeadCampaignAction(Request $request, MembershipManager $membershipManager, LeadModel $leadModel, CampaignModel $campaignModel): JsonResponse
+    public function toggleLeadCampaignAction(Request $request, LeadModel $leadModel, CampaignModel $campaignModel): JsonResponse
     {
         if (!$this->security->isGranted('campaign:campaigns:editown')
             && !$this->security->isGranted('campaign:campaigns:editother')) {
@@ -351,11 +359,11 @@ final class AjaxController extends CommonAjaxController
         }
 
         if ('add' === $action) {
-            $membershipManager->addContact($lead, $campaign);
+            $this->membershipManager->addContact($lead, $campaign);
         }
 
         if ('remove' === $action) {
-            $membershipManager->removeContact($lead, $campaign);
+            $this->membershipManager->removeContact($lead, $campaign);
         }
 
         $dataArray['success'] = 1;
@@ -430,7 +438,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Get the rows for new leads.
      */
-    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model): array|JsonResponse
+    public function getNewLeadsAction(Request $request, LeadModel $model): array|JsonResponse
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');
@@ -503,7 +511,7 @@ final class AjaxController extends CommonAjaxController
                         'security'      => $this->security,
                         'highlight'     => true,
                         'currentList'   => null,
-                        'columns'       => $contactColumnsDictionary->getColumns(),
+                        'columns'       => $this->contactColumnsDictionary->getColumns(),
                     ]
                 )->getContent();
                 $dataArray['indexMode'] = $indexMode;
@@ -515,7 +523,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getEmailTemplateAction(Request $request, EmailModel $model, MailHelper $mailHelper): JsonResponse
+    public function getEmailTemplateAction(Request $request, EmailModel $model): JsonResponse
     {
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
@@ -530,10 +538,10 @@ final class AjaxController extends CommonAjaxController
                 $email->getCreatedBy()
             )
         ) {
-            $mailHelper->setEmail($email, true, [], true);
+            $this->mailHelper->setEmail($email, true, [], true);
 
-            $data['body']    = $mailHelper->getBody();
-            $data['subject'] = $mailHelper->getSubject();
+            $data['body']    = $this->mailHelper->getBody();
+            $data['subject'] = $this->mailHelper->getSubject();
         }
 
         return $this->sendJsonResponse($data);
@@ -770,12 +778,12 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getCampaignShareStatsAction(Request $request, SegmentCampaignShare $segmentCampaignShareService): JsonResponse
+    public function getCampaignShareStatsAction(Request $request): JsonResponse
     {
         $ids      = $request->query->all()['ids'] ?? [];
         $entityid = $request->query->get('entityId');
 
-        $data = $segmentCampaignShareService->getCampaignsSegmentShare((int) $entityid, $ids);
+        $data = $this->segmentCampaignShareService->getCampaignsSegmentShare((int) $entityid, $ids);
 
         $data = [
             'success' => 1,
@@ -808,7 +816,7 @@ final class AjaxController extends CommonAjaxController
         );
     }
 
-    public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model): JsonResponse
+    public function getSegmentDependencyTreeAction(Request $request, ListModel $model): JsonResponse
     {
         $id      = (int) $request->get('id');
         $segment = $model->getEntity($id);
@@ -817,7 +825,7 @@ final class AjaxController extends CommonAjaxController
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
         }
 
-        $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
+        $parentNode = $this->segmentDependencyTreeFactory->buildTree($segment);
         $formatter  = new JsPlumbFormatter();
 
         return new JsonResponse($formatter->format($parentNode));
@@ -865,5 +873,30 @@ final class AjaxController extends CommonAjaxController
                 'form' => $form->createView(),
             ]
         );
+    }
+
+    #[Required]
+    public function autowireServices(
+        CorePermissions $corePermissions,
+        FormFactoryInterface $formFactory,
+        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        IntegrationHelper $integrationHelper,
+        IntegrationHelper $helper,
+        MembershipManager $membershipManager,
+        ContactColumnsDictionary $contactColumnsDictionary,
+        MailHelper $mailHelper,
+        SegmentCampaignShare $segmentCampaignShareService,
+        SegmentDependencyTreeFactory $segmentDependencyTreeFactory,
+    ): void {
+        $this->corePermissions = $corePermissions;
+        $this->formFactory = $formFactory;
+        $this->formAdjustmentsProvider = $formAdjustmentsProvider;
+        $this->integrationHelper = $integrationHelper;
+        $this->helper = $helper;
+        $this->membershipManager = $membershipManager;
+        $this->contactColumnsDictionary = $contactColumnsDictionary;
+        $this->mailHelper = $mailHelper;
+        $this->segmentCampaignShareService = $segmentCampaignShareService;
+        $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }
 }

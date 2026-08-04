@@ -30,12 +30,15 @@ final class ProjectController extends AbstractFormController
     private const TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
 
     private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
+    private CorePermissions $corePermissions;
+    private ProjectEntityLoaderService $entityLoader;
+    private FormFactoryInterface $formFactory;
 
-    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
+    public function indexAction(Request $request, ProjectModel $projectModel, int $page = 1): Response
     {
         $session = $request->getSession();
 
-        $permissions = $corePermissions->isGranted([
+        $permissions = $this->corePermissions->isGranted([
             ProjectPermissions::CAN_VIEW,
             ProjectPermissions::CAN_EDIT,
             ProjectPermissions::CAN_CREATE,
@@ -77,9 +80,9 @@ final class ProjectController extends AbstractFormController
         );
 
         // Calculate entity counts for each project
-        $entityTypes = $entityLoader->getEntityTypesWithViewPermissions();
+        $entityTypes = $this->entityLoader->getEntityTypesWithViewPermissions();
         foreach ($items as $project) {
-            $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
+            $projectEntities = $this->entityLoader->getProjectEntities($project, $entityTypes);
             $totalCount      = 0;
             foreach ($projectEntities as $entityData) {
                 $totalCount += $entityData['count'];
@@ -121,7 +124,7 @@ final class ProjectController extends AbstractFormController
                 'page'          => $page,
                 'limit'         => $limit,
                 'permissions'   => $permissions,
-                'security'      => $corePermissions,
+                'security'      => $this->corePermissions,
                 'tmpl'          => $tmpl,
                 'currentUser'   => $this->user,
                 'searchValue'   => $search,
@@ -135,9 +138,9 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function newAction(Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions): Response
+    public function newAction(Request $request, ProjectModel $projectModel): Response
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
             $this->throwAccessDenied();
         }
 
@@ -146,7 +149,7 @@ final class ProjectController extends AbstractFormController
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
         $action    = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'new']);
 
-        $form = $this->buildForm($project, $action, $formFactory);
+        $form = $this->buildForm($project, $action, $this->formFactory);
 
         if ('POST' === $request->getMethod()) {
             $valid     = $this->isFormValid($form);
@@ -176,7 +179,7 @@ final class ProjectController extends AbstractFormController
             }
 
             if ($valid) {
-                return $this->editAction($project->getId(), $request, $projectModel, $formFactory, $corePermissions, true);
+                return $this->editAction($project->getId(), $request, $projectModel, true);
             }
         }
 
@@ -194,9 +197,9 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions, bool $ignorePost = false): Response
+    public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, bool $ignorePost = false): Response
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
             $this->throwAccessDenied();
         }
 
@@ -211,7 +214,7 @@ final class ProjectController extends AbstractFormController
             }
 
             $action = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $objectId]);
-            $form   = $this->buildForm($project, $action, $formFactory);
+            $form   = $this->buildForm($project, $action, $this->formFactory);
 
             if (!$ignorePost && 'POST' === $request->getMethod()) {
                 if ($this->isFormCancelled($form)) {
@@ -242,7 +245,7 @@ final class ProjectController extends AbstractFormController
                         // Re-create the form once more with the fresh project and action.
                         // The alias was empty on redirect after cloning.
                         $editAction = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $project->getId()]);
-                        $form       = $this->buildForm($project, $editAction, $formFactory);
+                        $form       = $this->buildForm($project, $editAction, $this->formFactory);
 
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
@@ -319,7 +322,7 @@ final class ProjectController extends AbstractFormController
         ];
     }
 
-    public function viewAction(string|int $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
+    public function viewAction(string|int $objectId, Request $request, ProjectModel $projectModel): Response
     {
         /** @var ?Project $project */
         $project = $projectModel->getEntity($objectId);
@@ -346,12 +349,12 @@ final class ProjectController extends AbstractFormController
             ]);
         }
 
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_VIEW)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_VIEW)) {
             $this->throwAccessDenied();
         }
 
-        $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
-        $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
+        $entityTypes     = $this->entityLoader->getEntityTypesWithViewPermissions();
+        $projectEntities = $this->entityLoader->getProjectEntities($project, $entityTypes);
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'view', 'objectId' => $project->getId()]),
@@ -368,7 +371,7 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function deleteAction(string $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
+    public function deleteAction(string $objectId, Request $request, ProjectModel $projectModel): Response
     {
         $page      = $request->getSession()->get('mautic.project.page', 1);
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
@@ -394,7 +397,7 @@ final class ProjectController extends AbstractFormController
                     'msg'     => 'mautic.project.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
+            } elseif (!$this->corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
                 $this->throwAccessDenied();
             }
 
@@ -413,7 +416,7 @@ final class ProjectController extends AbstractFormController
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
     }
 
-    public function batchDeleteAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
+    public function batchDeleteAction(Request $request, ProjectModel $projectModel): Response
     {
         $page      = $request->getSession()->get('mautic.project.page', 1);
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
@@ -443,7 +446,7 @@ final class ProjectController extends AbstractFormController
                         'msg'     => 'mautic.project.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
+                } elseif (!$this->corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } else {
                     $deleteIds[] = $objectId;
@@ -478,9 +481,9 @@ final class ProjectController extends AbstractFormController
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
     }
 
-    public function selectEntityTypeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
+    public function selectEntityTypeAction(Request $request, ProjectModel $projectModel): Response
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
             $this->throwAccessDenied();
         }
 
@@ -493,7 +496,7 @@ final class ProjectController extends AbstractFormController
         }
 
         // Get available entity types
-        $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+        $entityTypes = $this->entityLoader->getEntityTypesWithEditPermissions();
 
         return $this->delegateView([
             'viewParameters' => [
@@ -504,9 +507,9 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function addEntityAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, FormFactoryInterface $formFactory, ProjectEntityLoaderService $entityLoader): Response
+    public function addEntityAction(Request $request, ProjectModel $projectModel): Response
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
             $this->throwAccessDenied();
         }
 
@@ -520,7 +523,7 @@ final class ProjectController extends AbstractFormController
         }
 
         // Validate entity type
-        $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+        $entityTypes = $this->entityLoader->getEntityTypesWithEditPermissions();
         if (!isset($entityTypes[$entityType])) {
             $returnUrl = $this->generateUrl(self::ROUTE_ACTION, [
                 'objectAction' => 'view',
@@ -553,7 +556,7 @@ final class ProjectController extends AbstractFormController
         ]);
 
         // Create the form
-        $form = $formFactory->create(ProjectAddEntityType::class, [], [
+        $form = $this->formFactory->create(ProjectAddEntityType::class, [], [
             'action'     => $action,
             'entityType' => $entityType,
             'projectId'  => $project->getId(),
@@ -591,7 +594,7 @@ final class ProjectController extends AbstractFormController
             }
 
             // Get entity types configuration
-            $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+            $entityTypes = $this->entityLoader->getEntityTypesWithEditPermissions();
             if (!isset($entityTypes[$entityType])) {
                 $flashes[] = [
                     'type' => 'error',
@@ -650,9 +653,9 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function removeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
+    public function removeAction(Request $request, ProjectModel $projectModel): Response
     {
-        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+        if (!$this->corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
             $this->throwAccessDenied();
         }
 
@@ -690,7 +693,7 @@ final class ProjectController extends AbstractFormController
             }
 
             // Get entity types configuration
-            $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+            $entityTypes = $this->entityLoader->getEntityTypesWithEditPermissions();
             if (!isset($entityTypes[$entityType])) {
                 $flashes[] = [
                     'type' => 'error',
@@ -738,5 +741,16 @@ final class ProjectController extends AbstractFormController
     private function buildForm(Project $project, string $action, FormFactoryInterface $formFactory): FormInterface
     {
         return $formFactory->create(ProjectEntityType::class, $project, ['action' => $action]);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        CorePermissions $corePermissions,
+        ProjectEntityLoaderService $entityLoader,
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->corePermissions = $corePermissions;
+        $this->entityLoader = $entityLoader;
+        $this->formFactory = $formFactory;
     }
 }

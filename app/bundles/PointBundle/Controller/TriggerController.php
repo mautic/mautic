@@ -18,6 +18,7 @@ final class TriggerController extends FormController
     private TriggerEventModel $triggerEventModel;
 
     private TriggerModel $triggerModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireTriggerController(
@@ -28,7 +29,7 @@ final class TriggerController extends FormController
         $this->triggerModel      = $triggerModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -45,7 +46,7 @@ final class TriggerController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.point.trigger', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.point.trigger', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
@@ -618,5 +619,12 @@ final class TriggerController extends FormController
         $session = $request->getSession();
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
+    }
+
+    #[Required]
+    public function autowire(
+        PageHelperFactoryInterface $pageHelperFactory,
+    ): void {
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

@@ -13,12 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class AuthController extends CommonController
 {
-    public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): Response
+    private AuthIntegrationsHelper $authIntegrationsHelper;
+
+    public function callbackAction(string $integration, Request $request): Response
     {
         $authenticationError = false;
 
         try {
-            $authIntegration = $authIntegrationsHelper->getIntegration($integration);
+            $authIntegration = $this->authIntegrationsHelper->getIntegration($integration);
             $message         = $authIntegration->authenticateIntegration($request);
         } catch (UnauthorizedException $exception) {
             $message             = $exception->getMessage();
@@ -34,5 +36,12 @@ final class AuthController extends CommonController
                 'authenticationError' => $authenticationError,
             ]
         );
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        AuthIntegrationsHelper $authIntegrationsHelper,
+    ): void {
+        $this->authIntegrationsHelper = $authIntegrationsHelper;
     }
 }

@@ -31,6 +31,8 @@ final class PublicController extends FormController
     private NotificationModel $notificationModel;
 
     private UserModel $userModel;
+    private LookupHelper $lookupHelper;
+    private LoggerInterface $mauticLogger;
 
     #[Required]
     public function autowirePublicController(
@@ -65,7 +67,7 @@ final class PublicController extends FormController
     /**
      * @throws \InvalidArgumentException
      */
-    public function callbackAction(Request $request, LookupHelper $lookupHelper, LoggerInterface $mauticLogger): Response
+    public function callbackAction(Request $request): Response
     {
         if (!$request->request->has('result') || !$request->request->has('webhookId')) {
             return new Response('ERROR');
@@ -73,14 +75,14 @@ final class PublicController extends FormController
 
         $result           = json_decode($request->request->all()['result'] ?? [], true);
         $oid              = $request->request->get('webhookId', '');
-        $validatedRequest = $lookupHelper->validateRequest($oid);
+        $validatedRequest = $this->lookupHelper->validateRequest($oid);
 
         if (!$validatedRequest || !is_array($result)) {
             return new Response('ERROR');
         }
 
         if ('company' == $validatedRequest['type']) {
-            return $this->compcallbackAction($mauticLogger, $result, $validatedRequest);
+            return $this->compcallbackAction($this->mauticLogger, $result, $validatedRequest);
         }
 
         $notify = $validatedRequest['notify'];
@@ -209,7 +211,7 @@ final class PublicController extends FormController
                 $data['country'] = $loc['country']['name'];
             }
 
-            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $this->mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $lead->getSocialCache();
@@ -246,7 +248,7 @@ final class PublicController extends FormController
                     }
                 }
             } catch (\Exception $ex2) {
-                $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
+                $this->mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
             }
         }
 
@@ -405,5 +407,14 @@ final class PublicController extends FormController
         }
 
         return new Response('OK');
+    }
+
+    #[Required]
+    public function autowire(
+        LookupHelper $lookupHelper,
+        LoggerInterface $mauticLogger,
+    ): void {
+        $this->lookupHelper = $lookupHelper;
+        $this->mauticLogger = $mauticLogger;
     }
 }

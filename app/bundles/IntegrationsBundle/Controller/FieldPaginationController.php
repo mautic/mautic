@@ -18,10 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldPaginationController extends CommonController
 {
+    private FormFactoryInterface $formFactory;
+    private ConfigIntegrationsHelper $integrationsHelper;
+
     public function paginateAction(
         Request $request,
-        FormFactoryInterface $formFactory,
-        ConfigIntegrationsHelper $integrationsHelper,
         string $integration,
         string $object,
         int $page,
@@ -34,7 +35,7 @@ final class FieldPaginationController extends CommonController
         // Find the integration
         try {
             /** @var ConfigFormSyncInterface $integrationObject */
-            $integrationObject        = $integrationsHelper->getIntegration($integration);
+            $integrationObject        = $this->integrationsHelper->getIntegration($integration);
             $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException) {
             return $this->notFound();
@@ -52,7 +53,7 @@ final class FieldPaginationController extends CommonController
         }
 
         // Create the form
-        $form = $formFactory->create(
+        $form = $this->formFactory->create(
             IntegrationSyncSettingsObjectFieldMappingType::class,
             $currentFields,
             [
@@ -114,5 +115,14 @@ final class FieldPaginationController extends CommonController
         $fieldMerger->mergeSyncFieldMapping($object, $sessionFields[$object]);
 
         return $fieldMerger->getFieldMappings()[$object];
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        FormFactoryInterface $formFactory,
+        ConfigIntegrationsHelper $integrationsHelper,
+    ): void {
+        $this->formFactory = $formFactory;
+        $this->integrationsHelper = $integrationsHelper;
     }
 }

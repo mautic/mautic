@@ -16,6 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class PublicController extends CommonController
 {
     private FocusModel $focusModel;
+    private ContactTracker $contactTracker;
 
     #[Required]
     public function autowirePublicController(
@@ -43,13 +44,13 @@ final class PublicController extends CommonController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    public function viewPixelAction(Request $request, ContactTracker $contactTracker): Response
+    public function viewPixelAction(Request $request): Response
     {
         $id = $request->get('id', false);
         if ($id) {
             $focus = $this->focusModel->getEntity($id);
 
-            $lead = $contactTracker->getContact();
+            $lead = $this->contactTracker->getContact();
 
             if ($focus && $focus->isPublished() && $lead) {
                 $stat = $this->focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, $request, $lead);
@@ -62,5 +63,12 @@ final class PublicController extends CommonController
         }
 
         return TrackingPixelHelper::getResponse($request);
+    }
+
+    #[Required]
+    public function autowire(
+        ContactTracker $contactTracker,
+    ): void {
+        $this->contactTracker = $contactTracker;
     }
 }

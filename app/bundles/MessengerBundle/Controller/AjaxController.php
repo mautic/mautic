@@ -12,13 +12,14 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class AjaxController extends CommonAjaxController
 {
+    private MessageBusInterface $bus;
+    private TestMessageFactory $messageFactory;
+
     public function sendTestMessageAction(
         Request $request,
-        MessageBusInterface $bus,
-        TestMessageFactory $messageFactory,
     ): Response {
         try {
-            $message = $messageFactory->crateMessageByDsnKey((string) $request->request->get('key'));
+            $message = $this->messageFactory->crateMessageByDsnKey((string) $request->request->get('key'));
         } catch (\InvalidArgumentException) {
             return $this->notFound();
         }
@@ -29,12 +30,21 @@ final class AjaxController extends CommonAjaxController
         ];
 
         try {
-            $bus->dispatch($message);
+            $this->bus->dispatch($message);
         } catch (\Throwable $e) {
             $data['success'] = 0;
             $data['message'] = $this->translator->trans('mautic.messenger.config.dsn.test_message_failed', ['%message%' => $e->getMessage()]);
         }
 
         return $this->sendJsonResponse($data);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowire(
+        MessageBusInterface $bus,
+        TestMessageFactory $messageFactory,
+    ): void {
+        $this->bus = $bus;
+        $this->messageFactory = $messageFactory;
     }
 }

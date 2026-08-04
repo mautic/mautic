@@ -13,6 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class AjaxController extends CommonAjaxController
 {
     private FocusModel $focusModel;
+    private CacheProviderTagAwareInterface $cacheProvider;
 
     #[Required]
     public function autowireMauticFocusAjaxController(
@@ -39,7 +40,7 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($responseContent);
     }
 
-    public function getViewsCountAction(Request $request, CacheProviderTagAwareInterface $cacheProvider): JsonResponse
+    public function getViewsCountAction(Request $request): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
@@ -51,7 +52,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
-        $cacheItem    = $cacheProvider->getItem('focus.viewsCount.'.$focusId);
+        $cacheItem    = $this->cacheProvider->getItem('focus.viewsCount.'.$focusId);
 
         if ($cacheItem->isHit()) {
             $cacheItemValue   = $cacheItem->get();
@@ -73,7 +74,7 @@ final class AjaxController extends CommonAjaxController
             ]);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
-            $cacheProvider->save($cacheItem);
+            $this->cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
@@ -83,7 +84,7 @@ final class AjaxController extends CommonAjaxController
         ]);
     }
 
-    public function getClickThroughCountAction(Request $request, CacheProviderTagAwareInterface $cacheProvider): JsonResponse
+    public function getClickThroughCountAction(Request $request): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
@@ -95,7 +96,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
-        $cacheItem    = $cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
+        $cacheItem    = $this->cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
 
         if ($cacheItem->isHit()) {
             $clickThroughCount = $cacheItem->get();
@@ -111,12 +112,19 @@ final class AjaxController extends CommonAjaxController
             $cacheItem->set($clickThroughCount);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
-            $cacheProvider->save($cacheItem);
+            $this->cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
             'success'        => 1,
             'clickThrough'   => $clickThroughCount,
         ]);
+    }
+
+    #[Required]
+    public function autowire(
+        CacheProviderTagAwareInterface $cacheProvider,
+    ): void {
+        $this->cacheProvider = $cacheProvider;
     }
 }
