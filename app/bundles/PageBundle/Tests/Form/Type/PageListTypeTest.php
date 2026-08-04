@@ -7,7 +7,6 @@ namespace Mautic\PageBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
-use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,26 +16,21 @@ final class PageListTypeTest extends TestCase
     private PageListType $page;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&PageModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&PageRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pageRepositoryMock;
 
     protected function setUp(): void
     {
-        $this->pageModelMock   = $this->createMock(PageModel::class);
-        $this->page            = new PageListType($this->pageModelMock, $this->createStub(CorePermissions::class));
+        $this->pageRepositoryMock = $this->createMock(PageRepository::class);
+        $this->page               = new PageListType($this->createStub(CorePermissions::class), $this->pageRepositoryMock);
     }
 
     public function testPageListTypeOptionsChoices(): void
     {
-        $pageRepository = $this->createMock(PageRepository::class);
-        $resolver       = new OptionsResolver();
+        $resolver = new OptionsResolver();
 
-        $this->pageModelMock
-            ->method('getRepository')
-            ->willReturn($pageRepository);
-
-        $pageRepository->method('getPageList')
+        $this->pageRepositoryMock->method('getPageList')
             ->willReturn([]);
 
         $this->page->configureOptions($resolver);

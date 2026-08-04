@@ -34,11 +34,6 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
     private MessageQueue $message;
 
     /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject&EntityManagerInterface
      */
     private MockObject $entityManager;
@@ -48,11 +43,16 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $messageQueueRepository;
 
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
+
     protected function setUp(): void
     {
-        $this->leadModel              = $this->createMock(LeadModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->entityManager,
@@ -65,10 +65,11 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CoreParametersHelper::class),
         );
         $this->messageQueue->autowireMessageQueueModel(
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->createStub(CompanyModel::class),
             $this->messageQueueRepository,
-            $this->createStub(FrequencyRuleRepository::class)
+            $this->createStub(FrequencyRuleRepository::class),
+            $this->leadRepository
         );
 
         $message      = new MessageQueue();
@@ -127,9 +128,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
         $this->entityManager->expects($this->exactly(1))
             ->method('detach');
@@ -153,9 +152,7 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
         $this->messageQueue->processMessageQueue($this->message);
         $this->assertArrayNotHasKey('companies', $this->message->getLead()->getFields());

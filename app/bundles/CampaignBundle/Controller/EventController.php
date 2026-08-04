@@ -362,7 +362,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -424,7 +424,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -491,7 +491,7 @@ final class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
