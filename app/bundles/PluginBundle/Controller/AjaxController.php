@@ -277,7 +277,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowirePluginAjaxController(
         IntegrationHelper $helper,
         IntegrationHelper $integrationHelper,
     ): void {

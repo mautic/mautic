@@ -51,10 +51,6 @@ class CommonController extends AbstractController implements MauticController
 
     protected Environment $twig;
 
-    private TrailingSlashHelper $trailingSlashHelper;
-
-    private ExportHelper $exportHelper;
-
     #[Required]
     public function autowireCommonController(
         PageModel $pageModel,
@@ -62,16 +58,12 @@ class CommonController extends AbstractController implements MauticController
         RouterInterface $router,
         HttpKernelInterface $httpKernel,
         Environment $twig,
-        TrailingSlashHelper $trailingSlashHelper,
-        ExportHelper $exportHelper,
     ): void {
         $this->pageModel = $pageModel;
         $this->notificationModel = $notificationModel;
         $this->router = $router;
         $this->httpKernel = $httpKernel;
         $this->twig = $twig;
-        $this->trailingSlashHelper = $trailingSlashHelper;
-        $this->exportHelper = $exportHelper;
     }
 
     /**
@@ -303,9 +295,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      */
-    public function removeTrailingSlashAction(Request $request): RedirectResponse
+    public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper): RedirectResponse
     {
-        return $this->redirect($this->trailingSlashHelper->getSafeRedirectUrl($request), 301);
+        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
 
     /**
@@ -720,9 +712,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param array|\Iterator $toExport
      */
-    public function exportResultsAs($toExport, $type, $filename): StreamedResponse
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
-        if (!in_array($type, $this->exportHelper->getSupportedExportTypes())) {
+        if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
@@ -733,7 +725,7 @@ class CommonController extends AbstractController implements MauticController
             $toExport[] = [$this->translator->trans('mautic.core.noresults.header')];
         }
 
-        return $this->exportHelper->exportDataAs($toExport, $type, $filename);
+        return $exportHelper->exportDataAs($toExport, $type, $filename);
     }
 
     /**

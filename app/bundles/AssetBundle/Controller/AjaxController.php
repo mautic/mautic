@@ -80,7 +80,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireAssetAjaxController(
         IntegrationHelper $integrationHelper,
     ): void {
         $this->integrationHelper = $integrationHelper;

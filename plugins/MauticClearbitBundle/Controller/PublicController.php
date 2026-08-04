@@ -297,7 +297,7 @@ final class PublicController extends FormController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireClearbitPublicController(
         LoggerInterface $mauticLogger,
         LookupHelper $lookupHelper,
     ): void {

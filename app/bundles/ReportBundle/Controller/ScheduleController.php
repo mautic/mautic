@@ -86,7 +86,7 @@ final class ScheduleController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireReportScheduleController(
         DateBuilder $dateBuilder,
     ): void {
         $this->dateBuilder = $dateBuilder;

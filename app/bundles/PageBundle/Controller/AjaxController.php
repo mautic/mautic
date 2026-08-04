@@ -66,7 +66,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowirePageAjaxController(
         FormFactoryInterface $formFactory,
     ): void {
         $this->formFactory = $formFactory;

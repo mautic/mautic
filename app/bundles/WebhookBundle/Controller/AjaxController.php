@@ -163,7 +163,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireWebhookAjaxController(
         Client $client,
         PathsHelper $pathsHelper,
     ): void {

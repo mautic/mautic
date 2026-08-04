@@ -524,7 +524,7 @@ final class ClearbitController extends FormController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireClearbitController(
         LookupHelper $lookupHelper,
     ): void {
         $this->lookupHelper = $lookupHelper;

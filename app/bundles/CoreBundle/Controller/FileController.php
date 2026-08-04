@@ -154,7 +154,7 @@ final class FileController extends AjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireCoreFileController(
         PathsHelper $pathsHelper,
         FileUploader $fileUploader,
     ): void {

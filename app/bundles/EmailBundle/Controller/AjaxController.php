@@ -351,7 +351,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireEmailAjaxController(
         FormFactoryInterface $formFactory,
         Mailbox $mailbox,
         TransportInterface $transport,

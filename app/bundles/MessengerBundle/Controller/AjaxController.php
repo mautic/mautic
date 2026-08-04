@@ -40,7 +40,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireMessengerAjaxController(
         MessageBusInterface $bus,
         TestMessageFactory $messageFactory,
     ): void {

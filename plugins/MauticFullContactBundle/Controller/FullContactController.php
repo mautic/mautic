@@ -524,7 +524,7 @@ final class FullContactController extends FormController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireFullContactController(
         LookupHelper $lookupHelper,
     ): void {
         $this->lookupHelper = $lookupHelper;

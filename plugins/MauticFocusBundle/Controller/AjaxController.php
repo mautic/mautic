@@ -122,7 +122,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireFocusAjaxController(
         CacheProviderTagAwareInterface $cacheProvider,
     ): void {
         $this->cacheProvider = $cacheProvider;

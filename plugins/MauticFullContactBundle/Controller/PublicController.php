@@ -410,7 +410,7 @@ final class PublicController extends FormController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireFullContactPublicController(
         LookupHelper $lookupHelper,
         LoggerInterface $mauticLogger,
     ): void {

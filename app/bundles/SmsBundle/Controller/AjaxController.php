@@ -117,7 +117,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireSmsAjaxController(
         BroadcastQuery $broadcastQuery,
         CacheStorageHelper $cacheStorageHelper,
     ): void {

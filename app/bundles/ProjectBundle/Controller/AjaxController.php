@@ -96,7 +96,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireProjectAjaxController(
         CorePermissions $corePermissions,
     ): void {
         $this->corePermissions = $corePermissions;
