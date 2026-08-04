@@ -21,6 +21,7 @@ class Group extends FormEntity implements UuidInterface
 
     private ?int $id             = null;
 
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private ?string $name        = '';
 
     private ?string $description = '';
@@ -38,11 +39,6 @@ class Group extends FormEntity implements UuidInterface
         static::addUuidField($builder);
 
         $builder->addIdColumns();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

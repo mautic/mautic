@@ -58,6 +58,7 @@ class Trigger extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -161,11 +162,6 @@ class Trigger extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     /**
