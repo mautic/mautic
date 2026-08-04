@@ -69,7 +69,7 @@ final class ConfigController extends AbstractFormController
         $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Create the form
-        $form = $this->getForm($this->formFactory);
+        $form = $this->getForm();
 
         if (Request::METHOD_POST === $request->getMethod()) {
             return $this->submitForm($request, $this->dispatcher, $form);
@@ -79,7 +79,7 @@ final class ConfigController extends AbstractFormController
         $session = $request->getSession();
         $session->remove("{$integration}-fields");
 
-        return $this->showForm($request, $form, $this->formExtension);
+        return $this->showForm($request, $form);
     }
 
     /**
@@ -132,7 +132,7 @@ final class ConfigController extends AbstractFormController
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = !empty($integrationDetailsPost['in_auth']);
         if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm($request, $form, $this->formExtension);
+            return $this->showForm($request, $form);
         }
 
         // Save the integration configuration
@@ -145,9 +145,9 @@ final class ConfigController extends AbstractFormController
         if ($this->isFormApplied($form)) {
             // Regenerate the form
             $this->resetFieldsInSession($request);
-            $form = $this->getForm($this->formFactory);
+            $form = $this->getForm();
 
-            return $this->showForm($request, $form, $this->formExtension);
+            return $this->showForm($request, $form);
         }
 
         // Otherwise close the modal
@@ -157,9 +157,9 @@ final class ConfigController extends AbstractFormController
     /**
      * @return FormInterface<mixed>
      */
-    private function getForm(FormFactoryInterface $formFactory): FormInterface
+    private function getForm(): FormInterface
     {
-        return $formFactory->create(
+        return $this->formFactory->create(
             $this->integrationObject->getConfigFormName() ?: IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
@@ -172,7 +172,7 @@ final class ConfigController extends AbstractFormController
     /**
      * @param FormInterface<mixed> $form
      */
-    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): Response
+    private function showForm(Request $request, FormInterface $form): Response
     {
         $formView = $form->createView();
 
@@ -182,13 +182,13 @@ final class ConfigController extends AbstractFormController
 
         $hasFeatureErrors = (
             $this->integrationObject instanceof ConfigFormFeatureSettingsInterface
-            && $formExtension->containsErrors($formView['featureSettings']['integration'])
+            && $this->formExtension->containsErrors($formView['featureSettings']['integration'])
         ) || (
             isset($formView['featureSettings']['sync']['integration'])
-            && $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
+            && $this->formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
         );
 
-        $hasAuthErrors = $this->integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
+        $hasAuthErrors = $this->integrationObject instanceof ConfigFormAuthInterface && $this->formExtension->containsErrors($formView['apiKeys']);
 
         $useSyncFeatures = $this->integrationObject instanceof ConfigFormSyncInterface;
 

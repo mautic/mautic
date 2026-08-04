@@ -302,7 +302,7 @@ final class TagController extends FormController
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
-            $response = $this->handleEditFormPost($request, $tag, $this->tagDependencies, $form, $postActionVars);
+            $response = $this->handleEditFormPost($request, $tag, $form, $postActionVars);
             if (null !== $response) {
                 return $response;
             }
@@ -327,7 +327,7 @@ final class TagController extends FormController
      * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
-    private function handleEditFormPost(Request $request, Tag $tag, TagDependencies $tagDependencies, FormInterface $form, array $postActionVars): ?Response
+    private function handleEditFormPost(Request $request, Tag $tag, FormInterface $form, array $postActionVars): ?Response
     {
         $response = null;
 

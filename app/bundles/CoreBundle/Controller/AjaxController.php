@@ -36,8 +36,18 @@ class AjaxController extends CommonController
     #[Required]
     public function autowireCoreAjaxController(
         NotificationModel $notificationModel,
+        AuthorizationCheckerInterface $authorizationChecker,
+        SearchCommandListInterface $searchCommandList,
+        TokenSorter $tokenSorter,
+        IpLookupFactory $ipServiceFactory,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->notificationModel = $notificationModel;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->searchCommandList = $searchCommandList;
+        $this->tokenSorter = $tokenSorter;
+        $this->ipServiceFactory = $ipServiceFactory;
+        $this->formFactory = $formFactory;
     }
 
     /**
@@ -454,20 +464,5 @@ class AjaxController extends CommonController
         );
 
         return parent::renderView($event->getTemplate(), $event->getVars());
-    }
-
-    #[Required]
-    public function autowireAjaxController(
-        AuthorizationCheckerInterface $authorizationChecker,
-        SearchCommandListInterface $searchCommandList,
-        TokenSorter $tokenSorter,
-        IpLookupFactory $ipServiceFactory,
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->searchCommandList = $searchCommandList;
-        $this->tokenSorter = $tokenSorter;
-        $this->ipServiceFactory = $ipServiceFactory;
-        $this->formFactory = $formFactory;
     }
 }

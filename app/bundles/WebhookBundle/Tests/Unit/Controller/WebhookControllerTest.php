@@ -124,8 +124,10 @@ final class WebhookControllerTest extends TestCase
         $pathsHelper = $this->createMock(PathsHelper::class);
         $pathsHelper->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
 
+        $controller->autowireWebhookAjaxController($client, $pathsHelper);
+
         // Send test action.
-        $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
+        $testResponse = $controller->sendHookTestAction($request);
         // If you encounter errors here, please check \Mautic\WebhookBundle\Controller\AjaxController::processWebhookTest
         // or inside the Client mock.
         $this->assertSame(Response::HTTP_OK, $testResponse->getStatusCode());

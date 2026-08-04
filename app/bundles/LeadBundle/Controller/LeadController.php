@@ -2043,7 +2043,7 @@ final class LeadController extends FormController
 
         if (is_string($fieldAlias) && is_array($ids)) {
             $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
-            $updated  = $this->replaceContactFieldValues($this->findReplace, $fieldAlias, $data, $entities, $model);
+            $updated  = $this->replaceContactFieldValues($fieldAlias, $data, $entities, $model);
 
             if ([] !== $updated) {
                 $model->saveEntities($updated);
@@ -2102,10 +2102,10 @@ final class LeadController extends FormController
      *
      * @return array<int, Lead>
      */
-    private function replaceContactFieldValues(CustomFieldFindReplace $findReplace, string $fieldAlias, array $data, iterable $entities, LeadModel $model): array
+    private function replaceContactFieldValues(string $fieldAlias, array $data, iterable $entities, LeadModel $model): array
     {
         /** @var array<int, Lead> $updated */
-        $updated = $findReplace->replace(
+        $updated = $this->findReplace->replace(
             new CustomFieldFindReplaceCriteria('lead', $fieldAlias, $data['find'] ?? null, $data['replace'] ?? null),
             $entities,
             function (CustomFieldEntityInterface $lead, array $values) use ($model): void {

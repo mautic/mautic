@@ -62,7 +62,9 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
         );
         $this->controller->autowireInstallController(
             $this->createStub(Configurator::class),
-            $this->installer
+            $this->installer,
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(PathsHelper::class)
         );
         $this->controller->setContainer($containerMock);
         $sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
@@ -85,12 +87,7 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
             ->with('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('http://localhost/');
 
-        $response = $this->controller->stepAction(
-            new Request(),
-            $this->createStub(EntityManagerInterface::class),
-            $this->createStub(PathsHelper::class),
-            InstallService::CHECK_STEP
-        );
+        $response = $this->controller->stepAction(new Request(), InstallService::CHECK_STEP);
         $this->assertSame(302, $response->getStatusCode());
     }
 }

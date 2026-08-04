@@ -282,7 +282,6 @@ final class PublicController extends CommonFormController
                     $viewParameters,
                     $language ?? null,
                     $successSessionName,
-                    $this->emailDefaultsHelper,
                     $pageModel
                 );
 
@@ -554,12 +553,10 @@ final class PublicController extends CommonFormController
         // Prepare contact
         if ($contactId) {
             // We have one from request parameter
-            /** @var LeadModel $leadModel */
             $contact = $this->leadRepository->getLead($contactId);
             $contact = $model->enrichedContactWithCompanies($contact);
         } else {
             // Make fake contact.
-            /** @var FakeContactHelper $fakeLeadHelper */
             $contact = $this->fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
         }
         // Generate and replace tokens
@@ -590,12 +587,10 @@ final class PublicController extends CommonFormController
      */
     private function doTracking(Request $request, $integration): void
     {
-        $logger = $this->mauticLogger;
-
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
         if (!$query_string) {
-            $logger->log('error', $integration.': query string is not available');
+            $this->mauticLogger->log('error', $integration.': query string is not available');
 
             return;
         }
@@ -608,7 +603,7 @@ final class PublicController extends CommonFormController
 
         // URL attr 'd' is encoded so let's decode it first.
         if (!isset($query['d'], $query['sig'])) {
-            $logger->log('error', $integration.': query variables are not found');
+            $this->mauticLogger->log('error', $integration.': query variables are not found');
 
             return;
         }
@@ -617,7 +612,7 @@ final class PublicController extends CommonFormController
         $myIntegration = $this->integrationHelper->getIntegrationObject($integration);
 
         if (!$myIntegration) {
-            $logger->log('error', $integration.': integration not found');
+            $this->mauticLogger->log('error', $integration.': integration not found');
 
             return;
         }
@@ -639,19 +634,19 @@ final class PublicController extends CommonFormController
             parse_str($gz, $query);
         } else {
             // signatures don't match: stop
-            $logger->log('error', $integration.': signatures don\'t match');
+            $this->mauticLogger->log('error', $integration.': signatures don\'t match');
 
             unset($query);
         }
 
         if (empty($query) || !isset($query['email'], $query['subject'], $query['body'])) {
-            $logger->log('error', $integration.': query variables are empty');
+            $this->mauticLogger->log('error', $integration.': query variables are empty');
 
             return;
         }
 
         if (MAUTIC_ENV === 'dev') {
-            $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
+            $this->mauticLogger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
         // email is a semicolon delimited list of emails
@@ -674,7 +669,7 @@ final class PublicController extends CommonFormController
             // stat doesn't exist, create one
             if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
-                $stat          = $this->addStat($this->mailer, $lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
@@ -695,29 +690,29 @@ final class PublicController extends CommonFormController
     /**
      * @param array<string, mixed> $query
      */
-    private function addStat(MailHelper $mailer, $lead, string $email, array $query, string $idHash): ?Stat
+    private function addStat($lead, string $email, array $query, string $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead
-            $mailer->addTo($email);
+            $this->mailer->addTo($email);
 
             // sanitize variables to prevent malicious content
             $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
-            $mailer->setFrom($from, '');
+            $this->mailer->setFrom($from, '');
 
             // Set Content
             $body = htmlspecialchars(filter_var($query['body'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
-            $mailer->setBody($body);
-            $mailer->parsePlainText($body);
+            $this->mailer->setBody($body);
+            $this->mailer->parsePlainText($body);
 
             // Set lead
-            $mailer->setLead($lead);
-            $mailer->setIdHash($idHash);
+            $this->mailer->setLead($lead);
+            $this->mailer->setIdHash($idHash);
 
             $subject = htmlspecialchars(filter_var($query['subject'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
-            $mailer->setSubject($subject);
+            $this->mailer->setSubject($subject);
 
-            return $mailer->createEmailStat();
+            return $this->mailer->createEmailStat();
         }
 
         return null;

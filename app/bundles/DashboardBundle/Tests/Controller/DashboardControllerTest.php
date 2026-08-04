@@ -7,21 +7,26 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
+use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -78,7 +83,14 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->controller->setContainer($this->containerMock);
-        $this->controller->autowireDashboardController($this->dashboardModelMock);
+        $this->controller->autowireDashboardController(
+            $this->dashboardModelMock,
+            $this->createStub(Widget::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(RouterInterface::class),
+            $this->createStub(Widget::class)
+        );
     }
 
     public function testSaveWithGetWillCallAccessDenied(): void
@@ -180,7 +192,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createStub(Widget::class), $this->createStub(Environment::class), 1);
+        $this->controller->widgetAction($this->requestMock, 1);
     }
 
     public function testWidgetNotFound(): void
@@ -203,8 +215,10 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->containerMock->expects($this->never())
             ->method('get');
 
+        $this->autowireWidgetServices($widgetService, $twig);
+
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
+        $this->controller->widgetAction($this->requestMock, $widgetId);
     }
 
     public function testWidget(): void
@@ -230,8 +244,29 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
+        $this->autowireWidgetServices($widgetService, $twig);
+
+        $response = $this->controller->widgetAction($this->requestMock, $widgetId);
 
         $this->assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
+    }
+
+    private function autowireWidgetServices(Widget $widgetService, Environment $twig): void
+    {
+        $this->controller->autowireDashboardController(
+            $this->dashboardModelMock,
+            $widgetService,
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(RouterInterface::class),
+            $widgetService
+        );
+        $this->controller->autowireCommonController(
+            $this->createStub(PageModel::class),
+            $this->createStub(NotificationModel::class),
+            $this->routerMock,
+            $this->createStub(HttpKernelInterface::class),
+            $twig
+        );
     }
 }

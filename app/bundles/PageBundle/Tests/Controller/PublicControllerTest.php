@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -26,6 +27,7 @@ use Mautic\PageBundle\Controller\PublicController;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\TrackingEvent;
+use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -42,7 +44,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 final class PublicControllerTest extends TestCase
 {
@@ -224,16 +228,11 @@ final class PublicControllerTest extends TestCase
         );
         $controller->setContainer($this->internalContainer);
 
+        $this->autowireController($controller, themeHelper: $themeHelper, analyticsHelper: $analyticsHelper, assetsHelper: $assetHelper);
+
         $response = $controller->indexAction(
             $this->request,
-            $this->contactRequestHelper,
-            $this->createStub(CookieHelper::class),
-            $analyticsHelper,
-            $assetHelper,
-            $themeHelper,
             $this->createStub(Tracking404Model::class),
-            $this->router,
-            $this->createStub(DeviceTrackingServiceInterface::class),
             $pageModel,
             '/page/a',
         );
@@ -307,11 +306,10 @@ final class PublicControllerTest extends TestCase
         );
         $controller->setContainer($this->internalContainer);
 
+        $this->autowireController($controller);
+
         $response = $controller->redirectAction(
             $this->request,
-            $this->contactRequestHelper,
-            $this->ipLookupHelper,
-            $this->logger,
             $this->redirectModel,
             $this->pageModel,
             $redirectId
@@ -387,11 +385,10 @@ final class PublicControllerTest extends TestCase
         );
         $controller->setContainer($this->internalContainer);
 
+        $this->autowireController($controller);
+
         $response = $controller->redirectAction(
             $this->request,
-            $this->contactRequestHelper,
-            $this->ipLookupHelper,
-            $this->logger,
             $this->redirectModel,
             $this->pageModel,
             $redirectId
@@ -472,13 +469,9 @@ final class PublicControllerTest extends TestCase
             $security
         );
 
-        $response = $publicController->trackingAction(
-            $request,
-            $deviceTrackingService,
-            $trackingHelper,
-            $contactTracker,
-            $this->pageModel
-        );
+        $this->autowireController($publicController, deviceTrackingService: $deviceTrackingService, trackingHelper: $trackingHelper, contactTracker: $contactTracker);
+
+        $response = $publicController->trackingAction($request, $this->pageModel);
 
         $json = json_decode($response->getContent(), true);
 
@@ -517,16 +510,44 @@ final class PublicControllerTest extends TestCase
             $security
         );
 
-        $response = $publicController->trackingAction(
-            $this->request,
-            $this->createStub(DeviceTrackingServiceInterface::class),
-            $this->createStub(TrackingHelper::class),
-            $this->createStub(ContactTracker::class),
-            $this->pageModel
-        );
+        $this->autowireController($publicController);
+
+        $response = $publicController->trackingAction($this->request, $this->pageModel);
         $this->assertEquals(
             ['success' => 0],
             json_decode($response->getContent(), true)
+        );
+    }
+
+    private function autowireController(
+        PublicController $controller,
+        ?ThemeHelper $themeHelper = null,
+        ?AnalyticsHelper $analyticsHelper = null,
+        ?AssetsHelper $assetsHelper = null,
+        ?DeviceTrackingServiceInterface $deviceTrackingService = null,
+        ?TrackingHelper $trackingHelper = null,
+        ?ContactTracker $contactTracker = null,
+    ): void {
+        $controller->autowirePublicController(
+            $this->contactRequestHelper,
+            $this->createStub(CookieHelper::class),
+            $analyticsHelper ?? new AnalyticsHelper($this->createStub(CoreParametersHelper::class)),
+            $assetsHelper ?? new AssetsHelper($this->createStub(Packages::class)),
+            $themeHelper ?? $this->createStub(ThemeHelper::class),
+            $deviceTrackingService ?? $this->createStub(DeviceTrackingServiceInterface::class),
+            new PageConfig($this->createStub(CoreParametersHelper::class)),
+            $trackingHelper ?? $this->createStub(TrackingHelper::class),
+            $contactTracker ?? $this->createStub(ContactTracker::class),
+            $this->ipLookupHelper,
+            $this->logger,
+            $this->createStub(DeviceTrackingServiceInterface::class)
+        );
+        $controller->autowireCommonController(
+            $this->createStub(PageModel::class),
+            $this->createStub(NotificationModel::class),
+            $this->router,
+            $this->createStub(HttpKernelInterface::class),
+            $this->createStub(Environment::class)
         );
     }
 }

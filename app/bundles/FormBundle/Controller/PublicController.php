@@ -161,7 +161,7 @@ final class PublicController extends CommonFormController
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();
-                $result['error']              = $this->getFormAvailabilityError($form, $this->dateTemplateHelper);
+                $result['error']              = $this->getFormAvailabilityError($form);
 
                 if (null === $result['error']) {
                     $result = array_merge(
@@ -175,7 +175,7 @@ final class PublicController extends CommonFormController
         return $result;
     }
 
-    private function getFormAvailabilityError(Form $form, DateHelper $dateTemplateHelper): ?string
+    private function getFormAvailabilityError(Form $form): ?string
     {
         $status = $form->getPublishStatus();
 
@@ -184,7 +184,7 @@ final class PublicController extends CommonFormController
 
             return $this->translator->trans(
                 'mautic.form.submit.error.pending',
-                ['%date%' => $dateTemplateHelper->toFull($publishUp instanceof \DateTime ? $publishUp : $publishUp->format('Y-m-d H:i:s'))],
+                ['%date%' => $this->dateTemplateHelper->toFull($publishUp instanceof \DateTime ? $publishUp : $publishUp->format('Y-m-d H:i:s'))],
                 'flashes'
             );
         }
@@ -194,7 +194,7 @@ final class PublicController extends CommonFormController
 
             return $this->translator->trans(
                 'mautic.form.submit.error.expired',
-                ['%date%' => $dateTemplateHelper->toFull($publishDown instanceof \DateTime ? $publishDown : $publishDown->format('Y-m-d H:i:s'))],
+                ['%date%' => $this->dateTemplateHelper->toFull($publishDown instanceof \DateTime ? $publishDown : $publishDown->format('Y-m-d H:i:s'))],
                 'flashes'
             );
         }

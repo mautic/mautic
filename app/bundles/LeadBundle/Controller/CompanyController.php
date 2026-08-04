@@ -867,7 +867,7 @@ final class CompanyController extends FormController
 
         if (is_string($fieldAlias) && is_array($ids)) {
             $entities = $this->getCompanyFindReplaceEntities($request, $model, $data, $ids);
-            $updated  = $this->replaceCompanyFieldValues($this->findReplace, $fieldAlias, $data, $entities, $model);
+            $updated  = $this->replaceCompanyFieldValues($fieldAlias, $data, $entities, $model);
 
             if ([] !== $updated) {
                 $model->saveEntities($updated);
@@ -925,10 +925,10 @@ final class CompanyController extends FormController
      *
      * @return array<int, Company>
      */
-    private function replaceCompanyFieldValues(CustomFieldFindReplace $findReplace, string $fieldAlias, array $data, iterable $entities, CompanyModel $model): array
+    private function replaceCompanyFieldValues(string $fieldAlias, array $data, iterable $entities, CompanyModel $model): array
     {
         /** @var array<int, Company> $updated */
-        $updated = $findReplace->replace(
+        $updated = $this->findReplace->replace(
             new CustomFieldFindReplaceCriteria('company', $fieldAlias, $data['find'] ?? null, $data['replace'] ?? null),
             $entities,
             function (CustomFieldEntityInterface $company, array $values) use ($model): void {
