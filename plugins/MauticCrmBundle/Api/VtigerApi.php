@@ -4,11 +4,11 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class VtigerApi extends CrmApi
+final class VtigerApi extends CrmApi
 {
-    protected $element = 'Leads';
+    private string $element = 'Leads';
 
-    protected function request($operation, $element, $elementData = [], $method = 'GET')
+    private function request(string $operation, string $element, array $elementData = [], string $method = 'GET')
     {
         $tokenData = $this->integration->getKeys();
 

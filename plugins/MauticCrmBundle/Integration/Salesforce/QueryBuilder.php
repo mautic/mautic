@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFetchException;
 
-class QueryBuilder
+final class QueryBuilder
 {
     /**
      * @throws NoObjectsToFetchException
