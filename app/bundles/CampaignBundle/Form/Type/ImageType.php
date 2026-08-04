@@ -30,10 +30,7 @@ final class ImageType extends AbstractType
         $resolver->setAllowedTypes('mime_types', 'array');
 
         $resolver->setNormalizer('constraints', static fn (Options $options, $value): array => [
-            new File([
-                'maxSize'   => $options['max_size'],
-                'mimeTypes' => $options['mime_types'],
-            ]),
+            new File(maxSize: $options['max_size'], mimeTypes: $options['mime_types']),
         ]);
 
         $resolver->setNormalizer('attr', static function (Options $options, $value): array {

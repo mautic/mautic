@@ -84,10 +84,7 @@ final class CampaignShareType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
-                    new Regex([
-                        'pattern' => '/^(?!mautic$)[a-z0-9]([a-z0-9-]*[a-z0-9])?$/',
-                        'message' => 'mautic.campaign.share.vendor_name.invalid',
-                    ]),
+                    new Regex(pattern: '/^(?!mautic$)[a-z0-9]([a-z0-9-]*[a-z0-9])?$/', message: 'mautic.campaign.share.vendor_name.invalid'),
                 ],
             ]
         );
@@ -102,10 +99,7 @@ final class CampaignShareType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new NotBlank(),
-                    new Regex([
-                        'pattern' => '/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/',
-                        'message' => 'mautic.campaign.share.version.invalid',
-                    ]),
+                    new Regex(pattern: '/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/', message: 'mautic.campaign.share.version.invalid'),
                 ],
             ]
         );
@@ -135,7 +129,7 @@ final class CampaignShareType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
-                    new Length(['max' => 60]),
+                    new Length(max: 60),
                 ],
             ]
         );
@@ -152,7 +146,7 @@ final class CampaignShareType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(),
-                    new Length(['min' => 100]),
+                    new Length(min: 100),
                 ],
             ]
         );
@@ -186,11 +180,7 @@ final class CampaignShareType extends AbstractType
                 'multiple'    => true,
                 'required'    => false,
                 'constraints' => [
-                    new Count([
-                        'min'        => 1,
-                        'minMessage' => 'mautic.campaign.share.works_with.min',
-                        'groups'     => ['publish'],
-                    ]),
+                    new Count(min: 1, minMessage: 'mautic.campaign.share.works_with.min', groups: ['publish']),
                 ],
             ]
         );

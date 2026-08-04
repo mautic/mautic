@@ -13,6 +13,7 @@ use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -35,6 +36,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
     private MockObject&UserModel $userModel;
 
+    private MockObject&UserRepository $userRepository;
+
     private string $packageName;
 
     protected function setUp(): void
@@ -44,6 +47,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $this->packageModel      = $this->createMock(PackageModel::class);
         $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->userModel         = $this->createMock(UserModel::class);
+        $this->userRepository    = $this->createMock(UserRepository::class);
         $this->packageName       = 'koco/mautic-recaptcha-bundle';
 
         $user = $this->createMock(User::class);
@@ -62,7 +66,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -83,7 +87,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($this->packageName)
             ->willReturn(new ConsoleOutput(0, 'OK'));
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -103,7 +107,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName)
             ->willThrowException(new ApiException('Package not found', 404));
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $this->expectException(\InvalidArgumentException::class);
 
@@ -122,7 +126,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName)
             ->willThrowException(new ApiException('Internal Server Error', 500));
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $this->expectException(\Exception::class);
 
@@ -143,7 +147,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName)
             ->willReturn($packageDetail);
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $this->expectException(\Exception::class);
 
@@ -166,7 +170,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName)
             ->willReturn($this->getPackageDetail());
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
         $result  = $this->testSymfonyCommand(
             'mautic:marketplace:install',
             ['package' => $packageName],
@@ -189,7 +193,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName, $this->anything())
             ->willReturn(['success' => true, 'summary' => [], 'errors' => []]);
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -209,7 +213,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName)
             ->willReturn($this->getResourcePackageDetail());
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -233,7 +237,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->with($packageName, $this->anything())
             ->willReturn(['success' => false, 'summary' => [], 'errors' => ['Import failed']]);
 
-        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel);
+        $command = new InstallCommand($this->composerHelper, $this->packageModel, $this->resourceInstaller, $this->userModel, $this->userRepository);
 
         $result = $this->testSymfonyCommand(
             'mautic:marketplace:install',

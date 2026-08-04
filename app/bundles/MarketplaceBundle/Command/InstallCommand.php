@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -30,6 +31,7 @@ final class InstallCommand extends Command
         private readonly PackageModel $packageModel,
         private readonly ResourceInstallerInterface $resourceInstaller,
         private readonly UserModel $userModel,
+        private readonly UserRepository $userRepository,
     ) {
         parent::__construct();
     }
@@ -137,7 +139,7 @@ final class InstallCommand extends Command
             return $userId;
         }
 
-        $adminUsers = $this->userModel->getRepository()->getAllAdminUsers();
+        $adminUsers = $this->userRepository->getAllAdminUsers();
         if ([] === $adminUsers) {
             throw new \RuntimeException('No admin users found. Create one first or pass --user-id.');
         }
