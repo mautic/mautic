@@ -46,6 +46,8 @@ use Twig\Runtime\EscaperRuntime;
  */
 class FocusModel extends FormModel implements GlobalSearchInterface
 {
+    private const ANONYMOUS_CONTACT_TOKEN_MODIFIERS = ['true', 'datetime', 'date', 'time', 'label'];
+
     public function __construct(
         protected \Mautic\FormBundle\Model\FormModel $formModel,
         protected TrackableModel $trackableModel,
@@ -480,7 +482,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     {
         if (preg_match_all(LeadTokenHelper::REGEX, $url, $matches)) {
             foreach ($matches[2] as $token) {
-                $default = explode('|', $token)[1] ?? '';
+                $default = self::getAnonymousContactTokenValue($token);
                 if ('' === $default) {
                     return '#';
                 }
@@ -494,8 +496,15 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     {
         return preg_replace_callback(
             LeadTokenHelper::REGEX,
-            static fn (array $matches): string => explode('|', $matches[2])[1] ?? '',
+            static fn (array $matches): string => self::getAnonymousContactTokenValue($matches[2]),
             $content
         );
+    }
+
+    private static function getAnonymousContactTokenValue(string $token): string
+    {
+        $default = explode('|', $token)[1] ?? '';
+
+        return in_array($default, self::ANONYMOUS_CONTACT_TOKEN_MODIFIERS, true) ? '' : $default;
     }
 }

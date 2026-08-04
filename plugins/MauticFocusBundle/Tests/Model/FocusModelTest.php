@@ -91,8 +91,8 @@ final class FocusModelTest extends TestCase
         $formModel = $this->createStub(FormModel::class);
         $formModel->method('getPages')->willReturn([[], false]);
         $twig = new Environment(new ArrayLoader([
-            '@MauticFocus/Builder/generate.js.twig' => 'var clickUrl = "{{ clickUrl }}";',
-            '@MauticFocus/Builder/content.html.twig'  => '<div>Anonymous content</div>',
+            '@MauticFocus/Builder/generate.js.twig' => 'var clickUrl = "{{ clickUrl }}"; var content = "{focus_content}";',
+            '@MauticFocus/Builder/content.html.twig'  => '<div>Anonymous {contactfield=date|datetime}</div>',
         ]));
         $focusModel = new FocusModel(
             $formModel,
@@ -124,6 +124,7 @@ final class FocusModelTest extends TestCase
         $content = $focusModel->generateJavascript($focus, false, [FocusJsScope::RUNTIME, FocusJsScope::DISPLAY]);
 
         $this->assertStringContainsString($expectedClickUrl, $content);
+        $this->assertStringNotContainsString('Anonymous datetime', $content);
     }
 
     /**
@@ -134,5 +135,10 @@ final class FocusModelTest extends TestCase
         yield 'token default' => ['https://example.com/{contactfield=firstname|visitor}', 'https://example.com/visitor'];
         yield 'no token default' => ['https://{contactfield=firstname}/tour', '#'];
         yield 'empty token default' => ['https://{contactfield=firstname||visitor}/tour', '#'];
+        yield 'URL encoding modifier' => ['https://example.com/{contactfield=website|true}', '#'];
+        yield 'date and time modifier' => ['https://example.com/{contactfield=date|datetime}', '#'];
+        yield 'date modifier' => ['https://example.com/{contactfield=date|date}', '#'];
+        yield 'time modifier' => ['https://example.com/{contactfield=date|time}', '#'];
+        yield 'label modifier' => ['https://example.com/{contactfield=select|label}', '#'];
     }
 }
