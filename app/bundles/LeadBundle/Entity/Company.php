@@ -60,7 +60,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var int|null
      */
     #[Groups(['company:read', 'company:write'])]
-    #[\Symfony\Component\Validator\Constraints\Range(min: 0, max: 2147483647)]
+    #[Assert\Range(min: 0, max: 2147483647)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]

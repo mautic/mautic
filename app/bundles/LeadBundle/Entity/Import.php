@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Import extends FormEntity
 {
@@ -69,7 +68,7 @@ class Import extends FormEntity
      *
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.lead.import.dir.notblank')]
+    #[Assert\NotBlank(message: 'mautic.lead.import.dir.notblank')]
     private $dir;
 
     /**
@@ -77,7 +76,7 @@ class Import extends FormEntity
      *
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.lead.import.file.notblank')]
+    #[Assert\NotBlank(message: 'mautic.lead.import.file.notblank')]
     private $file = 'import.csv';
 
     /**

@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[\Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
+#[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
 class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -75,8 +75,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * @var string
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.lead.field.label.notblank')]
-    #[\Symfony\Component\Validator\Constraints\Length(max: 191, maxMessage: 'mautic.lead.field.label.maxlength')]
+    #[Assert\NotBlank(message: 'mautic.lead.field.label.notblank')]
+    #[Assert\Length(max: 191, maxMessage: 'mautic.lead.field.label.maxlength')]
     private $label;
 
     /**
