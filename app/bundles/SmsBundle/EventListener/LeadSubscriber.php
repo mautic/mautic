@@ -67,7 +67,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $label,
                     'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                 ];
-                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
+                if ('failed' === $state or 'sent' === $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
 
@@ -85,7 +85,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
                             'type'   => $state,
                         ],
                         'contentTemplate' => '@MauticSms/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'ri-chat-1-fill' : 'ri-message-2-fill',
+                        'icon'            => ('read' === $state) ? 'ri-chat-1-fill' : 'ri-message-2-fill',
                         'contactId'       => $contactId,
                     ]
                 );

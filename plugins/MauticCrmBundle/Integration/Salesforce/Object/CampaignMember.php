@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object;
 
-class CampaignMember
+final class CampaignMember
 {
     public const OBJECT = 'CampaignMember';
 }

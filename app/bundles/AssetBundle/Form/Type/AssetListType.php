@@ -2,7 +2,7 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
-use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
@@ -16,8 +16,8 @@ final class AssetListType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $corePermissions,
-        private readonly AssetModel $assetModel,
         private readonly UserHelper $userHelper,
+        private readonly AssetRepository $assetRepository,
     ) {
     }
 
@@ -41,9 +41,9 @@ final class AssetListType extends AbstractType
     {
         $choices   = [];
         $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');
-        $repo      = $this->assetModel->getRepository();
-        $repo->setCurrentUser($this->userHelper->getUser());
-        $assets = $repo->getAssetList('', 0, 0, $viewOther);
+
+        $this->assetRepository->setCurrentUser($this->userHelper->getUser());
+        $assets = $this->assetRepository->getAssetList('', 0, 0, $viewOther);
 
         foreach ($assets as $asset) {
             $choices[$asset['language']][$asset['title']] = $asset['id'];
