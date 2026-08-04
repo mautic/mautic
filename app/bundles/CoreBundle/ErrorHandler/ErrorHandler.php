@@ -548,7 +548,7 @@ namespace {
                 if (1 === count($context) && true === $context[0]) {
                     ErrorHandler::logDebugEntry($log, $context, true);
                 } else {
-                    ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);
+                    ErrorHandler::logDebugEntry($log, ([] === $context) ? [] : $context);
                 }
             }
         }

@@ -648,7 +648,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
         // Assert that the actual options match the expected options
-        if (empty($expectedOptions)) {
+        if ([] === $expectedOptions) {
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {

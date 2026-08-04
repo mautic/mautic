@@ -583,7 +583,7 @@ final class AjaxController extends CommonAjaxController
                 }
             }
 
-            if (!empty($newTags)) {
+            if ([] !== $newTags) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
             }
 
@@ -626,7 +626,7 @@ final class AjaxController extends CommonAjaxController
                 }
             }
 
-            if (!empty($newUtmTags)) {
+            if ([] !== $newUtmTags) {
                 $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
             }
 

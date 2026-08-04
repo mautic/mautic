@@ -25,7 +25,7 @@ class EventCollector
 
     public function getEvents(): EventAccessor
     {
-        if (empty($this->eventsArray)) {
+        if ([] === $this->eventsArray) {
             $this->buildEventList();
         }
 
@@ -55,7 +55,7 @@ class EventCollector
      */
     public function getEventsArray($type = null)
     {
-        if (empty($this->eventsArray)) {
+        if ([] === $this->eventsArray) {
             $this->buildEventList();
         }
 

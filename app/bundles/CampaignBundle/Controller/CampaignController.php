@@ -755,7 +755,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
     {
-        if (empty($this->campaignEvents)) {
+        if ([] === $this->campaignEvents) {
             // set the error
             $form->addError(
                 new FormError(
@@ -794,7 +794,7 @@ class CampaignController extends AbstractStandardFormController
         $this->campaignModel->setEvents($entity, $this->campaignEvents, $this->connections, $this->deletedEvents);
 
         if ('edit' === $action && null !== $this->connections) {
-            if (!empty($this->deletedEvents)) {
+            if ([] !== $this->deletedEvents) {
                 $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }
         }
@@ -907,12 +907,12 @@ class CampaignController extends AbstractStandardFormController
             $filter['string'] = $this->stripQuickFilterTokensFromSearch((string) ($filter['string'] ?? ''), $searchFilterTerms);
             $session->set('mautic.campaign.filter', $filter['string']);
 
-            if (!empty($listAliases)) {
+            if ([] !== $listAliases) {
                 $joinLists         = true;
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => array_values(array_unique($listAliases))];
             }
 
-            if (!empty($formIds)) {
+            if ([] !== $formIds) {
                 $joinForms         = true;
                 $filter['force'][] = ['column' => 'f.id', 'expr' => 'in', 'value' => $formIds];
             }
