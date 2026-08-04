@@ -740,8 +740,8 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $scriptCopy  = (string) $script->filter('[data-copy]')->attr('data-copy');
         $contentCopy = (string) $content->filter('[data-copy]')->attr('data-copy');
 
-        $this->assertSame($scriptText, preg_replace('/^\r?\n/', '', $scriptCopy, 1));
-        $this->assertSame($contentText, preg_replace('/^\r?\n/', '', $contentCopy, 1));
+        $this->assertSame(ltrim($scriptText, "\r\n"), ltrim($scriptCopy, "\r\n"));
+        $this->assertSame(ltrim($contentText, "\r\n"), ltrim($contentCopy, "\r\n"));
         $this->assertStringContainsString('<script', $scriptText);
         $this->assertStringContainsString('<form', $contentText);
         $this->assertStringNotContainsString('&lt;', $scriptCopy);
