@@ -32,15 +32,16 @@ class PropertiesAccessor
     }
 
     /**
-     * @param string|mixed[] $options
+     * @param string|array<string, string>|list<array{label: string, alias: string}|array{label: string, value: string}|list<string>> $options
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function getChoices($options): array
     {
         $choices = [];
 
-        if (is_array($options) && !isset($options[0]['value'])) {
+        // A missing first numeric index means we already have an associative value=>label map.
+        if (is_array($options) && !isset($options[0])) {
             return array_flip($options);
         }
 

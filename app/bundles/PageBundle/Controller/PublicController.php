@@ -231,7 +231,7 @@ final class PublicController extends AbstractFormController
                     );
                     \assert($translatedEntity instanceof Page);
 
-                    if ($translationParent && $translatedEntity !== $entity) {
+                    if ($translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
