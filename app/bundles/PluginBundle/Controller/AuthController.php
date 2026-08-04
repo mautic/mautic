@@ -10,24 +10,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class AuthController extends FormController
 {
-    public function __construct(
-        protected \Symfony\Component\Form\FormFactoryInterface $formFactory,
-        protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper,
-        \Doctrine\Persistence\ManagerRegistry $managerRegistry,
-        \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
-        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
-        \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
-        \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
-        \Mautic\CoreBundle\Translation\Translator $translator,
-        \Mautic\CoreBundle\Service\FlashBag $flashBag,
-        \Symfony\Component\HttpFoundation\RequestStack $requestStack,
-        \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
-        private readonly IntegrationHelper $integrationHelper,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private IntegrationHelper $integrationHelper;
+
+    #[Required]
+    public function autowireAuthController(
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**

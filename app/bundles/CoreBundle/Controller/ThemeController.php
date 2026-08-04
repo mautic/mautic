@@ -14,27 +14,29 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ThemeController extends FormController
 {
-    public function __construct(
-        protected \Symfony\Component\Form\FormFactoryInterface $formFactory,
-        protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper,
-        \Doctrine\Persistence\ManagerRegistry $managerRegistry,
-        \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
-        \Mautic\CoreBundle\Helper\UserHelper $userHelper,
-        \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
-        \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
-        \Mautic\CoreBundle\Translation\Translator $translator,
-        \Mautic\CoreBundle\Service\FlashBag $flashBag,
-        \Symfony\Component\HttpFoundation\RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly ThemeHelperInterface $themeHelper,
-        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
-        private readonly PathsHelper $pathsHelper,
-        private readonly CorePermissions $corePermissions,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private ThemeHelperInterface $themeHelper;
+
+    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
+    private PathsHelper $pathsHelper;
+
+    private CorePermissions $corePermissions;
+
+    #[Required]
+    public function autowireThemeController(
+        ThemeHelperInterface $themeHelper,
+        BuilderIntegrationsHelper $builderIntegrationsHelper,
+        PathsHelper $pathsHelper,
+        CorePermissions $corePermissions,
+    ): void {
+        $this->themeHelper               = $themeHelper;
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+        $this->pathsHelper               = $pathsHelper;
+        $this->corePermissions           = $corePermissions;
     }
 
     public function indexAction(Request $request): Response
