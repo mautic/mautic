@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class StatsApiController extends CommonApiController
 {
+    private UserHelper $userHelper;
+
     /**
      * Lists stats for a database table.
      *
@@ -22,7 +24,7 @@ final class StatsApiController extends CommonApiController
      * @param array  $order
      * @param array  $where
      */
-    public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): Response
+    public function listAction(Request $request, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): Response
     {
         $response = [];
         $where    = InputHelper::cleanArray(empty($where) ? $request->query->all()['where'] ?? [] : $where);
@@ -35,7 +37,7 @@ final class StatsApiController extends CommonApiController
         $this->sanitizeWhereClauseArrayFromRequest($where);
 
         try {
-            $event = new StatsEvent($table, $start, $limit, $order, $where, $userHelper->getUser());
+            $event = new StatsEvent($table, $start, $limit, $order, $where, $this->userHelper->getUser());
             $this->dispatcher->dispatch($event, CoreEvents::LIST_STATS);
 
             // Return available tables if no result was set
@@ -59,5 +61,12 @@ final class StatsApiController extends CommonApiController
         $view = $this->view($response);
 
         return $this->handleView($view);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireStatsApiController(
+        UserHelper $userHelper,
+    ): void {
+        $this->userHelper = $userHelper;
     }
 }

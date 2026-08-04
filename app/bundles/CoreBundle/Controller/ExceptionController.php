@@ -12,7 +12,9 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 final class ExceptionController extends CommonController
 {
-    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, ?DebugLoggerInterface $logger = null): JsonResponse|Response
+    private ThemeHelper $themeHelper;
+
+    public function showAction(Request $request, \Throwable $exception, ?DebugLoggerInterface $logger = null): JsonResponse|Response
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();
@@ -71,7 +73,7 @@ final class ExceptionController extends CommonController
         $anonymous    = $this->security->isAnonymous();
         $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
-            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
+            if ($templatePage = $this->themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
                 $baseTemplate = $templatePage;
             }
         }
@@ -121,5 +123,12 @@ final class ExceptionController extends CommonController
         Response::closeOutputBuffers($startObLevel + 1, true);
 
         return ob_get_clean();
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireExceptionController(
+        ThemeHelper $themeHelper,
+    ): void {
+        $this->themeHelper = $themeHelper;
     }
 }

@@ -27,12 +27,27 @@ use Symfony\Contracts\Service\Attribute\Required;
 class AjaxController extends CommonController
 {
     private NotificationModel $notificationModel;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private SearchCommandListInterface $searchCommandList;
+    private TokenSorter $tokenSorter;
+    private IpLookupFactory $ipServiceFactory;
+    private FormFactoryInterface $formFactory;
 
     #[Required]
     public function autowireCoreAjaxController(
         NotificationModel $notificationModel,
+        AuthorizationCheckerInterface $authorizationChecker,
+        SearchCommandListInterface $searchCommandList,
+        TokenSorter $tokenSorter,
+        IpLookupFactory $ipServiceFactory,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->notificationModel = $notificationModel;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->searchCommandList = $searchCommandList;
+        $this->tokenSorter = $tokenSorter;
+        $this->ipServiceFactory = $ipServiceFactory;
+        $this->formFactory = $formFactory;
     }
 
     /**
@@ -63,7 +78,6 @@ class AjaxController extends CommonController
      */
     public function delegateAjaxAction(
         Request $request,
-        AuthorizationCheckerInterface $authorizationChecker,
     ): Response|JsonResponse {
         // process ajax actions
         $action     = $request->get('action');
@@ -73,7 +87,7 @@ class AjaxController extends CommonController
             $action = $request->request->get('action');
         }
 
-        if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (str_contains($action, ':')) {
                 // call the specified bundle's ajax action
                 $parts     = explode(':', $action);
@@ -177,9 +191,9 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function globalCommandListAction(SearchCommandListInterface $searchCommandList): JsonResponse
+    public function globalCommandListAction(): JsonResponse
     {
-        $allCommands = $searchCommandList->getList();
+        $allCommands = $this->searchCommandList->getList();
         $dataArray   = [];
         $dupChecker  = [];
         foreach ($allCommands as $commands) {
@@ -332,7 +346,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 1]);
     }
 
-    public function getBuilderTokensAction(Request $request, TokenSorter $tokenSorter): JsonResponse
+    public function getBuilderTokensAction(Request $request): JsonResponse
     {
         $builderComponents = [];
 
@@ -342,7 +356,7 @@ class AjaxController extends CommonController
         }
 
         if (array_key_exists('tokens', $builderComponents)) {
-            $builderComponents['tokens'] = $tokenSorter->sortTokens($builderComponents['tokens']);
+            $builderComponents['tokens'] = $this->tokenSorter->sortTokens($builderComponents['tokens']);
         }
 
         return $this->sendJsonResponse($builderComponents);
@@ -351,7 +365,7 @@ class AjaxController extends CommonController
     /**
      * Fetch remote data store.
      */
-    public function downloadIpLookupDataStoreAction(Request $request, IpLookupFactory $ipServiceFactory): JsonResponse
+    public function downloadIpLookupDataStoreAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -359,7 +373,7 @@ class AjaxController extends CommonController
             $serviceName = $request->request->get('service');
             $serviceAuth = $request->request->get('auth');
 
-            $ipService = $ipServiceFactory->getService($serviceName, $serviceAuth);
+            $ipService = $this->ipServiceFactory->getService($serviceName, $serviceAuth);
 
             if ($ipService instanceof AbstractLocalDataLookup) {
                 if ($ipService->downloadRemoteDataStore()) {
@@ -392,14 +406,14 @@ class AjaxController extends CommonController
     /**
      * Fetch IP Lookup form.
      */
-    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory): JsonResponse
+    public function getIpLookupFormAction(Request $request): JsonResponse
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 
         if ($request->query->has('service')) {
             $serviceName = $request->query->get('service');
 
-            $ipService = $ipServiceFactory->getService($serviceName);
+            $ipService = $this->ipServiceFactory->getService($serviceName);
 
             if ($ipService instanceof AbstractLookup) {
                 $dataArray['attribution'] = $ipService->getAttribution();
@@ -408,7 +422,7 @@ class AjaxController extends CommonController
                         $themes   = $ipService->getConfigFormThemes();
                         $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
 
-                        $form = $formFactory->createBuilder()
+                        $form = $this->formFactory->createBuilder()
                             ->add(
                                 'ip_lookup_config',
                                 $formType,
