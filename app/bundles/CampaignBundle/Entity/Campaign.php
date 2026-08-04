@@ -74,6 +74,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -218,13 +219,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'name',
-            new Assert\NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
         $metadata->addConstraint(new NoOrphanEvents());
     }
 
