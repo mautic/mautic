@@ -1737,7 +1737,7 @@ final class EmailController extends FormController
         $user   = $this->user;
 
         // We have to add prefix to example emails
-        $subject = sprintf('%s %s', static::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
+        $subject = sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
         $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
