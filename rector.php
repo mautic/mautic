@@ -49,7 +49,7 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withCodeQualityLevel(60)
+    ->withCodeQualityLevel(55)
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // @todo move to "twig" group
