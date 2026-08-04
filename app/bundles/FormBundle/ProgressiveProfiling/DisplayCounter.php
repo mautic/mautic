@@ -5,7 +5,7 @@ namespace Mautic\FormBundle\ProgressiveProfiling;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-class DisplayCounter
+final class DisplayCounter
 {
     private int $displayedFields = 0;
 

@@ -20,8 +20,10 @@ final class TriggerController extends FormController
     private TriggerModel $triggerModel;
 
     #[Required]
-    public function autowireTriggerController(TriggerEventModel $triggerEventModel, TriggerModel $triggerModel): void
-    {
+    public function autowireTriggerController(
+        TriggerEventModel $triggerEventModel,
+        TriggerModel $triggerModel,
+    ): void {
         $this->triggerEventModel = $triggerEventModel;
         $this->triggerModel      = $triggerModel;
     }

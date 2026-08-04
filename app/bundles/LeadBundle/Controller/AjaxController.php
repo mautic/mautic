@@ -10,10 +10,14 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Form\Type\FieldType;
@@ -41,22 +45,26 @@ final class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
+    private LeadFieldRepository $leadFieldRepository;
 
-    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
+    private EmailRepository $emailRepository;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private LeadModel $leadModel;
 
+    private DoNotContactRepository $doNotContactRepository;
+
     #[Required]
     public function autowireLeadAjaxController(
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
-        \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        LeadRepository $leadRepository,
+        EmailRepository $emailRepository,
+        LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
+        DoNotContactRepository $doNotContactRepository,
     ): void {
         $this->leadModel = $leadModel;
+        $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
@@ -397,7 +405,7 @@ final class AjaxController extends CommonAjaxController
 
         if (!empty($dncId)) {
             /** @var DoNotContact $dnc */
-            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->findOneBy(
+            $dnc = $this->doNotContactRepository->findOneBy(
                 [
                     'id' => $dncId,
                 ]

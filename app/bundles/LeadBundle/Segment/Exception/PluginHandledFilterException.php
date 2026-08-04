@@ -2,6 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Exception;
 
-class PluginHandledFilterException extends \Exception
+final class PluginHandledFilterException extends \Exception
 {
 }

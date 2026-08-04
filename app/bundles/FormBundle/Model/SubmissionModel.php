@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -71,19 +71,19 @@ use Twig\Environment;
 /**
  * @extends CommonFormModel<Submission>
  */
-class SubmissionModel extends CommonFormModel
+final class SubmissionModel extends CommonFormModel
 {
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected Environment $twig,
-        protected FormModel $formModel,
-        protected PageModel $pageModel,
-        protected LeadModel $leadModel,
-        protected CampaignModel $campaignModel,
-        protected MembershipManager $membershipManager,
-        protected LeadFieldModel $leadFieldModel,
-        protected CompanyModel $companyModel,
-        protected FormFieldHelper $fieldHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly Environment $twig,
+        private readonly FormModel $formModel,
+        private readonly PageModel $pageModel,
+        private readonly LeadModel $leadModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly MembershipManager $membershipManager,
+        private readonly LeadFieldModel $leadFieldModel,
+        private readonly CompanyModel $companyModel,
+        private readonly FormFieldHelper $fieldHelper,
         private readonly UploadFieldValidator $uploadFieldValidator,
         private readonly FormUploader $formUploader,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,
@@ -92,7 +92,7 @@ class SubmissionModel extends CommonFormModel
         private readonly ContactTracker $contactTracker,
         private readonly ContactMerger $contactMerger,
         private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -1097,7 +1097,7 @@ class SubmissionModel extends CommonFormModel
                     sprintf('%d:%s', $stage->getId(), $stage->getName()),
                     $this->translator->trans(
                         'mautic.stage.import.action.name',
-                        ['%name%' => $this->userHelper->getUser()->getUsername()]
+                        ['%name%' => $this->userHelper->getUser()->getUserIdentifier()]
                     )
                 );
             } else {

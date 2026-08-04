@@ -116,7 +116,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = static::getContainer()->get('event_dispatcher');
+        $dispatcher = static::getContainer()->get(EventDispatcherInterface::class);
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 

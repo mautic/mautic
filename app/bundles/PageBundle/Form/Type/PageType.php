@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -16,8 +16,8 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Helper\PageConfigInterface;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -35,19 +35,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Page>
  */
-class PageType extends AbstractType
+final class PageType extends AbstractType
 {
     private readonly ?\Mautic\UserBundle\Entity\User $user;
 
     private readonly bool $canViewOther;
 
     public function __construct(
-        private readonly EntityManager $em,
-        private readonly PageModel $model,
+        private readonly EntityManagerInterface $em,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
         private readonly ThemeHelperInterface $themeHelper,
         private readonly PageConfigInterface $pageConfig,
+        private readonly PageRepository $pageRepository,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
@@ -139,10 +139,10 @@ class PageType extends AbstractType
         $builder->add('sessionId', HiddenType::class);
 
         // Custom field for redirect URL
-        $this->model->getRepository()->setCurrentUser($this->user);
+        $this->pageRepository->setCurrentUser($this->user);
 
         $redirectUrlDataOptions = '';
-        $pages                  = $this->model->getRepository()->getPageList('', 0, 0, $this->canViewOther, 'variant', [$options['data']->getId()]);
+        $pages                  = $this->pageRepository->getPageList('', 0, 0, $this->canViewOther, 'variant', [$options['data']->getId()]);
         foreach ($pages as $page) {
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }

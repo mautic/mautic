@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @extends AbstractType<mixed>
  */
-class UserStepType extends AbstractType
+final class UserStepType extends AbstractType
 {
     public function __construct(
         private readonly RequestStack $requestStack,

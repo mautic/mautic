@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -37,7 +36,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<LeadField>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     /**
      * @var string[]
@@ -48,7 +47,7 @@ class FieldType extends AbstractType
     ];
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly LeadFieldRepository $leadFieldRepository,
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
@@ -435,9 +434,6 @@ class FieldType extends AbstractType
         };
 
         $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
-            /** @var LeadFieldRepository $leadFieldRepository */
-            $leadFieldRepository = $this->em->getRepository(LeadField::class);
-
             $options = [
                 'label'         => 'mautic.core.order.field',
                 'class'         => LeadField::class,
@@ -463,7 +459,7 @@ class FieldType extends AbstractType
             }
 
             // get order list
-            $transformer = new FieldToOrderTransformer($leadFieldRepository);
+            $transformer = new FieldToOrderTransformer($this->leadFieldRepository);
             $form->add(
                 $builder->create(
                     'order',

@@ -2,26 +2,20 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<MessageQueue>
@@ -33,21 +27,29 @@ class MessageQueueModel extends FormModel
      */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    public function __construct(
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
-        CoreParametersHelper $coreParametersHelper,
-        EntityManagerInterface $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        private readonly MessageQueueRepository $messageQueueRepository,
-        private readonly FrequencyRuleRepository $frequencyRuleRepository,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected LeadModel $leadModel;
+
+    protected CompanyModel $companyModel;
+
+    private MessageQueueRepository $messageQueueRepository;
+
+    private FrequencyRuleRepository $frequencyRuleRepository;
+
+    private LeadRepository $leadRepository;
+
+    #[Required]
+    public function autowireMessageQueueModel(
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        MessageQueueRepository $messageQueueRepository,
+        FrequencyRuleRepository $frequencyRuleRepository,
+        LeadRepository $leadRepository,
+    ): void {
+        $this->leadModel               = $leadModel;
+        $this->companyModel            = $companyModel;
+        $this->messageQueueRepository  = $messageQueueRepository;
+        $this->frequencyRuleRepository = $frequencyRuleRepository;
+        $this->leadRepository = $leadRepository;
     }
 
     public function getRepository(): MessageQueueRepository
@@ -215,7 +217,7 @@ class MessageQueueModel extends FormModel
             }
         }
         if (!empty($contacts)) {
-            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+            $contactData = $this->leadRepository->getContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }

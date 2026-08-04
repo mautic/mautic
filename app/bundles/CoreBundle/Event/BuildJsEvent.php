@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use MatthiasMullie\Minify;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class BuildJsEvent extends Event
+final class BuildJsEvent extends Event
 {
     /**
      * @param bool           $debugMode
@@ -13,8 +13,8 @@ class BuildJsEvent extends Event
      * @param BuildJsScope[] $acceptedScopes
      */
     public function __construct(
-        protected $js,
-        protected $debugMode = false,
+        private $js,
+        private $debugMode = false,
         private readonly array $acceptedScopes = [
             BuildJsScope::RUNTIME,
             BuildJsScope::ESSENTIAL,

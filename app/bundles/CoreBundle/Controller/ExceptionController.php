@@ -16,7 +16,7 @@ final class ExceptionController extends CommonController
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();
-        $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
+        $currentContent = $this->getAndCleanOutputBuffering((int) $request->headers->get('X-Php-Ob-Level', -1));
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
@@ -77,7 +77,7 @@ final class ExceptionController extends CommonController
         }
 
         $template   = "@MauticCore/{$layout}/{$code}.html.twig";
-        if (!$this->container->get('twig')->getLoader()->exists($template)) {
+        if (!$this->twig->getLoader()->exists($template)) {
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
@@ -112,10 +112,7 @@ final class ExceptionController extends CommonController
         );
     }
 
-    /**
-     * @param int $startObLevel
-     */
-    protected function getAndCleanOutputBuffering($startObLevel): string|false
+    private function getAndCleanOutputBuffering(?int $startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

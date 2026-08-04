@@ -66,7 +66,7 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @return array|void
+     * @return array<string,string>|null
      *
      * @throws \BadMethodCallException
      */
@@ -76,7 +76,7 @@ class BuilderTokenHelper
         $labelColumn = 'name',
         $valueColumn = 'id',
         ?CompositeExpression $expr = null,
-    ) {
+    ): ?array {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
         }
@@ -88,7 +88,7 @@ class BuilderTokenHelper
         );
 
         if (1 === count(array_unique($permissions)) && false == end($permissions)) {
-            return;
+            return null;
         }
 
         $repo   = $this->modelFactory->getModel($this->modelName)->getRepository();
@@ -99,7 +99,7 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if ($expr instanceof CompositeExpression && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
@@ -107,7 +107,7 @@ class BuilderTokenHelper
 
         if (!empty($filter)) {
             $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
-            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
+            $expr       = $expr instanceof CompositeExpression ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',

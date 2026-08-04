@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DncType extends AbstractType
+final class DncType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

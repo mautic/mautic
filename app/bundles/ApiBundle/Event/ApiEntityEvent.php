@@ -5,14 +5,14 @@ namespace Mautic\ApiBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApiEntityEvent extends CommonEvent
+final class ApiEntityEvent extends CommonEvent
 {
     /**
      * @param object $entity
      */
     public function __construct(
         protected $entity,
-        protected array $entityRequestParameters,
+        private readonly array $entityRequestParameters,
         private readonly Request $request,
     ) {
     }

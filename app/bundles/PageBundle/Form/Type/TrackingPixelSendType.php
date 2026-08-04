@@ -12,10 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TrackingPixelSendType extends AbstractType
+final class TrackingPixelSendType extends AbstractType
 {
     public function __construct(
-        protected TrackingHelper $trackingHelper,
+        private readonly TrackingHelper $trackingHelper,
     ) {
     }
 

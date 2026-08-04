@@ -2,6 +2,6 @@
 
 namespace Mautic\CampaignBundle\EventCollector\Accessor\Exception;
 
-class EventNotFoundException extends \InvalidArgumentException
+final class EventNotFoundException extends \InvalidArgumentException
 {
 }

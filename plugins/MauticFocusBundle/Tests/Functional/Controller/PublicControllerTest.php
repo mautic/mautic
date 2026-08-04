@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 use Twig\Extension\EscaperExtension;
 use Twig\Runtime\EscaperRuntime;
 
@@ -60,7 +61,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertSame($linkUrl, $redirect->getUrl());
 
         $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $twig = $this->getContainer()->get('twig');
+        $twig = $this->getContainer()->get(Environment::class);
         if (!$twig->hasExtension(EscaperExtension::class)) {
             $twig->addExtension(new EscaperExtension());
         }
