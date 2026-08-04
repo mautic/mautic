@@ -26,13 +26,13 @@ final class UniqueUserAlias extends Constraint
         return self::CLASS_CONSTRAINT;
     }
 
-//    public function getRequiredOptions(): array
-//    {
-//        return ['field'];
-//    }
+    //    public function getRequiredOptions(): array
+    //    {
+    //        return ['field'];
+    //    }
 
-//    public function getDefaultOption(): string
-//    {
-//        return 'field';
-//    }
+    //    public function getDefaultOption(): string
+    //    {
+    //        return 'field';
+    //    }
 }
