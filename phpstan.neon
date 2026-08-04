@@ -226,10 +226,15 @@ parameters:
 		-
 			identifier: mautic.noServiceJuggling
 			path: app/bundles/LeadBundle/Model/LeadModel.php
+
 		# mixed return
 		-
 			identifier: return.unusedType
 			message: '#Method Mautic(.*?)::getParameterValue\(\)#'
+		# string operations
+		-
+			identifier: parameterByRef.type
+			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
