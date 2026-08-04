@@ -12,9 +12,7 @@ class Config
 
     public const MARKETPLACE_WEBSITE_URL       = 'marketplace_website_url';
 
-    public const MARKETPLACE_API_BASE          = 'marketplace_api_base';
-
-    public const MARKETPLACE_API_KEY           = 'marketplace_api_key';
+    public const MARKETPLACE_REGISTRY_URL      = 'marketplace_registry_url';
 
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
@@ -31,14 +29,16 @@ class Config
         return $this->coreParametersHelper->get(self::MARKETPLACE_WEBSITE_URL);
     }
 
-    public function getApiBase(): string
+    /**
+     * Base URL of the marketplace application, which fronts the package registry.
+     *
+     * Deliberately a different parameter from the old marketplace_api_base: that one pointed
+     * straight at the storage backend, so a stale value carried over from an older install
+     * would silently 404 against these routes.
+     */
+    public function getRegistryUrl(): string
     {
-        return rtrim((string) $this->coreParametersHelper->get(self::MARKETPLACE_API_BASE), '/');
-    }
-
-    public function getApiKey(): string
-    {
-        return (string) $this->coreParametersHelper->get(self::MARKETPLACE_API_KEY);
+        return rtrim((string) $this->coreParametersHelper->get(self::MARKETPLACE_REGISTRY_URL), '/');
     }
 
     public function isComposerEnabled(): bool

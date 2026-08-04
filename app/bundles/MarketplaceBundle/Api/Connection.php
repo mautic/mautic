@@ -25,15 +25,14 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        $offset      = ($page - 1) * $limit;
         $queryParams = [
-            '_limit'  => $limit,
-            '_offset' => $offset,
+            'page'  => $page,
+            'limit' => $limit,
         ];
         if ('' !== $query) {
-            $queryParams['_query'] = $query;
+            $queryParams['query'] = $query;
         }
-        $url = $this->config->getApiBase().'/rest/v1/rpc/get_view?'.http_build_query($queryParams);
+        $url = $this->config->getRegistryUrl().'/api/registry/v1/packages?'.http_build_query($queryParams);
 
         return $this->makeRequest($url);
     }
@@ -45,7 +44,7 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        $url = $this->config->getApiBase().'/rest/v1/rpc/get_pack?'.http_build_query(['packag_name' => $pluginName]);
+        $url = $this->config->getRegistryUrl().'/api/registry/v1/packages/'.implode('/', array_map(rawurlencode(...), explode('/', $pluginName, 2)));
 
         return $this->makeRequest($url);
     }
@@ -57,7 +56,7 @@ class Connection
      */
     public function makeRequest(string $url): array
     {
-        $this->logger->debug('About to query the Packagist API: '.$url);
+        $this->logger->debug('About to query the marketplace API: '.$url);
 
         $request = new Request('GET', $url, $this->getHeaders());
 
@@ -91,8 +90,6 @@ class Connection
             'Accept-Encoding' => 'gzip, deflate, br',
             'Connection'      => 'keep-alive',
             'User-Agent'      => 'Mautic Marketplace',
-            'apikey'          => $this->config->getApiKey(),
-            'Authorization'   => 'Bearer '.$this->config->getApiKey(),
         ];
     }
 }
