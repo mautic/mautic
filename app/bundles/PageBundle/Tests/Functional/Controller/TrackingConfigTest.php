@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\Process;
 
 final class TrackingConfigTest extends MauticMysqlTestCase
 {
@@ -84,10 +85,27 @@ final class TrackingConfigTest extends MauticMysqlTestCase
 
         $sharedTracking = $getSnippet('Tracking add-on (after consent)', 'shared');
         $this->assertStringContainsString('w.MauticFocusUseMauticTrackingConsent=true;', $sharedTracking);
+        $this->assertStringContainsString("w.MauticJS.dispatchEvent('mautic:tracking-enabled');", $sharedTracking);
         $this->assertLessThan(
-            strpos($sharedTracking, "w['MauticTrackingObject']=n"),
+            strpos($sharedTracking, 'w.MauticJS.trackingEnabled === true'),
             strpos($sharedTracking, 'w.MauticFocusUseMauticTrackingConsent=true;')
         );
+
+        $temporaryPath = tempnam(sys_get_temp_dir(), 'mautic-shared-tracking-');
+        $this->assertNotFalse($temporaryPath);
+        file_put_contents($temporaryPath, $sharedTracking);
+
+        try {
+            $process = new Process([
+                'node',
+                __DIR__.'/../../Fixtures/shared-focus-consent-runtime.js',
+                $temporaryPath,
+            ]);
+            $process->mustRun();
+            $this->assertSame('', $process->getErrorOutput());
+        } finally {
+            unlink($temporaryPath);
+        }
 
         $sharedFull = $getSnippet('Full tracking', 'shared');
         $this->assertStringContainsString('w.MauticFocusUseMauticTrackingConsent=true;', $sharedFull);

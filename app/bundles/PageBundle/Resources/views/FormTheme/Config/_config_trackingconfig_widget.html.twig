@@ -55,12 +55,16 @@
         function enableTracking(){
             if (!w.MauticJS || w.MauticJS.runtimeReady !== true) return;
             d.removeEventListener(\'mauticEssentialReady\',enableTracking);
-            if (w.MauticJS.trackingEnabled === true || d.getElementById(\'mautic-tracking-script\')) return;
 ' ~ (sharedConsent ? '
             // Use Mautic consent for Focus tracking
             w.MauticFocusUseMauticTrackingConsent=true;
+            if (w.MauticJS.trackingEnabled === true) {
+                w.MauticJS.dispatchEvent(\'mautic:tracking-enabled\');
+                return;
+            }
 
-' : '') ~ '            w[\'MauticTrackingObject\']=n;
+' : '') ~ '            if (w.MauticJS.trackingEnabled === true || d.getElementById(\'mautic-tracking-script\')) return;
+            w[\'MauticTrackingObject\']=n;
             w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
             w[n](\'send\',\'pageview\');
             a=d.createElement(t),m=d.getElementsByTagName(t)[0];
