@@ -25,8 +25,10 @@ final class FieldController extends FormController
     #[Required]
     public function autowireFieldController(
         FieldModel $fieldModel,
+        FieldAliasHelper $fieldAliasHelper,
     ): void {
         $this->fieldModel = $fieldModel;
+        $this->fieldAliasHelper = $fieldAliasHelper;
     }
 
     /**
@@ -582,12 +584,5 @@ final class FieldController extends FormController
         }
 
         return $flashes;
-    }
-
-    #[Required]
-    public function autowire(
-        FieldAliasHelper $fieldAliasHelper,
-    ): void {
-        $this->fieldAliasHelper = $fieldAliasHelper;
     }
 }

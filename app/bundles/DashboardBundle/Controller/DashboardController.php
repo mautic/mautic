@@ -37,8 +37,18 @@ final class DashboardController extends AbstractFormController
     #[Required]
     public function autowireDashboardController(
         DashboardModel $dashboardModel,
+        WidgetService $widget,
+        FormFactoryInterface $formFactory,
+        PathsHelper $pathsHelper,
+        RouterInterface $urlGenerator,
+        WidgetService $widgetService,
     ): void {
         $this->dashboardModel = $dashboardModel;
+        $this->widget = $widget;
+        $this->formFactory = $formFactory;
+        $this->pathsHelper = $pathsHelper;
+        $this->urlGenerator = $urlGenerator;
+        $this->widgetService = $widgetService;
     }
 
     /**
@@ -547,20 +557,5 @@ final class DashboardController extends AbstractFormController
     private function getNameFromRequest(Request $request): string
     {
         return $request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
-    }
-
-    #[Required]
-    public function autowire(
-        WidgetService $widget,
-        FormFactoryInterface $formFactory,
-        PathsHelper $pathsHelper,
-        RouterInterface $urlGenerator,
-        WidgetService $widgetService,
-    ): void {
-        $this->widget = $widget;
-        $this->formFactory = $formFactory;
-        $this->pathsHelper = $pathsHelper;
-        $this->urlGenerator = $urlGenerator;
-        $this->widgetService = $widgetService;
     }
 }

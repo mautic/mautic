@@ -9,6 +9,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\Api\FieldApiController;
@@ -79,6 +80,7 @@ final class FieldApiControllerTest extends TestCase
             $this->createStub(ModelFactory::class),
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(CoreParametersHelper::class),
+            $this->createStub(UserHelper::class),
             $this->createStub(FieldModel::class),
             $this->createStub(LeadFieldRepository::class)
         );

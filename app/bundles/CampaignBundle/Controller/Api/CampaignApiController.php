@@ -45,8 +45,6 @@ final class CampaignApiController extends CommonApiController
      * @var CampaignModel|null
      */
     protected $model;
-    private UserHelper $userHelper;
-    private ImportHelper $importHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -61,12 +59,13 @@ final class CampaignApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
+        private UserHelper $userHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
         private CampaignContactCountHelper $contactCountHelper,
         CampaignModel $campaignModel,
         private LeadModel $leadModel,
+        private ImportHelper $importHelper,
     ) {
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
@@ -491,14 +490,5 @@ final class CampaignApiController extends CommonApiController
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        UserHelper $userHelper,
-        ImportHelper $importHelper,
-    ): void {
-        $this->userHelper = $userHelper;
-        $this->importHelper = $importHelper;
     }
 }

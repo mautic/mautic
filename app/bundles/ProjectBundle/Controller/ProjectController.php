@@ -149,7 +149,7 @@ final class ProjectController extends AbstractFormController
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);
         $action    = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'new']);
 
-        $form = $this->buildForm($project, $action, $this->formFactory);
+        $form = $this->buildForm($project, $action);
 
         if ('POST' === $request->getMethod()) {
             $valid     = $this->isFormValid($form);
@@ -214,7 +214,7 @@ final class ProjectController extends AbstractFormController
             }
 
             $action = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $objectId]);
-            $form   = $this->buildForm($project, $action, $this->formFactory);
+            $form   = $this->buildForm($project, $action);
 
             if (!$ignorePost && 'POST' === $request->getMethod()) {
                 if ($this->isFormCancelled($form)) {
@@ -245,7 +245,7 @@ final class ProjectController extends AbstractFormController
                         // Re-create the form once more with the fresh project and action.
                         // The alias was empty on redirect after cloning.
                         $editAction = $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'edit', 'objectId' => $project->getId()]);
-                        $form       = $this->buildForm($project, $editAction, $this->formFactory);
+                        $form       = $this->buildForm($project, $editAction);
 
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
@@ -738,13 +738,13 @@ final class ProjectController extends AbstractFormController
     /**
      * @return FormInterface<FormInterface>&FormInterface
      */
-    private function buildForm(Project $project, string $action, FormFactoryInterface $formFactory): FormInterface
+    private function buildForm(Project $project, string $action): FormInterface
     {
-        return $formFactory->create(ProjectEntityType::class, $project, ['action' => $action]);
+        return $this->formFactory->create(ProjectEntityType::class, $project, ['action' => $action]);
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireProjectController(
         CorePermissions $corePermissions,
         ProjectEntityLoaderService $entityLoader,
         FormFactoryInterface $formFactory,

@@ -23,8 +23,12 @@ final class ClientController extends AbstractStandardFormController
     #[Required]
     public function autowireClientController(
         ClientModel $clientModel,
+        PageHelperFactoryInterface $pageHelperFactory,
+        TokenStorageInterface $tokenStorage,
     ): void {
         $this->clientModel = $clientModel;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -434,14 +438,5 @@ final class ClientController extends AbstractStandardFormController
     public function getModelName(): string
     {
         return 'api.client';
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        TokenStorageInterface $tokenStorage,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->tokenStorage = $tokenStorage;
     }
 }

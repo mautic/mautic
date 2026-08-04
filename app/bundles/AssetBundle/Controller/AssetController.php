@@ -25,8 +25,14 @@ final class AssetController extends FormController
     #[Required]
     public function autowireAssetController(
         AuditLogModel $auditLogModel,
+        CoreParametersHelper $parametersHelper,
+        UploaderHelper $uploaderHelper,
+        IntegrationHelper $integrationHelper,
     ): void {
         $this->auditLogModel = $auditLogModel;
+        $this->parametersHelper = $parametersHelper;
+        $this->uploaderHelper = $uploaderHelper;
+        $this->integrationHelper = $integrationHelper;
     }
 
     public function indexAction(Request $request, AssetModel $assetModel, int $page = 1): Response
@@ -754,16 +760,5 @@ final class AssetController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
-    }
-
-    #[Required]
-    public function autowire(
-        CoreParametersHelper $parametersHelper,
-        UploaderHelper $uploaderHelper,
-        IntegrationHelper $integrationHelper,
-    ): void {
-        $this->parametersHelper = $parametersHelper;
-        $this->uploaderHelper = $uploaderHelper;
-        $this->integrationHelper = $integrationHelper;
     }
 }

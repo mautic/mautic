@@ -23,8 +23,14 @@ final class DynamicContentApiController extends CommonController
     #[Required]
     public function autowireDynamicContentApiController(
         PageModel $pageModel,
+        DynamicContentHelper $helper,
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        ContactRequestHelper $contactRequestHelper,
     ): void {
         $this->pageModel = $pageModel;
+        $this->helper = $helper;
+        $this->deviceTrackingService = $deviceTrackingService;
+        $this->contactRequestHelper = $contactRequestHelper;
     }
 
     public function processAction(Request $request, $objectAlias): Response
@@ -65,16 +71,5 @@ final class DynamicContentApiController extends CommonController
                     'device_id' => $deviceId,
                 ]
             );
-    }
-
-    #[Required]
-    public function autowire(
-        DynamicContentHelper $helper,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactRequestHelper $contactRequestHelper,
-    ): void {
-        $this->helper = $helper;
-        $this->deviceTrackingService = $deviceTrackingService;
-        $this->contactRequestHelper = $contactRequestHelper;
     }
 }

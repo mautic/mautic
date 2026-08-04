@@ -118,7 +118,7 @@ final class AuthController extends FormController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireAuthController(
         IntegrationHelper $integrationHelper,
     ): void {
         $this->integrationHelper = $integrationHelper;

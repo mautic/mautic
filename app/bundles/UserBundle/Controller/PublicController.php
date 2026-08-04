@@ -29,9 +29,13 @@ final class PublicController extends FormController
     public function autowirePublicController(
         UserModel $userModel,
         UserRepository $userRepository,
+        LoggerInterface $logger,
+        UserPasswordHasherInterface $hasher,
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;
+        $this->logger = $logger;
+        $this->hasher = $hasher;
     }
 
     /**
@@ -104,7 +108,7 @@ final class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $this->hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $data);
             }
         }
 
@@ -114,7 +118,7 @@ final class PublicController extends FormController
     /**
      * @param array<string, mixed> $data
      */
-    private function handlePasswordResetConfirm(Request $request, UserPasswordHasherInterface $hasher, array $data): ?Response
+    private function handlePasswordResetConfirm(Request $request, array $data): ?Response
     {
         $response = null;
         $user     = $this->userRepository->findByIdentifier($data['identifier']);
@@ -128,7 +132,7 @@ final class PublicController extends FormController
 
             $response = $this->redirectToRoute('mautic_user_passwordresetconfirm');
         } elseif ($this->userModel->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
-            $encodedPassword = $this->userModel->checkNewPassword($user, $hasher, $data['plainPassword']);
+            $encodedPassword = $this->userModel->checkNewPassword($user, $this->hasher, $data['plainPassword']);
             $user->setPassword($encodedPassword);
             $this->userModel->saveEntity($user);
 
@@ -216,14 +220,5 @@ final class PublicController extends FormController
         }
 
         return $response;
-    }
-
-    #[Required]
-    public function autowire(
-        LoggerInterface $logger,
-        UserPasswordHasherInterface $hasher,
-    ): void {
-        $this->logger = $logger;
-        $this->hasher = $hasher;
     }
 }

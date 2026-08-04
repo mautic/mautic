@@ -32,9 +32,13 @@ final class SmsController extends FormController
     public function autowireSmsController(
         SmsModel $smsModel,
         AuditLogModel $auditLogModel,
+        TransportChain $transportChain,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;
+        $this->transportChain = $transportChain;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -754,14 +758,5 @@ final class SmsController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
-    }
-
-    #[Required]
-    public function autowire(
-        TransportChain $transportChain,
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->transportChain = $transportChain;
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

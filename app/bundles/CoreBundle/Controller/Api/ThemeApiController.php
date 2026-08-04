@@ -23,8 +23,10 @@ final class ThemeApiController extends CommonApiController
     #[Required]
     public function autowireThemeApiController(
         ThemeHelper $themeHelper,
+        PathsHelper $pathsHelper,
     ): void {
         $this->themeHelper = $themeHelper;
+        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -150,12 +152,5 @@ final class ThemeApiController extends CommonApiController
         $view = $this->view($response);
 
         return $this->handleView($view);
-    }
-
-    #[Required]
-    public function autowire(
-        PathsHelper $pathsHelper,
-    ): void {
-        $this->pathsHelper = $pathsHelper;
     }
 }

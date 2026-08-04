@@ -72,12 +72,32 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+        CorePermissions $corePermissions,
+        FormFactoryInterface $formFactory,
+        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        IntegrationHelper $integrationHelper,
+        IntegrationHelper $helper,
+        MembershipManager $membershipManager,
+        ContactColumnsDictionary $contactColumnsDictionary,
+        MailHelper $mailHelper,
+        SegmentCampaignShare $segmentCampaignShareService,
+        SegmentDependencyTreeFactory $segmentDependencyTreeFactory,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->corePermissions = $corePermissions;
+        $this->formFactory = $formFactory;
+        $this->formAdjustmentsProvider = $formAdjustmentsProvider;
+        $this->integrationHelper = $integrationHelper;
+        $this->helper = $helper;
+        $this->membershipManager = $membershipManager;
+        $this->contactColumnsDictionary = $contactColumnsDictionary;
+        $this->mailHelper = $mailHelper;
+        $this->segmentCampaignShareService = $segmentCampaignShareService;
+        $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -873,30 +893,5 @@ final class AjaxController extends CommonAjaxController
                 'form' => $form->createView(),
             ]
         );
-    }
-
-    #[Required]
-    public function autowireServices(
-        CorePermissions $corePermissions,
-        FormFactoryInterface $formFactory,
-        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        IntegrationHelper $integrationHelper,
-        IntegrationHelper $helper,
-        MembershipManager $membershipManager,
-        ContactColumnsDictionary $contactColumnsDictionary,
-        MailHelper $mailHelper,
-        SegmentCampaignShare $segmentCampaignShareService,
-        SegmentDependencyTreeFactory $segmentDependencyTreeFactory,
-    ): void {
-        $this->corePermissions = $corePermissions;
-        $this->formFactory = $formFactory;
-        $this->formAdjustmentsProvider = $formAdjustmentsProvider;
-        $this->integrationHelper = $integrationHelper;
-        $this->helper = $helper;
-        $this->membershipManager = $membershipManager;
-        $this->contactColumnsDictionary = $contactColumnsDictionary;
-        $this->mailHelper = $mailHelper;
-        $this->segmentCampaignShareService = $segmentCampaignShareService;
-        $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }
 }

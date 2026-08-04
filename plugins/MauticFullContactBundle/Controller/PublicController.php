@@ -86,7 +86,7 @@ final class PublicController extends FormController
         }
 
         if ('company' == $validatedRequest['type']) {
-            return $this->compcallbackAction($this->mauticLogger, $result, $validatedRequest);
+            return $this->compcallbackAction($result, $validatedRequest);
         }
 
         $notify = $validatedRequest['notify'];
@@ -267,7 +267,7 @@ final class PublicController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, array $validatedRequest): Response
+    private function compcallbackAction(array $result, array $validatedRequest): Response
     {
         $notify = $validatedRequest['notify'];
 
@@ -369,7 +369,7 @@ final class PublicController extends FormController
                 $data['companyfax'] = $fax['number'];
             }
 
-            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $this->mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $company->getSocialCache();
@@ -406,7 +406,7 @@ final class PublicController extends FormController
                     }
                 }
             } catch (\Exception $ex2) {
-                $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
+                $this->mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
             }
         }
 

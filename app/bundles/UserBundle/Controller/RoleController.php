@@ -36,8 +36,10 @@ final class RoleController extends FormController
     #[Required]
     public function autowireRoleController(
         RoleModel $roleModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->roleModel = $roleModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -632,12 +634,5 @@ final class RoleController extends FormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

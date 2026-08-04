@@ -39,8 +39,18 @@ final class PageController extends FormController
     #[Required]
     public function autowirePageController(
         PageModel $pageModel,
+        PageConfig $pageConfig,
+        PageHelperFactoryInterface $pageHelperFactory,
+        AssetsHelper $assetsHelper,
+        RouterInterface $routerHelper,
+        ThemeHelper $themeHelper,
     ): void {
         $this->pageModel = $pageModel;
+        $this->pageConfig = $pageConfig;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->assetsHelper = $assetsHelper;
+        $this->routerHelper = $routerHelper;
+        $this->themeHelper = $themeHelper;
     }
 
     public function indexAction(Request $request, PageModel $model, int $page = 1): Response
@@ -1201,20 +1211,5 @@ final class PageController extends FormController
             $clonedPage->addVariantChild($variantChild);
         }
         $clonedPage->setDraft($cloningPage->getDraft());
-    }
-
-    #[Required]
-    public function autowire(
-        PageConfig $pageConfig,
-        PageHelperFactoryInterface $pageHelperFactory,
-        AssetsHelper $assetsHelper,
-        RouterInterface $routerHelper,
-        ThemeHelper $themeHelper,
-    ): void {
-        $this->pageConfig = $pageConfig;
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->assetsHelper = $assetsHelper;
-        $this->routerHelper = $routerHelper;
-        $this->themeHelper = $themeHelper;
     }
 }

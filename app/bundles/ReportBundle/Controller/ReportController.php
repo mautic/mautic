@@ -29,8 +29,10 @@ final class ReportController extends FormController
     #[Required]
     public function autowireReportController(
         ReportModel $reportModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->reportModel = $reportModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -901,12 +903,5 @@ final class ReportController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

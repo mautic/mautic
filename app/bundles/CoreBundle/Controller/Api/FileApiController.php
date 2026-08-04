@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -11,6 +10,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
@@ -32,8 +32,6 @@ final class FileApiController extends CommonApiController
      * @var array
      */
     private $allowedExtensions = [];
-    private PathsHelper $pathsHelper;
-    private LoggerInterface $mauticLogger;
 
     public function __construct(
         CorePermissions $security,
@@ -48,6 +46,8 @@ final class FileApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         UserHelper $userHelper,
+        private PathsHelper $pathsHelper,
+        private LoggerInterface $mauticLogger,
     ) {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
@@ -64,7 +64,7 @@ final class FileApiController extends CommonApiController
     public function createAction(Request $request, $dir)
     {
         try {
-            $path = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir, true);
+            $path = $this->getAbsolutePath($request, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -103,7 +103,7 @@ final class FileApiController extends CommonApiController
     public function listAction(Request $request, $dir)
     {
         try {
-            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir);
+            $filePath = $this->getAbsolutePath($request, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -136,7 +136,7 @@ final class FileApiController extends CommonApiController
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -161,7 +161,7 @@ final class FileApiController extends CommonApiController
      * @param string $dir
      * @param bool   $createDir
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false): string
+    protected function getAbsolutePath(Request $request, $dir, $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];
@@ -181,7 +181,7 @@ final class FileApiController extends CommonApiController
             }
 
             if ('images' === $dir) {
-                $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
+                $absoluteDir = realpath($this->pathsHelper->getSystemPath($dir, true));
             } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
@@ -208,7 +208,7 @@ final class FileApiController extends CommonApiController
 
             return $path;
         } catch (\Exception $e) {
-            $mauticLogger->error($e->getMessage(), ['exception' => $e]);
+            $this->mauticLogger->error($e->getMessage(), ['exception' => $e]);
 
             throw $e;
         }
@@ -224,14 +224,5 @@ final class FileApiController extends CommonApiController
             .':'.$request->getPort()
             .$request->getBasePath().'/'
             .$this->coreParametersHelper->get('image_path');
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        PathsHelper $pathsHelper,
-        LoggerInterface $mauticLogger,
-    ): void {
-        $this->pathsHelper = $pathsHelper;
-        $this->mauticLogger = $mauticLogger;
     }
 }

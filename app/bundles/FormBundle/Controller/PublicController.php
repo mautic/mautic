@@ -47,11 +47,21 @@ final class PublicController extends CommonFormController
         SubmissionModel $submissionModel,
         FieldRepository $fieldRepository,
         CompanyRepository $companyRepository,
+        DateHelper $dateTemplateHelper,
+        PageTokenHelper $pageTokenHelper,
+        AnalyticsHelper $analyticsHelper,
+        AssetsHelper $assetsHelper,
+        ThemeHelper $themeHelper,
     ): void {
         $this->formModel = $formModel;
         $this->submissionModel = $submissionModel;
         $this->fieldRepository = $fieldRepository;
         $this->companyRepository = $companyRepository;
+        $this->dateTemplateHelper = $dateTemplateHelper;
+        $this->pageTokenHelper = $pageTokenHelper;
+        $this->analyticsHelper = $analyticsHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->themeHelper = $themeHelper;
     }
 
     private array $tokens = [];
@@ -69,7 +79,7 @@ final class PublicController extends CommonFormController
         }
 
         $context          = $this->createSubmitContext($request);
-        $submissionResult = $this->processSubmittedForm($request, $context, $this->dateTemplateHelper, $notificationModel, $userRepository);
+        $submissionResult = $this->processSubmittedForm($request, $context, $notificationModel, $userRepository);
 
         if ($submissionResult['response'] instanceof Response) {
             return $submissionResult['response'];
@@ -77,7 +87,7 @@ final class PublicController extends CommonFormController
 
         if ($submissionResult['submissionEvent'] instanceof SubmissionEvent && !empty($submissionResult['postActionProperty'])) {
             // Replace post action property with tokens to support custom redirects, etc
-            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent'], $this->pageTokenHelper);
+            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent']);
         }
 
         return ($context['messengerMode'] || $context['isAjax'])
@@ -125,7 +135,6 @@ final class PublicController extends CommonFormController
     private function processSubmittedForm(
         Request $request,
         array $context,
-        DateHelper $dateTemplateHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
     ): array {
@@ -152,7 +161,7 @@ final class PublicController extends CommonFormController
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();
-                $result['error']              = $this->getFormAvailabilityError($form, $dateTemplateHelper);
+                $result['error']              = $this->getFormAvailabilityError($form, $this->dateTemplateHelper);
 
                 if (null === $result['error']) {
                     $result = array_merge(
@@ -642,7 +651,7 @@ final class PublicController extends CommonFormController
     /**
      * @return string|string[]
      */
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent, PageTokenHelper $pageTokenHelper): string|array
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
         if (count($this->tokens)) {
             return $this->tokens;
@@ -660,7 +669,7 @@ final class PublicController extends CommonFormController
 
         $this->tokens = array_merge(
             $this->tokens,
-            $pageTokenHelper->findPageTokens($string)
+            $this->pageTokenHelper->findPageTokens($string)
         );
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
@@ -685,20 +694,5 @@ final class PublicController extends CommonFormController
         }
 
         return new JsonResponse($this->companyRepository->getCompanyLookupData($search));
-    }
-
-    #[Required]
-    public function autowire(
-        DateHelper $dateTemplateHelper,
-        PageTokenHelper $pageTokenHelper,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
-    ): void {
-        $this->dateTemplateHelper = $dateTemplateHelper;
-        $this->pageTokenHelper = $pageTokenHelper;
-        $this->analyticsHelper = $analyticsHelper;
-        $this->assetsHelper = $assetsHelper;
-        $this->themeHelper = $themeHelper;
     }
 }

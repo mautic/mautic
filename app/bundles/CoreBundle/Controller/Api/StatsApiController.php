@@ -64,7 +64,7 @@ final class StatsApiController extends CommonApiController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireStatsApiController(
         UserHelper $userHelper,
     ): void {
         $this->userHelper = $userHelper;

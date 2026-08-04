@@ -24,9 +24,11 @@ final class TriggerController extends FormController
     public function autowireTriggerController(
         TriggerEventModel $triggerEventModel,
         TriggerModel $triggerModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->triggerEventModel = $triggerEventModel;
         $this->triggerModel      = $triggerModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -619,12 +621,5 @@ final class TriggerController extends FormController
         $session = $request->getSession();
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

@@ -118,7 +118,7 @@ final class FieldPaginationController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireFieldPaginationController(
         FormFactoryInterface $formFactory,
         ConfigIntegrationsHelper $integrationsHelper,
     ): void {

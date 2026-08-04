@@ -26,9 +26,13 @@ final class InstallController extends CommonController
     public function autowireInstallController(
         Configurator $configurator,
         InstallService $installer,
+        EntityManagerInterface $entityManager,
+        PathsHelper $pathsHelper,
     ): void {
         $this->configurator = $configurator;
         $this->installer    = $installer;
+        $this->entityManager = $entityManager;
+        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -271,14 +275,5 @@ final class InstallController extends CommonController
                 default => $form[$type]->addError(new FormError($message)),
             };
         }
-    }
-
-    #[Required]
-    public function autowire(
-        EntityManagerInterface $entityManager,
-        PathsHelper $pathsHelper,
-    ): void {
-        $this->entityManager = $entityManager;
-        $this->pathsHelper = $pathsHelper;
     }
 }

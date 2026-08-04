@@ -31,8 +31,14 @@ final class SecurityController extends CommonController implements EventSubscrib
     #[Required]
     public function autowireSecurityController(
         AuthorizationCheckerInterface $authorizationChecker,
+        AuthenticationUtils $authenticationUtils,
+        IntegrationHelper $integrationHelper,
+        SAMLHelper $samlHelper,
     ): void {
         $this->authorizationChecker = $authorizationChecker;
+        $this->authenticationUtils = $authenticationUtils;
+        $this->integrationHelper = $integrationHelper;
+        $this->samlHelper = $samlHelper;
     }
 
     public function onRequest(RequestEvent $event): void
@@ -147,16 +153,5 @@ final class SecurityController extends CommonController implements EventSubscrib
         return [
             KernelEvents::REQUEST => 'onRequest',
         ];
-    }
-
-    #[Required]
-    public function autowire(
-        AuthenticationUtils $authenticationUtils,
-        IntegrationHelper $integrationHelper,
-        SAMLHelper $samlHelper,
-    ): void {
-        $this->authenticationUtils = $authenticationUtils;
-        $this->integrationHelper = $integrationHelper;
-        $this->samlHelper = $samlHelper;
     }
 }

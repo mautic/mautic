@@ -30,9 +30,13 @@ final class MobileNotificationController extends FormController
     public function autowireMobileNotificationController(
         AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
+        IntegrationHelper $integrationHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->notificationModel = $notificationModel;
+        $this->integrationHelper = $integrationHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -747,14 +751,5 @@ final class MobileNotificationController extends FormController
             'mobile_notification',
             'notification_id'
         );
-    }
-
-    #[Required]
-    public function autowire(
-        IntegrationHelper $integrationHelper,
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->integrationHelper = $integrationHelper;
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

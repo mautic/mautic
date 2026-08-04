@@ -39,7 +39,7 @@ final class AuthController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireAuthController(
         AuthIntegrationsHelper $authIntegrationsHelper,
     ): void {
         $this->authIntegrationsHelper = $authIntegrationsHelper;

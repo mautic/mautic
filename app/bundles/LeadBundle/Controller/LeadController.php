@@ -130,6 +130,17 @@ final class LeadController extends FormController
         UserRepository $userRepository,
         DoNotContactRepository $doNotContactRepository,
         EmailRepository $emailRepository,
+        ContactColumnsDictionary $contactColumnsDictionary,
+        TokenStorageInterface $tokenStorage,
+        IntegrationHelper $integrationHelper,
+        UserHelper $userHelper,
+        AvatarHelper $avatarHelper,
+        ContactMerger $contactMerger,
+        MailHelper $mailHelper,
+        MembershipManager $membershipManager,
+        CustomFieldFindReplace $findReplace,
+        ExportHelper $exportHelper,
+        IpLookupHelper $ipLookupHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -146,6 +157,17 @@ final class LeadController extends FormController
         $this->userRepository = $userRepository;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->emailRepository = $emailRepository;
+        $this->contactColumnsDictionary = $contactColumnsDictionary;
+        $this->tokenStorage = $tokenStorage;
+        $this->integrationHelper = $integrationHelper;
+        $this->userHelper = $userHelper;
+        $this->avatarHelper = $avatarHelper;
+        $this->contactMerger = $contactMerger;
+        $this->mailHelper = $mailHelper;
+        $this->membershipManager = $membershipManager;
+        $this->findReplace = $findReplace;
+        $this->exportHelper = $exportHelper;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -608,7 +630,7 @@ final class LeadController extends FormController
                     if ('custom' === $image) {
                         // Check for a file
                         if ($form['custom_avatar']->getData()) {
-                            $this->uploadAvatar($request, $this->avatarHelper, $lead);
+                            $this->uploadAvatar($request, $lead);
                         }
                     }
 
@@ -803,7 +825,7 @@ final class LeadController extends FormController
                         // Check for a file
                         $file = $form['custom_avatar']->getData();
                         if ($file instanceof UploadedFile) {
-                            $this->uploadAvatar($request, $this->avatarHelper, $lead);
+                            $this->uploadAvatar($request, $lead);
 
                             // Note the avatar update so that it can be forced to update
                             $request->getSession()->set('mautic.lead.avatar.updated', true);
@@ -892,11 +914,11 @@ final class LeadController extends FormController
     /**
      * Upload an asset.
      */
-    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead): void
+    private function uploadAvatar(Request $request, Lead $lead): void
     {
         $leadInformation = $request->files->get('lead', []);
         $file            = $leadInformation['custom_avatar'] ?? null;
-        $avatarDir       = $avatarHelper->getAvatarPath(true);
+        $avatarDir       = $this->avatarHelper->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
             mkdir($avatarDir);
@@ -2002,16 +2024,16 @@ final class LeadController extends FormController
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->processContactFindReplace($request, $model, $this->findReplace, $permissions);
+            return $this->processContactFindReplace($request, $model, $permissions);
         }
 
-        return $this->createContactFindReplaceFormResponse($request, $this->findReplace);
+        return $this->createContactFindReplaceFormResponse($request);
     }
 
     /**
      * @param array<string, bool> $permissions
      */
-    private function processContactFindReplace(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace, array $permissions): JsonResponse
+    private function processContactFindReplace(Request $request, LeadModel $model, array $permissions): JsonResponse
     {
         $requestData = $request->request->all();
         $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
@@ -2021,7 +2043,7 @@ final class LeadController extends FormController
 
         if (is_string($fieldAlias) && is_array($ids)) {
             $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
-            $updated  = $this->replaceContactFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
+            $updated  = $this->replaceContactFieldValues($this->findReplace, $fieldAlias, $data, $entities, $model);
 
             if ([] !== $updated) {
                 $model->saveEntities($updated);
@@ -2109,7 +2131,7 @@ final class LeadController extends FormController
         return $updated;
     }
 
-    private function createContactFindReplaceFormResponse(Request $request, CustomFieldFindReplace $findReplace): Response
+    private function createContactFindReplaceFormResponse(Request $request): Response
     {
         $route = $this->generateUrl(
             'mautic_contact_action',
@@ -2124,7 +2146,7 @@ final class LeadController extends FormController
                     'form' => $this->formFactory->createNamed('lead_batch_find_replace', FindReplaceType::class, [], [
                         'action'        => $route,
                         'all_items'     => $request->query->getBoolean('all'),
-                        'field_choices' => $findReplace->getFieldChoices('lead'),
+                        'field_choices' => $this->findReplace->getFieldChoices('lead'),
                         'field_label'   => 'mautic.lead.batch.find_replace.field',
                     ])->createView(),
                 ],
@@ -2478,32 +2500,5 @@ final class LeadController extends FormController
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
-    }
-
-    #[Required]
-    public function autowire(
-        ContactColumnsDictionary $contactColumnsDictionary,
-        TokenStorageInterface $tokenStorage,
-        IntegrationHelper $integrationHelper,
-        UserHelper $userHelper,
-        AvatarHelper $avatarHelper,
-        ContactMerger $contactMerger,
-        MailHelper $mailHelper,
-        MembershipManager $membershipManager,
-        CustomFieldFindReplace $findReplace,
-        ExportHelper $exportHelper,
-        IpLookupHelper $ipLookupHelper,
-    ): void {
-        $this->contactColumnsDictionary = $contactColumnsDictionary;
-        $this->tokenStorage = $tokenStorage;
-        $this->integrationHelper = $integrationHelper;
-        $this->userHelper = $userHelper;
-        $this->avatarHelper = $avatarHelper;
-        $this->contactMerger = $contactMerger;
-        $this->mailHelper = $mailHelper;
-        $this->membershipManager = $membershipManager;
-        $this->findReplace = $findReplace;
-        $this->exportHelper = $exportHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
     }
 }

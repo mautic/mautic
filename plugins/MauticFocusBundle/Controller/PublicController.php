@@ -21,8 +21,10 @@ final class PublicController extends CommonController
     #[Required]
     public function autowirePublicController(
         FocusModel $focusModel,
+        ContactTracker $contactTracker,
     ): void {
         $this->focusModel = $focusModel;
+        $this->contactTracker = $contactTracker;
     }
 
     public function generateAction($id): Response
@@ -63,12 +65,5 @@ final class PublicController extends CommonController
         }
 
         return TrackingPixelHelper::getResponse($request);
-    }
-
-    #[Required]
-    public function autowire(
-        ContactTracker $contactTracker,
-    ): void {
-        $this->contactTracker = $contactTracker;
     }
 }

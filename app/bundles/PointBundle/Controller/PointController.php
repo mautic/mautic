@@ -21,8 +21,12 @@ final class PointController extends AbstractFormController
     #[Required]
     public function autowirePointController(
         PointModel $pointModel,
+        PageHelperFactoryInterface $pageHelperFactory,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->pointModel = $pointModel;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->formFactory = $formFactory;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -471,14 +475,5 @@ final class PointController extends AbstractFormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->formFactory = $formFactory;
     }
 }

@@ -53,11 +53,25 @@ final class UserController extends FormController
         RoleModel $roleModel,
         AuditLogRepository $auditLogRepository,
         RoleRepository $roleRepository,
+        PageHelperFactoryInterface $pageHelperFactory,
+        LanguageHelper $languageHelper,
+        UserPasswordHasherInterface $hasher,
+        SAMLHelper $samlHelper,
+        SerializerInterface $serializer,
+        MailHelper $mailer,
+        IpLookupHelper $ipLookupHelper,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
         $this->auditLogRepository = $auditLogRepository;
         $this->roleRepository = $roleRepository;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->languageHelper = $languageHelper;
+        $this->hasher = $hasher;
+        $this->samlHelper = $samlHelper;
+        $this->serializer = $serializer;
+        $this->mailer = $mailer;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -225,20 +239,20 @@ final class UserController extends FormController
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $this->languageHelper, $this->hasher, $this->samlHelper, $user, $form);
+            $response = $this->handleNewUserPost($request, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $this->languageHelper, $this->hasher, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -716,24 +730,5 @@ final class UserController extends FormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        LanguageHelper $languageHelper,
-        UserPasswordHasherInterface $hasher,
-        SAMLHelper $samlHelper,
-        SerializerInterface $serializer,
-        MailHelper $mailer,
-        IpLookupHelper $ipLookupHelper,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->languageHelper = $languageHelper;
-        $this->hasher = $hasher;
-        $this->samlHelper = $samlHelper;
-        $this->serializer = $serializer;
-        $this->mailer = $mailer;
-        $this->ipLookupHelper = $ipLookupHelper;
     }
 }

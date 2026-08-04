@@ -2,13 +2,13 @@
 
 namespace Mautic\SmsBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -34,8 +34,6 @@ final class SmsApiController extends CommonApiController
      * @var SmsModel|null
      */
     protected $model;
-    private TransportChain $transportChain;
-    private LoggerInterface $mauticLogger;
 
     public function __construct(
         CorePermissions $security,
@@ -51,6 +49,8 @@ final class SmsApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         UserHelper $userHelper,
         SmsModel $smsModel,
+        private TransportChain $transportChain,
+        private LoggerInterface $mauticLogger,
     ) {
         $this->model           = $smsModel;
         $this->entityClass     = Sms::class;
@@ -112,14 +112,5 @@ final class SmsApiController extends CommonApiController
         );
 
         return $this->handleView($view);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        TransportChain $transportChain,
-        LoggerInterface $mauticLogger,
-    ): void {
-        $this->transportChain = $transportChain;
-        $this->mauticLogger = $mauticLogger;
     }
 }

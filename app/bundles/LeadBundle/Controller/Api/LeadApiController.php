@@ -70,7 +70,6 @@ final class LeadApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
         private CampaignModel $campaignModel,
         private FieldModel $leadFieldModel,
         LeadModel $leadModel,

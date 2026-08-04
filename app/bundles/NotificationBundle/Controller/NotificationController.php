@@ -30,9 +30,13 @@ final class NotificationController extends AbstractFormController
     public function autowireNotificationController(
         AuditLogModel $auditLogModel,
         NotificationModel $notificationModel,
+        FormFactoryInterface $formFactory,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->auditLogModel = $auditLogModel;
         $this->notificationModel = $notificationModel;
+        $this->formFactory = $formFactory;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -735,14 +739,5 @@ final class NotificationController extends AbstractFormController
             'notification',
             'notification_id'
         );
-    }
-
-    #[Required]
-    public function autowire(
-        FormFactoryInterface $formFactory,
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->formFactory = $formFactory;
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

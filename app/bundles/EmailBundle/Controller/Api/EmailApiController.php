@@ -43,8 +43,6 @@ final class EmailApiController extends CommonApiController
      * @var array<string, mixed>
      */
     protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
-    private Reply $replyService;
-    private RandomHelperInterface $randomHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -60,6 +58,8 @@ final class EmailApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         UserHelper $userHelper,
         EmailModel $emailModel,
+        private Reply $replyService,
+        private RandomHelperInterface $randomHelper,
     ) {
         $this->model            = $emailModel;
         $this->entityClass      = Email::class;
@@ -258,14 +258,5 @@ final class EmailApiController extends CommonApiController
         }
 
         return parent::processForm($request, $entity, $parameters, $method);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        Reply $replyService,
-        RandomHelperInterface $randomHelper,
-    ): void {
-        $this->replyService = $replyService;
-        $this->randomHelper = $randomHelper;
     }
 }

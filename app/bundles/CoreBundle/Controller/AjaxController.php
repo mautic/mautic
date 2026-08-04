@@ -457,7 +457,7 @@ class AjaxController extends CommonController
     }
 
     #[Required]
-    public function autowire(
+    public function autowireAjaxController(
         AuthorizationCheckerInterface $authorizationChecker,
         SearchCommandListInterface $searchCommandList,
         TokenSorter $tokenSorter,

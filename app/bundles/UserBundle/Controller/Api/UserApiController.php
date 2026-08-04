@@ -2,13 +2,13 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
@@ -33,7 +33,6 @@ final class UserApiController extends CommonApiController
      * @var UserModel|null
      */
     protected $model;
-    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         CorePermissions $security,
@@ -50,6 +49,7 @@ final class UserApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         UserHelper $userHelper,
         UserModel $userModel,
+        private TokenStorageInterface $tokenStorage,
     ) {
         $this->model            = $userModel;
         $this->entityClass      = User::class;
@@ -224,12 +224,5 @@ final class UserApiController extends CommonApiController
         $view->setContext($context);
 
         return $this->handleView($view);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        TokenStorageInterface $tokenStorage,
-    ): void {
-        $this->tokenStorage = $tokenStorage;
     }
 }

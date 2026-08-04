@@ -2,7 +2,6 @@
 
 namespace Mautic\PointBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -11,6 +10,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -35,7 +35,6 @@ final class PointApiController extends CommonApiController
      * @var PointModel|null
      */
     protected $model;
-    private IpLookupHelper $ipLookupHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -52,6 +51,7 @@ final class PointApiController extends CommonApiController
         UserHelper $userHelper,
         private LeadModel $leadModel,
         PointModel $pointModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
         $this->model            = $pointModel;
         $this->entityClass      = Point::class;
@@ -94,7 +94,7 @@ final class PointApiController extends CommonApiController
         }
 
         try {
-            $this->logApiPointChange($request, $this->ipLookupHelper, $lead, $delta, $operator);
+            $this->logApiPointChange($request, $lead, $delta, $operator);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -107,21 +107,14 @@ final class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
+    protected function logApiPointChange(Request $request, $lead, $delta, $operator): void
     {
-        $ip         = $ipLookupHelper->getIpAddress();
+        $ip         = $this->ipLookupHelper->getIpAddress();
         $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
         $actionName = InputHelper::clean($request->request->get('actionName', $this->translator->trans('mautic.lead.event.api')));
 
         $lead->adjustPoints($delta, $operator);
         $lead->addPointsChangeLogEntry('API', $eventName, $actionName, $delta, $ip);
         $this->leadModel->saveEntity($lead, false);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        IpLookupHelper $ipLookupHelper,
-    ): void {
-        $this->ipLookupHelper = $ipLookupHelper;
     }
 }

@@ -46,7 +46,7 @@ final class ConfigController extends FormController
 
         $formConfigs = $this->configMapper->bindFormConfigsWithRealValues($event->getForms());
 
-        $this->mergeParamsWithLocal($formConfigs, $this->pathsHelper);
+        $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
@@ -139,7 +139,7 @@ final class ConfigController extends FormController
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
-                        $this->setLocale($request, $this->tokenStorage, $params);
+                        $this->setLocale($request, $params);
                     }
                 } elseif (!$isWritable) {
                     $form->addError(
@@ -253,10 +253,10 @@ final class ConfigController extends FormController
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
      */
-    private function mergeParamsWithLocal(array &$forms, PathsHelper $pathsHelper): void
+    private function mergeParamsWithLocal(array &$forms): void
     {
         $doNotChange     = $this->coreParametersHelper->get('mautic.security.restrictedConfigFields');
-        $localConfigFile = $pathsHelper->getLocalConfigurationFile();
+        $localConfigFile = $this->pathsHelper->getLocalConfigurationFile();
 
         // Import the current local configuration, $parameters is defined in this file
 
@@ -282,9 +282,9 @@ final class ConfigController extends FormController
     /**
      * @param array<string, string> $params
      */
-    private function setLocale(Request $request, TokenStorageInterface $tokenStorage, array $params): void
+    private function setLocale(Request $request, array $params): void
     {
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         assert($me instanceof User);
         $locale = $me->getLocale();
 
@@ -296,7 +296,7 @@ final class ConfigController extends FormController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireConfigController(
         BundleHelper $bundleHelper,
         Configurator $configurator,
         CacheHelper $cacheHelper,

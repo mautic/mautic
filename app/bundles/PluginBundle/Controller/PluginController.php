@@ -35,9 +35,17 @@ final class PluginController extends FormController
     public function autowirePluginController(
         PluginModel $pluginModel,
         PluginRepository $pluginRepository,
+        IntegrationHelper $integrationHelper,
+        EntityManagerInterface $em,
+        LoggerInterface $mauticLogger,
+        ReloadFacade $reloadFacade,
     ): void {
         $this->pluginModel = $pluginModel;
         $this->pluginRepository = $pluginRepository;
+        $this->integrationHelper = $integrationHelper;
+        $this->em = $em;
+        $this->mauticLogger = $mauticLogger;
+        $this->reloadFacade = $reloadFacade;
     }
 
     public function indexAction(Request $request): Response
@@ -463,18 +471,5 @@ final class PluginController extends FormController
         $keysToRemove = array_unique(array_merge($integrationObject->getRefreshTokenKeys(), [$integrationObject->getAuthTokenKey()]));
 
         return array_diff_key($keys, array_flip($keysToRemove));
-    }
-
-    #[Required]
-    public function autowire(
-        IntegrationHelper $integrationHelper,
-        EntityManagerInterface $em,
-        LoggerInterface $mauticLogger,
-        ReloadFacade $reloadFacade,
-    ): void {
-        $this->integrationHelper = $integrationHelper;
-        $this->em = $em;
-        $this->mauticLogger = $mauticLogger;
-        $this->reloadFacade = $reloadFacade;
     }
 }

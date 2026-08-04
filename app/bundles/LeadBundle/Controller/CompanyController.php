@@ -45,11 +45,19 @@ final class CompanyController extends FormController
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
+        PageHelperFactoryInterface $pageHelperFactory,
+        CompanyColumnsDictionary $companyColumnsDictionary,
+        CustomFieldFindReplace $findReplace,
+        ExportHelper $exportHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->companyColumnsDictionary = $companyColumnsDictionary;
+        $this->findReplace = $findReplace;
+        $this->exportHelper = $exportHelper;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -843,13 +851,13 @@ final class CompanyController extends FormController
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->processCompanyFindReplace($request, $model, $this->findReplace);
+            return $this->processCompanyFindReplace($request, $model);
         }
 
-        return $this->createCompanyFindReplaceFormResponse($request, $this->findReplace);
+        return $this->createCompanyFindReplaceFormResponse($request);
     }
 
-    private function processCompanyFindReplace(Request $request, CompanyModel $model, CustomFieldFindReplace $findReplace): JsonResponse
+    private function processCompanyFindReplace(Request $request, CompanyModel $model): JsonResponse
     {
         $requestData = $request->request->all();
         $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
@@ -859,7 +867,7 @@ final class CompanyController extends FormController
 
         if (is_string($fieldAlias) && is_array($ids)) {
             $entities = $this->getCompanyFindReplaceEntities($request, $model, $data, $ids);
-            $updated  = $this->replaceCompanyFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
+            $updated  = $this->replaceCompanyFieldValues($this->findReplace, $fieldAlias, $data, $entities, $model);
 
             if ([] !== $updated) {
                 $model->saveEntities($updated);
@@ -946,7 +954,7 @@ final class CompanyController extends FormController
         return $updated;
     }
 
-    private function createCompanyFindReplaceFormResponse(Request $request, CustomFieldFindReplace $findReplace): Response
+    private function createCompanyFindReplaceFormResponse(Request $request): Response
     {
         $route = $this->generateUrl(
             'mautic_company_action',
@@ -961,7 +969,7 @@ final class CompanyController extends FormController
                     'form' => $this->formFactory->createNamed('lead_batch_find_replace', FindReplaceType::class, [], [
                         'action'        => $route,
                         'all_items'     => $request->query->getBoolean('all'),
-                        'field_choices' => $findReplace->getFieldChoices('company'),
+                        'field_choices' => $this->findReplace->getFieldChoices('company'),
                         'field_label'   => 'mautic.company.batch.find_replace.field',
                     ])->createView(),
                 ],
@@ -1182,18 +1190,5 @@ final class CompanyController extends FormController
         }
 
         return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $this->exportHelper);
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        CompanyColumnsDictionary $companyColumnsDictionary,
-        CustomFieldFindReplace $findReplace,
-        ExportHelper $exportHelper,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->companyColumnsDictionary = $companyColumnsDictionary;
-        $this->findReplace = $findReplace;
-        $this->exportHelper = $exportHelper;
     }
 }

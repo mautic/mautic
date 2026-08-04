@@ -28,8 +28,16 @@ final class ProfileController extends FormController
     #[Required]
     public function autowireProfileController(
         UserModel $userModel,
+        LanguageHelper $languageHelper,
+        UserPasswordHasherInterface $hasher,
+        TokenStorageInterface $tokenStorage,
+        SAMLHelper $samlHelper,
     ): void {
         $this->userModel = $userModel;
+        $this->languageHelper = $languageHelper;
+        $this->hasher = $hasher;
+        $this->tokenStorage = $tokenStorage;
+        $this->samlHelper = $samlHelper;
     }
 
     /**
@@ -259,18 +267,5 @@ final class ProfileController extends FormController
                 ],
             ]
         );
-    }
-
-    #[Required]
-    public function autowire(
-        LanguageHelper $languageHelper,
-        UserPasswordHasherInterface $hasher,
-        TokenStorageInterface $tokenStorage,
-        SAMLHelper $samlHelper,
-    ): void {
-        $this->languageHelper = $languageHelper;
-        $this->hasher = $hasher;
-        $this->tokenStorage = $tokenStorage;
-        $this->samlHelper = $samlHelper;
     }
 }

@@ -51,7 +51,7 @@ final class PublicController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowirePublicController(
         LoggerInterface $mauticLogger,
         IntegrationHelper $integrationHelper,
     ): void {

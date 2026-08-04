@@ -61,11 +61,21 @@ final class EmailController extends FormController
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        EmailConfig $emailConfig,
+        ThemeHelper $themeHelper,
+        CorePermissions $corePermissions,
+        FakeContactHelper $fakeLeadHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->emailConfig = $emailConfig;
+        $this->themeHelper = $themeHelper;
+        $this->corePermissions = $corePermissions;
+        $this->fakeLeadHelper = $fakeLeadHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -550,7 +560,7 @@ final class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $this->corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     try {
                         // form is valid so process the data
@@ -750,7 +760,7 @@ final class EmailController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $this->corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     // form is valid so process the data
                     try {
@@ -1883,9 +1893,9 @@ final class EmailController extends FormController
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 
-    private function unpublishIfLackingPermission(Email $entity, CorePermissions $corePermissions): Email
+    private function unpublishIfLackingPermission(Email $entity): Email
     {
-        $canPublish = $corePermissions->hasPublishAccessForEntity(
+        $canPublish = $this->corePermissions->hasPublishAccessForEntity(
             $entity,
             'email:emails:publishown',
             'email:emails:publishother'
@@ -1895,20 +1905,5 @@ final class EmailController extends FormController
         }
 
         return $entity;
-    }
-
-    #[Required]
-    public function autowire(
-        EmailConfig $emailConfig,
-        ThemeHelper $themeHelper,
-        CorePermissions $corePermissions,
-        FakeContactHelper $fakeLeadHelper,
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->emailConfig = $emailConfig;
-        $this->themeHelper = $themeHelper;
-        $this->corePermissions = $corePermissions;
-        $this->fakeLeadHelper = $fakeLeadHelper;
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

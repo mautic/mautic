@@ -36,10 +36,14 @@ final class MonitoringController extends FormController
         MonitoringModel $monitoringModel,
         AuditLogModel $auditLogModel,
         PostCountRepository $postCountRepository,
+        IpLookupHelper $ipLookupHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->monitoringModel = $monitoringModel;
         $this->auditLogModel = $auditLogModel;
         $this->postCountRepository = $postCountRepository;
+        $this->ipLookupHelper = $ipLookupHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -662,14 +666,5 @@ final class MonitoringController extends FormController
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
-    }
-
-    #[Required]
-    public function autowire(
-        IpLookupHelper $ipLookupHelper,
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

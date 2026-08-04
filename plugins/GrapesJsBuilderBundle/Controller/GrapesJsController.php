@@ -239,7 +239,7 @@ class GrapesJsController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireGrapesJsController(
         LoggerInterface $mauticLogger,
         ThemeHelper $themeHelper,
     ): void {

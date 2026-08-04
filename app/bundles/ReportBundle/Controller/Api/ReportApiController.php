@@ -44,7 +44,6 @@ final class ReportApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
         private readonly UserHelper $userHelper,
         ReportModel $reportModel,
     ) {

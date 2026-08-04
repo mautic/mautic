@@ -69,10 +69,36 @@ final class PublicController extends CommonFormController
         LeadModel $leadModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        AnalyticsHelper $analyticsHelper,
+        MessageBusInterface $messageBus,
+        LoggerInterface $logger,
+        ContactTracker $contactTracker,
+        MailHashHelper $mailHash,
+        ThemeHelper $themeHelper,
+        EmailDefaultsHelper $emailDefaultsHelper,
+        AssetsHelper $assetsHelper,
+        EmailConfig $emailConfig,
+        FakeContactHelper $fakeLeadHelper,
+        IntegrationHelper $integrationHelper,
+        MailHelper $mailer,
+        LoggerInterface $mauticLogger,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->analyticsHelper = $analyticsHelper;
+        $this->messageBus = $messageBus;
+        $this->logger = $logger;
+        $this->contactTracker = $contactTracker;
+        $this->mailHash = $mailHash;
+        $this->themeHelper = $themeHelper;
+        $this->emailDefaultsHelper = $emailDefaultsHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->emailConfig = $emailConfig;
+        $this->fakeLeadHelper = $fakeLeadHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->mailer = $mailer;
+        $this->mauticLogger = $mauticLogger;
     }
 
     public function indexAction(Request $request, $idHash): Response
@@ -294,9 +320,9 @@ final class PublicController extends CommonFormController
     /**
      * @param array<mixed> $viewParameters
      */
-    private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, EmailDefaultsHelper $emailDefaultsHelper, PageModel $pageModel): ?string
+    private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, PageModel $pageModel): ?string
     {
-        $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
+        $prefCenter = $email instanceof Email ? $this->emailDefaultsHelper->resolvePreferenceCenter($email) : null;
         if (!$prefCenter instanceof Page) {
             return null;
         }
@@ -562,9 +588,9 @@ final class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
+    private function doTracking(Request $request, $integration): void
     {
-        $logger = $mauticLogger;
+        $logger = $this->mauticLogger;
 
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
@@ -588,7 +614,7 @@ final class PublicController extends CommonFormController
         }
 
         // get secret from plugin settings
-        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+        $myIntegration = $this->integrationHelper->getIntegrationObject($integration);
 
         if (!$myIntegration) {
             $logger->log('error', $integration.': integration not found');
@@ -648,7 +674,7 @@ final class PublicController extends CommonFormController
             // stat doesn't exist, create one
             if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
-                $stat          = $this->addStat($mailer, $lead, $email, $query, $idHash);
+                $stat          = $this->addStat($this->mailer, $lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
@@ -661,7 +687,7 @@ final class PublicController extends CommonFormController
 
     public function pluginTrackingGifAction(Request $request, $integration): Response
     {
-        $this->doTracking($request, $this->integrationHelper, $this->mailer, $this->mauticLogger, $integration);
+        $this->doTracking($request, $integration);
 
         return TrackingPixelHelper::getResponse($request); // send gif
     }
@@ -839,36 +865,5 @@ final class PublicController extends CommonFormController
                 ]
             )
         )->getContent();
-    }
-
-    #[Required]
-    public function autowire(
-        AnalyticsHelper $analyticsHelper,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-        ContactTracker $contactTracker,
-        MailHashHelper $mailHash,
-        ThemeHelper $themeHelper,
-        EmailDefaultsHelper $emailDefaultsHelper,
-        AssetsHelper $assetsHelper,
-        EmailConfig $emailConfig,
-        FakeContactHelper $fakeLeadHelper,
-        IntegrationHelper $integrationHelper,
-        MailHelper $mailer,
-        LoggerInterface $mauticLogger,
-    ): void {
-        $this->analyticsHelper = $analyticsHelper;
-        $this->messageBus = $messageBus;
-        $this->logger = $logger;
-        $this->contactTracker = $contactTracker;
-        $this->mailHash = $mailHash;
-        $this->themeHelper = $themeHelper;
-        $this->emailDefaultsHelper = $emailDefaultsHelper;
-        $this->assetsHelper = $assetsHelper;
-        $this->emailConfig = $emailConfig;
-        $this->fakeLeadHelper = $fakeLeadHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->mailer = $mailer;
-        $this->mauticLogger = $mauticLogger;
     }
 }

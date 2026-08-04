@@ -273,7 +273,7 @@ final class TimelineController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireTimelineController(
         DateHelper $dateHelper,
         ExportHelper $exportHelper,
     ): void {

@@ -35,11 +35,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    private PageHelperFactoryInterface $pageHelperFactory;
-    private ThemeHelper $themeHelper;
-    private AssetsHelper $assetsHelper;
-    private AnalyticsHelper $analyticsHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -59,6 +54,10 @@ class FormController extends CommonFormController
         private readonly SubmissionModel $submissionModel,
         private readonly SubmissionRepository $submissionRepository,
         private readonly FormRepository $formRepository,
+        private PageHelperFactoryInterface $pageHelperFactory,
+        private ThemeHelper $themeHelper,
+        private AssetsHelper $assetsHelper,
+        private AnalyticsHelper $analyticsHelper,
     ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1184,18 +1183,5 @@ class FormController extends CommonFormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        ThemeHelper $themeHelper,
-        AssetsHelper $assetsHelper,
-        AnalyticsHelper $analyticsHelper,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->themeHelper = $themeHelper;
-        $this->assetsHelper = $assetsHelper;
-        $this->analyticsHelper = $analyticsHelper;
     }
 }

@@ -150,7 +150,7 @@ final class AuditlogController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireAuditlogController(
         DateHelper $dateHelper,
         ExportHelper $exportHelper,
     ): void {

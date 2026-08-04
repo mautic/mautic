@@ -28,9 +28,13 @@ final class StageController extends AbstractFormController
     public function autowireStageController(
         StageModel $stageModel,
         StageRepository $stageRepository,
+        PageHelperFactoryInterface $pageHelperFactory,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->stageModel = $stageModel;
         $this->stageRepository = $stageRepository;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->formFactory = $formFactory;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -709,14 +713,5 @@ final class StageController extends AbstractFormController
         }
 
         return null;
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
-        $this->formFactory = $formFactory;
     }
 }

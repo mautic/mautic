@@ -72,7 +72,7 @@ final class ConfigController extends AbstractFormController
         $form = $this->getForm($this->formFactory);
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($request, $this->integrationsHelper, $this->fieldValidator, $this->dispatcher, $this->formFactory, $this->formExtension, $form);
+            return $this->submitForm($request, $this->dispatcher, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
@@ -87,11 +87,7 @@ final class ConfigController extends AbstractFormController
      */
     private function submitForm(
         Request $request,
-        ConfigIntegrationsHelper $integrationsHelper,
-        FieldValidationHelper $fieldValidator,
         EventDispatcherInterface $eventDispatcher,
-        FormFactoryInterface $formFactory,
-        FormExtension $formExtension,
         FormInterface $form,
     ): JsonResponse|Response {
         if ($this->isFormCancelled($form)) {
@@ -123,7 +119,7 @@ final class ConfigController extends AbstractFormController
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
 
-            $fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
+            $this->fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
@@ -136,11 +132,11 @@ final class ConfigController extends AbstractFormController
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = !empty($integrationDetailsPost['in_auth']);
         if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm($request, $form, $formExtension);
+            return $this->showForm($request, $form, $this->formExtension);
         }
 
         // Save the integration configuration
-        $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
+        $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
         $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
@@ -149,9 +145,9 @@ final class ConfigController extends AbstractFormController
         if ($this->isFormApplied($form)) {
             // Regenerate the form
             $this->resetFieldsInSession($request);
-            $form = $this->getForm($formFactory);
+            $form = $this->getForm($this->formFactory);
 
-            return $this->showForm($request, $form, $formExtension);
+            return $this->showForm($request, $form, $this->formExtension);
         }
 
         // Otherwise close the modal
@@ -267,7 +263,7 @@ final class ConfigController extends AbstractFormController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireConfigController(
         ConfigIntegrationsHelper $integrationsHelper,
         FieldValidationHelper $fieldValidator,
         FormFactoryInterface $formFactory,

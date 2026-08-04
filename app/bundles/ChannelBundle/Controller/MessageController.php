@@ -30,9 +30,11 @@ final class MessageController extends AbstractStandardFormController
     public function autowireMessageController(
         RequestStack $requestStack,
         MessageModel $messageModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->requestStack = $requestStack;
         $this->messageModel = $messageModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -284,12 +286,5 @@ final class MessageController extends AbstractStandardFormController
             ],
             '.message-'.$channel
         );
-    }
-
-    #[Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFactory,
-    ): void {
-        $this->pageHelperFactory = $pageHelperFactory;
     }
 }

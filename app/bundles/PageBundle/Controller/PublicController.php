@@ -593,7 +593,7 @@ final class PublicController extends AbstractFormController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowirePublicController(
         ContactRequestHelper $contactRequestHelper,
         CookieHelper $cookieHelper,
         AnalyticsHelper $analyticsHelper,

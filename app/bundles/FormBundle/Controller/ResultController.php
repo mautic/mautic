@@ -31,9 +31,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ResultController extends CommonFormController
 {
-    private PageHelperFactoryInterface $pageHelperFacotry;
-    private FormUploader $formUploader;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -49,6 +46,8 @@ final class ResultController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly SubmissionResultLoader $submissionResultLoader,
         private readonly SubmissionModel $submissionModel,
+        private PageHelperFactoryInterface $pageHelperFacotry,
+        private FormUploader $formUploader,
     ) {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -549,14 +548,5 @@ final class ResultController extends CommonFormController
                 'route'         => $route,
             ],
         ]);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        PageHelperFactoryInterface $pageHelperFacotry,
-        FormUploader $formUploader,
-    ): void {
-        $this->pageHelperFacotry = $pageHelperFacotry;
-        $this->formUploader = $formUploader;
     }
 }

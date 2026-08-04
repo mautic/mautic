@@ -126,7 +126,7 @@ final class ExceptionController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowireExceptionController(
         ThemeHelper $themeHelper,
     ): void {
         $this->themeHelper = $themeHelper;

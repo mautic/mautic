@@ -31,7 +31,7 @@ final class PopupController extends CommonController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
+    public function autowirePopupController(
         AssetsHelper $assetsHelper,
     ): void {
         $this->assetsHelper = $assetsHelper;

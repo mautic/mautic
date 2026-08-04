@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -13,6 +12,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -34,7 +34,6 @@ final class PointGroupsApiController extends CommonApiController
      * @var PointGroupModel
      */
     protected $model;
-    private IpLookupHelper $ipLookupHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -51,6 +50,7 @@ final class PointGroupsApiController extends CommonApiController
         UserHelper $userHelper,
         PointGroupModel $pointGroupModel,
         private readonly LeadModel $leadModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
         $this->model            = $pointGroupModel;
         $this->entityClass      = Group::class;
@@ -162,12 +162,5 @@ final class PointGroupsApiController extends CommonApiController
         $view->setContext($context);
 
         return $this->handleView($view);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        IpLookupHelper $ipLookupHelper,
-    ): void {
-        $this->ipLookupHelper = $ipLookupHelper;
     }
 }
