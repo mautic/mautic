@@ -52,20 +52,11 @@ return RectorConfig::configure()
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-<<<<<<< HEAD
-    ->withCodeQualityLevel(45)
-    ->withComposerBased(phpunit: true, symfony: true)
-=======
-    ->withComposerBased(phpunit: true)
     ->withCodeQualityLevel(55)
->>>>>>> 143d7dcc5d ([solid] replace logical or|and with bool conditions as intended)
+    ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // to be deprecated as depends on personal preference
-        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
-        \Rector\CodeQuality\Rector\Ternary\SwitchNegatedTernaryRector::class,
-
-        // opinionated
-        Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
+        Rector\CodeQuality\Rector\Ternary\SwitchNegatedTernaryRector::class,
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',

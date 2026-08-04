@@ -17866,7 +17866,6 @@
             "suggest": {
                 "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
-            "default-branch": true,
             "bin": [
                 "bin/rector"
             ],
@@ -17898,7 +17897,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-02T10:26:14+00:00"
+            "time": "2026-08-03T17:30:34+00:00"
         },
         {
             "name": "rector/type-perfect",
