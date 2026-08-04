@@ -28,7 +28,7 @@ final class Version20260709103000 extends AbstractMauticMigration
             return;
         }
 
-        $configFile = dirname(__DIR__).'/config/local.php';
+        $configFile = dirname(__DIR__, 2).'/config/local.php';
         if (!file_exists($configFile)) {
             return;
         }
