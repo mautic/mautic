@@ -45,27 +45,32 @@ return RectorConfig::configure()
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         UnserializeToSerializerDecodeRector::class,
 
-        // symfony
-        Rector\Symfony\Symfony73\Rector\Class_\CommandDefaultNameAndDescriptionToAsCommandAttributeRector::class,
-        Rector\Symfony\Symfony61\Rector\Class_\CommandConfigureToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\CommandHelpToAttributeRector::class,
-        Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector::class,
-
         // DI
-        // ModelGetRepositoryToRepositoryServiceRector::class,
+        Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withComposerBased(phpunit: true)
     ->withCodeQualityLevel(45)
+    ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
-        // to be deprecated as depends on personal preference
-        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+        // @todo move to "twig" group
+        Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
+        Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
 
-        // opinionated
-        Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
+        // handle next
+        Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
+        Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
+        ],
 
-        __DIR__.'/plugins/*/node_modules/*',
+        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
+            // doctrine magic
+            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
+        ],
+
+        Rector\Symfony\Symfony30\Rector\ClassMethod\RemoveDefaultGetBlockPrefixRector::class,
+
         // test fixtures
+        __DIR__.'/plugins/*/node_modules/*',
         __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
@@ -78,22 +83,9 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/ReportBundle/Model/ReportModel.php',
         ],
 
-        // static property is read from static log() before any instance is constructed,
-        // dropping the default would make it uninitialized
-        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
-            // buggy
-            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
-        ],
-
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
-        ],
-
-        // fixed in dev-main
-        Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
         // modified with reflection
@@ -113,4 +105,5 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
-    ]);
+    ])
+    ->reportUnusedSkips();

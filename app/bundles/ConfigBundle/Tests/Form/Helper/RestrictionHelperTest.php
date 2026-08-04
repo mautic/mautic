@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
+use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
@@ -233,6 +234,12 @@ final class RestrictionHelperTest extends TypeTestCase
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
         $escapeTransformer = new EscapeTransformer([]);
 
+        $coreParametersHelper  = $this->createStub(CoreParametersHelper::class);
+        $dsnTransformerFactory = $this->createMock(DsnTransformerFactory::class);
+        $dsnTransformerFactory->method('create')->willReturnCallback(
+            fn (string $configKey, bool $allowEmpty): DsnTransformer => new DsnTransformer($coreParametersHelper, $escapeTransformer, $configKey, $allowEmpty)
+        );
+
         $pageRepoMock = $this->createMock(PageRepository::class);
         $pageRepoMock->method('getPageList')->willReturn([]);
         $pageModelMock = $this->createMock(PageModel::class);
@@ -251,7 +258,7 @@ final class RestrictionHelperTest extends TypeTestCase
                     new FormButtonsType(),
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
-                    new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
+                    new DsnType($dsnTransformerFactory, $coreParametersHelper),
                     new PreferenceCenterListType($pageModelMock, $this->createStub(CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class)),

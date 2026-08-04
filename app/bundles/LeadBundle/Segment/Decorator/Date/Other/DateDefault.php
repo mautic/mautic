@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateDefault implements FilterDecoratorInterface
+final class DateDefault implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 

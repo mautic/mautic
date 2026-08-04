@@ -18,7 +18,7 @@ final class RequestHelper
         // Check if /oauth or /api
         $isApiRequest = (str_contains($requestUrl, '/oauth') || str_contains($requestUrl, '/api'));
 
-        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
+        defined('MAUTIC_API_REQUEST') || define('MAUTIC_API_REQUEST', $isApiRequest);
 
         return $isApiRequest;
     }
