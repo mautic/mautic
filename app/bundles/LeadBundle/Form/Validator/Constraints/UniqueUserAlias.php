@@ -2,14 +2,19 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
-#[\Attribute]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 final class UniqueUserAlias extends Constraint
 {
-    public $message = 'This alias is already in use.';
-
-    public $field   = '';
+    #[HasNamedArguments]
+    public function __construct(
+        public string $field,
+        public string $message = 'This alias is already in use.',
+    ) {
+        parent::__construct();
+    }
 
     public function validatedBy(): string
     {
@@ -21,13 +26,13 @@ final class UniqueUserAlias extends Constraint
         return self::CLASS_CONSTRAINT;
     }
 
-    public function getRequiredOptions(): array
-    {
-        return ['field'];
-    }
+//    public function getRequiredOptions(): array
+//    {
+//        return ['field'];
+//    }
 
-    public function getDefaultOption(): string
-    {
-        return 'field';
-    }
+//    public function getDefaultOption(): string
+//    {
+//        return 'field';
+//    }
 }
