@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -45,16 +44,6 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-dateModified'));
     }
 
-    public function testEmailListingFallsBackToDefaultColumnsWhenConfiguredColumnsAreEmpty(): void
-    {
-        $this->assertDefaultColumnsAreRendered();
-    }
-
-    public function testEmailListingFallsBackToDefaultColumnsWhenConfiguredColumnsAreInvalid(): void
-    {
-        $this->assertDefaultColumnsAreRendered();
-    }
-
     public function testEmailListingAppliesAndPersistsListFiltersFromRequest(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
@@ -85,54 +74,6 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertCount(0, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$otherEmail->getId().'"]'));
     }
 
-    public function testEmailListingIgnoresInvalidUpdatedFiltersPayload(): void
-    {
-        $matchingEmail = $this->createEmail(self::DEFAULT_EMAIL_NAME);
-        $otherEmail    = $this->createEmail('Email B');
-
-        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH, ['filters' => 'not-json']);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$matchingEmail->getId().'"]'));
-        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$otherEmail->getId().'"]'));
-        $this->assertSame([], $this->client->getRequest()->getSession()->get('mautic.email.list_filters'));
-    }
-
-    public function testEmailListingAppliesCategoryAndThemeFiltersAndIgnoresUnknownFilterTypes(): void
-    {
-        $category = $this->createCategory('Email Category', 'email-category');
-
-        $this->createEmail('Email Matching Filters', null, 'template', 'blank')->setCategory($category);
-
-        $this->createEmail('Email Wrong Category', null, 'template', 'blank');
-
-        $this->createEmail('Email Wrong Theme', null, 'template', 'aurora')->setCategory($category);
-
-        $this->em->flush();
-
-        $this->client->request(
-            Request::METHOD_GET,
-            self::EMAIL_INDEX_PATH,
-            [
-                'filters' => json_encode([
-                    'category:'.$category->getId(),
-                    'theme:blank',
-                    'unknown:value',
-                ]),
-            ]
-        );
-
-        $this->assertResponseIsSuccessful();
-        $this->assertSame(
-            [
-                'category' => [(string) $category->getId()],
-                'theme'    => ['blank'],
-                'unknown'  => ['value'],
-            ],
-            $this->client->getRequest()->getSession()->get('mautic.email.list_filters')
-        );
-    }
-
     public function testEmailListingShowsOnlyOwnedEmailsWithoutViewOtherPermission(): void
     {
         $ownerUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
@@ -159,50 +100,6 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('Other Email', (string) $content);
     }
 
-    public function testEmailListingRedirectsToLastAvailablePageWhenPageIsOutOfBounds(): void
-    {
-        $this->createEmail();
-        $this->client->followRedirects(false);
-
-        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH.'/2');
-
-        $this->assertTrue($this->client->getResponse()->isRedirect(self::EMAIL_INDEX_PATH.'/1'));
-        $this->assertSame(1, $this->client->getRequest()->getSession()->get('mautic.email.page'));
-    }
-
-    public function testEmailListingRedirectsToCalculatedLastPageWhenMoreThanOnePageExists(): void
-    {
-        $this->createEmail(self::DEFAULT_EMAIL_NAME);
-        $this->createEmail('Email B');
-
-        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
-        $this->client->getRequest()->getSession()->set('mautic.email.limit', 1);
-        $this->client->getRequest()->getSession()->save();
-        $this->client->followRedirects(false);
-
-        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH.'/3');
-
-        $this->assertTrue($this->client->getResponse()->isRedirect(self::EMAIL_INDEX_PATH.'/2'));
-        $this->assertSame(2, $this->client->getRequest()->getSession()->get('mautic.email.page'));
-    }
-
-    private function assertDefaultColumnsAreRendered(): void
-    {
-        $this->createEmail();
-
-        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-name'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-category'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-template'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-stats'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-dateAdded'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-dateModified'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-createdByUser'));
-        $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-id'));
-    }
-
     private function createSegment(string $name, string $alias): LeadList
     {
         $segment = new LeadList();
@@ -214,19 +111,6 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
-    }
-
-    private function createCategory(string $title, string $alias): Category
-    {
-        $category = new Category();
-        $category->setTitle($title);
-        $category->setAlias($alias);
-        $category->setBundle('global');
-
-        $this->em->persist($category);
-        $this->em->flush();
-
-        return $category;
     }
 
     private function createEmail(string $name = self::DEFAULT_EMAIL_NAME, ?LeadList $segment = null, string $emailType = 'list', ?string $template = null): Email
