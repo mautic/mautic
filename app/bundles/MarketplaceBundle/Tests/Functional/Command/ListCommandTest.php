@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Command\ListCommand;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class ListCommandTest extends AbstractMauticTestCase
@@ -56,7 +55,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         EOF;
 
         // Normalize line endings so the test passes on checkouts with core.autocrlf enabled.
-        Assert::assertStringContainsString(str_replace("\r", '', $expected), str_replace("\r", '', $result->getDisplay()));
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString(str_replace("\r", '', $expected), str_replace("\r", '', $result->getDisplay()));
+        $this->assertSame(0, $result->getStatusCode());
     }
 }

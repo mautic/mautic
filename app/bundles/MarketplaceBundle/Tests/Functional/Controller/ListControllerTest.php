@@ -7,7 +7,6 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends MauticMysqlTestCase
@@ -61,9 +60,6 @@ final class ListControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         // Verify no packages are displayed when API returns no results
-        Assert::assertSame(
-            [],
-            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-        );
+        $this->assertSame([], $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text']));
     }
 }

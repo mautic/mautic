@@ -14,7 +14,6 @@ use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class InstallCommandTest extends AbstractMauticTestCase
@@ -198,8 +197,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
-        Assert::assertStringContainsString('has successfully been installed', $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('has successfully been installed', $result->getDisplay());
     }
 
     public function testInstallResourceCommandWithDryRun(): void
@@ -218,8 +217,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
-        Assert::assertStringContainsString('dry-run mode', $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('dry-run mode', $result->getDisplay());
     }
 
     public function testInstallResourceCommandWithFailure(): void
@@ -242,8 +241,8 @@ final class InstallCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
-        Assert::assertStringContainsString('Error while installing this resource', $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertStringContainsString('Error while installing this resource', $result->getDisplay());
     }
 
     private function getPackageDetail(): PackageDetail

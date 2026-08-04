@@ -12,7 +12,6 @@ use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
@@ -128,8 +127,8 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
-        Assert::assertStringContainsString('has successfully been removed', $result->getDisplay());
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('has successfully been removed', $result->getDisplay());
     }
 
     public function testRemoveResourceCommandWhenNotInstalled(): void
@@ -153,8 +152,8 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
-        Assert::assertStringContainsString('is not currently installed', $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertStringContainsString('is not currently installed', $result->getDisplay());
     }
 
     public function testRemoveResourceCommandWithError(): void
@@ -182,8 +181,8 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
-        Assert::assertStringContainsString('Error while removing resource', $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertStringContainsString('Error while removing resource', $result->getDisplay());
     }
 
     public function testRemoveCommandWithNonExistingPackage(): void
@@ -203,8 +202,8 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
-        Assert::assertStringContainsString('not found', $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertStringContainsString('not found', $result->getDisplay());
     }
 
     private function getPluginPackageDetail(): PackageDetail

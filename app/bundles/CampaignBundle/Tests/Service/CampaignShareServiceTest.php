@@ -18,9 +18,9 @@ final class CampaignShareServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->service = new CampaignShareService(
-            $this->createMock(ExportHelper::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(ExportHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(UrlGeneratorInterface::class),
             new Filesystem(),
         );
     }
@@ -54,8 +54,8 @@ final class CampaignShareServiceTest extends TestCase
         $this->assertSame('2.0.1" onerror=alert(4)', $metadata['version']);
 
         foreach (['title', 'vendorName', 'headline', 'keywords', 'version'] as $field) {
-            $this->assertStringNotContainsString('<', $metadata[$field]);
-            $this->assertStringNotContainsString('>', $metadata[$field]);
+            $this->assertStringNotContainsString('<', (string) $metadata[$field]);
+            $this->assertStringNotContainsString('>', (string) $metadata[$field]);
         }
 
         // Quotes survive, and should: "John's screenshot" is ordinary alt text. Escaping them is

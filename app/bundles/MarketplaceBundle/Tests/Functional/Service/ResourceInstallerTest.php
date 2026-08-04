@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Service\ResourceInstaller;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
@@ -72,21 +71,21 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     public function testIsInstalledReturnsFalseWhenStateFileIsMissing(): void
     {
-        Assert::assertFalse($this->installer->isInstalled(self::PACKAGE));
+        $this->assertFalse($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testIsInstalledReturnsTrueForPreviouslyInstalledPackage(): void
     {
         $this->writeInstalledState([self::PACKAGE => []]);
 
-        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
+        $this->assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testIsInstalledMigratesLegacyFlatArrayFormat(): void
     {
         $this->writeInstalledState([self::PACKAGE]);
 
-        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
+        $this->assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testInstallReturnsErrorWhenPackageHasNoDownloadableVersion(): void
@@ -97,8 +96,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertFalse($result['success']);
-        Assert::assertStringContainsString('No downloadable version', $result['errors'][0]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('No downloadable version', $result['errors'][0]);
     }
 
     /**
@@ -114,8 +113,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertFalse($result['success']);
-        Assert::assertStringContainsString('Refusing to download', $result['errors'][0]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Refusing to download', $result['errors'][0]);
     }
 
     /**
@@ -141,8 +140,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertFalse($result['success']);
-        Assert::assertStringContainsString('Failed to download', $result['errors'][0]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Failed to download', $result['errors'][0]);
     }
 
     public function testInstallReturnsErrorWhenDownloadYieldsEmptyFile(): void
@@ -158,8 +157,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertFalse($result['success']);
-        Assert::assertStringContainsString('Failed to download', $result['errors'][0]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Failed to download', $result['errors'][0]);
     }
 
     public function testInstallReturnsErrorWhenZipContainsNoCampaignJson(): void
@@ -176,8 +175,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertFalse($result['success']);
-        Assert::assertStringContainsString('Import failed', $result['errors'][0]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Import failed', $result['errors'][0]);
     }
 
     public function testInstallDispatchesImportEventAndMarksPackageInstalled(): void
@@ -208,9 +207,9 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertTrue($result['success']);
-        Assert::assertNotEmpty($result['summary']);
-        Assert::assertTrue($this->installer->isInstalled(self::PACKAGE));
+        $this->assertTrue($result['success']);
+        $this->assertNotEmpty($result['summary']);
+        $this->assertTrue($this->installer->isInstalled(self::PACKAGE));
     }
 
     public function testInstallRestoresPackagedAssetsToMediaDir(): void
@@ -244,8 +243,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $result = $this->installer->install(self::PACKAGE, 1);
 
-        Assert::assertTrue($result['success']);
-        Assert::assertFileExists($this->tmpRoot.'/media/files/images/logo.png');
+        $this->assertTrue($result['success']);
+        $this->assertFileExists($this->tmpRoot.'/media/files/images/logo.png');
     }
 
     public function testUninstallIsNoOpWhenPackageWasNeverInstalled(): void
@@ -272,7 +271,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $this->installer->uninstall(self::PACKAGE);
 
-        Assert::assertFalse($this->installer->isInstalled(self::PACKAGE));
+        $this->assertFalse($this->installer->isInstalled(self::PACKAGE));
     }
 
     /**
@@ -282,7 +281,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
     {
         $path = $this->tmpRoot.'/fixture_'.bin2hex(random_bytes(4)).'.zip';
         $zip  = new \ZipArchive();
-        Assert::assertTrue($zip->open($path, \ZipArchive::CREATE));
+        $this->assertTrue($zip->open($path, \ZipArchive::CREATE));
 
         foreach ($files as $name => $content) {
             $zip->addFromString($name, $content);

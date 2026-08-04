@@ -35,7 +35,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private ImportHelper $importHelper,
-        #[Autowire('%kernel.debug%')]
+        #[Autowire(param: 'kernel.debug')]
         private bool $debug = false,
     ) {
     }

@@ -7,7 +7,6 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -33,9 +32,9 @@ final class DetailControllerTest extends MauticMysqlTestCase
             return;
         }
 
-        Assert::assertStringContainsString($foundPackageDesc, (string) $responseContent);
-        Assert::assertStringContainsString($foundPackageName, (string) $responseContent);
-        Assert::assertStringContainsString($latestVersion, (string) $responseContent);
+        $this->assertStringContainsString($foundPackageDesc, (string) $responseContent);
+        $this->assertStringContainsString($foundPackageName, (string) $responseContent);
+        $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
     /**
@@ -73,14 +72,14 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify reviews from object format (keyed by username) are displayed correctly
-        Assert::assertStringContainsString('john_doe', (string) $responseContent);
-        Assert::assertStringContainsString('Excellent reCAPTCHA integration!', (string) $responseContent);
-        Assert::assertStringContainsString('jane_smith', (string) $responseContent);
-        Assert::assertStringContainsString('Works great with Mautic forms', (string) $responseContent);
+        $this->assertStringContainsString('john_doe', (string) $responseContent);
+        $this->assertStringContainsString('Excellent reCAPTCHA integration!', (string) $responseContent);
+        $this->assertStringContainsString('jane_smith', (string) $responseContent);
+        $this->assertStringContainsString('Works great with Mautic forms', (string) $responseContent);
 
         // Verify star ratings are rendered (john_doe has 5 stars, jane_smith has 4)
         $starRows = $crawler->filter('.ri-star-fill');
-        Assert::assertGreaterThanOrEqual(9, $starRows->count()); // 5 + 4 filled stars
+        $this->assertGreaterThanOrEqual(9, $starRows->count()); // 5 + 4 filled stars
     }
 
     public function testMarketplaceDetailPageHandlesNoReviews(): void
@@ -97,10 +96,10 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify the page renders successfully with no reviews
-        Assert::assertStringContainsString('Mautic Recaptcha Bundle', (string) $responseContent);
+        $this->assertStringContainsString('Mautic Recaptcha Bundle', (string) $responseContent);
 
         // Verify no review blocks are rendered
-        Assert::assertCount(0, $crawler->filter('blockquote'));
-        Assert::assertCount(0, $crawler->filter('.ri-star-fill'));
+        $this->assertCount(0, $crawler->filter('blockquote'));
+        $this->assertCount(0, $crawler->filter('.ri-star-fill'));
     }
 }
