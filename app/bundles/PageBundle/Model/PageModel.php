@@ -310,13 +310,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'page':
-                $viewOther = $this->security->isGranted('page:pages:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
-                break;
+        if ('page' === $type) {
+            $viewOther = $this->security->isGranted('page:pages:viewother');
+            $repo      = $this->getRepository();
+            $repo->setCurrentUser($this->userHelper->getUser());
+            $results = $repo->getPageList($filter, $limit, 0, $viewOther);
         }
 
         return $results;
@@ -448,7 +446,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $this->companyModel->saveEntity($companyEntity);
             }
 
-            if (!empty($company) and $companyEntity instanceof Company) {
+            if (!empty($company) && $companyEntity instanceof Company) {
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());

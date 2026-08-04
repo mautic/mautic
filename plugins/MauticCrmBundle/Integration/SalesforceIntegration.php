@@ -125,7 +125,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        if (isset($config['sandbox'][0]) and 'sandbox' === $config['sandbox'][0]) {
+        if (isset($config['sandbox'][0]) && 'sandbox' === $config['sandbox'][0]) {
             return 'https://test.salesforce.com/services/oauth2/token';
         }
 
@@ -136,7 +136,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        if (isset($config['sandbox'][0]) and 'sandbox' === $config['sandbox'][0]) {
+        if (isset($config['sandbox'][0]) && 'sandbox' === $config['sandbox'][0]) {
             return 'https://test.salesforce.com/services/oauth2/authorize';
         }
 
@@ -241,14 +241,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $salesFields = [];
         try {
-            if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
+            if (!empty($salesForceObjects) && is_array($salesForceObjects)) {
                 foreach ($salesForceObjects as $sfObject) {
                     if ('Account' === $sfObject) {
                         // Match SF object to Mautic's
                         $sfObject = 'company';
                     }
 
-                    if (isset($sfObject) and 'Activity' == $sfObject) {
+                    if (isset($sfObject) && 'Activity' == $sfObject) {
                         continue;
                     }
 
@@ -363,7 +363,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $DNCUpdates = [];
 
-        if (isset($data['records']) and 'Activity' !== $object) {
+        if (isset($data['records']) && 'Activity' !== $object) {
             foreach ($data['records'] as $record) {
                 $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
                 if (isset($params['progress'])) {
@@ -1779,7 +1779,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (isset($entity[$mauticField])) {
                     $fieldType = (isset($objectFields['types']) && isset($objectFields['types'][$sfField])) ? $objectFields['types'][$sfField]
                         : 'string';
-                    if (!empty($entity[$mauticField]) and 'boolean' != $fieldType) {
+                    if (!empty($entity[$mauticField]) && 'boolean' != $fieldType) {
                         $body[$sfField] = $this->cleanPushData($entity[$mauticField], $fieldType);
                     } elseif ('boolean' == $fieldType) {
                         $body[$sfField] = $this->cleanPushData($entity[$mauticField], $fieldType);
@@ -2766,7 +2766,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 break;
             }
 
-            if (!empty($sfEntityRecords) and isset($sfEntityRecords['records'])) {
+            if (!empty($sfEntityRecords) && isset($sfEntityRecords['records'])) {
                 $this->prepareMauticCompaniesToUpdate(
                     $mauticData,
                     $checkCompaniesInSF,
@@ -2915,7 +2915,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         array $objectFields,
     ): void {
         foreach ($checkCompaniesInSF as $key => $company) {
-            if (!empty($company['integration_entity_id']) and array_key_exists($key, $processedCompanies)) {
+            if (!empty($company['integration_entity_id']) && array_key_exists($key, $processedCompanies)) {
                 if ($this->buildCompositeBody(
                     $mauticData,
                     $objectFields['company'],
@@ -3069,7 +3069,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
     {
-        if (isset($matchedFields['mauticContactIsContactableByEmail']) and $this->updateDncByDate()) {
+        if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();
             $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
             $record[$lead->getEmail()]              = $matchedFields;

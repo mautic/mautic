@@ -527,7 +527,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if ('Activity' !== $object and 'company' !== $object) {
+                if ('Activity' !== $object && 'company' !== $object) {
                     $result           = $this->getApiHelper()->getLeads($query, $object);
                     $params['offset'] = $result['next_offset'];
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
@@ -780,7 +780,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                 }
 
                 if (!empty($dataObject)) {
-                    if ('Leads' == $object or 'Contacts' == $object) {
+                    if ('Leads' == $object || 'Contacts' == $object) {
                         if (isset($dataObject['assigned_user_id__'.$object])) {
                             $auid = $dataObject['assigned_user_id__'.$object];
                             if (isset($onwerEmailByAssignedUserId[$auid])) {

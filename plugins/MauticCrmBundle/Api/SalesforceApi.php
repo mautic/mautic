@@ -655,7 +655,7 @@ final class SalesforceApi extends CrmApi
     {
         if (10 === $tries) {
             $this->integration->logIntegrationError(new \Exception(
-                sprintf('Maximum tries exceeded for handling missing field scenarios')
+                'Maximum tries exceeded for handling missing field scenarios'
             ));
         }
         try {

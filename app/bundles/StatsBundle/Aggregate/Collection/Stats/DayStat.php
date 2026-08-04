@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class DayStat implements StatInterface
+final class DayStat implements StatInterface
 {
     /**
      * @var HourStat[]

@@ -815,7 +815,7 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
     {
-        if (isset($this->sessionId)) {
+        if (null !== $this->sessionId) {
             return $this->sessionId;
         }
 
