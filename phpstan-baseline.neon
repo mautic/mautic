@@ -169,12 +169,6 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Exclusion/FieldInclusionStrategy.php
 
 		-
-			message: '#^Method Mautic\\AssetBundle\\Controller\\AssetController\:\:remoteAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/AssetBundle/Controller/AssetController.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\HttpFoundation\\File\\File\:\:getClientOriginalName\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1239,12 +1233,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\AbstractFormController\:\:copyErrorsRecursively\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\AbstractFormController\:\:isLocked\(\) should return array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
 
@@ -5295,12 +5283,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:getLineCountLimit\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ImportController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:indexAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/LeadBundle/Controller/ImportController.php
 
@@ -9808,24 +9790,6 @@ parameters:
 			path: app/bundles/UserBundle/Security/SAML/User/UserCreator.php
 
 		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:editAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/WebhookController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:indexAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/WebhookController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:newAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns array\|Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/WebhookController.php
-
-		-
 			message: '#^Method Mautic\\WebhookBundle\\Entity\\EventRepository\:\:getEntitiesByEventType\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9938,30 +9902,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: plugins/GrapesJsBuilderBundle/Model/GrapesJsBuilderModel.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Controller\\ClearbitController\:\:batchLookupCompanyAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Controller\\ClearbitController\:\:batchLookupPersonAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Controller\\ClearbitController\:\:lookupCompanyAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Controller\\ClearbitController\:\:lookupPersonAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$imported \(bool\) in isset\(\) is not nullable\.$#'
@@ -12116,30 +12056,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticFocusBundle/Security/Permissions/FocusPermissions.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Controller\\FullContactController\:\:batchLookupCompanyAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticFullContactBundle/Controller/FullContactController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Controller\\FullContactController\:\:batchLookupPersonAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticFullContactBundle/Controller/FullContactController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Controller\\FullContactController\:\:lookupCompanyAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticFullContactBundle/Controller/FullContactController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Controller\\FullContactController\:\:lookupPersonAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 2
-			path: plugins/MauticFullContactBundle/Controller/FullContactController.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Entity\\Lead\:\:\$imported \(bool\) in isset\(\) is not nullable\.$#'
