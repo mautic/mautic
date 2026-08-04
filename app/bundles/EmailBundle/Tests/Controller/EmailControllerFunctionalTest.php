@@ -296,6 +296,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('disabled', $html, $html);
     }
 
+    public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
+    {
+        $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $button  = $crawler->filter("#row_email_{$email->getId()} a[href=\"/s/emails/sendExample/{$email->getId()}\"]");
+
+        $this->assertCount(1, $button);
+        $this->assertSame('ajaxmodal', $button->attr('data-toggle'));
+        $this->assertSame('Send example', trim($button->text()));
+    }
+
     public function testEmailDetailPageForListEmailShowsScheduleButton(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
