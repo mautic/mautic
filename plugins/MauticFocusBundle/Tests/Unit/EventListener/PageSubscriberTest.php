@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -25,22 +30,41 @@ final class PageSubscriberTest extends TestCase
         $model = $this->createStub(FocusModel::class);
         $model->method('getPermissionBase')->willReturn('focus:items');
 
-        $builderTokenHelper = $this->createMock(BuilderTokenHelper::class);
-        $builderTokenHelper->expects($this->once())
-            ->method('getFormattedTokens')
-            ->willReturn(['{focus=7}' => 'Focus Item: Test']);
+        $repository = $this->createStub(FocusRepository::class);
+        $repository->method('getTableAlias')->willReturn('f');
+        $repository->method('getSimpleList')->willReturn([['value' => 7, 'label' => 'Test']]);
+        $model->method('getRepository')->willReturn($repository);
+
+        $security = $this->createStub(CorePermissions::class);
+        $security->method('isGranted')->willReturn(['focus:items:viewown' => true, 'focus:items:viewother' => true]);
+
+        $modelFactory = $this->createStub(ModelFactory::class);
+        $modelFactory->method('getModel')->willReturn($model);
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('createExpressionBuilder')->willReturn(new ExpressionBuilder($connection));
 
         $factory = $this->createStub(BuilderTokenHelperFactory::class);
-        $factory->method('getBuilderTokenHelper')->willReturn($builderTokenHelper);
 
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
             static fn (string $key): string => match ($key) {
+                'mautic.focus.focus_item'    => 'Focus Item',
                 'mautic.focus.token.display'  => '(display only)',
                 'mautic.focus.token.tracking' => '(tracking)',
                 default                        => $key,
             },
         );
+
+        $builderTokenHelper = new BuilderTokenHelper(
+            $security,
+            $modelFactory,
+            $connection,
+            $this->createStub(UserHelper::class),
+            $translator,
+        );
+        $builderTokenHelper->configure('focus', 'focus:items');
+        $factory->method('getBuilderTokenHelper')->willReturn($builderTokenHelper);
 
         $subscriber = new PageSubscriber(
             $model,
