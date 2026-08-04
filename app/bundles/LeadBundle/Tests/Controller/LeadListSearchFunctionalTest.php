@@ -41,7 +41,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $this->client->enableProfiler();
-        $prefix          = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix          = self::getContainer()->getParameter('mautic.db_table_prefix');
         $previousQueries = [];
 
         // non-existent segment search

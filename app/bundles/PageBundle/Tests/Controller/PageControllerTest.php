@@ -28,7 +28,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
@@ -36,7 +36,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var PageModel $model */
-        $model = static::getContainer()->get(PageModel::class);
+        $model = self::getContainer()->get(PageModel::class);
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -203,7 +203,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var PageModel $model */
-        $model                  = static::getContainer()->get(PageModel::class);
+        $model                  = self::getContainer()->get(PageModel::class);
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Page::class, $page);
@@ -277,7 +277,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     public function testSavePageAliasWithUnderscores(): void
     {
         /** @var PageModel $pageModel */
-        $pageModel = static::getContainer()->get(PageModel::class);
+        $pageModel = self::getContainer()->get(PageModel::class);
 
         $parentPage = new Page();
         $parentPage->setTitle('This is My Page');
