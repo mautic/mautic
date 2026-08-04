@@ -467,7 +467,7 @@ JS, self::DISPLAY_FOCUS_ID));
         if (null === $this->corsConfigParameters) {
             $parameters = [];
             if ($this->corsConfigExisted) {
-                include $configPath;
+                include_once $configPath;
             }
             $this->corsConfigParameters = $parameters;
         }
