@@ -51,7 +51,6 @@ final class EmailController extends FormController
     private AuditLogModel $auditLogModel;
     private EmailConfig $emailConfig;
     private ThemeHelper $themeHelper;
-    private CorePermissions $corePermissions;
     private FakeContactHelper $fakeLeadHelper;
     private PageHelperFactoryInterface $pageHelperFactory;
 
@@ -560,7 +559,7 @@ final class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $this->corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     try {
                         // form is valid so process the data
@@ -760,7 +759,7 @@ final class EmailController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $this->corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     // form is valid so process the data
                     try {
@@ -1893,9 +1892,9 @@ final class EmailController extends FormController
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 
-    private function unpublishIfLackingPermission(Email $entity, CorePermissions $corePermissions): Email
+    private function unpublishIfLackingPermission(Email $entity): Email
     {
-        $canPublish = $corePermissions->hasPublishAccessForEntity(
+        $canPublish = $this->security->hasPublishAccessForEntity(
             $entity,
             'email:emails:publishown',
             'email:emails:publishother'

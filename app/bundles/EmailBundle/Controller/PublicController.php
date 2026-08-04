@@ -554,12 +554,10 @@ final class PublicController extends CommonFormController
         // Prepare contact
         if ($contactId) {
             // We have one from request parameter
-            /** @var LeadModel $leadModel */
             $contact = $this->leadRepository->getLead($contactId);
             $contact = $model->enrichedContactWithCompanies($contact);
         } else {
             // Make fake contact.
-            /** @var FakeContactHelper $fakeLeadHelper */
             $contact = $this->fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
         }
         // Generate and replace tokens

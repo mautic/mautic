@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
@@ -22,7 +21,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PageController extends FormController
@@ -32,8 +30,6 @@ final class PageController extends FormController
     private PageModel $pageModel;
     private PageConfig $pageConfig;
     private PageHelperFactoryInterface $pageHelperFactory;
-    private AssetsHelper $assetsHelper;
-    private RouterInterface $routerHelper;
     private ThemeHelper $themeHelper;
 
     #[Required]
@@ -41,15 +37,11 @@ final class PageController extends FormController
         PageModel $pageModel,
         PageConfig $pageConfig,
         PageHelperFactoryInterface $pageHelperFactory,
-        AssetsHelper $assetsHelper,
-        RouterInterface $routerHelper,
         ThemeHelper $themeHelper,
     ): void {
         $this->pageModel = $pageModel;
         $this->pageConfig = $pageConfig;
         $this->pageHelperFactory = $pageHelperFactory;
-        $this->assetsHelper = $assetsHelper;
-        $this->routerHelper = $routerHelper;
         $this->themeHelper = $themeHelper;
     }
 
