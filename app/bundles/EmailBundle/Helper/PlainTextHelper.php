@@ -156,11 +156,9 @@ final class PlainTextHelper
     /**
      * Contains URL addresses from links to be rendered in plain text.
      *
-     * @var array
-     *
      * @see buildlinkList()
      */
-    private $linkList = [];
+    private array $linkList = [];
 
     /**
      * Various configuration options (able to be set in the constructor).
@@ -285,12 +283,11 @@ final class PlainTextHelper
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param string $link    URL of the link
      * @param string $display Part of the text to associate number with
      *
      * @return string
      */
-    private function buildlinkList(string|array $link, $display, ?string $linkOverride = null)
+    private function buildlinkList(string $link, $display, ?string $linkOverride = null)
     {
         $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
