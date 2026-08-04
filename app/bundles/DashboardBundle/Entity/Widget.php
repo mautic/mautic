@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Widget extends FormEntity
 {
@@ -40,7 +39,7 @@ class Widget extends FormEntity
     /**
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.type.required')]
+    #[NotBlank(message: 'mautic.core.type.required')]
     private $type;
 
     /**

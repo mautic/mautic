@@ -76,11 +76,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $id;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private ?string $name = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.type.required')]
+    #[NotBlank(message: 'mautic.core.type.required')]
     private string $type = TypeList::HTML;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]

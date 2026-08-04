@@ -57,7 +57,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**

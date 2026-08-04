@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -56,7 +55,7 @@ class Message extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
