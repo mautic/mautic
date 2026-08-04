@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class FoursquareIntegration extends SocialIntegration
+final class FoursquareIntegration extends SocialIntegration
 {
     public function getName(): string
     {

@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-class AmazonS3Integration extends CloudStorageIntegration
+final class AmazonS3Integration extends CloudStorageIntegration
 {
     private ?ResolvableFilesystem $fileSystem = null;
 

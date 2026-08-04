@@ -8,7 +8,7 @@ namespace MauticPlugin\MauticFullContactBundle\Services;
  * @author   Adam Curtis <me@alc.im>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class FullContact_Company extends FullContact_Base
+final class FullContact_Company extends FullContact_Base
 {
     /**
      * Supported lookup methods.
