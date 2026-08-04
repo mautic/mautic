@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<DynamicsApi>
  */
-class DynamicsIntegration extends CrmAbstractIntegration
+final class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
     {
@@ -163,10 +163,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [

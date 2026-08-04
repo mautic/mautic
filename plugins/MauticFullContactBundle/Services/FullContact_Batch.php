@@ -11,7 +11,7 @@ use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
  * @author   Adam Curtis <me@alc.im>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class FullContact_Batch extends FullContact_Base
+final class FullContact_Batch extends FullContact_Base
 {
     protected $_resourceUri = '/batch.json';
 

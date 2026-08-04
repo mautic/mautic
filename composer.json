@@ -43,7 +43,7 @@
     "phpstan/phpstan-symfony": "^2.0.20",
     "phpunit/phpunit": "^11.5",
     "rector/type-perfect": "^2.1.4",
-    "rector/rector": "^2.5.9",
+    "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",

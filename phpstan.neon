@@ -222,6 +222,19 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 		-
 			identifier: typePerfect.noArrayAccessOnObject
+		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
+		-
+			identifier: mautic.noServiceJuggling
+			path: app/bundles/LeadBundle/Model/LeadModel.php
+
+		# mixed return
+		-
+			identifier: return.unusedType
+			message: '#Method Mautic(.*?)::getParameterValue\(\)#'
+		# string operations
+		-
+			identifier: parameterByRef.type
+			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
@@ -257,6 +270,7 @@ rules:
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
 	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
+	- Utils\PHPStan\Rule\NoServiceJugglingRule
 
 #services:
 #	-

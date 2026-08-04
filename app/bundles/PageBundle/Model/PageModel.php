@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -45,6 +46,8 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -119,6 +122,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly HitRepository $hitRepository,
         private readonly EmailRepository $emailRepository,
         private readonly UtmTagRepository $utmTagRepository,
+        private readonly RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
 
@@ -629,11 +635,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         } elseif ($page instanceof Redirect) {
             try {
-                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+                $this->redirectRepository->upHitCount($page->getId(), 1, $isUnique);
 
                 // If this is a trackable, up the trackable counts as well
                 if ($hit->getSource() && $hit->getSourceId()) {
-                    $this->pageTrackableModel->getRepository()->upHitCount(
+                    $this->trackableRepository->upHitCount(
                         $page->getId(),
                         $hit->getSource(),
                         $hit->getSourceId(),
@@ -706,7 +712,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         if (null !== $hitDate) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
-                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+                    $this->leadRepository->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
                     $data = [
                         'unique'             => ($isUnique ? 'true' : 'false'),

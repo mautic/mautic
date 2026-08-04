@@ -170,7 +170,7 @@ final class UserController extends FormController
                         'redirect'   => $this->generateUrl('mautic_user_index'),
                     ]);
                 } else {
-                    $response = $this->redirect($this->generateUrl('mautic_user_index'));
+                    $response = $this->redirectToRoute('mautic_user_index');
                 }
             }
 
@@ -218,20 +218,20 @@ final class UserController extends FormController
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $this->userModel, $user, $form);
+            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, UserModel $model, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $model, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -251,17 +251,17 @@ final class UserController extends FormController
         return $response;
     }
 
-    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, UserModel $model, User $user, FormInterface $form): bool
+    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, User $user, FormInterface $form): bool
     {
         $formUser          = $request->request->all()['user'] ?? [];
         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-        $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+        $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
         $valid             = $this->isFormValid($form);
 
         if ($valid) {
             $user->setPassword($password);
-            $model->saveEntity($user);
-            $this->loadNewUserLocale($languageHelper, $model, $user);
+            $this->userModel->saveEntity($user);
+            $this->loadNewUserLocale($languageHelper, $user);
 
             $this->addFlashMessage('mautic.core.notice.created', [
                 '%name%'      => $user->getName(),
@@ -276,7 +276,7 @@ final class UserController extends FormController
         return $valid;
     }
 
-    private function loadNewUserLocale(LanguageHelper $languageHelper, UserModel $model, User $user): void
+    private function loadNewUserLocale(LanguageHelper $languageHelper, User $user): void
     {
         $installedLanguages = $languageHelper->getSupportedLanguages();
 
@@ -285,7 +285,7 @@ final class UserController extends FormController
 
             if ($fetchLanguage['error']) {
                 $user->setLocale(null);
-                $model->saveEntity($user);
+                $this->userModel->saveEntity($user);
                 $this->addFlashMessage(
                     $fetchLanguage['message'] ?? 'mautic.core.could.not.set.language',
                     $fetchLanguage['vars'] ?? []

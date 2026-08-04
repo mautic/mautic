@@ -28,7 +28,7 @@ class BuilderTokenHelperFactory
         ?string $langVar = null,
     ): BuilderTokenHelper {
         $builderTokenHelper = new BuilderTokenHelper($this->security, $this->modelFactory, $this->connection, $this->userHelper, $this->translator);
-        $builderTokenHelper->configure($modelName, $viewPermissionBase, $bundleName, $langVar);
+        $builderTokenHelper->configure($modelName, $viewPermissionBase);
 
         return $builderTokenHelper;
     }

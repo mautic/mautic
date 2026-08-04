@@ -60,7 +60,7 @@ class EventCollector
         }
 
         if (null !== $type) {
-            if (!isset($this->events[$type])) {
+            if (!isset($this->eventsArray[$type])) {
                 throw new \InvalidArgumentException("{$type} not found as array key");
             }
 

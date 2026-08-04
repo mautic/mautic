@@ -6,10 +6,10 @@ namespace Mautic\IntegrationsBundle\Facade;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 
-class EncryptionService
+final readonly class EncryptionService
 {
     public function __construct(
-        private readonly EncryptionHelper $encryptionHelper,
+        private EncryptionHelper $encryptionHelper,
     ) {
     }
 

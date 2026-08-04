@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 
-class ContactNotificationHandler implements HandlerInterface
+final class ContactNotificationHandler implements HandlerInterface
 {
     private ?string $integrationDisplayName = null;
 

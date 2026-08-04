@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39e439692f2e5fce1f341edc1e4c93f4",
+    "content-hash": "e80aa71bea18bf5f1248415c91959543",
     "packages": [
         {
             "name": "api-platform/core",
@@ -17826,16 +17826,17 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.5.9",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536"
+                "reference": "f7ab45b9df27d0213c5a2026b61442b655c36066"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/858b1fb95d94f658b54c01080bf7b6ae97274536",
-                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536"
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f7ab45b9df27d0213c5a2026b61442b655c36066",
+                "reference": "f7ab45b9df27d0213c5a2026b61442b655c36066",
+                "shasum": ""
             },
             "require": {
                 "php": "^7.4|^8.0",
@@ -17873,7 +17874,8 @@
                 "refactoring"
             ],
             "support": {
-                "source": "https://github.com/rectorphp/rector/tree/2.5.9"
+                "issues": "https://github.com/rectorphp/rector/issues",
+                "source": "https://github.com/rectorphp/rector/tree/main"
             },
             "funding": [
                 {
@@ -17881,7 +17883,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-31T11:03:01+00:00"
+            "time": "2026-08-02T10:26:14+00:00"
         },
         {
             "name": "rector/type-perfect",
@@ -19745,7 +19747,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "rector/rector": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},
