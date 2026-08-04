@@ -180,7 +180,7 @@ final class TagController extends FormController
         // get the user form factory
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $this->tagDependencies, $tag, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $tag, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -199,7 +199,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -272,7 +272,6 @@ final class TagController extends FormController
             return $this->createTagModifyResponse(
                 $request,
                 $this->getTag($objectId),
-                $this->tagDependencies,
                 $postActionVars,
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -296,14 +295,14 @@ final class TagController extends FormController
      * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
-    private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
+    private function createTagModifyResponse(Request $request, Tag $tag, array $postActionVars, string $action, bool $ignorePost): Response
     {
         /** @var FormInterface<FormInterface<Tag>> $form */
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
-            $response = $this->handleEditFormPost($request, $tag, $tagDependencies, $form, $postActionVars);
+            $response = $this->handleEditFormPost($request, $tag, $form, $postActionVars);
             if (null !== $response) {
                 return $response;
             }
@@ -328,7 +327,7 @@ final class TagController extends FormController
      * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
-    private function handleEditFormPost(Request $request, Tag $tag, TagDependencies $tagDependencies, FormInterface $form, array $postActionVars): ?Response
+    private function handleEditFormPost(Request $request, Tag $tag, FormInterface $form, array $postActionVars): ?Response
     {
         $response = null;
 

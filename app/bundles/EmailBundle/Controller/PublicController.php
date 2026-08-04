@@ -282,7 +282,6 @@ final class PublicController extends CommonFormController
                     $viewParameters,
                     $language ?? null,
                     $successSessionName,
-                    $this->emailDefaultsHelper,
                     $pageModel
                 );
 
@@ -320,9 +319,9 @@ final class PublicController extends CommonFormController
     /**
      * @param array<mixed> $viewParameters
      */
-    private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, EmailDefaultsHelper $emailDefaultsHelper, PageModel $pageModel): ?string
+    private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, PageModel $pageModel): ?string
     {
-        $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
+        $prefCenter = $email instanceof Email ? $this->emailDefaultsHelper->resolvePreferenceCenter($email) : null;
         if (!$prefCenter instanceof Page) {
             return null;
         }
@@ -586,14 +585,12 @@ final class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
+    private function doTracking(Request $request, $integration): void
     {
-        $logger = $mauticLogger;
-
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
         if (!$query_string) {
-            $logger->log('error', $integration.': query string is not available');
+            $this->mauticLogger->log('error', $integration.': query string is not available');
 
             return;
         }
@@ -612,7 +609,7 @@ final class PublicController extends CommonFormController
         }
 
         // get secret from plugin settings
-        $myIntegration = $integrationHelper->getIntegrationObject($integration);
+        $myIntegration = $this->integrationHelper->getIntegrationObject($integration);
 
         if (!$myIntegration) {
             $logger->log('error', $integration.': integration not found');
@@ -672,7 +669,7 @@ final class PublicController extends CommonFormController
             // stat doesn't exist, create one
             if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
-                $stat          = $this->addStat($mailer, $lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
@@ -685,7 +682,7 @@ final class PublicController extends CommonFormController
 
     public function pluginTrackingGifAction(Request $request, $integration): Response
     {
-        $this->doTracking($request, $this->integrationHelper, $this->mailer, $this->mauticLogger, $integration);
+        $this->doTracking($request, $integration);
 
         return TrackingPixelHelper::getResponse($request); // send gif
     }
@@ -693,29 +690,29 @@ final class PublicController extends CommonFormController
     /**
      * @param array<string, mixed> $query
      */
-    private function addStat(MailHelper $mailer, $lead, string $email, array $query, string $idHash): ?Stat
+    private function addStat($lead, string $email, array $query, string $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead
-            $mailer->addTo($email);
+            $this->mailer->addTo($email);
 
             // sanitize variables to prevent malicious content
             $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
-            $mailer->setFrom($from, '');
+            $this->mailer->setFrom($from, '');
 
             // Set Content
             $body = htmlspecialchars(filter_var($query['body'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
-            $mailer->setBody($body);
-            $mailer->parsePlainText($body);
+            $this->mailer->setBody($body);
+            $this->mailer->parsePlainText($body);
 
             // Set lead
-            $mailer->setLead($lead);
-            $mailer->setIdHash($idHash);
+            $this->mailer->setLead($lead);
+            $this->mailer->setIdHash($idHash);
 
             $subject = htmlspecialchars(filter_var($query['subject'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
-            $mailer->setSubject($subject);
+            $this->mailer->setSubject($subject);
 
-            return $mailer->createEmailStat();
+            return $this->mailer->createEmailStat();
         }
 
         return null;

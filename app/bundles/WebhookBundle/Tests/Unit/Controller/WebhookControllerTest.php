@@ -83,6 +83,18 @@ final class WebhookControllerTest extends TestCase
             $eventUnderTest => $leadPayload,
         ];
 
+        $client = $this->createMock(Client::class);
+        $client->expects($this->once())
+            ->method('post')
+            ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
+                $this->assertSame($payload, $testPayload, json_encode($payload, JSON_THROW_ON_ERROR));
+
+                return new GuzzleResponse();
+            });
+
+        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
+
         $controller = new AjaxController(
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
@@ -93,6 +105,8 @@ final class WebhookControllerTest extends TestCase
             $this->createStub(FlashBag::class),
             $this->createStub(RequestStack::class),
             $this->createStub(CorePermissions::class),
+            $client,
+            $pathsHelper,
         );
 
         $parameterBag = $this->createMock(ParameterBagInterface::class);
@@ -112,20 +126,8 @@ final class WebhookControllerTest extends TestCase
         $request->request->set('types', [$eventUnderTest]);
         $request->request->set('secret', $secret);
 
-        $client = $this->createMock(Client::class);
-        $client->expects($this->once())
-            ->method('post')
-            ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
-                $this->assertSame($payload, $testPayload, json_encode($payload, JSON_THROW_ON_ERROR));
-
-                return new GuzzleResponse();
-            });
-
-        $pathsHelper = $this->createMock(PathsHelper::class);
-        $pathsHelper->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
-
         // Send test action.
-        $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
+        $testResponse = $controller->sendHookTestAction($request);
         // If you encounter errors here, please check \Mautic\WebhookBundle\Controller\AjaxController::processWebhookTest
         // or inside the Client mock.
         $this->assertSame(Response::HTTP_OK, $testResponse->getStatusCode());

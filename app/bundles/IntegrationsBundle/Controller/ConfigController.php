@@ -87,17 +87,17 @@ final class ConfigController extends AbstractFormController
         $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Create the form
-        $form = $this->getForm($this->formFactory);
+        $form = $this->getForm();
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($request, $this->integrationsHelper, $this->fieldValidator, $this->dispatcher, $this->formFactory, $this->formExtension, $form);
+            return $this->submitForm($request, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
         $session = $request->getSession();
         $session->remove("{$integration}-fields");
 
-        return $this->showForm($request, $form, $this->formExtension);
+        return $this->showForm($request, $form);
     }
 
     /**
@@ -105,11 +105,6 @@ final class ConfigController extends AbstractFormController
      */
     private function submitForm(
         Request $request,
-        ConfigIntegrationsHelper $integrationsHelper,
-        FieldValidationHelper $fieldValidator,
-        EventDispatcherInterface $eventDispatcher,
-        FormFactoryInterface $formFactory,
-        FormExtension $formExtension,
         FormInterface $form,
     ): JsonResponse|Response {
         if ($this->isFormCancelled($form)) {
@@ -141,35 +136,35 @@ final class ConfigController extends AbstractFormController
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
 
-            $fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
+            $this->fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
 
         // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
         $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
-        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
         $authorize              = !empty($integrationDetailsPost['in_auth']);
         if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm($request, $form, $formExtension);
+            return $this->showForm($request, $form);
         }
 
         // Save the integration configuration
-        $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
+        $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
-        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
 
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($form)) {
             // Regenerate the form
             $this->resetFieldsInSession($request);
-            $form = $this->getForm($formFactory);
+            $form = $this->getForm();
 
-            return $this->showForm($request, $form, $formExtension);
+            return $this->showForm($request, $form);
         }
 
         // Otherwise close the modal
@@ -179,9 +174,9 @@ final class ConfigController extends AbstractFormController
     /**
      * @return FormInterface<mixed>
      */
-    private function getForm(FormFactoryInterface $formFactory): FormInterface
+    private function getForm(): FormInterface
     {
-        return $formFactory->create(
+        return $this->formFactory->create(
             $this->integrationObject->getConfigFormName() ?: IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
@@ -194,7 +189,7 @@ final class ConfigController extends AbstractFormController
     /**
      * @param FormInterface<mixed> $form
      */
-    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): Response
+    private function showForm(Request $request, FormInterface $form): Response
     {
         $formView = $form->createView();
 
@@ -204,13 +199,13 @@ final class ConfigController extends AbstractFormController
 
         $hasFeatureErrors = (
             $this->integrationObject instanceof ConfigFormFeatureSettingsInterface
-            && $formExtension->containsErrors($formView['featureSettings']['integration'])
+            && $this->formExtension->containsErrors($formView['featureSettings']['integration'])
         ) || (
             isset($formView['featureSettings']['sync']['integration'])
-            && $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
+            && $this->formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
         );
 
-        $hasAuthErrors = $this->integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
+        $hasAuthErrors = $this->integrationObject instanceof ConfigFormAuthInterface && $this->formExtension->containsErrors($formView['apiKeys']);
 
         $useSyncFeatures = $this->integrationObject instanceof ConfigFormSyncInterface;
 

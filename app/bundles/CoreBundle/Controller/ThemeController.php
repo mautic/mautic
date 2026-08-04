@@ -316,7 +316,7 @@ final class ThemeController extends FormController
         $flashes = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $flashes = $this->visibility($objectId, $this->themeHelper);
+            $flashes = $this->visibility($objectId);
         }
 
         return $this->postActionRedirect(
@@ -329,9 +329,9 @@ final class ThemeController extends FormController
     /**
      * @return array<mixed>
      */
-    private function visibility(string $themeName, ThemeHelperInterface $themeHelper): array
+    private function visibility(string $themeName): array
     {
-        if (!$themeHelper->exists($themeName)) {
+        if (!$this->themeHelper->exists($themeName)) {
             return [
                 [
                     'type'    => 'error',
@@ -341,7 +341,7 @@ final class ThemeController extends FormController
             ];
         }
 
-        if (!in_array($themeName, $themeHelper->getDefaultThemes())) {
+        if (!in_array($themeName, $this->themeHelper->getDefaultThemes())) {
             return [
                 [
                     'type'    => 'error',
@@ -354,8 +354,8 @@ final class ThemeController extends FormController
         $flashes = [];
 
         try {
-            $theme = $themeHelper->getTheme($themeName);
-            $themeHelper->toggleVisibility($themeName);
+            $theme = $this->themeHelper->getTheme($themeName);
+            $this->themeHelper->toggleVisibility($themeName);
             $flashes[] = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.theme.visibility.changed',

@@ -79,7 +79,7 @@ final class PublicController extends CommonFormController
         }
 
         $context          = $this->createSubmitContext($request);
-        $submissionResult = $this->processSubmittedForm($request, $context, $this->dateTemplateHelper, $notificationModel, $userRepository);
+        $submissionResult = $this->processSubmittedForm($request, $context, $notificationModel, $userRepository);
 
         if ($submissionResult['response'] instanceof Response) {
             return $submissionResult['response'];
@@ -87,7 +87,7 @@ final class PublicController extends CommonFormController
 
         if ($submissionResult['submissionEvent'] instanceof SubmissionEvent && !empty($submissionResult['postActionProperty'])) {
             // Replace post action property with tokens to support custom redirects, etc
-            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent'], $this->pageTokenHelper);
+            $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent']);
         }
 
         return ($context['messengerMode'] || $context['isAjax'])
@@ -135,7 +135,6 @@ final class PublicController extends CommonFormController
     private function processSubmittedForm(
         Request $request,
         array $context,
-        DateHelper $dateTemplateHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
     ): array {
@@ -162,7 +161,7 @@ final class PublicController extends CommonFormController
                 $result['form']               = $form;
                 $result['postAction']         = $form->getPostAction();
                 $result['postActionProperty'] = $form->getPostActionProperty();
-                $result['error']              = $this->getFormAvailabilityError($form, $dateTemplateHelper);
+                $result['error']              = $this->getFormAvailabilityError($form);
 
                 if (null === $result['error']) {
                     $result = array_merge(
@@ -176,7 +175,7 @@ final class PublicController extends CommonFormController
         return $result;
     }
 
-    private function getFormAvailabilityError(Form $form, DateHelper $dateTemplateHelper): ?string
+    private function getFormAvailabilityError(Form $form): ?string
     {
         $status = $form->getPublishStatus();
 
@@ -185,7 +184,7 @@ final class PublicController extends CommonFormController
 
             return $this->translator->trans(
                 'mautic.form.submit.error.pending',
-                ['%date%' => $dateTemplateHelper->toFull($publishUp instanceof \DateTime ? $publishUp : $publishUp->format('Y-m-d H:i:s'))],
+                ['%date%' => $this->dateTemplateHelper->toFull($publishUp instanceof \DateTime ? $publishUp : $publishUp->format('Y-m-d H:i:s'))],
                 'flashes'
             );
         }
@@ -195,7 +194,7 @@ final class PublicController extends CommonFormController
 
             return $this->translator->trans(
                 'mautic.form.submit.error.expired',
-                ['%date%' => $dateTemplateHelper->toFull($publishDown instanceof \DateTime ? $publishDown : $publishDown->format('Y-m-d H:i:s'))],
+                ['%date%' => $this->dateTemplateHelper->toFull($publishDown instanceof \DateTime ? $publishDown : $publishDown->format('Y-m-d H:i:s'))],
                 'flashes'
             );
         }
@@ -652,7 +651,7 @@ final class PublicController extends CommonFormController
     /**
      * @return string|string[]
      */
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent, PageTokenHelper $pageTokenHelper): string|array
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
         if (count($this->tokens)) {
             return $this->tokens;
@@ -670,7 +669,7 @@ final class PublicController extends CommonFormController
 
         $this->tokens = array_merge(
             $this->tokens,
-            $pageTokenHelper->findPageTokens($string)
+            $this->pageTokenHelper->findPageTokens($string)
         );
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);

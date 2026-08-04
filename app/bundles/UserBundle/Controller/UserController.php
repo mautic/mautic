@@ -239,20 +239,20 @@ final class UserController extends FormController
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $this->languageHelper, $this->hasher, $this->samlHelper, $user, $form);
+            $response = $this->handleNewUserPost($request, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -272,17 +272,17 @@ final class UserController extends FormController
         return $response;
     }
 
-    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, User $user, FormInterface $form): bool
+    private function saveNewUserIfValid(Request $request, User $user, FormInterface $form): bool
     {
         $formUser          = $request->request->all()['user'] ?? [];
         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-        $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
+        $password          = $this->userModel->checkNewPassword($user, $this->hasher, $submittedPassword);
         $valid             = $this->isFormValid($form);
 
         if ($valid) {
             $user->setPassword($password);
             $this->userModel->saveEntity($user);
-            $this->loadNewUserLocale($languageHelper, $user);
+            $this->loadNewUserLocale($user);
 
             $this->addFlashMessage('mautic.core.notice.created', [
                 '%name%'      => $user->getName(),
@@ -297,12 +297,12 @@ final class UserController extends FormController
         return $valid;
     }
 
-    private function loadNewUserLocale(LanguageHelper $languageHelper, User $user): void
+    private function loadNewUserLocale(User $user): void
     {
-        $installedLanguages = $languageHelper->getSupportedLanguages();
+        $installedLanguages = $this->languageHelper->getSupportedLanguages();
 
         if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
-            $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
+            $fetchLanguage = $this->languageHelper->extractLanguagePackage($user->getLocale());
 
             if ($fetchLanguage['error']) {
                 $user->setLocale(null);

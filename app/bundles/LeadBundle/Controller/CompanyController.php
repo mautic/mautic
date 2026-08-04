@@ -847,13 +847,13 @@ final class CompanyController extends FormController
         }
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->processCompanyFindReplace($request, $model, $this->findReplace);
+            return $this->processCompanyFindReplace($request, $model);
         }
 
-        return $this->createCompanyFindReplaceFormResponse($request, $this->findReplace);
+        return $this->createCompanyFindReplaceFormResponse($request);
     }
 
-    private function processCompanyFindReplace(Request $request, CompanyModel $model, CustomFieldFindReplace $findReplace): JsonResponse
+    private function processCompanyFindReplace(Request $request, CompanyModel $model): JsonResponse
     {
         $requestData = $request->request->all();
         $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
@@ -863,7 +863,7 @@ final class CompanyController extends FormController
 
         if (is_string($fieldAlias) && is_array($ids)) {
             $entities = $this->getCompanyFindReplaceEntities($request, $model, $data, $ids);
-            $updated  = $this->replaceCompanyFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
+            $updated  = $this->replaceCompanyFieldValues($fieldAlias, $data, $entities, $model);
 
             if ([] !== $updated) {
                 $model->saveEntities($updated);
@@ -921,10 +921,10 @@ final class CompanyController extends FormController
      *
      * @return array<int, Company>
      */
-    private function replaceCompanyFieldValues(CustomFieldFindReplace $findReplace, string $fieldAlias, array $data, iterable $entities, CompanyModel $model): array
+    private function replaceCompanyFieldValues(string $fieldAlias, array $data, iterable $entities, CompanyModel $model): array
     {
         /** @var array<int, Company> $updated */
-        $updated = $findReplace->replace(
+        $updated = $this->findReplace->replace(
             new CustomFieldFindReplaceCriteria('company', $fieldAlias, $data['find'] ?? null, $data['replace'] ?? null),
             $entities,
             function (CustomFieldEntityInterface $company, array $values) use ($model): void {
@@ -950,7 +950,7 @@ final class CompanyController extends FormController
         return $updated;
     }
 
-    private function createCompanyFindReplaceFormResponse(Request $request, CustomFieldFindReplace $findReplace): Response
+    private function createCompanyFindReplaceFormResponse(Request $request): Response
     {
         $route = $this->generateUrl(
             'mautic_company_action',
@@ -965,7 +965,7 @@ final class CompanyController extends FormController
                     'form' => $this->formFactory->createNamed('lead_batch_find_replace', FindReplaceType::class, [], [
                         'action'        => $route,
                         'all_items'     => $request->query->getBoolean('all'),
-                        'field_choices' => $findReplace->getFieldChoices('company'),
+                        'field_choices' => $this->findReplace->getFieldChoices('company'),
                         'field_label'   => 'mautic.company.batch.find_replace.field',
                     ])->createView(),
                 ],

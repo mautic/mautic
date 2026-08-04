@@ -204,8 +204,6 @@ final class ListController extends FormController
         return $this->createSegmentNewResponse(
             $request,
             $list,
-            $this->segmentDependencies,
-            $this->segmentCampaignShare,
             $listModel,
             $auditLogModel,
             [],
@@ -233,8 +231,6 @@ final class ListController extends FormController
             return $this->createSegmentNewResponse(
                 $request,
                 clone $segment,
-                $this->segmentDependencies,
-                $this->segmentCampaignShare,
                 $listModel,
                 $auditLogModel,
                 $postActionVars,
@@ -276,8 +272,6 @@ final class ListController extends FormController
             return $this->createSegmentModifyResponse(
                 $request,
                 $segment,
-                $this->segmentDependencies,
-                $this->segmentCampaignShare,
                 $listModel,
                 $auditLogModel,
                 $postActionVars,
@@ -328,7 +322,7 @@ final class ListController extends FormController
      *
      * @param array<string, string> $postActionVars
      */
-    private function createSegmentNewResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost): Response
+    private function createSegmentNewResponse(Request $request, LeadList $segment, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost): Response
     {
         // set the page we came from
         $page = $request->getSession()->get('mautic.segment.page', 1);
@@ -393,7 +387,7 @@ final class ListController extends FormController
      *
      * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');

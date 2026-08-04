@@ -36,7 +36,7 @@ final class AjaxController extends CommonAjaxController
     public function sendHookTestAction(Request $request): JsonResponse
     {
         try {
-            return $this->processWebhookTest($request, $this->client, $this->pathsHelper);
+            return $this->processWebhookTest($request);
         } catch (PrivateAddressException) {
             return $this->createErrorResponse(
                 'mautic.webhook.error.private_address'
@@ -50,7 +50,7 @@ final class AjaxController extends CommonAjaxController
         }
     }
 
-    private function processWebhookTest(Request $request, Client $client, PathsHelper $pathsHelper): JsonResponse
+    private function processWebhookTest(Request $request): JsonResponse
     {
         $url = $this->validateUrl($request);
 
@@ -67,7 +67,7 @@ final class AjaxController extends CommonAjaxController
         $payloadPaths = $this->getPayloadPaths($selectedTypes);
         $payload      = $this->loadPayloads($payloadPaths);
         $secret       = InputHelper::string($request->request->get('secret'));
-        $response     = $client->post($url, $payload, $secret);
+        $response     = $this->client->post($url, $payload, $secret);
 
         return $this->createResponseFromStatusCode($response->getStatusCode());
     }

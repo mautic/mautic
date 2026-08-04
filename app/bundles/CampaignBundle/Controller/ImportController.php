@@ -256,7 +256,7 @@ final class ImportController extends AbstractFormController
             return $this->redirectToRoute('mautic_campaign_import_action', ['objectAction' => 'new']);
         }
         if (self::STEP_PROGRESS_BAR === $step) {
-            $analyzeSummary = $this->analyzeData($this->importHelper, $fullPath);
+            $analyzeSummary = $this->analyzeData($fullPath);
 
             if (empty($analyzeSummary)) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
@@ -383,10 +383,10 @@ final class ImportController extends AbstractFormController
     /**
      * @return array<int|string, array<string, mixed>>
      */
-    private function analyzeData(ImportHelper $importHelper, string $fullPath): array
+    private function analyzeData(string $fullPath): array
     {
         try {
-            $fileData = $importHelper->readZipFile($fullPath);
+            $fileData = $this->importHelper->readZipFile($fullPath);
         } catch (\RuntimeException $e) {
             $this->logger->error($e->getMessage());
             $this->removeImportFile($fullPath);

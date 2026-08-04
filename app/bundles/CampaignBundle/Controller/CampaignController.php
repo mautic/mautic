@@ -158,12 +158,11 @@ class CampaignController extends AbstractStandardFormController
      * @param array<int, mixed> $assetList
      */
     private function handleExportDownload(
-        ExportHelper $exportHelper,
         string $jsonOutput,
         array $assetList,
         string $exportFileName,
     ): JsonResponse|BinaryFileResponse {
-        $filePath = $exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        $filePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
         if (!file_exists($filePath)) {
             $this->logger->error('Export file could not be created', ['filePath' => $filePath]);
             $this->addFlashMessage('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], FlashBag::LEVEL_ERROR);
@@ -174,7 +173,7 @@ class CampaignController extends AbstractStandardFormController
             ], 400);
         }
 
-        return $exportHelper->downloadAsZip($filePath, $exportFileName);
+        return $this->exportHelper->downloadAsZip($filePath, $exportFileName);
     }
 
     public function exportAction(CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
@@ -206,7 +205,7 @@ class CampaignController extends AbstractStandardFormController
         $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
         $assetList      = $assetListEvent->getList();
 
-        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($jsonOutput, $assetList, $exportFileName);
     }
 
     public function batchExportAction(Request $request): JsonResponse|BinaryFileResponse|Response
@@ -283,7 +282,7 @@ class CampaignController extends AbstractStandardFormController
 
         $jsonOutput = json_encode($allData, JSON_PRETTY_PRINT);
 
-        return $this->handleExportDownload($this->exportHelper, $jsonOutput, $assetList, $exportFileName);
+        return $this->handleExportDownload($jsonOutput, $assetList, $exportFileName);
     }
 
     /**

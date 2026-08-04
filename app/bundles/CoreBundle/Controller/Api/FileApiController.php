@@ -62,7 +62,7 @@ final class FileApiController extends CommonApiController
     public function createAction(Request $request, $dir)
     {
         try {
-            $path = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir, true);
+            $path = $this->getAbsolutePath($request, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -101,7 +101,7 @@ final class FileApiController extends CommonApiController
     public function listAction(Request $request, $dir)
     {
         try {
-            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir);
+            $filePath = $this->getAbsolutePath($request, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -134,7 +134,7 @@ final class FileApiController extends CommonApiController
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $this->pathsHelper, $this->mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -159,7 +159,7 @@ final class FileApiController extends CommonApiController
      * @param string $dir
      * @param bool   $createDir
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false): string
+    protected function getAbsolutePath(Request $request, $dir, $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];
@@ -179,7 +179,7 @@ final class FileApiController extends CommonApiController
             }
 
             if ('images' === $dir) {
-                $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
+                $absoluteDir = realpath($this->pathsHelper->getSystemPath($dir, true));
             } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
@@ -206,7 +206,7 @@ final class FileApiController extends CommonApiController
 
             return $path;
         } catch (\Exception $e) {
-            $mauticLogger->error($e->getMessage(), ['exception' => $e]);
+            $this->mauticLogger->error($e->getMessage(), ['exception' => $e]);
 
             throw $e;
         }

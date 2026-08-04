@@ -115,4 +115,9 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
+
+        // every controller extends this one, so a changed public method signature ripples through the whole app
+        Rector\Symfony\CodeQuality\Rector\Class_\ControllerMethodInjectionToConstructorRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
+        ],
     ]);

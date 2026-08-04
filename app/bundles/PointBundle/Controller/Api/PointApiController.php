@@ -92,7 +92,7 @@ final class PointApiController extends CommonApiController
         }
 
         try {
-            $this->logApiPointChange($request, $this->ipLookupHelper, $lead, $delta, $operator);
+            $this->logApiPointChange($request, $lead, $delta, $operator);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -105,9 +105,9 @@ final class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
+    protected function logApiPointChange(Request $request, $lead, $delta, $operator): void
     {
-        $ip         = $ipLookupHelper->getIpAddress();
+        $ip         = $this->ipLookupHelper->getIpAddress();
         $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));
         $actionName = InputHelper::clean($request->request->get('actionName', $this->translator->trans('mautic.lead.event.api')));
 
