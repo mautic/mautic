@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardEmailsInTimeWidgetType extends AbstractType
+final class DashboardEmailsInTimeWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

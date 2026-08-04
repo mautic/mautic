@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * @extends CommonApiController<User>
  */
-class UserApiController extends CommonApiController
+final class UserApiController extends CommonApiController
 {
     /**
      * @var UserModel|null
@@ -46,10 +46,8 @@ class UserApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserModel $userModel,
     ) {
-        $userModel     = $modelFactory->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-
         $this->model            = $userModel;
         $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
@@ -63,11 +61,9 @@ class UserApiController extends CommonApiController
     /**
      * Obtains the logged in user's data.
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction(TokenStorageInterface $tokenStorage)
+    public function getSelfAction(TokenStorageInterface $tokenStorage): Response
     {
         $currentUser = $tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
@@ -155,21 +151,18 @@ class UserApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
-        switch ($action) {
-            case 'new':
-                $submittedPassword = null;
-                if (isset($parameters['plainPassword'])) {
-                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
-                        $submittedPassword = $parameters['plainPassword']['password'];
-                    } else {
-                        $submittedPassword = $parameters['plainPassword'];
-                    }
+        if ('new' === $action) {
+            $submittedPassword = null;
+            if (isset($parameters['plainPassword'])) {
+                if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                    $submittedPassword = $parameters['plainPassword']['password'];
+                } else {
+                    $submittedPassword = $parameters['plainPassword'];
                 }
-
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
-                break;
+            }
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
         }
     }
 
@@ -178,12 +171,10 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function isGrantedAction(Request $request, $id)
+    public function isGrantedAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
@@ -207,10 +198,8 @@ class UserApiController extends CommonApiController
 
     /**
      * Obtains a list of roles for user edits.
-     *
-     * @return Response
      */
-    public function getRolesAction(Request $request)
+    public function getRolesAction(Request $request): Response
     {
         if (!$this->security->isGranted(
             ['user:users:create', 'user:users:edit'],

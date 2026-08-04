@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
@@ -42,7 +43,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $model = static::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignLeadsLabel                                      = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 

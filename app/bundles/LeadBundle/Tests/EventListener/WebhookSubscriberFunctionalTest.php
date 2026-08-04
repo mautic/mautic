@@ -38,7 +38,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = static::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $segmentModel);
 
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);

@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Update\Exception;
 
-class MetadataNotFoundException extends \Exception
+final class MetadataNotFoundException extends \Exception
 {
 }

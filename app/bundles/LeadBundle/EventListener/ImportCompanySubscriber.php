@@ -82,7 +82,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
                 $event->import->getDefault('owner'),
                 (bool) $event->import->getDefault('skip_if_exists')
             );
-            $event->setWasMerged((bool) $merged);
+            $event->setWasMerged($merged);
             $event->stopPropagation();
         }
     }

@@ -214,7 +214,7 @@ class CorePermissions implements ResetInterface
 
             $parts = explode(':', $permission);
             if (false === in_array(count($parts), [3, 4])) {
-                throw new PermissionBadFormatException($this->getTranslator()->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
+                throw new PermissionBadFormatException($this->translator->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
             }
 
             if ($userEntity->isAdmin()) {
@@ -231,7 +231,7 @@ class CorePermissions implements ResetInterface
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
                     } else {
-                        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
+                        throw new PermissionNotFoundException($this->translator->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
                     }
                 } elseif ('anon.' == $userEntity) {
                     // anon user or session timeout
@@ -260,7 +260,7 @@ class CorePermissions implements ResetInterface
         if ('RETURN_ARRAY' == $mode) {
             return $permissions;
         }
-        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
+        throw new PermissionNotFoundException($this->translator->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
     }
 
     /**
@@ -481,13 +481,13 @@ class CorePermissions implements ResetInterface
 
     private function registerPermissionClasses(): void
     {
-        foreach ($this->getBundles() as $bundle) {
+        foreach ($this->bundles as $bundle) {
             if (!empty($bundle['permissionClasses'])) {
                 $this->permissionClasses = array_merge($this->permissionClasses, $bundle['permissionClasses']);
             }
         }
 
-        foreach ($this->getPluginBundles() as $bundle) {
+        foreach ($this->pluginBundles as $bundle) {
             if (!empty($bundle['permissionClasses'])) {
                 $this->permissionClasses = array_merge($this->permissionClasses, $bundle['permissionClasses']);
             }

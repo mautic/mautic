@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Mautic\LeadBundle\Form\Type\HtmlType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -29,7 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 
 final class FieldAliasToFqcnMapTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('aliasFqcnProvider')]
+    #[DataProvider('aliasFqcnProvider')]
     public function testGetFqcn(string $alias, string $fcqn): void
     {
         $this->assertSame(FieldAliasToFqcnMap::getFqcn($alias), $fcqn);

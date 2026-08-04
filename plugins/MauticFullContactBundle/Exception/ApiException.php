@@ -2,6 +2,6 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Exception;
 
-class ApiException extends BaseException
+final class ApiException extends BaseException
 {
 }

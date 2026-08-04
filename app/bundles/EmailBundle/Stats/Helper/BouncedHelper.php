@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-class BouncedHelper extends AbstractHelper
+final class BouncedHelper extends AbstractHelper
 {
     public const NAME = 'email-bounced';
 

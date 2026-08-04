@@ -9,11 +9,16 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Export entity data.'
+)]
 final class EntityExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:entity:export';
@@ -30,8 +35,6 @@ final class EntityExportCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Export entity data.')
             ->addOption('entity', null, InputOption::VALUE_REQUIRED, 'The name of the entity to export (e.g., campaign, email)')
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Comma-separated list of entity IDs to export (e.g., --id=1,2,3)')
             ->addOption('json-only', null, InputOption::VALUE_NONE, 'Output only JSON data.')

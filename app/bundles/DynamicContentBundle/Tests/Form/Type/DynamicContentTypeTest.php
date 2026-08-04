@@ -9,6 +9,7 @@ use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -39,10 +40,6 @@ final class DynamicContentTypeTest extends TestCase
 
         $leadRepositoryMock = $this->createMock(LeadRepository::class);
 
-        $leadModelMock->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($leadRepositoryMock);
-
         $leadRepositoryMock->expects($this->once())
             ->method('getCustomFieldList')
             ->with('lead')
@@ -60,6 +57,7 @@ final class DynamicContentTypeTest extends TestCase
             $leadModelMock,
             new TypeList(),
             $relativeDateMock,
+            $leadRepositoryMock,
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
@@ -95,7 +93,7 @@ final class DynamicContentTypeTest extends TestCase
                     $this->assertSame('filters', $parameters[0]);
                     $this->assertSame(CollectionType::class, $parameters[1]);
                     $this->assertSame([
-                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
+                        'entry_type'     => DwcEntryFiltersType::class,
                         'entry_options'  => [
                             'countries'    => FormFieldHelper::getCountryChoices(),
                             'regions'      => FormFieldHelper::getRegionChoices(),

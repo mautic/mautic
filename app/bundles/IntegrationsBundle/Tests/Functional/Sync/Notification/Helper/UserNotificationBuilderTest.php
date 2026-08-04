@@ -17,7 +17,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->notificationBuilder = static::getContainer()->get('mautic.integrations.sync.notification.user_notification_builder');
+        $this->notificationBuilder = static::getContainer()->get(UserNotificationBuilder::class);
     }
 
     public function testGetUserIdsWithNonExistentObject(): void
@@ -36,7 +36,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $userIds = $this->notificationBuilder->getUserIds('lead', (int) $lead->getId());
+        $userIds = $this->notificationBuilder->getUserIds('lead', $lead->getId());
         $this->assertInstanceOf(User::class, $user);
 
         $this->assertSame([$user->getId()], $userIds);

@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class StandAloneButtonType extends AbstractType
+final class StandAloneButtonType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

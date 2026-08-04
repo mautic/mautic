@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Executioner\Dispatcher\Exception;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class LogPassedAndFailedException extends \Exception
+final class LogPassedAndFailedException extends \Exception
 {
     public function __construct(LeadEventLog $log)
     {

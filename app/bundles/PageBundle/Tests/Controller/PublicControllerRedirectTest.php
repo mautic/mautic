@@ -11,13 +11,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
+    #[DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/new');
@@ -60,7 +61,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('redirectUrlProvider')]
+    #[DataProvider('redirectUrlProvider')]
     public function testRedirectWithSpecialCharsInQuery(string $url): void
     {
         $redirect = new Redirect();
@@ -112,7 +113,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
-        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
 
         $this->logoutUser();
 

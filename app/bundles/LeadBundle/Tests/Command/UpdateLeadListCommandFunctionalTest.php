@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -489,8 +490,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -583,8 +584,8 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test Company');
         $company->addUpdatedField($fieldAlias, $companyValue);
 
-        $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -629,7 +630,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        $this->assertSame((int) $expected, (int) $leadListRepository->getLeadCount([$segment->getId()]));
+        $this->assertSame($expected, (int) $leadListRepository->getLeadCount([$segment->getId()]));
     }
 
     /**

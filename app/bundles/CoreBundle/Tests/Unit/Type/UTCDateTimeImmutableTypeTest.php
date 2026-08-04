@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Type;
 use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeImmutableType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class UTCDateTimeImmutableTypeTest extends TestCase
@@ -34,7 +35,7 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
+    #[DataProvider('timezoneProvider')]
     public function testConvertToDatabaseValueWithDate(string $timezone, string $date): void
     {
         date_default_timezone_set($timezone);
@@ -50,7 +51,7 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
         $this->assertNull($this->type->convertToPHPValue(null, $this->platform));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('timezoneProvider')]
+    #[DataProvider('timezoneProvider')]
     public function testConvertToPHPValueWithDate(string $timezone, string $date): void
     {
         date_default_timezone_set($timezone);

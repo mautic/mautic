@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticFocusBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
-class FocusEvent extends CommonEvent
+final class FocusEvent extends CommonEvent
 {
     /**
      * @param bool|false $isNew

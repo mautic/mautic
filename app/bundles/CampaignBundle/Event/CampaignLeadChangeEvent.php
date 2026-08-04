@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CampaignLeadChangeEvent extends Event
+final class CampaignLeadChangeEvent extends Event
 {
     /**
      * @var ?Lead

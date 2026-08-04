@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\Stat\Exception;
 
-class StatNotFoundException extends \Exception
+final class StatNotFoundException extends \Exception
 {
 }

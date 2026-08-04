@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -15,8 +15,9 @@ class IpAddressModel
     private const DELETE_SIZE = 10000;
 
     public function __construct(
-        protected EntityManager $entityManager,
+        protected EntityManagerInterface $entityManager,
         protected LoggerInterface $logger,
+        private readonly IpAddressRepository $ipAddressRepository,
     ) {
     }
 
@@ -38,7 +39,7 @@ class IpAddressModel
      */
     public function findOneByIpAddress($ip)
     {
-        return $this->entityManager->getRepository(IpAddress::class)->findOneByIpAddress($ip);
+        return $this->ipAddressRepository->findOneByIpAddress($ip);
     }
 
     /**
@@ -78,15 +79,13 @@ class IpAddressModel
      */
     public function deleteUnusedIpAddresses(int $limit): int
     {
-        /** @var IpAddressRepository $ipAddressRepo */
-        $ipAddressRepo = $this->entityManager->getRepository(IpAddress::class);
-        $ipIds         = $ipAddressRepo->getUnusedIpAddressesIds($limit);
+        $ipIds = $this->ipAddressRepository->getUnusedIpAddressesIds($limit);
 
         $chunkedIds = array_chunk($ipIds, self::DELETE_SIZE);
         $count      = 0;
 
         foreach ($chunkedIds as $ids) {
-            $count += $ipAddressRepo->deleteUnusedIpAddresses($ids);
+            $count += $this->ipAddressRepository->deleteUnusedIpAddresses($ids);
 
             // Use sleep to recover from any potential table locks.
             usleep(50000);

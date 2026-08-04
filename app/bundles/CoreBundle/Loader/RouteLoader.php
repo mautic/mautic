@@ -9,7 +9,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteLoader extends Loader
+final class RouteLoader extends Loader
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
@@ -86,10 +86,7 @@ class RouteLoader extends Loader
         return $collection;
     }
 
-    /**
-     * @param mixed $resource
-     */
-    public function supports($resource, $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return 'mautic' === $type;
     }

@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object;
 
-class Contact
+final class Contact
 {
     public const OBJECT = 'Contact';
 

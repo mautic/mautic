@@ -44,7 +44,7 @@ class FormController extends AbstractStandardFormController
         string $templateBase,
         string $activeLink,
         string $mauticContent,
-    ) {
+    ): void {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
         if (!str_starts_with($sessionBase, 'mautic.')) {

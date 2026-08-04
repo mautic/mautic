@@ -7,11 +7,11 @@ namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,7 +36,6 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact           = $this->createMock(Lead::class);
         $this->client            = $this->createMock(Client::class);
-        $companyModel            = $this->createMock(CompanyModel::class);
         $ipCollection            = new ArrayCollection();
         $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
             ->disableOriginalConstructor()
@@ -45,9 +44,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $companyModel->method('getRepository')->willReturn($companyRepository);
-
-        $this->campaignHelper = new CampaignHelper($this->client, $companyModel, $this->createStub(EventDispatcherInterface::class));
+        $this->campaignHelper = new CampaignHelper($this->client, $this->createStub(EventDispatcherInterface::class), $companyRepository);
 
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
@@ -68,8 +65,8 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('get')
             ->with($expectedUrl, [
-                \GuzzleHttp\RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -83,9 +80,9 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
-                \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
+                RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
+                RequestOptions::TIMEOUT     => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -98,13 +95,13 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::HEADERS => [
+                RequestOptions::HEADERS => [
                     'test'         => 'tee',
                     'company'      => 'Mautic',
                     'content-type' => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::BODY    => json_encode(
+                RequestOptions::TIMEOUT => 10,
+                RequestOptions::BODY    => json_encode(
                     ['test' => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']
                 ),
             ])
@@ -163,11 +160,10 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         if ('application/json' === $type) {
-            array_push($sample['headers']['list'],
-                [
-                    'label' => 'content-type',
-                    'value' => 'application/json',
-                ]);
+            $sample['headers']['list'][] = [
+                'label' => 'content-type',
+                'value' => 'application/json',
+            ];
         }
 
         return $sample;

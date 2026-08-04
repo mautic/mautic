@@ -21,7 +21,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->configParams['webhook_log_max']                      = 5;
         parent::setUp();
 
-        $this->webhookModel = static::getContainer()->get('mautic.webhook.model.webhook');
+        $this->webhookModel = static::getContainer()->get(WebhookModel::class);
     }
 
     public function testRemoveLogInstantly(): void
@@ -31,7 +31,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 6; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $this->assertLogs($webhook, 6, $logIds);
@@ -39,7 +39,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->webhookModel->addLog($webhook, 200, 15);
 
         array_shift($logIds);
-        array_push($logIds, end($logIds) + 1);
+        $logIds[] = end($logIds) + 1;
         $this->assertLogs($webhook, 6, $logIds);
     }
 
@@ -50,14 +50,14 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 6; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $this->assertLogs($webhook, 6, $logIds);
 
         $this->webhookModel->addLog($webhook, 200, 15);
 
-        array_push($logIds, end($logIds) + 1);
+        $logIds[] = end($logIds) + 1;
         $this->assertLogs($webhook, 7, $logIds);
     }
 
@@ -68,7 +68,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 7; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);

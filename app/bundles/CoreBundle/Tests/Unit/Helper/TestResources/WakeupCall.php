@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper\TestResources;
 
-class WakeupCall
+final class WakeupCall
 {
     public function __wakeup()
     {

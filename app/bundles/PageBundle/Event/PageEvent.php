@@ -5,7 +5,7 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Page;
 
-class PageEvent extends CommonEvent
+final class PageEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectUpdateEvent extends Event
+final class InternalObjectUpdateEvent extends Event
 {
     /**
      * @var UpdatedObjectMappingDAO[]

@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ParseEmailEvent extends Event
+final class ParseEmailEvent extends Event
 {
     /**
      * @var mixed[]

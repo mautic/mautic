@@ -183,6 +183,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getRole()->getCreatedBy();
+        return $this->role->getCreatedBy();
     }
 }

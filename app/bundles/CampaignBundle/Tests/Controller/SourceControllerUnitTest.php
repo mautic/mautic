@@ -174,9 +174,8 @@ final class SourceControllerUnitTest extends TestCase
             ->onlyMethods(['getModel', 'generateUrl', 'isFormCancelled', 'isFormValid', 'renderView'])
             ->getMock();
 
-        $controller->method('getModel')
-            ->with('campaign')
-            ->willReturn($campaignModel);
+        $controller->autowireSourceController($campaignModel);
+
         $controller->method('isFormCancelled')
             ->willReturn(false);
         $controller->method('isFormValid')

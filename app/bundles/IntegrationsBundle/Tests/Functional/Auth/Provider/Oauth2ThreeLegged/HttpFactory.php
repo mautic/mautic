@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory as Ori
  * In many custom plugins, the `HttpFactory` is used as argument in constructor injection. The use of class
  * `HttpFactory` should be replaced with AuthProviderInterface.
  */
-class HttpFactory extends OriginalHttpFactory implements AuthProviderInterface
+final class HttpFactory extends OriginalHttpFactory implements AuthProviderInterface
 {
     private ClientInterface $client;
 

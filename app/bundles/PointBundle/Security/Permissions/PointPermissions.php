@@ -5,7 +5,7 @@ namespace Mautic\PointBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PointPermissions extends AbstractPermissions
+final class PointPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

@@ -127,8 +127,8 @@ class PeakInteractionTimer
 
     private function resetBias(): void
     {
-        $this->bestHourStart  = (int) $this->bestDefaultHourStart;
-        $this->bestHourEnd    = (int) $this->bestDefaultHourEnd;
+        $this->bestHourStart  = $this->bestDefaultHourStart;
+        $this->bestHourEnd    = $this->bestDefaultHourEnd;
         $bestDays             = array_map(intval(...), $this->bestDefaultDays);
         $this->bestDays       = !empty($bestDays) ? $bestDays : self::DEFAULT_BEST_DAYS;
         $this->maxOptimalDays = count($this->bestDays);

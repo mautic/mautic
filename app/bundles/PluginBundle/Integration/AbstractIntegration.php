@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -34,6 +35,8 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -75,7 +78,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
@@ -95,10 +98,27 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     private \Closure $clientFactory;
 
+    protected IntegrationEntityRepository $integrationEntityRepository;
+
+    protected LeadRepository $leadRepository;
+
+    protected UserRepository $userRepository;
+
+    #[Required]
+    public function autowireAbstractIntegration(
+        IntegrationEntityRepository $integrationEntityRepository,
+        LeadRepository $leadRepository,
+        UserRepository $userRepository,
+    ): void {
+        $this->integrationEntityRepository = $integrationEntityRepository;
+        $this->leadRepository              = $leadRepository;
+        $this->userRepository              = $userRepository;
+    }
+
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        protected EntityManager $em,
+        protected EntityManagerInterface $em,
         protected RequestStack $requestStack,
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
@@ -336,7 +356,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function mergeApiKeys($mergeKeys, $withKeys = [], $return = false)
     {
-        $settings = $this->settings;
         if (empty($withKeys)) {
             $withKeys = $this->keys;
         }
@@ -359,10 +378,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
             return $this->keys;
         }
-        $this->encryptAndSetApiKeys($withKeys, $settings);
+        $this->encryptAndSetApiKeys($withKeys, $this->settings);
 
         // reset for events that depend on rebuilding auth objects
-        $this->setIntegrationSettings($settings);
+        $this->setIntegrationSettings($this->settings);
     }
 
     /**
@@ -403,9 +422,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         static $decryptedKeys = [];
 
-        if (!$entity) {
-            $entity = $this->settings;
-        }
+        $entity = $entity ?: $this->settings;
 
         $keys = $entity->getApiKeys();
 
@@ -427,8 +444,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Encrypts API keys.
-     *
      * @return array
      */
     public function encryptApiKeys(array $keys)
@@ -444,8 +459,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Decrypts API keys.
-     *
      * @param bool $mainDecryptOnly
      *
      * @return array
@@ -843,7 +856,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
+            $this->integrationEntityRepository->saveEntity($entity);
         }
 
         return $entity;
@@ -854,7 +867,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(IntegrationEntity::class);
+        return $this->integrationEntityRepository;
     }
 
     /**
@@ -1323,7 +1336,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public data.
      *
-     * @return mixed[]|void
+     * @return mixed[]|ResponseInterface|void
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -1696,7 +1709,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];
 
@@ -1711,15 +1723,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(Lead::class)
-                ->getLeadsByUniqueFields($uniqueLeadFieldData);
+            $existingLeads = $this->leadRepository->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         // Update the social cache
         $leadSocialCache = $lead->getSocialCache();
@@ -1754,7 +1765,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     null,
                     $this->getDisplayName()
                 ));
-                $leadModel->saveEntity($lead, false);
+                $this->leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
                 $this->logger->warning($exception->getMessage());
 
@@ -1922,11 +1933,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
     {
-        $logger = $this->logger;
-
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->userRepository->getEntities(
                     [
                         'filter' => [
                             'force' => [
@@ -1990,7 +1999,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $this->logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
@@ -2222,26 +2231,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $this->mauticDuplicates = [];
         }
 
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
-            $integrationEntityRepo->saveEntities($leadsToSync);
-            $integrationEntityRepo->deleteEntity($leadsToSync);
+            $this->integrationEntityRepository->saveEntities($leadsToSync);
+            $this->integrationEntityRepository->deleteEntity($leadsToSync);
             $leadsToSync = [];
         }
 
         // Persist updated entities if applicable
         if ($this->persistIntegrationEntities) {
-            $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
+            $this->integrationEntityRepository->saveEntities($this->persistIntegrationEntities);
             $this->persistIntegrationEntities = [];
         }
 
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ($this->deleteIntegrationEntities) {
-            $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+            $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
             $this->deleteIntegrationEntities = [];
         }
-        $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+        $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
             if ($error instanceof \Exception) {
@@ -2260,8 +2268,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
     {
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
+        $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
             $integrationEntity,
             $internalEntity,
@@ -2296,8 +2303,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $integrationEntityRepo->saveEntities($integrationEntities);
-        $integrationEntityRepo->detachEntities($integrationEntities);
+        $this->integrationEntityRepository->saveEntities($integrationEntities);
+        $this->integrationEntityRepository->detachEntities($integrationEntities);
     }
 
     /**

@@ -14,6 +14,7 @@ use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\EventListener\LeadSubscriber;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -70,7 +71,7 @@ final class LeadSubscriberTest extends CommonMocks
                     return self::EVENT_TYPE_CLICK_NAME;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
     }
 

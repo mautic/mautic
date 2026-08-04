@@ -183,7 +183,16 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 showLoadingBar: showLoading,
                 url: route,
                 type: "GET",
-                data: searchName + "=" + encodeURIComponent(value) + tmplParam,
+                data: (function () {
+                    let requestData = searchName + "=" + encodeURIComponent(value) + tmplParam;
+                    const filters = el.attr('data-filters');
+
+                    if (filters !== undefined) {
+                        requestData += "&filters=" + encodeURIComponent(filters);
+                    }
+
+                    return requestData;
+                })(),
                 dataType: "json",
                 success: function (response) {
                     //cache the response

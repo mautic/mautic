@@ -2,6 +2,6 @@
 
 namespace Mautic\ReportBundle\Scheduler\Exception;
 
-class NotSupportedScheduleTypeException extends \Exception
+final class NotSupportedScheduleTypeException extends \Exception
 {
 }

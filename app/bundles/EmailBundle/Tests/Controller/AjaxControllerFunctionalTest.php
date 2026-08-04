@@ -17,14 +17,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
+    #[DataProvider('provideSendToDncStatus')]
     public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
     {
         $email = $this->createEmailWithParams(
@@ -50,7 +53,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('sendToDncStatus', $content);
         $this->assertSame($sendToDnc, $content['sendToDncStatus']);
         $this->assertSame(
-            static::getContainer()->get('translator')->trans($expectedTranslationKey),
+            static::getContainer()->get(TranslatorInterface::class)->trans($expectedTranslationKey),
             $content['sendToDncText']
         );
     }
@@ -77,7 +80,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testSendTestEmailAction(): void
     {
         /** @var CoreParametersHelper $parameters */
-        $parameters = self::getContainer()->get('mautic.helper.core_parameters');
+        $parameters = self::getContainer()->get(CoreParametersHelper::class);
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
         self::assertResponseIsSuccessful();
@@ -98,7 +101,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
         $this->assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
         $this->assertCount(1, $email->getTo());
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
         $this->assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
     }
@@ -269,7 +272,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Email Subject');
         $email->setEmailType('template');
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         $payload = [
             'action'     => 'email:getLookupChoiceList',

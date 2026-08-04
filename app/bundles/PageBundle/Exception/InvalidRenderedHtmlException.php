@@ -2,6 +2,6 @@
 
 namespace Mautic\PageBundle\Exception;
 
-class InvalidRenderedHtmlException extends \Exception
+final class InvalidRenderedHtmlException extends \Exception
 {
 }

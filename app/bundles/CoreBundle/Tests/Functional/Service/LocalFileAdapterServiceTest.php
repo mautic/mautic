@@ -19,7 +19,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = static::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
@@ -64,7 +64,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         );
         self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = static::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
         $this->assertDirectoryExists($folderPath);
         $this->assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));

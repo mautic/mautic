@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldEmailType extends AbstractType
+final class FormFieldEmailType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

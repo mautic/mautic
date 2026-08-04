@@ -106,18 +106,14 @@ class Category extends FormEntity implements UuidInterface
         $metadata->addPropertyConstraint(
             'title',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.title.required',
-                ]
+                message: 'mautic.core.title.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'bundle',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
+                message: 'mautic.core.value.required'
             )
         );
     }

@@ -17,7 +17,7 @@ abstract class AbstractFormController extends CommonController
     /**
      * @param string $objectModel
      *
-     * @return mixed
+     * @return RedirectResponse
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
     {
@@ -66,7 +66,7 @@ abstract class AbstractFormController extends CommonController
      * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|array
+     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
@@ -233,7 +233,7 @@ abstract class AbstractFormController extends CommonController
         $vars['returnUrl'] = $returnUrl;
 
         $urlMatcher  = explode('/s/', $returnUrl);
-        $actionRoute = $this->container->get('router')->match('/s/'.$urlMatcher[1]);
+        $actionRoute = $this->router->match('/s/'.$urlMatcher[1]);
         $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 

@@ -11,11 +11,11 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MessageModel $model,
-        private readonly GlobalSearch $globalSearch,
+        private MessageModel $model,
+        private GlobalSearch $globalSearch,
     ) {
     }
 

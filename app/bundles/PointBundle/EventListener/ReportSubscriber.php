@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_GROUP_SCORE = 'group.score';
 

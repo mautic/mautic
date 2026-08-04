@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Deduplicate\Exception;
 
-class ValueNotMergeableException extends \Exception
+final class ValueNotMergeableException extends \Exception
 {
     /**
      * @param mixed $newerValue

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PasswordResetConfirmType extends AbstractType
+final class PasswordResetConfirmType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -34,7 +34,7 @@ class PasswordResetConfirmType extends AbstractType
                 ],
                 'required'    => true,
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'mautic.user.user.passwordreset.notblank']),
+                    new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
                 ],
             ]
         );
@@ -57,11 +57,8 @@ class PasswordResetConfirmType extends AbstractType
                     'required'       => true,
                     'error_bubbling' => false,
                     'constraints'    => [
-                        new Assert\NotBlank(['message' => 'mautic.user.user.passwordreset.notblank']),
-                        new Assert\Length([
-                            'min'        => 6,
-                            'minMessage' => 'mautic.user.user.password.minlength',
-                        ]),
+                        new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
+                        new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength'),
                         new NotWeak([
                             'message' => 'mautic.user.user.password.weak',
                         ]),
@@ -81,7 +78,7 @@ class PasswordResetConfirmType extends AbstractType
                     'required'       => true,
                     'error_bubbling' => false,
                     'constraints'    => [
-                        new Assert\NotBlank(['message' => 'mautic.user.user.passwordreset.notblank']),
+                        new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
                     ],
                 ],
                 'type'            => PasswordType::class,

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -26,10 +27,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
+
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireAbstractFormController(
+        AuditLogModel $auditLogModel,
+    ): void {
+        $this->auditLogModel = $auditLogModel;
+    }
 
     public function __construct(
         protected FormFactoryInterface $formFactory,
@@ -1080,7 +1091,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $this->setListFilters();
 
         // Audit log entries
-        $logs = ($logObject) ? $this->getModel('core.auditlog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : [];
+        $logs = ($logObject) ? $this->auditLogModel->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : [];
 
         // Generate route
         $routeVars = [

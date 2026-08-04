@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
@@ -318,8 +319,8 @@ class EmailRepository extends CommonRepository
         if ($threadId && $maxThreads) {
             if ($threadId <= $maxThreads) {
                 $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
-                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 

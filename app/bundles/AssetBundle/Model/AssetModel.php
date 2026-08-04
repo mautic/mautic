@@ -2,14 +2,17 @@
 
 namespace Mautic\AssetBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -23,6 +26,7 @@ use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -32,6 +36,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -57,7 +62,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,
         private readonly ContactTracker $contactTracker,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -65,6 +70,10 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly EmailRepository $emailRepository,
+        private readonly AssetRepository $assetRepository,
+        private readonly DownloadRepository $downloadRepository,
+        private readonly CategoryRepository $categoryRepository,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -159,8 +168,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository(Email::class);
-                    if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
+                    if ($emailEntity = $this->emailRepository->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
                 }
@@ -229,7 +237,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $isUnique = $trackingNewlyGenerated;
         } elseif (!empty($trackingId)) {
             // Determine if this is a unique download
-            $isUnique = $this->getDownloadRepository()->isUniqueDownload($asset->getId(), $trackingId);
+            $isUnique = $this->downloadRepository->isUniqueDownload($asset->getId(), $trackingId);
         }
 
         $download->setTrackingId($trackingId);
@@ -237,7 +245,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         if (empty($systemEntry)) {
             $download->setAsset($asset);
 
-            $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
+            $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
         // check for existing IP
@@ -277,17 +285,17 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
-        $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
+        $this->assetRepository->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
+    public function getRepository(): AssetRepository
     {
-        return $this->em->getRepository(Asset::class);
+        return $this->assetRepository;
     }
 
-    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
+    public function getDownloadRepository(): DownloadRepository
     {
-        return $this->em->getRepository(Download::class);
+        return $this->downloadRepository;
     }
 
     public function getPermissionBase(): string
@@ -300,7 +308,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -379,18 +387,17 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $request   = $this->requestStack->getCurrentRequest();
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
+                $this->assetRepository->setCurrentUser($this->userHelper->getUser());
                 // During the form submit & edit, make sure that the data is checked against available assets
                 if ('mautic_segment_action' === $request->get('_route')
                     && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
                 ) {
                     $limit = 0;
                 }
-                $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
+                $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->categoryModel->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryRepository->getCategoryList($filter, $limit, 0);
                 break;
         }
 
@@ -467,8 +474,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             return 0;
         }
 
-        $repo = $this->getRepository();
-        $size = $repo->getAssetSize($assets);
+        $size = $this->assetRepository->getAssetSize($assets);
 
         if ($size) {
             $size = Asset::convertBytesToHumanReadable($size);
@@ -628,7 +634,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
-        if (empty($id) || !ctype_digit((string) $id)) {
+        if (empty($id) || !ctype_digit($id)) {
             return false;
         }
 

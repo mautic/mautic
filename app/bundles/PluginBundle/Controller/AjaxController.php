@@ -9,11 +9,22 @@ use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
 use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    private PluginModel $pluginModel;
+
+    #[Required]
+    public function autowirePluginAjaxController(
+        PluginModel $pluginModel,
+    ): void {
+        $this->pluginModel = $pluginModel;
+    }
+
+    public function setIntegrationFilterAction(Request $request): JsonResponse
     {
         $session      = $request->getSession();
         $pluginFilter = (int) $request->get('plugin');
@@ -25,7 +36,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for list of fields.
      */
-    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -53,11 +64,8 @@ class AjaxController extends CommonAjaxController
                     $session = $request->getSession();
                     $session->set('mautic.plugin.'.$integration.'.'.$object.'.page', $page);
 
-                    /** @var PluginModel $pluginModel */
-                    $pluginModel = $this->getModel('plugin');
-
                     // Get a list of custom form fields
-                    $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $mauticFields       = ($isLead) ? $this->pluginModel->getLeadFields() : $this->pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
                     $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
@@ -108,7 +116,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for integration properties.
      */
-    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationConfigAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -162,7 +170,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getIntegrationCampaignStatusAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -216,7 +224,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function matchFieldsAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');
@@ -261,10 +269,7 @@ class AjaxController extends CommonAjaxController
             $dataArray = ['success' => 1];
         }
         $entity->setFeatureSettings($featureSettings);
-
-        $pluginModel = $this->getModel('plugin');
-        \assert($pluginModel instanceof PluginModel);
-        $pluginModel->saveFeatureSettings($entity);
+        $this->pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
     }

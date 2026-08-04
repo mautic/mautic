@@ -32,7 +32,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = static::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
@@ -63,7 +63,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = static::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');

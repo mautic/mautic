@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class KeepAliveController
+final class KeepAliveController
 {
     public function keepAliveAction(): Response
     {

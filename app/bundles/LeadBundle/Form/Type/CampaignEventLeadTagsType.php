@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadTagsType extends AbstractType
+final class CampaignEventLeadTagsType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

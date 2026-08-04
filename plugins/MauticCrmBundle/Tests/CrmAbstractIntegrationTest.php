@@ -6,6 +6,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
@@ -119,7 +120,7 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($data);
 
         $company = $integration->getMauticCompany($data);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));

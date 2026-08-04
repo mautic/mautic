@@ -22,7 +22,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
     public function testBatchDeleteFields(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $leadField = new LeadField();
         $leadField->setName('Test Lead Field')

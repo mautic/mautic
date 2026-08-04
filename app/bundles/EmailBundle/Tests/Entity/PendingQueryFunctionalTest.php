@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -21,7 +22,7 @@ final class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void
     {
-        $emailRepository = $this->em->getRepository(Email::class);
+        $emailRepository = self::getContainer()->get(EmailRepository::class);
 
         $contactCount  = 4;
         $oneBatchCount = $contactCount / 2;
@@ -58,7 +59,7 @@ final class PendingQueryFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 

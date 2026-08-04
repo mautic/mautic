@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicContentListType extends AbstractType
+final class DynamicContentListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -54,7 +54,7 @@ class DynamicContentListType extends AbstractType
         return 'dwc_list';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

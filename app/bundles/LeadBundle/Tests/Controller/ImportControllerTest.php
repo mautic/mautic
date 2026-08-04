@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
@@ -21,11 +22,14 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
@@ -63,7 +67,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
+    #[DataProvider('validateDataProvider')]
     public function testImportMappingAndImport(string $skipIfExist, string $expectedName): void
     {
         $this->createLead('john@doe.email', 'Johny');
@@ -443,8 +447,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function addCancellationNotification(?Import $import = null): void
     {
         /** @var NotificationModel $notificationModel */
-        $notificationModel = static::getContainer()->get('mautic.core.model.notification');
-        $translator        = static::getContainer()->get('translator');
+        $notificationModel = static::getContainer()->get(NotificationModel::class);
+        $translator        = static::getContainer()->get(TranslatorInterface::class);
 
         $fileName = basename('/tmp/test.csv');
         $message  = $import && $import->getId()
@@ -466,7 +470,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function assertNotificationMessageContainsForUser(int $userId, string $expectedSubstring): void
     {
-        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notificationRepo = self::getContainer()->get(NotificationRepository::class);
         $notifications    = $notificationRepo->getNotifications($userId);
         $found            = false;
         foreach ($notifications as $notification) {
@@ -481,7 +485,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function assertNotificationMessageDoesNotContainForUser(int $userId, string $expectedSubstring): void
     {
-        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notificationRepo = self::getContainer()->get(NotificationRepository::class);
         $notifications    = $notificationRepo->getNotifications($userId);
 
         foreach ($notifications as $notification) {
@@ -538,7 +542,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $user->setLastName($lastName);
         $user->setUsername($username);
         $user->setEmail($email);
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
@@ -563,7 +567,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $field->setProperties(['no' => 'No', 'yes' => 'Yes']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

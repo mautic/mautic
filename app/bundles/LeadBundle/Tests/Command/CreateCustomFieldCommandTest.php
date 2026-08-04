@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -20,7 +21,7 @@ final class CreateCustomFieldCommandTest extends TestCase
     {
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
+    #[DataProvider('completeRunMethodProvider')]
     public function testCompleteRunMethodIsCalled(bool $checkRunStatusResult, int $completeRunExpected): void
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)

@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CampaignEventSendWebhookType extends AbstractType
+final class CampaignEventSendWebhookType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -33,9 +33,7 @@ class CampaignEventSendWebhookType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

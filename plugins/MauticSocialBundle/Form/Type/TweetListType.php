@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TweetListType extends AbstractType
+final class TweetListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -33,7 +33,7 @@ class TweetListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription;
 
-class UnsubscribedEmail
+final class UnsubscribedEmail
 {
     /**
      * @param string $contactEmail

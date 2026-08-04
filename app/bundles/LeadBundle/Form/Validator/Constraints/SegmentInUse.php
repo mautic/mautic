@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class SegmentInUse extends Constraint
+final class SegmentInUse extends Constraint
 {
     public $message = 'mautic.lead_list.is_in_use.unpublish';
 

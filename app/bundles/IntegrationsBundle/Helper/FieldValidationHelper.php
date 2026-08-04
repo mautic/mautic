@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldValidationHelper
+final class FieldValidationHelper
 {
     private ?ConfigFormSyncInterface $integrationObject = null;
 

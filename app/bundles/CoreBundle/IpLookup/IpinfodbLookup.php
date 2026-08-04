@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IpinfodbLookup extends AbstractRemoteDataLookup
+final class IpinfodbLookup extends AbstractRemoteDataLookup
 {
     public string $statusCode    = '';
 
@@ -22,7 +22,7 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
         return "http://api.ipinfodb.com/v3/ip-city/?key={$this->auth}&format=json&ip={$this->ip}";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 

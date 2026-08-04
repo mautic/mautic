@@ -54,32 +54,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'permissions' => [
-            'mautic.asset.permissions' => [
-                'class'     => Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
-        'others' => [
-            'mautic.asset.upload.error.handler' => [
-                'class'     => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
-            ],
-            // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => [
-                'class'     => Mautic\AssetBundle\Controller\UploadController::class,
-            ],
-        ],
-        'fixtures' => [
-            'mautic.asset.fixture.asset' => [
-                'class'     => Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
-    ],
-
     'parameters' => [
         'upload_dir'          => '%mautic.application_dir%/media/files',
         'max_size'            => '6',

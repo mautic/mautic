@@ -10,8 +10,9 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateYearNext::class)]
+#[CoversClass(DateYearNext::class)]
 final class DateYearNextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void

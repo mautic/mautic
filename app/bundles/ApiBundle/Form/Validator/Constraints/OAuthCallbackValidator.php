@@ -6,7 +6,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class OAuthCallbackValidator extends ConstraintValidator
+final class OAuthCallbackValidator extends ConstraintValidator
 {
     public const PATTERN = '~^[0-9a-z].*://(.*?)(:[0-9]+)?(/?|/\S+)$~ixu';
 

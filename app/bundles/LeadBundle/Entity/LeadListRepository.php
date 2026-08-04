@@ -253,18 +253,25 @@ class LeadListRepository extends CommonRepository
     /**
      * Return a list of global lists.
      *
-     * @return array
+     * @return array<int, array{
+     *     id: int,
+     *     name: string,
+     *     publicName: string,
+     *     alias: string
+     *  }>
      */
-    public function getPreferenceCenterList()
+    public function getPreferenceCenterList(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
 
-        $q->select('partial l.{id, name, publicName, alias}')
-            ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter('true', true, 'boolean')
-            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
-            ->orderBy('l.name');
+        $q->select('l.id, l.name, l.publicName, l.alias')
+            ->where($q->expr()->eq('l.isPublished', ':published'))
+            ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':preferenceCenter'))
+            ->setParameter('published', true)
+            ->setParameter('preferenceCenter', true)
+            ->orderBy('l.publicName')
+            ->addOrderBy('l.id', 'ASC');
 
         return $q->getQuery()->getArrayResult();
     }

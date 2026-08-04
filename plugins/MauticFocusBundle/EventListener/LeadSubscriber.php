@@ -11,12 +11,12 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Translator $translator,
-        private readonly RouterInterface $router,
-        private readonly FocusModel $focusModel,
+        private Translator $translator,
+        private RouterInterface $router,
+        private FocusModel $focusModel,
     ) {
     }
 

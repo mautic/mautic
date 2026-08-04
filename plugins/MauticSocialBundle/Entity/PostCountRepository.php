@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 /**
  * @extends CommonRepository<PostCount>
  */
-class PostCountRepository extends CommonRepository
+final class PostCountRepository extends CommonRepository
 {
     /**
      * Fetch Lead stats for some period of time.

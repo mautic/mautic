@@ -6,7 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\Finder\Finder;
 
-class EntityMetadata
+final class EntityMetadata
 {
     private array $ormConfig = [];
 

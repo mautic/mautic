@@ -172,22 +172,13 @@ class Point extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.point.type.notblank',
-        ]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.point.type.notblank'));
 
-        $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
-            'message' => 'mautic.point.delta.notblank',
-        ]));
+        $metadata->addPropertyConstraint('delta', new Assert\NotBlank(message: 'mautic.point.delta.notblank'));
 
-        $metadata->addPropertyConstraint('delta', new Assert\Range([
-            'min' => IntHelper::MIN_INTEGER_VALUE,
-            'max' => IntHelper::MAX_INTEGER_VALUE,
-        ]));
+        $metadata->addPropertyConstraint('delta', new Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE));
     }
 
     /**

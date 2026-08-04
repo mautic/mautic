@@ -2,7 +2,7 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
-class BroadcastResult
+final class BroadcastResult
 {
     private int $sentCount = 0;
 

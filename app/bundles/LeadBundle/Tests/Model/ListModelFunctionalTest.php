@@ -35,7 +35,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testSegmentLineChartData(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = static::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
@@ -90,7 +90,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testSegmentLineChartDataWithoutFetchDataFromLeadListTable(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = static::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);

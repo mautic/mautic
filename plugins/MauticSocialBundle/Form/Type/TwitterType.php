@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TwitterType extends AbstractType
+final class TwitterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

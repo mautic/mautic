@@ -2,6 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Exception;
 
-class DecisionNotApplicableException extends \Exception
+final class DecisionNotApplicableException extends \Exception
 {
 }

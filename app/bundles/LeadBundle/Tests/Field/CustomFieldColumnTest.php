@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
@@ -141,7 +142,7 @@ final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $driverException = new \Doctrine\DBAL\Exception\DriverException($dbalException, null);
+        $driverException = new DriverException($dbalException, null);
 
         $this->columnSchemaHelper->expects($this->once())
             ->method('executeChanges')

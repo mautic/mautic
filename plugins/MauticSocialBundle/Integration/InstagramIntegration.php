@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class InstagramIntegration extends SocialIntegration
+final class InstagramIntegration extends SocialIntegration
 {
     public function getName(): string
     {
@@ -101,7 +101,7 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'full_name' => ['type' => 'string'],

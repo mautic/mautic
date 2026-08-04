@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:fields:analyse',
     description: 'Analyse actual usage of custom columns in leads table.'
 )]
-class AnalyseCustomFieldCommand extends Command
+final class AnalyseCustomFieldCommand extends Command
 {
     public function __construct(
         private readonly FieldModel $fieldModel,

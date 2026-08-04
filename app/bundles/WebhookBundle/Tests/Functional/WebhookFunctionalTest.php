@@ -7,7 +7,6 @@ namespace Mautic\WebhookBundle\Tests\Functional;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -18,6 +17,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,8 +52,8 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
 
-        $this->webhookQueueRepository       = $this->em->getRepository(WebhookQueue::class);
-        $this->notificationRepository       = $this->em->getRepository(Notification::class);
+        $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
+        $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
         $this->webhhokRepository            = $this->em->getRepository(Webhook::class);
     }
 
@@ -122,7 +122,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         yield 'Actual user' => [1, 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNotificationToUser')]
+    #[DataProvider('dataNotificationToUser')]
     public function testWebhookFailureNotificationSent(?int $createdByUserId, ?int $expectedUserId): void
     {
         $this->mockFailedWebhookResponse(2);

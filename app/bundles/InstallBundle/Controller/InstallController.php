@@ -3,42 +3,30 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class InstallController extends CommonController
+final class InstallController extends CommonController
 {
-    public function __construct(
-        private readonly Configurator $configurator,
-        private readonly InstallService $installer,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private Configurator $configurator;
+
+    private InstallService $installer;
+
+    #[Required]
+    public function autowireInstallController(
+        Configurator $configurator,
+        InstallService $installer,
+    ): void {
+        $this->configurator = $configurator;
+        $this->installer    = $installer;
     }
 
     /**
@@ -75,7 +63,6 @@ class InstallController extends CommonController
         }
 
         $step   = $this->configurator->getStep($index)[0];
-        \assert($step instanceof StepInterface);
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
@@ -133,32 +120,29 @@ class InstallController extends CommonController
                 }
             }
         } elseif (!empty($subIndex)) {
-            switch ($index) {
-                case InstallService::DOCTRINE_STEP:
-                    $dbParams = (array) $step;
+            if (InstallService::DOCTRINE_STEP === $index) {
+                $dbParams = (array) $step;
+                switch ($subIndex) {
+                    case 1:
+                        $messages = $this->installer->createSchemaStep($dbParams);
+                        if (!empty($messages)) {
+                            $this->handleInstallerErrors($form, $messages);
 
-                    switch ($subIndex) {
-                        case 1:
-                            $messages = $this->installer->createSchemaStep($dbParams);
-                            if (!empty($messages)) {
-                                $this->handleInstallerErrors($form, $messages);
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
+                        }
 
-                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
-                            }
+                        return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
+                    case 2:
+                        $messages = $this->installer->createFixturesStep();
+                        if (!empty($messages)) {
+                            $this->handleInstallerErrors($form, $messages);
 
-                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
-                        case 2:
-                            $messages = $this->installer->createFixturesStep();
-                            if (!empty($messages)) {
-                                $this->handleInstallerErrors($form, $messages);
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
+                        }
 
-                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
-                            }
-
-                            $complete = true;
-                            break;
-                    }
-                    break;
+                        $complete = true;
+                        break;
+                }
             }
         }
 
@@ -170,7 +154,7 @@ class InstallController extends CommonController
             if ($index < $this->configurator->getStepCount()) {
                 // On to the next step
 
-                return $this->redirectToRoute('mautic_installer_step', ['index' => (int) $index]);
+                return $this->redirectToRoute('mautic_installer_step', ['index' => $index]);
             }
             $siteUrl  = $request->getSchemeAndHttpHost().$request->getBaseUrl();
             $messages = $this->installer->createFinalConfigStep($siteUrl);

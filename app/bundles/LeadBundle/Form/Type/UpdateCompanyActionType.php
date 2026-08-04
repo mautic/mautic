@@ -11,12 +11,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UpdateCompanyActionType extends AbstractType
+final class UpdateCompanyActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        protected FieldModel $fieldModel,
+        private FieldModel $fieldModel,
     ) {
     }
 

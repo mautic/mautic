@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AlertType extends AbstractType
+final class AlertType extends AbstractType
 {
     /**
      * @param FormInterface<FormInterface> $form

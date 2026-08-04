@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableExceptio
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 
 final class IntervalTest extends \PHPUnit\Framework\TestCase
@@ -19,7 +20,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideBatchReschedulingData')]
+    #[DataProvider('provideBatchReschedulingData')]
     public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = []): void
     {
         $contact1 = $this->createMock(Lead::class);
@@ -105,7 +106,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<int> $restrictedDays
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideReschedulingData')]
+    #[DataProvider('provideReschedulingData')]
     public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
         $event = $this->createMock(Event::class);

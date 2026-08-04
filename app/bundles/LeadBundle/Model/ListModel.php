@@ -80,6 +80,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly ListLeadRepository $listLeadRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -89,28 +91,20 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     private array $leadChangeLists = [];
 
-    /**
-     * @return LeadListRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadListRepository
     {
-        /** @var LeadListRepository $repo */
-        $repo = $this->em->getRepository(LeadList::class);
+        $this->leadListRepository->setDispatcher($this->dispatcher);
+        $this->leadListRepository->setTranslator($this->translator);
 
-        $repo->setDispatcher($this->dispatcher);
-        $repo->setTranslator($this->translator);
-
-        return $repo;
+        return $this->leadListRepository;
     }
 
     /**
      * Returns the repository for the table that houses the leads associated with a list.
-     *
-     * @return ListLeadRepository
      */
-    public function getListLeadRepository()
+    public function getListLeadRepository(): ListLeadRepository
     {
-        return $this->em->getRepository(ListLead::class);
+        return $this->listLeadRepository;
     }
 
     public function getPermissionBase(): string
@@ -353,7 +347,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
-        return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
+        return $this->leadListRepository->getLists($user, $alias);
     }
 
     /**
@@ -363,17 +357,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getGlobalLists()
     {
-        return $this->em->getRepository(LeadList::class)->getGlobalLists();
+        return $this->leadListRepository->getGlobalLists();
     }
 
     /**
      * Get a list of preference center lead lists.
      *
-     * @return mixed
+     * @return array<int, array{
+     *      id: int,
+     *      name: string,
+     *      publicName: string,
+     *      alias: string
+     *   }>
      */
-    public function getPreferenceCenterLists()
+    public function getPreferenceCenterLists(): array
     {
-        return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
+        return $this->leadListRepository->getPreferenceCenterList();
     }
 
     /**
@@ -384,7 +383,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, ?OutputInterface $output = null): int
     {
-        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') || define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
         $segmentId = $leadList->getId();
 
@@ -668,7 +667,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             if (-1 == $searchListLead) {
                 $listLead = null;
             } elseif ($searchListLead) {
-                $listLead = $this->getListLeadRepository()->findOneBy(
+                $listLead = $this->listLeadRepository->findOneBy(
                     [
                         'lead' => $lead,
                         'list' => $this->leadChangeLists[$listId],
@@ -804,7 +803,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
 
             $listLead = (!$skipFindOne) ?
-                $this->getListLeadRepository()->findOneBy([
+                $this->listLeadRepository->findOneBy([
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$listId],
                 ]) :
@@ -847,8 +846,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->getListLeadRepository()->detachEntities($persistLists);
-        $this->getListLeadRepository()->detachEntities($deleteLists);
+        $this->listLeadRepository->detachEntities($persistLists);
+        $this->listLeadRepository->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -867,13 +866,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function removeLeadsByListId(int $listId): void
     {
-        $this->getListLeadRepository()->removeLeadsByListId($listId);
+        $this->listLeadRepository->removeLeadsByListId($listId);
     }
 
     /**
      * Batch sleep according to settings.
      */
-    protected function batchSleep()
+    protected function batchSleep(): void
     {
         $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
         if (false === $leadSleepTime) {

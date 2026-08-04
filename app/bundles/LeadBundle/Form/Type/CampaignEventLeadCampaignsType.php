@@ -13,10 +13,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadCampaignsType extends AbstractType
+final class CampaignEventLeadCampaignsType extends AbstractType
 {
     public function __construct(
-        protected ListModel $listModel,
+        private readonly ListModel $listModel,
     ) {
     }
 

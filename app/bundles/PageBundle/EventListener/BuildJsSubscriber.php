@@ -4,16 +4,17 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TrackingHelper $trackingHelper,
-        private readonly RouterInterface $router,
+        private TrackingHelper $trackingHelper,
+        private RouterInterface $router,
     ) {
     }
 
@@ -30,6 +31,10 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
     public function onBuildJs(BuildJsEvent $event): void
     {
+        if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
+            return;
+        }
+
         $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
         // Determine if this is https
         $parts           = parse_url($pageTrackingUrl);
@@ -49,6 +54,10 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
         $js = <<<JS
 (function(m, l, n, d) {
+    if (!m || m.runtimeReady !== true) {
+        return;
+    }
+
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
     m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
     m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
@@ -86,9 +95,9 @@ class BuildJsSubscriber implements EventSubscriberInterface
             m.beforeFirstDeliveryMade = true;
         }
 
-        MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
+        m.makeCORSRequest('POST', m.pageTrackingCORSUrl, params,
         function(response) {
-            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
+            m.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
         },
         function() {
             // CORS failed so load an image
@@ -112,7 +121,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         }
         
         m.trackingPixel.onload = function(e) {
-            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': pageview, 'params': params, 'image': true});
+            m.dispatchEvent('mauticPageEventDelivered', {'event': pageview, 'params': params, 'image': true});
         };
 
         m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
@@ -153,7 +162,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
                     params.timezone =  new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
                 }
                 
-                params = MauticJS.appendTrackedContact(params);
+                params = m.appendTrackedContact(params);
                 
                 // Merge user defined tracking pixel parameters.
                 if (typeof event[2] === 'object') {
@@ -174,19 +183,25 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
     // Process pageviews after new are added
     document.addEventListener('eventAddedToMauticQueue', function(e) {
-      if (MauticJS.ensureEventContext(e, 'send', 'pageview')) {
+      if (m.ensureEventContext(e, 'send', 'pageview')) {
           m.sendPageview(e.detail);
       }
     });
-})(MauticJS, location, navigator, document);
+})(window.MauticJS, location, navigator, document);
 JS;
 
-        $event->appendJs($js, 'Mautic Tracking Pixel');
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Pixel');
     }
 
     public function onBuildJsForTrackingEvent(BuildJsEvent $event): void
     {
-        $js = '';
+        if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
+            return;
+        }
+
+        $js = <<<'JS_WRAP'
+if (window.MauticJS && window.MauticJS.runtimeReady === true) {
+JS_WRAP;
 
         $lead   = $this->trackingHelper->getLead();
 
@@ -214,9 +229,9 @@ a.src = 'https://www.googletagmanager.com/gtag/js?id={$id}';
 document.getElementsByTagName('head')[0].appendChild(a);
 
 window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '{$id}'{$gtagSettings});
+window.gtag = function(){dataLayer.push(arguments);};
+window.gtag('js', new Date());
+window.gtag('config', '{$id}'{$gtagSettings});
 JS;
         }
 
@@ -297,8 +312,8 @@ MauticJS.setTrackedEvents = function(events) {
                 }
 };
 
-   
+}
 JS_WRAP;
-        $event->appendJs($js, 'Mautic 3rd party tracking pixels');
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic 3rd party tracking pixels');
     }
 }

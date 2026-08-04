@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardLeadsInTimeWidgetType extends AbstractType
+final class DashboardLeadsInTimeWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

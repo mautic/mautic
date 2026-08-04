@@ -15,27 +15,21 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityLookupChoiceLoader implements ChoiceLoaderInterface
+final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var array
-     */
-    protected $selected = [];
+    private array $selected = [];
 
-    /**
-     * @var array
-     */
-    protected $choices = [];
+    private array $choices = [];
 
     /**
      * @param ModelFactory<object>               $modelFactory
      * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
-        protected ModelFactory $modelFactory,
-        protected TranslatorInterface $translator,
-        protected Connection $connection,
-        protected $options = [],
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private $options = [],
     ) {
         if (is_array($options)) {
             $options = (new OptionsResolver())->setDefaults($options);
@@ -52,7 +46,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->options = $options;
     }
 
-    public function loadChoiceList($value = null): ChoiceListInterface
+    public function loadChoiceList(?callable $value = null): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices(null, true));
     }
@@ -62,7 +56,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      */
-    public function loadChoicesForValues(array $values, $value = null): array
+    public function loadChoicesForValues(array $values, ?callable $value = null): array
     {
         return $values;
     }
@@ -70,7 +64,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      */
-    public function loadValuesForChoices(array $choices, $value = null): array
+    public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         return $choices;
     }
@@ -85,11 +79,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * @param array|null $data
-     * @param bool       $includeNew
      *
      * @return array
      */
-    protected function getChoices($data = null, $includeNew = false)
+    private function getChoices($data = null, bool $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
@@ -153,7 +146,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array
      */
-    protected function prepareChoices($choices)
+    private function prepareChoices($choices)
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -189,7 +182,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    protected function fetchChoices($modelName, $data = [])
+    private function fetchChoices($modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
@@ -244,7 +237,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    protected function formatChoices(array &$choices)
+    private function formatChoices(array &$choices): void
     {
         $firstKey = array_key_first($choices);
 

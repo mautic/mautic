@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Stats\Helper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-class OpenedHelper extends AbstractHelper
+final class OpenedHelper extends AbstractHelper
 {
     public const NAME = 'email-opened';
 

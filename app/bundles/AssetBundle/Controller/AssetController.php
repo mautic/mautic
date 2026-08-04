@@ -13,9 +13,19 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AssetController extends FormController
+final class AssetController extends FormController
 {
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireAssetController(
+        AuditLogModel $auditLogModel,
+    ): void {
+        $this->auditLogModel = $auditLogModel;
+    }
+
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
@@ -165,11 +175,7 @@ class AssetController extends FormController
         if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs          = $this->auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,
@@ -217,10 +223,8 @@ class AssetController extends FormController
      * Show a preview of the file.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function previewAction(Request $request, AssetModel $model, $objectId)
+    public function previewAction(Request $request, AssetModel $model, $objectId): JsonResponse|Response
     {
         $activeAsset = $model->getEntity($objectId);
 
@@ -267,10 +271,8 @@ class AssetController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null)
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -561,10 +563,8 @@ class AssetController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId)
+    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId): Response
     {
         $entity = $model->getEntity($objectId);
         $clone  = null;

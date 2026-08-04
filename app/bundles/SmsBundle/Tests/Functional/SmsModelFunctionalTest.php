@@ -56,7 +56,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
         $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
@@ -158,7 +158,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
         $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS

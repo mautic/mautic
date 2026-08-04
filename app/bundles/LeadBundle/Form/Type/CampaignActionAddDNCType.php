@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignActionAddDNCType extends AbstractType
+final class CampaignActionAddDNCType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

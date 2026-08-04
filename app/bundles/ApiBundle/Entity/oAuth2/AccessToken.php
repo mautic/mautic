@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\UserBundle\Entity\User;
 
 class AccessToken extends BaseAccessToken
 {
@@ -13,6 +14,7 @@ class AccessToken extends BaseAccessToken
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_accesstokens')
+            ->setCustomRepositoryClass(AccessTokenRepository::class)
             ->addIndex(['token'], 'oauth2_access_token_search');
 
         $builder->createField('id', 'integer')
@@ -24,7 +26,7 @@ class AccessToken extends BaseAccessToken
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
+        $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
             ->build();
 

@@ -10,7 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 
-class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -23,7 +23,6 @@ class LoadTagData extends AbstractFixture implements OrderedFixtureInterface
         $contact1->addTag($tag);
 
         $contact3 = $this->getReference('lead-3');
-        \assert($contact1 instanceof Lead);
         $contact3->addTag($tag);
 
         $manager->persist($contact1);

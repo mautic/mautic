@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignDecisionTest extends MauticMysqlTestCase
 {
@@ -27,7 +28,7 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
      * @throws ORMException
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderLeadSelect')]
+    #[DataProvider('dataProviderLeadSelect')]
     public function testCampaignContactFieldValueDecision(
         string $object,
         string $type,

@@ -12,7 +12,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class FieldBuilder
 {
@@ -23,7 +23,7 @@ class FieldBuilder
     private ?RequestObjectDAO $requestObject = null;
 
     public function __construct(
-        private readonly Router $router,
+        private readonly RouterInterface $router,
         private readonly FieldHelper $fieldHelper,
         private readonly ContactObjectHelper $contactObjectHelper,
     ) {

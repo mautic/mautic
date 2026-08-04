@@ -10,7 +10,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessReplySubscriber implements EventSubscriberInterface
+final readonly class ProcessReplySubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 
@@ -28,8 +28,8 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     }
 
     public function __construct(
-        private readonly Reply $replier,
-        private readonly CacheStorageHelper $cache,
+        private Reply $replier,
+        private CacheStorageHelper $cache,
     ) {
     }
 

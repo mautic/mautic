@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class FilePathException extends \Exception
+final class FilePathException extends \Exception
 {
 }

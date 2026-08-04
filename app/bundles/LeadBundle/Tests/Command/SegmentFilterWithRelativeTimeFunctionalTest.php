@@ -12,10 +12,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('getRelativeHours')]
+    #[DataProvider('getRelativeHours')]
     public function testSegmentFilterWithRelativeTime(int $hours): void
     {
         $this->saveContacts();

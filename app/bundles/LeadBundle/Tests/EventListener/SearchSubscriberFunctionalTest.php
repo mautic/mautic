@@ -29,7 +29,7 @@ final class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
         $qb    = $this->em->getConnection()->createQueryBuilder();
         $event = new LeadBuildSearchEvent((string) $this->email->getId(), 'email_pending', $alias, false, $qb);
 
-        $dispatcher = self::getContainer()->get('event_dispatcher');
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         $this->assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
 
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);

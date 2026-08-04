@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GeneratedColumnSubscriber implements EventSubscriberInterface
+final class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 

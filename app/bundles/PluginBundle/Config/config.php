@@ -57,37 +57,4 @@ return [
             ],
         ],
     ],
-
-    'services' => [
-        'other' => [
-            'mautic.helper.integration' => [
-                'class'     => Mautic\PluginBundle\Helper\IntegrationHelper::class,
-                'arguments' => [
-                    'service_container',
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.paths',
-                    'mautic.helper.bundle',
-                    'mautic.helper.core_parameters',
-                    'twig',
-                    'mautic.plugin.model.plugin',
-                ],
-            ],
-            'mautic.plugin.helper.reload' => [
-                'class'     => Mautic\PluginBundle\Helper\ReloadHelper::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-        ],
-        'facades' => [
-            'mautic.plugin.facade.reload' => [
-                'class'     => Mautic\PluginBundle\Facade\ReloadFacade::class,
-                'arguments' => [
-                    'mautic.plugin.model.plugin',
-                    'mautic.plugin.helper.reload',
-                    'translator',
-                ],
-            ],
-        ],
-    ],
 ];

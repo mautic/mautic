@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\RefreshToken as BaseRefreshToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\UserBundle\Entity\User;
 
 class RefreshToken extends BaseRefreshToken
 {
@@ -24,7 +25,7 @@ class RefreshToken extends BaseRefreshToken
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
+        $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->build();
 
