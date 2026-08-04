@@ -73,7 +73,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $translator = static::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign listing page
-        $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
+        $crawler  = $this->client->request('GET', '/s/campaigns');
         $this->assertResponseIsSuccessful();
 
         $republishBehavior = $translator->trans('mautic.campaignconfig.campaign_republish_behavior.'.$campaign->getRepublishBehavior());
