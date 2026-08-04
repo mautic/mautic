@@ -11,10 +11,11 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterFactory::class)]
+#[CoversClass(ContactSegmentFilterFactory::class)]
 final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadFilter(): void

@@ -24,7 +24,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->model = self::getContainer()->get('mautic.point.model.point');
+        $this->model = self::getContainer()->get(PointModel::class);
     }
 
     public function testLeadPointLogUpdateLead(): void

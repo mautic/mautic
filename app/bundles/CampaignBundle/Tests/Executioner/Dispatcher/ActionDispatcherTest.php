@@ -18,7 +18,6 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedExcept
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -106,7 +105,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     }
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
-                        Assert::assertInstanceOf(PendingEvent::class, $event);
+                        $this->assertInstanceOf(PendingEvent::class, $event);
                         $this->assertInstanceOf(PendingEvent::class, $event);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');

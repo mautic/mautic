@@ -9,6 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -95,6 +96,7 @@ final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
         $mailHelper->setTokens($tokens);
 

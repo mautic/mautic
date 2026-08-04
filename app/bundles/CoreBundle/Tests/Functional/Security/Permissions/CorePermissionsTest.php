@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Security\Permissions\VirtualPermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CorePermissionsTest extends MauticMysqlTestCase
 {
@@ -22,18 +23,18 @@ final class CorePermissionsTest extends MauticMysqlTestCase
         yield 'Permission declined' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataVirtualPermission')]
+    #[DataProvider('dataVirtualPermission')]
     public function testVirtualPermission(bool $grant): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         /** @var CorePermissions $permissions */
-        $permissions = self::getContainer()->get('mautic.security');
+        $permissions = self::getContainer()->get(CorePermissions::class);
         $this->assertInstanceOf(CorePermissions::class, $permissions);
         $permissions->setPermissionObject($this->createVirtualPermission($grant));
 
-        Assert::assertSame($grant, $permissions->isGranted('test:group:action', 'MATCH_ALL', $user));
+        $this->assertSame($grant, $permissions->isGranted('test:group:action', 'MATCH_ALL', $user));
     }
 
     private function createVirtualPermission(bool $grant): AbstractPermissions

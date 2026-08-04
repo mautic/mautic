@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -28,51 +29,48 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     public const DATE = '2019-07-07 15:00:00';
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueue;
+    private MessageQueueModel $messageQueue;
 
-    /**
-     * @var MessageQueue
-     */
-    protected $message;
-
-    /**
-     * @var MockObject&LeadModel
-     */
-    protected MockObject $leadModel;
+    private MessageQueue $message;
 
     /**
      * @var MockObject&EntityManagerInterface
      */
-    protected MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&MessageQueueRepository
      */
-    protected MockObject $messageQueueRepository;
+    private MockObject $messageQueueRepository;
+
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
 
     protected function setUp(): void
     {
-        $this->leadModel              = $this->createMock(LeadModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
 
         $this->messageQueue = new MessageQueueModel(
-            $this->leadModel,
-            $this->createStub(CompanyModel::class),
-            $this->createStub(CoreParametersHelper::class),
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
         );
-
-        $this->entityManager->method('getRepository')->willReturn($this->messageQueueRepository);
+        $this->messageQueue->autowireMessageQueueModel(
+            $this->createStub(LeadModel::class),
+            $this->createStub(CompanyModel::class),
+            $this->messageQueueRepository,
+            $this->createStub(FrequencyRuleRepository::class),
+            $this->leadRepository
+        );
 
         $message      = new MessageQueue();
         $scheduleDate = new \DateTime(self::DATE);
@@ -119,10 +117,9 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 
     public function testSendMessagesWithNullEvent(): void
     {
-        $queue = $this->message;
         $lead  = new Lead();
         $lead->setId(1);
-        $queue->setLead($lead);
+        $this->message->setLead($lead);
 
         $contactData = [
             1 => [
@@ -131,26 +128,22 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
         $this->entityManager->expects($this->exactly(1))
             ->method('detach');
 
         $this->messageQueueRepository->method('getQueuedMessages')
-            ->willReturn([$queue]);
+            ->willReturn([$this->message]);
 
         $this->messageQueue->sendMessages('email', 1);
     }
 
     public function testProcessMessageQueueLeadFieldsShouldNotContainCompany(): void
     {
-        $queue = $this->message;
-
         $lead = new Lead();
         $lead->setId(1);
-        $queue->setLead($lead);
+        $this->message->setLead($lead);
 
         $contactData = [
             1 => [
@@ -159,11 +152,9 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($leadRepository);
-        $leadRepository->method('getContacts')->willReturn($contactData);
+        $this->leadRepository->method('getContacts')->willReturn($contactData);
 
-        $this->messageQueue->processMessageQueue($queue);
-        $this->assertArrayNotHasKey('companies', $queue->getLead()->getFields());
+        $this->messageQueue->processMessageQueue($this->message);
+        $this->assertArrayNotHasKey('companies', $this->message->getLead()->getFields());
     }
 }

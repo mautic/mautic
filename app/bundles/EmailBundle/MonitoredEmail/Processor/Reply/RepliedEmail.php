@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
-class RepliedEmail
+final class RepliedEmail
 {
     /**
      * @param string $fromAddress

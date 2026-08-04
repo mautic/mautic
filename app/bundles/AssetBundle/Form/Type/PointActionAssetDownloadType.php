@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class PointActionAssetDownloadType extends AbstractType
+final class PointActionAssetDownloadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

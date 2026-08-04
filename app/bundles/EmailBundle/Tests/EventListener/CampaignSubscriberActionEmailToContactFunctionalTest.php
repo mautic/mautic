@@ -9,6 +9,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticMysqlTestCase
 {
@@ -44,7 +45,7 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
         /** @var LeadEventLogRepository $logRepo */
-        $logRepo  = static::getContainer()->get('mautic.campaign.repository.lead_event_log');
+        $logRepo  = static::getContainer()->get(LeadEventLogRepository::class);
         $metaData = [];
         foreach ($logRepo->getLeadLogs() as $leadLog) {
             if ($leadLog['metadata']) {
@@ -52,7 +53,7 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
             }
         }
 
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
         $noEmailLog = $translator->trans(
             'mautic.email.contact_has_no_email',
             ['%contact%' => $leadB->getPrimaryIdentifier()]

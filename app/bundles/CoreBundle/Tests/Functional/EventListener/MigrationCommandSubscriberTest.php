@@ -9,11 +9,11 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 {
@@ -28,7 +28,7 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->tablePrefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->eventDispatcher = static::getContainer()->get('event_dispatcher');
+        $this->eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
     }
 
     protected function beforeTearDown(): void
@@ -57,21 +57,21 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 
         $output = $this->executeMigrationCommand();
 
-        Assert::assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_first
+        $this->assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_first
 -> ALTER TABLE {$this->tablePrefix}test_first ADD generated_name_one CHAR(2) AS (SUBSTRING(name, 1, 2)) COMMENT '(DC2Type:generated)', 
 ADD generated_name_three CHAR(2) AS (SUBSTRING(name, 5, 2)) COMMENT '(DC2Type:generated)'
 ++ Execution finished", $output);
 
-        Assert::assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_first
+        $this->assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_first
 -> ALTER TABLE {$this->tablePrefix}test_first ADD INDEX `{$this->tablePrefix}generated_name_one`(generated_name_one), 
 ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
 ++ Execution finished", $output);
 
-        Assert::assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_second
+        $this->assertStringContainsString("++ Executing adding generated columns for table {$this->tablePrefix}test_second
 -> ALTER TABLE {$this->tablePrefix}test_second ADD generated_date_year YEAR AS (YEAR(date_added)) STORED COMMENT '(DC2Type:generated)'
 ++ Execution finished", $output);
 
-        Assert::assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_second
+        $this->assertStringContainsString("++ Executing adding indices for table {$this->tablePrefix}test_second
 -> ALTER TABLE {$this->tablePrefix}test_second ADD INDEX `{$this->tablePrefix}campaign_id_generated_date_year_id`(campaign_id, generated_date_year, id)
 ++ Execution finished", $output);
 
@@ -83,10 +83,10 @@ ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
     private function assertTableHasColumnAndIndex(string $table, string $column, string $index): void
     {
         $result = $this->connection->fetchAssociative("SHOW COLUMNS FROM {$this->tablePrefix}{$table} WHERE Field = '{$column}'");
-        Assert::assertNotEmpty($result, sprintf('Table "%s" is expected to have column "%s".', $table, $column));
+        $this->assertNotEmpty($result, sprintf('Table "%s" is expected to have column "%s".', $table, $column));
 
         $result = $this->connection->fetchAssociative("SHOW INDEX FROM {$this->tablePrefix}{$table} WHERE Key_name = '{$this->tablePrefix}{$index}'");
-        Assert::assertNotEmpty($result, sprintf('Table "%s" is expected to have index "%s".', $table, $index));
+        $this->assertNotEmpty($result, sprintf('Table "%s" is expected to have index "%s".', $table, $index));
     }
 
     private function createTables(): void
@@ -121,14 +121,14 @@ ADD INDEX `{$this->tablePrefix}generated_name_three`(generated_name_three)
     {
         // intentionally not using AbstractMauticTestCase::testSymfonyCommand() as it does not dispatch 'console.terminate' event
         $params      = ['command' => 'doctrine:migration:migrate', '--no-interaction' => true];
-        $application = new Application(static::getContainer()->get('kernel'));
+        $application = new Application(static::getContainer()->get(KernelInterface::class));
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $output     = new BufferedOutput();
         $statusCode = $application->run(new ArrayInput($params), $output);
         $message    = $output->fetch();
 
-        Assert::assertSame(ExitCode::SUCCESS, $statusCode, $message);
+        $this->assertSame(ExitCode::SUCCESS, $statusCode, $message);
 
         return $message;
     }

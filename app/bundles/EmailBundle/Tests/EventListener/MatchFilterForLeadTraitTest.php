@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class MatchFilterForLeadTraitTest extends TestCase
@@ -22,7 +23,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @var mixed[]
      */
-    private $filter = [
+    private array $filter = [
         0 => [
             'display' => null,
             'field'   => 'custom',
@@ -47,7 +48,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @param string|array<int, string> $filter
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('regionFilterDataProvider')]
+    #[DataProvider('regionFilterDataProvider')]
     public function testMatchFilterForLeadWithRegionFilter(string|array $filter, string $operator, bool $expected): void
     {
         $this->assertSame(
@@ -210,7 +211,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dateMatchTestProvider')]
+    #[DataProvider('dateMatchTestProvider')]
     public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
@@ -254,7 +255,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
      * @param array<string,string> $fieldDetails
      * @param array<string,string> $filterDetails
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForInNotInOperatorFilter')]
+    #[DataProvider('dataForInNotInOperatorFilter')]
     public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
     {
         $lead = [
@@ -288,7 +289,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
         yield 'Static Segment Membership Filter' => ['leadlist_static'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('segmentMembershipFilterProvider')]
+    #[DataProvider('segmentMembershipFilterProvider')]
     public function testIsContactSegmentRelationshipValidEmpty(string $filterField): void
     {
         $lead['id'] = 1;
@@ -683,7 +684,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     }
 }
 
-class MatchFilterForLeadTraitTestable
+final class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 

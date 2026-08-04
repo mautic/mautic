@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
+#[CoversClass(FieldApiController::class)]
+#[CoversClass(CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -49,14 +53,14 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
-        Assert::assertTrue($fieldResponse['field']['isPublished']);
-        Assert::assertGreaterThan(0, $fieldResponse['field']['id']);
-        Assert::assertSame($payload['label'], $fieldResponse['field']['label']);
-        Assert::assertSame($payload['alias'], $fieldResponse['field']['alias']);
-        Assert::assertSame($payload['type'], $fieldResponse['field']['type']);
-        Assert::assertSame($payload['isPubliclyUpdatable'], $fieldResponse['field']['isPubliclyUpdatable']);
-        Assert::assertSame($payload['isUniqueIdentifier'], $fieldResponse['field']['isUniqueIdentifier']);
-        Assert::assertSame($payload['properties'], $fieldResponse['field']['properties']);
+        $this->assertTrue($fieldResponse['field']['isPublished']);
+        $this->assertGreaterThan(0, $fieldResponse['field']['id']);
+        $this->assertSame($payload['label'], $fieldResponse['field']['label']);
+        $this->assertSame($payload['alias'], $fieldResponse['field']['alias']);
+        $this->assertSame($payload['type'], $fieldResponse['field']['type']);
+        $this->assertSame($payload['isPubliclyUpdatable'], $fieldResponse['field']['isPubliclyUpdatable']);
+        $this->assertSame($payload['isUniqueIdentifier'], $fieldResponse['field']['isUniqueIdentifier']);
+        $this->assertSame($payload['properties'], $fieldResponse['field']['properties']);
 
         // Cleanup
         $this->client->request(Request::METHOD_DELETE, '/api/fields/contact/'.$fieldResponse['field']['id'].'/delete', $payload);
@@ -112,7 +116,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, array<string, string>> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
+    #[DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
     public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
     {
         $payload = [
@@ -130,9 +134,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $errorResponse  = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertArrayHasKey('errors', $errorResponse);
+        $this->assertArrayHasKey('errors', $errorResponse);
         self::assertResponseStatusCodeSame($errorResponse['errors'][0]['code']);
-        Assert::assertSame($expectedMessage, $errorResponse['errors'][0]['message']);
+        $this->assertSame($expectedMessage, $errorResponse['errors'][0]['message']);
     }
 
     /**
@@ -165,7 +169,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptyMultiSelectValue')]
+    #[DataProvider('provideEmptyMultiSelectValue')]
     public function testMultiselectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_multi';
@@ -174,7 +178,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+        $this->assertEmpty($fields, 'There are no Custom Fields.');
 
         // Add field.
         $leadField = new LeadField();
@@ -277,7 +281,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'empty array with null value' => [[null]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptySelectValue')]
+    #[DataProvider('provideEmptySelectValue')]
     public function testSelectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_single';
@@ -286,7 +290,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        Assert::assertEmpty($fields, 'There are no Custom Fields.');
+        $this->assertEmpty($fields, 'There are no Custom Fields.');
 
         // Add field.
         $leadField = new LeadField();

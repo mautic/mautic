@@ -56,7 +56,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(0, $result->getStatusCode());
+        $this->assertSame(0, $result->getStatusCode());
     }
 
     public function testRemoveCommandWithInvalidPackageType(): void
@@ -80,7 +80,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
+        $this->assertSame(1, $result->getStatusCode());
     }
 
     public function testRemoveCommandWithComposerError(): void
@@ -104,7 +104,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
             $command
         );
 
-        Assert::assertSame(1, $result->getStatusCode());
+        $this->assertSame(1, $result->getStatusCode());
     }
 
     public function testRemoveResourceCommand(): void

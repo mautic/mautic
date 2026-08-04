@@ -5,22 +5,13 @@ namespace Mautic\CoreBundle\Helper;
 /**
  * Helper class for operations with colors.
  */
-class ColorHelper
+final class ColorHelper
 {
-    /**
-     * @var int
-     */
-    protected $red = 0;
+    private int|float $red = 0;
 
-    /**
-     * @var int
-     */
-    protected $green = 0;
+    private int|float $green = 0;
 
-    /**
-     * @var int
-     */
-    protected $blue = 0;
+    private int|float $blue = 0;
 
     /**
      * @param string $hex in format #xxxxxx or #xxx

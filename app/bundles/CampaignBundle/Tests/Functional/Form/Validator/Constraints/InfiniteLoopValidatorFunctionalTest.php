@@ -6,12 +6,12 @@ namespace Mautic\CampaignBundle\Tests\Functional\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
+    #[DataProvider('delayDataProvider')]
     public function testSubmitCampaignActionVariousDelayOptions(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $uri = '/s/campaigns/events/new?type=campaign.addremovelead&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
@@ -40,10 +40,10 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame($success, $responseData['success'], $response->getContent());
+        $this->assertSame($success, $responseData['success'], $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, (string) $responseData['newContent']);
+            $this->assertStringContainsString($expectedString, (string) $responseData['newContent']);
         }
     }
 
@@ -77,7 +77,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
+    #[DataProvider('delayDataProvider')]
     public function testValidationViaCampaignApi(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $segment = new LeadList();
@@ -203,7 +203,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 
         if ($expectedString) {
-            Assert::assertStringContainsString($expectedString, (string) $response->getContent());
+            $this->assertStringContainsString($expectedString, (string) $response->getContent());
         }
     }
 }

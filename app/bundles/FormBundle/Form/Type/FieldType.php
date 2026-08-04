@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
@@ -205,7 +205,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Assert\NotBlank(
-                        ['message' => 'mautic.form.field.label.notblank']
+                        message: 'mautic.form.field.label.notblank'
                     ),
                 ],
             ]

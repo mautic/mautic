@@ -14,7 +14,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class ObjectChangeGeneratorTest extends TestCase
@@ -150,14 +149,14 @@ final class ObjectChangeGeneratorTest extends TestCase
         $objectChange = $objectChangeGenerator->getSyncObjectChange($reportDAO, $mappingManualDAO, $objectMappingDAO, $internalObject, $integrationObject);
 
         // The points/Score field should not be recorded as a change because it has direction to Mautic.
-        Assert::assertCount(2, $objectChange->getFields());
-        Assert::assertSame('john@doe.email', $objectChange->getField('Email')->getValue()->getNormalizedValue());
-        Assert::assertSame('John', $objectChange->getField('FirstName')->getValue()->getNormalizedValue());
-        Assert::assertSame(Contact::NAME, $objectChange->getMappedObject());
-        Assert::assertSame(123, $objectChange->getMappedObjectId());
-        Assert::assertSame('integration-id-1', $objectChange->getObjectId());
-        Assert::assertSame('Lead', $objectChange->getObject());
-        Assert::assertSame($integrationName, $objectChange->getIntegration());
+        $this->assertCount(2, $objectChange->getFields());
+        $this->assertSame('john@doe.email', $objectChange->getField('Email')->getValue()->getNormalizedValue());
+        $this->assertSame('John', $objectChange->getField('FirstName')->getValue()->getNormalizedValue());
+        $this->assertSame(Contact::NAME, $objectChange->getMappedObject());
+        $this->assertSame(123, $objectChange->getMappedObjectId());
+        $this->assertSame('integration-id-1', $objectChange->getObjectId());
+        $this->assertSame('Lead', $objectChange->getObject());
+        $this->assertSame($integrationName, $objectChange->getIntegration());
     }
 
     private function getMappingManual(string $integration, string $objectName): MappingManualDAO

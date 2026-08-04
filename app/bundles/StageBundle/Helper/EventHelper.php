@@ -2,15 +2,9 @@
 
 namespace Mautic\StageBundle\Helper;
 
-use Mautic\LeadBundle\Entity\Lead;
-
-class EventHelper
+final class EventHelper
 {
-    /**
-     * @param Lead  $lead
-     * @param array $action
-     */
-    public static function engageStageAction($lead, $action): int
+    public static function engageStageAction(): int
     {
         static $initiated = [];
 

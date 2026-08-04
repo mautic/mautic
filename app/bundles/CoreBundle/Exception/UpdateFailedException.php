@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class UpdateFailedException extends \Exception
+final class UpdateFailedException extends \Exception
 {
 }

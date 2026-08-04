@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventJumpToEventType extends AbstractType
+final class CampaignEventJumpToEventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -32,9 +32,7 @@ class CampaignEventJumpToEventType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

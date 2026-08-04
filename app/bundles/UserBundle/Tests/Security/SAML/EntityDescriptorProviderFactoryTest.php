@@ -8,7 +8,6 @@ use LightSaml\Credential\X509Certificate;
 use LightSaml\Credential\X509Credential;
 use LightSaml\Store\Credential\CredentialStoreInterface;
 use Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -44,16 +43,8 @@ final class EntityDescriptorProviderFactoryTest extends TestCase
 
         $entityDescriptor = $builder->get();
 
-        Assert::assertCount(
-            1,
-            $entityDescriptor->getFirstSpSsoDescriptor()->getAllAssertionConsumerServicesByUrl('https://example.com/saml/login'),
-            'When building the SpSsoDescriptor, it should add a single AssertionConsumerService with the correct url. '
-        );
+        $this->assertCount(1, $entityDescriptor->getFirstSpSsoDescriptor()->getAllAssertionConsumerServicesByUrl('https://example.com/saml/login'), 'When building the SpSsoDescriptor, it should add a single AssertionConsumerService with the correct url. ');
 
-        Assert::assertEquals(
-            $entityId,
-            $entityDescriptor->getEntityID(),
-            'The entity ID should be set to the passed entity ID'
-        );
+        $this->assertEquals($entityId, $entityDescriptor->getEntityID(), 'The entity ID should be set to the passed entity ID');
     }
 }

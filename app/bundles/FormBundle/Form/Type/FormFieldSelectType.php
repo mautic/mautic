@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldSelectType extends AbstractType
+final class FormFieldSelectType extends AbstractType
 {
     use SortableListTrait;
 

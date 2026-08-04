@@ -4,9 +4,9 @@ namespace Acceptance;
 
 use Page\Acceptance\EmailsPage;
 
-class DisplayTestCest
+final class DisplayTestCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(\AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
     }
@@ -18,7 +18,7 @@ class DisplayTestCest
         $I->amOnPage('/s/contacts/batchCampaigns');
 
         // Wait for the form to load
-        $I->waitForElementVisible('#lead_batch_add', 5);
+        $I->waitForElementVisible('#lead_batch_add', \AcceptanceTester::TIMEOUT);
 
         // Grab the options inside the dropdown
         $campaigns = $I->grabMultiple('#lead_batch_add option');
@@ -35,7 +35,7 @@ class DisplayTestCest
         $I->amOnPage('/s/categories/batch/contact/view');
 
         // Wait for the form to load
-        $I->waitForElementVisible('#lead_batch_add', 5);
+        $I->waitForElementVisible('#lead_batch_add', \AcceptanceTester::TIMEOUT);
 
         // Grab the options inside the dropdown
         $categories = $I->grabMultiple('#lead_batch_add option');
@@ -52,7 +52,7 @@ class DisplayTestCest
         $I->amOnPage('/s/contacts/batchOwners');
 
         // Wait for the dropdown to be visible
-        $I->waitForElementVisible('#lead_batch_owner_addowner', 5);
+        $I->waitForElementVisible('#lead_batch_owner_addowner', \AcceptanceTester::TIMEOUT);
 
         // Grab the owner options from the dropdown
         $owners = $I->grabMultiple('#lead_batch_owner_addowner option');
@@ -72,7 +72,7 @@ class DisplayTestCest
         $I->amOnPage('/s/segments/batch/contact/view');
 
         // Wait for the form to load
-        $I->waitForElementVisible('#lead_batch_add', 5);
+        $I->waitForElementVisible('#lead_batch_add', \AcceptanceTester::TIMEOUT);
 
         // Grab the options inside the dropdown
         $segments = $I->grabMultiple('#lead_batch_add option');
@@ -89,7 +89,7 @@ class DisplayTestCest
         $I->amOnPage('/s/contacts/batchStages');
 
         // Wait for the form to load
-        $I->waitForElementVisible('#lead_batch_stage_addstage', 5);
+        $I->waitForElementVisible('#lead_batch_stage_addstage', \AcceptanceTester::TIMEOUT);
 
         // Grab the options inside the dropdown
         $stages = $I->grabMultiple('#lead_batch_stage_addstage option');
@@ -109,7 +109,7 @@ class DisplayTestCest
         $I->amOnPage('/s/points/triggers/new');
 
         // Wait for the dropdown to be visible
-        $I->waitForElementVisible('#pointtrigger_group_chosen', 5);
+        $I->waitForElementVisible('#pointtrigger_group_chosen', \AcceptanceTester::TIMEOUT);
 
         // Grab the point group options from the dropdown
         $pointGroups = $I->grabMultiple('#pointtrigger_group_chosen option');
@@ -126,13 +126,13 @@ class DisplayTestCest
         $I->amOnPage('/s/emails/new');
 
         // Wait for the select button to appear
-        $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, 5);
+        $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, \AcceptanceTester::TIMEOUT);
 
         // Click the "Select" button to choose the email type
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
 
         // Wait for the dropdown to be visible
-        $I->waitForElementVisible('#emailform_unsubscribeForm_chosen', 5);
+        $I->waitForElementVisible('#emailform_unsubscribeForm_chosen', \AcceptanceTester::TIMEOUT);
 
         // Grab the point group options from the dropdown
         $I->click('#emailform_unsubscribeForm_chosen a.chosen-single');

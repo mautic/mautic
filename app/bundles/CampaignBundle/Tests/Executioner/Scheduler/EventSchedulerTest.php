@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -337,9 +336,9 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The first log was scheduled to 10 minutes.
-                        Assert::assertCount(1, $event->getScheduled());
-                        Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getScheduled()->first()->getTriggerDate());
-                        Assert::assertLessThan($now->modify('+11 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        $this->assertCount(1, $event->getScheduled());
+                        $this->assertGreaterThan($now->modify('+9 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        $this->assertLessThan($now->modify('+11 minutes'), $event->getScheduled()->first()->getTriggerDate());
                     };
                     $callback($parameters[0]);
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
@@ -347,16 +346,16 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The second log was not scheduled so the default interval is used.
-                        Assert::assertCount(1, $event->getScheduled());
-                        Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getScheduled()->first()->getTriggerDate());
-                        Assert::assertLessThan($now->modify('+61 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        $this->assertCount(1, $event->getScheduled());
+                        $this->assertGreaterThan($now->modify('+59 minutes'), $event->getScheduled()->first()->getTriggerDate());
+                        $this->assertLessThan($now->modify('+61 minutes'), $event->getScheduled()->first()->getTriggerDate());
                     };
                     $callback($parameters[0]);
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event): void {
-                        Assert::assertCount(2, $event->getScheduled());
+                        $this->assertCount(2, $event->getScheduled());
                     };
                     $callback($parameters[0]);
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);

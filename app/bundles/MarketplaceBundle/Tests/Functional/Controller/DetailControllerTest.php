@@ -8,13 +8,14 @@ use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class DetailControllerTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         $handlerStack = $this->getClientMockHandler();

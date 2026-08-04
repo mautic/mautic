@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -39,7 +40,7 @@ final class EmailRepositoryTest extends TestCase
      * @param int[] $variantIds
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForCount')]
+    #[DataProvider('dataGetEmailPendingQueryForCount')]
     public function testGetEmailPendingQueryForCount(?array $variantIds, bool $countWithMaxMin, array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);
@@ -91,7 +92,7 @@ final class EmailRepositoryTest extends TestCase
     /**
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
+    #[DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
     public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);

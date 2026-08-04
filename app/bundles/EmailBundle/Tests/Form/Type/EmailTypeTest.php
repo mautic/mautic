@@ -12,8 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
-use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
+use Mautic\StageBundle\Entity\StageRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -44,12 +43,12 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->form                 = new EmailType(
             $translator,
             $this->createStub(EntityManager::class),
-            $this->createStub(StageModel::class),
             $this->createStub(CoreParametersHelper::class),
             $this->themeHelper,
             $corePermissions,
             $emailConfig,
             $this->createStub(EmailDefaultsHelper::class),
+            $this->createStub(StageRepository::class),
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
@@ -79,7 +78,7 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->form->buildForm($this->formBuilder, $options);
 
-        Assert::assertContains('buttons', $names);
+        $this->assertContains('buttons', $names);
     }
 
     private function expectThemeHelper(): void

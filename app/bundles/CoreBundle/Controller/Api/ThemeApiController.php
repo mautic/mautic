@@ -2,46 +2,28 @@
 
 namespace Mautic\CoreBundle\Controller\Api;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\AppVersion;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonApiController<object>
  */
-class ThemeApiController extends CommonApiController
+final class ThemeApiController extends CommonApiController
 {
-    public function __construct(
-        CorePermissions $security,
-        Translator $translator,
-        EntityResultHelper $entityResultHelper,
-        RouterInterface $router,
-        FormFactoryInterface $formFactory,
-        AppVersion $appVersion,
-        protected ThemeHelper $themeHelper,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        EventDispatcherInterface $dispatcher,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+    private readonly ThemeHelper $themeHelper;
+
+    #[Required]
+    public function autowireThemeApiController(
+        ThemeHelper $themeHelper,
+    ): void {
+        $this->themeHelper = $themeHelper;
     }
 
     /**

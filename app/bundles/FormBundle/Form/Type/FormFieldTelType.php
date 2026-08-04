@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldTelType extends AbstractType
+final class FormFieldTelType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

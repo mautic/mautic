@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class DynamicContentDecisionType extends DynamicContentSendType
+final class DynamicContentDecisionType extends DynamicContentSendType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -22,7 +22,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
                 ],
                 'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.core.value.required']),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -44,7 +44,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'mautic.core.value.required']),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );

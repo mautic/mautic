@@ -37,5 +37,5 @@ interface StepInterface
      *
      * @return array
      */
-    public function update(StepInterface $data);
+    public function update(self $data);
 }

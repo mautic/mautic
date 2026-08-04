@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Scheduler\Enum;
 
-class SchedulerEnum
+final class SchedulerEnum
 {
     public const UNIT_NOW     = 'NOW';
 

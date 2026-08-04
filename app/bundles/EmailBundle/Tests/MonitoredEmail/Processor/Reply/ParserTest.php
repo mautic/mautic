@@ -8,10 +8,11 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\RepliedEmail;
+use PHPUnit\Framework\Attributes\TestDox;
 
 final class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an email is found inside a feedback report')]
+    #[TestDox('Test that an email is found inside a feedback report')]
     public function testThatReplyIsDetectedThroughTrackingPixel(): void
     {
         $message           = new Message();
@@ -27,7 +28,7 @@ BODY;
         $this->assertEquals('123abc', $replyEmail->getStatHash());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an email is found inside a feedback report')]
+    #[TestDox('Test that an email is found inside a feedback report')]
     public function testThatReplyIsDetectedThroughTrackingPixelWithUnsubcribeLink(): void
     {
         $message           = new Message();
@@ -43,7 +44,7 @@ BODY;
         $this->assertEquals('5c897694957a7581067884', $replyEmail->getStatHash());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exeption is thrown if the hash is not found')]
+    #[TestDox('Test that an exeption is thrown if the hash is not found')]
     public function testExceptionIsThrownWithHashNotFound(): void
     {
         $this->expectException(ReplyNotFound::class);

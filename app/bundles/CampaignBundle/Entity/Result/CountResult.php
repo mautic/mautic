@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity\Result;
 
-class CountResult
+final class CountResult
 {
     private readonly int $count;
 

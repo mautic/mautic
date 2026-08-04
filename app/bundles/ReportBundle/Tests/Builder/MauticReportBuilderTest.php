@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -53,7 +52,7 @@ final class MauticReportBuilderTest extends TestCase
         $query   = $builder->getQuery([
             'columns' => ['a.b' => [], 'b.c' => []],
         ]);
-        Assert::assertSame('SELECT `a`.`b`, `b`.`c`', $query->getSql());
+        $this->assertSame('SELECT `a`.`b`, `b`.`c`', $query->getSql());
     }
 
     public function testFiltersWithEmptyAndNotEmptyDateTypes(): void
@@ -74,7 +73,7 @@ final class MauticReportBuilderTest extends TestCase
             'a.emptyString'      => $this->buildFilterDefinition('Empty string', 'string', 'emptyString'),
             'a.notEmptyString'   => $this->buildFilterDefinition('Not empty string', 'string', 'notEmptyString'),
         ]);
-        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', "
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
             SELECT
                 `a`.`someField`
             WHERE
@@ -110,7 +109,7 @@ final class MauticReportBuilderTest extends TestCase
                 ],
             ],
         ]);
-        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `a`.`someField` WHERE (a.notEqualString IS NULL) OR (a.notEqualString <> :i0canotEqualString)
         ')), $query->getSql());
     }
@@ -123,7 +122,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
         $query = $this->buildQueryWithFilters($report, $this->buildPublishedAndNameFilterDefinitions());
 
-        Assert::assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
+        $this->assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
     }
 
     public function testOrFiltersKeepRemainingAndGroup(): void
@@ -139,7 +138,7 @@ final class MauticReportBuilderTest extends TestCase
             'a.email'       => $this->buildFilterDefinition('Email', 'email', 'email'),
         ]);
 
-        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `a`.`someField` WHERE (a.isPublished = :i0caisPublished) OR ((a.name LIKE :i1caname) AND (a.email LIKE :i2caemail))
         ')), $query->getSql());
     }
@@ -155,7 +154,7 @@ final class MauticReportBuilderTest extends TestCase
             'a.reset'       => $this->buildFilterDefinition('Reset', 'bool', 'reset'),
         ]);
 
-        Assert::assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
+        $this->assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
     }
 
     public function testReportWithPreciseAvg(): void
@@ -188,7 +187,7 @@ final class MauticReportBuilderTest extends TestCase
             'groupBy' => ['a.id'],
         ]);
 
-        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `a`.`id`, AVG(IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
         ')), $query->getSql());
     }
@@ -240,7 +239,7 @@ final class MauticReportBuilderTest extends TestCase
             ],
         ]);
 
-        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
         ')), $query->getSql());
     }
@@ -270,8 +269,8 @@ final class MauticReportBuilderTest extends TestCase
 
         $builder   = $this->buildBuilder(new Report());
         $groupExpr = CompositeExpression::and($builder->getTagCondition($filters[0]), $builder->getTagCondition($filters[1]));
-        Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
-        Assert::assertNull($builder->getTagCondition($filters[2]));
+        $this->assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
+        $this->assertNull($builder->getTagCondition($filters[2]));
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder

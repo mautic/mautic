@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class BounceNotFound extends \Exception
+final class BounceNotFound extends \Exception
 {
 }

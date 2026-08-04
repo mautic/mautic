@@ -269,7 +269,7 @@ class Submission
      */
     public function getCreatedBy()
     {
-        return $this->getForm()->getCreatedBy();
+        return $this->form->getCreatedBy();
     }
 
     /**
@@ -279,7 +279,7 @@ class Submission
      */
     public function getFieldByAlias($alias)
     {
-        foreach ($this->getForm()->getFields() as $field) {
+        foreach ($this->form->getFields() as $field) {
             if ($field->getAlias() === $alias) {
                 return $field;
             }

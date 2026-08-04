@@ -9,7 +9,6 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -60,15 +59,15 @@ final class NotificationTypeTest extends TypeTestCase
             'language' => 'en',
         ]);
 
-        Assert::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
         $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
-        Assert::assertEquals($expected, $formData);
+        $this->assertEquals($expected, $formData);
 
-        Assert::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
 
         $view          = $form->createView();
         $invalidFields = ['name', 'heading', 'message'];
@@ -114,15 +113,15 @@ final class NotificationTypeTest extends TypeTestCase
             'language' => 'en',
         ]);
 
-        Assert::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
         $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
-        Assert::assertEquals($expected, $formData);
+        $this->assertEquals($expected, $formData);
 
-        Assert::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
 
         $view = $form->createView();
         foreach ($view->children as $fieldName => $child) {

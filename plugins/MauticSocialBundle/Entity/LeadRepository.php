@@ -7,6 +7,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Lead>
  */
-class LeadRepository extends CommonRepository
+final class LeadRepository extends CommonRepository
 {
 }

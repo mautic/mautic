@@ -4,15 +4,15 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class ListPreProcessListEvent extends CommonEvent
+final class ListPreProcessListEvent extends CommonEvent
 {
-    protected $result;
+    private $result;
 
     /**
      * @param bool $isNew
      */
     public function __construct(
-        protected array $list,
+        private array $list,
         $isNew = false,
     ) {
         $this->isNew = $isNew;

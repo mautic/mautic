@@ -6,6 +6,8 @@ namespace Mautic\CategoryBundle\Tests\Controller\Api;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 
@@ -75,13 +77,13 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $category->setIsPublished(true);
         $this->em->persist($category);
 
-        $lead = new \Mautic\LeadBundle\Entity\Lead();
+        $lead = new Lead();
         $lead->setFirstname('Test');
         $lead->setLastname('Lead');
         $lead->setEmail('test@example.com');
         $this->em->persist($lead);
 
-        $leadCategory = new \Mautic\LeadBundle\Entity\LeadCategory();
+        $leadCategory = new LeadCategory();
         $leadCategory->setCategory($category);
         $leadCategory->setLead($lead);
         $leadCategory->setDateAdded(new \DateTime());
@@ -90,7 +92,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Debug: Verify the entity was actually persisted
-        $repository        = $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadCategory::class);
+        $repository        = $this->em->getRepository(LeadCategory::class);
         $allLeadCategories = $repository->findAll();
         $this->assertGreaterThanOrEqual(1, count($allLeadCategories), 'LeadCategory should be in database');
 

@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CampaignBundle\Tests\Command\AbstractCampaignCommand;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCommand
 {
@@ -22,7 +22,7 @@ final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCo
     /**
      * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('republishBehaviorProvider')]
+    #[DataProvider('republishBehaviorProvider')]
     public function testExecuteEventCommandWithRepublishBehavior(
         string $republishBehavior,
         string $triggerMode,
@@ -89,8 +89,8 @@ final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCo
         $eventLog = $this->em->find(LeadEventLog::class, $logId);
         $this->assertInstanceOf(LeadEventLog::class, $eventLog);
 
-        Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
-        Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
+        $this->assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
     }
 
     /**

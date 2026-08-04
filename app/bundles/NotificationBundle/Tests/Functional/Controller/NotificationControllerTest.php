@@ -6,7 +6,6 @@ namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,7 +60,7 @@ final class NotificationControllerTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        Assert::assertStringContainsString('Some Name has been created!', $crawler->text());
+        $this->assertStringContainsString('Some Name has been created!', $crawler->text());
     }
 
     public function testNewWebNotificationValidationErrors(): void
@@ -95,8 +94,8 @@ final class NotificationControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($form);
         $formCrawler = $crawler->filter('form[name=notification]');
         $this->assertCount(1, $formCrawler);
-        Assert::assertMatchesRegularExpression('/A name is required\./', $formCrawler->text());
-        Assert::assertMatchesRegularExpression('/A heading is required\./', $formCrawler->text());
-        Assert::assertMatchesRegularExpression('/A message is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A name is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A heading is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A message is required\./', $formCrawler->text());
     }
 }

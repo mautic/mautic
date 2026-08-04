@@ -10,13 +10,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 {
     public function testPointGroupCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
 
         // Create a new point group
         $this->client->request('POST', '/api/points/groups/new', [
@@ -88,7 +89,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     public function testContactGroupPointsActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
 
         // Arrange
         $contact     = $this->createContact('test@example.com');

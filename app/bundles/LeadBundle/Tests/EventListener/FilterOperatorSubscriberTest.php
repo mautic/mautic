@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,7 +64,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
     public function testOnListOperatorsGenerate(): void
     {
-        $event = new LeadListFiltersOperatorsEvent([], $this->translator);
+        $event = new LeadListFiltersOperatorsEvent([]);
 
         $this->subscriber->onListOperatorsGenerate($event);
 
@@ -492,11 +491,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
@@ -563,14 +562,14 @@ final class FilterOperatorSubscriberTest extends TestCase
         $choices = $event->getChoices();
 
         // Only custom fields should be shown
-        Assert::assertArrayHasKey('lead', $choices);
-        Assert::assertArrayHasKey('test_select', $choices['lead']);
+        $this->assertArrayHasKey('lead', $choices);
+        $this->assertArrayHasKey('test_select', $choices['lead']);
 
         // Static fields should not be included
-        Assert::assertArrayNotHasKey('utm_source', $choices['lead']);
+        $this->assertArrayNotHasKey('utm_source', $choices['lead']);
 
         // Behaviors should not be included
-        Assert::assertArrayNotHasKey('behaviors', $choices);
+        $this->assertArrayNotHasKey('behaviors', $choices);
     }
 
     public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypesForValueAjaxRequest(): void
@@ -796,11 +795,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']

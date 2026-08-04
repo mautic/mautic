@@ -39,12 +39,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
     /**
      * @param string $slug
-     *
-     * @return Response
      *
      * @throws \Exception
      * @throws FileNotFoundException
@@ -60,7 +58,7 @@ class PublicController extends AbstractFormController
         RouterInterface $router,
         DeviceTrackingServiceInterface $deviceTrackingService,
         PageModel $model,
-        $slug)
+        $slug): RedirectResponse|Response
     {
         /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
@@ -312,11 +310,9 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * @return mixed[]|JsonResponse|RedirectResponse|Response
-     *
      * @throws FileNotFoundException
      */
-    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null)
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
     {
         $page = $model->getEntity($id);
 
@@ -401,16 +397,13 @@ class PublicController extends AbstractFormController
         return TrackingPixelHelper::getResponse($request);
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function trackingAction(
         Request $request,
         DeviceTrackingServiceInterface $deviceTrackingService,
         TrackingHelper $trackingHelper,
         ContactTracker $contactTracker,
         PageModel $model,
-    ) {
+    ): JsonResponse {
         $notSuccessResponse = new JsonResponse(
             [
                 'success' => 0,
@@ -506,7 +499,7 @@ class PublicController extends AbstractFormController
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $logger->warning(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');

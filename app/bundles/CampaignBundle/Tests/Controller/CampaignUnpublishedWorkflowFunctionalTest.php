@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTestCase
 {
@@ -37,7 +38,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignEditPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/edit/%d', $campaign->getId()));
@@ -69,7 +70,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignListPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
 
         // Check the message in the Campaign listing page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
@@ -97,7 +98,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignUnpublishToggle(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'campaign', 'id' => $campaign->getId()]);
         $response = $this->client->getResponse();

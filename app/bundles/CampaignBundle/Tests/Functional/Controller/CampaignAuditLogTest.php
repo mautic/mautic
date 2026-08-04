@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -90,12 +91,12 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
         // 2.c Save campaign through CampaignModel to trigger audit log creation
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = static::getContainer()->get(CampaignModel::class);
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
         $this->assertInstanceOf(Event::class, $event);
         $event->setName('2 contact points after 1 day');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
         $campaign->addEvent($eventId, $event);
         $campaignModel->saveEntity($campaign);
         $this->em->clear();
@@ -105,7 +106,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, $campaignViewUrl);
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get('translator');
+        $translator = static::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
@@ -121,7 +122,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
     public function testCampaignMultipleProjectAdditionsShowInAuditLog(): void
     {
-        $campaignModel = CampaignAuditLogTest::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
 
         // Create projects first
         $project1 = $this->createProject('First Project');

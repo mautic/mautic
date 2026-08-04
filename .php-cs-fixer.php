@@ -4,17 +4,21 @@ require 'autoload.php';
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/bundles')
-    ->exclude('CoreBundle/Tests/_support/_generated')
     ->in(__DIR__.'/app/config')
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
+    ->in(__DIR__.'/tests')
+    ->in(__DIR__.'/utils')
+    // rector rule fixtures are test data, not code, and reformatting them breaks the expected output
+    ->notName('*.php.inc')
     ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
+    ->exclude('_support/_generated')
+    ->exclude('node_modules')
     ->append([
         __DIR__.'/app/AppKernel.php',
         __DIR__.'/app/AppTestKernel.php',
         __DIR__.'/rector.php',
-        __DIR__.'/rector-older-symfony.php',
         __DIR__.'/.php-cs-fixer.php',
         __DIR__.'/ecs.php',
     ]);
@@ -43,7 +47,6 @@ return (new PhpCsFixer\Config())
         'header_comment'        => [
             'header' => '',
         ],
-        'Mautic/no_table_prefix_definition_in_tests'       => true,
         'multiline_whitespace_before_semicolons'           => true,
         'nullable_type_declaration_for_default_null_value' => true,
         'new_with_parentheses'                             => ['anonymous_class' => true],
@@ -51,5 +54,4 @@ return (new PhpCsFixer\Config())
             'allow_mixed' => true,
         ],
     ])
-    ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);

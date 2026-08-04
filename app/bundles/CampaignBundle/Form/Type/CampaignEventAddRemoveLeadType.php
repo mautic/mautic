@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventAddRemoveLeadType extends AbstractType
+final class CampaignEventAddRemoveLeadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

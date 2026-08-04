@@ -18,7 +18,7 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,13 +40,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
         /** @var PageModel $pageModel */
-        $pageModel = self::getContainer()->get('mautic.page.model.page');
+        $pageModel = self::getContainer()->get(PageModel::class);
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
-            Assert::assertNotNull($hit['id']);
-            Assert::assertNotNull($hit['title']);
-            Assert::assertNotNull($hit['hits']);
+            $this->assertNotNull($hit['id']);
+            $this->assertNotNull($hit['title']);
+            $this->assertNotNull($hit['hits']);
         }
     }
 
@@ -130,7 +130,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
-        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+        $this->assertSame($report->getId() + 1, $reportClone->getId());
     }
 
     public function testContactReportSqlInjectionDontWork(): void
@@ -147,7 +147,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check sql injection in parameter orderby
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id\'');
@@ -177,7 +177,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -187,7 +187,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -269,7 +269,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -287,13 +287,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Load view content as HTML and convert the report table to result array
         $result  = $this->parseReportTable($response->getContent());
 
-        Assert::assertSame($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testContactReportNotLikeExpression(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -332,7 +332,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -361,7 +361,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ]]
         );
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -372,7 +372,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
      * @throws NotSupported
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('scheduleProvider')]
+    #[DataProvider('scheduleProvider')]
     public function testScheduleEdit(?string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
     {
         $report = new Report();
@@ -389,7 +389,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setScheduleUnit($oldScheduleUnit);
         $report->setScheduleDay($oldScheduleDay);
         $report->setScheduleMonthFrequency($oldScheduleMonthFrequency);
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $schedule = $report->getSchedule();
 
@@ -415,7 +415,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $report   = $this->em->getRepository(Report::class)->find($report->getId());
         $schedule = $report->getSchedule();
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $this->em->clear();
 
@@ -447,7 +447,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setName('HTML Test');
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('email');
-        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/'.$report->getId());
@@ -477,7 +477,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'ph.user_agent',
         ];
         $report->setColumns($coulmns);
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
         $xssHeader     = '<script>alert(1)</script>';
         $this->client->request('GET', '/mtracking.gif?page_url='.$xssHeader);
         $this->assertResponseStatusCodeSame(200);
@@ -662,13 +662,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -691,7 +691,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Mock the ReportModel to add a defaultValue to the filter definition
         $reportModel = $this->createMock(ReportModel::class);
@@ -713,6 +713,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
+        $this->assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

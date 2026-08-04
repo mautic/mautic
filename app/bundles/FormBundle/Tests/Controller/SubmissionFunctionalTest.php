@@ -20,9 +20,10 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
@@ -180,11 +181,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'country' => 'Australia',
             'state'   => 'Victoria',
         ], $submission->getResults());
@@ -193,8 +194,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('Australia', $contact->getCountry());
-        Assert::assertSame('Victoria', $contact->getState());
+        $this->assertSame('Australia', $contact->getCountry());
+        $this->assertSame('Victoria', $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -273,11 +274,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'country' => '',
         ], $submission->getResults());
 
@@ -285,8 +286,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertNull($contact->getCountry());
-        Assert::assertNull($contact->getState());
+        $this->assertNull($contact->getCountry());
+        $this->assertNull($contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -366,7 +367,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
         // It should not create a submission now as the required field is now visible and empty.
-        Assert::assertCount(0, $submissions);
+        $this->assertCount(0, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -431,7 +432,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('formTypeDataProvider')]
+    #[DataProvider('formTypeDataProvider')]
     public function testAddContactToCampaignByForm(?string $formType): void
     {
         // Create the test form via API.
@@ -468,7 +469,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $campaignSources = ['forms' => [$formId => $formId]];
 
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = static::getContainer()->get(CampaignModel::class);
 
         $campaign = new Campaign();
         $campaign->setName('Test Campaign');
@@ -489,7 +490,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['campaign' => $campaign->getId()]);
-        Assert::assertCount(1, $campaignLeads);
+        $this->assertCount(1, $campaignLeads);
     }
 
     /**
@@ -545,7 +546,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         // Enable reboots so all the services and in-memory data are refreshed.
         $this->client->enableReboot();
@@ -558,8 +559,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submission     = $response['submissions'][0];
 
         $this->assertResponseIsSuccessful();
-        Assert::assertSame($formId, $submission['form']['id']);
-        Assert::assertGreaterThanOrEqual(1, $response['total']);
+        $this->assertSame($formId, $submission['form']['id']);
+        $this->assertGreaterThanOrEqual(1, $response['total']);
 
         // Create non admin user
         $user = $this->createUser();
@@ -593,7 +594,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
@@ -652,11 +653,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'company' => 'Acquia',
             'email'   => 'leeloo@fifth.element',
         ], $submission->getResults());
@@ -665,8 +666,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('Acquia', $contact->getCompany());
-        Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
+        $this->assertSame('Acquia', $contact->getCompany());
+        $this->assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -718,11 +719,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'f_all' => 'test',
         ], $submission->getResults());
 
@@ -730,7 +731,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contact = $submission->getLead();
         $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('test', $contact->getFirstname());
+        $this->assertSame('test', $contact->getFirstname());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -754,7 +755,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formFieldValuesMappingDataProvider')]
+    #[DataProvider('formFieldValuesMappingDataProvider')]
     public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
         $formPayload = [
@@ -1027,7 +1028,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formCustomFieldsMappingDataProvider')]
+    #[DataProvider('formCustomFieldsMappingDataProvider')]
     public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
     {
         // Create new contact custom field
@@ -1215,7 +1216,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('htmlFieldSubmissionDataProvider')]
+    #[DataProvider('htmlFieldSubmissionDataProvider')]
     public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
     {
         // Create form with freehtml and email fields
@@ -1389,7 +1390,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
         /** @var SubmissionModel $submissionModel */
-        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        $submissionModel = static::getContainer()->get(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);
 
@@ -1456,7 +1457,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -1472,7 +1473,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(0, $submissions);
+        $this->assertCount(0, $submissions);
     }
 
     public function testResultRecordsAreRemovedIfSubmissionRecordsAreRemovedForForm(): void
@@ -1489,7 +1490,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         $submissionId = $submissions[0]->getId();
 
@@ -1503,7 +1504,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $stmt        = $conn->prepare($sql);
         $results     = $stmt->executeQuery()->fetchAllAssociative();
 
-        Assert::assertCount(0, $results);
+        $this->assertCount(0, $results);
     }
 
     public function testResultRecordsAreRemovedIfSubmissionRecordsAreRemovedInBatchForForm(): void
@@ -1524,7 +1525,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount($totalSubmissions, $submissions);
+        $this->assertCount($totalSubmissions, $submissions);
 
         $submissionIds = [];
 
@@ -1550,7 +1551,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $resultCount = (int) $qb->executeQuery()->fetchOne();
 
-        Assert::assertSame(0, $resultCount);
+        $this->assertSame(0, $resultCount);
     }
 
     protected function beforeTearDown(): void

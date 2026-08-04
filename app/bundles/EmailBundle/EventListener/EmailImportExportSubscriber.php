@@ -14,10 +14,13 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -29,6 +32,9 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private EmailModel $emailModel,
         private EntityManagerInterface $entityManager,
+        private EmailRepository $emailRepository,
+        private FormRepository $formRepository,
+        private PageRepository $pageRepository,
         private EventDispatcherInterface $dispatcher,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
@@ -99,7 +105,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME  => (int) $emailId,
+                Email::ENTITY_NAME  => $emailId,
                 Asset::ENTITY_NAME  => (int) $asset->getId(),
             ]);
         }
@@ -110,7 +116,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME => (int) $emailId,
+                Email::ENTITY_NAME => $emailId,
                 Form::ENTITY_NAME  => (int) $form->getId(),
             ]);
         }
@@ -120,7 +126,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME => (int) $emailId,
+                Email::ENTITY_NAME => $emailId,
                 Page::ENTITY_NAME  => (int) $page->getId(),
             ]);
         }
@@ -138,16 +144,16 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $email = $this->entityManager->getRepository(Email::class)->findOneBy(['uuid' => $element['uuid']]);
+            $email = $this->emailRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew = !$email;
 
             $email ??= new Email();
             $unsubscribeForm = !empty($element['unsubscribeform_id'])
-                ? $this->entityManager->getRepository(Form::class)->find($element['unsubscribeform_id'])
+                ? $this->formRepository->find($element['unsubscribeform_id'])
                 : null;
 
             $preferenceCenter = !empty($element['preference_center_id'])
-                ? $this->entityManager->getRepository(Page::class)->find($element['preference_center_id'])
+                ? $this->pageRepository->find($element['preference_center_id'])
                 : null;
 
             $email->setUnsubscribeForm($unsubscribeForm);
@@ -199,7 +205,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Email::class)->find($id);
+            $entity = $this->emailRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

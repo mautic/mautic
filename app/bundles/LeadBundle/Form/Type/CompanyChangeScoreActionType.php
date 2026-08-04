@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 /**
  * @extends AbstractType<mixed>
  */
-class CompanyChangeScoreActionType extends AbstractType
+final class CompanyChangeScoreActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -24,12 +24,7 @@ class CompanyChangeScoreActionType extends AbstractType
                 'scale'       => 0,
                 'data'        => $options['data']['score'] ?? 0,
                 'constraints' => [
-                    new NotEqualTo(
-                        [
-                            'value'   => 0,
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotEqualTo(value: 0, message: 'mautic.core.value.required'),
                 ],
             ]
         );

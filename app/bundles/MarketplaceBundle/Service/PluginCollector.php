@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Service;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
 
-class PluginCollector
+final class PluginCollector
 {
     private int $total = 0;
 

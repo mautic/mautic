@@ -6,7 +6,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CategoryChangeEvent extends Event
+final class CategoryChangeEvent extends Event
 {
     private ?Lead $lead = null;
 

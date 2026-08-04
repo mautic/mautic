@@ -22,9 +22,8 @@ class FilePathResolver
      */
     public function getUniqueFileName($uploadDir, UploadedFile $file): string
     {
-        $inputHelper       = $this->inputHelper;
         $fullName          = $file->getClientOriginalName();
-        $fullNameSanitized = $inputHelper::filename($fullName);
+        $fullNameSanitized = $this->inputHelper::filename($fullName);
         $ext               = $this->getFileExtension($file);
         $baseFileName      = pathinfo($fullNameSanitized, PATHINFO_FILENAME);
         $name              = $baseFileName;

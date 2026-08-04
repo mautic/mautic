@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -89,10 +88,10 @@ final class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -138,13 +137,13 @@ final class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
                 case 4:
-                    Assert::assertSame(129, $objectMapping->getInternalObjectId());
+                    $this->assertSame(129, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -222,7 +221,7 @@ final class CompanyObjectHelperTest extends TestCase
 
         $objectMappings = $this->getObjectHelper()->update([], []);
 
-        Assert::assertSame([], $objectMappings);
+        $this->assertSame([], $objectMappings);
     }
 
     private function getObjectHelper(): CompanyObjectHelper

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: RemoveCommand::NAME,
     description: 'Removes a plugin or resource that is currently installed'
 )]
-class RemoveCommand extends Command
+final class RemoveCommand extends Command
 {
     public const NAME = 'mautic:marketplace:remove';
 

@@ -17,17 +17,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class SortableListType extends AbstractType
+final class SortableListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraints = ($options['option_required']) ? [
-            new Count(
-                [
-                    'minMessage' => 'mautic.form.lists.count',
-                    'min'        => 1,
-                ]
-            ),
+            new Count(minMessage: 'mautic.form.lists.count', min: 1),
         ] : [];
 
         if ($options['constraint_callback'] instanceof Callback) {
@@ -36,7 +31,7 @@ class SortableListType extends AbstractType
 
         if ($options['option_notblank']) {
             $options['option_constraint'][] = new NotBlank(
-                ['message' => 'mautic.form.lists.notblank']
+                message: 'mautic.form.lists.notblank'
             );
         }
 

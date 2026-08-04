@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadChangeEvent extends Event
+final class LeadChangeEvent extends Event
 {
     public function __construct(
         private readonly Lead $oldLead,

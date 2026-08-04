@@ -12,10 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TweetSendType extends AbstractType
+final class TweetSendType extends AbstractType
 {
     public function __construct(
-        protected RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -36,7 +36,7 @@ class TweetSendType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.integration.Twitter.send.selecttweet.notblank']
+                        message: 'mautic.integration.Twitter.send.selecttweet.notblank'
                     ),
                 ],
             ]

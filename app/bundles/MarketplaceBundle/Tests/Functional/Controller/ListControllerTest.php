@@ -25,19 +25,16 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        Assert::assertSame(
-            [
-                'Mautic Saelos Bundle',
-                'Mautic Recaptcha Bundle',
-                'Mautic Ldap Auth Bundle',
-                'Mautic Referrals Bundle',
-                'Mautic Do Not Contact Extras Bundle',
-            ],
-            array_map(
-                trim(...),
-                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-            )
-        );
+        $this->assertSame([
+            'Mautic Saelos Bundle',
+            'Mautic Recaptcha Bundle',
+            'Mautic Ldap Auth Bundle',
+            'Mautic Referrals Bundle',
+            'Mautic Do Not Contact Extras Bundle',
+        ], array_map(
+            trim(...),
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        ));
     }
 
     public function testMarketplaceListWithSearchQuery(): void

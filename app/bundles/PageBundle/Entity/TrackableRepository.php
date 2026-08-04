@@ -87,8 +87,6 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int  $increaseBy
      * @param bool $unique
      */

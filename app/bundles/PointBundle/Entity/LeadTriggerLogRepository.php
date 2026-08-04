@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadTriggerLog>
  */
-class LeadTriggerLogRepository extends CommonRepository
+final class LeadTriggerLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -108,7 +109,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
 
         // Assert
         $this->em->refresh($childNotification);
-        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\TranslationEntityInterface::class, $childNotification->getTranslationParent());
+        $this->assertNotInstanceOf(TranslationEntityInterface::class, $childNotification->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTestCase
@@ -17,7 +17,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
      * @param array<mixed,mixed> $accumulativeTime
      * @param array<mixed,mixed> $page
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldAndValueProvider')]
+    #[DataProvider('fieldAndValueProvider')]
     public function testCreatePageHitConditionForm(
         array $pageUrl,
         array $startDate,
@@ -55,7 +55,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
     }
 
     /**

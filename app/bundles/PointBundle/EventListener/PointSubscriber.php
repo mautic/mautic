@@ -8,11 +8,11 @@ use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
     ) {
     }
 

@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
-    class ErrorHandler
+    final class ErrorHandler
     {
         public static $handler;
 
@@ -281,13 +281,21 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            $handlingException = true;
-            $line              = $exception->getLine();
-            $file              = $exception->getFile();
-            $trace             = $exception->getTrace();
-            $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
+            $context = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'showExceptionDetails', 'previous']);
+            return [
+                'inline' => $inline,
+                'type' => $type,
+                'message' => $message,
+                'logMessage' => $logMessage,
+                'line' => $exception->getLine(),
+                'file' => $exception->getFile(),
+                'trace' => $exception->getTrace(),
+                'context' => $context,
+                'showExceptionMessage' => $showExceptionMessage,
+                'showExceptionDetails' => $showExceptionDetails,
+                'previous' => $previous,
+            ];
         }
 
         /**
@@ -365,7 +373,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param mixed[] $context
          */
-        protected function log($logLevel, $message, array $context = [], $debugTrace = null)
+        private function log(string $logLevel, string $message, array $context = [], $debugTrace = null): void
         {
             $message = strip_tags($message);
             if ($this->logger) {
@@ -516,7 +524,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $content;
         }
 
-        private function getErrorName($bit): string
+        private function getErrorName(int $bit): string
         {
             return match ($bit) {
                 E_PARSE => 'Parse Error',

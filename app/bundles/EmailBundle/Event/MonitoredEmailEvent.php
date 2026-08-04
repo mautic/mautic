@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Event;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MonitoredEmailEvent extends Event
+final class MonitoredEmailEvent extends Event
 {
     private array $folders = [];
 

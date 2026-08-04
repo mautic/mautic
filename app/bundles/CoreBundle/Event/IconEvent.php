@@ -5,15 +5,15 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class IconEvent extends Event
+final class IconEvent extends Event
 {
     /**
      * @var array
      */
-    protected $icons = [];
+    private $icons = [];
 
     public function __construct(
-        protected CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 

@@ -404,14 +404,14 @@ final class ObjectChangeGeneratorTest extends TestCase
         $objectChange = $objectChangeGenerator->getSyncObjectChange($reportDAO, $mappingManualDAO, $objectMappingDAO, $internalObject, $integrationObject);
 
         // The points/Score field should not be recorded as a change because it has direction to integration.
-        Assert::assertCount(2, $objectChange->getFields());
-        Assert::assertSame('john@doe.email', $objectChange->getField('email')->getValue()->getNormalizedValue());
-        Assert::assertSame('John', $objectChange->getField('firstname')->getValue()->getNormalizedValue());
-        Assert::assertSame('Lead', $objectChange->getMappedObject());
-        Assert::assertSame('integration-id-1', $objectChange->getMappedObjectId());
-        Assert::assertSame(Contact::NAME, $objectChange->getObject());
-        Assert::assertSame(123, $objectChange->getObjectId());
-        Assert::assertSame($integrationName, $objectChange->getIntegration());
+        $this->assertCount(2, $objectChange->getFields());
+        $this->assertSame('john@doe.email', $objectChange->getField('email')->getValue()->getNormalizedValue());
+        $this->assertSame('John', $objectChange->getField('firstname')->getValue()->getNormalizedValue());
+        $this->assertSame('Lead', $objectChange->getMappedObject());
+        $this->assertSame('integration-id-1', $objectChange->getMappedObjectId());
+        $this->assertSame(Contact::NAME, $objectChange->getObject());
+        $this->assertSame(123, $objectChange->getObjectId());
+        $this->assertSame($integrationName, $objectChange->getIntegration());
     }
 
     private function getMappingManual(string $integration, string $objectName): MappingManualDAO

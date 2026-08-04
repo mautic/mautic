@@ -7,6 +7,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<CompanyChangeLog>
  */
-class CompanyChangeLogRepository extends CommonRepository
+final class CompanyChangeLogRepository extends CommonRepository
 {
 }

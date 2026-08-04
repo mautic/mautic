@@ -2,19 +2,19 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
-        private readonly EntityManager $em,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private StatRepository $statRepository,
     ) {
     }
 
@@ -34,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->addSmsEvents($event, 'failed');
     }
 
-    protected function addSmsEvents(LeadTimelineEvent $event, $state)
+    private function addSmsEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types
         $eventTypeKey  = 'sms.'.$state;
@@ -47,11 +47,9 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
+        $stats                 = $this->statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);
@@ -69,7 +67,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $label,
                     'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                 ];
-                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
+                if ('failed' === $state or 'sent' === $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
 
@@ -87,7 +85,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'type'   => $state,
                         ],
                         'contentTemplate' => '@MauticSms/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'ri-chat-1-fill' : 'ri-message-2-fill',
+                        'icon'            => ('read' === $state) ? 'ri-chat-1-fill' : 'ri-message-2-fill',
                         'contactId'       => $contactId,
                     ]
                 );

@@ -11,13 +11,13 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     private const FEATURE_PUSH_LEAD = 'push_lead';
 
     public function __construct(
-        private readonly PluginModel $pluginModel,
-        private readonly IntegrationRepository $integrationRepository,
+        private PluginModel $pluginModel,
+        private IntegrationRepository $integrationRepository,
     ) {
     }
 

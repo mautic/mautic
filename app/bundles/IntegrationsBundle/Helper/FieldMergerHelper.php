@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
-class FieldMergerHelper
+final class FieldMergerHelper
 {
     /**
      * @var MappedFieldInfoInterface[]

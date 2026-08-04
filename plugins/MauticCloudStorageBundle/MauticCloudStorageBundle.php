@@ -4,6 +4,6 @@ namespace MauticPlugin\MauticCloudStorageBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-class MauticCloudStorageBundle extends PluginBundleBase
+final class MauticCloudStorageBundle extends PluginBundleBase
 {
 }

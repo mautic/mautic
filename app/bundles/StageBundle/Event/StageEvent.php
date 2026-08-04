@@ -5,7 +5,7 @@ namespace Mautic\StageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\StageBundle\Entity\Stage;
 
-class StageEvent extends CommonEvent
+final class StageEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

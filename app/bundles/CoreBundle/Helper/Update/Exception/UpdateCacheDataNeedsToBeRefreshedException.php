@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Update\Exception;
 
-class UpdateCacheDataNeedsToBeRefreshedException extends \Exception
+final class UpdateCacheDataNeedsToBeRefreshedException extends \Exception
 {
 }

@@ -5,7 +5,7 @@ namespace Step\Acceptance;
 use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\ContactPage;
 
-class ContactStep extends \AcceptanceTester
+final class ContactStep extends \AcceptanceTester
 {
     /**
      * Fill out the contact form with the provided details.
@@ -19,7 +19,7 @@ class ContactStep extends \AcceptanceTester
     {
         $I = $this;
         // Wait for the first name field to be visible
-        $I->waitForElementVisible(ContactPage::$firstNameField, 10);
+        $I->waitForElementVisible(ContactPage::$firstNameField, self::TIMEOUT);
         // Fill in the form fields
         $I->fillField(ContactPage::$firstNameField, $firstName);
         $I->fillField(ContactPage::$lastNameField, $lastName);
@@ -56,7 +56,7 @@ class ContactStep extends \AcceptanceTester
         // Click the dropdown menu
         $I->click("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/button");
         // Select the desired option
-        $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/ul/li[{$option}]/a", 30);
+        $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/ul/li[{$option}]/a", self::TIMEOUT);
         $I->click("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/ul/li[{$option}]/a");
     }
 
@@ -67,7 +67,7 @@ class ContactStep extends \AcceptanceTester
     {
         $I     = $this;
         $xpath = "//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/span/input";
-        $I->waitForElementClickable($xpath, 10);
+        $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
     }
@@ -79,7 +79,7 @@ class ContactStep extends \AcceptanceTester
     {
         $I     = $this;
         $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"{$contactName}\"]]/td[1]/div/span/input";
-        $I->waitForElementClickable($xpath, 10);
+        $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
     }
@@ -91,7 +91,7 @@ class ContactStep extends \AcceptanceTester
     {
         $I     = $this;
         $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/{$leadId}')]]/td[1]/div/span/input";
-        $I->waitForElementClickable($xpath, 10);
+        $I->waitForElementClickable($xpath, self::TIMEOUT);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
     }
@@ -104,13 +104,13 @@ class ContactStep extends \AcceptanceTester
         $I = $this;
         // Click the dropdown button for bulk actions
         $xpathDropdownButton = '//button[@id="core-options"]';
-        $I->waitForElementClickable($xpathDropdownButton, 10);
+        $I->waitForElementClickable($xpathDropdownButton, self::TIMEOUT);
         $I->click($xpathDropdownButton);
 
         // Select the desired option from the dropdown menu by label when provided.
         if (is_string($option) && !ctype_digit($option)) {
             $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li/a[contains(normalize-space(), \"{$option}\")]";
-            $I->waitForElementClickable($xpathOption, 10);
+            $I->waitForElementClickable($xpathOption, self::TIMEOUT);
             $I->click($xpathOption);
 
             return;
@@ -118,7 +118,7 @@ class ContactStep extends \AcceptanceTester
 
         $position    = (int) $option;
         $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[{$position}]";
-        $I->waitForElementClickable($xpathOption, 10);
+        $I->waitForElementClickable($xpathOption, self::TIMEOUT);
         $I->click($xpathOption);
     }
 
@@ -180,12 +180,14 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
+        $contactNameSelector = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($contactNameSelector, self::TIMEOUT);
+        $contactName = $I->grabTextFrom($contactNameSelector);
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
-        $I->waitForText($contactName, 10, '#app-content');
+        $I->waitForText($contactName, self::TIMEOUT, '#app-content');
         // Verify the owner is "Sales User"
-        $I->waitForElement('//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]', 15);
+        $I->waitForElement('//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]', self::TIMEOUT);
         $I->see('Sales User', '//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 
@@ -200,12 +202,14 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage('/s/contacts');
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
+        $contactNameSelector = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($contactNameSelector, self::TIMEOUT);
+        $contactName = $I->grabTextFrom($contactNameSelector);
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
-        $I->waitForText($contactName, 10, '#app-content');
+        $I->waitForText($contactName, self::TIMEOUT, '#app-content');
         // Verify the owner is "Admin User"
-        $I->waitForElement('//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]', 15);
+        $I->waitForElement('//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]', self::TIMEOUT);
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 }

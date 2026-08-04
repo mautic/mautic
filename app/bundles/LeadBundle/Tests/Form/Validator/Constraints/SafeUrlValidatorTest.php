@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Validator\Constraints\SafeUrl;
 use Mautic\LeadBundle\Validator\Constraints\SafeUrlValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -16,7 +17,7 @@ final class SafeUrlValidatorTest extends ConstraintValidatorTestCase
         return new SafeUrlValidator();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlProvider')]
+    #[DataProvider('urlProvider')]
     public function testSafeUrlValidation(string $url, bool $isValid): void
     {
         $constraint = new SafeUrl();

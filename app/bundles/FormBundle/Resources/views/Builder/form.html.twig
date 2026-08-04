@@ -30,6 +30,7 @@
 {{ style|raw }}
 <style type="text/css" scoped>
     .mauticform-field-hidden { display:none }
+    .mauticform-row.mauticform-honeypot { display: none; }
 </style>
 <div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes|raw }}>

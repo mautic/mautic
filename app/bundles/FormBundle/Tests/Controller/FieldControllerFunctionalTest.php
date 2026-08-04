@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $payload        = json_decode($clientResponse->getContent(), true);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('<option value="email" selected="selected">', (string) $payload['newContent']);
+        $this->assertStringContainsString('<option value="email" selected="selected">', (string) $payload['newContent']);
     }
 
     public function testNewCaptchaFieldFormCanBeSaved(): void
@@ -62,7 +62,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');
-        Assert::assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
+        $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
         $form = $formCrawler->form();
         $form->setValues(
             [
@@ -78,8 +78,8 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        Assert::assertSame(1, $response['success'] ?? null, $this->client->getResponse()->getContent());
-        Assert::assertSame(1, $response['closeModal'] ?? null, $this->client->getResponse()->getContent());
+        $this->assertSame(1, $response['success'] ?? null, $this->client->getResponse()->getContent());
+        $this->assertSame(1, $response['closeModal'] ?? null, $this->client->getResponse()->getContent());
     }
 
     public function testNewCompanyLookupFieldForm(): void
@@ -108,7 +108,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed>|null $additionalValues
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldTypesData')]
+    #[DataProvider('provideFieldTypesData')]
     public function testFieldWithLinkInLabel(
         string $fieldType,
         string $label,
@@ -125,7 +125,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');
-        Assert::assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
+        $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
         $form = $formCrawler->form();
         $form->setValues(
             [

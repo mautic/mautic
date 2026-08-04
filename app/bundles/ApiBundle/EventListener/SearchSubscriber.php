@@ -12,12 +12,12 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly ClientModel $apiClientModel,
-        private readonly CorePermissions $security,
-        private readonly GlobalSearch $globalSearch,
+        private ClientModel $apiClientModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
     ) {
     }
 

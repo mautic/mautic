@@ -12,12 +12,19 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
+use Mautic\NotificationBundle\Api\OneSignalApi;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
@@ -414,7 +421,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber                                    = new class(static::getContainer()->get('mautic.helper.integration'), static::getContainer()->get('mautic.notification.model.notification'), static::getContainer()->get('mautic.notification.api'), static::getContainer()->get('event_dispatcher'), static::getContainer()->get('mautic.lead.model.dnc'), static::getContainer()->get('translator')) extends CampaignSubscriber {
+        $subscriber = new class(static::getContainer()->get(IntegrationHelper::class), static::getContainer()->get(NotificationModel::class), static::getContainer()->get(OneSignalApi::class), static::getContainer()->get(EventDispatcherInterface::class), static::getContainer()->get(DoNotContactModel::class), static::getContainer()->get(TranslatorInterface::class), static::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
@@ -537,14 +544,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
      */
     private function getExpectedResponsePushIds(array $pushIds, Notification $notification): array
     {
-        return array_merge(
-            ['include_player_ids' => $pushIds],
-            [
-                'contents' => ['en' => $notification->getMessage()],
-                'headings' => ['en' => $notification->getHeading()],
-                'app_id'   => self::API_ID,
-            ]
-        );
+        return ['include_player_ids' => $pushIds, 'contents' => ['en' => $notification->getMessage()], 'headings' => ['en' => $notification->getHeading()], 'app_id' => self::API_ID];
     }
 
     private function noMoreRequestAssertion(): callable
@@ -557,7 +557,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     private function convertToTrackedUrl(Notification $notification, Lead $leadOne): string
     {
         /** @var AbstractNotificationApi $api */
-        $api          = static::getContainer()->get('mautic.notification.api');
+        $api          = static::getContainer()->get(OneSignalApi::class);
         $clickThrough = [
             'notification' => $notification->getId(),
             'lead'         => $leadOne->getId(),
@@ -569,25 +569,25 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     private function assertEventLogPassed(CampaignEvent $event, Lead $leadOne): void
     {
         $log = $this->findEventLog($event, $leadOne);
-        Assert::assertFalse($log->getIsScheduled());
+        $this->assertFalse($log->getIsScheduled());
 
         $metadata = $log->getMetadata();
-        Assert::assertIsArray($metadata);
-        Assert::assertArrayHasKey('status', $metadata);
-        Assert::assertSame('mautic.notification.timeline.status.delivered', $metadata['status']);
+        $this->assertIsArray($metadata);
+        $this->assertArrayHasKey('status', $metadata);
+        $this->assertSame('mautic.notification.timeline.status.delivered', $metadata['status']);
     }
 
     private function assertEventLogFailed(CampaignEvent $event, Lead $leadOne, ?string $reason, bool $isScheduled = false): void
     {
         $log = $this->findEventLog($event, $leadOne);
-        Assert::assertSame($isScheduled, $log->getIsScheduled());
+        $this->assertSame($isScheduled, $log->getIsScheduled());
 
         $metadata = $log->getMetadata();
-        Assert::assertIsArray($metadata);
-        Assert::assertArrayHasKey('failed', $metadata);
-        Assert::assertSame(1, $metadata['failed']);
-        Assert::assertArrayHasKey('reason', $metadata);
-        Assert::assertSame($reason, $metadata['reason']);
+        $this->assertIsArray($metadata);
+        $this->assertArrayHasKey('failed', $metadata);
+        $this->assertSame(1, $metadata['failed']);
+        $this->assertArrayHasKey('reason', $metadata);
+        $this->assertSame($reason, $metadata['reason']);
     }
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
@@ -597,7 +597,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
             'lead'     => $leadOne,
             'rotation' => 1,
         ]);
-        Assert::assertNotNull($log);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         return $log;
     }

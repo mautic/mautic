@@ -21,7 +21,7 @@ final class Version
     ) {
     }
 
-    public static function fromArray(array $array): Version
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['version'],

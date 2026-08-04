@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Service\ResourceInstaller;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -103,9 +104,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
     /**
      * A dist URL is chosen by whoever published the package, so it must not be able to point the
      * server at its own network or at the local filesystem.
-     *
-     * @dataProvider unsafeDistUrlProvider
      */
+    #[DataProvider('unsafeDistUrlProvider')]
     public function testInstallRefusesUnsafeDistUrls(string $url): void
     {
         $this->mockPackageWithDistUrl($url);

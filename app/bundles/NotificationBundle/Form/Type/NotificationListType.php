@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class NotificationListType extends AbstractType
+final class NotificationListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -44,7 +44,7 @@ class NotificationListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

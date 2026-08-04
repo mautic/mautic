@@ -33,6 +33,6 @@ final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
         // Calling for the second time to ensure it's cached and the dispatcher is called only once.
         $objectCollector->getObjects();
 
-        Assert::assertSame(1, $dispatcher->dispatchMethodCallCounter);
+        $this->assertSame(1, $dispatcher->dispatchMethodCallCounter);
     }
 }

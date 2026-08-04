@@ -4,48 +4,49 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\ComposerHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    public function __construct(
-        private readonly ComposerHelper $composer,
-        private readonly CacheHelper $cacheHelper,
-        private readonly LoggerInterface $logger,
-        private readonly Config $config,
-        private readonly ResourceInstallerInterface $resourceInstaller,
-        private readonly PackageModel $packageModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        private readonly UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private ComposerHelper $composer;
+
+    private CacheHelper $cacheHelper;
+
+    private LoggerInterface $logger;
+
+    private Config $config;
+
+    private ResourceInstallerInterface $resourceInstaller;
+
+    private PackageModel $packageModel;
+
+    #[Required]
+    public function autowireMarketplaceAjaxController(
+        ComposerHelper $composer,
+        CacheHelper $cacheHelper,
+        LoggerInterface $logger,
+        Config $config,
+        ResourceInstallerInterface $resourceInstaller,
+        PackageModel $packageModel,
+    ): void {
+        $this->composer          = $composer;
+        $this->cacheHelper       = $cacheHelper;
+        $this->logger            = $logger;
+        $this->config            = $config;
+        $this->resourceInstaller = $resourceInstaller;
+        $this->packageModel      = $packageModel;
     }
 
     public function installPackageAction(Request $request): JsonResponse
@@ -225,7 +226,8 @@ class AjaxController extends CommonAjaxController
 
     private function installResource(string $packageName): JsonResponse
     {
-        $userId = $this->userHelper->getUser()->getId();
+        // CommonController resolves the current user for us, so the helper is no longer injected.
+        $userId = (int) $this->user?->getId();
 
         try {
             $result = $this->resourceInstaller->install($packageName, $userId);

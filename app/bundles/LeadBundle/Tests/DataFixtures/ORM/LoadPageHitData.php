@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\PageBundle\Entity\Hit;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -85,7 +85,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    protected function createHit(array $hitConfig, ObjectManager $manager)
+    private function createHit(array $hitConfig, ObjectManager $manager): void
     {
         $hit = new Hit();
 
@@ -104,10 +104,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }

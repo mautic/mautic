@@ -2,6 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho\Exception;
 
-class MatchingKeyNotFoundException extends \Exception
+final class MatchingKeyNotFoundException extends \Exception
 {
 }

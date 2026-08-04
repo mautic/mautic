@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Response;
 
-class JsController extends CommonController
+final class JsController extends CommonController
 {
     public function generateAction($formName): Response
     {

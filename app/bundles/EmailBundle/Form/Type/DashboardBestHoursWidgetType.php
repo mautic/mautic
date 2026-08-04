@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardBestHoursWidgetType extends AbstractType
+final class DashboardBestHoursWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

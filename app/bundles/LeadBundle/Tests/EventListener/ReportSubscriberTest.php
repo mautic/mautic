@@ -8,14 +8,14 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -28,7 +28,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -43,11 +43,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&FieldModel
      */
     private MockObject $leadFieldModelMock;
-
-    /**
-     * @var MockObject&CompanyModel
-     */
-    private MockObject $companyModelMock;
 
     /**
      * @var MockObject&CompanyReportData
@@ -131,9 +126,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
         $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
         $stageModelMock                         = $this->createMock(StageModel::class);
-        $campaignModelMock                      = $this->createMock(CampaignModel::class);
         $eventCollectorMock                     = $this->createMock(EventCollector::class);
-        $this->companyModelMock                 = $this->createMock(CompanyModel::class);
         $this->companyReportDataMock            = $this->createMock(CompanyReportData::class);
         $this->fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
         $this->translatorMock                   = $this->createMock(Translator::class);
@@ -148,13 +141,13 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->leadModelMock,
             $this->leadFieldModelMock,
             $stageModelMock,
-            $campaignModelMock,
             $eventCollectorMock,
-            $this->companyModelMock,
             $this->companyReportDataMock,
             $this->fieldsBuilderMock,
             $this->translatorMock,
-            $this->createStub(DncReportService::class)
+            $this->createStub(DncReportService::class),
+            $this->createStub(CompanyRepository::class),
+            $this->createStub(CampaignRepository::class)
         );
 
         $this->queryBuilderMock
@@ -231,8 +224,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('orderBy')
             ->willReturn($this->queryBuilderMock);
 
-        $campaignModelMock->method('getRepository')->willReturn($this->createStub(CampaignRepository::class));
-
         $eventCollectorMock
             ->method('getEventsArray')
             ->willReturn(
@@ -242,7 +233,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'           => 'Send email',
                             'description'     => 'Send the selected email to the contact.',
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
-                            'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
+                            'formType'        => EmailSendType::class,
                             'formTypeOptions' => [
                                 'update_select'    => 'campaignevent_properties_email',
                                 'with_email_types' => true,
@@ -257,7 +248,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'                  => 'Clicks email',
                             'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                             'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                            'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
+                            'formType'               => EmailClickDecisionType::class,
                             'connectionRestrictions' => [
                                 'source' => [
                                     'action' => [
@@ -364,7 +355,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testOnReportBuilder(string $event): void
     {
         if ('companies' !== $event) {
@@ -835,7 +826,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $reportBuilderEvent->getTables());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('eventDataProvider')]
+    #[DataProvider('eventDataProvider')]
     public function testReportGenerate(string $context): void
     {
         $matcher = $this->any();
@@ -868,7 +859,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testonReportGraphGenerate(string $event): void
     {
         $this->reportGraphEventMock->expects($this->once())
@@ -890,10 +881,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModelMock->expects($this->once())
             ->method('getPointLogRepository')
             ->willReturn($this->createStub(PointsChangeLogRepository::class));
-
-        $this->companyModelMock->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->createStub(CompanyRepository::class));
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getQueryBuilder')
@@ -940,7 +927,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportGraphGenerate($this->reportGraphEventMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ReportGraphEventDataProvider')]
+    #[DataProvider('ReportGraphEventDataProvider')]
     public function testOnReportDisplay(string $event): void
     {
         $this->reportBuilderEventMock
@@ -1041,7 +1028,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 
     public function testOnReportColumnCollectForContact(): void
@@ -1086,6 +1073,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+        $this->assertSame($columns, $columnCollectEvent->getColumns());
     }
 }

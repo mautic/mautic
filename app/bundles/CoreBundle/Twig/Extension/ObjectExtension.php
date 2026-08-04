@@ -8,7 +8,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 
-class ObjectExtension extends AbstractExtension
+final class ObjectExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {
@@ -17,7 +17,7 @@ class ObjectExtension extends AbstractExtension
         ];
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('object', fn ($value): bool => is_object($value)),

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
@@ -28,6 +29,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private ListModel $leadListModel,
         private EntityManagerInterface $entityManager,
+        private LeadListRepository $leadListRepository,
         private AuditLogModel $auditLogModel,
         private PluginModel $pluginModel,
         private EventDispatcherInterface $dispatcher,
@@ -83,7 +85,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
                         $this->mergeExportData($data, $subEvent);
 
                         $event->addDependencyEntity(LeadList::ENTITY_NAME, [
-                            LeadList::ENTITY_NAME   => (int) $leadListId,
+                            LeadList::ENTITY_NAME   => $leadListId,
                             LeadField::ENTITY_NAME  => (int) $field->getId(),
                         ]);
                     }
@@ -109,7 +111,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $segment = $this->entityManager->getRepository(LeadList::class)->findOneBy(['uuid' => $element['uuid']]);
+            $segment = $this->leadListRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew   = !$segment;
 
             $segment ??= new LeadList();
@@ -151,7 +153,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(LeadList::class)->find($id);
+            $entity = $this->leadListRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

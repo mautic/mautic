@@ -5,7 +5,7 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(
         UnifiedIntegrationInterface $integration,

@@ -6,7 +6,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LogoutEvent extends Event
+final class LogoutEvent extends Event
 {
     private array $session = [];
 

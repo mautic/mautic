@@ -317,7 +317,7 @@ class ContactTracker
         return !$this->security->isAnonymous();
     }
 
-    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId): void
+    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, ?string $previouslyTrackedId): void
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->debug(

@@ -2,6 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Exception;
 
-class NoContactsFoundException extends \Exception
+final class NoContactsFoundException extends \Exception
 {
 }

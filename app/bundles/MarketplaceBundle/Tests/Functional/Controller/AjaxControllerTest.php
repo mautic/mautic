@@ -216,13 +216,9 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->packageModel      = $this->createMock(PackageModel::class);
 
+        // The controller takes its own dependencies through #[Required] autowiring, so only
+        // CommonController's constructor arguments go here.
         $controller = new AjaxController(
-            $composer,
-            $cacheHelper,
-            $this->createStub(LoggerInterface::class),
-            $this->marketplaceConfig,
-            $this->resourceInstaller,
-            $this->packageModel,
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $userHelper,
@@ -232,6 +228,14 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->security
+        );
+        $controller->autowireMarketplaceAjaxController(
+            $composer,
+            $cacheHelper,
+            $this->createStub(LoggerInterface::class),
+            $this->marketplaceConfig,
+            $this->resourceInstaller,
+            $this->packageModel
         );
         $controller->setContainer(static::getContainer());
 

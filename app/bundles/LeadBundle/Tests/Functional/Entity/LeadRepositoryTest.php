@@ -7,6 +7,8 @@ namespace Mautic\LeadBundle\Tests\Functional\Entity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,10 +34,10 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     /**
      * @param array<string, bool> $args
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('joinIpAddressesProvider')]
+    #[DataProvider('joinIpAddressesProvider')]
     public function testSaveIpAddressToContacts(array $args): void
     {
-        $contactRepo = $this->em->getRepository(Lead::class);
+        $contactRepo = self::getContainer()->get(LeadRepository::class);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();

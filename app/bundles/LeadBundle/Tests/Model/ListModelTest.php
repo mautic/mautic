@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -29,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ListModelTest extends TestCase
 {
-    protected ?MockObject $fixture = null;
+    private ?MockObject $fixture = null;
 
     private ListModel $model;
 
@@ -74,7 +75,9 @@ final class ListModelTest extends TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
+            $this->leadListRepositoryMock,
+            $this->createStub(ListLeadRepository::class), // $listLeadRepository
         );
     }
 
@@ -119,7 +122,9 @@ final class ListModelTest extends TestCase
                 $this->createStub(UrlGeneratorInterface::class),
                 $this->createStub(Translator::class),
                 $this->createStub(UserHelper::class),
-                $this->createStub(LoggerInterface::class)])
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(LeadListRepository::class),
+                $this->createStub(ListLeadRepository::class)])
             ->onlyMethods([])
             ->getMock();
 

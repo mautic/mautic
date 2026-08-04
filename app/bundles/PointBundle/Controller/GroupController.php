@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GroupController extends AbstractStandardFormController
+final class GroupController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
@@ -43,10 +43,8 @@ class GroupController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }

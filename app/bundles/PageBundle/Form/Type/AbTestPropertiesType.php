@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class AbTestPropertiesType extends AbstractType
+final class AbTestPropertiesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

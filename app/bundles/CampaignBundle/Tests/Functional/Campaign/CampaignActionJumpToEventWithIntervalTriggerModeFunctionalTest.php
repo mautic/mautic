@@ -11,9 +11,12 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends MauticMysqlTestCase
 {
+    private const HOUR_DATE_FORMAT = 'Y-m-d H:00:00';
+
     private static string $timezone;
 
     protected function setUp(): void
@@ -30,7 +33,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
+    #[DataProvider('dataForCampaignWithJumpToEventWithIntervalTriggerMode')]
     public function testCampaignWithJumpToEventWithIntervalTriggerMode(Event $adjustPointEvent, callable $assertEventLog): void
     {
         // Create Campaign
@@ -162,9 +165,10 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
 
         yield 'Points at a relative time: Scheduled at - before one hour. Should trigger now.' => [
             $adjustPointEvent,
-            function (LeadEventLog $eventLog) use ($testNow): void {
+            function (LeadEventLog $eventLog): void {
+                $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -271,7 +275,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
             $adjustPointEvent,
             function (LeadEventLog $eventLog) use ($triggerHourDate): void {
                 Assert::assertTrue($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($triggerHourDate->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($triggerHourDate->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 
@@ -301,9 +305,10 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
 
         yield 'Execute the event when Send From is in the past on the selected day when the day is today' => [
             $adjustPointEvent,
-            function (LeadEventLog $eventLog) use ($testNow): void {
+            function (LeadEventLog $eventLog): void {
+                $now = new \DateTime('now', new \DateTimeZone(self::$timezone));
                 Assert::assertFalse($eventLog->getIsScheduled());
-                self::assertPlusMinusOneMinuteOf($testNow->format('Y-m-d H:00:00'), $eventLog->getTriggerDate()->format('Y-m-d H:00:00'));
+                self::assertPlusMinusOneMinuteOf($now->format(self::HOUR_DATE_FORMAT), $eventLog->getTriggerDate()->format(self::HOUR_DATE_FORMAT));
             },
         ];
 

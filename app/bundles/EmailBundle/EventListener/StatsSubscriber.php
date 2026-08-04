@@ -2,32 +2,30 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\EmailReply;
-use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
-use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Entity\StatRepository;
 
-class StatsSubscriber extends CommonStatsSubscriber
+final class StatsSubscriber extends CommonStatsSubscriber
 {
-    public function __construct(CorePermissions $security, EntityManager $entityManager)
-    {
+    public function __construct(
+        CorePermissions $security,
+        EntityManagerInterface $entityManager,
+        StatDeviceRepository $statDeviceRepository,
+        StatRepository $statRepository,
+    ) {
         parent::__construct($security, $entityManager);
 
-        /** @var StatDeviceRepository $repo */
-        $repo                                     = $entityManager->getRepository(StatDevice::class);
-        $this->repositories[]                     = $repo;
-        $this->permissions[$repo->getTableName()] = ['stat.lead' => 'lead:leads'];
+        $this->repositories[]                                     = $statDeviceRepository;
+        $this->permissions[$statDeviceRepository->getTableName()] = ['stat.lead' => 'lead:leads'];
 
         $this->addContactRestrictedRepositories([EmailReply::class]);
 
-        /** @var StatRepository $repo */
-        $repo                           = $entityManager->getRepository(Stat::class);
-        $this->repositories[]           = $repo;
-        $statsTable                     = $repo->getTableName();
+        $this->repositories[]           = $statRepository;
+        $statsTable                     = $statRepository->getTableName();
         $this->permissions[$statsTable] = ['lead' => 'lead:leads'];
         $this->selects[$statsTable]     = [
             'id',

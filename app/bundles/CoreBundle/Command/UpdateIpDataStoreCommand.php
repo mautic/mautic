@@ -15,27 +15,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:iplookup:download',
-    description: 'Fetch remote datastores for IP lookup services that leverage local lookups'
+    description: 'Fetch remote datastores for IP lookup services that leverage local lookups',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
+
+<info>php %command.full_name%</info>
+TXT
 )]
-class UpdateIpDataStoreCommand extends Command
+final class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly AbstractLookup $ipService,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
-
-<info>php %command.full_name%</info>
-EOT
-            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

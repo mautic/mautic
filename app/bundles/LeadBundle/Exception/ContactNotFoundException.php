@@ -2,6 +2,6 @@
 
 namespace Mautic\LeadBundle\Exception;
 
-class ContactNotFoundException extends \Exception
+final class ContactNotFoundException extends \Exception
 {
 }

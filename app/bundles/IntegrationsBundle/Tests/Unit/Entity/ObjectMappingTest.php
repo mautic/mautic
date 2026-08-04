@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +34,7 @@ final class ObjectMappingTest extends TestCase
 
     public function testLoadMetadata(): void
     {
-        $metadata = new \Doctrine\ORM\Mapping\ClassMetadata(ObjectMapping::class);
+        $metadata = new ClassMetadata(ObjectMapping::class);
         ObjectMapping::loadMetadata($metadata);
 
         $expectedFieldNames = [

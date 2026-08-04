@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserSummaryNotificationHelper
+final class UserSummaryNotificationHelper
 {
     private array $userNotifications = [];
 

@@ -36,45 +36,6 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'permissions' => [
-            'marketplace.permissions' => [
-                'class'     => Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'marketplace.service.config',
-                ],
-            ],
-        ],
-        'api' => [
-            'marketplace.api.connection' => [
-                'class'     => Mautic\MarketplaceBundle\Api\Connection::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'monolog.logger.mautic',
-                    'marketplace.service.config',
-                ],
-            ],
-        ],
-        'other' => [
-            'marketplace.service.plugin_collector' => [
-                'class'     => Mautic\MarketplaceBundle\Service\PluginCollector::class,
-                'arguments' => [
-                    'marketplace.api.connection',
-                ],
-            ],
-            'marketplace.service.route_provider' => [
-                'class'     => RouteProvider::class,
-                'arguments' => ['router'],
-            ],
-            'marketplace.service.config' => [
-                'class'     => Config::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
-    ],
     // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
         Config::MARKETPLACE_ENABLED                => true,

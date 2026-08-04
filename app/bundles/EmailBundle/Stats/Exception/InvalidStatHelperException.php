@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\Stats\Exception;
 
-class InvalidStatHelperException extends \Exception
+final class InvalidStatHelperException extends \Exception
 {
 }

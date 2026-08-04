@@ -12,12 +12,12 @@ use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CampaignEventHelper $campaignEventHelper,
-        private readonly IntegrationHelper $integrationHelper,
-        private readonly TranslatorInterface $translator,
+        private CampaignEventHelper $campaignEventHelper,
+        private IntegrationHelper $integrationHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 

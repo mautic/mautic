@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper;
 
-class Category
+final class Category
 {
     /**
      * @param string $category

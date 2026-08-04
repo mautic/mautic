@@ -26,8 +26,8 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
         $mappedObjectCollector = new MappedObjectCollector($fieldCollector);
         $objectCollection      = $mappedObjectCollector->buildCollection('');
-        Assert::assertCount(0, $objectCollection);
-        Assert::assertSame(0, $fieldCollector->getFieldsMethodCallCounter);
+        $this->assertCount(0, $objectCollection);
+        $this->assertSame(0, $fieldCollector->getFieldsMethodCallCounter);
     }
 
     public function testBuildCollectionForOneObject(): void
@@ -46,8 +46,8 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
         $mappedObjectCollector = new MappedObjectCollector($fieldCollector);
         $objectCollection      = $mappedObjectCollector->buildCollection('contact');
-        Assert::assertCount(1, $objectCollection);
-        Assert::assertSame(1, $fieldCollector->getFieldsMethodCallCounter);
+        $this->assertCount(1, $objectCollection);
+        $this->assertSame(1, $fieldCollector->getFieldsMethodCallCounter);
     }
 
     public function testBuildCollectionForMultipleObjects(): void
@@ -66,7 +66,7 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
         $mappedObjectCollector = new MappedObjectCollector($fieldCollector);
         $objectCollection      = $mappedObjectCollector->buildCollection('contact', 'company');
-        Assert::assertCount(2, $objectCollection);
-        Assert::assertSame(2, $fieldCollector->getFieldsMethodCallCounter);
+        $this->assertCount(2, $objectCollection);
+        $this->assertSame(2, $fieldCollector->getFieldsMethodCallCounter);
     }
 }

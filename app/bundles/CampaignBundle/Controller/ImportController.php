@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Form\Type\CampaignImportType;
@@ -12,29 +11,26 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImportController extends AbstractFormController
 {
@@ -45,21 +41,29 @@ final class ImportController extends AbstractFormController
 
     public const STEP_IMPORT_FROM_ZIP = 3;
 
-    public function __construct(
-        ManagerRegistry $doctrine,
-        CoreParametersHelper $coreParametersHelper,
-        ModelFactory $modelFactory,
-        private readonly UserHelper $userHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        private readonly RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly LoggerInterface $logger,
-        private readonly PathsHelper $pathsHelper,
-        private readonly FormFactoryInterface $formFactory,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private UserHelper $userHelper;
+
+    private RequestStack $requestStack;
+
+    private LoggerInterface $logger;
+
+    private PathsHelper $pathsHelper;
+
+    private FormFactoryInterface $formFactory;
+
+    #[Required]
+    public function autowireImportController(
+        UserHelper $userHelper,
+        RequestStack $requestStack,
+        LoggerInterface $logger,
+        PathsHelper $pathsHelper,
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->userHelper   = $userHelper;
+        $this->requestStack = $requestStack;
+        $this->logger       = $logger;
+        $this->pathsHelper  = $pathsHelper;
+        $this->formFactory  = $formFactory;
     }
 
     public function newAction(): Response
@@ -177,7 +181,7 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function cancelAction(): RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
             $this->throwAccessDenied();

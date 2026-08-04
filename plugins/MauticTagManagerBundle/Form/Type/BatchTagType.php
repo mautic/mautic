@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class BatchTagType extends AbstractType
+final class BatchTagType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -21,9 +21,7 @@ class BatchTagType extends AbstractType
                 'required'    => false,
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

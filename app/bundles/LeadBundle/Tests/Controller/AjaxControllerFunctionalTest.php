@@ -18,7 +18,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
@@ -104,7 +106,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('no-campaign-edit-user');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $user->setPassword($hasher->hash('mautic'));
         $userRepository->saveEntity($user);
@@ -128,7 +130,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(404);
-        Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
+        $this->assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
     }
 
     public function testCompanyLookupWithNoCompanySelected(): void
@@ -136,7 +138,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertSame('[]', $response->getContent());
+        $this->assertSame('[]', $response->getContent());
     }
 
     public function testCompanyLookupWithCompanySelected(): void
@@ -149,7 +151,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=sa');
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
+        $this->assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
     }
 
     public function testCompanyLookupWithNoModelSet(): void
@@ -157,7 +159,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(400);
-        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', (string) $response->getContent());
+        $this->assertStringContainsString('Bad Request - The searchKey parameter is required', (string) $response->getContent());
     }
 
     public function testCompanyLookupWithLimit(): void
@@ -178,20 +180,20 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $content  = json_decode($response->getContent(), true);
 
         self::assertResponseIsSuccessful();
-        Assert::assertIsArray($content);
-        Assert::assertCount(1, $content, 'The result should contain only one element');
-        Assert::assertSame('Company 1', $content[0]['text']);
-        Assert::assertSame($company1->getId(), (int) $content[0]['value']);
+        $this->assertIsArray($content);
+        $this->assertCount(1, $content, 'The result should contain only one element');
+        $this->assertSame('Company 1', $content[0]['text']);
+        $this->assertSame($company1->getId(), (int) $content[0]['value']);
 
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
 
         self::assertResponseIsSuccessful();
-        Assert::assertIsArray($content);
-        Assert::assertCount(1, $content, 'The result should contain only one element');
-        Assert::assertSame('Company 2', $content[0]['text']);
-        Assert::assertSame($company2->getId(), (int) $content[0]['value']);
+        $this->assertIsArray($content);
+        $this->assertCount(1, $content, 'The result should contain only one element');
+        $this->assertSame('Company 2', $content[0]['text']);
+        $this->assertSame($company2->getId(), (int) $content[0]['value']);
     }
 
     public function testSegmentDependencyTree(): void
@@ -269,36 +271,33 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
 
-        Assert::assertSame(
-            [
-                'levels' => [
-                    [
-                        'nodes' => [
-                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
-                        ],
+        $this->assertSame([
+            'levels' => [
+                [
+                    'nodes' => [
+                        ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
                     ],
                 ],
-                'edges' => [
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
-                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
+                    ],
+                ],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
+                    ],
                 ],
             ],
-            json_decode($response->getContent(), true)
-        );
+            'edges' => [
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+                ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+            ],
+        ], json_decode($response->getContent(), true));
     }
 
     public function testSegmentDependencyTreeWithLoop(): void
@@ -391,42 +390,39 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $responseData = json_decode($response->getContent(), true);
 
-        Assert::assertSame(
-            [
-                'levels' => [
-                    [
-                        'nodes' => [
-                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                        ],
+        $this->assertSame([
+            'levels' => [
+                [
+                    'nodes' => [
+                        ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
                     ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
-                        ],
+                ],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
                     ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
-                        ],
+                ],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
                     ],
-                    [
-                        'nodes' => [
-                            [
-                                'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
-                                'name'    => $segmentA->getName(),
-                                'link'    => "/s/segments/view/{$segmentA->getId()}",
-                                'message' => 'This segment already exists in the segment dependency tree',
-                            ],
+                ],
+                [
+                    'nodes' => [
+                        [
+                            'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
+                            'name'    => $segmentA->getName(),
+                            'link'    => "/s/segments/view/{$segmentA->getId()}",
+                            'message' => 'This segment already exists in the segment dependency tree',
                         ],
                     ],
                 ],
             ],
-            [
-                'levels' => $responseData['levels'],
-            ]
-        );
+        ], [
+            'levels' => $responseData['levels'],
+        ]);
 
         $expectedEdges = [
             ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
@@ -437,7 +433,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $actualEdges = $responseData['edges'];
-        Assert::assertCount(count($expectedEdges), $actualEdges, 'Should have the correct number of edges');
+        $this->assertCount(count($expectedEdges), $actualEdges, 'Should have the correct number of edges');
 
         foreach ($expectedEdges as $expectedEdge) {
             $edgeFound = false;
@@ -447,7 +443,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                     break;
                 }
             }
-            Assert::assertTrue($edgeFound, "Expected edge {$expectedEdge['source']} -> {$expectedEdge['target']} not found");
+            $this->assertTrue($edgeFound, "Expected edge {$expectedEdge['source']} -> {$expectedEdge['target']} not found");
         }
     }
 
@@ -574,7 +570,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordHasherInterface $hasher */
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $passwordNonAdmin = 'Maut1cR0cks!';
         $user->setPassword($hasher->hash($passwordNonAdmin));
@@ -618,7 +614,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param string[] $expectedOptions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('leadFieldOrderChoiceListProvider')]
+    #[DataProvider('leadFieldOrderChoiceListProvider')]
     public function testUpdateLeadFieldOrderChoiceListAction(string $object, string $group, array $expectedOptions): void
     {
         $payload = [
@@ -746,7 +742,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame('Alias cannot be empty', $response['error']);
+        $this->assertSame('Alias cannot be empty', $response['error']);
 
         // User search for filter
         $this->client->request(
@@ -760,7 +756,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame('Admin User', $response[0]['value']);
+        $this->assertSame('Admin User', $response[0]['value']);
 
         // Check if filed type is not lookup
         $this->client->request(
@@ -774,7 +770,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertEmpty($response);
+        $this->assertEmpty($response);
 
         // Check if filed type is lookup
         $this->client->request(
@@ -788,7 +784,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertArrayHasKey(0, $response);
+        $this->assertArrayHasKey(0, $response);
     }
 
     public function testGetLookupChoiceListForGlobalCategory(): void
@@ -810,7 +806,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame($category1->getTitle(), $response[0]['text']);
+        $this->assertSame($category1->getTitle(), $response[0]['text']);
 
         // Search global category with array of ids
         $this->client->request(
@@ -826,7 +822,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertCount(2, $response);
+        $this->assertCount(2, $response);
     }
 
     public function testLoadSegmentFilterFormForSubscribedCategory(): void
@@ -845,8 +841,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertArrayHasKey('viewParameters', $response);
-        Assert::assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
+        $this->assertArrayHasKey('viewParameters', $response);
+        $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }
 
     /**

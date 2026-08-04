@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class ReplyNotFound extends \Exception
+final class ReplyNotFound extends \Exception
 {
 }

@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ListActionType extends AbstractType
+final class ListActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Tweet>
  */
-class TweetRepository extends CommonRepository
+final class TweetRepository extends CommonRepository
 {
     /**
      * @param string $search

@@ -8,16 +8,20 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\ManualWinnerEvent;
+use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -43,11 +47,6 @@ final class EmailControllerTest extends TestCase
      * @var MockObject&Session
      */
     private MockObject $sessionMock;
-
-    /**
-     * @var MockObject&ModelFactory
-     */
-    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject&Container
@@ -105,7 +104,6 @@ final class EmailControllerTest extends TestCase
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
-        $this->modelFactoryMock           = $this->createMock(ModelFactory::class);
         $helperUserMock                   = $this->createMock(UserHelper::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
         $this->requestStack               = new RequestStack();
@@ -118,7 +116,7 @@ final class EmailControllerTest extends TestCase
             $this->formFactoryMock,
             $this->createStub(FormFieldHelper::class),
             $this->createStub(ManagerRegistry::class),
-            $this->modelFactoryMock,
+            $this->createStub(ModelFactory::class),
             $helperUserMock,
             $this->createStub(CoreParametersHelper::class),
             $this->dispatcher,
@@ -128,6 +126,14 @@ final class EmailControllerTest extends TestCase
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
+
+        $this->controller->autowireEmailController(
+            $this->createStub(ListModel::class),
+            $this->createStub(AuditLogModel::class),
+            $this->modelMock,
+            $this->createStub(LeadRepository::class)
+        );
+
         $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
     }
 
@@ -137,11 +143,6 @@ final class EmailControllerTest extends TestCase
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
 
         $this->modelMock->expects($this->once())
             ->method('getEntity')
@@ -170,11 +171,6 @@ final class EmailControllerTest extends TestCase
             ->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
 
         $this->modelMock->expects($this->once())
             ->method('getEntity')
@@ -238,7 +234,7 @@ final class EmailControllerTest extends TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with(\Mautic\EmailBundle\Form\Type\ExampleSendType::class,
+            ->with(ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [
@@ -284,11 +280,6 @@ final class EmailControllerTest extends TestCase
         $request->expects($this->once())
             ->method('getMethod')
             ->willReturn(Request::METHOD_POST);
-
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
 
         $this->emailMock->expects($this->once())
             ->method('getVariantParent')

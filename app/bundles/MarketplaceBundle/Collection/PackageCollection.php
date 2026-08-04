@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\PackageBase;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class PackageCollection implements \Iterator, \Countable, \ArrayAccess
+final class PackageCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var PackageBase[]
@@ -24,7 +24,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
-    public static function fromArray(array $array): PackageCollection
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(
@@ -34,12 +34,12 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         );
     }
 
-    public function map(callable $callback): PackageCollection
+    public function map(callable $callback): self
     {
         return new self(array_map($callback, $this->records));
     }
 
-    public function filter(callable $callback): PackageCollection
+    public function filter(callable $callback): self
     {
         return new self(array_values(array_filter($this->records, $callback)));
     }

@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -30,7 +31,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function addViolation($message, array $parameters = []): void
+            public function addViolation(string|\Stringable $message, array $parameters = []): void
             {
                 ++$this->violationCount;
             }
@@ -71,10 +72,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $validator->initialize($context);
         $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(['allowMultiple' => false]));
 
-        Assert::assertSame(1, $context->violationCount);
+        $this->assertSame(1, $context->violationCount);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
+    #[DataProvider('provider')]
     public function testNoEmailsProvided(?string $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class() extends ExecutionContext {
@@ -92,7 +93,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function addViolation($message, array $parameters = []): void
+            public function addViolation(string|\Stringable $message, array $parameters = []): void
             {
                 ++$this->violationCount;
                 ($this->violationResult)($message, $parameters);
@@ -143,7 +144,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $emaiOrEmailTokenListValidator->initialize($context);
         $emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList());
 
-        Assert::assertSame($expectedViolationCount, $context->violationCount);
+        $this->assertSame($expectedViolationCount, $context->violationCount);
     }
 
     /**

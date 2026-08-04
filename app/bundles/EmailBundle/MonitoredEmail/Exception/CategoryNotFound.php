@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class CategoryNotFound extends \Exception
+final class CategoryNotFound extends \Exception
 {
 }

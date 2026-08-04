@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use PHPUnit\Framework\Assert;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
@@ -55,7 +54,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
+        $this->contactSegmentService = static::getContainer()->get(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -76,11 +75,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         foreach ($this->provideSegments() as $segmentAlias => $expectedCount) {
             $reference       = $this->getReference($segmentAlias);
             $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($reference);
-            Assert::assertEquals(
-                $expectedCount,
-                $segmentContacts[$reference->getId()]['count'],
-                sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias)
-            );
+            $this->assertEquals($expectedCount, $segmentContacts[$reference->getId()]['count'], sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias));
         }
     }
 
@@ -111,6 +106,8 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'segment-membership-regexp'                                          => 11,
             'segment-company-only-fields'                                        => 6,
             'segment-including-segment-with-company-only-fields'                 => 14,
+            'segment-test-with-in-the-last-filter'                               => 54,
+            'segment-test-with-in-the-next-filter'                               => 54,
             'name-is-not-equal-not-null-test'                                    => 54,
             'manually-unsubscribed-sms-test'                                     => 1,
             'clicked-link-in-any-email'                                          => 2,
@@ -258,12 +255,12 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);
 
         $leads = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertCount(50, $leads[$segment->getId()]);
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertCount(50, $leads[$segment->getId()]);
 
         $leadsSubset = array_column(array_slice($leads[$segment->getId()], 0, 15), 'id');
         $leads       = $this->contactSegmentService->getNewLeadListLeads($segment, ['ids' => $leadsSubset]);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
     }
 }

@@ -10,23 +10,23 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SysinfoModel
+final class SysinfoModel
 {
     /**
      * @var string|null
      */
-    protected $phpInfo;
+    private $phpInfo;
 
     /**
      * @var array<string,bool>|null
      */
-    protected $folders;
+    private ?array $folders = null;
 
     public function __construct(
-        protected PathsHelper $pathsHelper,
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
         private readonly TranslatorInterface $translator,
-        protected Connection $connection,
+        private readonly Connection $connection,
         private readonly InstallService $installService,
         private readonly CheckStep $checkStep,
     ) {
@@ -62,7 +62,7 @@ class SysinfoModel
             // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
-            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
+            $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => PHP_VERSION]);
         } else {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.missing');
         }
@@ -88,10 +88,8 @@ class SysinfoModel
 
     /**
      * Method to get important folders with a writable flag.
-     *
-     * @return array
      */
-    public function getFolders()
+    public function getFolders(): array
     {
         if (null !== $this->folders) {
             return $this->folders;

@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-class IcontactIntegration extends EmailAbstractIntegration
+final class IcontactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -119,7 +119,7 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];

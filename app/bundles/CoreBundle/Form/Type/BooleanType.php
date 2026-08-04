@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class BooleanType extends AbstractType
+final class BooleanType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -21,7 +21,7 @@ class BooleanType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return YesNoButtonGroupType::class;
     }

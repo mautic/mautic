@@ -12,11 +12,13 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -65,7 +67,7 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
      * @param mixed[]           $configParams
      * @param array<string,int> $selectorsAndExpectedCounts
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('frequencyFormRenderingDataProvider')]
+    #[DataProvider('frequencyFormRenderingDataProvider')]
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
         $emailStat = $this->createStat(
@@ -102,20 +104,16 @@ final class BuilderSubscriberTest extends MauticMysqlTestCase
                 $html
             );
 
-            Assert::assertCount(
-                $expectedCount,
-                $form->filter($selector),
-                $message
-            );
+            $this->assertCount($expectedCount, $form->filter($selector), $message);
         }
 
         // Ensure the token and save button are always included within the <form> tag
-        Assert::assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
+        $this->assertCount(1, $form->filter(static::TOKEN_SELECTOR), sprintf('The following HTML does not contain the _token. %s', $html));
 
         if ($hasPreferenceCenter) {
-            Assert::assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::CUSTOM_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         } else {
-            Assert::assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
+            $this->assertCount(1, $form->filter(static::DEFAULT_SAVE_BUTTON_SELECTOR), sprintf('The following HTML does not contain the save button. %s', $html));
         }
     }
 

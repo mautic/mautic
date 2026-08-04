@@ -7,7 +7,7 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ChannelSubscriber implements EventSubscriberInterface
+final class ChannelSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

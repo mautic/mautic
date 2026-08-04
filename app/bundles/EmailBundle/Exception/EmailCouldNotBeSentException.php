@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\Exception;
 
-class EmailCouldNotBeSentException extends \Exception
+final class EmailCouldNotBeSentException extends \Exception
 {
 }

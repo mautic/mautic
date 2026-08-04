@@ -7,14 +7,14 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Submission;
-use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly PageModel $pageModel,
-        private readonly SubmissionModel $submissionModel,
+        private readonly SubmissionRepository $submissionRepository,
     ) {
     }
 
@@ -48,7 +48,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                 }
 
                 $submission->setResults($rows);
-                $this->submissionModel->getRepository()->saveEntity($submission);
+                $this->submissionRepository->saveEntity($submission);
             }
         };
 
@@ -61,7 +61,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $importResults($results2);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 9;
     }

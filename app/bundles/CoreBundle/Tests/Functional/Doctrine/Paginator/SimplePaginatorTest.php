@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Doctrine\Paginator;
 
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 
@@ -42,7 +43,7 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
         $this->em->persist($ipAddress3);
         $this->em->flush();
 
-        $repository = $this->em->getRepository(IpAddress::class);
+        $repository = self::getContainer()->get(IpAddressRepository::class);
 
         $paginator  = $repository->getEntities([
             'use_simple_paginator' => true,

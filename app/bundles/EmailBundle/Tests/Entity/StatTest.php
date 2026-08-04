@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StatTest extends TestCase
@@ -14,7 +15,7 @@ final class StatTest extends TestCase
     /**
      * @param int $count How many openDetails to add to the entity
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('addOpenDetailsTestProvider')]
+    #[DataProvider('addOpenDetailsTestProvider')]
     public function testAddOpenDetails(int $count): void
     {
         $stat = new Stat();
@@ -69,20 +70,20 @@ final class StatTest extends TestCase
         $stat->setSourceId(123);
         $stat->addReply(new EmailReply($stat, '456'));
 
-        Assert::assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
-        Assert::assertSame([false, true], $stat->getChanges()['isFailed']);
-        Assert::assertSame([0, 2], $stat->getChanges()['openCount']);
-        Assert::assertSame([0, 3], $stat->getChanges()['retryCount']);
-        Assert::assertSame([null, 'campaign'], $stat->getChanges()['source']);
-        Assert::assertSame([null, 123], $stat->getChanges()['sourceId']);
-        Assert::assertSame([false, true], $stat->getChanges()['replyAdded']);
-        Assert::assertArrayNotHasKey('isRead', $stat->getChanges()); // Don't want to record changes from false to false.
-        Assert::assertNull($stat->getChanges()['dateRead'][0]);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][1]);
-        Assert::assertNull($stat->getChanges()['dateSent'][0]);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['dateSent'][1]);
-        Assert::assertNull($stat->getChanges()['lastOpened'][0]);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['lastOpened'][1]);
+        $this->assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
+        $this->assertSame([false, true], $stat->getChanges()['isFailed']);
+        $this->assertSame([0, 2], $stat->getChanges()['openCount']);
+        $this->assertSame([0, 3], $stat->getChanges()['retryCount']);
+        $this->assertSame([null, 'campaign'], $stat->getChanges()['source']);
+        $this->assertSame([null, 123], $stat->getChanges()['sourceId']);
+        $this->assertSame([false, true], $stat->getChanges()['replyAdded']);
+        $this->assertArrayNotHasKey('isRead', $stat->getChanges()); // Don't want to record changes from false to false.
+        $this->assertNull($stat->getChanges()['dateRead'][0]);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][1]);
+        $this->assertNull($stat->getChanges()['dateSent'][0]);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateSent'][1]);
+        $this->assertNull($stat->getChanges()['lastOpened'][0]);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['lastOpened'][1]);
 
         $stat->upOpenCount();
         $stat->upRetryCount();
@@ -93,17 +94,17 @@ final class StatTest extends TestCase
         $stat->setSourceId(321);
         $stat->addReply(new EmailReply($stat, '456'));
 
-        Assert::assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
-        Assert::assertSame([false, true], $stat->getChanges()['isFailed']);
-        Assert::assertSame([2, 3], $stat->getChanges()['openCount']);
-        Assert::assertSame([3, 4], $stat->getChanges()['retryCount']);
-        Assert::assertSame([null, 'campaign'], $stat->getChanges()['source']);
-        Assert::assertSame([123, 321], $stat->getChanges()['sourceId']);
-        Assert::assertSame([false, true], $stat->getChanges()['replyAdded']);
-        Assert::assertSame([false, true], $stat->getChanges()['isRead']);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][0]);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][1]);
-        Assert::assertNull($stat->getChanges()['dateSent'][0]);
-        Assert::assertInstanceOf(\DateTime::class, $stat->getChanges()['dateSent'][1]);
+        $this->assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
+        $this->assertSame([false, true], $stat->getChanges()['isFailed']);
+        $this->assertSame([2, 3], $stat->getChanges()['openCount']);
+        $this->assertSame([3, 4], $stat->getChanges()['retryCount']);
+        $this->assertSame([null, 'campaign'], $stat->getChanges()['source']);
+        $this->assertSame([123, 321], $stat->getChanges()['sourceId']);
+        $this->assertSame([false, true], $stat->getChanges()['replyAdded']);
+        $this->assertSame([false, true], $stat->getChanges()['isRead']);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][0]);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateRead'][1]);
+        $this->assertNull($stat->getChanges()['dateSent'][0]);
+        $this->assertInstanceOf(\DateTime::class, $stat->getChanges()['dateSent'][1]);
     }
 }

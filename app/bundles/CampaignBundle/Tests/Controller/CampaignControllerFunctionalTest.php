@@ -11,9 +11,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
@@ -43,7 +43,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $model = static::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignLeadsLabel                                      = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 
@@ -255,7 +255,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaignId = $campaign->getId();
 
         $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     private function campaignContactCountOnCanvas(): void
@@ -263,7 +263,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign      = $this->saveSomeCampaignLeadEventLogs();
         $campaignId    = $campaign->getId();
         $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     /**
@@ -287,9 +287,9 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         }
 
         $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
-        Assert::assertSame($expectedCompleted, $actionCounts['completed']);
-        Assert::assertSame($expectedPending, $actionCounts['pending']);
+        $this->assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
+        $this->assertSame($expectedCompleted, $actionCounts['completed']);
+        $this->assertSame($expectedPending, $actionCounts['pending']);
     }
 
     public function testDeleteCampaign(): void
@@ -305,7 +305,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         self::assertResponseIsSuccessful($response->getContent());
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $this->assertCount(0, $eventLogs);
     }
 
     private function createLead(): Lead

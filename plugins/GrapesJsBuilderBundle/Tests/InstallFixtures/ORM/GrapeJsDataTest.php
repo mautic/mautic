@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
-use PHPUnit\Framework\Assert;
 
 final class GrapeJsDataTest extends MauticMysqlTestCase
 {
@@ -16,7 +15,7 @@ final class GrapeJsDataTest extends MauticMysqlTestCase
 
     public function testGetGroups(): void
     {
-        Assert::assertSame(['group_install', 'group_mautic_install_data'], GrapesJsData::getGroups());
+        $this->assertSame(['group_install', 'group_mautic_install_data'], GrapesJsData::getGroups());
     }
 
     public function testLoad(): void

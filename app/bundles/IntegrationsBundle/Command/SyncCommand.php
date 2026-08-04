@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: SyncCommand::NAME,
     description: 'Fetch objects from integration.'
 )]
-class SyncCommand extends Command
+final class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 

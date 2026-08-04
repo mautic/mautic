@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: InstallCommand::NAME,
     description: 'Installs a plugin or resource from the Marketplace'
 )]
-class InstallCommand extends Command
+final class InstallCommand extends Command
 {
     public const NAME = 'mautic:marketplace:install';
 

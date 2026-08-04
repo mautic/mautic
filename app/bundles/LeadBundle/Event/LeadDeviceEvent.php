@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-class LeadDeviceEvent extends CommonEvent
+final class LeadDeviceEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
-class StatDAO
+final class StatDAO
 {
     private array $stats = [];
 

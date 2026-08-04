@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
+use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
-use PHPUnit\Framework\Assert;
 
 final class MenuExtensionTest extends AbstractMauticTestCase
 {
@@ -21,10 +21,10 @@ final class MenuExtensionTest extends AbstractMauticTestCase
             'class' => 'test-a-class test-another-class',
         ];
 
-        Assert::assertStringStartsWith(' id=', $menuExtension->parseMenuAttributes($menuAttributes));
-        Assert::assertStringContainsString('myId', $menuExtension->parseMenuAttributes($menuAttributes));
-        Assert::assertStringContainsString(' class=', $menuExtension->parseMenuAttributes($menuAttributes));
-        Assert::assertStringContainsString('test-a-class test-another-class', $menuExtension->parseMenuAttributes($menuAttributes));
+        $this->assertStringStartsWith(' id=', $menuExtension->parseMenuAttributes($menuAttributes));
+        $this->assertStringContainsString('myId', $menuExtension->parseMenuAttributes($menuAttributes));
+        $this->assertStringContainsString(' class=', $menuExtension->parseMenuAttributes($menuAttributes));
+        $this->assertStringContainsString('test-a-class test-another-class', $menuExtension->parseMenuAttributes($menuAttributes));
     }
 
     public function testBuildMenuClasses(): void
@@ -44,20 +44,20 @@ final class MenuExtensionTest extends AbstractMauticTestCase
 
         $itemFirst  = $menu->getChild('First item');
         $itemSecond = $menu->getChild('Second item');
-        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemFirst);
+        $this->assertInstanceOf(ItemInterface::class, $itemFirst);
 
         // test an item which has no class
-        Assert::assertSame([], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
-        $this->assertInstanceOf(\Knp\Menu\ItemInterface::class, $itemSecond);
+        $this->assertSame([], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
+        $this->assertInstanceOf(ItemInterface::class, $itemSecond);
 
         // test an item with an inherrent class
-        Assert::assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
-        Assert::assertSame(['class' => 'test-class'], $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
+        $this->assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
+        $this->assertSame(['class' => 'test-class'], $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
 
         // test an item with an 'extra' class
         $extraClasses = 'extra-class';
-        Assert::assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
-        Assert::assertSame(['class' => 'extra-class'], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
-        Assert::assertSame(['class' => 'test-class extra-class'], $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
+        $this->assertArrayHasKey('class', $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
+        $this->assertSame(['class' => 'extra-class'], $menuExtension->buildMenuClasses($itemFirst, $matcher, $options, $extraClasses));
+        $this->assertSame(['class' => 'test-class extra-class'], $menuExtension->buildMenuClasses($itemSecond, $matcher, $options, $extraClasses));
     }
 }

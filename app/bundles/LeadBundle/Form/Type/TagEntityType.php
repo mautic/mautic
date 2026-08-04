@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class TagEntityType extends AbstractType
+final class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +13,7 @@ final class AbstractLocalDataLookupTest extends TestCase
     #[DataProvider('provideUrlToClean')]
     public function testCleanUrl(string $url, string $expected): void
     {
-        Assert::assertSame($expected, AbstractLocalDataLookup::cleanUrl($url));
+        $this->assertSame($expected, AbstractLocalDataLookup::cleanUrl($url));
     }
 
     public static function provideUrlToClean(): \Generator

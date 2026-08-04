@@ -54,7 +54,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailModel = $this->getEmailModel($emailRepository);
+        $emailModel = $this->getEmailModel();
 
         $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
@@ -63,7 +63,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }
@@ -96,8 +96,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
 
         $grapeJsBuilderModel = new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -105,14 +103,20 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository,
+            $emailRepository,
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
 
         // Not a GrapeJs email, so we are not saving anything.
-        Assert::assertSame(0, $grapesJsBuilderRepository->saveEntityCallCount);
-        Assert::assertSame(0, $emailRepository->saveEntityCallCount);
+        $this->assertSame(0, $grapesJsBuilderRepository->saveEntityCallCount);
+        $this->assertSame(0, $emailRepository->saveEntityCallCount);
     }
 
     public function testAddOrEditEntityWithoutMatchingEntityAndGrapeRequestQuery(): void
@@ -156,7 +160,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailModel = $this->getEmailModel($emailRepository);
+        $emailModel = $this->getEmailModel();
 
         $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
             public int $saveEntityCallCount = 0;
@@ -165,7 +169,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }
@@ -199,8 +203,6 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
 
         $grapeJsBuilderModel = new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -208,27 +210,27 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository,
+            $emailRepository,
         );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
 
         // Saving the entities now.
-        Assert::assertSame(1, $grapesJsBuilderRepository->saveEntityCallCount);
-        Assert::assertSame(1, $emailRepository->saveEntityCallCount);
+        $this->assertSame(1, $grapesJsBuilderRepository->saveEntityCallCount);
+        $this->assertSame(1, $emailRepository->saveEntityCallCount);
     }
 
-    private function getEmailModel(EmailRepository $emailRepository): EmailModel
+    private function getEmailModel(): EmailModel
     {
-        return new class($emailRepository) extends EmailModel {
-            public function __construct(
-                private readonly EmailRepository $emailRepository,
-            ) {
-            }
-
-            public function getRepository(): EmailRepository
+        return new class() extends EmailModel {
+            public function __construct()
             {
-                return $this->emailRepository;
             }
         };
     }

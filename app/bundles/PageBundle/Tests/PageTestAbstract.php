@@ -10,20 +10,29 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -99,8 +108,8 @@ abstract class PageTestAbstract extends TestCase
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
-                    [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
+                    [Page::class, $pageRepository],
+                    [Hit::class, $hitRepository],
                 ]
             );
 
@@ -134,7 +143,7 @@ abstract class PageTestAbstract extends TestCase
             $contactTracker,
             $coreParametersHelper,
             $this->contactRequestHelper,
-            $this->createStub(\Mautic\CoreBundle\Model\AbTest\VariantConverterService::class),
+            $this->createStub(VariantConverterService::class),
             $entityManager,
             $this->security = $this->createMock(CorePermissions::class),
             $this->createStub(EventDispatcher::class),
@@ -144,7 +153,14 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(StatRepository::class),
             $this->createStub(BotRatioHelper::class),
-            $validatorMock
+            $validatorMock,
+            $this->createStub(PageRepository::class), // $pageRepository
+            $this->createStub(HitRepository::class), // $hitRepository
+            $this->createStub(EmailRepository::class), // $emailRepository
+            $this->createStub(UtmTagRepository::class), // $utmTagRepository
+            $this->createStub(RedirectRepository::class),
+            $this->createStub(TrackableRepository::class),
+            $this->createStub(LeadRepository::class)
         );
     }
 
@@ -153,8 +169,6 @@ abstract class PageTestAbstract extends TestCase
      */
     protected function getRedirectModel(): MockObject
     {
-        $shortener = $this->createMock(Shortener::class);
-
         $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([
                 $this->createStub(EntityManagerInterface::class),
@@ -165,14 +179,15 @@ abstract class PageTestAbstract extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
-                $shortener,
             ])
             ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
+        $mockRedirectModel->autowireRedirectModel($this->createMock(Shortener::class), $this->createStub(RedirectRepository::class));
+
         $mockRedirectModel
             ->method('createRedirectEntity')
-            ->willReturn($this->createStub(\Mautic\PageBundle\Entity\Redirect::class));
+            ->willReturn($this->createStub(Redirect::class));
 
         $mockRedirectModel
             ->method('generateRedirectUrl')

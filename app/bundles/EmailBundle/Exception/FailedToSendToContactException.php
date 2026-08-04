@@ -2,6 +2,6 @@
 
 namespace Mautic\EmailBundle\Exception;
 
-class FailedToSendToContactException extends \Exception
+final class FailedToSendToContactException extends \Exception
 {
 }

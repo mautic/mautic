@@ -56,7 +56,7 @@ final class SegmentCountCacheHelperTest extends TestCase
             ->willReturn($cacheItem);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount($segmentId);
-        Assert::assertSame(1, $count);
+        $this->assertSame(1, $count);
     }
 
     public function testSetSegmentContactCount(): void
@@ -205,7 +205,7 @@ final class SegmentCountCacheHelperTest extends TestCase
         $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
 
         // Verify the count was decremented from 5 to 4
-        Assert::assertSame(4, $cacheItem->get());
+        $this->assertSame(4, $cacheItem->get());
     }
 
     public function testDecrementSegmentCountIsNotNegative(): void
@@ -231,6 +231,6 @@ final class SegmentCountCacheHelperTest extends TestCase
         $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
 
         // Assert that the cache item value is still 0 (not negative)
-        Assert::assertSame(0, $cacheItem->get());
+        $this->assertSame(0, $cacheItem->get());
     }
 }

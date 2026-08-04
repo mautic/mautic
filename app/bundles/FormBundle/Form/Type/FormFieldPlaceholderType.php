@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldPlaceholderType extends AbstractType
+final class FormFieldPlaceholderType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

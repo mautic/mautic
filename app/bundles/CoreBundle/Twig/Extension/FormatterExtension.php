@@ -9,14 +9,14 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-class FormatterExtension extends AbstractExtension
+final class FormatterExtension extends AbstractExtension
 {
     public function __construct(
-        protected FormatterHelper $formatterHelper,
+        private readonly FormatterHelper $formatterHelper,
     ) {
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('formatter_simple_array_to_html', $this->simpleArrayToHtml(...), ['is_safe' => ['html']]),

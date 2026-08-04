@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardSentEmailToContactsWidgetType extends AbstractType
+final class DashboardSentEmailToContactsWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -2,16 +2,16 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportNormalizeSubscriber implements EventSubscriberInterface
+final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -28,7 +28,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $fields = $this->fieldModel->getRepository()->getFields();
+        $fields = $this->leadFieldRepository->getFields();
         $rows   = $event->getData();
         foreach ($rows as $key => $row) {
             foreach ($row as $alias => $value) {
@@ -47,7 +47,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
     /**
      * @param array<string> $columns
      */
-    protected function useContactOrCompanyColumn(array $columns): bool
+    private function useContactOrCompanyColumn(array $columns): bool
     {
         foreach ($columns as $column) {
             if (str_starts_with($column, 'l.') || str_starts_with($column, 'comp.')) {

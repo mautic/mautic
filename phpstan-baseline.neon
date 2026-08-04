@@ -25,12 +25,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: '#^Parameter \#2 \$default of method Symfony\\Component\\HttpFoundation\\InputBag\<string\>\:\:get\(\) expects string\|null, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ApiBundle/Controller/FetchCommonApiController.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:isChanged\(\) has parameter \$prop with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -177,12 +171,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\AssetBundle\\Controller\\AssetController\:\:remoteAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
 			identifier: return.type
-			count: 1
-			path: app/bundles/AssetBundle/Controller/AssetController.php
-
-		-
-			message: '#^Parameter \#2 \$default of method Symfony\\Component\\HttpFoundation\\InputBag\<string\>\:\:get\(\) expects string\|null, int given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/AssetBundle/Controller/AssetController.php
 
@@ -391,49 +379,13 @@ parameters:
 			path: app/bundles/CampaignBundle/Command/ValidateEventCommand.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:cloneCampaignAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
-			message: '#^Parameter \#2 \$default of method Symfony\\Component\\HttpFoundation\\InputBag\<string\>\:\:get\(\) expects string\|null, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
 			message: '#^Parameter \#3 \$referenceType of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:generateUrl\(\) expects int, true given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:afterEntitySave\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:afterFormProcessed\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:beforeFormProcessed\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:prepareCampaignSourcesForEdit\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
@@ -607,12 +559,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:getCampaignSegments\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:getContactRotations\(\) has parameter \$campaignId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -662,12 +608,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:updateLead\(\) has parameter \$toLeadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:updateQueryWithHistoryExclusion\(\) has parameter \$campaignId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
@@ -799,18 +739,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Executioner/Dispatcher/LegacyEventDispatcher.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:\:dispatchExecutionEvent\(\) has parameter \$result with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/Dispatcher/LegacyEventDispatcher.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:\:isFailed\(\) has parameter \$result with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/Dispatcher/LegacyEventDispatcher.php
-
-		-
 			message: '#^Parameter \#1 \$objectOrMethod of class ReflectionMethod constructor expects object\|string, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -829,18 +757,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Executioner/Helper/InactiveHelper.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Executioner\\Helper\\InactiveHelper\:\:getLastActiveDates\(\) has parameter \$lastActiveEventId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/Helper/InactiveHelper.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Executioner\\RealTimeExecutioner\:\:fetchCampaignData\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/RealTimeExecutioner.php
-
-		-
 			message: '#^Parameter \#1 \$hour of method DateTime\:\:setTime\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 3
@@ -851,12 +767,6 @@ parameters:
 			identifier: argument.type
 			count: 3
 			path: app/bundles/CampaignBundle/Executioner/Scheduler/Mode/Interval.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Form\\Type\\EventType\:\:addPropertiesType\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Form/Type/EventType.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Helper\\RemovedContactTracker\:\:clearRemovedContact\(\) has parameter \$contactId with no type specified\.$#'
@@ -887,12 +797,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CampaignBundle/Membership/Exception/RunLimitReachedException.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Model\\CampaignModel\:\:buildOrder\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Model\\CampaignModel\:\:getCampaignIdsWithDependenciesOnSegment\(\) has parameter \$segmentId with no type specified\.$#'
@@ -992,12 +896,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\ChannelBundle\\Entity\\MessageQueue\:\:\$channelId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/ChannelBundle/Entity/MessageQueue.php
-
-		-
-			message: '#^Property Mautic\\ChannelBundle\\Entity\\MessageQueue\:\:\$options has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/ChannelBundle/Entity/MessageQueue.php
@@ -1154,12 +1052,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getLeadStatsPost\(\) has parameter \$messageId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
@@ -1357,6 +1249,12 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
 
 		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 1
+			path: app/bundles/CoreBundle/Controller/AjaxController.php
+
+		-
 			message: '#^Call to an undefined method Twig\\Environment\:\:get\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -1375,40 +1273,10 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/ExceptionController.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$response has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$statusCode has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\FormController\:\:setStandardParameters\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FormController.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Controller\\FormController\:\:\$activeLink has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Controller/FormController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\DependencyInjection\\Builder\\Metadata\\ConfigMetadata\:\:encodeParameters\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Builder/Metadata/ConfigMetadata.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\DependencyInjection\\Builder\\Metadata\\ConfigMetadata\:\:encodeParameters\(\) has parameter \$valueToEncode with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Builder/Metadata/ConfigMetadata.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Doctrine\\AbstractMauticMigration\:\:findPropertyName\(\) has parameter \$suffix with no type specified\.$#'
@@ -1592,15 +1460,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to method convertToPHPValue\(\) of deprecated class Doctrine\\DBAL\\Types\\ArrayType\:
-				Use \{@link JsonType\} instead\.$#
-			'''
-			identifier: staticMethod.deprecatedClass
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Type/ArrayType.php
-
-		-
-			message: '''
 				#^Class Mautic\\CoreBundle\\Doctrine\\Type\\ArrayType extends deprecated class Doctrine\\DBAL\\Types\\ArrayType\:
 				Use \{@link JsonType\} instead\.$#
 			'''
@@ -1675,15 +1534,21 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
 			identifier: arguments.count
-			count: 2
+			count: 1
+			path: app/bundles/CoreBundle/Entity/CommonRepository.php
+
+		-
+			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
@@ -1909,12 +1774,6 @@ parameters:
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:getErrorName\(\) has parameter \$bit with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:handleError\(\) has parameter \$level with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1933,25 +1792,7 @@ parameters:
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:log\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:log\(\) has parameter \$debugTrace with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:log\(\) has parameter \$logLevel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:log\(\) has parameter \$message with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
@@ -2203,18 +2044,6 @@ parameters:
 			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\EventListener\\CoreSubscriber\:\:addRouteToCollection\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/CoreSubscriber.php
-
-		-
 			message: '#^Parameter \#2 \$id of method Mautic\\CoreBundle\\Model\\AuditLogModel\:\:getLogForObject\(\) expects int\|string, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2293,20 +2122,8 @@ parameters:
 			path: app/bundles/CoreBundle/Factory/IpLookupFactory.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:fetchChoices\(\) has parameter \$modelName with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\ChoiceLoader\\EntityLookupChoiceLoader\:\:formatChoices\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/CoreBundle/Form/ChoiceLoader/EntityLookupChoiceLoader.php
 
@@ -2345,12 +2162,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/bundles/CoreBundle/Form/DataTransformer/SecondsConversionTransformer.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\SortableListTransformer\:\:transformKeyValuePair\(\) has parameter \$array with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/SortableListTransformer.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\Type\\DynamicContentFilterEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
@@ -2493,12 +2304,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:set\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:\:setCacheAdaptor\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
 
@@ -2785,12 +2590,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/PhoneNumberHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:addFilterCommand\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:addFilterCommand\(\) has parameter \$filters with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2809,43 +2608,7 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:parseString\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:parseString\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:setFilter\(\) has parameter \$baseName with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:setFilter\(\) has parameter \$command with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:setFilter\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:setFilter\(\) has parameter \$keyCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:setFilter\(\) has parameter \$overrideCommand with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
@@ -3019,12 +2782,6 @@ parameters:
 			path: app/bundles/CoreBundle/IpLookup/IP2LocationAPILookup.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\IpLookup\\IP2LocationBinLookup\:\:lookup\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/IP2LocationBinLookup.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\IpLookup\\IpLookupFormInterface\:\:getConfigFormService\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3047,18 +2804,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\IpLookup\\MaxmindDownloadLookup\:\:lookup\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Loader\\RouteLoader\:\:supports\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Loader/RouteLoader.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Menu\\MenuHelper\:\:getParameter\(\) has parameter \$name with no type specified\.$#'
@@ -3091,6 +2836,12 @@ parameters:
 			path: app/bundles/CoreBundle/Menu/MenuHelper.php
 
 		-
+			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\FormEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noEntityManagerGetRepository
+			count: 1
+			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
+
+		-
 			message: '#^Method Mautic\\CoreBundle\\Model\\AbstractCommonModel\:\:decodeArrayFromUrl\(\) has parameter \$string with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3101,12 +2852,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Model\\FormModel\:\:flushAndCatch\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Model/FormModel.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Model\\FormModel\:\:saveAndDetachEntity\(\) has parameter \$entity with no type specified\.$#'
@@ -3199,24 +2944,6 @@ parameters:
 			path: app/bundles/CoreBundle/Test/AbstractMauticTestCase.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockConnection\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockEm\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockQueryBuilder\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockResultStatement\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3235,50 +2962,8 @@ parameters:
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getQueryParts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:setQueryResponse\(\) has parameter \$queryResponse with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$connectionInserted has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$connectionUpdated has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$mockConnection has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$mockEm has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$mockQueryBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$queryParts has no type specified\.$#'
-			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
@@ -3400,16 +3085,10 @@ parameters:
 			path: app/bundles/DashboardBundle/Event/WidgetFormEvent.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:newAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
 			count: 1
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:addFiltersMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:setSentCount\(\) has parameter \$sentCount with no type specified\.$#'
@@ -3484,6 +3163,12 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Entity/StatRepository.php
 
 		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
+
+		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Form\\Type\\DwcEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3520,24 +3205,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:postVariantSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3562,10 +3229,10 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Security/Permissions/DynamicContentPermissions.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\PublicController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
 			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
+			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
 			message: '#^Property Mautic\\EmailBundle\\Controller\\PublicController\:\:\$dncChannels has no type specified\.$#'
@@ -3604,12 +3271,6 @@ parameters:
 			'''
 			identifier: classConstant.deprecated
 			count: 2
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:addDynamicContentMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
 			path: app/bundles/EmailBundle/Entity/Email.php
 
 		-
@@ -3991,24 +3652,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:buildMetadata\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:checkBatchMaxRecipients\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:createAssetDownloadEntries\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:createEmailStat\(\) has parameter \$listId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4045,12 +3688,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:logError\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:logError\(\) has parameter \$context with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4059,12 +3696,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:logError\(\) has parameter \$error with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:queueAssetDownloadEntry\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -4087,20 +3718,8 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setDefaultReplyTo\(\) has parameter \$systemReplyToEmail with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setLead\(\) has parameter \$interalSend with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\MailHelper\:\:setMessagePlainText\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -4147,43 +3766,13 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:convert\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:convertBlockquotes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:convertPre\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:convertPre\(\) has parameter \$text with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:converter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:converter\(\) has parameter \$text with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:linewrap\(\) has parameter \$width with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
@@ -4209,30 +3798,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:isPublished\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:addCampaignFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:addCampaignFilterForEmailSource\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:addCompanyFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:addSegmentFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
@@ -4309,18 +3874,6 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:postVariantSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:resetVariants\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4393,20 +3946,8 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:createContactStatEntry\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:createContactStatEntry\(\) has parameter \$email with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:downEmailSentCount\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
 
@@ -4418,24 +3959,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:failContact\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:processBadEmails\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:processSendFailures\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:upEmailSentCount\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
@@ -4457,24 +3980,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Model/TransportCallback.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\TransportCallback\:\:updateStatDetails\(\) has parameter \$comments with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportCallback.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\TransportCallback\:\:updateStatDetails\(\) has parameter \$dncReason with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportCallback.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Accessor\\ConfigAccessor\:\:getProperty\(\) has parameter \$property with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Accessor/ConfigAccessor.php
 
 		-
 			message: '#^Property Mautic\\EmailBundle\\MonitoredEmail\\Attachment\:\:\$filePath has no type specified\.$#'
@@ -4513,12 +4018,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:disconnect\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:fetchUnread\(\) has parameter \$folder with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4539,12 +4038,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:getParameters\(\) has parameter \$partStructure with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:initMailPart\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
@@ -4825,12 +4318,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Address.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\:\:updateStat\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Bounce\\BodyParser\:\:getBounce\(\) has parameter \$contactEmail with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4859,12 +4346,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/Mapper/CategoryMapper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Reply\:\:createReply\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Reply.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\MonitoredEmail\\Processor\\Reply\\RepliedEmail\:\:__construct\(\) has parameter \$statHash with no type specified\.$#'
@@ -4901,30 +4382,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Stat/StatHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Stats\\Helper\\AbstractHelper\:\:addCampaignFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Stats/Helper/AbstractHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Stats\\Helper\\AbstractHelper\:\:addCampaignFilterForEmailSource\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Stats/Helper/AbstractHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Stats\\Helper\\AbstractHelper\:\:addCompanyFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Stats/Helper/AbstractHelper.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Stats\\Helper\\AbstractHelper\:\:addSegmentFilter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Stats/Helper/AbstractHelper.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Stats\\Helper\\AbstractHelper\:\:fetchAndBindToCollection\(\) has no return type specified\.$#'
@@ -4985,12 +4442,6 @@ parameters:
 			identifier: argument.type
 			count: 6
 			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Entity\\Action\:\:isChanged\(\) has parameter \$val with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Entity/Action.php
 
 		-
 			message: '#^Property Mautic\\FormBundle\\Entity\\Action\:\:\$id \(int\) does not accept null\.$#'
@@ -5188,18 +4639,6 @@ parameters:
 			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:getEmailsFromString\(\) has parameter \$emailString with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:postToHtml\(\) has parameter \$post with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
-
-		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
 			count: 2
@@ -5332,31 +4771,13 @@ parameters:
 			path: app/bundles/FormBundle/Model/FormModel.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Model\\FormModel\:\:extractScriptTag\(\) has parameter \$html with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Model/FormModel.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Model\\FormModel\:\:getFilterExpressionFunctions\(\) has parameter \$operator with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Model/FormModel.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Model\\FormModel\:\:loadHTML\(\) has parameter \$html with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Model/FormModel.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Model\\FormModel\:\:populateValuesWithGetParameters\(\) has parameter \$formHtml with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Model/FormModel.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Model\\FormModel\:\:removeScriptTag\(\) has parameter \$html with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Model/FormModel.php
@@ -5387,12 +4808,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:exportResults\(\) has parameter \$format with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Model/SubmissionModel.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:normalizeValue\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
@@ -5680,12 +5095,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Auth/Support/Oauth2/Token/IntegrationToken.php
 
 		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Controller\\AuthController\:\:callbackAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/IntegrationsBundle/Controller/AuthController.php
-
-		-
 			message: '#^Call to an undefined method \(Mautic\\IntegrationsBundle\\Integration\\BasicIntegration&Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormCallbackInterface\)\|\(Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormCallbackInterface&Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormInterface\)\:\:getRedirectUri\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -5854,12 +5263,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/Helper/RelationsHelper.php
 
 		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Internal\\ObjectHelper\\ContactObjectHelper\:\:getDoNotContactReason\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/ObjectHelper/ContactObjectHelper.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\SyncDataExchangeInterface\:\:executeSyncOrder\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5878,12 +5281,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:\$dncChannels has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5894,18 +5291,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\AuditlogController\:\:indexAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AuditlogController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\CompanyController\:\:companyExportAction\(\) should return array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse\|Symfony\\Component\\HttpFoundation\\StreamedResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\ImportController\:\:getLineCountLimit\(\) has no return type specified\.$#'
@@ -5922,18 +5307,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:getCompanies\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\LeadController\:\:contactExportAction\(\) should return array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse\|Symfony\\Component\\HttpFoundation\\StreamedResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\LeadController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
@@ -5956,22 +5329,10 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/ListController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\TimelineController\:\:indexAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\TimelineController\:\:pluginIndexAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\TimelineController\:\:pluginViewAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 2
+			path: app/bundles/LeadBundle/Controller/NoteController.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Deduplicate\\CompanyDeduper\:\:\$object has no type specified\.$#'
@@ -6024,12 +5385,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Company\:\:getEventData\(\) has parameter \$key with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Company.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Company\:\:loadFixedFieldMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Company.php
 
@@ -6184,26 +5539,8 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:postSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:postSaveEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:prepareDbalFieldsForSave\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:removeNonFieldColumns\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
 
@@ -6357,12 +5694,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:getPrimaryIdentifier\(\) should return string but returns true\.$#'
 			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Lead\:\:loadFixedFieldMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
@@ -6691,24 +6022,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadNoteRepository\:\:getNoteCount\(\) has parameter \$filter with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadNoteRepository\:\:getNoteCount\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadNoteRepository\:\:getNoteCount\(\) has parameter \$noteTypes with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadNoteRepository\:\:updateLead\(\) has parameter \$fromLeadId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6725,12 +6038,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:defaultPrepareDbalFieldsForSave\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:generateFilterExpression\(\) has parameter \$column with no type specified\.$#'
@@ -6817,24 +6124,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:postSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:prepareDbalFieldsForSave\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:removeNonFieldColumns\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:updateContactPoints\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6917,12 +6206,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/PointsChangeLogRepository.php
-
-		-
-			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Entity/StagesChangeLogRepository.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\TagRepository\:\:checkLeadByTags\(\) has parameter \$tags with no type specified\.$#'
@@ -7156,12 +6439,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/TimelineEventLogCampaignSubscriber.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\EventListener\\TimelineEventLogCampaignSubscriber\:\:writeEntries\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/TimelineEventLogCampaignSubscriber.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\TimelineEventLogSegmentSubscriber\:\:addEvents\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7318,12 +6595,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
 
 		-
-			message: '#^Unable to resolve the template type T in call to method Doctrine\\ORM\\EntityManager\:\:getRepository\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\CompanyType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7462,12 +6733,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/CompanyModel.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\CompanyModel\:\:setEntityDefaultValues\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Model/CompanyModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\DoNotContact\:\:createDncRecord\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7518,18 +6783,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\ImportModel\:\:getFailedRows\(\) should return array\|null but returns Doctrine\\ORM\\Tools\\Pagination\\Paginator\.$#'
 			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Model/ImportModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ImportModel\:\:logDebug\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Model/ImportModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ImportModel\:\:setGhostImportsAsFailed\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Model/ImportModel.php
 
@@ -7654,12 +6907,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:setEntityDefaultValues\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:setFrequencyRules\(\) has parameter \$persist with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7722,12 +6969,6 @@ parameters:
 		-
 			message: '#^Dead catch \- Mautic\\LeadBundle\\Segment\\Exception\\SegmentNotFoundException is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ListModel\:\:batchSleep\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
@@ -7840,12 +7081,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/ContactSegmentFilterCrate.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\ContactSegmentService\:\:formatPeriod\(\) has parameter \$inputSeconds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Segment/ContactSegmentService.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\BaseDecorator\:\:prepareRegex\(\) has parameter \$regex with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7856,78 +7091,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/DateOptionAbstract.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Day\\DateDayToday\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Day/DateDayToday.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Day\\DateDayTomorrow\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Day/DateDayTomorrow.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Day\\DateDayYesterday\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Day/DateDayYesterday.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Month\\DateMonthLast\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthLast.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Month\\DateMonthNext\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthNext.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Month\\DateMonthThis\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthThis.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Week\\DateWeekLast\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekLast.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Week\\DateWeekNext\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekNext.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Week\\DateWeekThis\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekThis.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Year\\DateYearLast\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearLast.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Year\\DateYearNext\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearNext.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Year\\DateYearThis\:\:modifyBaseDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearThis.php
 
 		-
 			message: '#^Parameter \#2 \$leadId of class Mautic\\LeadBundle\\Event\\LeadListFilteringEvent constructor expects int, null given\.$#'
@@ -8002,12 +7165,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Query/QueryBuilder.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Segment\\Query\\QueryBuilder\:\:addLogicStack\(\) has parameter \$expression with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Query/QueryBuilder.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Segment\\Query\\QueryBuilder\:\:getTableAlias\(\) has parameter \$joinType with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8074,18 +7231,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/TableSchemaColumnsCache.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\DataFixtures\\ORM\\LoadPageHitData\:\:createHit\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/DataFixtures/ORM/LoadPageHitData.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\DataFixtures\\ORM\\LoadSegmentsData\:\:createSegment\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/DataFixtures/ORM/LoadSegmentsData.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Tests\\StandardImportTestHelper\:\:\$csvPath has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -8110,20 +7255,8 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/StandardImportTestHelper.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Tracker\\ContactTracker\:\:dispatchContactChangeEvent\(\) has parameter \$previouslyTrackedId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tracker/ContactTracker.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tracker\\ContactTracker\:\:getCurrentContact\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
-			count: 1
-			path: app/bundles/LeadBundle/Tracker/ContactTracker.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tracker\\ContactTracker\:\:setEntityDefaultValues\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Tracker/ContactTracker.php
 
@@ -8138,6 +7271,12 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/LeadBundle/Tracker/Service/DeviceTrackingService/DeviceTrackingServiceInterface.php
+
+		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 1
+			path: app/bundles/MarketplaceBundle/Controller/Package/DetailController.php
 
 		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
@@ -8158,10 +7297,16 @@ parameters:
 			path: app/bundles/NotificationBundle/Api/AbstractNotificationApi.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Api\\OneSignalApi\:\:addMobileData\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
 			count: 1
-			path: app/bundles/NotificationBundle/Api/OneSignalApi.php
+			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
+
+		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 1
+			path: app/bundles/NotificationBundle/Controller/NotificationController.php
 
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setButton\(\) has parameter \$button with no type specified\.$#'
@@ -8284,22 +7429,10 @@ parameters:
 			path: app/bundles/NotificationBundle/Event/NotificationSendEvent.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Helper\\NotificationHelper\:\:getHeaderScript\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
 			count: 1
-			path: app/bundles/NotificationBundle/Helper/NotificationHelper.php
-
-		-
-			message: '#^Method Mautic\\NotificationBundle\\Helper\\NotificationHelper\:\:getScript\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/NotificationBundle/Helper/NotificationHelper.php
-
-		-
-			message: '#^Method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Model/NotificationModel.php
+			path: app/bundles/NotificationBundle/EventListener/NotificationSubscriber.php
 
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getNotificationClickStats\(\) has parameter \$notificationId with no type specified\.$#'
@@ -8740,24 +7873,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getPageUrl\(\) has parameter \$page with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:postVariantSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:resetVariants\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8902,12 +8017,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:isContactFieldToken\(\) has parameter \$token with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:isInDoNotTrack\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8915,24 +8024,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:isValidUrl\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:parseContent\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:parseContent\(\) has parameter \$channelId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:parseContent\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
@@ -9304,18 +8395,6 @@ parameters:
 			path: app/bundles/PluginBundle/Exception/ApiErrorException.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:buildFieldView\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/CompanyFieldsType.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:buildFormFields\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/CompanyFieldsType.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:buildFormFields\(\) has parameter \$limit with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9328,28 +8407,10 @@ parameters:
 			path: app/bundles/PluginBundle/Form/Type/CompanyFieldsType.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:configureFieldOptions\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/CompanyFieldsType.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\CompanyFieldsType\:\:configureFieldOptions\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Form/Type/CompanyFieldsType.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:buildFieldView\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/FieldsType.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:buildFormFields\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/FieldsType.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:buildFormFields\(\) has parameter \$limit with no type specified\.$#'
@@ -9360,12 +8421,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:buildFormFields\(\) has parameter \$start with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/FieldsType.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:configureFieldOptions\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/PluginBundle/Form/Type/FieldsType.php
 
@@ -9414,12 +8469,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:clearIntegrationCache\(\) has parameter \$lead with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getCoreIntegrationSettings\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/bundles/PluginBundle/Helper/IntegrationHelper.php
 
@@ -9490,43 +8539,13 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:buildBaseString\(\) has parameter \$baseURI with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:buildBaseString\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:encode\(\) has parameter \$string with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:normalizeParameters\(\) has parameter \$normalized with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
@@ -9862,18 +8881,6 @@ parameters:
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getIntegrationEntityRepository\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getMauticContactsById\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getMauticContactsById\(\) has parameter \$integrationName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9898,12 +8905,6 @@ parameters:
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getSyncedRecords\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Model\\IntegrationEntityModel\:\:getSyncedRecords\(\) has parameter \$integrationName with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9920,12 +8921,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Model\\PluginModel\:\:getIntegrationEntityRepository\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Model/PluginModel.php
 
 		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addManagePermission\(\) expects array, string given\.$#'
@@ -9946,28 +8941,10 @@ parameters:
 			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginUpdate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginUpdate\(\) has parameter \$metadata with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:getPointActionTypesAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:logApiPointChange\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -10030,12 +9007,6 @@ parameters:
 			path: app/bundles/PointBundle/Entity/Trigger.php
 
 		-
-			message: '#^Method Mautic\\PointBundle\\Entity\\TriggerEvent\:\:isChanged\(\) has parameter \$val with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Entity/TriggerEvent.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Model\\PointModel\:\:triggerAction\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10066,10 +9037,22 @@ parameters:
 			path: app/bundles/PointBundle/Model/TriggerModel.php
 
 		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 3
+			path: app/bundles/ReportBundle/Controller/ReportController.php
+
+		-
 			message: '#^Method Mautic\\ReportBundle\\Controller\\ReportController\:\:downloadAction\(\) should return Symfony\\Component\\HttpFoundation\\BinaryFileResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
 			identifier: return.type
 			count: 2
 			path: app/bundles/ReportBundle/Controller/ReportController.php
+
+		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 1
+			path: app/bundles/ReportBundle/Controller/ScheduleController.php
 
 		-
 			message: '''
@@ -10279,6 +9262,12 @@ parameters:
 			path: app/bundles/SmsBundle/Callback/HandlerContainer.php
 
 		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 2
+			path: app/bundles/SmsBundle/Controller/SmsController.php
+
+		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10357,18 +9346,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Method Mautic\\SmsBundle\\EventListener\\LeadSubscriber\:\:addSmsEvents\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/SmsBundle/EventListener/LeadSubscriber.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\EventListener\\LeadSubscriber\:\:addSmsEvents\(\) has parameter \$state with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/EventListener/LeadSubscriber.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\EventListener\\ReplySubscriber\:\:addEvents\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10441,6 +9418,12 @@ parameters:
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
 
 		-
+			message: '#^Unable to resolve the template type T in call to function array_values$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/SmsBundle/EventListener/SmsSubscriber.php
+
+		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -10460,12 +9443,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:createStatEntry\(\) has parameter \$source with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Model/SmsModel.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/Model/SmsModel.php
@@ -10505,24 +9482,6 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/SmsBundle/Sms/TransportChain.php
-
-		-
-			message: '#^Method Mautic\\StageBundle\\Entity\\LeadStageLogRepository\:\:updateLead\(\) has parameter \$fromLeadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/StageBundle/Entity/LeadStageLogRepository.php
-
-		-
-			message: '#^Method Mautic\\StageBundle\\Entity\\LeadStageLogRepository\:\:updateLead\(\) has parameter \$toLeadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/StageBundle/Entity/LeadStageLogRepository.php
-
-		-
-			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/StageBundle/Entity/LeadStageLogRepository.php
 
 		-
 			message: '#^Method Mautic\\StageBundle\\Entity\\Stage\:\:setWeight\(\) has parameter \$type with no type specified\.$#'
@@ -10849,12 +9808,6 @@ parameters:
 			path: app/bundles/UserBundle/Security/SAML/User/UserCreator.php
 
 		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:getTriggersAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
 			message: '#^Method Mautic\\WebhookBundle\\Controller\\WebhookController\:\:editAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
 			identifier: return.type
 			count: 1
@@ -11023,12 +9976,6 @@ parameters:
 			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$notify with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11045,12 +9992,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Integration\\ClearbitIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticClearbitBundle/Integration/ClearbitIntegration.php
 
 		-
 			message: '#^Property MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Base\:\:\$_baseUri has no type specified\.$#'
@@ -11347,12 +10288,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Api/SalesforceApi.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SalesforceApi\:\:processError\(\) has parameter \$isRetry with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/SalesforceApi.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SalesforceApi\:\:request\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -11366,12 +10301,6 @@ parameters:
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SalesforceApi\:\:request\(\) has parameter \$queryUrl with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/SalesforceApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SalesforceApi\:\:revalidateSession\(\) has parameter \$isRetry with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Api/SalesforceApi.php
@@ -11917,18 +10846,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getExistingRecord\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getExistingRecord\(\) has parameter \$searchValue with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getFormNotes\(\) has parameter \$section with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12337,12 +11254,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getMauticEntitesToCreate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:getMauticEntitesToCreate\(\) has parameter \$fromDate with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12505,12 +11416,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:makeCompositeRequest\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:makeCompositeRequest\(\) has parameter \$mauticData with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12523,20 +11428,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticCompaniesToCreate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticCompaniesToCreate\(\) has parameter \$mauticData with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticCompaniesToUpdate\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
@@ -12559,20 +11452,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticContactsToCreate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticContactsToCreate\(\) has parameter \$mauticData with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:prepareMauticContactsToUpdate\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
@@ -12657,12 +11538,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:authCallback\(\) should return array but returns false\.$#'
 			identifier: return.type
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:buildCompositeBody\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
@@ -13147,12 +12022,6 @@ parameters:
 			path: plugins/MauticEmailMarketingBundle/Integration/MailchimpIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Controller\\Api\\FocusApiController\:\:generateJsAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFocusBundle/Controller/Api/FocusApiController.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Entity\\Focus\:\:setEditor\(\) has parameter \$editor with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -13283,12 +12152,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticFullContactBundle/EventListener/ButtonSubscriber.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$notify with no type specified\.$#'
@@ -13585,28 +12448,16 @@ parameters:
 			path: plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MonitorTwitterBaseCommand\:\:printInformation\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MonitorTwitterBaseCommand.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MonitorTwitterBaseCommand\:\:printQueryMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MonitorTwitterBaseCommand.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MonitorTwitterBaseCommand\:\:printTweets\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticSocialBundle/Command/MonitorTwitterBaseCommand.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Command\\MonitorTwitterBaseCommand\:\:processMonitor\(\) should return bool but returns int\.$#'
 			identifier: return.type
 			count: 2
 			path: plugins/MauticSocialBundle/Command/MonitorTwitterBaseCommand.php
+
+		-
+			message: '#^Instead of assigning service property to a variable, use the property directly$#'
+			identifier: symplify.noJustPropertyAssign
+			count: 1
+			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Entity\\Lead\:\:setDateAdded\(\) has parameter \$dateAdded with no type specified\.$#'
@@ -13703,30 +12554,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/FacebookIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getUserData\(\) should return array but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/FacebookIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getUserData\(\) should return array but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/FacebookIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getUserData\(\) should return array but returns object\.$#'
-			identifier: return.type
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/FacebookIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FoursquareIntegration\:\:getContactUserId\(\) has parameter \$identifier with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FoursquareIntegration\:\:getErrorsFromResponse\(\) has parameter \$response with no type specified\.$#'
@@ -13861,12 +12688,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Model/PostCountModel.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Model\\TweetModel\:\:getLookupResults\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Model/TweetModel.php
-
-		-
 			message: '#^Parameter \#1 \$monitoring of class MauticPlugin\\MauticSocialBundle\\Event\\SocialEvent constructor expects MauticPlugin\\MauticSocialBundle\\Entity\\Monitoring, MauticPlugin\\MauticSocialBundle\\Entity\\Tweet given\.$#'
 			identifier: argument.type
 			count: 1
@@ -13878,20 +12699,3 @@ parameters:
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
 
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countByLeads\(\) has parameter \$tagIds with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Entity\\TagRepository\:\:countOccurrences\(\) has parameter \$tag with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php

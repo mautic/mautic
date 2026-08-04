@@ -137,7 +137,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->logoutUser();
         $asset                = $this->createAsset(['title' => 'Missing Local File Asset']);
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
         $asset->setUploadDir($coreParametersHelper->get('upload_dir'));
         $this->em->flush();
 

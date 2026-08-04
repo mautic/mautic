@@ -9,8 +9,10 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -21,7 +23,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => 1]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        Assert::assertStringContainsString('"message":"Item was not found."', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('"message":"Item was not found."', (string) $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseIfRoleDoesNotExist(): void
@@ -30,7 +32,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        Assert::assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseWithInvalidRequestFormat(): void
@@ -39,7 +41,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        Assert::assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('"message":"role: The selected choice is invalid."', (string) $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotHaveValidPermissionToUpdate(): void
@@ -60,10 +62,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
-        Assert::assertStringContainsString(
-            '"message":"You do not have access to the requested area\/action."',
-            (string) $this->client->getResponse()->getContent()
-        );
+        $this->assertStringContainsString('"message":"You do not have access to the requested area\/action."', (string) $this->client->getResponse()->getContent());
     }
 
     public function testRoleUpdateByApiThroughAdminUserGivesSuccessResponse(): void
@@ -83,7 +82,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', (string) $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiThroughNonAdminUserGivesSuccessResponse(): void
@@ -104,7 +103,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', (string) $clientResponse->getContent());
     }
 
     public function testWeakPasswordGivesUnauthorizedResponse(): void
@@ -127,7 +126,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('passwordProvider')]
+    #[DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
         $userPayload = [
@@ -182,7 +181,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -196,7 +195,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @param array<string, mixed> $userData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('userCreateDataProvider')]
+    #[DataProvider('userCreateDataProvider')]
     public function testCreateUserViaApiPlatform(array $userData, int $expectedStatusCode): void
     {
         // Create a role first
@@ -242,7 +241,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame($userData['email'], $user->getEmail());
 
             // Verify the password was hashed correctly by checking if we can verify it
-            $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+            $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
             $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),

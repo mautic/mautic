@@ -64,15 +64,15 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
             'campaign' => $campaign->getId(),
         ]);
 
-        Assert::assertNotNull($campaignLead, 'Contact should be in the campaign after first rebuild.');
-        Assert::assertFalse($campaignLead->wasManuallyRemoved(), 'Contact should not be removed after first rebuild.');
-        Assert::assertSame(1, $campaignLead->getRotation(), 'Rotation should be 1 after first run.');
+        $this->assertInstanceOf(CampaignLead::class, $campaignLead, 'Contact should be in the campaign after first rebuild.');
+        $this->assertFalse($campaignLead->wasManuallyRemoved(), 'Contact should not be removed after first rebuild.');
+        $this->assertSame(1, $campaignLead->getRotation(), 'Rotation should be 1 after first run.');
 
         $logsAfterFirstRun = $this->em->getRepository(LeadEventLog::class)->findBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);
-        Assert::assertCount(1, $logsAfterFirstRun, 'Campaign event should have run once after first trigger.');
+        $this->assertCount(1, $logsAfterFirstRun, 'Campaign event should have run once after first trigger.');
 
         // Simulate contact leaving the segment (e.g. campaign removes their tag).
         // Use DBAL directly to avoid ORM caching complications with composite-PK entities.
@@ -81,7 +81,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
             'UPDATE '.MAUTIC_TABLE_PREFIX.'lead_lists_leads SET manually_removed = 1 WHERE lead_id = ? AND leadlist_id = ?',
             [$contact->getId(), $segment->getId()]
         );
-        Assert::assertSame(1, $affected, 'Expected exactly one ListLead row to be updated.');
+        $this->assertSame(1, $affected, 'Expected exactly one ListLead row to be updated.');
         $this->em->clear();
 
         // Rebuild: contact is now orphaned in the campaign (in campaign_leads but no longer in segment)
@@ -94,9 +94,9 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
             'campaign' => $campaign->getId(),
         ]);
 
-        Assert::assertNotNull($campaignLead, 'Campaign lead record should still exist after soft-removal.');
-        Assert::assertTrue($campaignLead->wasManuallyRemoved(), 'Contact should be removed from campaign after leaving segment.');
-        Assert::assertNotNull($campaignLead->getDateLastExited(), 'date_last_exited should be set when removed via segment departure.');
+        $this->assertInstanceOf(CampaignLead::class, $campaignLead, 'Campaign lead record should still exist after soft-removal.');
+        $this->assertTrue($campaignLead->wasManuallyRemoved(), 'Contact should be removed from campaign after leaving segment.');
+        $this->assertInstanceOf(\DateTimeInterface::class, $campaignLead->getDateLastExited(), 'date_last_exited should be set when removed via segment departure.');
 
         // Simulate contact returning to the segment (e.g. tag is re-applied)
         $connection->executeStatement(
@@ -115,12 +115,9 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
             'campaign' => $campaign->getId(),
         ]);
 
-        Assert::assertNotNull($campaignLead, 'Campaign lead record should exist.');
-        Assert::assertFalse(
-            $campaignLead->wasManuallyRemoved(),
-            'Contact should be re-added to campaign when returning to segment with allowRestart=true.'
-        );
-        Assert::assertSame(2, $campaignLead->getRotation(), 'Rotation should be incremented to 2 for the second run.');
+        $this->assertInstanceOf(CampaignLead::class, $campaignLead, 'Campaign lead record should exist.');
+        $this->assertFalse($campaignLead->wasManuallyRemoved(), 'Contact should be re-added to campaign when returning to segment with allowRestart=true.');
+        $this->assertSame(2, $campaignLead->getRotation(), 'Rotation should be incremented to 2 for the second run.');
 
         // Trigger campaign events for the second rotation
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
@@ -132,10 +129,6 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
             'campaign' => $campaign->getId(),
         ]);
 
-        Assert::assertCount(
-            2,
-            $allEventLogs,
-            'Campaign event should have run twice in total (once per rotation) when the contact returns to the segment.'
-        );
+        $this->assertCount(2, $allEventLogs, 'Campaign event should have run twice in total (once per rotation) when the contact returns to the segment.');
     }
 }

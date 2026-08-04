@@ -12,9 +12,10 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -89,7 +90,7 @@ final class ExportHelperTest extends TestCase
 
         $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\BinaryFileResponse::class, $response);
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
         $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));
@@ -130,7 +131,7 @@ final class ExportHelperTest extends TestCase
 
     public function testWriteToZipFileIncludesAssetsWithCustomPath(): void
     {
-        $filesystem = new \Symfony\Component\Filesystem\Filesystem();
+        $filesystem = new Filesystem();
         $tempDir    = sys_get_temp_dir();
         $customDir  = $tempDir.'/export_test_'.uniqid();
         $filesystem->mkdir($customDir);
@@ -246,7 +247,7 @@ final class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             ExportHelper::EXPORT_TYPE_EXCEL,
         ];
-        Assert::assertSame($fileTypes, $this->exportHelper->getSupportedExportTypes());
+        $this->assertSame($fileTypes, $this->exportHelper->getSupportedExportTypes());
     }
 
     public function testExportDataAsInvalidData(): void
@@ -275,8 +276,8 @@ final class ExportHelperTest extends TestCase
     public function testExportDataAsExcel(): void
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
-        Assert::assertSame(200, $stream->getStatusCode());
-        Assert::assertFalse($stream->isEmpty());
+        $this->assertSame(200, $stream->getStatusCode());
+        $this->assertFalse($stream->isEmpty());
 
         ob_start();
         $stream->sendContent();
@@ -336,7 +337,7 @@ final class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv'
         );
-        Assert::assertFileExists($filePath);
+        $this->assertFileExists($filePath);
         $spreadsheet = IOFactory::load('/tmp/demo.csv');
         $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
@@ -349,8 +350,8 @@ final class ExportHelperTest extends TestCase
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv' // give same file name
         );
-        Assert::assertSame('/tmp/demo_1.csv', $filePath2);
-        Assert::assertFileExists($filePath2);
+        $this->assertSame('/tmp/demo_1.csv', $filePath2);
+        $this->assertFileExists($filePath2);
         $spreadsheet = IOFactory::load('/tmp/demo_1.csv');
         $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
@@ -358,7 +359,7 @@ final class ExportHelperTest extends TestCase
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
 
         $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath, 'contacts_export.csv');
-        Assert::assertFileExists($zipFilePath);
+        $this->assertFileExists($zipFilePath);
     }
 
     /**

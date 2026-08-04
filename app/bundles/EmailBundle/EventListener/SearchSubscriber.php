@@ -12,12 +12,12 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
-        private readonly CorePermissions $security,
-        private readonly GlobalSearch $globalSearch,
+        private EmailModel $emailModel,
+        private CorePermissions $security,
+        private GlobalSearch $globalSearch,
     ) {
     }
 

@@ -6,7 +6,6 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class SysinfoControllerTest extends MauticMysqlTestCase
@@ -26,9 +25,9 @@ final class SysinfoControllerTest extends MauticMysqlTestCase
         $dbPlatform      = $crawler->filterXPath("//td[@id='dbinfo-platform']")->text();
         $recommendations = $crawler->filter('#recommendations');
 
-        Assert::assertSame($dbInfo['version'], $dbVersion);
-        Assert::assertSame($dbInfo['driver'], $dbDriver);
-        Assert::assertSame($dbInfo['platform'], $dbPlatform);
-        Assert::assertGreaterThan(0, $recommendations->count());
+        $this->assertSame($dbInfo['version'], $dbVersion);
+        $this->assertSame($dbInfo['driver'], $dbDriver);
+        $this->assertSame($dbInfo['platform'], $dbPlatform);
+        $this->assertGreaterThan(0, $recommendations->count());
     }
 }

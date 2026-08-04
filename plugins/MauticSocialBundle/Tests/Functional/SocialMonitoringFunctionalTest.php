@@ -7,25 +7,24 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use PHPUnit\Framework\Assert;
 
 final class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
 {
     public function testHideSocialMonitoring(): void
     {
         $crawler = $this->client->request('GET', '/s/config/edit');
-        Assert::assertStringNotContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
-        Assert::assertStringNotContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
+        $this->assertStringNotContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
+        $this->assertStringNotContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
 
         $crawler = $this->client->request('GET', '/s/forms/new');
-        Assert::assertStringNotContainsString('Social Login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
+        $this->assertStringNotContainsString('Social Login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
     }
 
     public function testShowSocialMonitoring(): void
     {
         $this->createIntegration();
         $crawler = $this->client->request('GET', '/s/config/edit');
-        Assert::assertStringContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
+        $this->assertStringContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
     }
 
     private function createIntegration(): Integration

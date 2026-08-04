@@ -26,7 +26,7 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DynamicContentSubscriber implements EventSubscriberInterface
+final class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 

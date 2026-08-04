@@ -8,21 +8,21 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @deprecated 2.13.0; to be removed in 3.0
  */
-class CampaignDecisionEvent extends Event
+final class CampaignDecisionEvent extends Event
 {
-    protected $decisionTriggered = false;
+    private $decisionTriggered = false;
 
     /**
      * @param LeadEventLog[] $logs
      */
     public function __construct(
-        protected $lead,
-        protected $decisionType,
-        protected $decisionEventDetails,
-        protected $events,
-        protected $eventSettings,
-        protected $isRootLevel = false,
-        protected $logs = [],
+        private $lead,
+        private $decisionType,
+        private $decisionEventDetails,
+        private $events,
+        private $eventSettings,
+        private $isRootLevel = false,
+        private $logs = [],
     ) {
     }
 

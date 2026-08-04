@@ -12,13 +12,13 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
     public function __construct(
-        private readonly CompanyReportData $companyReportData,
-        private readonly DncReportService $dncReportService,
+        private CompanyReportData $companyReportData,
+        private DncReportService $dncReportService,
     ) {
     }
 

@@ -10,7 +10,6 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 
 final class WebhookModelTest extends MauticMysqlTestCase
 {
@@ -35,15 +34,15 @@ final class WebhookModelTest extends MauticMysqlTestCase
         $counter = 1;
 
         foreach ($queueArray as $queuedEvent) {
-            Assert::assertSame((string) $counter, $queuedEvent->getId());
+            $this->assertSame((string) $counter, $queuedEvent->getId());
 
             $payload = json_decode($queuedEvent->getPayload(), true);
-            Assert::assertSame($counter, $payload['spoof']);
+            $this->assertSame($counter, $payload['spoof']);
 
             ++$counter;
         }
 
-        Assert::assertSame(11, $counter);
+        $this->assertSame(11, $counter);
     }
 
     public function testEventsOrderByDirDesc(): void
@@ -55,15 +54,15 @@ final class WebhookModelTest extends MauticMysqlTestCase
         // Order should be 10 to 1
         $counter = 10;
         foreach ($queueArray as $queuedEvent) {
-            Assert::assertSame((string) $counter, $queuedEvent->getId());
+            $this->assertSame((string) $counter, $queuedEvent->getId());
 
             $payload = json_decode($queuedEvent->getPayload(), true);
-            Assert::assertSame($counter, $payload['spoof']);
+            $this->assertSame($counter, $payload['spoof']);
 
             --$counter;
         }
 
-        Assert::assertSame(0, $counter);
+        $this->assertSame(0, $counter);
     }
 
     private function createWebhookAndQueue(): Webhook
@@ -115,6 +114,6 @@ final class WebhookModelTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($webhookParams);
 
-        return static::getContainer()->get('mautic.webhook.model.webhook');
+        return static::getContainer()->get(WebhookModel::class);
     }
 }

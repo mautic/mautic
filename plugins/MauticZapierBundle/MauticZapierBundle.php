@@ -4,6 +4,6 @@ namespace MauticPlugin\MauticZapierBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-class MauticZapierBundle extends PluginBundleBase
+final class MauticZapierBundle extends PluginBundleBase
 {
 }

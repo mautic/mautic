@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -43,7 +44,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailReadDateOperatorProvider')]
+    #[DataProvider('emailReadDateOperatorProvider')]
     public function testEmailReadDateFilterUsesMostRecentReadDate(
         string $operator,
         bool $expectRecentOnly,

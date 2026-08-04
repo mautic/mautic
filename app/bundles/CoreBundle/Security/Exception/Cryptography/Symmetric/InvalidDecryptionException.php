@@ -2,6 +2,6 @@
 
 namespace Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric;
 
-class InvalidDecryptionException extends \Exception
+final class InvalidDecryptionException extends \Exception
 {
 }
