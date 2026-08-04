@@ -59,7 +59,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -72,8 +72,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[\Symfony\Component\Validator\Constraints\Url(message: 'mautic.core.valid_url_required')]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[NotBlank(message: 'mautic.core.valid_url_required')]
     private $webhookUrl;
 
     /**

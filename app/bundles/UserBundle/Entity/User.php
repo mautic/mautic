@@ -44,8 +44,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[\Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
-#[\Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass'])]
+#[UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
+#[UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass'])]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'User';
@@ -57,7 +57,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     protected $id;
 
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.username.notblank')]
+    #[Assert\NotBlank(message: 'mautic.user.user.username.notblank')]
     protected ?string $username = null;
 
     /**
@@ -71,8 +71,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var ?string
      */
     #[Groups(['user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
-    #[\Symfony\Component\Validator\Constraints\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
+    #[Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank'])]
+    #[Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword'])]
     private $plainPassword;
 
     /**
@@ -86,36 +86,36 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var string
      */
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.firstname.notblank')]
+    #[Assert\NotBlank(message: 'mautic.user.user.firstname.notblank')]
     private $firstName;
 
     /**
      * @var string
      */
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.lastname.notblank')]
+    #[Assert\NotBlank(message: 'mautic.user.user.lastname.notblank')]
     private $lastName;
 
     /**
      * @var string
      */
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.email.valid')]
-    #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass'])]
+    #[Assert\NotBlank(message: 'mautic.user.user.email.valid')]
+    #[Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass'])]
     private $email;
 
     /**
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong')]
+    #[Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong')]
     private $position;
 
     /**
      * @var Role
      */
     #[Groups(['user:read', 'user:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.user.user.role.notblank')]
+    #[Assert\NotBlank(message: 'mautic.user.user.role.notblank')]
     private $role;
 
     /**

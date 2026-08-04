@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -56,7 +55,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var string
      */
     #[Groups(['role:read', 'role:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
