@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -59,7 +58,6 @@ final class EventLogApiController extends FetchCommonApiController
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
-        private readonly UserHelper $userHelper,
     ) {
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -75,7 +73,7 @@ final class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $this->userHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     public function getEntitiesAction(Request $request): Response

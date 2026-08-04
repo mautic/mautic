@@ -34,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @template E of object
@@ -125,6 +126,15 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     protected ContainerBagInterface $parametersContainer;
 
+    private UserHelper $userHelper;
+
+    #[Required]
+    public function autowireFetchCommonApiController(
+        UserHelper $userHelper,
+    ): void {
+        $this->userHelper = $userHelper;
+    }
+
     /**
      * @param ModelFactory<E> $modelFactory
      */
@@ -138,7 +148,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected ModelFactory $modelFactory,
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
-        private readonly UserHelper $userHelper,
     ) {
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();

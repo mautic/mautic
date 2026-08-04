@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
@@ -41,7 +40,6 @@ final class SubmissionApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         SubmissionModel $formSubmissionModel,
         private readonly FormModel $formModel,
-        private readonly UserHelper $userHelper,
     ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
@@ -100,7 +98,7 @@ final class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($request, $this->userHelper, $formId);
+        return $this->getEntitiesAction($request, $formId);
     }
 
     /**
