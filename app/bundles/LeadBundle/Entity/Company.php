@@ -60,6 +60,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var int|null
      */
     #[Groups(['company:read', 'company:write'])]
+    #[\Symfony\Component\Validator\Constraints\Range(min: 0, max: 2147483647)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
@@ -263,7 +264,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
-        $metadata->addPropertyConstraint('score', new Assert\Range(min: 0, max: 2147483647));
     }
 
     public static function getDefaultIdentifierFields(): array
