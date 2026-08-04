@@ -44,7 +44,7 @@
     };
 
     var activate = function () {
-        item.activateTracking({
+        var activated = item.activateTracking({
             install: installTrackingHandlers,
             hooks: {
                 onEngage: function () {
@@ -60,6 +60,9 @@
                 onConvert: installTrackingHandlers
             }
         });
+        if (activated && item.iframe && item.iframe.parentNode) {
+            item.trackingHooks.onEngage();
+        }
     };
 
     if (!item.runtimeReady) {

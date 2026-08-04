@@ -12,6 +12,7 @@ final class FocusTrackingCest
     private const EXPLICIT_FOCUS_ID = 999992;
     private const LEGACY_FOCUS_ID = 999995;
     private const QUEUED_FOCUS_ID = 999993;
+    private const REMOVED_FOCUS_ID = 999996;
 
     private ?string $corsConfigBackup = null;
 
@@ -124,7 +125,7 @@ JS, self::DISPLAY_FOCUS_ID));
         $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::BAR_FOCUS_ID]);
     }
 
-    public function displayThenTrackingTracksOnlyFutureActionsOnce(\AcceptanceTester $I): void
+    public function displayThenTrackingCountsMountedItemOnce(\AcceptanceTester $I): void
     {
         $displayPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'display');
         $trackingPath = $this->focusPath(self::EXPLICIT_FOCUS_ID, 'tracking');
@@ -148,18 +149,36 @@ JS, self::DISPLAY_FOCUS_ID));
         $postActivationState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
         $I->assertSame(1, $this->requestCount($postActivationState['requests'], $trackingPath, 'script'));
         $I->assertSame(1, $postActivationState['iframeCount']);
-        $I->assertSame(0, $this->requestCount($postActivationState['requests'], $viewPath));
-        $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::EXPLICIT_FOCUS_ID]);
+        $I->assertSame(1, $this->requestCount($postActivationState['requests'], $viewPath, 'image'));
+        $I->seeNumRecords(1, 'test_focus_stats', ['focus_id' => self::EXPLICIT_FOCUS_ID, 'type' => 'view']);
         $I->assertNotSame(self::DESTINATION_URL, $this->linkUrl($I, self::EXPLICIT_FOCUS_ID));
         $I->assertSame(1, $this->formMarkerCount($I, self::EXPLICIT_FOCUS_ID));
 
         $I->executeJS('window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingHooks.onEngage(); window.MauticFocusItems['.self::EXPLICIT_FOCUS_ID.'].trackingHooks.onEngage();');
-        $I->waitForJS('return window.focusFixture.countRequests('.json_encode($viewPath, JSON_THROW_ON_ERROR).', "image") === 1', 10);
         $this->waitForNetworkQuiet($I);
-        $futureState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
-        $I->assertSame(1, $this->requestCount($futureState['requests'], $viewPath, 'image'));
-        $I->assertSame([], $futureState['errors']);
+        $deduplicatedState = $this->focusState($I, self::EXPLICIT_FOCUS_ID);
+        $I->assertSame(1, $this->requestCount($deduplicatedState['requests'], $viewPath, 'image'));
+        $I->assertSame([], $deduplicatedState['errors']);
         $I->seeNumRecords(1, 'test_focus_stats', ['focus_id' => self::EXPLICIT_FOCUS_ID, 'type' => 'view']);
+
+        $removedDisplayPath = $this->focusPath(self::REMOVED_FOCUS_ID, 'display');
+        $removedTrackingPath = $this->focusPath(self::REMOVED_FOCUS_ID, 'tracking');
+        $removedViewPath = $this->focusPath(self::REMOVED_FOCUS_ID, 'view');
+        $this->openFixture($I, [$removedDisplayPath], ['reset' => '1']);
+        $I->waitForJS('return window.focusFixture.finished && window.MauticFocusItems && window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].runtimeReady', 10);
+        $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].engageVisitor();');
+        $this->waitForFocus($I, self::REMOVED_FOCUS_ID, true);
+        $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].iframeDoc.querySelector(".mf-modal-close a").click();');
+        $I->waitForJS('return document.querySelectorAll("iframe").length === 0', 10);
+        $I->executeJS('window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].loadTracking();');
+        $I->waitForJS('return window.MauticFocusItems['.self::REMOVED_FOCUS_ID.'].trackingEnabled === true', 10);
+        $this->waitForNetworkQuiet($I);
+
+        $removedState = $this->focusState($I, self::REMOVED_FOCUS_ID);
+        $I->assertSame(1, $this->requestCount($removedState['requests'], $removedTrackingPath, 'script'));
+        $I->assertSame(0, $this->requestCount($removedState['requests'], $removedViewPath));
+        $I->assertSame([], $removedState['errors']);
+        $I->seeNumRecords(0, 'test_focus_stats', ['focus_id' => self::REMOVED_FOCUS_ID, 'type' => 'view']);
     }
 
     public function queuedConsentActivatesBeforeInitialEngagement(\AcceptanceTester $I): void
@@ -238,6 +257,7 @@ JS, self::DISPLAY_FOCUS_ID));
             $this->focusFixture(self::QUEUED_FOCUS_ID, 'Queued consent', 'modal', 'immediately'),
             $this->focusFixture(self::BAR_FOCUS_ID, 'Bar persistence', 'bar', 'immediately'),
             $this->focusFixture(self::LEGACY_FOCUS_ID, 'Legacy aggregate', 'modal', 'immediately'),
+            $this->focusFixture(self::REMOVED_FOCUS_ID, 'Removed before tracking', 'modal', 'leave'),
         ];
     }
 

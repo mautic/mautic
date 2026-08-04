@@ -7,7 +7,7 @@ const trackingScript = fs.readFileSync(process.argv[3], 'utf8');
 const aggregateScript = fs.readFileSync(process.argv[4], 'utf8');
 const focusId = process.argv[5];
 
-function createBrowser(body = {className: ''}) {
+function createBrowser(body) {
     const documentListeners = {};
     const appendedScripts = [];
     const images = [];
@@ -28,6 +28,10 @@ function createBrowser(body = {className: ''}) {
                 child.parentNode = null;
             }
         };
+    }
+
+    if (arguments.length === 0) {
+        body = createElement('body');
     }
 
     const head = createElement('head');
@@ -113,6 +117,7 @@ function item(browser) {
         item(browser).trackingHooks.onEngage();
     };
     execute(trackingScript, browser);
+    assert.strictEqual(browser.images.length, 0, 'queued consent must not send a view during activation');
     assert.strictEqual(item(browser).trackingEnabled, true, 'queued tracking must activate before engagement');
     browser.appendedScripts[0].onload();
     assert.strictEqual(item(browser).initialized, true, 'display must initialize after tracking activation');
@@ -207,6 +212,8 @@ function item(browser) {
             return [form];
         }
     };
+    focus.iframe = browser.document.createElement('iframe');
+    browser.document.body.appendChild(focus.iframe);
 
     focus.trackingHooks.onEngage();
     assert.strictEqual(browser.images.length, 0, 'pre-activation engagement must not send a view');
@@ -215,10 +222,24 @@ function item(browser) {
     execute(trackingScript, browser);
     assert.strictEqual(focus.trackingEnabled, true);
     assert.strictEqual(hiddenInputs.length, 1, 'tracking metadata must be installed once');
+    assert.strictEqual(browser.images.length, 1, 'late activation must send one view for a mounted item');
 
     focus.trackingHooks.onEngage();
     focus.trackingHooks.onEngage();
-    assert.strictEqual(browser.images.length, 1, 'post-activation engagement must send one view');
+    assert.strictEqual(browser.images.length, 1, 'repeated engagement must not send another view');
+}
+
+{
+    const browser = createBrowser();
+    execute(displayScript, browser);
+    const focus = item(browser);
+    focus.iframe = browser.document.createElement('iframe');
+    browser.document.body.appendChild(focus.iframe);
+    browser.document.body.removeChild(focus.iframe);
+
+    execute(trackingScript, browser);
+    assert.strictEqual(focus.trackingEnabled, true);
+    assert.strictEqual(browser.images.length, 0, 'late activation must not send a view for a removed item');
 }
 
 {
