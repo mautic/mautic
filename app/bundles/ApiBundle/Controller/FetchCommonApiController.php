@@ -138,7 +138,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected ModelFactory $modelFactory,
         protected EventDispatcherInterface $dispatcher,
         protected CoreParametersHelper $coreParametersHelper,
-        private readonly UserHelper $userHelper,
     ) {
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
@@ -160,7 +159,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return Response
      */
-    public function getEntitiesAction(Request $request)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper)
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
@@ -177,7 +176,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
             && !$this->security->isGranted($this->permissionBase.':viewother')
-            && null !== $user = $this->userHelper->getUser()
+            && null !== $user = $userHelper->getUser()
         ) {
             $this->listFilters[] = [
                 'column' => $tableAlias.'.createdBy',

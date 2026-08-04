@@ -47,7 +47,6 @@ final class ListApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
         private ListModel $listModel,
         private LeadModel $leadModel,
     ) {
@@ -63,7 +62,7 @@ final class ListApiController extends CommonApiController
             'categoryList',
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
@@ -97,10 +96,10 @@ final class ListApiController extends CommonApiController
     /**
      * Obtains a list of entities.
      */
-    public function getEntitiesAction(Request $request): Response
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         $withCounts = $request->query->has('withCounts');
-        $response   = parent::getEntitiesAction($request);
+        $response   = parent::getEntitiesAction($request, $userHelper);
 
         if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
             $content = json_decode($response->getContent(), true);

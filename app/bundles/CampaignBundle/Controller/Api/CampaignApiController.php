@@ -81,12 +81,12 @@ final class CampaignApiController extends CommonApiController
             'formList',
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getEntitiesAction(Request $request): Response
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
-        $response = parent::getEntitiesAction($request);
+        $response = parent::getEntitiesAction($request, $userHelper);
 
         $withCounts = $request->query->has('withContactCounts')
             && 'false' !== strtolower((string) $request->query->get('withContactCounts', 'true'));

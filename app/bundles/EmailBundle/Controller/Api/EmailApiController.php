@@ -56,7 +56,6 @@ final class EmailApiController extends CommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
         EmailModel $emailModel,
         private Reply $replyService,
         private RandomHelperInterface $randomHelper,
@@ -83,13 +82,13 @@ final class EmailApiController extends CommonApiController
             ],
         ];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
     /**
      * Obtains a list of emails.
      */
-    public function getEntitiesAction(Request $request): Response
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         // get parent level only
         $this->listFilters[] = [
@@ -97,7 +96,7 @@ final class EmailApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction($request);
+        return parent::getEntitiesAction($request, $userHelper);
     }
 
     /**

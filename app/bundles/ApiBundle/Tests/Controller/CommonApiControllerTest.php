@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -100,8 +99,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(CoreParametersHelper::class),
-            $this->createStub(UserHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
@@ -239,8 +237,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(CoreParametersHelper::class),
-            $this->createStub(UserHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $reflection = new \ReflectionClass(CommonApiController::class);
@@ -250,7 +247,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createStub(CorePermissions::class), $this->createStub(Translator::class), new EntityResultHelper(), $this->createStub(Router::class), $this->createStub(FormFactoryInterface::class), $this->createStub(AppVersion::class), $this->createStub(RequestStack::class), $this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(CoreParametersHelper::class), $this->createStub(UserHelper::class)) extends CommonApiController {
+        $controller = new class($this->createStub(CorePermissions::class), $this->createStub(Translator::class), new EntityResultHelper(), $this->createStub(Router::class), $this->createStub(FormFactoryInterface::class), $this->createStub(AppVersion::class), $this->createStub(RequestStack::class), $this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(CoreParametersHelper::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

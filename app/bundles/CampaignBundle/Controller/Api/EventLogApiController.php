@@ -55,7 +55,6 @@ final class EventLogApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
-        UserHelper $userHelper,
         EventLogModel $campaignEventLogModel,
         private LeadModel $leadModel,
         private CampaignModel $campaignModel,
@@ -75,16 +74,16 @@ final class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $userHelper);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getEntitiesAction(Request $request): Response
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
         $this->serializerGroups[]                        = 'leadBasicList';
 
-        return parent::getEntitiesAction($request);
+        return parent::getEntitiesAction($request, $userHelper);
     }
 
     /**
@@ -92,7 +91,7 @@ final class EventLogApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function getContactEventsAction(Request $request, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -136,7 +135,7 @@ final class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction($request);
+        return $this->getEntitiesAction($request, $userHelper);
     }
 
     /**
