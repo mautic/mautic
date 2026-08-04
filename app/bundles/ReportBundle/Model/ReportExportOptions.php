@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ReportExportOptions
+final class ReportExportOptions
 {
     private readonly int $batchSize;
 
