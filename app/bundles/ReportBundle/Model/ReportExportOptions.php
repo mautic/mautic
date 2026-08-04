@@ -4,12 +4,9 @@ namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ReportExportOptions
+final class ReportExportOptions
 {
-    /**
-     * @var int
-     */
-    private $batchSize;
+    private readonly int $batchSize;
 
     private int $page;
 
@@ -39,10 +36,7 @@ class ReportExportOptions
         ++$this->page;
     }
 
-    /**
-     * @return int
-     */
-    public function getBatchSize()
+    public function getBatchSize(): int
     {
         return $this->batchSize;
     }
@@ -52,10 +46,7 @@ class ReportExportOptions
         return $this->page;
     }
 
-    /**
-     * @return int
-     */
-    public function getNumberOfProcessedResults(): int|float
+    public function getNumberOfProcessedResults(): int
     {
         return $this->page * $this->batchSize;
     }

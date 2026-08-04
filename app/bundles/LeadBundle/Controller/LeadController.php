@@ -2469,13 +2469,7 @@ final class LeadController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters' => array_merge(
-                    [
-                        'fields' => $fields,
-                        'form'   => $form->createView(),
-                        'lead'   => $lead,
-                    ],
-                ),
+                'viewParameters' => ['fields' => $fields, 'form' => $form->createView(), 'lead' => $lead],
                 'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
