@@ -42,6 +42,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[\Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique')]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -57,6 +58,7 @@ class Stage extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -131,13 +133,6 @@ class Stage extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
-
-        $metadata->addConstraint(new UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique'));
     }
 
     /**

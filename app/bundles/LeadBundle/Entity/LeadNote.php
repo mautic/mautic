@@ -24,6 +24,7 @@ class LeadNote extends FormEntity
     /**
      * @var string
      */
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.lead.note.text.notblank')]
     private $text;
 
     /**
@@ -122,16 +123,6 @@ class LeadNote extends FormEntity
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Form validation rules.
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('text', new NotBlank(
-            message: 'mautic.lead.note.text.notblank'
-        ));
     }
 
     /**

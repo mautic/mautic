@@ -40,6 +40,7 @@ class Widget extends FormEntity
     /**
      * @var string
      */
+    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.type.required')]
     private $type;
 
     /**
@@ -96,11 +97,6 @@ class Widget extends FormEntity
         $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
         $builder->addNullableField('ordering', Types::INTEGER);
         $builder->addNullableField('params', Types::ARRAY);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
     }
 
     /**
