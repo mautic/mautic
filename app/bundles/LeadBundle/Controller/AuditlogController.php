@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,6 @@ final class AuditlogController extends CommonController
         private \Symfony\Component\HttpFoundation\RequestStack $requestStack,
         protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security,
         private readonly DateHelper $dateHelper,
-        private readonly ExportHelper $exportHelper,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -164,6 +162,6 @@ final class AuditlogController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_auditlog', $this->exportHelper);
+        return $this->exportResultsAs($toExport, $dataType, 'contact_auditlog');
     }
 }

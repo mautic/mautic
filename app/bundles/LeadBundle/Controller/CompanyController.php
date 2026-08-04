@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
-use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -37,7 +36,6 @@ final class CompanyController extends FormController
     private PageHelperFactoryInterface $pageHelperFactory;
     private CompanyColumnsDictionary $companyColumnsDictionary;
     private CustomFieldFindReplace $findReplace;
-    private ExportHelper $exportHelper;
 
     #[Required]
     public function autowireCompanyController(
@@ -48,7 +46,6 @@ final class CompanyController extends FormController
         PageHelperFactoryInterface $pageHelperFactory,
         CompanyColumnsDictionary $companyColumnsDictionary,
         CustomFieldFindReplace $findReplace,
-        ExportHelper $exportHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
@@ -57,7 +54,6 @@ final class CompanyController extends FormController
         $this->pageHelperFactory = $pageHelperFactory;
         $this->companyColumnsDictionary = $companyColumnsDictionary;
         $this->findReplace = $findReplace;
-        $this->exportHelper = $exportHelper;
     }
 
     public function indexAction(Request $request, int $page = 1): Response
@@ -1189,6 +1185,6 @@ final class CompanyController extends FormController
             ];
         }
 
-        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $this->exportHelper);
+        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']));
     }
 }

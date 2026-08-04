@@ -2280,7 +2280,7 @@ final class LeadController extends FormController
             $args,
             fn (Lead $contact): array => $this->exportHelper->parseLeadToExport($contact)
         );
-        $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $this->exportHelper);
+        $response = $this->exportResultsAs($iterator, $fileType, 'contacts');
 
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
@@ -2335,7 +2335,7 @@ final class LeadController extends FormController
             LeadEvents::POST_CONTACT_EXPORT
         );
 
-        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $this->exportHelper);
+        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
     }
 
     public function downloadExportAction(string $fileName = ''): Response
