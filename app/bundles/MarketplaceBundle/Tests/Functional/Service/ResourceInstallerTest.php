@@ -98,6 +98,38 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         Assert::assertStringContainsString('No downloadable version', $result['errors'][0]);
     }
 
+    /**
+     * A dist URL is chosen by whoever published the package, so it must not be able to point the
+     * server at its own network or at the local filesystem.
+     *
+     * @dataProvider unsafeDistUrlProvider
+     */
+    public function testInstallRefusesUnsafeDistUrls(string $url): void
+    {
+        $this->mockPackageWithDistUrl($url);
+
+        $this->httpClient->expects($this->never())->method('request');
+
+        $result = $this->installer->install('vendor/pkg', 1);
+
+        Assert::assertFalse($result['success']);
+        Assert::assertStringContainsString('Refusing to download', $result['errors'][0]);
+    }
+
+    /**
+     * @return \Iterator<string, array{string}>
+     */
+    public static function unsafeDistUrlProvider(): \Iterator
+    {
+        yield 'plain http' => ['http://example.test/pkg.zip'];
+        yield 'file scheme' => ['file:///etc/passwd'];
+        yield 'loopback' => ['https://127.0.0.1/pkg.zip'];
+        yield 'ipv6 loopback' => ['https://[::1]/pkg.zip'];
+        yield 'private range' => ['https://10.1.2.3/pkg.zip'];
+        yield 'link local' => ['https://169.254.169.254/latest/meta-data/'];
+        yield 'no host' => ['not-a-url'];
+    }
+
     public function testInstallReturnsErrorWhenDownloadThrows(): void
     {
         $this->mockPackageWithDistUrl('https://example.test/pkg.zip');

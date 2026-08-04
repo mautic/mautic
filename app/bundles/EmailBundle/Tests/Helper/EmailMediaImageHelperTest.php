@@ -97,6 +97,44 @@ final class EmailMediaImageHelperTest extends TestCase
         $this->assertFileExists($this->imageDir.'/hero.png');
     }
 
+    public function testRestoredSvgLosesItsScripts(): void
+    {
+        file_put_contents($this->filesDir.'/logo.svg', <<<'SVG'
+            <svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)">
+                <script>alert(2)</script>
+                <a href="javascript:alert(3)"><rect width="10" height="10" fill="#000"/></a>
+            </svg>
+            SVG);
+
+        $this->helper->restoreInHtml('<img src="https://origin.example.com/media/images/logo.svg">');
+
+        $restored = (string) file_get_contents($this->imageDir.'/logo.svg');
+
+        $this->assertStringNotContainsString('<script', $restored);
+        $this->assertStringNotContainsString('onload', $restored);
+        $this->assertStringNotContainsString('javascript:', $restored);
+        // The drawing itself must survive — this runs on every imported SVG, not just hostile ones.
+        $this->assertStringContainsString('<rect', $restored);
+    }
+
+    public function testRestoredSvgThatIsNotXmlIsDiscarded(): void
+    {
+        file_put_contents($this->filesDir.'/broken.svg', '<html><script>alert(1)</script>');
+
+        $this->helper->restoreInHtml('<img src="https://origin.example.com/media/images/broken.svg">');
+
+        $this->assertFileDoesNotExist($this->imageDir.'/broken.svg');
+    }
+
+    public function testRestoredRasterImageIsUntouched(): void
+    {
+        file_put_contents($this->filesDir.'/photo.png', 'raw-png-bytes');
+
+        $this->helper->restoreInHtml('<img src="https://origin.example.com/media/images/photo.png">');
+
+        $this->assertSame('raw-png-bytes', file_get_contents($this->imageDir.'/photo.png'));
+    }
+
     private function coreParametersHelper(): CoreParametersHelper&MockObject
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);

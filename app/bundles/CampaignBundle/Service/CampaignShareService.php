@@ -173,24 +173,62 @@ final readonly class CampaignShareService
             if (null !== $image) {
                 $gallery[] = [
                     'image' => $image,
-                    'alt'   => $formData['galleryAlt'.$i] ?? '',
+                    'alt'   => $this->plainText($formData['galleryAlt'.$i] ?? ''),
                 ];
             }
         }
 
         return [
-            'title'             => $formData['title'],
-            'vendorName'        => $formData['vendorName'] ?? '',
-            'headline'          => $formData['headline'] ?? '',
+            'title'             => $this->plainText($formData['title']),
+            'vendorName'        => $this->plainText($formData['vendorName'] ?? ''),
+            'headline'          => $this->plainText($formData['headline'] ?? ''),
             'description'       => $formData['description'] ?? '',
-            'keywords'          => $formData['keywords'] ?? '',
-            'version'           => $formData['version'],
-            'worksWithVersions' => $formData['worksWithVersions'] ?? [],
-            'languages'         => $formData['languages'] ?? [],
+            'keywords'          => $this->plainText($formData['keywords'] ?? ''),
+            'version'           => $this->plainText($formData['version']),
+            'worksWithVersions' => $this->plainTextList($formData['worksWithVersions'] ?? []),
+            'languages'         => $this->plainTextList($formData['languages'] ?? []),
             'bannerImage'       => $formData['bannerImage'] ?? null,
             'gallery'           => $gallery,
             'price'             => $formData['price'] ?? null,
         ];
+    }
+
+    /**
+     * Strips markup from the short metadata fields that end up in composer.json.
+     *
+     * These are read back by the marketplace and by anything else that consumes the package, so
+     * they shouldn't be able to carry markup out of here. Description is left alone on purpose —
+     * it is markdown, rendered with HTML input escaped, and stripping tags would mangle it.
+     */
+    private function plainText(mixed $value): string
+    {
+        if (!\is_string($value)) {
+            return '';
+        }
+
+        // strip_tags leaves the stray angle brackets a malformed tag leaves behind, and these
+        // fields never legitimately contain them.
+        return trim(str_replace(['<', '>'], '', strip_tags($value)));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function plainTextList(mixed $values): array
+    {
+        if (!\is_array($values)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($values as $value) {
+            $text = $this->plainText($value);
+            if ('' !== $text) {
+                $clean[] = $text;
+            }
+        }
+
+        return $clean;
     }
 
     /**

@@ -104,10 +104,75 @@ final readonly class EmailMediaImageHelper
             $restored = rtrim($this->pathsHelper->getMediaPath(), '/').'/files/'.$basename;
             if (is_file($restored)) {
                 @copy($restored, $destination);
+                $this->scrubSvg($destination);
             }
         }
 
         return '/'.$this->imagePathSegment().'/'.$basename;
+    }
+
+    /**
+     * An SVG is XML, and it can carry scripts that run when a browser opens the file. These arrive
+     * inside an imported archive, so strip anything executable before the file lands in the media
+     * directory, where it is served from the instance's own origin.
+     */
+    private function scrubSvg(string $file): void
+    {
+        if ('svg' !== strtolower(pathinfo($file, \PATHINFO_EXTENSION))) {
+            return;
+        }
+
+        $contents = @file_get_contents($file);
+        if (false === $contents || '' === trim($contents)) {
+            return;
+        }
+
+        $document = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        // LIBXML_NONET keeps entity resolution off the network.
+        $loaded = $document->loadXML($contents, \LIBXML_NONET | \LIBXML_NOERROR | \LIBXML_NOWARNING);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!$loaded) {
+            // Not valid XML, so it was never going to render as an image. Don't leave it lying
+            // around in a servable directory.
+            @unlink($file);
+
+            return;
+        }
+
+        $xpath = new \DOMXPath($document);
+
+        // Elements that execute, or that let HTML back in through the side door.
+        $executable = $xpath->query('//*[local-name()="script" or local-name()="handler" or local-name()="foreignObject"]');
+        foreach (iterator_to_array($executable ?: []) as $node) {
+            $node->parentNode?->removeChild($node);
+        }
+
+        foreach (iterator_to_array($xpath->query('//@*') ?: []) as $attribute) {
+            if ($attribute instanceof \DOMAttr && $this->isExecutableAttribute($attribute)) {
+                $attribute->ownerElement?->removeAttributeNode($attribute);
+            }
+        }
+
+        $sanitized = $document->saveXML();
+        if (is_string($sanitized)) {
+            file_put_contents($file, $sanitized);
+        }
+    }
+
+    private function isExecutableAttribute(\DOMAttr $attribute): bool
+    {
+        $name = strtolower($attribute->nodeName);
+
+        if (str_starts_with($name, 'on')) {
+            return true;
+        }
+
+        // data: is left alone otherwise — embedding a raster image that way is normal.
+        return \in_array($name, ['href', 'xlink:href', 'src'], true)
+            && 1 === preg_match('#^\s*(?:javascript:|data:text/html)#i', (string) $attribute->nodeValue);
     }
 
     private function imagePathSegment(): string

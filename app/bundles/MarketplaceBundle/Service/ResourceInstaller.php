@@ -12,6 +12,9 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\MarketplaceBundle\Api\Connection;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -22,6 +25,8 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
 {
     private const INSTALLED_FILE = 'marketplace_installed_resources.json';
 
+    private const MAX_REDIRECTS = 5;
+
     public function __construct(
         private Connection $connection,
         #[Autowire(service: 'mautic.http.client')]
@@ -30,6 +35,8 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private ImportHelper $importHelper,
+        #[Autowire('%kernel.debug%')]
+        private bool $debug = false,
     ) {
     }
 
@@ -130,6 +137,10 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
 
     private function downloadZip(string $url): string
     {
+        // The dist URL comes from the package's own metadata, so anyone who can publish to the
+        // marketplace picks it. Vet it before we connect, and again on every redirect.
+        $this->assertSafeDownloadUrl($url);
+
         $importDir = $this->pathsHelper->getImportCampaignsPath();
         (new Filesystem())->mkdir($importDir, 0755);
 
@@ -143,8 +154,16 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'sink'            => $filePath,
-                'allow_redirects' => true,
-                'headers'         => [
+                'allow_redirects' => [
+                    'max'         => self::MAX_REDIRECTS,
+                    'protocols'   => $this->debug ? ['http', 'https'] : ['https'],
+                    'strict'      => true,
+                    'referer'     => false,
+                    'on_redirect' => function (RequestInterface $request, ResponseInterface $response, UriInterface $uri): void {
+                        $this->assertSafeDownloadUrl((string) $uri);
+                    },
+                ],
+                'headers' => [
                     'User-Agent' => 'Mautic Marketplace',
                 ],
             ]);
@@ -163,6 +182,63 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
         }
 
         return $filePath;
+    }
+
+    /**
+     * Rejects anything that isn't a plain https URL pointing at a publicly routable host, so a
+     * crafted dist URL can't turn an install into a request against the server's own network.
+     *
+     * A local install talks to a marketplace on http://127.0.0.1, so both rules are relaxed when
+     * debug is on — never in production, where debug is off.
+     */
+    private function assertSafeDownloadUrl(string $url): void
+    {
+        $parts  = parse_url($url);
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host   = (string) ($parts['host'] ?? '');
+
+        if ('' === $host || !\in_array($scheme, $this->debug ? ['http', 'https'] : ['https'], true)) {
+            throw new \RuntimeException(\sprintf('Refusing to download "%s": expected an absolute https URL.', $url));
+        }
+
+        foreach ($this->resolveHost($host) as $address) {
+            if (filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE)) {
+                continue;
+            }
+
+            if ($this->debug) {
+                $this->logger->warning(\sprintf('Marketplace download host "%s" resolves to the non-public address %s; allowed because debug is on.', $host, $address));
+                continue;
+            }
+
+            throw new \RuntimeException(\sprintf('Refusing to download "%s": the host resolves to a non-public address.', $url));
+        }
+    }
+
+    /**
+     * Every address the host points at. An unresolvable host yields none — there is nothing to
+     * connect to, so let the HTTP client report it rather than guessing here.
+     *
+     * @return list<string>
+     */
+    private function resolveHost(string $host): array
+    {
+        // IPv6 literals arrive wrapped in brackets.
+        $host = trim($host, '[]');
+
+        if (filter_var($host, \FILTER_VALIDATE_IP)) {
+            return [$host];
+        }
+
+        $addresses = [];
+        foreach (@dns_get_record($host, \DNS_A | \DNS_AAAA) ?: [] as $record) {
+            $address = $record['ip'] ?? $record['ipv6'] ?? null;
+            if (\is_string($address) && '' !== $address) {
+                $addresses[] = $address;
+            }
+        }
+
+        return $addresses;
     }
 
     /**
