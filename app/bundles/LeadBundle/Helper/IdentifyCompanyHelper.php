@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelper
+final class IdentifyCompanyHelper
 {
     /**
      * @param mixed $lead
@@ -109,30 +109,5 @@ class IdentifyCompanyHelper
         }
 
         return $parameters;
-    }
-
-    /**
-     * Checks if email address' domain has a DNS MX record. Returns the domain if found.
-     *
-     * @param string $email
-     */
-    protected static function domainExists($email): false|string
-    {
-        if (!strstr($email, '@')) { // not a valid email adress
-            return false;
-        }
-
-        [$user, $domain]     = explode('@', $email);
-        $arr                 = dns_get_record($domain, DNS_MX);
-
-        if (empty($arr)) {
-            return false;
-        }
-
-        if ($arr[0]['host'] === $domain) {
-            return $domain;
-        }
-
-        return false;
     }
 }
