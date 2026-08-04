@@ -52,11 +52,17 @@ return RectorConfig::configure()
         // ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
+<<<<<<< HEAD
     ->withCodeQualityLevel(45)
     ->withComposerBased(phpunit: true, symfony: true)
+=======
+    ->withComposerBased(phpunit: true)
+    ->withCodeQualityLevel(55)
+>>>>>>> 143d7dcc5d ([solid] replace logical or|and with bool conditions as intended)
     ->withSkip([
         // to be deprecated as depends on personal preference
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+        \Rector\CodeQuality\Rector\Ternary\SwitchNegatedTernaryRector::class,
 
         // opinionated
         Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
@@ -83,11 +89,6 @@ return RectorConfig::configure()
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
-        ],
-
-        // fixed in dev-main
-        Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
         // modified with reflection

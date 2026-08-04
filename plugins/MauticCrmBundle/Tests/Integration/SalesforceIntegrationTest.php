@@ -109,7 +109,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     /**

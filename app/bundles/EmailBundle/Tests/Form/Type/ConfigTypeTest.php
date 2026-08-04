@@ -37,9 +37,9 @@ final class ConfigTypeTest extends TypeTestCase
     {
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
