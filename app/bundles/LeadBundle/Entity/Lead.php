@@ -528,7 +528,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+        $metadata->addConstraint(new UniqueCustomField(object: 'lead'));
     }
 
     public static function getDefaultIdentifierFields(): array
