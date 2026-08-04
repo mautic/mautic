@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerListingPageTest extends MauticMysqlTestCase
@@ -251,7 +252,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
