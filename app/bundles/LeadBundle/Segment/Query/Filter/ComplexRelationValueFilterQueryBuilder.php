@@ -96,6 +96,8 @@ final class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilde
             case 'between':   // Used only for date with week combination (EQUAL [this week, next week, last week])
             case 'regexp':
             case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            case 'inLast':
+            case 'inNext':
                 $expression = $queryBuilder->expr()->{$filterOperator}(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder

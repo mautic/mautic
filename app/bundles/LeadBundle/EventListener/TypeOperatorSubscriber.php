@@ -10,6 +10,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
+use Mautic\CoreBundle\Form\Type\DateSpanType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
@@ -59,6 +60,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleLookup', 600],
                 ['onSegmentFilterFormHandleGlobalCategory', 400],
                 ['onSegmentFilterFormHandleSelect', 200],
+                ['onSegmentFilterFormHandleDateSpan', 100],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
         ];
@@ -71,9 +73,17 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->setOperatorsForFieldType($typeName, $operatorOptions);
         }
 
+        $dateOperators = $this->typeOperators['date'];
+
+        if ('segment' === $event->getContext()) {
+            $dateOperators['include'][] = OperatorOptions::IN_LAST;
+            $dateOperators['include'][] = OperatorOptions::IN_NEXT;
+        }
+
         // Subscribe aliases
         $event->setOperatorsForFieldType('boolean', $this->typeOperators['bool']);
-        $event->setOperatorsForFieldType('datetime', $this->typeOperators['date']);
+        $event->setOperatorsForFieldType('datetime', $dateOperators);
+        $event->setOperatorsForFieldType('date', $dateOperators);
 
         foreach (['country', 'timezone', 'region', 'locale'] as $selectAlias) {
             $event->setOperatorsForFieldType($selectAlias, $this->typeOperators['select']);
@@ -307,6 +317,26 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             );
             $event->stopPropagation();
         }
+    }
+
+    public function onSegmentFilterFormHandleDateSpan(FormAdjustmentEvent $event): void
+    {
+        if (!$event->operatorIsOneOf(OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT)
+            || !$event->fieldTypeIsOneOf('date', 'datetime')) {
+            return;
+        }
+
+        $form = $event->getForm();
+        $form->add(
+            'filter',
+            DateSpanType::class,
+            [
+                'label' => false,
+                'data'  => $form->getData()['filter'] ?? [],
+            ]
+        );
+
+        $event->stopPropagation();
     }
 
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
