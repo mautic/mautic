@@ -254,7 +254,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
         if (isset($details['format'])) {
             $defaults['_format'] = $details['format'];
-        } elseif ('api' == $type) {
+        } elseif ('api' === $type) {
             $defaults['_format'] = 'json';
         }
         $method = [];
@@ -285,7 +285,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
                 $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
-        if ('api' == $type) {
+        if ('api' === $type) {
             if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
