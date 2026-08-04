@@ -560,11 +560,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
 
     #[TestDox('Tests that URL based contact fields are found in plain text')]
@@ -595,11 +595,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
 
     /**

@@ -550,10 +550,8 @@ class TrackableModel extends AbstractCommonModel
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
      * @param array<string, mixed> $urlParts from parse_url
-     *
-     * @return array|false
      */
-    protected function extractTokensFromQuery(array &$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts): array|false
     {
         $tokenizedParams = false;
 

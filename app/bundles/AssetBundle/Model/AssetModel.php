@@ -634,7 +634,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
-        if (empty($id) || !ctype_digit((string) $id)) {
+        if (empty($id) || !ctype_digit($id)) {
             return false;
         }
 
