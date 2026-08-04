@@ -49,17 +49,25 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withCodeQualityLevel(55)
+    ->withCodeQualityLevel(45)
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
-        // to be deprecated as depends on personal preference
-        Rector\CodeQuality\Rector\Ternary\SwitchNegatedTernaryRector::class,
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
 
         // handle next
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
+        Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
+            __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
+        ],
+
+        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
+            // doctrine magic
+            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
+        ],
+
+        Rector\Symfony\Symfony30\Rector\ClassMethod\RemoveDefaultGetBlockPrefixRector::class,
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
