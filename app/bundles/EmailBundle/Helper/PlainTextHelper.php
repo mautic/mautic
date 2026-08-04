@@ -2,27 +2,41 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-final class PlainTextHelper
+class PlainTextHelper
 {
     public const ENCODING = 'UTF-8';
 
     /**
      * Contains the HTML content to convert.
      */
-    private string $html = '';
+    protected string $html = '';
 
     /**
      * Contains the converted, formatted text.
+     *
+     * @var string
      */
-    private ?string $text = null;
+    protected $text;
+
+    /**
+     * Maximum width of the formatted text, in columns.
+     *
+     * Set this value to 0 (or less) to ignore word wrapping
+     * and not constrain text to a fixed-width column.
+     *
+     * @var int
+     */
+    protected $width = 70;
 
     /**
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $replace.
      *
+     * @var array
+     *
      * @see $replace
      */
-    private array $search = [
+    protected $search = [
         "/\r/",                                           // Non-legal carriage return
         "/[\n\t]+/",                                      // Newlines and tabs
         '/<head[^>]*>.*?<\/head>/i',                      // <head>
@@ -50,9 +64,11 @@ final class PlainTextHelper
     /**
      * List of pattern replacements corresponding to patterns searched.
      *
+     * @var array
+     *
      * @see $search
      */
-    private array $replace = [
+    protected $replace = [
         '',                              // Non-legal carriage return
         ' ',                             // Newlines and tabs
         '',                              // <head>
@@ -81,9 +97,11 @@ final class PlainTextHelper
      * List of preg* regular expression patterns to search for,
      * used in conjunction with $entReplace.
      *
+     * @var array
+     *
      * @see $entReplace
      */
-    private array $entSearch = [
+    protected $entSearch = [
         '/&#153;/i',                                     // TM symbol in win-1252
         '/&#151;/i',                                     // m-dash in win-1252
         '/&(amp|#38);/i',                                // Ampersand: see converter()
@@ -93,9 +111,11 @@ final class PlainTextHelper
     /**
      * List of pattern replacements corresponding to patterns searched.
      *
+     * @var array
+     *
      * @see $entSearch
      */
-    private array $entReplace = [
+    protected $entReplace = [
         '™',         // TM symbol
         '—',         // m-dash
         '|+|amp|+|', // Ampersand: see converter()
@@ -105,8 +125,10 @@ final class PlainTextHelper
     /**
      * List of preg* regular expression patterns to search for
      * and replace using callback function.
+     *
+     * @var array
      */
-    private array $callbackSearch = [
+    protected $callbackSearch = [
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',           // h1 - h6
         '/<(b)( [^>]*)?>(.*?)<\/b>/i',                           // <b>
         '/<(strong)( [^>]*)?>(.*?)<\/strong>/i',                 // <strong>
@@ -118,9 +140,11 @@ final class PlainTextHelper
      * List of preg* regular expression patterns to search for in PRE body,
      * used in conjunction with $preReplace.
      *
+     * @var array
+     *
      * @see $preReplace
      */
-    private array $preSearch = [
+    protected $preSearch = [
         "/\n/",
         "/\t/",
         '/ /',
@@ -131,9 +155,11 @@ final class PlainTextHelper
     /**
      * List of pattern replacements corresponding to patterns searched for PRE body.
      *
+     * @var array
+     *
      * @see $preSearch
      */
-    private array $preReplace = [
+    protected $preReplace = [
         '<br>',
         '&nbsp;&nbsp;&nbsp;&nbsp;',
         '&nbsp;',
@@ -143,15 +169,19 @@ final class PlainTextHelper
 
     /**
      * Temporary workspace used during PRE processing.
+     *
+     * @var string
      */
-    private ?string $preContent = '';
+    protected $preContent = '';
 
     /**
      * Indicates whether content in the $html variable has been converted yet.
      *
+     * @var bool
+     *
      * @see $html, $text
      */
-    private bool $converted = false;
+    protected $converted = false;
 
     /**
      * Contains URL addresses from links to be rendered in plain text.
@@ -160,14 +190,14 @@ final class PlainTextHelper
      *
      * @see buildlinkList()
      */
-    private $linkList = [];
+    protected $linkList = [];
 
     /**
      * Various configuration options (able to be set in the constructor).
      *
      * @var array<string, mixed>
      */
-    private array $options = [
+    protected array $options = [
         'do_links' => 'inline', // 'none'
         // 'inline' (show links inline)
         // 'nextline' (show links on the next line)
@@ -228,7 +258,7 @@ final class PlainTextHelper
         return $preview;
     }
 
-    private function convert(): void
+    protected function convert(): void
     {
         $this->linkList = [];
 
@@ -248,7 +278,7 @@ final class PlainTextHelper
         $this->converted = true;
     }
 
-    private function converter(string &$text): void
+    protected function converter(&$text): void
     {
         $this->convertBlockquotes($text);
         $this->convertPre($text);
@@ -290,7 +320,7 @@ final class PlainTextHelper
      *
      * @return string
      */
-    private function buildlinkList(string|array $link, $display, ?string $linkOverride = null)
+    protected function buildlinkList($link, $display, ?string $linkOverride = null)
     {
         $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
@@ -327,7 +357,7 @@ final class PlainTextHelper
         return $display.' ['.$url.']';
     }
 
-    private function convertPre(string &$text): void
+    protected function convertPre(&$text): void
     {
         // get the content of PRE element
         while (preg_match('/<pre[^>]*>(.*)<\/pre>/ismU', $text, $matches)) {
@@ -364,7 +394,7 @@ final class PlainTextHelper
      *
      * @param string $text HTML content
      */
-    private function convertBlockquotes(string &$text): void
+    protected function convertBlockquotes(&$text): void
     {
         if (preg_match_all('/<\/*blockquote[^>]*>/i', $text, $matches, PREG_OFFSET_CAPTURE)) {
             $start  = 0;
@@ -422,7 +452,7 @@ final class PlainTextHelper
      *
      * @return string
      */
-    private function pregCallback(array $matches)
+    protected function pregCallback(array $matches)
     {
         switch (strtolower($matches[1])) {
             case 'b':
@@ -451,8 +481,10 @@ final class PlainTextHelper
      * Callback function for preg_replace_callback use in PRE content handler.
      *
      * @param array $matches PREG matches
+     *
+     * @return string
      */
-    private function pregPreCallback($matches): ?string
+    protected function pregPreCallback(/* @noinspection PhpUnusedParameterInspection */ $matches)
     {
         return $this->preContent;
     }
