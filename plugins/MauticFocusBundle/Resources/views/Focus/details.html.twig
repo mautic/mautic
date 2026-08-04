@@ -241,64 +241,84 @@
       </div>
       <!--/ left section -->
 
-      {% set displayUrl = url('mautic_focus_generate_display', {'id': item.id}) %}
-      {% set displayLoader = '    if (document.getElementById(\'mautic-focus-display-script-' ~ item.id ~ '\')) {\n        return;\n    }\n\n    var display = document.createElement(\'script\');\n    var firstScript = document.getElementsByTagName(\'script\')[0];\n    display.id = \'mautic-focus-display-script-' ~ item.id ~ '\';\n    display.async = true;\n    display.src = \'' ~ displayUrl ~ '\';\n    firstScript.parentNode.insertBefore(display, firstScript);' %}
-      {% set displaySnippet = '<script async src="' ~ displayUrl ~ '"></script>' %}
-      {% set trackingSnippet = 'if (window.MauticFocus && window.MauticFocus.enableTracking) {\n    window.MauticFocus.enableTracking(' ~ item.id ~ ');\n} else {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n}' %}
-      {% set fullSnippet = '<script>\n(function (window, document) {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n\n' ~ displayLoader ~ '\n}(window, document));\n</script>' %}
+       {% set displayUrl = url('mautic_focus_generate_display', {'id': item.id}) %}
+       {% set displayLoader = '    if (document.getElementById(\'mautic-focus-display-script-' ~ item.id ~ '\')) {\n        return;\n    }\n\n    var display = document.createElement(\'script\');\n    var firstScript = document.getElementsByTagName(\'script\')[0];\n    display.id = \'mautic-focus-display-script-' ~ item.id ~ '\';\n    display.async = true;\n    display.src = \'' ~ displayUrl ~ '\';\n    firstScript.parentNode.insertBefore(display, firstScript);' %}
+       {% set displaySnippet = '<script async src="' ~ displayUrl ~ '"></script>' %}
+       {% set trackingSnippet = 'if (window.MauticFocus && window.MauticFocus.enableTracking) {\n    window.MauticFocus.enableTracking(' ~ item.id ~ ');\n} else {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n}' %}
+       {% set fullSnippet = '<script>\n(function (window, document) {\n    window.MauticFocusTrackingQueue = window.MauticFocusTrackingQueue || {};\n    window.MauticFocusTrackingQueue[' ~ item.id ~ '] = true;\n\n' ~ displayLoader ~ '\n}(window, document));\n</script>' %}
+       {% set displayToken = '{focus=' ~ item.id ~ '|display}' %}
+       {% set trackingToken = '{focus=' ~ item.id ~ '|tracking}' %}
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
-          <div class="pa-md">
-              {% set aboveFoldContent %}
-                  <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
-                  {% include '@MauticCore/Components/pictogram.html.twig' with {
-                      pictogram: 'embed',
-                      size: 64,
-                      color: 'var(--icon-interactive)'
-                  } %}
+          <div class="pl-md pb-md pr-md">
+              {% set implementationContent %}
+                  <div class="focus-implementation__pictogram" aria-hidden="true">
+                      {% include '@MauticCore/Components/pictogram.html.twig' with {
+                          pictogram: 'embed',
+                          size: 110,
+                          color: 'var(--icon-interactive)'
+                      } %}
+                  </div>
+                  <div class="focus-implementation__content">
+                      <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
+                      <div id="focus-implementation-landing-pages">
+                          <h5 class="mt-lg fw-b">{{ 'mautic.focus.install.landing_pages.header'|trans }}</h5>
+                          <p class="mt-xs mb-sm">{{ 'mautic.focus.install.landing_pages.description'|trans }}</p>
+                          <div class="d-flex fd-column ai-start gap-xs mb-sm">
+                              {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                                  variant: 'single',
+                                  innerText: displayToken,
+                                  className: 'code-snippet__code--contrast type-code-01',
+                              }) }}
+                              <span class="type-helper-text-01 text-secondary">{{ 'mautic.focus.token.display.helper'|trans }}</span>
+                          </div>
+                          <div class="d-flex fd-column ai-start gap-xs mb-lg">
+                              {{ include('@MauticCore/Components/code-snippet.html.twig', {
+                                  variant: 'single',
+                                  innerText: trackingToken,
+                                  className: 'code-snippet__code--contrast type-code-01',
+                              }) }}
+                              <span class="type-helper-text-01 text-secondary">{{ 'mautic.focus.token.tracking.helper'|trans }}</span>
+                          </div>
+                      </div>
+                      <div id="focus-implementation-external-websites">
+                          <h5 class="mt-lg mb-sm fw-b">{{ 'mautic.focus.install.external_websites.header'|trans }}</h5>
+                          {% include '@MauticCore/Helper/button.html.twig' with {
+                              buttons: [
+                                  {
+                                      label: 'mautic.focus.install.consent.tab',
+                                      variant: 'tertiary',
+                                      size: 'sm',
+                                      wide: true,
+                                      attributes: {
+                                          'data-toggle': 'modal',
+                                          'data-target': '#modal-focus-consent-installation',
+                                          'class': 'mb-4'
+                                      }
+                                  },
+                                  {
+                                      label: 'mautic.focus.install.full.tab',
+                                      variant: 'tertiary',
+                                      size: 'sm',
+                                      wide: true,
+                                      attributes: {
+                                          'data-toggle': 'modal',
+                                          'data-target': '#modal-focus-full-installation',
+                                          'class': 'ml-0'
+                                      }
+                                  }
+                              ]
+                          } %}
+                      </div>
+                  </div>
               {% endset %}
 
-               {% set belowFoldContent %}
-                   <div id="focus-implementation-landing-pages">
-                       <h5 class="mt-lg fw-b">{{ 'mautic.focus.install.landing_pages.header'|trans }}</h5>
-                       <p class="mt-xs mb-lg">{{ 'mautic.focus.install.landing_pages.description'|trans }}</p>
-                   </div>
-                   <div id="focus-implementation-external-websites">
-                       <h5 class="mt-lg mb-sm fw-b">{{ 'mautic.focus.install.external_websites.header'|trans }}</h5>
-                       {% include '@MauticCore/Helper/button.html.twig' with {
-                           buttons: [
-                               {
-                                   label: 'mautic.focus.install.consent.tab',
-                                   variant: 'tertiary',
-                                   size: 'sm',
-                                   wide: true,
-                                   attributes: {
-                                       'data-toggle': 'modal',
-                                       'data-target': '#modal-focus-consent-installation'
-                                   }
-                               },
-                               {
-                                   label: 'mautic.focus.install.full.tab',
-                                   variant: 'tertiary',
-                                   size: 'sm',
-                                   wide: true,
-                                   attributes: {
-                                       'data-toggle': 'modal',
-                                       'data-target': '#modal-focus-full-installation',
-                                       'class': 'ml-0'
-                                   }
-                               }
-                           ]
-                       } %}
-                   </div>
-               {% endset %}
-
               {{ include('@MauticCore/Components/tile.html.twig', {
-                  'type': 'expandable-interactive',
-                  'aboveFoldContent': aboveFoldContent,
-                  'belowFoldContent': belowFoldContent,
+                  'type': 'base',
+                  'className': 'focus-implementation',
+                  'content': implementationContent,
               }) }}
           </div>
           <!--/ form HTML -->

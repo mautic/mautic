@@ -57,27 +57,46 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $router        = self::getContainer()->get(RouterInterface::class);
-        $translator    = self::getContainer()->get(TranslatorInterface::class);
-        $displayUrl    = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $legacyUrl     = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $configUrl     = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $landingPages  = $crawler->filter('#focus-implementation-landing-pages');
-        $external      = $crawler->filter('#focus-implementation-external-websites');
-        $consentButton = $external->filter('[data-target="#modal-focus-consent-installation"]');
-        $fullButton    = $external->filter('[data-target="#modal-focus-full-installation"]');
-        $configLink    = $crawler->filter('#focus-shared-consent-note a');
-        $responseHtml  = (string) $this->client->getResponse()->getContent();
+        $router         = self::getContainer()->get(RouterInterface::class);
+        $translator     = self::getContainer()->get(TranslatorInterface::class);
+        $displayUrl     = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $legacyUrl      = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $configUrl      = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $implementation = $crawler->filter('.focus-implementation');
+        $landingPages   = $crawler->filter('#focus-implementation-landing-pages');
+        $external       = $crawler->filter('#focus-implementation-external-websites');
+        $consentButton  = $external->filter('[data-target="#modal-focus-consent-installation"]');
+        $fullButton     = $external->filter('[data-target="#modal-focus-full-installation"]');
+        $configLink     = $crawler->filter('#focus-shared-consent-note a');
+        $responseHtml   = (string) $this->client->getResponse()->getContent();
 
         $displaySnippet  = (string) $crawler->filter('#focus-display-snippet [data-copy]')->attr('data-copy');
         $trackingSnippet = (string) $crawler->filter('#focus-tracking-snippet [data-copy]')->attr('data-copy');
         $fullSnippet     = (string) $crawler->filter('#focus-full-snippet [data-copy]')->attr('data-copy');
 
+        $this->assertCount(1, $implementation);
+        $this->assertCount(0, $implementation->filter('[data-toggle="collapse"], .collapse'));
+        $this->assertCount(1, $implementation->filter('.focus-implementation__pictogram[aria-hidden="true"]'));
         $this->assertCount(1, $landingPages);
         $this->assertStringContainsString($translator->trans('mautic.focus.install.landing_pages.description'), $landingPages->text());
+        $landingPageTokens = $landingPages->filter('code');
+        $this->assertCount(2, $landingPageTokens);
+        $this->assertStringContainsString('code-snippet__code--contrast', (string) $landingPageTokens->eq(0)->attr('class'));
+        $this->assertStringContainsString('code-snippet__code--contrast', (string) $landingPageTokens->eq(1)->attr('class'));
+        $this->assertSame('{focus='.$focus->getId().'|display}', trim($landingPageTokens->eq(0)->text()));
+        $this->assertSame('{focus='.$focus->getId().'|tracking}', trim($landingPageTokens->eq(1)->text()));
+        $tokenHelpers = $landingPages->filter('.type-helper-text-01');
+        $this->assertCount(2, $tokenHelpers);
+        $this->assertSame($translator->trans('mautic.focus.token.display.helper'), trim($tokenHelpers->eq(0)->text()));
+        $this->assertSame($translator->trans('mautic.focus.token.tracking.helper'), trim($tokenHelpers->eq(1)->text()));
+        $landingPageCopyButtons = $landingPages->filter('button[data-copy]');
+        $this->assertCount(2, $landingPageCopyButtons);
+        $this->assertSame('{focus='.$focus->getId().'|display}', $landingPageCopyButtons->eq(0)->attr('data-copy'));
+        $this->assertSame('{focus='.$focus->getId().'|tracking}', $landingPageCopyButtons->eq(1)->attr('data-copy'));
         $this->assertCount(1, $external);
         $this->assertCount(1, $consentButton);
         $this->assertSame($translator->trans('mautic.focus.install.consent.tab'), trim($consentButton->text()));
+        $this->assertStringContainsString('mb-4', (string) $consentButton->attr('class'));
         $this->assertCount(1, $fullButton);
         $this->assertSame($translator->trans('mautic.focus.install.full.tab'), trim($fullButton->text()));
         $this->assertCount(1, $crawler->filter('#modal-focus-consent-installation'));
