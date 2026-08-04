@@ -44,11 +44,6 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $formRepository;
 
     /**
-     * @var MockObject&CoreParametersHelper
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
      * @var MockObject&LeadFieldModel
      */
     private MockObject $leadFieldModel;
@@ -80,8 +75,8 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
-        $this->coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
-        $this->coreParametersHelper->method('get')
+        $coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
             ->willReturnMap([
                 ['form_field_autofill', false, true],
             ]);
@@ -107,7 +102,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->coreParametersHelper,
+            $coreParametersHelper,
             $this->formRepository,
         );
     }
