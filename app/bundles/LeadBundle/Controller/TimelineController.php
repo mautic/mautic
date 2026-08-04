@@ -13,6 +13,8 @@ final class TimelineController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
+    private DateHelper $dateHelper;
+    private ExportHelper $exportHelper;
 
     public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
@@ -187,7 +189,7 @@ final class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
+    public function batchExportAction(Request $request, $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -223,7 +225,7 @@ final class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function (array $event) use ($dateHelper): array {
+        $resultsCallback = function (array $event): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
@@ -232,7 +234,7 @@ final class TimelineController extends CommonController
             return [
                 'eventName'      => $eventLabel,
                 'eventType'      => $event['eventType'] ?? '',
-                'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $this->dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 
@@ -267,6 +269,15 @@ final class TimelineController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $exportHelper);
+        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $this->exportHelper);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function autowireTimelineController(
+        DateHelper $dateHelper,
+        ExportHelper $exportHelper,
+    ): void {
+        $this->dateHelper = $dateHelper;
+        $this->exportHelper = $exportHelper;
     }
 }

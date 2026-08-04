@@ -20,12 +20,15 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class FieldController extends FormController
 {
     private FieldModel $fieldModel;
+    private FieldAliasHelper $fieldAliasHelper;
 
     #[Required]
     public function autowireFieldController(
         FieldModel $fieldModel,
+        FieldAliasHelper $fieldAliasHelper,
     ): void {
         $this->fieldModel = $fieldModel;
+        $this->fieldAliasHelper = $fieldAliasHelper;
     }
 
     /**
@@ -367,7 +370,7 @@ final class FieldController extends FormController
     /**
      * Clone an entity.
      */
-    public function cloneAction(Request $request, FieldAliasHelper $fieldAliasHelper, FieldModel $fieldModel, $objectId): RedirectResponse|Response
+    public function cloneAction(Request $request, FieldModel $fieldModel, $objectId): RedirectResponse|Response
     {
         $entity = $fieldModel->getEntity($objectId);
 
@@ -377,7 +380,7 @@ final class FieldController extends FormController
 
         $clone = clone $entity;
 
-        $fieldAliasHelper->makeAliasUnique($clone);
+        $this->fieldAliasHelper->makeAliasUnique($clone);
 
         $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
         $form      = $fieldModel->createForm($clone, $this->formFactory, $action);
