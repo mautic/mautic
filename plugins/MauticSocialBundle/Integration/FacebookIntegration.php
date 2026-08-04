@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
-use Psr\Http\Message\ResponseInterface;
 
 final class FacebookIntegration extends SocialIntegration
 {
@@ -73,10 +72,8 @@ final class FacebookIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @return array|ResponseInterface|null
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): ?object
     {
         $this->persistNewLead = false;
         $accessToken          = $this->getContactAccessToken($socialCache);
