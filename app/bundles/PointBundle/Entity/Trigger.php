@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -58,7 +57,7 @@ class Trigger extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**

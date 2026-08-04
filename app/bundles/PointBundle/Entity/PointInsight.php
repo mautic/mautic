@@ -9,7 +9,6 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class PointInsight extends FormEntity
 {
@@ -19,7 +18,7 @@ class PointInsight extends FormEntity
 
     private ?int $id = null;
 
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private string $name = '';
 
     /**
@@ -30,13 +29,13 @@ class PointInsight extends FormEntity
     /**
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.point.insight.type.required')]
+    #[Assert\NotBlank(message: 'mautic.point.insight.type.required')]
     private $insightType = self::INSIGHT_TYPE_COMPARE_POINT_GROUPS;
 
     /**
      * @var string
      */
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.point.insight.action.required')]
+    #[Assert\NotBlank(message: 'mautic.point.insight.action.required')]
     private $insightAction = self::INSIGHT_ACTION_SET_CUSTOM_FIELD;
 
     /**

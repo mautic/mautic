@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -59,7 +58,7 @@ class Point extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['point:read', 'point:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -72,7 +71,7 @@ class Point extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['point:read', 'point:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.point.type.notblank')]
+    #[Assert\NotBlank(message: 'mautic.point.type.notblank')]
     private $type;
 
     /**
@@ -97,8 +96,8 @@ class Point extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['point:read', 'point:write'])]
-    #[\Symfony\Component\Validator\Constraints\NotBlank(message: 'mautic.point.delta.notblank')]
-    #[\Symfony\Component\Validator\Constraints\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
+    #[Assert\NotBlank(message: 'mautic.point.delta.notblank')]
+    #[Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
     private $delta = 0;
 
     /**
