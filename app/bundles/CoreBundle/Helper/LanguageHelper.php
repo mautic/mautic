@@ -222,10 +222,12 @@ class LanguageHelper
             ];
         }
 
-        $cacheData = json_decode(file_get_contents($this->cacheFile), true);
+        $cacheData     = json_decode(file_get_contents($this->cacheFile), true);
+        $languageCode  = (string) $languageCode;
+        $cacheLanguages = is_array($cacheData['languages'] ?? null) ? $cacheData['languages'] : [];
 
-        // Make sure the language actually exists
-        if (!isset($cacheData['languages'][$languageCode])) {
+        // Make sure the language code is valid and the language actually exists.
+        if ('' === $languageCode || !isset($cacheLanguages[$languageCode])) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.invalid.language',
