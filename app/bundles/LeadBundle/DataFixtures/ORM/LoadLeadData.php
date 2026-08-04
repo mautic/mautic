@@ -50,7 +50,7 @@ final class LoadLeadData extends AbstractFixture implements OrderedFixtureInterf
             $this->setReference('lead-'.$count, $lead);
 
             // Assign to companies in a predictable way
-            $lastCharacter = (int) substr($count, -1, 1);
+            $lastCharacter = (int) substr((string) $count, -1, 1);
             if ($lastCharacter <= 3) {
                 if ($this->hasReference('company-'.$lastCharacter)) {
                     $companyLead = new CompanyLead();
