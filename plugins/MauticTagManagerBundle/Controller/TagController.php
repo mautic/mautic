@@ -177,7 +177,7 @@ final class TagController extends FormController
         // get the user form factory
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $this->tagManagerModel, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -196,7 +196,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, TagManagerModel $model, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -218,7 +218,7 @@ final class TagController extends FormController
                         ]),
                     ]);
                 } else {
-                    $model->saveEntity($tag);
+                    $this->tagManagerModel->saveEntity($tag);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $tag->getTag(),

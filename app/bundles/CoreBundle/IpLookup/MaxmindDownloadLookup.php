@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
 
-class MaxmindDownloadLookup extends AbstractLocalDataLookup
+final class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
     public function getAttribution(): string
     {
