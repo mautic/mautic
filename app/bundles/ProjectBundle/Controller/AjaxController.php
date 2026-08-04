@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
@@ -23,7 +24,7 @@ final class AjaxController extends CommonAjaxController
      */
     public function __construct(
         protected \Doctrine\Persistence\ManagerRegistry $doctrine,
-        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        protected ModelFactory $modelFactory,
         \Mautic\CoreBundle\Helper\UserHelper $userHelper,
         protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
         protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,

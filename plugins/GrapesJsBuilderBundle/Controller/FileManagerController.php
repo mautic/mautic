@@ -6,6 +6,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController;
 use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ final class FileManagerController extends AjaxController
      */
     public function __construct(
         protected \Doctrine\Persistence\ManagerRegistry $doctrine,
-        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        protected ModelFactory $modelFactory,
         \Mautic\CoreBundle\Helper\UserHelper $userHelper,
         protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
         protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,

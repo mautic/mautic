@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,7 +18,7 @@ final class ExceptionController extends CommonController
      */
     public function __construct(
         protected \Doctrine\Persistence\ManagerRegistry $doctrine,
-        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        protected ModelFactory $modelFactory,
         \Mautic\CoreBundle\Helper\UserHelper $userHelper,
         protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
         protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,

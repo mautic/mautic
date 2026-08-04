@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType;
 use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
@@ -23,7 +24,7 @@ final class FieldPaginationController extends CommonController
      */
     public function __construct(
         protected \Doctrine\Persistence\ManagerRegistry $doctrine,
-        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        protected ModelFactory $modelFactory,
         \Mautic\CoreBundle\Helper\UserHelper $userHelper,
         protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
         protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,

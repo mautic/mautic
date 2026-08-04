@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
@@ -50,7 +51,7 @@ final class ConfigController extends AbstractFormController
      */
     public function __construct(
         protected \Doctrine\Persistence\ManagerRegistry $doctrine,
-        protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory,
+        protected ModelFactory $modelFactory,
         \Mautic\CoreBundle\Helper\UserHelper $userHelper,
         protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper,
         protected EventDispatcherInterface $dispatcher,
