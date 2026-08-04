@@ -24,7 +24,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Service\Attribute\Required;
-use Twig\Environment;
 
 final class AjaxController extends CommonAjaxController
 {
@@ -32,21 +31,42 @@ final class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     private EmailModel $emailModel;
+    private FormFactoryInterface $formFactory;
+    private Mailbox $mailbox;
+    private TransportInterface $transport;
+    private UserHelper $userHelper;
+    private CoreParametersHelper $parametersHelper;
+    private CacheProvider $cacheProvider;
+    private EmailDependencies $emailDependencies;
 
     #[Required]
     public function autowireEmailAjaxController(
         EmailModel $emailModel,
+        FormFactoryInterface $formFactory,
+        Mailbox $mailbox,
+        TransportInterface $transport,
+        UserHelper $userHelper,
+        CoreParametersHelper $parametersHelper,
+        CacheProvider $cacheProvider,
+        EmailDependencies $emailDependencies,
     ): void {
         $this->emailModel = $emailModel;
+        $this->formFactory = $formFactory;
+        $this->mailbox = $mailbox;
+        $this->transport = $transport;
+        $this->userHelper = $userHelper;
+        $this->parametersHelper = $parametersHelper;
+        $this->cacheProvider = $cacheProvider;
+        $this->emailDependencies = $emailDependencies;
     }
 
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, EmailModel $emailModel, Environment $twig): JsonResponse
+    public function getAbTestFormAction(Request $request, EmailModel $emailModel): JsonResponse
     {
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $emailModel,
-            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn (FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn ($formType, $formOptions): FormInterface => $this->formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $this->twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -132,7 +152,7 @@ final class AjaxController extends CommonAjaxController
     /**
      * Tests monitored email connection settings.
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request, Mailbox $mailbox): JsonResponse
+    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 
@@ -147,8 +167,8 @@ final class AjaxController extends CommonAjaxController
             }
 
             try {
-                $mailbox->setMailboxSettings($settings);
-                $folders = $mailbox->getListingFolders();
+                $this->mailbox->setMailboxSettings($settings);
+                $folders = $this->mailbox->getListingFolders();
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
@@ -165,20 +185,18 @@ final class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): JsonResponse
+    public function sendTestEmailAction(): JsonResponse
     {
-        $user  = $userHelper->getUser();
+        $user  = $this->userHelper->getUser();
         $email = (new MauticMessage())
             ->subject($this->translator->trans('mautic.email.config.mailer.transport.test_send.subject'))
             ->text($this->translator->trans('mautic.email.config.mailer.transport.test_send.body'))
-            ->from(new Address($parametersHelper->get('mailer_from_email'), $parametersHelper->get('mailer_from_name') ?: ''))
+            ->from(new Address($this->parametersHelper->get('mailer_from_email'), $this->parametersHelper->get('mailer_from_name') ?: ''))
             ->to(new Address($user->getEmail(), trim($user->getFirstName().' '.$user->getLastName()) ?: ''));
-
         $success = 1;
         $message = $this->translator->trans('mautic.core.success');
-
         try {
-            $transport->send($email);
+            $this->transport->send($email);
         } catch (TransportExceptionInterface $e) {
             $success = 0;
             $message = $e->getMessage();
@@ -230,7 +248,7 @@ final class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    public function getEmailDeliveredCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    public function getEmailDeliveredCountAction(Request $request): JsonResponse
     {
         $emailId = (int) InputHelper::clean($request->query->get('id'));
 
@@ -242,7 +260,7 @@ final class AjaxController extends CommonAjaxController
         }
 
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
-        $cacheItem    = $cacheProvider->getItem('email.stats.delivered.'.$emailId);
+        $cacheItem    = $this->cacheProvider->getItem('email.stats.delivered.'.$emailId);
 
         if ($cacheItem->isHit()) {
             $deliveredCount = $cacheItem->get();
@@ -257,7 +275,7 @@ final class AjaxController extends CommonAjaxController
             $deliveredCount = $this->emailModel->getDeliveredCount($email);
             $cacheItem->set($deliveredCount);
             $cacheItem->expiresAfter($cacheTimeout * 60);
-            $cacheProvider->save($cacheItem);
+            $this->cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
@@ -310,7 +328,7 @@ final class AjaxController extends CommonAjaxController
         ]);
     }
 
-    public function getEmailUsagesAction(Request $request, EmailDependencies $emailDependencies): JsonResponse
+    public function getEmailUsagesAction(Request $request): JsonResponse
     {
         $emailId = (int) $request->query->get('id');
 
@@ -322,7 +340,7 @@ final class AjaxController extends CommonAjaxController
 
         $usagesHtml = $this->renderView('@MauticCore/Helper/usage.html.twig', [
             'title'    => $this->translator->trans('mautic.email.usages'),
-            'stats'    => $emailDependencies->getChannelsIds($emailId),
+            'stats'    => $this->emailDependencies->getChannelsIds($emailId),
             'noUsages' => $this->translator->trans('mautic.email.no_usages'),
         ]);
 

@@ -30,6 +30,7 @@ final class EmailMapStatsController extends AbstractController
 
     public function __construct(
         private readonly EmailModel $model,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -56,9 +57,9 @@ final class EmailMapStatsController extends AbstractController
         );
     }
 
-    public function hasAccess(CorePermissions $security, Email $entity): bool
+    public function hasAccess(Email $entity): bool
     {
-        return $security->hasEntityAccess(
+        return $this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $entity->getCreatedBy()
@@ -82,14 +83,13 @@ final class EmailMapStatsController extends AbstractController
      * @throws \Exception
      */
     public function viewAction(
-        CorePermissions $security,
         int $objectId,
         string $dateFrom = '',
         string $dateTo = '',
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (!$entity instanceof Email || !$this->hasAccess($security, $entity)) {
+        if (!$entity instanceof Email || !$this->hasAccess($entity)) {
             throw new AccessDeniedHttpException();
         }
 

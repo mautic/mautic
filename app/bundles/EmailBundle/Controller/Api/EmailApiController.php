@@ -57,6 +57,8 @@ final class EmailApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         EmailModel $emailModel,
+        private Reply $replyService,
+        private RandomHelperInterface $randomHelper,
     ) {
         $this->model            = $emailModel;
         $this->entityClass      = Email::class;
@@ -210,10 +212,10 @@ final class EmailApiController extends CommonApiController
     /**
      * @param string $trackingHash
      */
-    public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash): Response
+    public function replyAction($trackingHash): Response
     {
         try {
-            $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
+            $this->replyService->createReplyByHash($trackingHash, "api-{$this->randomHelper->generate()}");
         } catch (EntityNotFoundException $e) {
             return $this->notFound($e->getMessage());
         }

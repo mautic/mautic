@@ -6,7 +6,9 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -16,6 +18,7 @@ use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -131,7 +134,12 @@ final class EmailControllerTest extends TestCase
             $this->createStub(ListModel::class),
             $this->createStub(AuditLogModel::class),
             $this->modelMock,
-            $this->createStub(LeadRepository::class)
+            $this->createStub(LeadRepository::class),
+            new EmailConfig($this->createStub(CoreParametersHelper::class)),
+            $this->createStub(ThemeHelper::class),
+            $this->corePermissionsMock,
+            $this->createStub(FakeContactHelper::class),
+            $this->createStub(PageHelperFactoryInterface::class)
         );
 
         $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
@@ -254,7 +262,7 @@ final class EmailControllerTest extends TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(LeadModel::class), $this->createStub(FakeContactHelper::class));
+        $this->controller->sendExampleAction($request, 1, $this->modelMock, $this->createStub(LeadModel::class));
     }
 
     public function testWinnerActionForDispatchManualWinnerEvent(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -14,14 +15,18 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Stats\EmailDependencies;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -65,7 +70,16 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->controller->setContainer($containerMock);
-        $this->controller->autowireEmailAjaxController($this->modelMock);
+        $this->controller->autowireEmailAjaxController(
+            $this->modelMock,
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(Mailbox::class),
+            $this->createStub(TransportInterface::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            (new \ReflectionClass(CacheProvider::class))->newInstanceWithoutConstructor(),
+            (new \ReflectionClass(EmailDependencies::class))->newInstanceWithoutConstructor()
+        );
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);
         $parameterBag->expects($this->once())

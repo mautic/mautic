@@ -49,6 +49,11 @@ final class EmailController extends FormController
     private ListModel $listModel;
 
     private AuditLogModel $auditLogModel;
+    private EmailConfig $emailConfig;
+    private ThemeHelper $themeHelper;
+    private CorePermissions $corePermissions;
+    private FakeContactHelper $fakeLeadHelper;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireEmailController(
@@ -56,11 +61,21 @@ final class EmailController extends FormController
         AuditLogModel $auditLogModel,
         EmailModel $emailModel,
         LeadRepository $leadRepository,
+        EmailConfig $emailConfig,
+        ThemeHelper $themeHelper,
+        CorePermissions $corePermissions,
+        FakeContactHelper $fakeLeadHelper,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->listModel = $listModel;
         $this->auditLogModel = $auditLogModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->emailConfig = $emailConfig;
+        $this->themeHelper = $themeHelper;
+        $this->corePermissions = $corePermissions;
+        $this->fakeLeadHelper = $fakeLeadHelper;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
@@ -70,9 +85,9 @@ final class EmailController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, $page = 1): Response
     {
-        $isDraftEnabled = $emailConfig->isDraftEnabled();
+        $isDraftEnabled = $this->emailConfig->isDraftEnabled();
         // set some permissions
         $permissions = $this->security->isGranted(
             [
@@ -136,7 +151,7 @@ final class EmailController extends FormController
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $themeHelper->getInstalledThemes('email'),
+            'options' => $this->themeHelper->getInstalledThemes('email'),
             'prefix'  => 'theme',
         ];
 
@@ -287,7 +302,7 @@ final class EmailController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      */
-    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
+    public function viewAction(Request $request, EmailModel $model, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
     {
         $security = $this->security;
 
@@ -397,7 +412,7 @@ final class EmailController extends FormController
             ];
         } else {
             $draftPreviewUrl = null;
-            if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
+            if ($this->emailConfig->isDraftEnabled() && $email->hasDraft()) {
                 $draftPreviewUrl = $this->generateUrl(
                     'mautic_email_preview',
                     [
@@ -505,10 +520,7 @@ final class EmailController extends FormController
     public function newAction(
         Request $request,
         AssetModel $assetModel,
-        CorePermissions $corePermissions,
-        EmailConfig $emailConfig,
         EmailModel $model,
-        ThemeHelper $themeHelper,
         $entity = null,
     ): Response {
         if (!$entity instanceof Email) {
@@ -548,7 +560,7 @@ final class EmailController extends FormController
 
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     try {
                         // form is valid so process the data
@@ -578,7 +590,7 @@ final class EmailController extends FormController
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
                             // return edit view so that all the session stuff is loaded
-                            return $this->editAction($request, $assetModel, $corePermissions, $emailConfig, $model, $themeHelper, $entity->getId(), true);
+                            return $this->editAction($request, $assetModel, $model, $entity->getId(), true);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid                  = false;
@@ -648,7 +660,7 @@ final class EmailController extends FormController
                     'form'              => $form->createView(),
                     'isVariant'         => $entity->isVariant(true),
                     'email'             => $entity,
-                    'themes'            => $themeHelper->getInstalledThemes('email', true),
+                    'themes'            => $this->themeHelper->getInstalledThemes('email', true),
                     'updateSelect'      => $updateSelect,
                     'permissions'       => $permissions,
                     'invalidHtmlError'  => $this->invalidHtmlError,
@@ -672,10 +684,7 @@ final class EmailController extends FormController
     public function editAction(
         Request $request,
         AssetModel $assetModel,
-        CorePermissions $corePermissions,
-        EmailConfig $emailConfig,
         EmailModel $model,
-        ThemeHelper $themeHelper,
         $objectId,
         $ignorePost = false,
         $forceTypeSelection = false,
@@ -751,13 +760,13 @@ final class EmailController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    $this->unpublishIfLackingPermission($entity, $corePermissions);
+                    $this->unpublishIfLackingPermission($entity);
 
                     // form is valid so process the data
                     try {
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                        if ($emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        if ($this->emailConfig->isDraftEnabled() && !empty($entity->getId())) {
                             $this->dispatcher->dispatch(new EmailEditSubmitEvent(
                                 $existingEmail,
                                 $entity,
@@ -880,7 +889,7 @@ final class EmailController extends FormController
             'RETURN_ARRAY'
         );
         $draftPreviewUrl = '';
-        if ($emailConfig->isDraftEnabled() && $entity->hasDraft()) {
+        if ($this->emailConfig->isDraftEnabled() && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
                 'mautic_email_preview',
                 ['objectId'       => $entity->getId(),
@@ -902,7 +911,7 @@ final class EmailController extends FormController
                 'viewParameters' => [
                     'form'               => $form->createView(),
                     'isVariant'          => $entity->isVariant(true),
-                    'themes'             => $themeHelper->getInstalledThemes('email', true),
+                    'themes'             => $this->themeHelper->getInstalledThemes('email', true),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
@@ -932,7 +941,7 @@ final class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, EmailModel $model, ThemeHelper $themeHelper, $objectId)
+    public function cloneAction(Request $request, EmailModel $model, $objectId)
     {
         $emailEntity  = $model->getEntity($objectId);
         $entity       = null;
@@ -1075,7 +1084,7 @@ final class EmailController extends FormController
                     'form'              => $form->createView(),
                     'isVariant'         => $entity->isVariant(true),
                     'email'             => $entity,
-                    'themes'            => $themeHelper->getInstalledThemes('email', true),
+                    'themes'            => $this->themeHelper->getInstalledThemes('email', true),
                     'permissions'       => $permissions,
                     'invalidHtmlError'  => $this->invalidHtmlError,
                 ],
@@ -1253,7 +1262,7 @@ final class EmailController extends FormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId): Response
+    public function builderAction(Request $request, $objectId): Response
     {
         // permission check
         if (str_contains($objectId, 'new')) {
@@ -1289,9 +1298,9 @@ final class EmailController extends FormController
             $entity->setContent($content);
         }
 
-        $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-        return new Response($themeHelper->renderThemeTemplate(
+        return new Response($this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'    => $isNew,
@@ -1303,7 +1312,7 @@ final class EmailController extends FormController
         ));
     }
 
-    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
+    public function abTestAction(Request $request, AssetModel $assetModel, EmailModel $model, int $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1330,7 +1339,7 @@ final class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetModel, $corePermissions, $emailConfig, $model, $themeHelper, $clone);
+        return $this->newAction($request, $assetModel, $model, $clone);
     }
 
     /**
@@ -1620,13 +1629,13 @@ final class EmailController extends FormController
         );
     }
 
-    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
+    public function scheduleSendAction(EmailModel $model, Request $request, int $objectId): JsonResponse|Response
     {
         $entity = $model->getEntity($objectId);
 
         // not found or not allowed
         if (null === $entity
-            || (!$security->hasEntityAccess(
+            || (!$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $entity->getCreatedBy()
@@ -1710,7 +1719,7 @@ final class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FakeContactHelper $fakeLeadHelper): Response
+    public function sendExampleAction(Request $request, $objectId, EmailModel $model, LeadModel $leadModel): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1755,8 +1764,8 @@ final class EmailController extends FormController
                 }
 
                 if ($previewForContactId
-                    && (!$security->isAdmin()
-                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
+                    && (!$this->security->isAdmin()
+                        || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {
                     // disallow displaying contact information
@@ -1771,7 +1780,7 @@ final class EmailController extends FormController
 
                 if (!isset($fields)) {
                     // Prepare a fake contact
-                    $fields = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+                    $fields = $this->fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
                 }
 
                 $errors = [];
@@ -1831,7 +1840,6 @@ final class EmailController extends FormController
      */
     public function contactsAction(
         Request $request,
-        PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
     ) {
@@ -1844,7 +1852,7 @@ final class EmailController extends FormController
 
         return $this->generateContactsGrid(
             $request,
-            $pageHelperFactory,
+            $this->pageHelperFactory,
             $objectId,
             $page,
             $permissions,
@@ -1885,9 +1893,9 @@ final class EmailController extends FormController
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 
-    private function unpublishIfLackingPermission(Email $entity, CorePermissions $corePermissions): Email
+    private function unpublishIfLackingPermission(Email $entity): Email
     {
-        $canPublish = $corePermissions->hasPublishAccessForEntity(
+        $canPublish = $this->corePermissions->hasPublishAccessForEntity(
             $entity,
             'email:emails:publishown',
             'email:emails:publishother'
