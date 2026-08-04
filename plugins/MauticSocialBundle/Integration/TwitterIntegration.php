@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-class TwitterIntegration extends SocialIntegration
+final class TwitterIntegration extends SocialIntegration
 {
     public const NAME = 'Twitter';
 

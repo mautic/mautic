@@ -4,11 +4,11 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ConstantContactApi extends EmailMarketingApi
+final class ConstantContactApi extends EmailMarketingApi
 {
     private string $version = 'v2';
 
-    protected function request($endpoint, $parameters = [], $method = 'GET', $query = [])
+    private function request(string $endpoint, array $parameters = [], string $method = 'GET', array $query = [])
     {
         $url = sprintf('https://api.constantcontact.com/%s/%s?api_key=%s', $this->version, $endpoint, $this->keys['client_id']);
 

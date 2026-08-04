@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Api\OneSignalApi;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
@@ -420,7 +421,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(static::getContainer()->get(IntegrationHelper::class), static::getContainer()->get(NotificationModel::class), static::getContainer()->get(OneSignalApi::class), static::getContainer()->get(EventDispatcherInterface::class), static::getContainer()->get(DoNotContactModel::class), static::getContainer()->get(TranslatorInterface::class)) extends CampaignSubscriber {
+        $subscriber = new class(static::getContainer()->get(IntegrationHelper::class), static::getContainer()->get(NotificationModel::class), static::getContainer()->get(OneSignalApi::class), static::getContainer()->get(EventDispatcherInterface::class), static::getContainer()->get(DoNotContactModel::class), static::getContainer()->get(TranslatorInterface::class), static::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
@@ -543,14 +544,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
      */
     private function getExpectedResponsePushIds(array $pushIds, Notification $notification): array
     {
-        return array_merge(
-            ['include_player_ids' => $pushIds],
-            [
-                'contents' => ['en' => $notification->getMessage()],
-                'headings' => ['en' => $notification->getHeading()],
-                'app_id'   => self::API_ID,
-            ]
-        );
+        return ['include_player_ids' => $pushIds, 'contents' => ['en' => $notification->getMessage()], 'headings' => ['en' => $notification->getHeading()], 'app_id' => self::API_ID];
     }
 
     private function noMoreRequestAssertion(): callable
