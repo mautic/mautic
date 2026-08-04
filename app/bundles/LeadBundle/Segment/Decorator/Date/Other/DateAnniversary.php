@@ -9,13 +9,13 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateAnniversary implements FilterDecoratorInterface
+final readonly class DateAnniversary implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 
     public function __construct(
-        private readonly DateDecorator $dateDecorator,
-        private readonly DateOptionParameters $dateOptionParameters,
+        private DateDecorator $dateDecorator,
+        private DateOptionParameters $dateOptionParameters,
     ) {
     }
 
@@ -45,9 +45,6 @@ class DateAnniversary implements FilterDecoratorInterface
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date           = $this->dateOptionParameters->getDefaultDate();
