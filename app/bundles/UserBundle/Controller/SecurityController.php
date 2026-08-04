@@ -20,17 +20,25 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Service\Attribute\Required;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SecurityController extends CommonController implements EventSubscriberInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
+    private AuthenticationUtils $authenticationUtils;
+    private IntegrationHelper $integrationHelper;
+    private SAMLHelper $samlHelper;
 
     #[Required]
     public function autowireSecurityController(
         AuthorizationCheckerInterface $authorizationChecker,
+        AuthenticationUtils $authenticationUtils,
+        IntegrationHelper $integrationHelper,
+        SAMLHelper $samlHelper,
     ): void {
         $this->authorizationChecker = $authorizationChecker;
+        $this->authenticationUtils = $authenticationUtils;
+        $this->integrationHelper = $integrationHelper;
+        $this->samlHelper = $samlHelper;
     }
 
     public function onRequest(RequestEvent $event): void
@@ -54,13 +62,13 @@ final class SecurityController extends CommonController implements EventSubscrib
     /**
      * Generates login form and processes login.
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
+    public function loginAction(Request $request): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
+        $error = $this->authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
             if ($error instanceof WeakPasswordException) {
-                $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
+                $this->addFlash(FlashBag::LEVEL_ERROR, $this->translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 
                 return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
             }
@@ -80,11 +88,11 @@ final class SecurityController extends CommonController implements EventSubscrib
         $request->query->set('tmpl', 'login');
 
         // Get a list of SSO integrations
-        $integrations = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
+        $integrations = $this->integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
         return $this->delegateView([
             'viewParameters' => [
-                'last_username' => $authenticationUtils->getLastUsername(),
+                'last_username' => $this->authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
             'contentTemplate' => '@MauticUser/Security/login.html.twig',
@@ -114,9 +122,9 @@ final class SecurityController extends CommonController implements EventSubscrib
         return new RedirectResponse($this->generateUrl('login'));
     }
 
-    public function samlLoginRetryAction(Request $request, SAMLHelper $samlHelper, SessionInterface $session): Response
+    public function samlLoginRetryAction(Request $request, SessionInterface $session): Response
     {
-        if (!$samlHelper->isSamlEnabled()) {
+        if (!$this->samlHelper->isSamlEnabled()) {
             return new RedirectResponse($this->generateUrl('login'));
         }
 

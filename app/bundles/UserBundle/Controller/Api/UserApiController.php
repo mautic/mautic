@@ -47,6 +47,7 @@ final class UserApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         UserModel $userModel,
+        private TokenStorageInterface $tokenStorage,
     ) {
         $this->model            = $userModel;
         $this->entityClass      = User::class;
@@ -63,9 +64,9 @@ final class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction(TokenStorageInterface $tokenStorage): Response
+    public function getSelfAction(): Response
     {
-        $currentUser = $tokenStorage->getToken()->getUser();
+        $currentUser = $this->tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
 
         return $this->handleView($view);

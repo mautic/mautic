@@ -31,12 +31,15 @@ final class RoleController extends FormController
     private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
 
     private RoleModel $roleModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
 
     #[Required]
     public function autowireRoleController(
         RoleModel $roleModel,
+        PageHelperFactoryInterface $pageHelperFactory,
     ): void {
         $this->roleModel = $roleModel;
+        $this->pageHelperFactory = $pageHelperFactory;
     }
 
     /**
@@ -56,7 +59,7 @@ final class RoleController extends FormController
     /**
      * Generate's default role list view.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
@@ -64,7 +67,7 @@ final class RoleController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper = $pageHelperFactory->make('mautic.role', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.role', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();

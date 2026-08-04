@@ -38,6 +38,13 @@ final class UserController extends FormController
     private UserModel $userModel;
 
     private AuditLogModel $auditLogModel;
+    private PageHelperFactoryInterface $pageHelperFactory;
+    private LanguageHelper $languageHelper;
+    private UserPasswordHasherInterface $hasher;
+    private SAMLHelper $samlHelper;
+    private SerializerInterface $serializer;
+    private MailHelper $mailer;
+    private IpLookupHelper $ipLookupHelper;
 
     #[Required]
     public function autowireUserController(
@@ -46,22 +53,36 @@ final class UserController extends FormController
         RoleModel $roleModel,
         AuditLogRepository $auditLogRepository,
         RoleRepository $roleRepository,
+        PageHelperFactoryInterface $pageHelperFactory,
+        LanguageHelper $languageHelper,
+        UserPasswordHasherInterface $hasher,
+        SAMLHelper $samlHelper,
+        SerializerInterface $serializer,
+        MailHelper $mailer,
+        IpLookupHelper $ipLookupHelper,
     ): void {
         $this->userModel = $userModel;
         $this->auditLogModel = $auditLogModel;
         $this->auditLogRepository = $auditLogRepository;
         $this->roleRepository = $roleRepository;
+        $this->pageHelperFactory = $pageHelperFactory;
+        $this->languageHelper = $languageHelper;
+        $this->hasher = $hasher;
+        $this->samlHelper = $samlHelper;
+        $this->serializer = $serializer;
+        $this->mailer = $mailer;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
      * Generate's default user list.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): JsonResponse|Response
+    public function indexAction(Request $request, int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             $this->throwAccessDenied();
         }
-        $pageHelper = $pageHelperFactory->make('mautic.user', $page);
+        $pageHelper = $this->pageHelperFactory->make('mautic.user', $page);
 
         $this->setListFilters();
 
@@ -202,7 +223,7 @@ final class UserController extends FormController
         ]);
     }
 
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper): JsonResponse|Response
+    public function newAction(Request $request): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:create')) {
             $this->throwAccessDenied();
@@ -218,20 +239,20 @@ final class UserController extends FormController
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $user, $form);
+            $response = $this->handleNewUserPost($request, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -245,23 +266,23 @@ final class UserController extends FormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $languageHelper, $hasher, $samlHelper, $user->getId(), true);
+            $response = $this->editAction($request, $user->getId(), true);
         }
 
         return $response;
     }
 
-    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, User $user, FormInterface $form): bool
+    private function saveNewUserIfValid(Request $request, User $user, FormInterface $form): bool
     {
         $formUser          = $request->request->all()['user'] ?? [];
         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-        $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
+        $password          = $this->userModel->checkNewPassword($user, $this->hasher, $submittedPassword);
         $valid             = $this->isFormValid($form);
 
         if ($valid) {
             $user->setPassword($password);
             $this->userModel->saveEntity($user);
-            $this->loadNewUserLocale($languageHelper, $user);
+            $this->loadNewUserLocale($user);
 
             $this->addFlashMessage('mautic.core.notice.created', [
                 '%name%'      => $user->getName(),
@@ -276,12 +297,12 @@ final class UserController extends FormController
         return $valid;
     }
 
-    private function loadNewUserLocale(LanguageHelper $languageHelper, User $user): void
+    private function loadNewUserLocale(User $user): void
     {
-        $installedLanguages = $languageHelper->getSupportedLanguages();
+        $installedLanguages = $this->languageHelper->getSupportedLanguages();
 
         if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
-            $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
+            $fetchLanguage = $this->languageHelper->extractLanguagePackage($user->getLocale());
 
             if ($fetchLanguage['error']) {
                 $user->setLocale(null);
@@ -315,7 +336,7 @@ final class UserController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
@@ -364,7 +385,7 @@ final class UserController extends FormController
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form   = $this->userModel->createForm($user, $this->formFactory, $action);
 
-        $isSamlUser    = $samlHelper->isSamlSession();
+        $isSamlUser    = $this->samlHelper->isSamlSession();
         if ($isSamlUser) {
             $form->remove('plainPassword');
         }
@@ -377,7 +398,7 @@ final class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
+                $password          = $this->userModel->checkNewPassword($user, $this->hasher, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
@@ -393,10 +414,10 @@ final class UserController extends FormController
                     }
 
                     // check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $languageHelper->getSupportedLanguages();
+                    $installedLanguages = $this->languageHelper->getSupportedLanguages();
 
                     if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
-                        $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
+                        $fetchLanguage = $this->languageHelper->extractLanguagePackage($user->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
                         if ($fetchLanguage['error']) {
@@ -531,7 +552,7 @@ final class UserController extends FormController
      *
      * @param int $objectId
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function contactAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $user  = $this->userModel->getEntity($objectId);
 
@@ -566,11 +587,11 @@ final class UserController extends FormController
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
 
-                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
-                    $mailer->setSubject($subject);
-                    $mailer->setTo($user->getEmail(), $user->getName());
-                    $mailer->setBody($body);
-                    $mailer->send();
+                    $this->mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                    $this->mailer->setSubject($subject);
+                    $this->mailer->setTo($user->getEmail(), $user->getName());
+                    $this->mailer->setBody($body);
+                    $this->mailer->send();
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
@@ -584,7 +605,7 @@ final class UserController extends FormController
                         $entityId = $form->get('id')->getData();
                     }
 
-                    $details = $serializer->serialize([
+                    $details = $this->serializer->serialize([
                         'from'    => $currentUser->getName(),
                         'to'      => $user->getName(),
                         'subject' => $subject,
@@ -597,7 +618,7 @@ final class UserController extends FormController
                         'objectId'  => $entityId,
                         'action'    => 'communication',
                         'details'   => $details,
-                        'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
 
