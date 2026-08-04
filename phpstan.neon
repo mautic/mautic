@@ -136,9 +136,13 @@ parameters:
 			paths:
 				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
 		# Backward compatibility.
-        -
-            message: '#^Call to deprecated method add\(\) of class Doctrine\\DBAL\\Query\\Expression\\CompositeExpression#'
-            path: app/bundles/CoreBundle/Entity/CommonRepository.php
+		-
+			message: '#^Call to deprecated method add\(\) of class Doctrine\\DBAL\\Query\\Expression\\CompositeExpression#'
+			path: app/bundles/CoreBundle/Entity/CommonRepository.php
+		# There are no service "provided".
+		-
+			identifier: mautic.noNullableServiceInConstructor
+			path: app/bundles/CoreBundle/Doctrine/Query/Expression.php
 		# exception handler as both handler and standalone method
 		-
 			identifier: argument.type

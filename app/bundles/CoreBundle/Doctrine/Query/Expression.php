@@ -23,7 +23,7 @@ class Expression implements \Countable
 
     private int $count = 0;
 
-    private function __construct(private ExpressionBuilder|Expr $builder, CompositeExpression|Composite|null $expr, private string $type)
+    private function __construct(private readonly ExpressionBuilder|Expr $builder, CompositeExpression|Composite|null $expr, private readonly string $type)
     {
         if (null === $expr) {
             return;

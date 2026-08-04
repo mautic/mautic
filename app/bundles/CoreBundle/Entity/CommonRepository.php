@@ -588,7 +588,7 @@ class CommonRepository extends ServiceEntityRepository
             );
         } else {
             $builder->add(
-                Expression::or($q)->add(
+                Expression::and($q)->add(
                     $q->expr()->isNotNull("{$alias}.{$pubUp}"),
                     $q->expr()->lte("{$alias}.{$pubUp}", ':now')
                 )->expr()
@@ -1582,7 +1582,7 @@ class CommonRepository extends ServiceEntityRepository
                 [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
 
                 // Parameters could be added independently of the where clauses.
-                if (is_array($parameters) && [] !== $parameters) {
+                if ([] !== $parameters) {
                     $queryParameters = array_merge($queryParameters, $parameters);
                 }
 
