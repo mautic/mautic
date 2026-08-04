@@ -90,14 +90,9 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        if (!empty($field->getValidation()['donotsubmit'])) {
-            // Check the domains using shell wildcard patterns
-            $donotSubmitFilter  = fn ($doNotSubmitArray): bool => fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
-            $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
-            if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
-                $validationMsg = $field->getValidation()['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators');
-                $event->failedValidation($validationMsg);
-            }
+        if (!empty($field->getValidation()['donotsubmit']) && $this->isDoNotSubmitEmail((string) $value, (array) $this->coreParametersHelper->get('do_not_submit_emails'))) {
+            $validationMsg = $field->getValidation()['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators');
+            $event->failedValidation($validationMsg);
         }
 
         if (!empty($field->getValidation()['blockfreeemail'])) {
@@ -108,6 +103,33 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
                 $event->failedValidation($validationMsg);
             }
         }
+    }
+
+    /**
+     * @param array<int, mixed> $filters
+     */
+    private function isDoNotSubmitEmail(string $email, array $filters): bool
+    {
+        $email  = strtolower(trim($email));
+        $domain = strtolower((string) substr(strrchr($email, '@') ?: '', 1));
+
+        foreach ($filters as $filter) {
+            $filter = strtolower(trim((string) $filter));
+
+            if ('' === $filter) {
+                continue;
+            }
+
+            if (fnmatch($filter, $email, FNM_CASEFOLD)) {
+                return true;
+            }
+
+            if ('' !== $domain && !str_contains($filter, '@') && fnmatch($filter, $domain, FNM_CASEFOLD)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function fieldTelValidation(Events\ValidationEvent $event): void
