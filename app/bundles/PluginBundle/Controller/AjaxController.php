@@ -22,8 +22,12 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowirePluginAjaxController(
         PluginModel $pluginModel,
+        IntegrationHelper $helper,
+        IntegrationHelper $integrationHelper,
     ): void {
         $this->pluginModel = $pluginModel;
+        $this->helper = $helper;
+        $this->integrationHelper = $integrationHelper;
     }
 
     public function setIntegrationFilterAction(Request $request): JsonResponse
@@ -274,14 +278,5 @@ final class AjaxController extends CommonAjaxController
         $this->pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    #[Required]
-    public function autowirePluginAjaxController(
-        IntegrationHelper $helper,
-        IntegrationHelper $integrationHelper,
-    ): void {
-        $this->helper = $helper;
-        $this->integrationHelper = $integrationHelper;
     }
 }

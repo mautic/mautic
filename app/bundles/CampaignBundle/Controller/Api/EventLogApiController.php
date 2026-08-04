@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -44,7 +43,6 @@ final class EventLogApiController extends FetchCommonApiController
      * @var EventLogModel|null
      */
     protected $model;
-    private UserHelper $userHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -78,13 +76,13 @@ final class EventLogApiController extends FetchCommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
         $this->serializerGroups[]                        = 'leadBasicList';
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -136,7 +134,7 @@ final class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction($request, $this->userHelper);
+        return $this->getEntitiesAction($request);
     }
 
     /**
@@ -263,12 +261,5 @@ final class EventLogApiController extends FetchCommonApiController
         }
 
         return parent::view($data, $statusCode, $headers);
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        UserHelper $userHelper,
-    ): void {
-        $this->userHelper = $userHelper;
     }
 }

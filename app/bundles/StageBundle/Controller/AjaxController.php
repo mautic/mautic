@@ -19,8 +19,10 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowireStageAjaxController(
         StageModel $stageModel,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->stageModel = $stageModel;
+        $this->formFactory = $formFactory;
     }
 
     public function getActionFormAction(Request $request): JsonResponse
@@ -54,12 +56,5 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    #[Required]
-    public function autowireStageAjaxController(
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->formFactory = $formFactory;
     }
 }

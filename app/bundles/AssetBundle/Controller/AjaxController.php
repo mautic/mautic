@@ -21,8 +21,10 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowireAssetAjaxController(
         AssetModel $assetModel,
+        IntegrationHelper $integrationHelper,
     ): void {
         $this->assetModel = $assetModel;
+        $this->integrationHelper = $integrationHelper;
     }
 
     public function categoryListAction(Request $request): JsonResponse
@@ -77,12 +79,5 @@ final class AjaxController extends CommonAjaxController
         );
 
         return $this->sendJsonResponse(['success' => 1, 'output' => $output]);
-    }
-
-    #[Required]
-    public function autowireAssetAjaxController(
-        IntegrationHelper $integrationHelper,
-    ): void {
-        $this->integrationHelper = $integrationHelper;
     }
 }

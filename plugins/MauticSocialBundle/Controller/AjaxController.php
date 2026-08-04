@@ -61,7 +61,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireSocialAjaxController(
+    public function autowireMauticSocialAjaxController(
         FormFactoryInterface $formFactory,
     ): void {
         $this->formFactory = $formFactory;

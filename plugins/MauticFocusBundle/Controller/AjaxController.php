@@ -18,8 +18,10 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowireMauticFocusAjaxController(
         FocusModel $focusModel,
+        CacheProviderTagAwareInterface $cacheProvider,
     ): void {
         $this->focusModel = $focusModel;
+        $this->cacheProvider = $cacheProvider;
     }
 
     public function generatePreviewAction(Request $request): JsonResponse
@@ -119,12 +121,5 @@ final class AjaxController extends CommonAjaxController
             'success'        => 1,
             'clickThrough'   => $clickThroughCount,
         ]);
-    }
-
-    #[Required]
-    public function autowireFocusAjaxController(
-        CacheProviderTagAwareInterface $cacheProvider,
-    ): void {
-        $this->cacheProvider = $cacheProvider;
     }
 }

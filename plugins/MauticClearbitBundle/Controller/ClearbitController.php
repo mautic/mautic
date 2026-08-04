@@ -26,9 +26,11 @@ final class ClearbitController extends FormController
     public function autowireClearbitController(
         LeadModel $leadModel,
         CompanyModel $companyModel,
+        LookupHelper $lookupHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->lookupHelper = $lookupHelper;
     }
 
     /**
@@ -521,12 +523,5 @@ final class ClearbitController extends FormController
         }
 
         return new Response('Bad Request', 400);
-    }
-
-    #[Required]
-    public function autowireClearbitController(
-        LookupHelper $lookupHelper,
-    ): void {
-        $this->lookupHelper = $lookupHelper;
     }
 }

@@ -23,8 +23,10 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowirePageAjaxController(
         PageModel $pageModel,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->pageModel = $pageModel;
+        $this->formFactory = $formFactory;
     }
 
     public function getAbTestFormAction(Request $request, PageModel $pageModel): JsonResponse
@@ -63,12 +65,5 @@ final class AjaxController extends CommonAjaxController
     protected function getBuilderTokens($query)
     {
         return $this->pageModel->getBuilderComponents(null, ['tokens'], $query ?? '');
-    }
-
-    #[Required]
-    public function autowirePageAjaxController(
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->formFactory = $formFactory;
     }
 }

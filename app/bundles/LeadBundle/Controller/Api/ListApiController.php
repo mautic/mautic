@@ -96,10 +96,10 @@ final class ListApiController extends CommonApiController
     /**
      * Obtains a list of entities.
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         $withCounts = $request->query->has('withCounts');
-        $response   = parent::getEntitiesAction($request, $userHelper);
+        $response   = parent::getEntitiesAction($request);
 
         if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
             $content = json_decode($response->getContent(), true);

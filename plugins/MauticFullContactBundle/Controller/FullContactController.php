@@ -26,9 +26,11 @@ final class FullContactController extends FormController
     public function autowireFullContactController(
         LeadModel $leadModel,
         CompanyModel $companyModel,
+        LookupHelper $lookupHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->lookupHelper = $lookupHelper;
     }
 
     /**
@@ -521,12 +523,5 @@ final class FullContactController extends FormController
         }
 
         return new Response('Bad Request', 400);
-    }
-
-    #[Required]
-    public function autowireFullContactController(
-        LookupHelper $lookupHelper,
-    ): void {
-        $this->lookupHelper = $lookupHelper;
     }
 }

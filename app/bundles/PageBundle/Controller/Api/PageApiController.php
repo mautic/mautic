@@ -57,7 +57,7 @@ final class PageApiController extends CommonApiController
     /**
      * Obtains a list of pages.
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         // get parent level only
         $this->listFilters[] = [
@@ -70,6 +70,6 @@ final class PageApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 }

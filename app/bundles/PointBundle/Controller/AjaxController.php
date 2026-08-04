@@ -19,8 +19,10 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowirePointAjaxController(
         PointModel $pointModel,
+        FormFactoryInterface $formFactory,
     ): void {
         $this->pointModel = $pointModel;
+        $this->formFactory = $formFactory;
     }
 
     public function reorderTriggerEventsAction(Request $request): JsonResponse
@@ -75,12 +77,5 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    #[Required]
-    public function autowirePointAjaxController(
-        FormFactoryInterface $formFactory,
-    ): void {
-        $this->formFactory = $formFactory;
     }
 }

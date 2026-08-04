@@ -42,7 +42,11 @@ final class PublicController extends FormController
         UserModel $userModel,
         LeadRepository $leadRepository,
         CompanyRepository $companyRepository,
+        LookupHelper $lookupHelper,
+        LoggerInterface $mauticLogger,
     ): void {
+        $this->lookupHelper = $lookupHelper;
+        $this->mauticLogger = $mauticLogger;
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->notificationModel = $notificationModel;
@@ -407,14 +411,5 @@ final class PublicController extends FormController
         }
 
         return new Response('OK');
-    }
-
-    #[Required]
-    public function autowireFullContactPublicController(
-        LookupHelper $lookupHelper,
-        LoggerInterface $mauticLogger,
-    ): void {
-        $this->lookupHelper = $lookupHelper;
-        $this->mauticLogger = $mauticLogger;
     }
 }

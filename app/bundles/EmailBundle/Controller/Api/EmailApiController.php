@@ -88,7 +88,7 @@ final class EmailApiController extends CommonApiController
     /**
      * Obtains a list of emails.
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    public function getEntitiesAction(Request $request): Response
     {
         // get parent level only
         $this->listFilters[] = [
@@ -96,7 +96,7 @@ final class EmailApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 
     /**

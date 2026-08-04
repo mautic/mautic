@@ -62,7 +62,7 @@ final class FileManagerController extends AjaxController
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowireGrapesJsBuilderFileManagerController(
+    public function autowireFileManagerController(
         FileManager $fileManager,
     ): void {
         $this->fileManager = $fileManager;

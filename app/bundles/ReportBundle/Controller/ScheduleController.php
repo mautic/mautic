@@ -17,8 +17,10 @@ final class ScheduleController extends CommonAjaxController
     #[Required]
     public function autowireScheduleController(
         ReportModel $reportModel,
+        DateBuilder $dateBuilder,
     ): void {
         $this->reportModel = $reportModel;
+        $this->dateBuilder = $dateBuilder;
     }
 
     public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
@@ -83,12 +85,5 @@ final class ScheduleController extends CommonAjaxController
     private function flushFlash(): JsonResponse
     {
         return new JsonResponse(['flashes' => $this->getFlashContent()]);
-    }
-
-    #[Required]
-    public function autowireReportScheduleController(
-        DateBuilder $dateBuilder,
-    ): void {
-        $this->dateBuilder = $dateBuilder;
     }
 }

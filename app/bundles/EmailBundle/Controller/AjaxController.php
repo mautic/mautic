@@ -42,8 +42,22 @@ final class AjaxController extends CommonAjaxController
     #[Required]
     public function autowireEmailAjaxController(
         EmailModel $emailModel,
+        FormFactoryInterface $formFactory,
+        Mailbox $mailbox,
+        TransportInterface $transport,
+        UserHelper $userHelper,
+        CoreParametersHelper $parametersHelper,
+        CacheProvider $cacheProvider,
+        EmailDependencies $emailDependencies,
     ): void {
         $this->emailModel = $emailModel;
+        $this->formFactory = $formFactory;
+        $this->mailbox = $mailbox;
+        $this->transport = $transport;
+        $this->userHelper = $userHelper;
+        $this->parametersHelper = $parametersHelper;
+        $this->cacheProvider = $cacheProvider;
+        $this->emailDependencies = $emailDependencies;
     }
 
     public function getAbTestFormAction(Request $request, EmailModel $emailModel): JsonResponse
@@ -348,24 +362,5 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    #[Required]
-    public function autowireEmailAjaxController(
-        FormFactoryInterface $formFactory,
-        Mailbox $mailbox,
-        TransportInterface $transport,
-        UserHelper $userHelper,
-        CoreParametersHelper $parametersHelper,
-        CacheProvider $cacheProvider,
-        EmailDependencies $emailDependencies,
-    ): void {
-        $this->formFactory = $formFactory;
-        $this->mailbox = $mailbox;
-        $this->transport = $transport;
-        $this->userHelper = $userHelper;
-        $this->parametersHelper = $parametersHelper;
-        $this->cacheProvider = $cacheProvider;
-        $this->emailDependencies = $emailDependencies;
     }
 }

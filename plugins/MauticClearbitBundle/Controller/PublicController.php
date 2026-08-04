@@ -34,11 +34,15 @@ final class PublicController extends FormController
         UserModel $userModel,
         LeadModel $leadModel,
         CompanyModel $companyModel,
+        LoggerInterface $mauticLogger,
+        LookupHelper $lookupHelper,
     ): void {
         $this->notificationModel = $notificationModel;
         $this->userModel = $userModel;
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
+        $this->mauticLogger = $mauticLogger;
+        $this->lookupHelper = $lookupHelper;
     }
 
     /**
@@ -294,14 +298,5 @@ final class PublicController extends FormController
         }
 
         return new Response('OK');
-    }
-
-    #[Required]
-    public function autowireClearbitPublicController(
-        LoggerInterface $mauticLogger,
-        LookupHelper $lookupHelper,
-    ): void {
-        $this->mauticLogger = $mauticLogger;
-        $this->lookupHelper = $lookupHelper;
     }
 }

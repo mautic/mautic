@@ -8,7 +8,6 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
@@ -27,7 +26,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class SubmissionApiController extends CommonApiController
 {
-    private UserHelper $userHelper;
 
     public function __construct(
         CorePermissions $security,
@@ -59,7 +57,7 @@ final class SubmissionApiController extends CommonApiController
      *
      * @param int $formId
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null): Response
+    public function getEntitiesAction(Request $request, $formId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -76,7 +74,7 @@ final class SubmissionApiController extends CommonApiController
             ]
         );
 
-        return parent::getEntitiesAction($request, $userHelper);
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -101,7 +99,7 @@ final class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($request, $this->userHelper, $formId);
+        return $this->getEntitiesAction($request, $formId);
     }
 
     /**
@@ -142,12 +140,5 @@ final class SubmissionApiController extends CommonApiController
         }
 
         return $form;
-    }
-
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowire(
-        UserHelper $userHelper,
-    ): void {
-        $this->userHelper = $userHelper;
     }
 }
