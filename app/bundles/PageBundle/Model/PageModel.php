@@ -310,13 +310,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'page':
-                $viewOther = $this->security->isGranted('page:pages:viewother');
-                $repo      = $this->getRepository();
-                $repo->setCurrentUser($this->userHelper->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
-                break;
+        if ('page' === $type) {
+            $viewOther = $this->security->isGranted('page:pages:viewother');
+            $repo      = $this->getRepository();
+            $repo->setCurrentUser($this->userHelper->getUser());
+            $results = $repo->getPageList($filter, $limit, 0, $viewOther);
         }
 
         return $results;

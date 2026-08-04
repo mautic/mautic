@@ -120,32 +120,29 @@ final class InstallController extends CommonController
                 }
             }
         } elseif (!empty($subIndex)) {
-            switch ($index) {
-                case InstallService::DOCTRINE_STEP:
-                    $dbParams = (array) $step;
+            if (InstallService::DOCTRINE_STEP === $index) {
+                $dbParams = (array) $step;
+                switch ($subIndex) {
+                    case 1:
+                        $messages = $this->installer->createSchemaStep($dbParams);
+                        if (!empty($messages)) {
+                            $this->handleInstallerErrors($form, $messages);
 
-                    switch ($subIndex) {
-                        case 1:
-                            $messages = $this->installer->createSchemaStep($dbParams);
-                            if (!empty($messages)) {
-                                $this->handleInstallerErrors($form, $messages);
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
+                        }
 
-                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
-                            }
+                        return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
+                    case 2:
+                        $messages = $this->installer->createFixturesStep();
+                        if (!empty($messages)) {
+                            $this->handleInstallerErrors($form, $messages);
 
-                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
-                        case 2:
-                            $messages = $this->installer->createFixturesStep();
-                            if (!empty($messages)) {
-                                $this->handleInstallerErrors($form, $messages);
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
+                        }
 
-                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
-                            }
-
-                            $complete = true;
-                            break;
-                    }
-                    break;
+                        $complete = true;
+                        break;
+                }
             }
         }
 

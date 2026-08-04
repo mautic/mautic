@@ -2154,32 +2154,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'email':
-                $this->emailRepository->setCurrentUser($this->userHelper->getUser());
-                $emails = $this->emailRepository->getEmailList(
-                    $filter,
-                    $limit,
-                    $start,
-                    $this->security->isGranted('email:emails:viewother'),
-                    $options['top_level'] ?? false,
-                    $options['email_type'] ?? null,
-                    $options['ignore_ids'] ?? [],
-                    $options['variant_parent'] ?? null
-                );
-
-                foreach ($emails as $email) {
-                    if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
-                    } else {
-                        $results[$email['language']][$email['name']] = $email['id'];
-                    }
+        if ('email' === $type) {
+            $this->emailRepository->setCurrentUser($this->userHelper->getUser());
+            $emails = $this->emailRepository->getEmailList(
+                $filter,
+                $limit,
+                $start,
+                $this->security->isGranted('email:emails:viewother'),
+                $options['top_level'] ?? false,
+                $options['email_type'] ?? null,
+                $options['ignore_ids'] ?? [],
+                $options['variant_parent'] ?? null
+            );
+            foreach ($emails as $email) {
+                if (empty($options['name_is_key'])) {
+                    $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
+                } else {
+                    $results[$email['language']][$email['name']] = $email['id'];
                 }
-
-                // sort by language
-                ksort($results);
-
-                break;
+            }
+            // sort by language
+            ksort($results);
         }
 
         return $results;
