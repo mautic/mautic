@@ -13,20 +13,16 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class SlotNameType extends Constraint
 {
-    public string $message;
-
     /**
      * @param string[]|null $groups
      */
     #[HasNamedArguments]
     public function __construct(
-        string $message = 'mautic.dynamicContent.slot_name_type',
+        public string $message = 'mautic.dynamicContent.slot_name_type',
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
-
-        $this->message = $message;
     }
 
     public function getTargets(): string

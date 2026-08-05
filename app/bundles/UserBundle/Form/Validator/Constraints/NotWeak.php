@@ -17,23 +17,16 @@ final class NotWeak extends Constraint
         self::TOO_WEAK => 'PASSWORD_TOO_WEAK_ERROR',
     ];
 
-    public string $message;
-
-    public int $score;
-
     /**
      * @param string[]|null $groups
      */
     #[HasNamedArguments]
     public function __construct(
-        string $message = 'This password is too weak. Consider using a stronger password.',
-        int $score = PasswordStrengthEstimatorModel::MINIMUM_PASSWORD_STRENGTH_ALLOWED,
+        public string $message = 'This password is too weak. Consider using a stronger password.',
+        public int $score = PasswordStrengthEstimatorModel::MINIMUM_PASSWORD_STRENGTH_ALLOWED,
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
-
-        $this->message = $message;
-        $this->score   = $score;
     }
 }

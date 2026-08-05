@@ -10,20 +10,16 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class UniqueName extends Constraint
 {
-    public string $message;
-
     /**
      * @param string[]|null $groups
      */
     #[HasNamedArguments]
     public function __construct(
-        string $message = 'project.name.already.exists',
+        public string $message = 'project.name.already.exists',
         ?array $groups = null,
         mixed $payload = null,
     ) {
         parent::__construct(null, $groups, $payload);
-
-        $this->message = $message;
     }
 
     public function getTargets(): string
