@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 final class WeekStat
