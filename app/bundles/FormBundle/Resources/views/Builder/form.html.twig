@@ -58,6 +58,7 @@
                             not f.showWhenValueExists and
                             f.mappedField is not empty and
                             'contact' is same as f.mappedObject and
+                            isAutoFillFeatureEnabled and
                             f.isAutoFill and
                             (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
                       -%}
