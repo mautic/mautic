@@ -233,7 +233,7 @@ final class InstallCommand extends Command
             case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
                 $messages = $this->stepAction(['site_url' => $siteUrl], $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
                         // Stop install if requirements not met
                         $output->writeln('Missing requirements:');
@@ -274,7 +274,7 @@ final class InstallCommand extends Command
                 $connectionWrapper->initConnection($dbParams);
 
                 $messages = $this->stepAction($dbParams, $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -286,7 +286,7 @@ final class InstallCommand extends Command
                 $step = InstallService::DOCTRINE_STEP + .1;
                 $output->writeln($step.' - Creating schema...');
                 $messages = $this->stepAction($dbParams, $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -298,7 +298,7 @@ final class InstallCommand extends Command
                 $step = InstallService::DOCTRINE_STEP + .2;
                 $output->writeln($step.' - Loading fixtures...');
                 $messages = $this->stepAction($dbParams, $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -314,7 +314,7 @@ final class InstallCommand extends Command
             case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
                 $messages = $this->stepAction($adminParam, $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -329,7 +329,7 @@ final class InstallCommand extends Command
             case InstallService::FINAL_STEP:
                 $output->writeln($step.' - Final steps...');
                 $messages = $this->stepAction($allParams, $step);
-                if (!empty($messages)) {
+                if ([] !== $messages) {
                     $output->writeln('Errors in final step:');
                     $this->handleInstallerErrors($output, $messages);
 
@@ -420,7 +420,7 @@ final class InstallCommand extends Command
                 // Save final configuration
                 $siteUrl  = $params['site_url'];
                 $messages = $this->installer->createFinalConfigStep($siteUrl);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     $this->installer->finalMigrationStep();
                 }
                 break;
