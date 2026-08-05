@@ -58,7 +58,7 @@ final class ValidateEventCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $decisionId = $input->getOption('decision-id');
         $contactId  = $input->getOption('contact-id');

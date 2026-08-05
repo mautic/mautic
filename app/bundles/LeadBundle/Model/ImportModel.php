@@ -457,7 +457,7 @@ class ImportModel extends FormModel
      */
     public function isEmptyCsvRow($row): bool
     {
-        if (!is_array($row) || empty($row)) {
+        if (!is_array($row) || [] === $row) {
             return true;
         }
 

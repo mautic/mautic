@@ -133,7 +133,7 @@ class ReportDAO
 
     public function shouldSync(): bool
     {
-        return !empty($this->objects);
+        return [] !== $this->objects;
     }
 
     public function getRelations(): RelationsDAO
