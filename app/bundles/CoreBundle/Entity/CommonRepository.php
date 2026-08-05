@@ -618,11 +618,11 @@ class CommonRepository extends ServiceEntityRepository
      * @return Andx|CompositeExpression
      */
     public function getPublishedByDateExpression(
-        $q,
-        $alias = null,
-        $setNowParameter = true,
-        $setTrueParameter = true,
-        $allowNullForPublishedUp = true,
+        QueryBuilder|DbalQueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
     ) {
         if ($q instanceof QueryBuilder) {
             return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
