@@ -19,9 +19,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ConfigController extends FormController
 {
+    private TokenStorageInterface $tokenStorage;
+
+    #[Required]
+    public function autowireConfigController(
+        TokenStorageInterface $tokenStorage,
+    ): void {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * Controller action for editing the application configuration.
      */
@@ -132,7 +142,7 @@ final class ConfigController extends FormController
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
-                        $this->setLocale($request, $tokenStorage, $params);
+                        $this->setLocale($request, $params);
                     }
                 } elseif (!$isWritable) {
                     $form->addError(
@@ -275,9 +285,9 @@ final class ConfigController extends FormController
     /**
      * @param array<string, string> $params
      */
-    private function setLocale(Request $request, TokenStorageInterface $tokenStorage, array $params): void
+    private function setLocale(Request $request, array $params): void
     {
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         assert($me instanceof User);
         $locale = $me->getLocale();
 
