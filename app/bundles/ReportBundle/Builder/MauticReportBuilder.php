@@ -552,7 +552,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filter['value']
         );
 
-        if (empty($conditions)) {
+        if ([] === $conditions) {
             return null;
         }
 

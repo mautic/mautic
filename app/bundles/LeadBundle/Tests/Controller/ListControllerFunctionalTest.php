@@ -43,14 +43,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->name();
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
-        $this->listModel = static::getContainer()->get(ListModel::class);
+        $this->listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
         $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $leadModel);
-        $this->segmentCountCacheHelper = static::getContainer()->get(SegmentCountCacheHelper::class);
+        $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
         $this->assertInstanceOf(LeadRepository::class, $this->leadRepo);
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');

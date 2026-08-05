@@ -326,7 +326,7 @@ class FormController extends CommonFormController
                     $fields = array_diff_key($modifiedFields, array_flip($deletedFields));
 
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -582,7 +582,7 @@ class FormController extends CommonFormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($fields)) {
+                    if ([] === $fields) {
                         // set the error
                         $form->addError(
                             new FormError(
@@ -1082,7 +1082,7 @@ class FormController extends CommonFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->formModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

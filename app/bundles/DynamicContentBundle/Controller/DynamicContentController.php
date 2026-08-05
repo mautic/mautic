@@ -552,7 +552,7 @@ final class DynamicContentController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->dynamicContentModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

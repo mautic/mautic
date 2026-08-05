@@ -48,7 +48,7 @@ final class FieldFilterTransformer implements DataTransformerInterface
         }
 
         foreach ($rawFilters as $key => $filter) {
-            if (!empty($this->default)) {
+            if ([] !== $this->default) {
                 $rawFilters[$key] = array_merge($this->default, $rawFilters[$key]);
             }
             $operator = $filter['operator'] ?? '';

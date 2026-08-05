@@ -194,7 +194,7 @@ final class TriggerController extends FormController
 
         // set added/updated events
         $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', []);
-        if (!empty($triggerEvents)) {
+        if ([] !== $triggerEvents) {
             $addEvents += $triggerEvents;
             $session->set('mautic.point.'.$sessionId.'.triggerevents.modified', $triggerEvents);
         }
@@ -213,7 +213,7 @@ final class TriggerController extends FormController
                     $events = array_diff_key($addEvents, array_flip($deletedEvents));
 
                     // make sure that at least one action is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
@@ -262,7 +262,7 @@ final class TriggerController extends FormController
                     ],
                 ]);
             }
-        } elseif (!empty($triggerEvents)) {
+        } elseif ([] !== $triggerEvents) {
             // The clone part, no need to clear session here.
             $addEvents     = $triggerEvents;
             $deletedEvents = [];
@@ -359,7 +359,7 @@ final class TriggerController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     // make sure that at least one field is selected
-                    if (empty($events)) {
+                    if ([] === $events) {
                         // set the error
                         $form->addError(new FormError(
                             $this->translator->trans('mautic.core.value.required', [], 'validators')
@@ -595,7 +595,7 @@ final class TriggerController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->triggerModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

@@ -826,7 +826,7 @@ final class PageController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

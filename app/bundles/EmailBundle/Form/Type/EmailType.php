@@ -563,7 +563,7 @@ final class EmailType extends AbstractType
         ];
 
         $draftActionButtons = $this->getDraftActionButtons($emailEntity);
-        if (!empty($draftActionButtons)) {
+        if ([] !== $draftActionButtons) {
             $extraButtons['post_extra_buttons'] = $draftActionButtons;
         }
         $builder->add(

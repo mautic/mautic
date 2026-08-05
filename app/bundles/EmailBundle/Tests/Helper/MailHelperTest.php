@@ -136,13 +136,13 @@ final class MailHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $this->contactRepository    = $this->createMock(LeadRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

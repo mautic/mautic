@@ -225,11 +225,11 @@ final class EmailController extends FormController
                 $ignoreListJoin    = false;
             }
 
-            if (!empty($catIds)) {
+            if ([] !== $catIds) {
                 $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
             }
 
-            if (!empty($templates)) {
+            if ([] !== $templates) {
                 $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
             }
         }
@@ -1611,7 +1611,7 @@ final class EmailController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->emailModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -1751,7 +1751,7 @@ final class EmailController extends FormController
         $user   = $this->user;
 
         // We have to add prefix to example emails
-        $subject = sprintf('%s %s', static::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
+        $subject = sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
         $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);

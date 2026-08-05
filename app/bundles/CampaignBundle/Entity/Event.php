@@ -226,7 +226,7 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?Event $redirectEvent;
+    private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTime $dateLinked = null;
@@ -242,7 +242,6 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->log               = new ArrayCollection();
         $this->children          = new ArrayCollection();
-        $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
 
         if ($dateAdded) {
