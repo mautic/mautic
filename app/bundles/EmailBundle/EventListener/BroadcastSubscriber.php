@@ -18,7 +18,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
         private EmailModel $model,
         private EntityManagerInterface $em,
         private TranslatorInterface $translator,
-        private readonly EmailRepository $emailRepository,
+        private EmailRepository $emailRepository,
     ) {
     }
 

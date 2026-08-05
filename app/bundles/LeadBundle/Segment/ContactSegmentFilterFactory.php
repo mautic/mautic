@@ -145,7 +145,7 @@ final class ContactSegmentFilterFactory
         // add all grouped conditions back
         foreach ($arrStacks as $stack) {
             $groupedFilter = $this->groupFilters($stack);
-            if (!empty($groupedFilter)) {
+            if ([] !== $groupedFilter) {
                 $shrinkedFilters[] = $groupedFilter;
             }
         }
@@ -160,7 +160,7 @@ final class ContactSegmentFilterFactory
      */
     private function groupFilters(array $stack): array
     {
-        if (empty($stack)) {
+        if ([] === $stack) {
             return [];
         }
 
