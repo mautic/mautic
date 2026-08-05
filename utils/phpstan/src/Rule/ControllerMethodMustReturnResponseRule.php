@@ -25,8 +25,9 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Only the public "*Action()" methods and "__invoke()" are actions. The public helpers a controller exposes next to
  * them - "getModelName()", "getViewArguments()" and the like - return their own data and are left alone.
  *
- * The shared base controllers - "Abstract*" and "Common*" - are skipped. Their actions are widened by child
- * controllers, so a narrow return type on the parent would lock the children out.
+ * The shared base controllers - those with "Abstract" or "Common" in their name, e.g. "AbstractFormController" or
+ * "FetchCommonApiController" - are skipped. Their actions are widened by child controllers, so a narrow return type
+ * on the parent would lock the children out.
  *
  * @implements Rule<ClassMethod>
  */
@@ -55,7 +56,7 @@ final class ControllerMethodMustReturnResponseRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_CLASS_PREFIXES = ['Abstract', 'Common'];
+    private const SKIPPED_CLASS_NAME_PARTS = ['Abstract', 'Common'];
 
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,
@@ -125,8 +126,8 @@ final class ControllerMethodMustReturnResponseRule implements Rule
         $lastSeparatorPosition = strrpos($className, '\\');
         $shortClassName        = false === $lastSeparatorPosition ? $className : substr($className, $lastSeparatorPosition + 1);
 
-        foreach (self::SKIPPED_CLASS_PREFIXES as $skippedClassPrefix) {
-            if (str_starts_with($shortClassName, $skippedClassPrefix)) {
+        foreach (self::SKIPPED_CLASS_NAME_PARTS as $skippedClassNamePart) {
+            if (str_contains($shortClassName, $skippedClassNamePart)) {
                 return true;
             }
         }

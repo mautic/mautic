@@ -46,5 +46,6 @@ final class ControllerMethodMustReturnResponseRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/AbstractSomeController.php'], []);
         $this->analyse([__DIR__.'/Fixture/CommonSomeController.php'], []);
+        $this->analyse([__DIR__.'/Fixture/FetchCommonSomeController.php'], []);
     }
 }
