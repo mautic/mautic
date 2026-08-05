@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
