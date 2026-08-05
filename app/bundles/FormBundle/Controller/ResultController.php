@@ -429,11 +429,9 @@ final class ResultController extends CommonFormController
 
     public function getPostActionRedirectArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'batchDelete':
-                $formId                             = $this->getFormIdFromRequest();
-                $args['viewParameters']['objectId'] = $formId;
-                break;
+        if ('batchDelete' === $action) {
+            $formId                             = $this->getFormIdFromRequest();
+            $args['viewParameters']['objectId'] = $formId;
         }
 
         return $args;

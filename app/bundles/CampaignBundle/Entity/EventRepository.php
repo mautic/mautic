@@ -323,7 +323,7 @@ class EventRepository extends CommonRepository
      */
     public function setEventsAsDeletedWithRedirect(array $eventData): void
     {
-        if (empty($eventData)) {
+        if ([] === $eventData) {
             return;
         }
 
@@ -367,7 +367,7 @@ class EventRepository extends CommonRepository
                ->executeStatement();
         }
 
-        if (!empty($eventData)) {
+        if ([] !== $eventData) {
             $this->updateRedirectionChains($eventData);
         }
     }

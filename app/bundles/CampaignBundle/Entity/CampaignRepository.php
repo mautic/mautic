@@ -627,7 +627,7 @@ class CampaignRepository extends CommonRepository
             );
         $q->groupBy('c.id');
 
-        if (!empty($campaignIds)) {
+        if ([] !== $campaignIds) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
             $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
