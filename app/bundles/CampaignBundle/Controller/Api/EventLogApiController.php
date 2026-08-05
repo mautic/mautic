@@ -240,7 +240,7 @@ final class EventLogApiController extends FetchCommonApiController
             $this->entityNameMulti => $events,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

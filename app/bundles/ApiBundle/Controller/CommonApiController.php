@@ -118,7 +118,7 @@ class CommonApiController extends FetchCommonApiController
             $this->doctrine->getManager()->detach($entity);
         }
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $content           = json_decode($response->getContent(), true);
             $content['errors'] = $errors;
             $response->setContent(json_encode($content));
@@ -223,7 +223,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 
@@ -320,7 +320,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

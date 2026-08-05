@@ -8,7 +8,7 @@ final class ReportExportOptions
 {
     private readonly int $batchSize;
 
-    private int $page;
+    private int $page = 1;
 
     /**
      * @var \DateTimeInterface
@@ -23,7 +23,6 @@ final class ReportExportOptions
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->batchSize = $coreParametersHelper->get('report_export_batch_size');
-        $this->page      = 1;
     }
 
     public function beginExport(): void

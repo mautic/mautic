@@ -36,7 +36,7 @@ class MembershipBuilder
      */
     public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, ?OutputInterface $output = null): int
     {
-        defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
+        defined('MAUTIC_REBUILDING_CAMPAIGNS') || define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
 
         $this->campaign       = $campaign;
         $this->contactLimiter = $contactLimiter;

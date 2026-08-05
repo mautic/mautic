@@ -451,7 +451,7 @@ final class PointController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->pointModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

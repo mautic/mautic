@@ -315,7 +315,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $object = 'contacts';
                 $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
-                if (!empty($integrationId)) {
+                if ([] !== $integrationId) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
                     $this->getApiHelper()->updateLead($mappedData, $integrationEntityId);
 
@@ -697,7 +697,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
             unset($leadFields[$key]);
         }
 
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 

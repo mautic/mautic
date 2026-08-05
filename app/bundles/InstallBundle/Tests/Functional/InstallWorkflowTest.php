@@ -33,7 +33,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /** @var \AppKernel $kernel */
-        $kernel                   = static::getContainer()->get(KernelInterface::class);
+        $kernel                   = self::getContainer()->get(KernelInterface::class);
         $this->localConfigPath    = $kernel->getLocalConfigFile();
         $this->defaultMemoryLimit = ini_get('memory_limit');
 
@@ -112,7 +112,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
     public function testInstallRequirementsAndRecommendations(): void
     {
         $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
-        $expectedMemoryMessage = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+        $expectedMemoryMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
 
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));

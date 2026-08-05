@@ -153,19 +153,16 @@ final class UserApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
-        switch ($action) {
-            case 'new':
-                $submittedPassword = null;
-                if (isset($parameters['plainPassword'])) {
-                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
-                        $submittedPassword = $parameters['plainPassword']['password'];
-                    } else {
-                        $submittedPassword = $parameters['plainPassword'];
-                    }
+        if ('new' === $action) {
+            $submittedPassword = null;
+            if (isset($parameters['plainPassword'])) {
+                if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                    $submittedPassword = $parameters['plainPassword']['password'];
+                } else {
+                    $submittedPassword = $parameters['plainPassword'];
                 }
-
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
-                break;
+            }
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
         }
     }
 

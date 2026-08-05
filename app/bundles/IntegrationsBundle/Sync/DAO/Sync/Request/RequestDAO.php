@@ -66,6 +66,6 @@ final class RequestDAO
      */
     public function shouldSync(): bool
     {
-        return !empty($this->objects);
+        return [] !== $this->objects;
     }
 }
