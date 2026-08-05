@@ -72,8 +72,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Delete a batch of entities.
+     *
+     * @return array|Response
      */
-    public function deleteEntitiesAction(Request $request): Response
+    public function deleteEntitiesAction(Request $request)
     {
         $parameters = $request->query->all();
 
@@ -129,8 +131,10 @@ class CommonApiController extends FetchCommonApiController
      * Deletes an entity.
      *
      * @param int $id Entity ID
+     *
+     * @return Response
      */
-    public function deleteEntityAction($id): Response
+    public function deleteEntityAction($id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -159,8 +163,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Edit a batch of entities.
+     *
+     * @return array|Response
      */
-    public function editEntitiesAction(Request $request): Response
+    public function editEntitiesAction(Request $request)
     {
         $parameters = $request->request->all();
 
@@ -231,8 +237,10 @@ class CommonApiController extends FetchCommonApiController
      * Edits an existing entity or creates one on PUT if it doesn't exist.
      *
      * @param int $id Entity ID
+     *
+     * @return Response
      */
-    public function editEntityAction(Request $request, $id): Response
+    public function editEntityAction(Request $request, $id)
     {
         $entity     = $this->model->getEntity($id);
         $parameters = $request->request->all();
@@ -260,8 +268,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Create a batch of new entities.
+     *
+     * @return array|Response
      */
-    public function newEntitiesAction(Request $request): Response
+    public function newEntitiesAction(Request $request)
     {
         $entity = $this->model->getEntity();
 
@@ -322,8 +332,10 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Creates a new entity.
+     *
+     * @return Response
      */
-    public function newEntityAction(Request $request): Response
+    public function newEntityAction(Request $request)
     {
         $parameters = $request->request->all();
         $entity     = $this->getNewEntity($parameters);

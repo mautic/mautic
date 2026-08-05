@@ -1237,6 +1237,12 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
 
 		-
+			message: '#^Method Mautic\\CoreBundle\\Controller\\AbstractFormController\:\:isLocked\(\) should return array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
+			identifier: return.type
+			count: 1
+			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
+
+		-
 			message: '#^Instead of assigning service property to a variable, use the property directly$#'
 			identifier: symplify.noJustPropertyAssign
 			count: 1

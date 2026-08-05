@@ -7,8 +7,8 @@ use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractFormController extends CommonController
 {
@@ -16,8 +16,10 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * @param string $objectModel
+     *
+     * @return RedirectResponse
      */
-    public function unlockAction(Request $request, $objectId, $objectModel): Response
+    public function unlockAction(Request $request, $objectId, $objectModel)
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
@@ -64,7 +66,7 @@ abstract class AbstractFormController extends CommonController
      * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
-     * @return ($batch is true ? array : Response)
+     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
