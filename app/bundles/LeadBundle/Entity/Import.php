@@ -133,10 +133,6 @@ class Import extends FormEntity
         parent::__clone();
     }
 
-    public function __construct()
-    {
-    }
-
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
