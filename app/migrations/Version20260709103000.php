@@ -6,29 +6,30 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 final class Version20260709103000 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        if (!$schema->hasTable($this->prefix.'form_fields')) {
+        if (!$schema->hasTable("{$this->prefix}form_fields")) {
             return;
         }
 
-        $formFieldsTable = $schema->getTable($this->prefix.'form_fields');
+        $formFieldsTable = $schema->getTable("{$this->prefix}form_fields");
         if (!$formFieldsTable->hasColumn('is_auto_fill')) {
             return;
         }
 
         $formUsingAutoFill = $this->connection->fetchOne(
-            sprintf('SELECT 1 FROM %sform_fields WHERE is_auto_fill = 1 LIMIT 1', $this->prefix)
+            "SELECT 1 FROM {$this->prefix}form_fields WHERE is_auto_fill = 1 LIMIT 1"
         );
 
         if (false === $formUsingAutoFill) {
             return;
         }
 
-        $configFile = dirname(__DIR__, 2).'/config/local.php';
+        $configFile = ParameterLoader::getLocalConfigFile(__DIR__.'/../');
         if (!file_exists($configFile)) {
             return;
         }
@@ -43,7 +44,7 @@ final class Version20260709103000 extends AbstractMauticMigration
 
         $result = file_put_contents($configFile, "<?php\n".'$parameters = '.var_export($parameters, true).';');
         if (false === $result) {
-            throw new \RuntimeException('Could not update config/local.php with form_field_autofill parameter.');
+            throw new \RuntimeException('Could not update the local config file with form_field_autofill parameter.');
         }
     }
 }
