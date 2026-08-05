@@ -27,35 +27,7 @@ final class ApiPermissionVoterTest extends TestCase
         $this->corePermissionsMock = $this->createMock(CorePermissions::class);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new class() implements EventSubscriberInterface {
-            public static function getSubscribedEvents(): array
-            {
-                return [
-                    ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
-                ];
-            }
-
-            public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
-            {
-                $permission = $event->getPermission();
-
-                if ('custom:bridge:view' === $permission) {
-                    $event->setPermission('custom:bridge:viewown');
-                    $event->setRequestObject(new class() {
-                        public function getCreatedBy(): int
-                        {
-                            return 12;
-                        }
-                    });
-
-                    return;
-                }
-
-                if ('custom:bridge:write' === $permission) {
-                    $event->setPermission('custom:bridge:publish');
-                }
-            }
-        });
+        $dispatcher->addSubscriber(new TestApiPermissionContextSubscriber());
 
         $this->voter = new ApiPermissionVoter($this->corePermissionsMock, $dispatcher);
     }
@@ -102,5 +74,32 @@ final class ApiPermissionVoterTest extends TestCase
         $token->method('getUser')->willReturn($this->createStub(UserInterface::class));
 
         return $token;
+    }
+}
+
+final class TestApiPermissionContextSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
+        ];
+    }
+
+    public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
+    {
+        $permission = $event->getPermission();
+
+        if ('custom:bridge:view' === $permission) {
+            $event->setPermission('custom:bridge:viewown');
+            $event->setRequestObject(new class() {
+                public function getCreatedBy(): int
+                {
+                    return 12;
+                }
+            });
+        } elseif ('custom:bridge:write' === $permission) {
+            $event->setPermission('custom:bridge:publish');
+        }
     }
 }

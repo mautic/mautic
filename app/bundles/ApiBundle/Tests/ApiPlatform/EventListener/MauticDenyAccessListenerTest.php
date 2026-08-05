@@ -44,61 +44,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $this->configureRequest($this->createFormEntityMock());
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new class() implements EventSubscriberInterface {
-            public static function getSubscribedEvents(): array
-            {
-                return [
-                    ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
-                ];
-            }
-
-            public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
-            {
-                $permission = $event->getPermission();
-
-                if (!str_starts_with($permission, 'custom_objects:')) {
-                    return;
-                }
-
-                if (!str_contains($permission, '[') && !str_contains($permission, '(')) {
-                    return;
-                }
-
-                $requestObject = $event->getRequestObject();
-                $match         = [];
-                preg_match('#\((.*?)\)#', $permission, $match);
-                $objectPath = $match[1] ?? null;
-
-                if (is_string($objectPath) && '' !== $objectPath) {
-                    $permission = substr($permission, 0, strpos($permission, '('));
-                    foreach (explode('.', $objectPath) as $property) {
-                        if (!is_object($requestObject) || !method_exists($requestObject, $property)) {
-                            break;
-                        }
-
-                        $requestObject = $requestObject->{$property}();
-                    }
-                }
-
-                if (preg_match('#\[(.*?)\]#', $permission, $match) && !empty($match[1]) && is_object($requestObject)) {
-                    $getter = 'get'.ucfirst($match[1]);
-                    if (method_exists($requestObject, $getter)) {
-                        $objectId = $requestObject->{$getter}();
-
-                        if (is_object($objectId) && method_exists($objectId, 'getId')) {
-                            $objectId = $objectId->getId();
-                        }
-
-                        if (null !== $objectId && '' !== (string) $objectId) {
-                            $permission = preg_replace('#\[(.*?)\]#', (string) $objectId, $permission, 1) ?? $permission;
-                        }
-                    }
-                }
-
-                $event->setPermission($permission);
-                $event->setRequestObject($requestObject);
-            }
-        });
+        $dispatcher->addSubscriber(new TestApiPlatformPermissionContextSubscriber());
 
         $this->mauticDenyAccessListener = new MauticDenyAccessListener(
             $this->corePermissionsMock,
@@ -282,5 +228,97 @@ final class MauticDenyAccessListenerTest extends TestCase
     private function createFormEntityMock(): FormEntity
     {
         return $this->createConfiguredMock(FormEntity::class, ['getCreatedBy' => 0]);
+    }
+}
+
+final class TestApiPlatformPermissionContextSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
+        ];
+    }
+
+    public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
+    {
+        $permission = $event->getPermission();
+
+        if ($this->shouldMutate($permission)) {
+            [$permission, $requestObject] = $this->resolvePermissionContext($permission, $event->getRequestObject());
+            $event->setPermission($permission);
+            $event->setRequestObject($requestObject);
+        }
+    }
+
+    private function shouldMutate(string $permission): bool
+    {
+        return str_starts_with($permission, 'custom_objects:')
+            && (str_contains($permission, '[') || str_contains($permission, '('));
+    }
+
+    /**
+     * @return array{0: string, 1: mixed}
+     */
+    private function resolvePermissionContext(string $permission, mixed $requestObject): array
+    {
+        $resolvedRequestObject = $this->resolveRequestObjectFromPath($permission, $requestObject);
+        $permissionWithoutPath = preg_replace('#\(.*?\)#', '', $permission, 1) ?? $permission;
+
+        return [$this->replacePermissionPlaceholder($permissionWithoutPath, $resolvedRequestObject), $resolvedRequestObject];
+    }
+
+    private function resolveRequestObjectFromPath(string $permission, mixed $requestObject): mixed
+    {
+        $resolvedObject = $requestObject;
+        $path           = $this->extractPath($permission);
+
+        if (is_string($path) && '' !== $path) {
+            foreach (explode('.', $path) as $property) {
+                if (!is_object($resolvedObject) || !method_exists($resolvedObject, $property)) {
+                    break;
+                }
+
+                $resolvedObject = $resolvedObject->{$property}();
+            }
+        }
+
+        return $resolvedObject;
+    }
+
+    private function extractPath(string $permission): ?string
+    {
+        if (preg_match('#\((.*?)\)#', $permission, $matches)) {
+            return $matches[1] ?? null;
+        }
+
+        return null;
+    }
+
+    private function replacePermissionPlaceholder(string $permission, mixed $requestObject): string
+    {
+        if (!is_object($requestObject)) {
+            return $permission;
+        }
+
+        if (!preg_match('#\[(.*?)\]#', $permission, $matches) || empty($matches[1])) {
+            return $permission;
+        }
+
+        $getter = 'get'.ucfirst($matches[1]);
+        if (!method_exists($requestObject, $getter)) {
+            return $permission;
+        }
+
+        $objectId = $requestObject->{$getter}();
+        if (is_object($objectId) && method_exists($objectId, 'getId')) {
+            $objectId = $objectId->getId();
+        }
+
+        if (null === $objectId || '' === (string) $objectId) {
+            return $permission;
+        }
+
+        return preg_replace('#\[(.*?)\]#', (string) $objectId, $permission, 1) ?? $permission;
     }
 }
