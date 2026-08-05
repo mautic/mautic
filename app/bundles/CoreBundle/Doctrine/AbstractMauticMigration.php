@@ -204,13 +204,12 @@ abstract class AbstractMauticMigration extends AbstractMigration
     {
         $table       = $schema->getTable($this->getPrefixedTableName($tableName));
         $idColumn    = $table->getColumn($columnName);
-        $idDataType  = self::COLUMN_TYPE_SIGNED;
 
         if (true === $idColumn->getUnsigned()) {
             return self::COLUMN_TYPE_UNSIGNED;
         }
 
-        return $idDataType;
+        return self::COLUMN_TYPE_SIGNED;
     }
 
     protected function getColumnType(Schema $schema, string $tableName, string $columnName): string
