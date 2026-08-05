@@ -24,7 +24,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
     public function testCreateCompany(): void
     {
         /** @var UserModel $userModel */
-        $userModel = static::getContainer()->get(UserModel::class);
+        $userModel = self::getContainer()->get(UserModel::class);
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $this->assertInstanceOf(User::class, $user);
@@ -33,7 +33,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $company->setName('Test company');
         $company->setOwner($user);
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company);
 
         $auditLogRepository = $this->em->getRepository(AuditLog::class);
@@ -49,13 +49,13 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $company = new Company();
         $company->setName('Test Delete Company');
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company);
 
         $lead = new Lead();
         $lead->setFirstname('Test name');
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntity($lead);
         $companyModel->addLeadToCompany($company, $lead);
         $leadModel->saveEntity($lead);

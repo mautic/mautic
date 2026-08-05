@@ -104,7 +104,7 @@ final class SearchSubscriber implements EventSubscriberInterface
             '@MauticLead/SubscribedEvents/Search/global_segment.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.segment.segment', $results);
         }
     }

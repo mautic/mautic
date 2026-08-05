@@ -50,7 +50,7 @@ final class BroadcastExecutioner
     private function send(Sms $sms): void
     {
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
-        while (!empty($contacts)) {
+        while ([] !== $contacts) {
             $reduction = 0;
             $leads     = [];
             foreach ($contacts as $contact) {
