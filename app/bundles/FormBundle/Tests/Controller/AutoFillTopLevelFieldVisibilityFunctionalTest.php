@@ -60,7 +60,7 @@ final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTes
             $this->assertMatchesRegularExpression('/<input[^>]*(name="mauticform\[firstname\]"[^>]*type="text"|type="text"[^>]*name="mauticform\[firstname\]")[^>]*>/', $html, $html);
             $this->assertDoesNotMatchRegularExpression('/<input[^>]*(name="mauticform\[firstname\]"[^>]*type="hidden"|type="hidden"[^>]*name="mauticform\[firstname\]")[^>]*>/', $html, $html);
         } finally {
-            $contactTracker->setSystemContact(null);
+            $contactTracker->setSystemContact();
             $contactTracker->setUseSystemContact(false);
             $requestStack->pop();
             $this->client->enableReboot();
