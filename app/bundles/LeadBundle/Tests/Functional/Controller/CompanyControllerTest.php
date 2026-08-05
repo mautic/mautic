@@ -28,6 +28,14 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(403, $clientResponse->getStatusCode());
     }
 
+    public function testBatchOwnersAction(): void
+    {
+        $this->client->request('GET', '/s/companies/batchOwners/0');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('lead_batch_owner', (string) $this->client->getResponse()->getContent());
+    }
+
     private function createAndLoginUser(): User
     {
         // Create non-admin role
