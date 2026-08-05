@@ -434,7 +434,7 @@ final class LeadController extends FormController
         $returnUrl = null;
         if ('form_results' === $request->query->get('returnTo')) {
             $formId   = (int) $request->query->get('formId');
-            $formPage = max(0, (int) $request->query->get('formPage', 1));
+            $formPage = max(1, (int) $request->query->get('formPage', 1));
 
             if ($formId > 0) {
                 $returnUrl = $this->generateUrl('mautic_form_results', [
