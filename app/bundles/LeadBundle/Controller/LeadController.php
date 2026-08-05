@@ -601,7 +601,7 @@ final class LeadController extends FormController
                     // Save here as we need the entity with an ID for the company code bellow.
                     $this->leadRepository->saveEntity($lead);
 
-                    if (!empty($companies)) {
+                    if ([] !== $companies) {
                         $this->leadModel->modifyCompanies($lead, $companies);
                     }
 
@@ -1284,7 +1284,7 @@ final class LeadController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->leadModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

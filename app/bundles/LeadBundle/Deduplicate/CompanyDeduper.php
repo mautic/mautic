@@ -30,7 +30,7 @@ class CompanyDeduper
     public function checkForDuplicateCompanies(array $queryFields): array
     {
         $uniqueData = $this->getUniqueData($queryFields);
-        if (empty($uniqueData)) {
+        if ([] === $uniqueData) {
             throw new UniqueFieldNotFoundException();
         }
 

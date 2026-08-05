@@ -545,7 +545,7 @@ final class CategoryController extends AbstractFormController
                 }
             }
 
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',

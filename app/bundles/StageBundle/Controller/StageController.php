@@ -586,7 +586,7 @@ final class StageController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->stageModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

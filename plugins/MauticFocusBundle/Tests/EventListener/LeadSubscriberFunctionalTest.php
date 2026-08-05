@@ -21,7 +21,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = static::getContainer()->get(FocusModel::class);
+        $this->focusModel = self::getContainer()->get(FocusModel::class);
         $this->lead       = $this->createLead();
 
         $this->setTestsData($this->lead);

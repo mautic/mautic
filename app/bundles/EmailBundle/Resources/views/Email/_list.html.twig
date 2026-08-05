@@ -110,7 +110,19 @@
                             'priority': 100
                         } %}
 
-                        {% set customButtons = ('list' == type) ? [sendButton, previewButton] : [previewButton] %}
+                        {% set sendExampleButton = {
+                            'attr': {
+                                'class': 'btn btn-tertiary btn-sm btn-nospin',
+                                'data-toggle': 'ajaxmodal',
+                                'data-target': '#MauticSharedModal',
+                                'href': path('mautic_email_action', {'objectAction': 'sendExample', 'objectId': item.getId()}),
+                                'data-header': 'mautic.email.send.example'|trans,
+                            },
+                            'iconClass': 'ri-mail-send-line',
+                            'btnText': 'mautic.email.send.example',
+                        } %}
+
+                        {% set customButtons = ('list' == type) ? [sendButton, sendExampleButton, previewButton] : [sendExampleButton, previewButton] %}
 
                         {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
