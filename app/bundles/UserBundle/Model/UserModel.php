@@ -59,6 +59,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         private readonly PermissionRepository $permissionRepository,
         private readonly RoleRepository $roleRepository,
         private readonly UserInviteRepository $userInviteRepository,
+        private UserPasswordHasherInterface $userPasswordHasher,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -106,7 +107,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      * @param string     $submittedPassword
      * @param bool|false $validate
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): ?string
+    public function checkNewPassword(User $entity, $submittedPassword, $validate = false): ?string
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -116,7 +117,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($submittedPassword)) {
             // hash the clear password submitted via the form
-            return $hasher->hashPassword($entity, $submittedPassword);
+            return $this->userPasswordHasher->hashPassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
@@ -232,9 +233,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordHasherInterface $hasher, $newPassword): void
+    public function resetPassword(User $user, $newPassword): void
     {
-        $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
+        $hashedPassword = $this->checkNewPassword($user, $newPassword);
 
         $user->setPassword($hashedPassword);
         $this->saveEntity($user);
