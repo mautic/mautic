@@ -107,7 +107,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $this->createStub(LoggerInterface::class),
             $this->marketplaceConfig
         );
-        $controller->setContainer(static::getContainer());
+        $controller->setContainer(self::getContainer());
 
         return $controller;
     }

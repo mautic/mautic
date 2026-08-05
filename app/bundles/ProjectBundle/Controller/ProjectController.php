@@ -451,7 +451,7 @@ final class ProjectController extends AbstractFormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $projectModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {

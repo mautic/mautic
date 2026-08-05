@@ -484,7 +484,7 @@ final class FieldType extends AbstractType
             function (FormEvent $event) use ($formModifier, $disableDefaultValue, $setupOrderField): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
-                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                $masks         = [] !== $cleaningRules ? $cleaningRules : 'clean';
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 

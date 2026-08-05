@@ -421,10 +421,10 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     public function testNotificationsSentInBatches(): void
     {
-        $subscriber = new class(static::getContainer()->get(IntegrationHelper::class), static::getContainer()->get(NotificationModel::class), static::getContainer()->get(OneSignalApi::class), static::getContainer()->get(EventDispatcherInterface::class), static::getContainer()->get(DoNotContactModel::class), static::getContainer()->get(TranslatorInterface::class), static::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
+        $subscriber = new class(self::getContainer()->get(IntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
             protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
-        static::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
+        self::getContainer()->set('mautic.notification.campaignbundle.subscriber', $subscriber);
 
         $notification = $this->createNotification($this->em);
         $this->em->flush();
@@ -557,7 +557,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     private function convertToTrackedUrl(Notification $notification, Lead $leadOne): string
     {
         /** @var AbstractNotificationApi $api */
-        $api          = static::getContainer()->get(OneSignalApi::class);
+        $api          = self::getContainer()->get(OneSignalApi::class);
         $clickThrough = [
             'notification' => $notification->getId(),
             'lead'         => $leadOne->getId(),

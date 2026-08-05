@@ -16,9 +16,9 @@ final class EventHelper
     {
         $contact = $leadRepository->getEntityWithPrimaryCompany($lead);
 
-        static::setStaticIntegrationHelper($integrationHelper);
+        self::setStaticIntegrationHelper($integrationHelper);
         $errors  = [];
 
-        return static::pushIt($config, $contact, $errors);
+        return self::pushIt($config, $contact, $errors);
     }
 }
