@@ -404,7 +404,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
             }
         }
 
-        if (empty($values)) {
+        if ([] === $values) {
             throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
         }
 
@@ -702,11 +702,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     public function getSchedule(): array
     {
-        $schedule                             = [];
-        $schedule['schedule_unit']            = $this->scheduleUnit;
-        $schedule['schedule_day']             = $this->scheduleDay;
-        $schedule['schedule_month_frequency'] = $this->scheduleMonthFrequency;
-
-        return $schedule;
+        return ['schedule_unit' => $this->scheduleUnit, 'schedule_day' => $this->scheduleDay, 'schedule_month_frequency' => $this->scheduleMonthFrequency];
     }
 }

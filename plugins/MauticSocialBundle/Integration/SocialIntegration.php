@@ -60,7 +60,7 @@ abstract class SocialIntegration extends AbstractIntegration
         if (empty($fields)) {
             $s         = $this->getName();
             $available = $this->getAvailableLeadFields($settings);
-            if (empty($available)) {
+            if ([] === $available) {
                 return [];
             }
             // create social profile fields

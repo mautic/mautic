@@ -683,7 +683,7 @@ final class SmsController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->smsModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

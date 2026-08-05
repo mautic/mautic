@@ -109,7 +109,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     /**
@@ -784,9 +784,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $this->em->method('getReference')
             ->willReturnCallback(
                 function () {
-                    switch (func_get_arg(0)) {
-                        case IntegrationEntity::class:
-                            return new IntegrationEntity();
+                    if (IntegrationEntity::class === func_get_arg(0)) {
+                        return new IntegrationEntity();
                     }
                 }
             );

@@ -412,7 +412,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get(RoleModel::class);
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

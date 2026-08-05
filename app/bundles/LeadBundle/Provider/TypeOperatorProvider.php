@@ -76,7 +76,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 
     public function getAllTypeOperators(): array
     {
-        if (empty($this->cachedTypeOperators)) {
+        if ([] === $this->cachedTypeOperators) {
             $event = new TypeOperatorsEvent($this->context);
 
             $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE);

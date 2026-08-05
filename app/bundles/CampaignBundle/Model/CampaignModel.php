@@ -941,7 +941,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     private function handleDeletedEventsWithRedirect(array $deletedEvents): void
     {
-        if (empty($deletedEvents)) {
+        if ([] === $deletedEvents) {
             return;
         }
 
