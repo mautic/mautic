@@ -800,7 +800,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             return null;
         }
 
-        $company = !empty($duplicateCompanies) ? $duplicateCompanies[0] : new Company();
+        $company = $duplicateCompanies[0] ?? new Company();
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;

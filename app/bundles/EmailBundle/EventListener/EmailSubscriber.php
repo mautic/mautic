@@ -37,7 +37,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
-        private readonly EmailRepository $emailRepository,
+        private EmailRepository $emailRepository,
     ) {
     }
 

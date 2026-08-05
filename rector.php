@@ -49,7 +49,7 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withCodeQualityLevel(45)
+    ->withCodeQualityLevel(55)
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // @todo move to "twig" group
@@ -61,6 +61,9 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
+
+        // preference to compare null over object
+        Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
 
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
             // doctrine magic
