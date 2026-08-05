@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-class IntegrationObject
+final class IntegrationObject
 {
     /**
      * @param string $type

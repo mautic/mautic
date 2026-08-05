@@ -131,6 +131,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     {
         $type          = new SortableValueLabelListType();
         $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
+
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')

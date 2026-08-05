@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-class MiddlewareCacheWarmer implements CacheWarmerInterface
+final class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
     private ?string $cacheFile = null;
 

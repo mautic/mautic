@@ -47,6 +47,6 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
         $projectId = $options['projectId'] ?? null;
 
         // Results are already in the correct format (id => name)
-        return $this->entityLoaderService->getLookupResults($type, (string) $filter, (int) $limit, (int) $start, $projectId);
+        return $this->entityLoaderService->getLookupResults($type, $filter, $limit, $start, $projectId);
     }
 }

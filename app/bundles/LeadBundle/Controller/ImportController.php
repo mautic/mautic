@@ -397,7 +397,7 @@ final class ImportController extends FormController
 
                     $matchedFields = $validateEvent->getMatchedFields();
 
-                    if (empty($matchedFields)) {
+                    if ([] === $matchedFields) {
                         $this->resetImport($object);
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
@@ -654,28 +654,24 @@ final class ImportController extends FormController
      */
     public function getViewArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'view':
-                /** @var Import $entity */
-                $entity = $args['entity'];
-
-                $args['viewParameters'] = array_merge(
-                    $args['viewParameters'],
-                    [
-                        'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
-                        'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
-                            'i',
-                            $entity->getDateStarted(),
-                            $entity->getDateEnded() ?: $entity->getDateModified(),
-                            null,
-                            [
-                                'object_id' => $entity->getId(),
-                            ]
-                        ) : [],
-                    ]
-                );
-
-                break;
+        if ('view' === $action) {
+            /** @var Import $entity */
+            $entity = $args['entity'];
+            $args['viewParameters'] = array_merge(
+                $args['viewParameters'],
+                [
+                    'failedRows'        => $this->importModel->getFailedRows($entity->getId(), $entity->getObject()),
+                    'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
+                        'i',
+                        $entity->getDateStarted(),
+                        $entity->getDateEnded() ?: $entity->getDateModified(),
+                        null,
+                        [
+                            'object_id' => $entity->getId(),
+                        ]
+                    ) : [],
+                ]
+            );
         }
 
         return $args;

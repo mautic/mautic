@@ -11,13 +11,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreAuthorizationEventListener implements EventSubscriberInterface
+final readonly class PreAuthorizationEventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly UserRepository $userRepository,
-        private readonly CorePermissions $mauticSecurity,
-        private readonly TranslatorInterface $translator,
+        private EntityManagerInterface $em,
+        private UserRepository $userRepository,
+        private CorePermissions $mauticSecurity,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -68,7 +68,7 @@ class PreAuthorizationEventListener implements EventSubscriberInterface
     /**
      * @return mixed
      */
-    protected function getUser(OAuthEvent $event)
+    private function getUser(OAuthEvent $event)
     {
         return $this->userRepository->findOneByUsername($event->getUser()->getUserIdentifier());
     }

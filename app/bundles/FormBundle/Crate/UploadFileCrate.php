@@ -5,7 +5,7 @@ namespace Mautic\FormBundle\Crate;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class UploadFileCrate implements \Iterator
+final class UploadFileCrate implements \Iterator
 {
     /**
      * @var array|FileFieldCrate[]

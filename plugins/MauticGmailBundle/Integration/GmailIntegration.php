@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticGmailBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class GmailIntegration extends AbstractIntegration
+final class GmailIntegration extends AbstractIntegration
 {
     public function getName(): string
     {

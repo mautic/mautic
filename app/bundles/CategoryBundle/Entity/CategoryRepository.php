@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Category>
  */
-final class CategoryRepository extends CommonRepository
+class CategoryRepository extends CommonRepository
 {
     /**
      * Get a list of entities.

@@ -101,7 +101,7 @@ final class FocusPropertiesType extends AbstractType
                 break;
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $builder->add(
                 'placement',
                 ChoiceType::class,

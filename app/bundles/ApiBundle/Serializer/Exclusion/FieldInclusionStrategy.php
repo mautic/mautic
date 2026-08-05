@@ -10,7 +10,7 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 /**
  * Include specific fields at a specific level.
  */
-class FieldInclusionStrategy implements ExclusionStrategyInterface
+final class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
     private readonly int $level;
 

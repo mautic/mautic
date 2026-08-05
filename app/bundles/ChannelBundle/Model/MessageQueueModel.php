@@ -11,6 +11,7 @@ use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -34,17 +35,21 @@ class MessageQueueModel extends FormModel
 
     private FrequencyRuleRepository $frequencyRuleRepository;
 
+    private LeadRepository $leadRepository;
+
     #[Required]
     public function autowireMessageQueueModel(
         LeadModel $leadModel,
         CompanyModel $companyModel,
         MessageQueueRepository $messageQueueRepository,
         FrequencyRuleRepository $frequencyRuleRepository,
+        LeadRepository $leadRepository,
     ): void {
         $this->leadModel               = $leadModel;
         $this->companyModel            = $companyModel;
         $this->messageQueueRepository  = $messageQueueRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
+        $this->leadRepository = $leadRepository;
     }
 
     public function getRepository(): MessageQueueRepository
@@ -211,8 +216,8 @@ class MessageQueueModel extends FormModel
                 $contacts[$message->getId()] = $message->getLead()->getId();
             }
         }
-        if (!empty($contacts)) {
-            $contactData = $this->leadModel->getRepository()->getContacts($contacts);
+        if ([] !== $contacts) {
+            $contactData = $this->leadRepository->getContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }

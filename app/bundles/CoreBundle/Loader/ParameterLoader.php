@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ParameterLoader
+final class ParameterLoader
 {
     private readonly string $configBaseDir;
 
@@ -28,7 +28,7 @@ class ParameterLoader
     public function __construct(
         private readonly string $rootPath = __DIR__.'/../../../',
     ) {
-        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
+        $this->configBaseDir = self::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
