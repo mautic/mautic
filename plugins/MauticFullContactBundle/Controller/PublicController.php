@@ -219,7 +219,7 @@ final class PublicController extends FormController
             $this->leadModel->setFieldValues($lead, $data);
             $this->leadRepository->saveEntity($lead);
 
-            if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+            if ($notify && (!$lead->imported)) {
                 if ($user = $this->userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
@@ -231,7 +231,7 @@ final class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && $lead && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf(

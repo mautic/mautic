@@ -162,7 +162,7 @@ final class CompanyController extends FormController
 
         $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $companyIds = array_keys($companies);
-        $leadCounts = (!empty($companyIds)) ? $this->companyRepository->getLeadCount($companyIds) : [];
+        $leadCounts = ([] !== $companyIds) ? $this->companyRepository->getLeadCount($companyIds) : [];
 
         return $this->delegateView(
             [
@@ -839,7 +839,7 @@ final class CompanyController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->companyModel->deleteEntities($deleteIds);
                 $deleted  = count($entities);
                 $this->addFlashMessage(

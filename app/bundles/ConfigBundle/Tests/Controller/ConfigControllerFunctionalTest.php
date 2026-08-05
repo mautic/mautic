@@ -89,7 +89,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private function getConfigPath(): string
     {
         /** @var \AppKernel $kernel */
-        $kernel = static::getContainer()->get(KernelInterface::class);
+        $kernel = self::getContainer()->get(KernelInterface::class);
 
         return $kernel->getLocalConfigFile();
     }
