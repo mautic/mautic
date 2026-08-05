@@ -401,7 +401,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, []);
                 $items = [];
 
-                if (empty($leads)) {
+                if ([] === $leads) {
                     $leads[] = [
                         'name' => $this->translator->trans('mautic.report.report.noresults'),
                     ];

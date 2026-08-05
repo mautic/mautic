@@ -147,22 +147,18 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'channel.message':
-                $entities = $this->messageRepository->getMessageList(
-                    $filter,
-                    $limit,
-                    $start
-                );
-
-                foreach ($entities as $entity) {
-                    $results[] = [
-                        'label' => $entity['name'],
-                        'value' => $entity['id'],
-                    ];
-                }
-
-                break;
+        if ('channel.message' === $type) {
+            $entities = $this->messageRepository->getMessageList(
+                $filter,
+                $limit,
+                $start
+            );
+            foreach ($entities as $entity) {
+                $results[] = [
+                    'label' => $entity['name'],
+                    'value' => $entity['id'],
+                ];
+            }
         }
 
         return $results;

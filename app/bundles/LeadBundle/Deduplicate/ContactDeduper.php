@@ -92,7 +92,7 @@ final class ContactDeduper
      */
     public function mergeContacts(array $duplicates): void
     {
-        if (empty($duplicates)) {
+        if ([] === $duplicates) {
             return;
         }
 
@@ -114,7 +114,7 @@ final class ContactDeduper
     {
         $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);
-        if (!empty($uniqueData)) {
+        if ([] !== $uniqueData) {
             $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
 
             // By default, duplicates are ordered by newest first

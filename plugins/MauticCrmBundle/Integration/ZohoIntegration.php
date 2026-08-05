@@ -789,7 +789,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
         if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
             unset($leadFields[$key]);
         }
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 
@@ -1031,7 +1031,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($existingPerson) && empty($integrationId)) {
+                if ([] !== $existingPerson && [] === $integrationId) {
                     $this->createIntegrationEntity($zObject, $existingPerson['id'], 'lead', $lead->getId());
 
                     $mapper
@@ -1039,7 +1039,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                         ->setContact($lead->getProfileFields())
                         ->map($lead->getId(), $existingPerson['id']);
                     $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
-                } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
+                } elseif ([] !== $existingPerson && [] !== $integrationId) { // contact exists, then update
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())

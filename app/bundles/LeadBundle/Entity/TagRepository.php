@@ -100,7 +100,7 @@ class TagRepository extends CommonRepository
      */
     public function getTagsByName(array $tags): array
     {
-        if (empty($tags)) {
+        if ([] === $tags) {
             return [];
         }
 
