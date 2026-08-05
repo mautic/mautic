@@ -389,7 +389,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('');
 
         // Inject the mock into the container
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -447,7 +447,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('/invalid/path/to/file.zip');
 
         // Use the test container to replace the service with the mock
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 

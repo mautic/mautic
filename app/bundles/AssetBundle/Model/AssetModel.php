@@ -427,7 +427,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate('mautic_asset_download', $routeParams, $referenceType);
 
-        if (empty($clickthrough)) {
+        if ([] === $clickthrough) {
             return $url;
         }
 
@@ -478,7 +478,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
             $assets = [$assets];
         }
 
-        if (empty($assets)) {
+        if ([] === $assets) {
             return 0;
         }
 
@@ -642,7 +642,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
         [$id] = array_pad(explode(':', $slug, 2), 1, null);
 
-        if (empty($id) || !ctype_digit((string) $id)) {
+        if (empty($id) || !ctype_digit($id)) {
             return false;
         }
 

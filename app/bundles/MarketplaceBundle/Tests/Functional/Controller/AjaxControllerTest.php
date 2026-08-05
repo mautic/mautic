@@ -236,7 +236,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $this->resourceInstaller,
             $this->packageModel
         );
-        $controller->setContainer(static::getContainer());
+        $controller->setContainer(self::getContainer());
 
         return $controller;
     }

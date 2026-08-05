@@ -645,7 +645,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
-        if (empty($eventIds)) {
+        if ([] === $eventIds) {
             return false;
         }
 

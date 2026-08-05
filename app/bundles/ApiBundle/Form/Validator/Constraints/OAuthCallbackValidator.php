@@ -28,7 +28,7 @@ final class OAuthCallbackValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        if (!preg_match(static::PATTERN, $value)) {
+        if (!preg_match(self::PATTERN, $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->addViolation();

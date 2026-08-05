@@ -64,7 +64,7 @@ final class ModifyCustomFieldCommand extends Command
             $fieldsNeedsToBeUpdated[$field['alias']] = $field;
         }
 
-        if (empty($fieldsNeedsToBeUpdated)) {
+        if ([] === $fieldsNeedsToBeUpdated) {
             $output->writeln('<info>No custom field(s) to update!!!</info>');
 
             return Command::SUCCESS;
