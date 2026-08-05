@@ -203,7 +203,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
 
                 $listId = $config['list_settings']['list'];
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData += $customfields;
                 }
 

@@ -17,7 +17,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->notificationBuilder = static::getContainer()->get(UserNotificationBuilder::class);
+        $this->notificationBuilder = self::getContainer()->get(UserNotificationBuilder::class);
     }
 
     public function testGetUserIdsWithNonExistentObject(): void

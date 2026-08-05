@@ -141,7 +141,7 @@ final class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilde
                     $expressions[] = $queryBuilder->expr()->{$operator}($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                if (empty($expressions)) {
+                if ([] === $expressions) {
                     $expression = $queryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
                     break;
                 }

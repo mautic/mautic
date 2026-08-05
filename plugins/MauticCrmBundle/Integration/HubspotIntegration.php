@@ -152,7 +152,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
+                if (!empty($hubspotObjects) && is_array($hubspotObjects)) {
                     foreach ($hubspotObjects as $object) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
@@ -414,7 +414,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
-                if (isset($data['hasMore']) and $data['hasMore']) {
+                if (isset($data['hasMore']) && $data['hasMore']) {
                     $params['offset'] = $data['offset'];
                     if ($params['offset'] < strtotime($params['start'])) {
                         $this->getCompanies($params, $id, $executed);
@@ -562,7 +562,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 $integrationId     = $this->integrationEntityRepository->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
-                $integrationEntity = (empty($integrationId)) ?
+                $integrationEntity = ([] === $integrationId) ?
                     $this->createIntegrationEntity(
                         $object,
                         $leadData['vid'],
