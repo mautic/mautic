@@ -55,7 +55,11 @@ final class AjaxController extends CommonAjaxController
 
     private DoNotContactRepository $doNotContactRepository;
 
+<<<<<<< HEAD
     private FormFieldHelper $formFieldHelper;
+=======
+    private FormFactoryInterface $formFactory;
+>>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
 
     #[Required]
     public function autowireLeadAjaxController(
@@ -64,14 +68,22 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+<<<<<<< HEAD
         FormFieldHelper $formFieldHelper,
+=======
+        FormFactoryInterface $formFactory,
+>>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
+<<<<<<< HEAD
         $this->formFieldHelper = $formFieldHelper;
+=======
+        $this->formFactory = $formFactory;
+>>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -155,7 +167,6 @@ final class AjaxController extends CommonAjaxController
 
     public function loadSegmentFilterFormAction(
         Request $request,
-        FormFactoryInterface $formFactory,
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel,
     ): JsonResponse {
@@ -165,7 +176,7 @@ final class AjaxController extends CommonAjaxController
         $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
-        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+        $form = $this->formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
             $formAdjustmentsProvider->adjustForm(

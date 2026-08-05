@@ -452,7 +452,7 @@ class CampaignController extends AbstractStandardFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'new']);
-        $form    = $this->campaignModel->createForm($campaign, $this->formFactory, $action, $options);
+        $form    = $this->campaignModel->createForm($campaign, $action, $options);
 
         // /Check for a submitted form and process it
         $isPost = 'POST' === $request->getMethod();

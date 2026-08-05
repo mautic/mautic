@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\StageBundle\Form\Type\StageActionType;
 use Mautic\StageBundle\Model\StageModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -23,7 +22,7 @@ final class AjaxController extends CommonAjaxController
         $this->stageModel = $stageModel;
     }
 
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
+    public function getActionFormAction(Request $request, Environment $twig): JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -42,7 +41,7 @@ final class AjaxController extends CommonAjaxController
                 $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericstage_settings';
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
 
-                $form = $formFactory->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
+                $form = $this->createForm(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html = $this->renderView('@MauticStage/Stage/actionform.html.twig', [
                     'form' => $this->setFormTheme($form, $twig, $themes),
                 ]);

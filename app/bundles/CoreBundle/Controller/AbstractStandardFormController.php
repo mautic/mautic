@@ -392,7 +392,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form    = $model->createForm($entity, $this->formFactory, $action, $options);
+        $form    = $model->createForm($entity, $action, $options);
 
         $isPost = !$ignorePost && 'POST' === $request->getMethod();
         $this->beforeFormProcessed($entity, $form, 'edit', $isPost, $objectId, $isClone);
@@ -463,7 +463,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
-                $form   = $model->createForm($entity, $this->formFactory, $action);
+                $form   = $model->createForm($entity, $action);
                 $this->beforeFormProcessed($entity, $form, 'edit', false, $isClone);
                 $this->setOptimisticLockVersion($entity, $form);
             }
@@ -937,7 +937,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
-        $form    = $model->createForm($entity, $this->formFactory, $action, $options);
+        $form    = $model->createForm($entity, $action, $options);
 
         // /Check for a submitted form and process it
         $isPost = 'POST' === $request->getMethod();

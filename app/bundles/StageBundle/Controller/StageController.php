@@ -9,7 +9,6 @@ use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Form\Type\StageMergeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\Security\Permissions\StagePermissions;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -120,7 +119,7 @@ final class StageController extends AbstractFormController
      *
      * @param Stage $entity
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): Response
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$entity instanceof Stage) {
             /** @var Stage $entity */
@@ -140,7 +139,6 @@ final class StageController extends AbstractFormController
         $actions    = $this->stageModel->getStageActions();
         $form       = $this->stageModel->createForm(
             $entity,
-            $formFactory,
             $action,
             [
                 'stageActions' => $actions,
@@ -178,7 +176,7 @@ final class StageController extends AbstractFormController
                         $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $formFactory, $entity->getId(), true);
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -239,7 +237,11 @@ final class StageController extends AbstractFormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
+<<<<<<< HEAD
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
+=======
+    public function editAction(Request $request, $objectId, $ignorePost = false)
+>>>>>>> 5a984947ee (use injected form factory in FormModel::createForm() instead of passing it as parameter)
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -291,7 +293,6 @@ final class StageController extends AbstractFormController
         $actions = $this->stageModel->getStageActions();
         $form    = $this->stageModel->createForm(
             $entity,
-            $formFactory,
             $action,
             [
                 'stageActions' => $actions,
@@ -389,7 +390,7 @@ final class StageController extends AbstractFormController
      *
      * @param int $objectId
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): Response
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 
@@ -402,10 +403,10 @@ final class StageController extends AbstractFormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($request, $formFactory, $entity);
+        return $this->newAction($request, $entity);
     }
 
-    public function mergeAction(Request $request, FormFactoryInterface $formFactory, StageModel $model, int $objectId): Response
+    public function mergeAction(Request $request, StageModel $model, int $objectId): Response
     {
         $secondaryStage = $model->getEntity($objectId);
         $page           = $request->getSession()->get('mautic.stage.page', 1);
@@ -441,7 +442,7 @@ final class StageController extends AbstractFormController
 
         $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
 
-        $form = $formFactory->create(
+        $form = $this->createForm(
             StageMergeType::class,
             [],
             [

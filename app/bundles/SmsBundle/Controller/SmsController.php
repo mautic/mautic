@@ -284,7 +284,7 @@ final class SmsController extends FormController
         }
 
         // create the form
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->smsModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -445,7 +445,7 @@ final class SmsController extends FormController
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->smsModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {

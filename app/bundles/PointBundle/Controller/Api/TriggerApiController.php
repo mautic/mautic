@@ -130,7 +130,6 @@ final class TriggerApiController extends CommonApiController
     {
         return $this->triggerEventModel->createForm(
             $entity,
-            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,

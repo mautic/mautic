@@ -21,6 +21,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FormModel extends AbstractCommonModel
 {
+    protected FormFactoryInterface $formFactory;
+
+    public function autowireFormModel(
+        FormFactoryInterface $formFactory,
+    ): void {
+        $this->formFactory = $formFactory;
+    }
+
     /**
      * Lock an entity to prevent multiple people from editing.
      *
@@ -367,7 +375,7 @@ class FormModel extends AbstractCommonModel
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }

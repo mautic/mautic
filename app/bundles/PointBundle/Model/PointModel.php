@@ -25,7 +25,6 @@ use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -75,7 +74,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -89,7 +88,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
             $options['pointActions'] = $this->getPointActions();
         }
 
-        return $formFactory->create(PointType::class, $entity, $options);
+        return $this->formFactory->create(PointType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?Point

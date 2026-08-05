@@ -185,7 +185,7 @@ final class ClientController extends AbstractStandardFormController
 
         // get the user form factory
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'new']);
-        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $action);
 
         // remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
@@ -306,7 +306,7 @@ final class ClientController extends AbstractStandardFormController
         }
 
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $action);
 
         // remove api_mode field
         $form->remove('api_mode');

@@ -175,7 +175,7 @@ final class TagController extends FormController
         $action    = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']);
 
         // get the user form factory
-        $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
+        $form = $this->tagManagerModel->createForm($tag, $action);
 
         $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
@@ -296,7 +296,7 @@ final class TagController extends FormController
     private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
     {
         /** @var FormInterface<FormInterface<Tag>> $form */
-        $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
+        $form = $this->tagManagerModel->createForm($tag, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -368,7 +368,7 @@ final class TagController extends FormController
                     // Re-create the form once more with the fresh tag and action.
                     // The alias was empty on redirect after cloning.
                     $editAction = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $tag->getId()]);
-                    $form       = $this->tagManagerModel->createForm($tag, $this->formFactory, $editAction);
+                    $form       = $this->tagManagerModel->createForm($tag, $editAction);
 
                     $postActionVars['viewParameters'] = [
                         'objectAction' => 'edit',

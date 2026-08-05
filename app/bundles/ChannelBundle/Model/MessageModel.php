@@ -12,7 +12,6 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -91,13 +90,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create(MessageType::class, $entity, $options);
+        return $this->formFactory->create(MessageType::class, $entity, $options);
     }
 
     /**

@@ -12,7 +12,6 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Entity\PointInsightRepository;
 use Mautic\PointBundle\Form\Type\PointInsightType;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -50,7 +49,7 @@ final class InsightModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof PointInsight) {
             throw new MethodNotAllowedHttpException(['PointInsight']);
@@ -60,7 +59,7 @@ final class InsightModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(PointInsightType::class, $entity, $options);
+        return $this->formFactory->create(PointInsightType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?PointInsight

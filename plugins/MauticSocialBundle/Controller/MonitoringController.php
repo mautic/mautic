@@ -151,7 +151,6 @@ final class MonitoringController extends FormController
         // build the form
         $form = $model->createForm(
             $entity,
-            $this->formFactory,
             $action,
             [
                 // pass through the types and the selected default type
@@ -302,7 +301,6 @@ final class MonitoringController extends FormController
         // build the form
         $form = $this->monitoringModel->createForm(
             $entity,
-            $this->formFactory,
             $action,
             [
                 // pass through the types and the selected default type

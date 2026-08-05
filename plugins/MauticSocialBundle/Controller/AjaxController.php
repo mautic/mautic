@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,7 +13,7 @@ final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel, FormFactoryInterface $formFactory): JsonResponse
+    public function getNetworkFormAction(Request $request, MonitoringModel $monitoringModel): JsonResponse
     {
         // get the form type
         $type = InputHelper::clean($request->request->get('networkType'));
@@ -31,7 +30,7 @@ final class AjaxController extends CommonAjaxController
             $formType = $monitoringModel->getFormByType($type);
 
             // get the network type form
-            $form = $formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
+            $form = $this->createForm($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
                 '@MauticSocial/FormTheme/'.$type.'_widget.html.twig',

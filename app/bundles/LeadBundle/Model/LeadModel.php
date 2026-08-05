@@ -285,7 +285,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -294,7 +294,7 @@ class LeadModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create(LeadType::class, $entity, $options);
+        return $this->formFactory->create(LeadType::class, $entity, $options);
     }
 
     /**
@@ -622,7 +622,6 @@ class LeadModel extends FormModel
             // Cleanup the field values
             $form = $this->createForm(
                 new Lead(), // use empty lead to prevent binding errors
-                $this->formFactory,
                 null,
                 ['fields' => $this->flattenedFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
             );

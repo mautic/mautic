@@ -217,7 +217,7 @@ final class CompanyController extends FormController
                 : $request->get('updateSelect', false)
         );
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
-        $form   = $this->companyModel->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $form   = $this->companyModel->createForm($entity, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -390,7 +390,6 @@ final class CompanyController extends FormController
         $fields = $this->fieldModel->getPublishedFieldArrays('company');
         $form   = $this->companyModel->createForm(
             $entity,
-            $this->formFactory,
             $action,
             ['fields' => $fields, 'update_select' => $updateSelect]
         );
@@ -473,7 +472,7 @@ final class CompanyController extends FormController
             if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $this->companyModel->getEntity($objectId);
-                $form    = $this->companyModel->createForm($company, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+                $form    = $this->companyModel->createForm($company, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
             }
         } else {
             // lock the entity

@@ -49,7 +49,7 @@ final class ProfileController extends FormController
         ];
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $this->userModel->createForm($me, $this->formFactory, $action, ['in_profile' => true]);
+        $form   = $this->userModel->createForm($me, $action, ['in_profile' => true]);
 
         $overrides = [];
 

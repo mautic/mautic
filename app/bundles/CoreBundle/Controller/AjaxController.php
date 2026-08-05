@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Service\SearchCommandListInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -392,7 +391,7 @@ class AjaxController extends CommonController
     /**
      * Fetch IP Lookup form.
      */
-    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory): JsonResponse
+    public function getIpLookupFormAction(Request $request, IpLookupFactory $ipServiceFactory): JsonResponse
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 
@@ -408,7 +407,7 @@ class AjaxController extends CommonController
                         $themes   = $ipService->getConfigFormThemes();
                         $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
 
-                        $form = $formFactory->createBuilder()
+                        $form = $this->createFormBuilder()
                             ->add(
                                 'ip_lookup_config',
                                 $formType,

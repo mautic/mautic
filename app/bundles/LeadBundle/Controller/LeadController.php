@@ -370,7 +370,7 @@ final class LeadController extends FormController
             ]
         );
 
-        $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $this->formFactory, $action, ['fields' => $fields, 'isShortForm' => true]);
+        $quickForm = $this->leadModel->createForm($this->leadModel->getEntity(), $action, ['fields' => $fields, 'isShortForm' => true]);
 
         // set the default owner to the currently logged in user
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -561,7 +561,7 @@ final class LeadController extends FormController
         $page           = $request->getSession()->get('mautic.lead.page', 1);
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $form   = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -765,7 +765,7 @@ final class LeadController extends FormController
 
         $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $fields = $this->leadFieldModel->getPublishedFieldArrays('lead');
-        $form   = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+        $form   = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -864,7 +864,7 @@ final class LeadController extends FormController
             if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $this->leadModel->getEntity($objectId);
-                $form = $this->leadModel->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
+                $form = $this->leadModel->createForm($lead, $action, ['fields' => $fields]);
             }
         } else {
             // lock the entity

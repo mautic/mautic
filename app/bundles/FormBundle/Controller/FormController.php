@@ -304,7 +304,7 @@ class FormController extends CommonFormController
         $deletedActions  = $session->get('mautic.form.'.$sessionId.'.actions.deleted', []);
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'new']);
-        $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->formModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -551,7 +551,7 @@ class FormController extends CommonFormController
         }
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->formModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -681,7 +681,7 @@ class FormController extends CommonFormController
 
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
-                $form   = $this->formModel->createForm($entity, $this->formFactory, $action);
+                $form   = $this->formModel->createForm($entity, $action);
             }
         } else {
             // lock the entity
