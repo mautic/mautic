@@ -134,7 +134,7 @@
                           } %}
                       </td>
                       <td class="visible-md visible-lg">{{ ('mautic.'~item.object~'.'~item.object)|trans }}</td>
-                      <td class="visible-md visible-lg">{{ ('mautic.lead.field.group.'~item.group)|trans }}</td>
+                      <td class="visible-md visible-lg">{{ translatedGroups[item.group] ?? ('mautic.lead.field.group.'~item.group)|trans }}</td>
                       <td>{{ translatorConditional('mautic.core.type.'~item.type, 'mautic.lead.field.type.'~item.type) }}</td>
                       <td class="visible-md visible-lg">{{ item.id }}</td>
                       <td class="visible-sm visible-md visible-lg">

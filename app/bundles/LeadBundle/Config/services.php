@@ -196,6 +196,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.helper.field.alias', Mautic\LeadBundle\Helper\FieldAliasHelper::class);
     $services->alias(Mautic\LeadBundle\Helper\FieldAliasHelper::class, 'mautic.helper.field.alias');
     $services->alias('mautic.lead.model.lead', Mautic\LeadBundle\Model\LeadModel::class);
+    $services->alias('mautic.lead.model.field_group', Mautic\LeadBundle\Model\FieldGroupModel::class);
     $services->get(Mautic\LeadBundle\Entity\CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)

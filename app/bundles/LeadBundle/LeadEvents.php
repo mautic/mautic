@@ -904,4 +904,13 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_POST_BATCH_SAVE = 'mautic.lead_post_batch_save';
+
+    /**
+     * The mautic.lead.field_group_list.on_generate event is dispatched when building the field group list for a view.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\FieldGroupListEvent instance.
+     *
+     * @var string
+     */
+    public const FIELD_GROUP_LIST_ON_GENERATE = 'mautic.lead.field_group_list.on_generate';
 }

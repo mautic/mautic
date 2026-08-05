@@ -163,7 +163,7 @@
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
                                 <a href="#{{ g }}" class="group" data-toggle="tab">
-                                    {{ ('mautic.lead.field.group.'~g)|trans }}
+                                    {{ translatedGroups[g] ?? ('mautic.lead.field.group.'~g)|trans }}
                                 </a>
                             </li>
                         {% endif %}

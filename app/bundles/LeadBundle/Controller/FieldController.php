@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -33,7 +34,7 @@ final class FieldController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, FieldModel $fieldModel, $page = 1): Response
+    public function indexAction(Request $request, FieldModel $fieldModel, FieldGroupModel $fieldGroupModel, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
@@ -105,13 +106,14 @@ final class FieldController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'items'       => $fields,
-                'searchValue' => $search,
-                'permissions' => $permissions,
-                'tmpl'        => $tmpl,
-                'totalItems'  => $count,
-                'limit'       => $limit,
-                'page'        => $page,
+                'items'            => $fields,
+                'searchValue'      => $search,
+                'permissions'      => $permissions,
+                'tmpl'             => $tmpl,
+                'totalItems'       => $count,
+                'limit'            => $limit,
+                'page'             => $page,
+                'translatedGroups' => $fieldGroupModel->getTranslatedGroups('lead'),
             ],
             'contentTemplate' => '@MauticLead/Field/list.html.twig',
             'passthroughVars' => [
