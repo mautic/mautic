@@ -1729,8 +1729,8 @@ class CommonRepository extends ServiceEntityRepository
                 }
             } elseif ($this->translator->trans($c) == $command || $this->translator->trans($c, [], null, 'en_US') == $command) {
                 return true;
-            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}"
-                || $this->translator->trans($c, [], null, 'en_US') == "{$command}:{$subcommand}"
+            } elseif ($this->translator->trans($c) === "{$command}:{$subcommand}"
+                || $this->translator->trans($c, [], null, 'en_US') === "{$command}:{$subcommand}"
             ) {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
