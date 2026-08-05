@@ -216,7 +216,7 @@ class MessageQueueModel extends FormModel
                 $contacts[$message->getId()] = $message->getLead()->getId();
             }
         }
-        if (!empty($contacts)) {
+        if ([] !== $contacts) {
             $contactData = $this->leadRepository->getContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);

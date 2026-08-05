@@ -316,26 +316,21 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'dynamicContent':
-                $entities = $this->getRepository()->getDynamicContentList(
-                    $filter,
-                    $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['top_level'] ?? false,
-                    $options['ignore_ids'] ?? [],
-                    $options['where'] ?? ''
-                );
-
-                foreach ($entities as $entity) {
-                    $results[$entity['language']][$entity['id']] = $entity['name'];
-                }
-
-                // sort by language
-                ksort($results);
-
-                break;
+        if ('dynamicContent' === $type) {
+            $entities = $this->getRepository()->getDynamicContentList(
+                $filter,
+                $limit,
+                $start,
+                $this->security->isGranted($this->getPermissionBase().':viewother'),
+                $options['top_level'] ?? false,
+                $options['ignore_ids'] ?? [],
+                $options['where'] ?? ''
+            );
+            foreach ($entities as $entity) {
+                $results[$entity['language']][$entity['id']] = $entity['name'];
+            }
+            // sort by language
+            ksort($results);
         }
 
         return $results;

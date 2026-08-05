@@ -257,7 +257,7 @@ final class ImportController extends AbstractFormController
         if (self::STEP_PROGRESS_BAR === $step) {
             $analyzeSummary = $this->analyzeData($importHelper, $fullPath);
 
-            if (empty($analyzeSummary)) {
+            if ([] === $analyzeSummary) {
                 $this->addFlashMessage('mautic.campaign.import.nofile', [], FlashBag::LEVEL_ERROR, 'validators');
                 $this->removeImportFile($fullPath);
                 $this->resetImport();
@@ -331,7 +331,7 @@ final class ImportController extends AbstractFormController
                 $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
                 $this->dispatcher->dispatch($event);
                 $summary = $event->getStatus();
-                if (!empty($summary)) {
+                if ([] !== $summary) {
                     $importSummary[] = $summary;
                 }
             }
@@ -439,7 +439,7 @@ final class ImportController extends AbstractFormController
                     }
                 }
             }
-            if (!empty($mergedSummary)) {
+            if ([] !== $mergedSummary) {
                 $allData[] = $mergedSummary;
             }
         }

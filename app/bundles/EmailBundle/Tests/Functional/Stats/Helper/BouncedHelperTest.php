@@ -42,7 +42,7 @@ final class BouncedHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->bouncedHelper = static::getContainer()->get(BouncedHelper::class);
+        $this->bouncedHelper = self::getContainer()->get(BouncedHelper::class);
 
         $this->createUsers();
         $this->createEmailAndCampaign();

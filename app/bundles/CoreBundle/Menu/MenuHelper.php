@@ -32,7 +32,7 @@ final class MenuHelper
     public function createMenuStructure(array &$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
-            if (!is_array($i) || empty($i)) {
+            if (!is_array($i) || [] === $i) {
                 continue;
             }
 

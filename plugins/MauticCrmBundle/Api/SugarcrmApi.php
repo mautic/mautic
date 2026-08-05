@@ -314,7 +314,7 @@ final class SugarcrmApi extends CrmApi
         $s7_records = [];
         // Send activities and get back sugar activities id
 
-        if (!empty($activity)) {
+        if ([] !== $activity) {
             foreach ($activity as $sugarId => $records) {
                 foreach ($records['records'] as $record) {
                     $rec   = [];
@@ -580,7 +580,7 @@ final class SugarcrmApi extends CrmApi
         if ('6' == $tokenData['version']) {
             $result = [];
 
-            if (!empty($fields)) {
+            if ([] !== $fields) {
                 $q   = '';
                 $qry = [];
                 if (isset($query['start'])) {
@@ -637,7 +637,7 @@ final class SugarcrmApi extends CrmApi
                 return $this->request('get_entry_list', $parameters, 'GET', $object);
             }
         } else {
-            if (!empty($fields)) {
+            if ([] !== $fields) {
                 $q      = '';
                 $qry    = [];
                 $filter = [];
