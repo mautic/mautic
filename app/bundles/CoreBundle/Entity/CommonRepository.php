@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -53,10 +54,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $currentUser;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected ?TranslatorInterface $translator = null;
 
     /**
      * This eliminates chance for parameter name collision.
@@ -930,8 +928,10 @@ class CommonRepository extends ServiceEntityRepository
         $this->currentUser = $user;
     }
 
-    public function setTranslator(TranslatorInterface $translator): void
-    {
+    #[Required]
+    public function autowireCommonRepository(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 
