@@ -1051,7 +1051,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.form',
         ];
 
-        if (!empty($this->availableSearchFields)) {
+        if ([] !== $this->availableSearchFields) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
 
@@ -1141,7 +1141,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
     {
-        if (empty($stages)) {
+        if ([] === $stages) {
             return false;
         }
 
@@ -1215,7 +1215,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getContactCollection(array $ids): ArrayCollection
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             return new ArrayCollection();
         }
 

@@ -691,7 +691,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mappedData = $this->mapContactDataForPush($lead, $config);
 
         // No fields are mapped so bail
-        if (empty($mappedData)) {
+        if ([] === $mappedData) {
             return false;
         }
 
@@ -750,7 +750,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if (isset($personData['Id'])) {
                         $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
-                        $integrationEntity = (empty($integrationId))
+                        $integrationEntity = ([] === $integrationId)
                             ? $this->createIntegrationEntity($object, $personData['Id'], 'lead', $lead->getId(), [], false)
                             :
                             $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
@@ -1026,7 +1026,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $start,
                         $limit
                     );
-                    while (!empty($salesForceIds)) {
+                    while ([] !== $salesForceIds) {
                         $executed += count($salesForceIds);
 
                         // Extract a list of lead Ids
@@ -1065,7 +1065,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             }
                         }
 
-                        if (!empty($salesForceLeadData)) {
+                        if ([] !== $salesForceLeadData) {
                             $apiHelper->createLeadActivity($salesForceLeadData, $object);
                         } else {
                             $this->logger->debug('SALESFORCE: No contact activity to sync');
@@ -1750,7 +1750,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
                         if ($lead) {
                             $companies = $this->leadModel->getCompanies($lead);
-                            if (!empty($companies)) {
+                            if ([] !== $companies) {
                                 foreach ($companies as $companyData) {
                                     if ($companyData['is_primary']) {
                                         $company = $this->companyModel->getEntity($companyData['company_id']);
@@ -2766,7 +2766,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 break;
             }
 
-            if (!empty($sfEntityRecords) && isset($sfEntityRecords['records'])) {
+            if ([] !== $sfEntityRecords && isset($sfEntityRecords['records'])) {
                 $this->prepareMauticCompaniesToUpdate(
                     $mauticData,
                     $checkCompaniesInSF,
@@ -3025,7 +3025,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $resultsByName = $this->getApiHelper()->getCompaniesByName($searchForNames, $requiredFieldString);
         $resultsById   = [];
-        if (!empty($searchForIds)) {
+        if ([] !== $searchForIds) {
             $resultsById = $this->getApiHelper()->getCompaniesById($searchForIds, $requiredFieldString);
 
             // mark as deleleted

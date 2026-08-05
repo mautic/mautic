@@ -240,7 +240,7 @@ class EmailRepository extends CommonRepository
 
             $listIds = array_column($lists, 'leadlist_id');
 
-            if (empty($listIds)) {
+            if ([] === $listIds) {
                 // Prevent fatal error
                 return ($countOnly) ? 0 : [];
             }
@@ -456,7 +456,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('e.id', ':emailIds'))
                 ->setParameter('emailIds', $ignoreIds);
         }

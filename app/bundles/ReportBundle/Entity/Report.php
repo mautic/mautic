@@ -404,7 +404,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
             }
         }
 
-        if (empty($values)) {
+        if ([] === $values) {
             throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
         }
 

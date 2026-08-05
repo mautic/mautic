@@ -10,6 +10,6 @@ final class SegmentUsedInCampaigns extends Constraint
 {
     public function getTargets(): string
     {
-        return static::CLASS_CONSTRAINT;
+        return self::CLASS_CONSTRAINT;
     }
 }

@@ -1155,7 +1155,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     $decoded = true;
                 }
 
-                if (is_array($query) && !empty($query)) {
+                if (is_array($query) && [] !== $query) {
                     if (isset($query['page_url'])) {
                         $pageURL = $query['page_url'];
                         if (!$decoded) {

@@ -1415,7 +1415,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Process frequency rules for email
         if (!$email->getSendToDnc() && count($sendTo)) {
-            $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
+            $campaignEventId = (is_array($channel) && [] !== $channel && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
 
             $this->messageQueueModel->processFrequencyRules(
@@ -1567,7 +1567,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         unset($emailSettings, $options, $sendTo);
 
-        $success = empty($failedContacts);
+        $success = [] === $failedContacts;
         if (!$success && $returnErrorMessages) {
             return $singleEmail ? $errorMessages[$singleEmail] : $errorMessages;
         }
@@ -1609,7 +1609,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // No one to send to so bail
-        if (empty($users) && empty($to)) {
+        if ([] === $users && [] === $to) {
             return false;
         }
 
@@ -2048,7 +2048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $dateTo
         );
 
-        if (empty($deviceStats)) {
+        if ([] === $deviceStats) {
             $deviceStats[] = [
                 'count'   => 0,
                 'device'  => $this->translator->trans('mautic.report.report.noresults'),
@@ -2238,7 +2238,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // noone to send to so bail
-        if (empty($users)) {
+        if ([] === $users) {
             return false;
         }
 

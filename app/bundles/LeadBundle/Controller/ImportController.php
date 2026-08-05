@@ -397,7 +397,7 @@ final class ImportController extends FormController
 
                     $matchedFields = $validateEvent->getMatchedFields();
 
-                    if (empty($matchedFields)) {
+                    if ([] === $matchedFields) {
                         $this->resetImport($object);
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
