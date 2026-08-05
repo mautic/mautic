@@ -59,7 +59,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         private readonly PermissionRepository $permissionRepository,
         private readonly RoleRepository $roleRepository,
         private readonly UserInviteRepository $userInviteRepository,
-        private UserPasswordHasherInterface $userPasswordHasher,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
