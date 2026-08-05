@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractFormFieldHelper
 {
@@ -37,7 +38,7 @@ abstract class AbstractFormFieldHelper
      */
     protected $translationKeyPrefix;
 
-    protected ?Translator $translator = null;
+    protected Translator $translator;
 
     /**
      * @return mixed
@@ -54,7 +55,8 @@ abstract class AbstractFormFieldHelper
         $this->setTranslationKeyPrefix();
     }
 
-    public function setTranslator(Translator $translator): void
+    #[Required]
+    public function autowireFormFieldHelper(Translator $translator): void
     {
         $this->translator = $translator;
     }
