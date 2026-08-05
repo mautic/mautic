@@ -35,7 +35,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
         private DncReportService $dncReportService,
-        private readonly FormRepository $formRepository,
+        private FormRepository $formRepository,
     ) {
     }
 

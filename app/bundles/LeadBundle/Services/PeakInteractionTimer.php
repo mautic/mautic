@@ -130,7 +130,7 @@ class PeakInteractionTimer
         $this->bestHourStart  = $this->bestDefaultHourStart;
         $this->bestHourEnd    = $this->bestDefaultHourEnd;
         $bestDays             = array_map(intval(...), $this->bestDefaultDays);
-        $this->bestDays       = !empty($bestDays) ? $bestDays : self::DEFAULT_BEST_DAYS;
+        $this->bestDays       = [] !== $bestDays ? $bestDays : self::DEFAULT_BEST_DAYS;
         $this->maxOptimalDays = count($this->bestDays);
     }
 
