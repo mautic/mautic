@@ -1,41 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
+use Mautic\IntegrationsBundle\Facade\EncryptionService;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 
-abstract class CloudStorageIntegration extends AbstractIntegration
+abstract class CloudStorageIntegration extends BasicIntegration implements BasicInterface
 {
-    /**
-     * @var Adapter
-     */
-    protected $adapter;
+    protected ?Adapter $adapter = null;
 
-    public function appendToForm(&$builder, $data, $formArea): void
-    {
-        if ('features' !== $formArea) {
-            return;
-        }
-
-        try {
-            $builder->add(
-                'provider',
-                $this->getForm(),
-                [
-                    'label'    => 'mautic.integration.form.provider.settings',
-                    'required' => false,
-                    'data'     => $data['provider'] ?? [],
-                ]
-            );
-        } catch (NoFormNeededException) {
-        }
-    }
-
-    public function getAuthenticationType()
-    {
-        return 'api';
+    public function __construct(
+        private readonly EncryptionService $encryptionService,
+    ) {
     }
 
     /**
@@ -46,13 +27,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     abstract public function getAdapter();
 
     /**
-     * Retrieves FQCN form type class name.
-     *
-     * @throws NoFormNeededException
-     */
-    abstract public function getForm(): string;
-
-    /**
      * Retrieves the public URL for a given key.
      *
      * @param string $key
@@ -61,8 +35,19 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     abstract public function getPublicUrl($key);
 
-    public function getSupportedFeatures()
+    /**
+     * @return array<string, string>
+     */
+    public function getSupportedFeatures(): array
     {
-        return ['cloud_storage'];
+        return [ConfigFormFeaturesInterface::FEATURE_CLOUD_STORAGE => 'mautic.integration.form.feature.cloud_storage'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function getDecryptedApiKeys(): array
+    {
+        return $this->encryptionService->decrypt($this->getIntegrationSettings()?->getApiKeys() ?? []);
     }
 }

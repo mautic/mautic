@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;
+use Gaufrette\Adapter;
 use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Filesystem;
 use MauticPlugin\MauticCloudStorageBundle\Exception\InvalidCredentialConfigurationException;
-use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
 
 final class AmazonS3Integration extends CloudStorageIntegration
 {
@@ -27,75 +26,16 @@ final class AmazonS3Integration extends CloudStorageIntegration
         return 'Amazon S3';
     }
 
-    /**
-     * Get the array key for clientId.
-     */
-    public function getClientIdKey(): string
+    public function getIcon(): string
     {
-        return 'client_id';
+        return 'plugins/MauticCloudStorageBundle/Assets/img/amazons3.png';
     }
 
-    /**
-     * Get the array key for client secret.
-     */
-    public function getClientSecretKey(): string
-    {
-        return 'client_secret';
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function getRequiredKeyFields(): array
-    {
-        return [
-            'client_id'     => 'mautic.integration.keyfield.clientid',
-            'client_secret' => 'mautic.integration.keyfield.clientsecret',
-            'bucket'        => 'mautic.integration.keyfield.amazons3.bucket',
-        ];
-    }
-
-    /**
-     * @param Form|FormBuilder $builder
-     * @param array            $data
-     * @param string           $formArea
-     */
-    public function appendToForm(&$builder, $data, $formArea): void
-    {
-        if ('keys' === $formArea) {
-            $builder->add(
-                'region',
-                TextType::class,
-                [
-                    'label'    => 'mautic.integration.Amazon.region',
-                    'attr'     => ['class'   => 'form-control'],
-                    'data'     => empty($data['region']) ? 'us-east-1' : $data['region'],
-                    'required' => false,
-                ]
-            );
-
-            $builder->add(
-                'endpoint',
-                TextType::class,
-                [
-                    'label'    => 'mautic.integration.Amazon.endpoint',
-                    'attr'     => ['class'   => 'form-control'],
-                    'data'     => empty($data['endpoint']) ? null : $data['endpoint'],
-                    'required' => false,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @return AwsS3
-     */
-    public function getAdapter()
+    public function getAdapter(): Adapter
     {
         if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
             if (empty($keys['client_id']) || empty($keys['client_secret'])) {
-                $errorMessage = 'Configuration error: client_id and client_secret are not set!';
                 throw new InvalidCredentialConfigurationException('AmazonS3Integration misconfigured: client_id or client_secret missing.');
             }
 
@@ -122,11 +62,6 @@ final class AmazonS3Integration extends CloudStorageIntegration
         }
 
         return $this->adapter;
-    }
-
-    public function getForm(): string
-    {
-        throw new NoFormNeededException();
     }
 
     public function getPublicUrl($key)

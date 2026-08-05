@@ -10072,12 +10072,6 @@ parameters:
 			path: plugins/MauticClearbitBundle/Services/Clearbit_Person.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCloudStorageBundle\\Integration\\AmazonS3Integration\:\:getAdapter\(\) should return Gaufrette\\Adapter\\AwsS3 but returns Gaufrette\\Adapter\.$#'
-			identifier: return.type
-			count: 1
-			path: plugins/MauticCloudStorageBundle/Integration/AmazonS3Integration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\ConnectwiseApi\:\:fetchAllRecords\(\) has parameter \$endpoint with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
