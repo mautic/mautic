@@ -94,12 +94,18 @@ return RectorConfig::configure()
         // to be deprecated
         Rector\EarlyReturn\Rector\If_\ChangeOrIfContinueToMultiContinueRector::class,
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 7fd760cca4 ([solid] return value directly if possible)
 =======
         \Rector\EarlyReturn\Rector\Foreach_\ChangeNestedForeachIfsToEarlyContinueRector::class,
         \Rector\EarlyReturn\Rector\Return_\ReturnBinaryOrToEarlyReturnRector::class,
         \Rector\EarlyReturn\Rector\If_\ChangeNestedIfsToEarlyReturnRector::class,
 >>>>>>> dfac34b0a2 (setup)
+=======
+        Rector\EarlyReturn\Rector\Foreach_\ChangeNestedForeachIfsToEarlyContinueRector::class,
+        Rector\EarlyReturn\Rector\Return_\ReturnBinaryOrToEarlyReturnRector::class,
+        Rector\EarlyReturn\Rector\If_\ChangeNestedIfsToEarlyReturnRector::class,
+>>>>>>> f2c211442b (Return array)
 
         // preference to compare null over object
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
