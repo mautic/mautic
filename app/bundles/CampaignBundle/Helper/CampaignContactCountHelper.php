@@ -37,7 +37,7 @@ final readonly class CampaignContactCountHelper
             }
         }
 
-        if (empty($campaignIdsForCountFromDb)) {
+        if ([] === $campaignIdsForCountFromDb) {
             return $contactCounts;
         }
 

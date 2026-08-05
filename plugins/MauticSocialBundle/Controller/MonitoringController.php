@@ -603,7 +603,7 @@ final class MonitoringController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->monitoringModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

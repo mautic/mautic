@@ -105,6 +105,8 @@ abstract class AbstractCompanyRelationValueFilterQueryBuilder extends ComplexRel
             'lte',
             'in',
             'between',
+            'inLast',
+            'inNext',
             'regexp',
             'notRegexp'             => $this->getOperatorExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias),
             'notLike',
