@@ -51,12 +51,20 @@ return RectorConfig::configure()
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
     ])
     ->reportUnusedSkips()
-    ->withCodeQualityLevel(55)
+    ->withCodeQualityLevel(65)
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,
+
+        // is deprecated, messy code
+        Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector::class,
+
+        // intentional parent property assign override
+        Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector::class => [
+            __DIR__.'/app/bundles/ApiBundle/Entity/oAuth2/Client.php',
+        ],
 
         // handle next
         Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
