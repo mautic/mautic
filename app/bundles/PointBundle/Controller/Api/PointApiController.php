@@ -80,10 +80,8 @@ final class PointApiController extends CommonApiController
      * @param int    $leadId
      * @param string $operator
      * @param int    $delta
-     *
-     * @return Response
      */
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
+    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta): Response
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {

@@ -156,10 +156,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Obtains a list of entities as defined by the API URL.
-     *
-     * @return Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
@@ -305,10 +303,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * Obtains a specific entity as defined by the API URL.
      *
      * @param int $id Entity ID
-     *
-     * @return Response
      */
-    public function getEntityAction(Request $request, $id)
+    public function getEntityAction(Request $request, $id): Response
     {
         $args = [];
         if ($select = InputHelper::cleanArray($request->get('select', []))) {

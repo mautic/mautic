@@ -619,10 +619,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return $args;
     }
 
-    /**
-     * @return string
-     */
-    protected function getPostActionControllerAction($action)
+    protected function getPostActionControllerAction($action): string
     {
         return 'index';
     }

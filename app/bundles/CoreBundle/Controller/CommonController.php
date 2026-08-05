@@ -496,10 +496,8 @@ class CommonController extends AbstractController implements MauticController
      * @param int    $objectId
      * @param int    $objectSubId
      * @param string $objectModel
-     *
-     * @return Response
      */
-    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(

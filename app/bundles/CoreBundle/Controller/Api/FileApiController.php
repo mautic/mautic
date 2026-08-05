@@ -55,10 +55,12 @@ final class FileApiController extends CommonApiController
 
     /**
      * Uploads a file.
-     *
-     * @return Response
      */
+<<<<<<< HEAD
     public function createAction(Request $request, PathsHelper $pathsHelper, $dir)
+=======
+    public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir): Response
+>>>>>>> d5b190b1f1 ([types] add Response return type to controller actions, add PHPStan rule to keep it)
     {
         try {
             $path = $this->getAbsolutePath($request, $pathsHelper, $dir, true);
@@ -94,10 +96,12 @@ final class FileApiController extends CommonApiController
 
     /**
      * List the files in /media directory.
-     *
-     * @return Response
      */
+<<<<<<< HEAD
     public function listAction(Request $request, PathsHelper $pathsHelper, $dir)
+=======
+    public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir): Response
+>>>>>>> d5b190b1f1 ([types] add Response return type to controller actions, add PHPStan rule to keep it)
     {
         try {
             $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir);
@@ -125,10 +129,12 @@ final class FileApiController extends CommonApiController
 
     /**
      * Delete a file from /media directory.
-     *
-     * @return Response
      */
+<<<<<<< HEAD
     public function deleteAction(Request $request, PathsHelper $pathsHelper, $dir, $file)
+=======
+    public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file): Response
+>>>>>>> d5b190b1f1 ([types] add Response return type to controller actions, add PHPStan rule to keep it)
     {
         $response = ['success' => false];
 

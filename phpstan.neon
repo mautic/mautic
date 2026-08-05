@@ -268,6 +268,7 @@ rules:
 	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
 	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
 	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
+	- Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule

@@ -311,10 +311,12 @@ final class UserController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
+<<<<<<< HEAD
     public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
+=======
+    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
+>>>>>>> f25657f603 ([types] add Response return type to controller actions, add PHPStan rule to keep it)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
@@ -460,10 +462,8 @@ final class UserController extends FormController
      * Deletes a user object.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('user:users:delete')) {
             $this->throwAccessDenied();
