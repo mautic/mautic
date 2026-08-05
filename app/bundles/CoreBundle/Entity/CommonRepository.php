@@ -1533,7 +1533,7 @@ class CommonRepository extends ServiceEntityRepository
                 $advancedFilterStrings[] = $filter;
             }
 
-            if (!empty($advancedFilterStrings)) {
+            if ([] !== $advancedFilterStrings) {
                 foreach ($advancedFilterStrings as $parseString) {
                     $parsed = $filterHelper->parseString($parseString);
 

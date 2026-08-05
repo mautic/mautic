@@ -11,7 +11,7 @@ final class QueryBuilder
      */
     public static function getLeadQuery(array $fields, array $ids): string
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             throw new NoObjectsToFetchException();
         }
 
@@ -26,7 +26,7 @@ final class QueryBuilder
      */
     public static function getContactQuery(array $fields, array $ids): string
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             throw new NoObjectsToFetchException();
         }
 

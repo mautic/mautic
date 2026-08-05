@@ -63,7 +63,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper    = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
@@ -116,7 +116,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
         /** @var DateHelper $dateHelper */
-        $dateHelper             = static::getContainer()->get(DateHelper::class);
+        $dateHelper             = self::getContainer()->get(DateHelper::class);
         $requestedAt            = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
@@ -190,14 +190,14 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
         $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         /** @var DateHelper $dateHelper */
-        $dateHelper      = static::getContainer()->get(DateHelper::class);
+        $dateHelper      = self::getContainer()->get(DateHelper::class);
         $requestedAt     = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
 
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         $downloadLink         = $this->router->generate(
@@ -257,7 +257,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         }
 
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 

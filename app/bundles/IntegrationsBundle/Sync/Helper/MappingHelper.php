@@ -70,7 +70,7 @@ class MappingHelper
             }
         }
 
-        if (empty($identifiers)) {
+        if ([] === $identifiers) {
             // No fields found to search for contact so return null
             return new ObjectDAO($internalObjectName, null);
         }

@@ -33,7 +33,7 @@ final class LeadTriggerLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($events)) {
+        if ([] !== $events) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', ':events')
             )
