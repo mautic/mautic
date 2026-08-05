@@ -12,6 +12,7 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -522,15 +523,99 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
-     * The Expr() sets a :now and :true parameter that must be set in the calling function.
+     * Returns an ORM expression that takes into account isPublished, publishUp and publishDown dates.
+     * The expression sets :now and :true parameters in the provided query builder when requested.
+     */
+    public function getPublishedByDateOrmExpression(
+        QueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
+    ): Andx {
+        $alias ??= $this->getTableAlias();
+
+        if ($setNowParameter) {
+            $q->setParameter('now', new \DateTime());
+        }
+
+        if ($setTrueParameter) {
+            $q->setParameter('true', true, 'boolean');
+        }
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq("{$alias}.isPublished", ':true'),
+            $q->expr()->orX(
+                $q->expr()->isNull("{$alias}.publishDown"),
+                $q->expr()->gte("{$alias}.publishDown", ':now')
+            )
+        );
+
+        if ($allowNullForPublishedUp) {
+            $expr->add(
+                $q->expr()->orX(
+                    $q->expr()->isNull("{$alias}.publishUp"),
+                    $q->expr()->lte("{$alias}.publishUp", ':now')
+                )
+            );
+        } else {
+            $expr->add(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull("{$alias}.publishUp"),
+                    $q->expr()->lte("{$alias}.publishUp", ':now')
+                )
+            );
+        }
+
+        return $expr;
+    }
+
+    /**
+     * Returns a DBAL expression that takes into account is_published, publish_up and publish_down dates.
+     * The expression sets :now and :true parameters in the provided query builder when requested.
+     */
+    public function getPublishedByDateDbalExpression(
+        DbalQueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
+    ): CompositeExpression {
+        $alias ??= $this->getTableAlias();
+
+        if ($setNowParameter) {
+            $now = (new DateTimeHelper(new \DateTime(), 'Y-m-d H:i:s', 'local'))->toUtcString();
+            $q->setParameter('now', $now);
+        }
+
+        if ($setTrueParameter) {
+            $q->setParameter('true', true, 'boolean');
+        }
+
+        $publishedUpExpression = $allowNullForPublishedUp
+            ? $q->expr()->or(
+                $q->expr()->isNull("{$alias}.publish_up"),
+                $q->expr()->lte("{$alias}.publish_up", ':now')
+            )
+            : $q->expr()->and(
+                $q->expr()->isNotNull("{$alias}.publish_up"),
+                $q->expr()->lte("{$alias}.publish_up", ':now')
+            );
+
+        return $q->expr()->and(
+            $q->expr()->eq("{$alias}.is_published", ':true'),
+            $q->expr()->or(
+                $q->expr()->isNull("{$alias}.publish_down"),
+                $q->expr()->gte("{$alias}.publish_down", ':now')
+            ),
+            $publishedUpExpression
+        );
+    }
+
+    /**
+     * @deprecated use getPublishedByDateOrmExpression() or getPublishedByDateDbalExpression()
      *
-     * @param string|null $alias
-     * @param bool        $setNowParameter
-     * @param bool        $setTrueParameter
-     * @param bool        $allowNullForPublishedUp Allow entities without a published up date
-     *
-     * @return mixed
+     * @return Andx|CompositeExpression
      */
     public function getPublishedByDateExpression(
         $q,
@@ -539,60 +624,11 @@ class CommonRepository extends ServiceEntityRepository
         $setTrueParameter = true,
         $allowNullForPublishedUp = true,
     ) {
-        $isORM = $q instanceof QueryBuilder;
-
-        if (null === $alias) {
-            $alias = $this->getTableAlias();
+        if ($q instanceof QueryBuilder) {
+            return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
         }
 
-        if ($setNowParameter) {
-            $now = new \DateTime();
-            if (!$isORM) {
-                $dtHelper = new DateTimeHelper($now, 'Y-m-d H:i:s', 'local');
-                $now      = $dtHelper->toUtcString();
-            }
-            $q->setParameter('now', $now);
-        }
-
-        if ($setTrueParameter) {
-            $q->setParameter('true', true, 'boolean');
-        }
-
-        if ($isORM) {
-            $pub     = 'isPublished';
-            $pubUp   = 'publishUp';
-            $pubDown = 'publishDown';
-        } else {
-            $pub     = 'is_published';
-            $pubUp   = 'publish_up';
-            $pubDown = 'publish_down';
-        }
-
-        $expr = $q->expr()->andX(
-            $q->expr()->eq("{$alias}.{$pub}", ':true'),
-            $q->expr()->orX(
-                $q->expr()->isNull("{$alias}.{$pubDown}"),
-                $q->expr()->gte("{$alias}.{$pubDown}", ':now')
-            )
-        );
-
-        if ($allowNullForPublishedUp) {
-            $expr->add(
-                $q->expr()->orX(
-                    $q->expr()->isNull("{$alias}.{$pubUp}"),
-                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
-            );
-        } else {
-            $expr->add(
-                $q->expr()->andX(
-                    $q->expr()->isNotNull("{$alias}.{$pubUp}"),
-                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
-            );
-        }
-
-        return $expr;
+        return $this->getPublishedByDateDbalExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
     }
 
     /**
