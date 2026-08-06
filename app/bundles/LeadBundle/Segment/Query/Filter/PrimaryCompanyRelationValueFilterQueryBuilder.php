@@ -113,6 +113,8 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
             'lte',
             'in',
             'between',
+            'inLast',
+            'inNext',
             'regexp',
             'notRegexp'             => $this->getOperatorExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias),
             'notLike',
@@ -202,7 +204,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
      */
     private function combineMultiselectExpressions(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $companyAlias, array $expressions, string $filterGlue, bool $applyIsNull, bool $applyNot): CompositeExpression|string
     {
-        if (empty($expressions)) {
+        if ([] === $expressions) {
             return $subQueryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
         }
 

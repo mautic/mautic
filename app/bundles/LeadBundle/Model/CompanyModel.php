@@ -537,7 +537,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $tags = $this->normalizeCompanyTags($tags);
 
-        if (empty($tags) && empty($removeTags)) {
+        if ([] === $tags && empty($removeTags)) {
             return false;
         }
 

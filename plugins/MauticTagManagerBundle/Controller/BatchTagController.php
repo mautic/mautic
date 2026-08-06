@@ -66,7 +66,7 @@ final class BatchTagController extends AbstractFormController
         $params     = (array) $request->get('batch_tag');
         $objectType = $this->getObjectType($request);
         $ids        = empty($params['ids']) ? [] : (array) json_decode($params['ids']);
-        if (empty($ids)) {
+        if ([] === $ids) {
             return $this->getBatchModalResponse('mautic.core.error.ids.missing');
         }
 
@@ -90,11 +90,11 @@ final class BatchTagController extends AbstractFormController
     private function applyBatchTags(string $objectType, array $ids, array $tagsToAdd, array $tagsToRemove): void
     {
         if (self::OBJECT_TYPE_COMPANY === $objectType) {
-            if (!empty($tagsToAdd)) {
+            if ([] !== $tagsToAdd) {
                 $this->tagRepository->addTagsToCompanies($ids, $tagsToAdd);
             }
 
-            if (!empty($tagsToRemove)) {
+            if ([] !== $tagsToRemove) {
                 $this->tagRepository->removeTagsFromCompanies($ids, $tagsToRemove);
             }
 
@@ -105,11 +105,11 @@ final class BatchTagController extends AbstractFormController
             return;
         }
 
-        if (!empty($tagsToAdd)) {
+        if ([] !== $tagsToAdd) {
             $this->tagRepository->addTagsToLeads($ids, $tagsToAdd);
         }
 
-        if (!empty($tagsToRemove)) {
+        if ([] !== $tagsToRemove) {
             $this->tagRepository->removeTagsFromLeads($ids, $tagsToRemove);
         }
 

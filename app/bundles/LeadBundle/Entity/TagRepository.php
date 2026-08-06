@@ -253,20 +253,20 @@ class TagRepository extends CommonRepository
     {
         $result = [];
 
-        if (empty($entityIds) || empty($tagIds)) {
+        if ([] === $entityIds || [] === $tagIds) {
             return $result;
         }
 
         $tags = $this->getTagById($tagIds);
 
-        if (empty($tags)) {
+        if ([] === $tags) {
             return $result;
         }
 
         $this->_em->flush();
 
         $entityIds = $this->getExistingEntityIds($entityIds, $entityClass);
-        if (empty($entityIds)) {
+        if ([] === $entityIds) {
             return $result;
         }
 
@@ -296,7 +296,7 @@ class TagRepository extends CommonRepository
     private function getExistingEntityIds(array $entityIds, string $entityClass): array
     {
         $entityIds = array_values(array_unique(array_map(intval(...), $entityIds)));
-        if (empty($entityIds)) {
+        if ([] === $entityIds) {
             return [];
         }
 

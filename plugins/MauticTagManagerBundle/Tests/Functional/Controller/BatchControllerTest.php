@@ -123,7 +123,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('2 companies affected', (string) $this->client->getResponse()->getContent());
 
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $company1     = $companyModel->getEntity($this->companies[0]->getId());
         $tagIds       = $this->getTagIds($company1);
         $this->assertContains($this->tags[0]->getId(), $tagIds);
@@ -184,7 +184,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
      */
     public function addCompanies(): array
     {
-        $companyModel = static::getContainer()->get(CompanyModel::class);
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $company      = $companyModel->getEntity();
 
         $company->setName('Company 1');
