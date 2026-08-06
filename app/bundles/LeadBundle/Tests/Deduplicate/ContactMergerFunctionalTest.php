@@ -101,7 +101,6 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $jane = $model->getEntity($jane->getId());
         $this->assertInstanceOf(Lead::class, $jane);
         $this->assertEquals(50, $jane->getPoints());
-        $this->assertInstanceOf(Lead::class, $jane);
         $janeId = $jane->getId();
 
         // Jane is currently a visitor on a different device with 3 points

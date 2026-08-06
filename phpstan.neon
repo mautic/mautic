@@ -199,11 +199,6 @@ parameters:
 			identifier: mautic.noTablePrefixDefinitionInTests
 			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
 
-		# the concrete Form is created by the form factory, not autowired
-		-
-			identifier: mautic.preferInterfaceInConstructor
-			path: app/bundles/ApiBundle/Controller/oAuth2/AuthorizeController.php
-
 		# not useful, rather pedantic from phsptan-* extensions
 		-
 			identifier: argument.templateType

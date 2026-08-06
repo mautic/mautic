@@ -55,12 +55,6 @@ parameters:
 			path: app/bundles/ApiBundle/EventListener/ClientSubscriber.php
 
 		-
-			message: '#^Property Mautic\\ApiBundle\\Form\\Validator\\Constraints\\OAuthCallback\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/ApiBundle/Form/Validator/Constraints/OAuthCallback.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Model\\ClientModel\:\:revokeAccess\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2170,28 +2164,10 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/DynamicContentFilterEntryFiltersType.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Form\\Validator\\Constraints\\CircularDependency\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/CircularDependency.php
-
-		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$message\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/bundles/CoreBundle/Form/Validator/Constraints/CircularDependencyValidator.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Form\\Validator\\Constraints\\FileEncoding\:\:\$encodingFormat has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncoding.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Form\\Validator\\Constraints\\FileEncoding\:\:\$encodingFormatMessage has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncoding.php
 
 		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$encodingFormatMessage\.$#'
@@ -4807,28 +4783,10 @@ parameters:
 			path: app/bundles/FormBundle/Security/Permissions/FormPermissions.php
 
 		-
-			message: '#^Property Mautic\\FormBundle\\Validator\\Constraint\\FileExtensionConstraint\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Validator/Constraint/FileExtensionConstraint.php
-
-		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$message\.$#'
 			identifier: property.notFound
 			count: 2
 			path: app/bundles/FormBundle/Validator/Constraint/FileExtensionConstraintValidator.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Validator\\Constraint\\PhoneNumberConstraint\:\:getMessage\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/FormBundle/Validator/Constraint/PhoneNumberConstraint.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Validator\\Constraint\\PhoneNumberConstraint\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Validator/Constraint/PhoneNumberConstraint.php
 
 		-
 			message: '#^Call to an undefined method Symfony\\Component\\Validator\\Constraint\:\:getMessage\(\)\.$#'
@@ -6559,22 +6517,10 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/UpdateLeadActionType.php
 
 		-
-			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\FieldAliasKeyword\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Form/Validator/Constraints/FieldAliasKeyword.php
-
-		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$message\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/bundles/LeadBundle/Form/Validator/Constraints/FieldAliasKeywordValidator.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\SegmentInUse\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Form/Validator/Constraints/SegmentInUse.php
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\UniqueUserAlias\:\:\$field has no type specified\.$#'
