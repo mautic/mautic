@@ -48,7 +48,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
     {
         $form = $this->createForm('Legacy form', 'legacy-form');
         $this->em->flush();
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $this->em->getConnection()->update(
             $tablePrefix.Form::TABLE_NAME,
             ['lang' => null],

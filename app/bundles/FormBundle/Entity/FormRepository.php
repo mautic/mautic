@@ -85,7 +85,7 @@ class FormRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('f.translationParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('f.id', ':formIds'))
                 ->setParameter('formIds', $ignoreIds);
         }
