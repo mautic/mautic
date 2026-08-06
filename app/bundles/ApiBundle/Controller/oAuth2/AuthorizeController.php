@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
