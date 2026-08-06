@@ -2171,7 +2171,7 @@ final class LeadController extends FormController
      *
      * @throws \Exception
      */
-    public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
+    public function batchExportAction(Request $request, ExportHelper $exportHelper): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2253,7 +2253,7 @@ final class LeadController extends FormController
         }
 
         if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
-            return $this->contactExportCSVScheduler($dispatcher, $permissions);
+            return $this->contactExportCSVScheduler($permissions);
         }
 
         $iterator = new IteratorExportDataModel(
@@ -2266,7 +2266,7 @@ final class LeadController extends FormController
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportEvent($details, 'ContactExports'),
             LeadEvents::POST_CONTACT_EXPORT
         );
@@ -2338,12 +2338,12 @@ final class LeadController extends FormController
     /**
      * @param array<mixed> $permissions
      */
-    private function contactExportCSVScheduler(EventDispatcherInterface $dispatcher, array $permissions): JsonResponse
+    private function contactExportCSVScheduler(array $permissions): JsonResponse
     {
         $data                   = $this->contactExportSchedulerModel->prepareData($permissions);
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             new ContactExportSchedulerEvent($contactExportScheduler),
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
         );

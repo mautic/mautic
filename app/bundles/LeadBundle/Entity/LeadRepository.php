@@ -60,10 +60,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->doNotContactRepository = $doNotContactRepository;
     }
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected EventDispatcherInterface $dispatcher;
 
     private array $availableSocialFields = [];
 
@@ -97,8 +94,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->triggerModel = $triggerModel;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
+    #[Required]
+    public function setDispatcher(
+        EventDispatcherInterface $dispatcher,
+    ): void {
         $this->dispatcher = $dispatcher;
     }
 
@@ -993,15 +992,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
         }
 
-        if ($this->dispatcher) {
-            $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
-            $this->dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
-            if ($event->isSearchDone()) {
-                $returnParameter = $event->getReturnParameters();
-                $filter->strict  = $event->getStrict();
-                $expr            = $event->getSubQuery();
-                $parameters      = array_merge($parameters, $event->getParameters());
-            }
+        $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
+        if ($event->isSearchDone()) {
+            $returnParameter = $event->getReturnParameters();
+            $filter->strict  = $event->getStrict();
+            $expr            = $event->getSubQuery();
+            $parameters      = array_merge($parameters, $event->getParameters());
         }
 
         if ($returnParameter) {
