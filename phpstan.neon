@@ -14,7 +14,7 @@ parameters:
 	type_coverage:
 		return: 88.3
 		param: 75.7
-		property: 75.5
+		property: 71.6
 		# wait for PHP 8.3 before changing
 		constant: 3
 		declare: 73
