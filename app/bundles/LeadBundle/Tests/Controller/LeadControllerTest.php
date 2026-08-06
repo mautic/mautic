@@ -1069,6 +1069,21 @@ EMAIL;
         $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/contacts/1'));
     }
 
+    public function testContactViewReturnsToFormResultsWhenContextIsProvided(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/contacts/view/1?returnTo=form_results&formId=12&formPage=2'
+        );
+
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/forms/results/12/2', (string) $response['newContent']);
+    }
+
     public function testContactGroupPointsEdit(): void
     {
         $contact = $this->createContact('test-contact@example.com');

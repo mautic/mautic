@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',

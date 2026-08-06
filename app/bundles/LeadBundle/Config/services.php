@@ -27,6 +27,8 @@ return function (ContainerConfigurator $configurator): void {
         'Segment/IntegrationCampaign',
         'Segment/Query',
         'Segment/Stat',
+        'Form/Validator/Constraints/UniqueCustomField.php',
+        'Validator/Constraints/SegmentDate.php',
     ];
 
     $services->load('Mautic\\LeadBundle\\', '../')

@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -53,10 +54,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $currentUser;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     /**
      * This eliminates chance for parameter name collision.
@@ -930,8 +928,10 @@ class CommonRepository extends ServiceEntityRepository
         $this->currentUser = $user;
     }
 
-    public function setTranslator(TranslatorInterface $translator): void
-    {
+    #[Required]
+    public function autowireCommonRepository(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 
@@ -1729,8 +1729,8 @@ class CommonRepository extends ServiceEntityRepository
                 }
             } elseif ($this->translator->trans($c) == $command || $this->translator->trans($c, [], null, 'en_US') == $command) {
                 return true;
-            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}"
-                || $this->translator->trans($c, [], null, 'en_US') == "{$command}:{$subcommand}"
+            } elseif ($this->translator->trans($c) === "{$command}:{$subcommand}"
+                || $this->translator->trans($c, [], null, 'en_US') === "{$command}:{$subcommand}"
             ) {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';
@@ -1751,7 +1751,7 @@ class CommonRepository extends ServiceEntityRepository
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
-            if (!empty($params)) {
+            if ([] !== $params) {
                 $parameters = array_merge($parameters, $params);
             }
 
