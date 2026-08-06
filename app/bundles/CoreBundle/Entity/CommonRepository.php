@@ -54,7 +54,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $currentUser;
 
-    protected ?TranslatorInterface $translator = null;
+    protected TranslatorInterface $translator;
 
     /**
      * This eliminates chance for parameter name collision.
