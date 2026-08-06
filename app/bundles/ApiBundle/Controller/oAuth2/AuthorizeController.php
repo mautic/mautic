@@ -5,14 +5,8 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
-use FOS\OAuthServerBundle\Model\ClientManagerInterface;
-use OAuth2\OAuth2;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
