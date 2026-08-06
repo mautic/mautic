@@ -286,8 +286,6 @@ class CampaignController extends AbstractStandardFormController
      * @param string|int $objectId
      * @param int        $page
      * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -297,7 +295,7 @@ class CampaignController extends AbstractStandardFormController
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-    ) {
+    ): Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
