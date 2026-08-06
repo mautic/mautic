@@ -325,7 +325,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $owner);
         $contact = new Lead();
         $contact->setFirstname('Owned')->setEmail('owned@example.com')->setOwner($owner);
-        static::getContainer()->get(LeadModel::class)->saveEntity($contact);
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
 
         $this->client->request(Request::METHOD_POST, '/s/contacts/batchOwners', [
             'lead_batch_owner' => [
