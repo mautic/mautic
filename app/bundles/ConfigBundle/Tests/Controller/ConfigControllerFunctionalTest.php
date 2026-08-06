@@ -32,14 +32,14 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
-            $translator        = static::getContainer()->get(TranslatorInterface::class);
+            $translator        = self::getContainer()->get(TranslatorInterface::class);
             $restrictionHelper = new RestrictionHelper(
                 $translator,
                 ['upload_dir'],
                 RestrictionHelper::MODE_REMOVE
             );
-            static::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
-            static::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
+            self::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
+            self::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
         }
 
         $this->prefix = MAUTIC_TABLE_PREFIX;

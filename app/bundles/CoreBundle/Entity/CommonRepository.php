@@ -1751,7 +1751,7 @@ class CommonRepository extends ServiceEntityRepository
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
-            if (!empty($params)) {
+            if ([] !== $params) {
                 $parameters = array_merge($parameters, $params);
             }
 
