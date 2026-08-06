@@ -173,7 +173,7 @@ final class DateHelper
             }
         }
 
-        if (empty($formated)) {
+        if ([] === $formated) {
             return $this->translator->trans('mautic.core.date.less.than.second');
         }
 

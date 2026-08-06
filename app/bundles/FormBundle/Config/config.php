@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
 
 return [

@@ -45,7 +45,7 @@ final class AnalyseCustomFieldCommand extends Command
         $displayAsTable = $input->getOption('display-table');
 
         $fieldDetails = $this->getCustomFieldDetails();
-        if (empty($fieldDetails)) {
+        if ([] === $fieldDetails) {
             $output->writeln('No custom field(s) to analyse!!!');
 
             return Command::SUCCESS;

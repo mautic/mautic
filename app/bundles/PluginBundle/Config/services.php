@@ -19,6 +19,7 @@ return function (ContainerConfigurator $configurator): void {
     $excludes = [
         'Helper/oAuthHelper.php',
         'Integration/IntegrationObject.php',
+        'Form/Constraint/CanPublish.php',
     ];
 
     $services->load('Mautic\\PluginBundle\\', '../')

@@ -207,10 +207,10 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     public function __construct()
     {
-        $this->fields               = new ArrayCollection();
-        $this->actions              = new ArrayCollection();
-        $this->submissions          = new ArrayCollection();
-        $this->translationChildren  = new ArrayCollection();
+        $this->fields              = new ArrayCollection();
+        $this->actions             = new ArrayCollection();
+        $this->submissions         = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
         $this->initializeProjects();
     }
 
