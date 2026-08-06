@@ -971,7 +971,7 @@ class CampaignController extends AbstractStandardFormController
     {
         $joinLists = $joinForms = false;
 
-        if (!empty($currentFilters)) {
+        if ([] !== $currentFilters) {
             $listAliases = $catIds = $formIds = [];
 
             foreach ($currentFilters as $type => $typeFilters) {
@@ -1001,7 +1001,7 @@ class CampaignController extends AbstractStandardFormController
      */
     private function appendCampaignFilter(array &$filter, string $column, array $values): bool
     {
-        $hasValues = !empty($values);
+        $hasValues = [] !== $values;
 
         if ($hasValues) {
             $filter['force'][] = [

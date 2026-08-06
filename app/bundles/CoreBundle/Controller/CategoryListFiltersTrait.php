@@ -158,7 +158,7 @@ trait CategoryListFiltersTrait
      */
     private function getSelectedCategoryIds(array $selectedCategoryValues, array $categories): array
     {
-        if (empty($selectedCategoryValues)) {
+        if ([] === $selectedCategoryValues) {
             return [];
         }
 

@@ -220,7 +220,7 @@ final class EmailController extends FormController
                 }
             }
 
-            if (!empty($listAliases)) {
+            if ([] !== $listAliases) {
                 $filter['force'][] = ['column' => 'l.alias', 'expr' => 'in', 'value' => $listAliases];
                 $ignoreListJoin    = false;
             }
