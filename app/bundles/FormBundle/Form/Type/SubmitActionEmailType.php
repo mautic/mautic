@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;

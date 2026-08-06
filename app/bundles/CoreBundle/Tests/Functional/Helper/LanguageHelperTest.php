@@ -18,24 +18,22 @@ final class LanguageHelperTest extends MauticMysqlTestCase
         $languageFiles = $languageHelper->getLanguageFiles();
 
         // As the list depends on installed plugins, let's assert only for random files that should exist.
-        self::assertBundleContainsDefaultLanguageFile($languageFiles, 'EmailBundle');
-        self::assertBundleContainsDefaultLanguageFile($languageFiles, 'LeadBundle');
+        $this->assertBundleContainsDefaultLanguageFile($languageFiles, 'EmailBundle');
+        $this->assertBundleContainsDefaultLanguageFile($languageFiles, 'LeadBundle');
     }
 
     /**
      * @param array<string, string[]> $languageFiles
      */
-    private static function assertBundleContainsDefaultLanguageFile(array $languageFiles, string $bundle): void
+    private function assertBundleContainsDefaultLanguageFile(array $languageFiles, string $bundle): void
     {
-        Assert::assertArrayHasKey($bundle, $languageFiles);
-        Assert::assertNotEmpty(
-            array_filter(
-                $languageFiles[$bundle],
-                static fn (string $file): bool => 1 === preg_match(
-                    sprintf('/app\/bundles\/%s\/Translations\/en_US\/(messages|validators|flashes)\.ini/', $bundle),
-                    $file
-                )
+        $this->assertArrayHasKey($bundle, $languageFiles);
+        $this->assertNotEmpty(array_filter(
+            $languageFiles[$bundle],
+            static fn (string $file): bool => 1 === preg_match(
+                sprintf('/app\/bundles\/%s\/Translations\/en_US\/(messages|validators|flashes)\.ini/', $bundle),
+                $file
             )
-        );
+        ));
     }
 }

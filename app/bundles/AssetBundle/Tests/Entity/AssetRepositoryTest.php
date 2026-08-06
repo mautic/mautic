@@ -27,7 +27,7 @@ final class AssetRepositoryTest extends TestCase
             'mautic.asset.asset.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
