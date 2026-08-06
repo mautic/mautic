@@ -722,7 +722,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('Confirm your email address', strip_tags((string) $crawler->html()));
+        $this->assertStringContainsString('Confirm your email address', strip_tags($crawler->html()));
     }
 
     public function testValidateEmailFormRedirectsToUnsubscribeWithValidEmail(): void
@@ -737,7 +737,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             '/email/validate/unsubscribe/'.$secretHash.'/'.$stat->getTrackingHash()
         );
 
-        $this->assertStringContainsString('Confirm your email address', (string) $crawler->html());
+        $this->assertStringContainsString('Confirm your email address', $crawler->html());
 
         $form           = $crawler->selectButton('Verify email')->form();
         $emailFieldName = $crawler->filter('input[type="email"]')->attr('name');
@@ -766,10 +766,10 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler               = $this->client->submit($form);
 
         $this->assertFalse($this->client->getResponse()->isRedirect());
-        $this->assertStringContainsString('This email address does not match the email address that was used to generate this link.', strip_tags((string) $crawler->html()));
-        $this->assertStringNotContainsString('mautic.email.address.does.not.match.link', strip_tags((string) $crawler->html()));
-        $this->assertStringContainsString('Confirm your email address', strip_tags((string) $crawler->html()));
-        $this->assertStringNotContainsString('We are sorry to see you go!', strip_tags((string) $crawler->html()));
+        $this->assertStringContainsString('This email address does not match the email address that was used to generate this link.', strip_tags($crawler->html()));
+        $this->assertStringNotContainsString('mautic.email.address.does.not.match.link', strip_tags($crawler->html()));
+        $this->assertStringContainsString('Confirm your email address', strip_tags($crawler->html()));
+        $this->assertStringNotContainsString('We are sorry to see you go!', strip_tags($crawler->html()));
     }
 
     public function testLegacyResubscribeLinkRedirectsToValidateEmailForm(): void
@@ -779,7 +779,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/email/resubscribe/'.$stat->getTrackingHash());
 
-        $this->assertStringContainsString('Confirm your email address', (string) $crawler->html());
+        $this->assertStringContainsString('Confirm your email address', $crawler->html());
     }
 
     public function testValidateEmailFormRedirectsToResubscribeWithValidEmail(): void

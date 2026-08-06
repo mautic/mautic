@@ -248,10 +248,6 @@ final class PublicController extends CommonFormController
                 $formTemplate = $unsubscribeForm->getTemplate();
                 $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
             }
-        } else {
-            if ($isOneClickUnsubscribe) {
-                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
-            }
         }
 
         if (empty($template) && empty($formTemplate)) {

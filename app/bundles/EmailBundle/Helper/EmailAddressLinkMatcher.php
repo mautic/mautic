@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Helper;
 
-final class EmailAddressLinkMatcher
+final readonly class EmailAddressLinkMatcher
 {
-    public function __construct(private readonly MailHashHelper $mailHash)
+    public function __construct(private MailHashHelper $mailHash)
     {
     }
 
