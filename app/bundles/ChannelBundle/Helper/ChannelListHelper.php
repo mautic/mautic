@@ -101,7 +101,7 @@ class ChannelListHelper
      */
     private function setupChannels(): void
     {
-        if (!empty($this->channels)) {
+        if ([] !== $this->channels) {
             return;
         }
 

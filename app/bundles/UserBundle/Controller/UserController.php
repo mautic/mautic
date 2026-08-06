@@ -26,7 +26,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class UserController extends FormController
@@ -170,7 +169,7 @@ final class UserController extends FormController
                         'redirect'   => $this->generateUrl('mautic_user_index'),
                     ]);
                 } else {
-                    $response = $this->redirect($this->generateUrl('mautic_user_index'));
+                    $response = $this->redirectToRoute('mautic_user_index');
                 }
             }
 
@@ -202,7 +201,7 @@ final class UserController extends FormController
         ]);
     }
 
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper): JsonResponse|Response
+    public function newAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:create')) {
             $this->throwAccessDenied();
@@ -218,20 +217,20 @@ final class UserController extends FormController
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $this->userModel, $user, $form);
+            $response = $this->handleNewUserPost($request, $languageHelper, $samlHelper, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, UserModel $model, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $model, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $languageHelper, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -245,23 +244,23 @@ final class UserController extends FormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $languageHelper, $hasher, $samlHelper, $user->getId(), true);
+            $response = $this->editAction($request, $languageHelper, $samlHelper, $user->getId(), true);
         }
 
         return $response;
     }
 
-    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, UserModel $model, User $user, FormInterface $form): bool
+    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, User $user, FormInterface $form): bool
     {
         $formUser          = $request->request->all()['user'] ?? [];
         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-        $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+        $password          = $this->userModel->checkNewPassword($user, $submittedPassword);
         $valid             = $this->isFormValid($form);
 
         if ($valid) {
             $user->setPassword($password);
-            $model->saveEntity($user);
-            $this->loadNewUserLocale($languageHelper, $model, $user);
+            $this->userModel->saveEntity($user);
+            $this->loadNewUserLocale($languageHelper, $user);
 
             $this->addFlashMessage('mautic.core.notice.created', [
                 '%name%'      => $user->getName(),
@@ -276,7 +275,7 @@ final class UserController extends FormController
         return $valid;
     }
 
-    private function loadNewUserLocale(LanguageHelper $languageHelper, UserModel $model, User $user): void
+    private function loadNewUserLocale(LanguageHelper $languageHelper, User $user): void
     {
         $installedLanguages = $languageHelper->getSupportedLanguages();
 
@@ -285,7 +284,7 @@ final class UserController extends FormController
 
             if ($fetchLanguage['error']) {
                 $user->setLocale(null);
-                $model->saveEntity($user);
+                $this->userModel->saveEntity($user);
                 $this->addFlashMessage(
                     $fetchLanguage['message'] ?? 'mautic.core.could.not.set.language',
                     $fetchLanguage['vars'] ?? []
@@ -315,7 +314,7 @@ final class UserController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
@@ -377,7 +376,7 @@ final class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $this->userModel->checkNewPassword($user, $hasher, $submittedPassword);
+                $password          = $this->userModel->checkNewPassword($user, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
@@ -691,7 +690,7 @@ final class UserController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->userModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

@@ -435,7 +435,7 @@ class CorePermissions implements ResetInterface
 
     protected function getPermissionClasses(): array
     {
-        if (empty($this->permissionClasses)) {
+        if ([] === $this->permissionClasses) {
             $this->registerPermissionClasses();
         }
 

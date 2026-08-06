@@ -90,7 +90,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $field->setProperties($fieldDetails['properties']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get(FieldModel::class);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -123,7 +123,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
                     ],
                 ]);
                 /** @var LeadModel $leadModel */
-                $leadModel = static::getContainer()->get(LeadModel::class);
+                $leadModel = self::getContainer()->get(LeadModel::class);
                 $leadModel->setFieldValues($contact, [self::FIELD_NAME => [$cars[$i % 3]]]);
             }
             $contacts[] = $contact;

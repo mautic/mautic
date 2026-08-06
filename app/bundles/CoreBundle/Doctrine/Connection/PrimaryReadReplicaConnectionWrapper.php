@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Doctrine\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Exception;
 
-class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
+final class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
 {
     /**
      * @param array<string, string> $dbParams

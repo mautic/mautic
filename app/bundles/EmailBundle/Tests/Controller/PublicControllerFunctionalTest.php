@@ -143,7 +143,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $this->assertCount(1, $crawler->filter('#success-message-text'), $this->client->getResponse()->getContent());
-        $expectedMessage = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertResponseIsSuccessful();
 
@@ -325,7 +325,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $needle     = $translator->trans('mautic.page.form.saveprefs', [], null, $expectedLocale);
 
         $this->assertStringContainsString($needle, $crawler->html());

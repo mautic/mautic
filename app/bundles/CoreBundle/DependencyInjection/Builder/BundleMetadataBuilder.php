@@ -6,7 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\EntityMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetadata;
 
-class BundleMetadataBuilder
+final class BundleMetadataBuilder
 {
     private array $ipLookupServices = [];
 

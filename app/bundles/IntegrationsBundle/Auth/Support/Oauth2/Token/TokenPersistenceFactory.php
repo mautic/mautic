@@ -8,10 +8,10 @@ use kamermans\OAuth2\Token\RawToken;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 
-class TokenPersistenceFactory
+final readonly class TokenPersistenceFactory
 {
     public function __construct(
-        private readonly IntegrationsHelper $integrationsHelper,
+        private IntegrationsHelper $integrationsHelper,
     ) {
     }
 

@@ -8,12 +8,12 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
-use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Entity\PageRepository;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly PageModel $pageModel,
+        private readonly PageRepository $pageRepository,
     ) {
     }
 
@@ -38,7 +38,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                     }
                 }
             }
-            $this->pageModel->getRepository()->saveEntity($hit);
+            $this->pageRepository->saveEntity($hit);
         }
     }
 

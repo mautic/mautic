@@ -10,11 +10,12 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 87.9
-		param: 75
-		property: 68
+		return: 88.1
+		param: 75.4
+		property: 69.5
 		# wait for PHP 8.3 before changing
 		constant: 3
+		declare: 73
 	paths:
 		- app/bundles
 		- app/migrations
@@ -220,10 +221,26 @@ parameters:
 		-
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
+		-
+			identifier: typePerfect.noArrayAccessOnObject
+		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
+		-
+			identifier: mautic.noServiceJuggling
+			path: app/bundles/LeadBundle/Model/LeadModel.php
+
+		# mixed return
+		-
+			identifier: return.unusedType
+			message: '#Method Mautic(.*?)::getParameterValue\(\)#'
+		# string operations
+		-
+			identifier: parameterByRef.type
+			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
 	scanDirectories:
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
 		- vendor/javer/sp-bundle/src
+		- vendor/javer/symfony-bridge/src
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -235,6 +252,7 @@ parameters:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 
+
 rules:
 	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
 	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
@@ -243,6 +261,7 @@ rules:
 	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
 	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
 	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+	- Utils\PHPStan\Rule\ConstraintMustHaveAttributeRule
 	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
 	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
 	- Utils\PHPStan\Rule\NoContainerGetRule
@@ -252,6 +271,8 @@ rules:
 
 	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
 	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
+	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
+	- Utils\PHPStan\Rule\NoServiceJugglingRule
 
 #services:
 #	-

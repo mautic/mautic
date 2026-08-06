@@ -11,15 +11,15 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class EmailDependencies
+final readonly class EmailDependencies
 {
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly ListModel $listModel,
-        private readonly ActionModel $actionModel,
-        private readonly PointModel $pointModel,
-        private readonly TriggerEventModel $triggerEventModel,
-        private readonly ReportModel $reportModel,
+        private CampaignModel $campaignModel,
+        private ListModel $listModel,
+        private ActionModel $actionModel,
+        private PointModel $pointModel,
+        private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel,
     ) {
     }
 

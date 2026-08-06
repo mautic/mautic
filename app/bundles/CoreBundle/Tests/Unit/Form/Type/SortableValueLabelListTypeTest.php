@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -55,7 +56,7 @@ final class SortableValueLabelListTypeTest extends TestCase
 
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->isType('callable'));
+            ->with(FormEvents::PRE_SUBMIT, $this->isCallable());
 
         $type->buildForm($builder, []);
     }
@@ -102,7 +103,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         $this->assertEquals([], $view->vars['postaddon']);
     }
 
-    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, FormBuilderInterface $builder): callable
+    /**
+     * @param MockObject&FormBuilderInterface $builder
+     */
+    private function getEventListenerFromBuildForm(SortableValueLabelListType $type, MockObject $builder): callable
     {
         $eventListener = null;
         // @phpstan-ignore-next-line
@@ -126,8 +130,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createStub(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
+
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -177,8 +181,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createStub(FormBuilderInterface::class);
-        $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
+        $eventListener = $this->getEventListenerFromBuildForm($type, $this->createMock(FormBuilderInterface::class));
         $event         = $this->createMock(FormEvent::class);
 
         $data = ['label' => $input, 'value' => ''];
