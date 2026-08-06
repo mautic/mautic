@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Facade\ReloadFacade;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\StageBundle\Entity\Stage;
