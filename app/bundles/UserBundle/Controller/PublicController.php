@@ -14,7 +14,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
@@ -87,7 +86,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): RedirectResponse|Response
+    public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
         $form     = $this->formFactory->create(PasswordResetConfirmType::class, [], ['action' => $action]);
@@ -102,7 +101,7 @@ final class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $data);
             }
         }
 
@@ -112,7 +111,7 @@ final class PublicController extends FormController
     /**
      * @param array<string, mixed> $data
      */
-    private function handlePasswordResetConfirm(Request $request, UserPasswordHasherInterface $hasher, array $data): ?Response
+    private function handlePasswordResetConfirm(Request $request, array $data): ?Response
     {
         $response = null;
         $user     = $this->userRepository->findByIdentifier($data['identifier']);
@@ -126,7 +125,7 @@ final class PublicController extends FormController
 
             $response = $this->redirectToRoute('mautic_user_passwordresetconfirm');
         } elseif ($this->userModel->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
-            $encodedPassword = $this->userModel->checkNewPassword($user, $hasher, $data['plainPassword']);
+            $encodedPassword = $this->userModel->checkNewPassword($user, $data['plainPassword']);
             $user->setPassword($encodedPassword);
             $this->userModel->saveEntity($user);
 
@@ -152,7 +151,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function inviteAction(Request $request, UserPasswordHasherInterface $hasher, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
+    public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
     {
         $token    = $request->attributes->getString('token');
         $invite   = $model->getInvite($token);
@@ -189,7 +188,7 @@ final class PublicController extends FormController
                         $formUser          = $request->request->all()['user_invite_registration'] ?? [];
                         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
 
-                        $user->setPassword($model->checkNewPassword($user, $hasher, $submittedPassword));
+                        $user->setPassword($model->checkNewPassword($user, $submittedPassword));
                         $model->markInviteUsed($invite);
                         $model->saveEntity($user);
                         $this->addFlashMessage('mautic.user.invite.account_created', [], 'notice', 'flashes');
