@@ -498,7 +498,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new EmailOrEmailTokenList(['allowMultiple' => false]),
+            new EmailOrEmailTokenList(allowMultiple: false),
         );
 
         $metadata->addPropertyConstraint(
