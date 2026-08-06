@@ -729,7 +729,7 @@ class Mailbox
      *
      * @return array|false - FALSE in the case of call failure
      */
-    protected function getQuota(): array|bool
+    protected function getQuota(): array|false
     {
         return imap_get_quotaroot($this->getImapStream(), 'INBOX');
     }
@@ -739,7 +739,7 @@ class Mailbox
      *
      * @return int|false - FALSE in the case of call failure
      */
-    public function getQuotaLimit()
+    public function getQuotaLimit(): int|false
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
@@ -754,7 +754,7 @@ class Mailbox
      *
      * @return int|false - FALSE in the case of call failure
      */
-    public function getQuotaUsage()
+    public function getQuotaUsage(): int|false
     {
         $quota = $this->getQuota();
         if (is_array($quota)) {
