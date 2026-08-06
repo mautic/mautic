@@ -55,11 +55,9 @@ final class AjaxController extends CommonAjaxController
 
     private DoNotContactRepository $doNotContactRepository;
 
-<<<<<<< HEAD
-    private FormFieldHelper $formFieldHelper;
-=======
     private FormFactoryInterface $formFactory;
->>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
+
+    private FormFieldHelper $formFieldHelper;
 
     #[Required]
     public function autowireLeadAjaxController(
@@ -68,22 +66,16 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
-<<<<<<< HEAD
-        FormFieldHelper $formFieldHelper,
-=======
         FormFactoryInterface $formFactory,
->>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
+        FormFieldHelper $formFieldHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
-<<<<<<< HEAD
-        $this->formFieldHelper = $formFieldHelper;
-=======
         $this->formFactory = $formFactory;
->>>>>>> fe0615a14b (use injected form factory in FormModel::createForm() instead of passing it as parameter)
+        $this->formFieldHelper = $formFieldHelper;
     }
 
     public function userListAction(Request $request): JsonResponse

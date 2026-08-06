@@ -13,6 +13,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @template T of object
@@ -23,6 +24,7 @@ class FormModel extends AbstractCommonModel
 {
     protected FormFactoryInterface $formFactory;
 
+    #[Required]
     public function autowireFormModel(
         FormFactoryInterface $formFactory,
     ): void {
