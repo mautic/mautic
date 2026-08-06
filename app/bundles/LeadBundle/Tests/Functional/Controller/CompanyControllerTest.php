@@ -36,6 +36,22 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('lead_batch_owner', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testBatchOwnersActionPost(): void
+    {
+        $this->client->request('POST', '/s/companies/batchOwners/0', [
+            'lead_batch_owner' => [
+                'ids'      => '[]',
+                'addowner' => '0',
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertTrue($response['closeModal']);
+        $this->assertArrayHasKey('flashes', $response);
+    }
+
     private function createAndLoginUser(): User
     {
         // Create non-admin role
