@@ -69,7 +69,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         $this->loginAdminUser();
 
-        $this->contactSegmentService = static::getContainer()->get(ContactSegmentService::class);
+        $this->contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -99,7 +99,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     private function clearLoggedInUser(): void
     {
-        $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
+        $tokenStorage = self::getContainer()->get(TokenStorageInterface::class);
         $this->assertInstanceOf(TokenStorageInterface::class, $tokenStorage);
 
         $tokenStorage->setToken(null);

@@ -196,7 +196,7 @@ abstract class AbstractCompanyRelationValueFilterQueryBuilder extends ComplexRel
      */
     private function combineMultiselectExpressions(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $companyAlias, array $expressions, string $filterGlue, bool $applyIsNull, bool $applyNot): CompositeExpression|string
     {
-        if (empty($expressions)) {
+        if ([] === $expressions) {
             return $subQueryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
         }
 
