@@ -55,6 +55,8 @@ final class AjaxController extends CommonAjaxController
 
     private DoNotContactRepository $doNotContactRepository;
 
+    private FormFieldHelper $formFieldHelper;
+
     #[Required]
     public function autowireLeadAjaxController(
         LeadRepository $leadRepository,
@@ -62,12 +64,14 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+        FormFieldHelper $formFieldHelper,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->formFieldHelper = $formFieldHelper;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -706,9 +710,7 @@ final class AjaxController extends CommonAjaxController
                     case 'date':
                     case 'datetime':
                         if ('date' == $operator) {
-                            $fieldHelper = new FormFieldHelper();
-                            $fieldHelper->setTranslator($this->translator);
-                            $options = $fieldHelper->getDateChoices();
+                            $options = $this->formFieldHelper->getDateChoices();
                             $options = array_merge(
                                 [
                                     'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
