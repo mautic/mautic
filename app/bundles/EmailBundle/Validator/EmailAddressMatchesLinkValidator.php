@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Validator;
 
-use Mautic\EmailBundle\Helper\MailHashHelper;
+use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class EmailAddressMatchesLinkValidator extends ConstraintValidator
 {
-    public function __construct(private readonly MailHashHelper $mailHash)
+    public function __construct(private readonly EmailAddressLinkMatcher $emailAddressLinkMatcher)
     {
     }
 
@@ -25,20 +25,7 @@ final class EmailAddressMatchesLinkValidator extends ConstraintValidator
             return;
         }
 
-        $matchesSecretHash = $this->mailHash->getEmailHash($value) === $constraint->secretHash;
-        $normalizedValue   = strtolower($value);
-        if (!$matchesSecretHash && $normalizedValue !== $value) {
-            $matchesSecretHash = $this->mailHash->getEmailHash($normalizedValue) === $constraint->secretHash;
-        }
-
-        $matchesStatEmail = true;
-        if (null !== $constraint->statEmailAddress) {
-            $matchesStatEmail  = strtolower($value) === strtolower($constraint->statEmailAddress);
-            $matchesSecretHash = $matchesSecretHash
-                || $this->mailHash->getEmailHash($constraint->statEmailAddress) === $constraint->secretHash;
-        }
-
-        if ($matchesSecretHash && $matchesStatEmail) {
+        if ($this->emailAddressLinkMatcher->matchesLink($value, $constraint->secretHash, $constraint->statEmailAddress)) {
             return;
         }
 

@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
+use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
@@ -56,6 +57,8 @@ final class PublicController extends CommonFormController
 
     private MailHashHelper $mailHashHelper;
 
+    private EmailAddressLinkMatcher $emailAddressLinkMatcher;
+
     #[Required]
     public function autowirePublicController(
         LeadModel $leadModel,
@@ -63,12 +66,14 @@ final class PublicController extends CommonFormController
         LeadRepository $leadRepository,
         ThemeHelperInterface $themeHelper,
         MailHashHelper $mailHashHelper,
+        EmailAddressLinkMatcher $emailAddressLinkMatcher,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
         $this->themeHelper = $themeHelper;
         $this->mailHashHelper = $mailHashHelper;
+        $this->emailAddressLinkMatcher = $emailAddressLinkMatcher;
     }
 
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
@@ -206,7 +211,7 @@ final class PublicController extends CommonFormController
         $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
         $isHeadRequest          = $request->isMethod(Request::METHOD_HEAD);
 
-        if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe')) {
+        if ($isOneClickUnsubscribe) {
             return $this->oneClickUnsubscribe($model, $stat);
         }
 
@@ -257,7 +262,14 @@ final class PublicController extends CommonFormController
             $template = $theme->getTheme();
         }
         $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
-        $isCorrectHash   = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
+        $isCorrectHash   = false;
+        if ($secretHash && $urlEmail) {
+            $isCorrectHash = $this->emailAddressLinkMatcher->matchesLink(
+                $urlEmail,
+                $secretHash,
+                $hasStat ? $stat->getEmailAddress() : null
+            );
+        }
         if ($isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
             if ($hasStat && $lead = $stat->getLead()) {

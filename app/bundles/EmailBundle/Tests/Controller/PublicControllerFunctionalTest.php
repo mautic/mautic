@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +36,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
         'testHeadRequestWithNoShowContactPreferences',
+        'testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair',
+        'testUnsubscribeWithDeletedStatAllowsValidEmailHashPair',
     ];
 
     protected function setUp(): void
@@ -630,6 +631,77 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('email', $dncRecords[0]->getChannel());
         $this->assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
         $this->assertSame('User unsubscribed.', $dncRecords[0]->getComments());
+    }
+
+    public function testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair(): void
+    {
+        $email = new Email();
+        $email->setName('Victim Email');
+        $email->setSubject('Victim Subject');
+        $email->setEmailType('template');
+
+        $victimLead = new Lead();
+        $victimLead->setEmail('victim@mautic.tld');
+
+        $attackerLead = new Lead();
+        $attackerLead->setEmail('attacker@mautic.tld');
+
+        $emailStat = new Stat();
+        $emailStat->setEmail($email);
+        $emailStat->setLead($victimLead);
+        $emailStat->setEmailAddress((string) $victimLead->getEmail());
+        $emailStat->setDateSent(new \DateTime());
+        $emailStat->setTrackingHash('existing-stat-hash-for-mismatch-test');
+
+        $this->em->persist($email);
+        $this->em->persist($victimLead);
+        $this->em->persist($attackerLead);
+        $this->em->persist($emailStat);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/existing-stat-hash-for-mismatch-test/attacker@mautic.tld/'.$this->getSecretHash('attacker@mautic.tld')
+        );
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $victimLead->getId()]));
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $attackerLead->getId()]));
+    }
+
+    public function testUnsubscribeWithDeletedStatAllowsValidEmailHashPair(): void
+    {
+        $requestLead = new Lead();
+        $requestLead->setEmail('request@mautic.tld');
+        $this->em->persist($requestLead);
+        $this->em->flush();
+
+        // Synthetic stale tracking hash: this simulates a link whose stat once existed but is now deleted.
+        $staleTrackingHash = 'deleted-stat-hash-for-unsubscribe-test';
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/'.$staleTrackingHash.'/request@mautic.tld/'.$this->getSecretHash('request@mautic.tld')
+        );
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('We are sorry to see you go!', strip_tags($content));
+        $this->assertStringContainsString('/email/validate/resubscribe/'.$this->getSecretHash('request@mautic.tld').'/'.$staleTrackingHash, $content);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        /** @var DoNotContact[] $requestLeadDncRecords */
+        $requestLeadDncRecords = $dncRepository->findBy(['lead' => $requestLead->getId()]);
+
+        $this->assertCount(1, $requestLeadDncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $requestLeadDncRecords[0]->getReason());
+        $this->assertSame('email', $requestLeadDncRecords[0]->getChannel());
     }
 
     public function testValidateEmailFormRejectsInvalidAction(): void
