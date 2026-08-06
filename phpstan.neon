@@ -12,9 +12,9 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 90.1
-		param: 77.4
-		property: 71.5
+		return: 88.3
+		param: 75.7
+		property: 75.5
 		# wait for PHP 8.3 before changing
 		constant: 3
 		declare: 73
