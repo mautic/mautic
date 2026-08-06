@@ -61,7 +61,9 @@ final class ConfigType extends AbstractType
                 $form = $event->getForm();
 
                 foreach ($form as $configForm) {
-                    foreach ($configForm as $child) {
+                    $children = iterator_to_array($configForm);
+
+                    foreach ($children as $child) {
                         $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
                 }
