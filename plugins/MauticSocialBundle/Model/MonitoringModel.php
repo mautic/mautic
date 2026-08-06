@@ -44,12 +44,12 @@ final class MonitoringModel extends FormModel
     ];
 
     /**
-     * @param object      $entity
-     * @param string|null $action
-     * @param mixed[]     $options
+     * @param object $entity
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
         }

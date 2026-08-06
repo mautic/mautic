@@ -122,8 +122,10 @@ class UserModel extends FormModel implements GlobalSearchInterface
         return $entity->getPassword();
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
         }

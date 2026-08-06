@@ -354,6 +354,7 @@ class CommonApiController extends FetchCommonApiController
     {
         return $this->model->createForm(
             $entity,
+            $this->formFactory,
             null,
             array_merge(
                 [

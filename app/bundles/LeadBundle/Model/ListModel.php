@@ -214,13 +214,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string|null $action
-     * @param array       $options
-     *
      * @return FormInterface<LeadList>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }

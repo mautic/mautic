@@ -44,10 +44,11 @@ class ActionModel extends CommonFormModel
 
     /**
      * @param object $entity
-     * @param array  $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
         }

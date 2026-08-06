@@ -277,16 +277,16 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead        $entity
-     * @param string|null $action
-     * @param array       $options
+     * @param Lead $entity
      *
      * @return FormInterface<Lead>
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
         }

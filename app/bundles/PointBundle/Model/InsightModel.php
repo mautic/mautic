@@ -45,12 +45,12 @@ final class InsightModel extends CommonFormModel
     }
 
     /**
-     * @param array<string, mixed> $options
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof PointInsight) {
             throw new MethodNotAllowedHttpException(['PointInsight']);
         }

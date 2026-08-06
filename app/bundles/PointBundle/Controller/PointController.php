@@ -6,11 +6,6 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
-<<<<<<< HEAD
-use Symfony\Component\Form\FormFactoryInterface;
-=======
-use Symfony\Component\HttpFoundation\JsonResponse;
->>>>>>> 5a984947ee (use injected form factory in FormModel::createForm() instead of passing it as parameter)
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -207,11 +202,7 @@ final class PointController extends AbstractFormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
-<<<<<<< HEAD
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
-=======
-    public function editAction(Request $request, $objectId, $ignorePost = false)
->>>>>>> 5a984947ee (use injected form factory in FormModel::createForm() instead of passing it as parameter)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 

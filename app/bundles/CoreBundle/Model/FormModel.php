@@ -376,10 +376,29 @@ class FormModel extends AbstractCommonModel
      * @return FormInterface<mixed>
      *
      * @throws NotFoundHttpException
+     *
+     * @deprecated since 7.0, the $formFactory argument is ignored and will be removed in 8.0; child models use the injected form factory
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
+    }
+
+    /**
+     * Normalizes the createForm() arguments, so child models can be called with or without
+     * the deprecated $formFactory argument.
+     *
+     * @param mixed[] $args
+     *
+     * @return array{0: string|null, 1: mixed[]}
+     */
+    protected function resolveCreateFormArgs(array $args): array
+    {
+        if (($args[0] ?? null) instanceof FormFactoryInterface) {
+            array_shift($args);
+        }
+
+        return [$args[0] ?? null, $args[1] ?? []];
     }
 
     /**

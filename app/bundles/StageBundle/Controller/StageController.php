@@ -237,11 +237,7 @@ final class StageController extends AbstractFormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
-<<<<<<< HEAD
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
-=======
-    public function editAction(Request $request, $objectId, $ignorePost = false)
->>>>>>> 5a984947ee (use injected form factory in FormModel::createForm() instead of passing it as parameter)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->stageModel->getEntity($objectId);
 

@@ -10,11 +10,6 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Model\NotificationModel;
-<<<<<<< HEAD
-use Symfony\Component\Form\FormFactoryInterface;
-=======
-use Symfony\Component\HttpFoundation\JsonResponse;
->>>>>>> 5a984947ee (use injected form factory in FormModel::createForm() instead of passing it as parameter)
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;

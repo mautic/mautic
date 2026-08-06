@@ -95,14 +95,14 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 
     /**
      * @param Notification|null $entity
-     * @param string|null       $action
-     * @param array             $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
         }

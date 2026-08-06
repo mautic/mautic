@@ -50,13 +50,13 @@ class FieldModel extends CommonFormModel
 
     /**
      * @param object|array<mixed> $entity
-     * @param string|null         $action
-     * @param array               $options
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, mixed ...$args): FormInterface
     {
+        [$action, $options] = $this->resolveCreateFormArgs($args);
+
         if ($action) {
             $options['action'] = $action;
         }
