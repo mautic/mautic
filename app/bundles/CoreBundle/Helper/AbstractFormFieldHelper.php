@@ -57,9 +57,8 @@ abstract class AbstractFormFieldHelper
 
     #[Required]
     public function autowireFormFieldHelper(
-        Translator $translator
-    ): void
-    {
+        Translator $translator,
+    ): void {
         $this->translator = $translator;
     }
 
