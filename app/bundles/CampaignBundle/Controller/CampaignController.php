@@ -467,15 +467,9 @@ class CampaignController extends AbstractStandardFormController
                         $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
-                        }
+                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                     }
                 }
 
