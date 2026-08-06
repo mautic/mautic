@@ -27,25 +27,9 @@ final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\Author
     /**
      * This constructor must be duplicated from the extended class so our custom code could access the properties.
      */
-    public function __construct(
-        RequestStack $requestStack,
-        Form $authorizeForm,
-        OAuth2 $oAuth2Server,
+    public function autowireAuthorizeController(
         TokenStorageInterface $tokenStorage,
-        UrlGeneratorInterface $router,
-        ClientManagerInterface $clientManager,
-        EventDispatcherInterface $eventDispatcher,
     ) {
-        parent::__construct(
-            $requestStack,
-            $authorizeForm,
-            $oAuth2Server,
-            $tokenStorage,
-            $router,
-            $clientManager,
-            $eventDispatcher
-        );
-
         $this->tokenStorage = $tokenStorage;
     }
 
