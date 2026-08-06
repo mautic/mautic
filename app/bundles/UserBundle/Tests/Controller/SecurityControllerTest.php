@@ -48,7 +48,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
     public function testLoginPageDoesNotLoadEditorAssets(): void
     {
-        $this->client->request(Request::METHOD_GET, '/login');
+        $this->client->request(Request::METHOD_GET, '/s/login');
 
         $this->assertResponseIsSuccessful();
 
