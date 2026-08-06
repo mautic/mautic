@@ -241,8 +241,6 @@ class CampaignController extends AbstractStandardFormController
         $objectIds      = json_decode($ids, true);
 
         if (empty($ids)) {
-            $this->campaignRepository->setTranslator($this->translator);
-
             $args = [
                 'filter'           => $filter,
                 'orderBy'          => 'c.id',
