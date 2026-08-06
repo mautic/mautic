@@ -312,11 +312,7 @@ final class UserController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      */
-<<<<<<< HEAD
-    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
-=======
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
->>>>>>> f25657f603 ([types] add Response return type to controller actions, add PHPStan rule to keep it)
+    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('user:users:edit')) {
             $this->throwAccessDenied();
