@@ -24,7 +24,7 @@ final class PointControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/points/edit/'.$point->getId());
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/points/edit/'.$point->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['point[projects]']->setValue((string) $project->getId());
 

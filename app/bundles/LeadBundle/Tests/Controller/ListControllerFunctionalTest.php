@@ -520,7 +520,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        $this->client->request('POST', 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_POST, 's/segments/delete/'.$list1->getId(), [], [], $this->createAjaxHeaders());
 
         $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
@@ -559,7 +559,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';
-        $this->client->request('POST', 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_POST, 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -913,7 +913,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $dnc->setDateAdded(new \DateTime());
         $this->em->persist($dnc);
         $this->em->flush();
-        $this->client->request('GET', sprintf('/s/segments/view/%d', $segment->getId()));
+        $this->client->request(Request::METHOD_GET, sprintf('/s/segments/view/%d', $segment->getId()));
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $html = $response->getContent();

@@ -78,7 +78,7 @@ final class EmailMapStatsControllerTest extends MauticMysqlTestCase
         }
         $this->em->flush();
 
-        $this->client->request('GET', "s/emails-map-stats/{$email->getId()}/false/2023-07-20/2023-07-25");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/emails-map-stats/{$email->getId()}/false/2023-07-20/2023-07-25");
         $clientResponse = $this->client->getResponse();
         $crawler        = new Crawler($clientResponse->getContent(), $this->client->getInternalRequest()->getUri());
 

@@ -25,7 +25,7 @@ final class CompanyListColumnConfigurationFunctionalTest extends MauticMysqlTest
         $this->em->persist($company);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/s/companies');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/companies');
 
         $this->assertResponseIsSuccessful();
 

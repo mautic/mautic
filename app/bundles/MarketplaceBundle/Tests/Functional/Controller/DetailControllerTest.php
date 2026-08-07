@@ -28,7 +28,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
-        $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "s/marketplace/detail/{$requestedPackage}");
 
         $responseContent = $this->client->getResponse()->getContent();
 

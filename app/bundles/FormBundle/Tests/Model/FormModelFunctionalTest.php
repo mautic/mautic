@@ -177,7 +177,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
             'postAction'  => 'return',
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
@@ -206,7 +206,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
             </html>',
         ];
 
-        $this->client->request('POST', '/api/pages/new', $pagePayload);
+        $this->client->request(Request::METHOD_POST, '/api/pages/new', $pagePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
@@ -236,7 +236,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         $contactTracker = $this->getContainer()->get(ContactTracker::class);
         $contactTracker->setTrackedContact($lead);
 
-        $this->client->request('GET', "/form/{$formId}");
+        $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $this->client->getCrawler();
         $checkboxA   = $formCrawler->filter('[id*="mauticform_checkboxgrp_checkbox_"][id$="_a0"]')->attr('checked');
         $checkboxB   = $formCrawler->filter('[id*="mauticform_checkboxgrp_checkbox_"][id$="_b1"]')->attr('checked');

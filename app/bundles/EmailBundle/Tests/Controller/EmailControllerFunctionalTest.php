@@ -77,7 +77,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($email);
 
-        $this->client->request('GET', '/s/emails');
+        $this->client->request(Request::METHOD_GET, '/s/emails');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200');
         $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
@@ -98,7 +98,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
+        $this->client->request(Request::METHOD_GET, '/s/emails?search=has%3Aresults&tmpl=list');
         $this->assertResponseIsSuccessful();
     }
 
@@ -886,7 +886,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['emailform[projects]']->setValue((string) $project->getId());
 
@@ -906,7 +906,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertEmailVersion($email->getId(), $version);
 
-        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();

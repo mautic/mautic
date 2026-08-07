@@ -212,14 +212,14 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($this->createUser('user3', $role2));
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=DESC');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=DESC');
         $rows    = $crawler->filter('#roleTable tbody tr');
 
         $this->assertSame($uniquePrefix.' 1', trim($rows->eq(0)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 2', trim($rows->eq(1)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 3', trim($rows->eq(2)->filter('td')->eq(1)->text()));
 
-        $crawler = $this->client->request('GET', '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=ASC');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/roles?tmpl=list&search='.$uniquePrefix.'&orderby=user_count&orderbydir=ASC');
         $rows    = $crawler->filter('#roleTable tbody tr');
 
         $this->assertSame($uniquePrefix.' 3', trim($rows->eq(0)->filter('td')->eq(1)->text()));

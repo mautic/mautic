@@ -12,7 +12,7 @@ final class CommonRepositoryTest extends MauticMysqlTestCase
     #[TestDox('Test that is:mine does not throw an exception due to bad DQL')]
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQL(): void
     {
-        $this->client->request('GET', 's/contacts?search=is:mine');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/contacts?search=is:mine');
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:mine', (string) $this->client->getResponse()->getContent());
@@ -20,7 +20,7 @@ final class CommonRepositoryTest extends MauticMysqlTestCase
 
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQLForCompanies(): void
     {
-        $this->client->request('GET', 's/companies?search=is:mine');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/companies?search=is:mine');
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:mine', (string) $this->client->getResponse()->getContent());
@@ -28,7 +28,7 @@ final class CommonRepositoryTest extends MauticMysqlTestCase
 
     public function testIsPublishedSearchCommandDoesntCauseExceptionDueToBadDQLForEmails(): void
     {
-        $this->client->request('GET', 's/emails?search=is:published');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, 's/emails?search=is:published');
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:published', (string) $this->client->getResponse()->getContent());

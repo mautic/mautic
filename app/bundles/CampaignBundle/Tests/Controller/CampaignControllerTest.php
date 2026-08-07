@@ -17,7 +17,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenNotFiltered(): void
     {
-        $this->client->request('GET', '/s/campaigns');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns');
         $this->assertResponseIsSuccessful();
     }
 
@@ -26,7 +26,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testIndexActionWhenFiltering(): void
     {
-        $this->client->request('GET', '/s/campaigns?search=has%3Aresults&tmpl=list');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns?search=has%3Aresults&tmpl=list');
         $this->assertResponseIsSuccessful();
     }
 
@@ -35,7 +35,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCampaign(): void
     {
-        $this->client->request('GET', '/s/campaigns/new/');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/new/');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -47,7 +47,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCampaignCancel(): void
     {
-        $crawler = $this->client->request('GET', '/s/campaigns/new/');
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/new/');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->filter('form[name="campaign"]')->selectButton('campaign_buttons_cancel')->form();
@@ -68,7 +68,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/campaigns/edit/'.$campaign->getId());
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/edit/'.$campaign->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['campaign[projects]']->setValue((string) $project->getId());
 
@@ -112,7 +112,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Request the edit page for the campaign
-        $this->client->request('GET', '/s/campaigns/edit/'.$campaign->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/campaigns/edit/'.$campaign->getId());
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();

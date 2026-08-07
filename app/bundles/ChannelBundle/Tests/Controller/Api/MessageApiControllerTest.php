@@ -29,7 +29,7 @@ JSON;
 
         $payloadArray = json_decode($payloadJson, true);
 
-        $this->client->request('POST', '/api/messages/new', $payloadArray);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/messages/new', $payloadArray);
         $responseJson = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $responseJson);
         $this->assertMessagePayload($payloadArray, json_decode($responseJson, true)['message'], $responseJson);
@@ -58,7 +58,7 @@ JSON;
         $this->em->detach($message);
 
         $patchPayload = ['id' => $message->getId()] + $payload;
-        $this->client->request('PATCH', "/api/messages/{$message->getId()}/edit", $patchPayload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, "/api/messages/{$message->getId()}/edit", $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
         self::assertResponseIsSuccessful($responseJson);
         $this->assertMessagePayload(
@@ -151,7 +151,7 @@ JSON;
             ['id' => $message1->getId(), 'name' => 'API message 1 (updated)'],
             ['id' => $message2->getId(), 'channels' => ['email' => ['channelId' => 14, 'isEnabled' => false]]],
         ];
-        $this->client->request('PATCH', '/api/messages/batch/edit', $patchPayload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/messages/batch/edit', $patchPayload);
         $responseJson = $this->client->getResponse()->getContent();
         self::assertResponseIsSuccessful($responseJson);
         $responseArray = json_decode($responseJson, true);

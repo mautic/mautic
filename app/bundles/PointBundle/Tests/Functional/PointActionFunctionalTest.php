@@ -28,7 +28,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
         $this->createEmailStat($lead, $email, $trackingHash);
         $pointAction = $this->createReadEmailAction(5);
-        $this->client->request('GET', '/email/'.$trackingHash.'.gif');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$trackingHash.'.gif');
 
         $lead = $leadModel->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
@@ -50,7 +50,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
         $this->createEmailStat($lead, $email, $trackingHash);
         $pointAction = $this->createReadEmailAction(5, $group);
-        $this->client->request('GET', '/email/'.$trackingHash.'.gif');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$trackingHash.'.gif');
         $this->em->clear();
         $lead        = $leadModel->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
@@ -74,7 +74,7 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         // Note: No point actions created for email.open type
 
         $initialPoints = $lead->getPoints();
-        $this->client->request('GET', '/email/'.$trackingHash.'.gif');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$trackingHash.'.gif');
 
         $lead = $leadModel->getEntity($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);

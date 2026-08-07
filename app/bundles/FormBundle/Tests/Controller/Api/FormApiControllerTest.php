@@ -20,7 +20,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
     public function testCreateFormWithFieldsAndActions(array $formData, int $expectedStatusCode): void
     {
         $this->client->request(
-            'POST',
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -69,7 +69,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $form = $this->createForm($initialFormData);
 
         $this->client->request(
-            'PUT',
+            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
             '/api/forms/'.$form->getId().'/edit',
             $updateData,
         );
@@ -113,7 +113,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'POST',
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -151,7 +151,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'POST',
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
             '/api/forms/new',
             $formData,
         );
@@ -187,7 +187,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'PUT',
+            \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
             '/api/forms/'.$form->getId().'/edit',
             $updateData,
         );
@@ -271,7 +271,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         // If fields are provided, create them through the API to properly test the preSaveEntity method
         if (isset($data['fields'])) {
             $this->client->request(
-                'PUT',
+                \Symfony\Component\HttpFoundation\Request::METHOD_PUT,
                 '/api/forms/'.$form->getId().'/edit',
                 [
                     'name'   => $form->getName(),

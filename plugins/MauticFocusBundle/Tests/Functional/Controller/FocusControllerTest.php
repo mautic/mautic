@@ -25,7 +25,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/focus/edit/'.$focus->getId());
+        $crawler = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/focus/edit/'.$focus->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['focus[projects]']->setValue((string) $project->getId());
 

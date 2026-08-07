@@ -22,7 +22,7 @@ final class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($asset);
 
-        $crawler   = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
+        $crawler   = $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, sprintf('/s/assets/view/%d', $asset->getId()));
         $imageTag  = $crawler->filter('.img-thumbnail');
 
         $onError  = $imageTag->attr('onerror');

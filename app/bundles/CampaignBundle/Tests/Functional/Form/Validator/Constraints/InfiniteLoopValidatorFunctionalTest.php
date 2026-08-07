@@ -198,7 +198,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 
         $expectedStatusCode = $success ? 201 : 422;
 
-        $this->client->request('POST', '/api/campaigns/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/campaigns/new', $payload);
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame($expectedStatusCode, $response->getContent());
 

@@ -87,7 +87,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
     public function testForbiddenDeleteAction(): void
     {
         $this->createAndLoginUser();
-        $this->client->request('GET', '/s/dwc/delete');
+        $this->client->request(Request::METHOD_GET, '/s/dwc/delete');
 
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
@@ -105,7 +105,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/dwc/edit/'.$dynamicContent->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$dynamicContent->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['dwc[projects]']->setValue((string) $project->getId());
 

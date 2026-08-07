@@ -51,7 +51,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -113,7 +113,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         // Request page 1 with all items on one page first
-        $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -173,7 +173,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -189,7 +189,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();

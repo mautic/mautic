@@ -46,7 +46,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // create 3 new companies
-        $this->client->request('POST', '/api/companies/batch/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -71,7 +71,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // use unique field to not create new company
-        $this->client->request('POST', '/api/companies/batch/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -92,7 +92,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // use both unique fields and create new, because use AND operator between unique fields
-        $this->client->request('POST', '/api/companies/batch/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
@@ -111,7 +111,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             'companyname'            => 'API',
         ];
 
-        $this->client->request('POST', '/api/companies/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $companyId      = $response['company']['id'];
@@ -119,7 +119,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['companyname'], $response['company']['fields']['all']['companyname']);
 
         // Lets try to create the same company
-        $this->client->request('POST', '/api/companies/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -131,7 +131,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Lets try to create the new company because use unique fields with AND operator
-        $this->client->request('POST', '/api/companies/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -147,7 +147,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreateCompanyViaApiPlatform(array $companyData, int $expectedStatusCode): void
     {
         $this->client->request(
-            'POST',
+            \Symfony\Component\HttpFoundation\Request::METHOD_POST,
             '/api/v2/companies',
             [],
             [],
@@ -212,7 +212,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             'companyphone'    => '123456789',
             'companywebsite'  => 'https://company.com',
         ];
-        $this->client->request('POST', '/api/companies/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/new', $payload);
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -253,7 +253,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
                 'companywebsite'  => 'https://company.b.com',
             ],
         ];
-        $this->client->request('POST', '/api/companies/batch/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/companies/batch/new', $payload);
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -274,7 +274,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testDeleteCompanyInBackground(): void
     {
         $company = $this->createCompany();
-        $this->client->request('DELETE', sprintf('/api/companies/%d/delete', $company->getId()));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/companies/%d/delete', $company->getId()));
 
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -288,7 +288,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $company   = $this->createCompany();
         $companyId = $company->getId();
-        $this->client->request('DELETE', sprintf('/api/companies/%d/delete', $company->getId()));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/companies/%d/delete', $company->getId()));
 
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -309,7 +309,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $companyId2,
         ];
 
-        $this->client->request('DELETE', sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
 
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -329,7 +329,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $company2->getId(),
         ];
 
-        $this->client->request('DELETE', sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_DELETE, sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
 
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
@@ -370,7 +370,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PATCH', '/api/companies/batch/edit', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, '/api/companies/batch/edit', $payload);
         $this->client->getResponse();
         $this->em->clear();
 
@@ -403,7 +403,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             'companyname' => $company1UpdatedName,
         ];
 
-        $this->client->request('PATCH', sprintf('/api/companies/%d/edit', $company1Id), $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_PATCH, sprintf('/api/companies/%d/edit', $company1Id), $payload);
         $this->client->getResponse();
         $this->em->clear();
 

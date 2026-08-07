@@ -40,7 +40,7 @@ final class UserApiTest extends MauticMysqlTestCase
         $userId = $adminUser->getId();
 
         // Test GET - password should not be in response
-        $this->client->request('GET', "/api/v2/users/{$userId}");
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, "/api/v2/users/{$userId}");
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
@@ -58,7 +58,7 @@ final class UserApiTest extends MauticMysqlTestCase
     public function testPasswordNotExposedInCollection(): void
     {
         // Test GET collection
-        $this->client->request('GET', '/api/v2/users');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/users');
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);

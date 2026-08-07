@@ -126,7 +126,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 
@@ -293,7 +293,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 
@@ -453,7 +453,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Now let's simulate email opens
         foreach ($stats as $stat) {
-            $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
+            $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/email/'.$stat['tracking_hash'].'.gif');
             $this->assertResponseIsSuccessful();
         }
 

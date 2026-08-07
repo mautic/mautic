@@ -51,7 +51,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         $endpoint = sprintf($endpointTemplate, $foreignContact->getId());
-        $this->client->request('GET', $endpoint);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, $endpoint);
 
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
@@ -112,7 +112,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/contacts?limit=100');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts?limit=100');
         self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
@@ -128,7 +128,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->assertContains($ownContact->getId(), $legacyIds);
         $this->assertNotContains($foreignContact->getId(), $legacyIds);
 
-        $this->client->request('GET', '/api/v2/contacts?page=1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=1');
         self::assertResponseIsSuccessful();
 
         $v2Collection = json_decode($this->client->getResponse()->getContent(), true);
@@ -179,7 +179,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $viewer->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=2');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=2');
         self::assertResponseIsSuccessful();
 
         $firstPage = json_decode($this->client->getResponse()->getContent(), true);
@@ -198,7 +198,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
             $this->assertContains($id, $ownedContactIds);
         }
 
-        $this->client->request('GET', '/api/v2/contacts?page=2&itemsPerPage=2');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=2&itemsPerPage=2');
         self::assertResponseIsSuccessful();
 
         $secondPage = json_decode($this->client->getResponse()->getContent(), true);
@@ -263,7 +263,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $viewOtherUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/contacts?start=0&limit=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/contacts?start=0&limit=10');
         self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
@@ -279,7 +279,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->assertContains($ownContact->getId(), $legacyIds);
         $this->assertContains($foreignContact->getId(), $legacyIds);
 
-        $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=10');
         self::assertResponseIsSuccessful();
 
         $collection = json_decode($this->client->getResponse()->getContent(), true);
@@ -341,7 +341,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -357,7 +357,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/api/v2/contacts?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
         self::assertResponseIsSuccessful();

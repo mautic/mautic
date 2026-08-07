@@ -78,7 +78,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
-        $this->client->request('GET', '/page-page-landingPageTracking');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTracking');
         $this->assertResponseIsSuccessful();
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
@@ -117,7 +117,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
-        $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
         if ([] !== $leadIdsBeforeTest) {
@@ -134,7 +134,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
-        $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
+        $this->client->request(Request::METHOD_GET, '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
@@ -156,7 +156,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $timestamp  = \time();
         $page       = $this->createTestPage();
 
-        $this->client->request('GET', "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
+        $this->client->request(Request::METHOD_GET, "/{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -199,7 +199,7 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionPage(): void
     {
-        $this->client->request('GET', '/s/pages/view/'.$this->id);
+        $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var PageModel $model */
@@ -215,7 +215,7 @@ final class PageControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionPage(): void
     {
-        $this->client->request('GET', '/s/pages/new/');
+        $this->client->request(Request::METHOD_GET, '/s/pages/new/');
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -223,7 +223,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     /* Get landing page's submissions list */
     public function testListLandingPageSubmissions(): void
     {
-        $this->client->request('GET', 's/pages/results/'.$this->id);
+        $this->client->request(Request::METHOD_GET, 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());

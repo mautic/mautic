@@ -16,26 +16,26 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
 
     public function testIndex(): void
     {
-        $this->client->request('GET', '/s/monitoring');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring');
         $this->assertResponseIsSuccessful();
     }
 
     public function testNew(): void
     {
-        $this->client->request('GET', '/s/monitoring/new');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/new');
         $this->assertResponseIsSuccessful();
     }
 
     public function testEdit(): void
     {
-        $this->client->request('GET', '/s/monitoring/edit/1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/edit/1');
         $this->assertResponseIsSuccessful();
     }
 
     public function testIndexWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request('GET', '/s/monitoring');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring');
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());
     }
@@ -43,7 +43,7 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
     public function testNewWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request('GET', '/s/monitoring/new');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/new');
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());
     }
@@ -51,7 +51,7 @@ final class MonitoringControllerTest extends MauticMysqlTestCase
     public function testEditWithoutPermission(): void
     {
         $this->createAndLoginUser();
-        $this->client->request('GET', '/s/monitoring/edit/1');
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/monitoring/edit/1');
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());
     }

@@ -149,7 +149,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             $payload['lists'] = [$segmentId];
         }
 
-        $this->client->request('POST', '/api/emails/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -169,7 +169,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function sendEmailViaApi(int $emailId): void
     {
-        $this->client->request('POST', "/api/emails/{$emailId}/send");
+        $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertSame(json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), [

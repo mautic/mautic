@@ -76,7 +76,7 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
-        $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
 
         self::assertResponseIsSuccessful();
 
@@ -95,7 +95,7 @@ final class CampaignRotationTest extends MauticMysqlTestCase
             $this->campaignWithJump->getId()
         );
 
-        $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
+        $this->client->request(Request::METHOD_GET, sprintf('/%s', $this->page->getAlias()));
 
         self::assertResponseIsSuccessful();
 

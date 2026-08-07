@@ -58,7 +58,7 @@ final class TweetControllerTest extends MauticMysqlTestCase
         $tweet = $this->tweetsRepo->findOneBy([]);
         $this->assertInstanceOf(Tweet::class, $tweet);
 
-        $crawler               = $this->client->request('GET', '/s/tweets/edit/'.$tweet->getId());
+        $crawler               = $this->client->request(Request::METHOD_GET, '/s/tweets/edit/'.$tweet->getId());
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();

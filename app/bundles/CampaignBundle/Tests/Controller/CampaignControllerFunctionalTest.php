@@ -178,7 +178,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     {
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
-        $this->client->request('GET', sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
+        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/graph/%d/%s/%s', $campaignId, $from, $to));
         $response      = $this->client->getResponse();
         $body          = json_decode($response->getContent(), true);
         $crawler       = new Crawler($body['newContent']);
@@ -213,7 +213,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from = date('Y-m-d', strtotime('-2 months'));
         $to   = date('Y-m-d', strtotime('-1 month'));
         $url  = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaignId, $from, $to);
-        $this->client->request('GET', $url);
+        $this->client->request(Request::METHOD_GET, $url);
         $response = $this->client->getResponse();
         $body     = json_decode($response->getContent(), true);
         $this->client->restart();
@@ -356,7 +356,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     public function testCampaignView(): void
     {
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
+        $crawler  = $this->client->request(Request::METHOD_GET, sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('Campaign ABC', (string) $response->getContent());
@@ -371,7 +371,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $from     = date('Y-m-d', strtotime('-2 months'));
         $to       = date('Y-m-d', strtotime('-1 month'));
         $campaign = $this->saveSomeCampaignLeadEventLogs();
-        $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
+        $this->client->request(Request::METHOD_GET, sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);

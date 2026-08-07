@@ -72,7 +72,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         // Make a dummy request to initialize session
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
 
         // Simulate import summary with NEW entities to trigger undo
@@ -87,7 +87,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ]);
         $session->save();
 
-        $this->client->request('GET', '/s/campaign/import/undo');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -101,7 +101,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         // Dummy request to initialize session
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
 
         // Simulate import summary with only UPDATE (no NEW data)
@@ -116,7 +116,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ]);
         $session->save();
 
-        $this->client->request('GET', '/s/campaign/import/undo');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/undo');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -129,7 +129,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
         $session->set('mautic.campaign.import.step', 2);
         $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/empty.zip');
@@ -139,7 +139,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn([]);
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
-        $this->client->request('GET', '/s/campaign/import/progress');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -150,7 +150,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
 
         $fixturesDir = __DIR__.'/Fixtures';
@@ -169,7 +169,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
-        $this->client->request('GET', '/s/campaign/import/progress');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -182,7 +182,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
         $session->set('mautic.campaign.import.step', 3);
         $session->set('mautic.campaign.import.file', __DIR__.'/Fixtures/empty.zip');
@@ -192,7 +192,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn([]);
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
-        $this->client->request('GET', '/s/campaign/import/progress');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -203,7 +203,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
-        $this->client->request('GET', '/');
+        $this->client->request(Request::METHOD_GET, '/');
         $session = $this->client->getRequest()->getSession();
 
         $fixturesDir = __DIR__.'/Fixtures';
@@ -222,7 +222,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $importHelper->method('readZipFile')->willReturn(FixtureHelper::getPayload());
         self::getContainer()->set(ImportHelper::class, $importHelper);
 
-        $this->client->request('GET', '/s/campaign/import/progress');
+        $this->client->request(Request::METHOD_GET, '/s/campaign/import/progress');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -247,7 +247,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/campaign/import/upload',
             ['campaign_import' => []], // POST data
             ['campaign_import' => ['campaignFile' => $fileArray]]

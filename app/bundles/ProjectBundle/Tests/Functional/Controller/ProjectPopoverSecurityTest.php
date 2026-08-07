@@ -35,7 +35,7 @@ final class ProjectPopoverSecurityTest extends MauticMysqlTestCase
         $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->saveEntity($email);
 
-        $this->client->request('GET', '/s/emails/view/'.$email->getId());
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_GET, '/s/emails/view/'.$email->getId());
         $this->assertResponseIsSuccessful();
 
         $content = (string) $this->client->getResponse()->getContent();

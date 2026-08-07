@@ -90,7 +90,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/fields/contact/new', $fieldPayload);
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $fieldPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
@@ -124,7 +124,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
             'postAction' => 'return',
         ];
 
-        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
@@ -152,7 +152,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
                 </html>',
         ];
 
-        $this->client->request('POST', '/api/pages/new', $pagePayload);
+        $this->client->request(Request::METHOD_POST, '/api/pages/new', $pagePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
@@ -171,7 +171,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PATCH', "/api/fields/contact/{$customFieldId}/edit", $updatePayload);
+        $this->client->request(Request::METHOD_PATCH, "/api/fields/contact/{$customFieldId}/edit", $updatePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }

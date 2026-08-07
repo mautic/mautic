@@ -106,7 +106,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Create:
-        $this->client->request('POST', '/api/segments/new', $payload);
+        $this->client->request(\Symfony\Component\HttpFoundation\Request::METHOD_POST, '/api/segments/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
