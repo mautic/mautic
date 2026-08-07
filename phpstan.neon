@@ -5,7 +5,7 @@ parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
 
-	#reportUnmatchedIgnoredErrors: false
+	reportUnmatchedIgnoredErrors: false
 
 	treatPhpDocTypesAsCertain: false
 	parallel:
@@ -222,10 +222,6 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
 		-
 			identifier: typePerfect.noArrayAccessOnObject
-		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
-		-
-			identifier: mautic.noServiceJuggling
-			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		# mixed return
 		-

@@ -36,7 +36,6 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -137,7 +136,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -146,7 +145,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             $options['action'] = $action;
         }
 
-        return $formFactory->create(SmsType::class, $entity, $options);
+        return $this->formFactory->create(SmsType::class, $entity, $options);
     }
 
     /**

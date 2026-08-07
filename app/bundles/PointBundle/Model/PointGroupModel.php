@@ -13,7 +13,6 @@ use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
 use Mautic\PointBundle\PointGroupEvents;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -50,7 +49,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
@@ -60,7 +59,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create(GroupType::class, $entity, $options);
+        return $this->formFactory->create(GroupType::class, $entity, $options);
     }
 
     /**

@@ -325,7 +325,7 @@ final class ListController extends FormController
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
         // get the user form factory
-        $form = $segmentModel->createForm($segment, $this->formFactory, $action);
+        $form = $segmentModel->createForm($segment, $action);
 
         // Check for a submitted form and process it
         if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
@@ -388,7 +388,7 @@ final class ListController extends FormController
             return $this->isLocked($postActionVars, $segment, 'lead.list');
         }
 
-        $form = $segmentModel->createForm($segment, $this->formFactory, $action);
+        $form = $segmentModel->createForm($segment, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -415,7 +415,7 @@ final class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
-                        $form = $segmentModel->createForm($segment, $this->formFactory, $postActionVars['returnUrl']);
+                        $form = $segmentModel->createForm($segment, $postActionVars['returnUrl']);
 
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',

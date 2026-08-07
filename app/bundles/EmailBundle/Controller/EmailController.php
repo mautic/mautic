@@ -536,7 +536,7 @@ final class EmailController extends FormController
         }
 
         // create the form
-        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -739,7 +739,7 @@ final class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
-        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $action, ['update_select' => $updateSelect]);
         $this->setOptimisticLockVersion($entity, $form);
 
         // /Check for a submitted form and process it
@@ -843,7 +843,7 @@ final class EmailController extends FormController
             }
             if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
-                $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+                $form = $model->createForm($entity, $action, ['update_select' => $updateSelect]);
                 $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
@@ -987,7 +987,7 @@ final class EmailController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $model->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {

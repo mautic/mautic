@@ -386,7 +386,7 @@ final class PageController extends FormController
         $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'new']);
 
         // create the form
-        $form = $model->createForm($entity, $this->formFactory, $action);
+        $form = $model->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -533,7 +533,7 @@ final class PageController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_page_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $model->createForm($entity, $action);
         $this->setOptimisticLockVersion($entity, $form);
         $existingPage = clone $entity;
         $this->restoreNullifiedFieldsDuringClone($existingPage, $entity);
@@ -597,7 +597,7 @@ final class PageController extends FormController
             }
             if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
-                $form = $model->createForm($entity, $this->formFactory, $action);
+                $form = $model->createForm($entity, $action);
                 $this->setOptimisticLockVersion($entity, $form);
             }
         } else {

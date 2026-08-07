@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,12 +26,12 @@ final class AjaxController extends CommonAjaxController
         $this->pageModel = $pageModel;
     }
 
-    public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, PageModel $pageModel, Environment $twig): JsonResponse
+    public function getAbTestFormAction(Request $request, PageModel $pageModel, Environment $twig): JsonResponse
     {
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $pageModel,
-            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn ($formType, $formOptions): FormInterface => $this->createForm(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
             fn (FormInterface $form): string => $this->renderView('@MauticPage/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticPage/AbTest/form.html.twig', 'MauticPageBundle:FormTheme\Page'])]),
             'page_abtest_settings',
             'page'

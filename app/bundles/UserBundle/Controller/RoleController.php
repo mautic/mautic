@@ -148,7 +148,7 @@ final class RoleController extends FormController
 
         // get the user form factory
         $permissionsConfig = $this->getPermissionsConfig($entity);
-        $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -269,7 +269,7 @@ final class RoleController extends FormController
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
-        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $model->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         if (!$request->isMethod('POST')) {
             return $this->renderRoleCloneForm($form, $permissionsConfig, $action);
         }
@@ -388,7 +388,7 @@ final class RoleController extends FormController
 
         $permissionsConfig = $this->getPermissionsConfig($entity);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -423,7 +423,7 @@ final class RoleController extends FormController
             }
             // the form has to be rebuilt because the permissions were updated
             $permissionsConfig = $this->getPermissionsConfig($entity);
-            $form              = $this->roleModel->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+            $form              = $this->roleModel->createForm($entity, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         } else {
             // lock the entity
             $this->roleModel->lockEntity($entity);

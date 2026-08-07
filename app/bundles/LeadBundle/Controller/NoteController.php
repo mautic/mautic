@@ -186,7 +186,7 @@ final class NoteController extends FormController
             ]
         );
         // get the user form factory
-        $form       = $this->noteModel->createForm($note, $this->formFactory, $action);
+        $form       = $this->noteModel->createForm($note, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -273,7 +273,7 @@ final class NoteController extends FormController
                 'leadId'       => $leadId,
             ]
         );
-        $form = $this->noteModel->createForm($note, $this->formFactory, $action);
+        $form = $this->noteModel->createForm($note, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {

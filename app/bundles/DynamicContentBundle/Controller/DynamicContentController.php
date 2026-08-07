@@ -140,7 +140,7 @@ final class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-        $form         = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form         = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -280,7 +280,7 @@ final class DynamicContentController extends FormController
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->dynamicContentModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {

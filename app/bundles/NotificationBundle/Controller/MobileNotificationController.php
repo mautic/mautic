@@ -286,7 +286,7 @@ final class MobileNotificationController extends FormController
         }
 
         // create the form
-        $form = $this->notificationModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->notificationModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -447,7 +447,7 @@ final class MobileNotificationController extends FormController
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->notificationModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->notificationModel->createForm($entity, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {

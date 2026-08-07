@@ -311,7 +311,7 @@ final class AssetController extends FormController
         $uploadEndpoint = $uploaderHelper->endpoint('asset');
 
         // create the form
-        $form = $model->createForm($entity, $this->formFactory, $action);
+        $form = $model->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -471,7 +471,7 @@ final class AssetController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_asset_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($entity, $this->formFactory, $action);
+        $form   = $model->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {

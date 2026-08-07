@@ -318,7 +318,7 @@ final class ReportController extends FormController
 
         // Create the form
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->reportModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->reportModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -398,7 +398,7 @@ final class ReportController extends FormController
             }
             if ($valid) {
                 // Rebuild the form for updated columns
-                $form = $this->reportModel->createForm($entity, $this->formFactory, $action);
+                $form = $this->reportModel->createForm($entity, $action);
             }
         } else {
             // lock the entity
@@ -441,7 +441,7 @@ final class ReportController extends FormController
         $page    = $session->get('mautic.report.page', 1);
 
         $action = $this->generateUrl('mautic_report_action', ['objectAction' => 'new']);
-        $form   = $this->reportModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->reportModel->createForm($entity, $action);
 
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {

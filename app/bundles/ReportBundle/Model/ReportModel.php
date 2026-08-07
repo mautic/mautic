@@ -106,7 +106,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -125,7 +125,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
 
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $this->formFactory);
 
         return $reportGenerator->getForm($entity, $options);
     }

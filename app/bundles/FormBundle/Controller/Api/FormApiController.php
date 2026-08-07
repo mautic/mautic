@@ -299,7 +299,6 @@ final class FormApiController extends CommonApiController
 
         return $this->actionModel->createForm(
             $entity,
-            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,
@@ -318,7 +317,6 @@ final class FormApiController extends CommonApiController
     {
         return $this->fieldModel->createForm(
             $entity,
-            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,

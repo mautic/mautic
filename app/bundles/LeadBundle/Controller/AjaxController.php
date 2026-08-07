@@ -55,6 +55,8 @@ final class AjaxController extends CommonAjaxController
 
     private DoNotContactRepository $doNotContactRepository;
 
+    private FormFactoryInterface $formFactory;
+
     private FormFieldHelper $formFieldHelper;
 
     #[Required]
@@ -64,6 +66,7 @@ final class AjaxController extends CommonAjaxController
         LeadFieldRepository $leadFieldRepository,
         LeadModel $leadModel,
         DoNotContactRepository $doNotContactRepository,
+        FormFactoryInterface $formFactory,
         FormFieldHelper $formFieldHelper,
     ): void {
         $this->leadModel = $leadModel;
@@ -71,6 +74,7 @@ final class AjaxController extends CommonAjaxController
         $this->leadRepository = $leadRepository;
         $this->emailRepository = $emailRepository;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->formFactory = $formFactory;
         $this->formFieldHelper = $formFieldHelper;
     }
 
@@ -155,7 +159,6 @@ final class AjaxController extends CommonAjaxController
 
     public function loadSegmentFilterFormAction(
         Request $request,
-        FormFactoryInterface $formFactory,
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel,
     ): JsonResponse {
@@ -165,7 +168,7 @@ final class AjaxController extends CommonAjaxController
         $search      = InputHelper::clean($request->request->get('search'));
         $filterNum   = (int) $request->request->get('filterNum');
 
-        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
+        $form = $this->formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
             $formAdjustmentsProvider->adjustForm(

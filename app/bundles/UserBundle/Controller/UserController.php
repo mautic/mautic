@@ -212,7 +212,7 @@ final class UserController extends FormController
 
         // get the user form factory
         $action   = $this->generateUrl('mautic_user_action', ['objectAction' => 'new']);
-        $form     = $this->userModel->createForm($user, $this->formFactory, $action);
+        $form     = $this->userModel->createForm($user, $action);
         $response = null;
 
         // Check for a submitted form and process it
@@ -359,7 +359,7 @@ final class UserController extends FormController
         }
 
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->userModel->createForm($user, $this->formFactory, $action);
+        $form   = $this->userModel->createForm($user, $action);
 
         $isSamlUser    = $samlHelper->isSamlSession();
         if ($isSamlUser) {

@@ -10,7 +10,6 @@ use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -75,7 +74,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -83,7 +82,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
 
         $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create(ClientType::class, $entity, $params);
+        return $this->formFactory->create(ClientType::class, $entity, $params);
     }
 
     public function getEntity($id = null): ?Client

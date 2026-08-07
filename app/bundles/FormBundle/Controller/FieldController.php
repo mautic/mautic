@@ -421,7 +421,6 @@ final class FieldController extends CommonFormController
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;
         $form = $this->formFieldModel->createForm(
             $formField,
-            $this->formFactory,
             (!empty($formField['id'])) ?
                 $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $formField['id']])
                 : $this->generateUrl('mautic_formfield_action', ['objectAction' => 'new']),

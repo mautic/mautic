@@ -30,7 +30,6 @@ use Mautic\WebhookBundle\Service\WebhookService;
 use Mautic\WebhookBundle\WebhookEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -165,7 +164,7 @@ class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -177,7 +176,7 @@ class WebhookModel extends FormModel
 
         $options['events'] = $this->getEvents();
 
-        return $formFactory->create(WebhookType::class, $entity, $options);
+        return $this->formFactory->create(WebhookType::class, $entity, $options);
     }
 
     public function getEntity($id = null): ?Webhook

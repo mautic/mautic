@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -26,7 +25,6 @@ final class EmailGraphStatsController extends AbstractController
     public function viewAction(
         Request $request,
         EmailModel $model,
-        FormFactoryInterface $formFactory,
         CorePermissions $security,
         $objectId,
         $isVariant,
@@ -39,7 +37,7 @@ final class EmailGraphStatsController extends AbstractController
         // Init the date range filter form
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->createForm(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         if (null === $email || !$security->hasEntityAccess(
             'email:emails:viewown',

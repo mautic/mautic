@@ -195,7 +195,7 @@ final class TriggerController extends FormController
         $deletedEvents = $session->get('mautic.point.'.$sessionId.'.triggerevents.deleted', []);
 
         $action = $this->generateUrl('mautic_pointtrigger_action', ['objectAction' => 'new']);
-        $form   = $this->triggerModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->triggerModel->createForm($entity, $action);
         $form->get('sessionId')->setData($sessionId);
 
         // Check for a submitted form and process it
@@ -337,7 +337,7 @@ final class TriggerController extends FormController
         }
 
         $action = $this->generateUrl('mautic_pointtrigger_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $this->triggerModel->createForm($entity, $this->formFactory, $action);
+        $form   = $this->triggerModel->createForm($entity, $action);
         $form->get('sessionId')->setData($objectId);
 
         // /Check for a submitted form and process it
