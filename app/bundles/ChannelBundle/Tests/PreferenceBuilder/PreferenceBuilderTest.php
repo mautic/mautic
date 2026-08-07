@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
+final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized(): void
     {
@@ -64,9 +66,9 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $preferences = $builder->getChannelPreferences();
 
         $this->assertCount(3, $preferences);
-        $this->assertTrue(isset($preferences['email']));
-        $this->assertTrue(isset($preferences['sms']));
-        $this->assertTrue(isset($preferences['push']));
+        $this->assertArrayHasKey('email', $preferences);
+        $this->assertArrayHasKey('sms', $preferences);
+        $this->assertArrayHasKey('push', $preferences);
 
         /** @var ChannelPreferences $email */
         $email = $preferences['email'];

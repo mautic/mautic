@@ -25,17 +25,17 @@ class EventExecutioner
 {
     private ?Responses $responses = null;
 
-    private \DateTimeInterface $executionDate;
+    private readonly \DateTimeInterface $executionDate;
 
     public function __construct(
-        private EventCollector $collector,
-        private EventLogger $eventLogger,
-        private ActionExecutioner $actionExecutioner,
-        private ConditionExecutioner $conditionExecutioner,
-        private DecisionExecutioner $decisionExecutioner,
-        private LoggerInterface $logger,
-        private EventScheduler $scheduler,
-        private RemovedContactTracker $removedContactTracker,
+        private readonly EventCollector $collector,
+        private readonly EventLogger $eventLogger,
+        private readonly ActionExecutioner $actionExecutioner,
+        private readonly ConditionExecutioner $conditionExecutioner,
+        private readonly DecisionExecutioner $decisionExecutioner,
+        private readonly LoggerInterface $logger,
+        private readonly EventScheduler $scheduler,
+        private readonly RemovedContactTracker $removedContactTracker,
     ) {
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -223,10 +223,7 @@ class EventExecutioner
         }
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDate()
+    public function getExecutionDate(): \DateTimeInterface
     {
         return $this->executionDate;
     }
@@ -300,7 +297,7 @@ class EventExecutioner
             $campaignId = $log->getCampaign()->getId();
 
             if ($this->removedContactTracker->wasContactRemoved($campaignId, $contactId)) {
-                $this->logger->debug("CAMPAIGN: Contact ID# $contactId has been removed from campaign ID $campaignId");
+                $this->logger->debug("CAMPAIGN: Contact ID# {$contactId} has been removed from campaign ID {$campaignId}");
                 $logs->remove($key);
 
                 // Clear out removed contacts to prevent a memory leak

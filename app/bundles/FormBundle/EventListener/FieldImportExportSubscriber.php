@@ -14,7 +14,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -28,6 +30,8 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FieldRepository $fieldRepository,
+        private FormRepository $formRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private FieldModel $fieldModel,
@@ -103,7 +107,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
                     $this->mergeExportData($data, $subEvent);
 
                     $event->addDependencyEntity(Form::ENTITY_NAME, [
-                        Field::ENTITY_NAME       => (int) $fieldId,
+                        Field::ENTITY_NAME       => $fieldId,
                         LeadField::ENTITY_NAME   => (int) $object->getId(),
                     ]);
                 }
@@ -127,7 +131,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $fieldData) {
-            $field = $this->entityManager->getRepository(Field::class)->findOneBy(['uuid' => $fieldData['uuid']]);
+            $field = $this->fieldRepository->findOneBy(['uuid' => $fieldData['uuid']]);
             $isNew = !$field;
             $field ??= new Field();
 
@@ -140,7 +144,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
 
             // Form mapping
             if (!empty($fieldData['form'])) {
-                $form = $this->entityManager->getRepository(Form::class)->find($fieldData['form']);
+                $form = $this->formRepository->find($fieldData['form']);
                 if ($form instanceof Form) {
                     $field->setForm($form);
                     unset($fieldData['form']);
@@ -185,7 +189,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary['ids'] as $id) {
-            $field = $this->entityManager->getRepository(Field::class)->find($id);
+            $field = $this->fieldRepository->find($id);
 
             if ($field) {
                 $this->entityManager->remove($field);
@@ -214,7 +218,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
                 break;
             }
 
-            $existing = $this->entityManager->getRepository(Field::class)->findOneBy(['uuid' => $item['uuid']]);
+            $existing = $this->fieldRepository->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel() ?? $existing->getAlias();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();

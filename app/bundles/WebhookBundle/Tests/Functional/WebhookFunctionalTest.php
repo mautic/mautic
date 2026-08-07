@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -16,31 +17,25 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookFunctionalTest extends MauticMysqlTestCase
+final class WebhookFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
     protected $useCleanupRollback = false;
 
-    /**
-     * @var WebhookQueueRepository
-     */
-    private $webhookQueueRepository;
+    private WebhookQueueRepository $webhookQueueRepository;
 
-    /**
-     * @var NotificationRepository
-     */
-    private $notificationRepository;
+    private NotificationRepository $notificationRepository;
 
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private $webhhokRepository;
+    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {
@@ -57,8 +52,8 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
 
-        $this->webhookQueueRepository       = $this->em->getRepository(WebhookQueue::class);
-        $this->notificationRepository       = $this->em->getRepository(Notification::class);
+        $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
+        $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
         $this->webhhokRepository            = $this->em->getRepository(Webhook::class);
     }
 
@@ -73,21 +68,21 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     public function testWebhookWorkflowWithCommandProcess(): void
     {
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
-        \assert($webhookQueueRepository instanceof WebhookQueueRepository);
+        $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();
         // Ensure we have a clean slate. There should be no rows waiting to be processed at this point.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->createContacts();
 
         // At this point there should be 3 events waiting to be processed.
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookWorkflowWithCommandProcessInQueueRange(): void
@@ -103,7 +98,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         ]);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookWorkflowWithCommandProcessWithoutPassingWebhookID(): void
@@ -115,7 +110,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     /**
@@ -127,7 +122,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         yield 'Actual user' => [1, 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNotificationToUser')]
+    #[DataProvider('dataNotificationToUser')]
     public function testWebhookFailureNotificationSent(?int $createdByUserId, ?int $expectedUserId): void
     {
         $this->mockFailedWebhookResponse(2);
@@ -140,7 +135,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $webhookQueues = $this->getWebhookQueue($webhook->getId());
         foreach ($webhookQueues as $webhookQueue) {
@@ -157,15 +152,15 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
-        Assert::assertCount(1, $this->notificationRepository->getNotifications($expectedUserId));
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertCount(1, $this->notificationRepository->getNotifications($expectedUserId));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
-        Assert::assertNotNull($webhook->getMarkedUnhealthyAt());
-        Assert::assertNotNull($webhook->getUnHealthySince());
-        Assert::assertNotNull($webhook->getLastNotificationSentAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
     }
 
     public function testWebhookQueueNotProcessedIfMarkedUnhealthy(): void
@@ -180,7 +175,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         // The queue should not be processed.
-        Assert::assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(3, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     public function testWebhookQueueProcessedWhenUnhealthyTimePassed(): void
@@ -195,12 +190,13 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
-        Assert::assertNull($webhook->getMarkedUnhealthyAt());
-        Assert::assertNull($webhook->getUnHealthySince());
-        Assert::assertNull($webhook->getLastNotificationSentAt());
+        $this->assertInstanceOf(Webhook::class, $webhook);
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getMarkedUnhealthyAt());
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getUnHealthySince());
+        $this->assertNotInstanceOf(\DateTimeImmutable::class, $webhook->getLastNotificationSentAt());
 
         // The queue should be processed.
-        Assert::assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
+        $this->assertSame(0, $this->getQueueCountByWebhookId($webhook->getId()));
     }
 
     private function createWebhook(): Webhook
@@ -263,10 +259,10 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
 
         return [
             $response['contacts'][0]['id'],
@@ -280,10 +276,10 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
-                    Assert::assertSame('/post', $request->getUri()->getPath());
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
+                    $this->assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
-                    Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
+                    $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;
 
@@ -298,10 +294,10 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
-                    Assert::assertSame('/post', $request->getUri()->getPath());
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
+                    $this->assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
-                    Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
+                    $this->assertNotEmpty($request->getHeader('Webhook-Signature'));
 
                     ++$sendRequestCounter;
 

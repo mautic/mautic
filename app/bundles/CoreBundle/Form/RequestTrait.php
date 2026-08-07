@@ -62,7 +62,7 @@ trait RequestTrait
                     $setter = 'set'.ucfirst($name);
                     // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                     // If value is array and count 1, return value of array as string
-                    if (is_array($params[$name]) && 1 == count($params[$name])) {
+                    if (is_array($params[$name]) && 1 === count($params[$name])) {
                         $params[$name] = end($params[$name]);
                     }
 
@@ -71,7 +71,7 @@ trait RequestTrait
                     }
 
                     // find property by value
-                    if (!empty($fields)) {
+                    if ([] !== $fields) {
                         $properties = ArrayHelper::getValue('properties', $fields[$name]);
                         if (is_array($properties)) {
                             $valuesAsKeys = array_flip(array_values($properties));
@@ -84,7 +84,7 @@ trait RequestTrait
                     $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                     $data = (bool) $data;
                     try {
-                        $entity->$setter($data);
+                        $entity->{$setter}($data);
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;

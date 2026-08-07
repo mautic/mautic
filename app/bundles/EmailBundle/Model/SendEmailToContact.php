@@ -40,19 +40,17 @@ class SendEmailToContact
     private array $contact = [];
 
     public function __construct(
-        private MailHelper $mailer,
-        private StatHelper $statHelper,
-        private DoNotContact $dncModel,
-        private TranslatorInterface $translator,
+        private readonly MailHelper $mailer,
+        private readonly StatHelper $statHelper,
+        private readonly DoNotContact $dncModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     /**
      * @param bool $resetMailer
-     *
-     * @return $this
      */
-    public function flush($resetMailer = true)
+    public function flush($resetMailer = true): static
     {
         // Flushes the batch in case of using API mailers
         if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
@@ -93,7 +91,7 @@ class SendEmailToContact
         array $channel = [],
         array $customHeaders = [],
         array $assetAttachments = [],
-    ): SendEmailToContact {
+    ): self {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -117,10 +115,8 @@ class SendEmailToContact
 
     /**
      * @param int|null $id
-     *
-     * @return $this
      */
-    public function setListId($id)
+    public function setListId($id): static
     {
         $this->listId = empty($id) ? null : (int) $id;
 
@@ -128,11 +124,9 @@ class SendEmailToContact
     }
 
     /**
-     * @return $this
-     *
      * @throws FailedToSendToContactException
      */
-    public function setContact(array $contact, array $tokens = [])
+    public function setContact(array $contact, array $tokens = []): static
     {
         $this->contact = $contact;
 
@@ -197,26 +191,17 @@ class SendEmailToContact
         $this->mailer->reset();
     }
 
-    /**
-     * @return array
-     */
-    public function getSentCounts()
+    public function getSentCounts(): array
     {
         return $this->emailSentCounts;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errorMessages;
     }
 
-    /**
-     * @return array
-     */
-    public function getFailedContacts()
+    public function getFailedContacts(): array
     {
         return $this->failedContacts;
     }
@@ -253,7 +238,7 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    protected function processSendFailures($sendFailures)
+    protected function processSendFailures(array $sendFailures): void
     {
         $failedEmailAddresses = $sendFailures['failures'];
         unset($sendFailures['failures']);
@@ -282,7 +267,7 @@ class SendEmailToContact
     /**
      * Add DNC entries for bad emails to get them out of the queue permanently.
      */
-    protected function processBadEmails()
+    protected function processBadEmails(): void
     {
         // Update bad emails as bounces
         if (count($this->badEmails)) {
@@ -299,7 +284,7 @@ class SendEmailToContact
         }
     }
 
-    protected function createContactStatEntry($email)
+    protected function createContactStatEntry($email): void
     {
         ++$this->statBatchCounter;
 
@@ -315,7 +300,7 @@ class SendEmailToContact
     /**
      * Up sent counter for the given email ID.
      */
-    protected function upEmailSentCount($emailId)
+    protected function upEmailSentCount($emailId): void
     {
         // Up sent counts
         if (!isset($this->emailSentCounts[$emailId])) {
@@ -328,7 +313,7 @@ class SendEmailToContact
     /**
      * Down sent counter for the given email ID.
      */
-    protected function downEmailSentCount($emailId)
+    protected function downEmailSentCount($emailId): void
     {
         --$this->emailSentCounts[$emailId];
     }

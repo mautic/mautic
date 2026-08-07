@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -17,7 +19,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class DynamicListType extends AbstractType
+final class DynamicListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -64,7 +66,7 @@ class DynamicListType extends AbstractType
 
                     'constraints'    => fn (Options $options): array => ($options['option_notblank']) ? [
                         new NotBlank(
-                            ['message' => 'mautic.form.lists.notblank']
+                            message: 'mautic.form.lists.notblank'
                         ),
                     ] : [],
                     'error_bubbling' => true,
@@ -73,12 +75,7 @@ class DynamicListType extends AbstractType
                 'allow_delete'    => true,
                 'prototype'       => true,
                 'constraints'     => fn (Options $options): array => ($options['option_required']) ? [
-                    new Count(
-                        [
-                            'minMessage' => 'mautic.form.lists.count',
-                            'min'        => 1,
-                        ]
-                    ),
+                    new Count(min: 1, minMessage: 'mautic.form.lists.count'),
                 ] : [],
                 'error_bubbling'  => false,
             ]
@@ -100,7 +97,7 @@ class DynamicListType extends AbstractType
         return 'dynamiclist';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return CollectionType::class;
     }

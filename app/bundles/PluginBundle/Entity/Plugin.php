@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+
     public const CACHE_NAMESPACE             = 'Plugin';
 
     /**
@@ -107,8 +108,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -117,13 +116,9 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Plugin
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 
@@ -131,8 +126,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()

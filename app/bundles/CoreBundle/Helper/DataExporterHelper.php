@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 
-class DataExporterHelper
+final class DataExporterHelper
 {
     /**
      * Standard function to generate an array of data via any model's "getEntities" method.
@@ -24,7 +24,7 @@ class DataExporterHelper
         array $args,
         ?callable $resultsCallback = null,
         bool $skipOrdering = false,
-    ) {
+    ): ?array {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;
         $args['skipOrdering'] = $skipOrdering;

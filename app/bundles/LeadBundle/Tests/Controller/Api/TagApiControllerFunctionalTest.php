@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Symfony\Component\HttpFoundation\Response;
 
-class TagApiControllerFunctionalTest extends MauticMysqlTestCase
+final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTagWorkflow(): void
     {
@@ -119,7 +121,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testSearchMatchesTagDescription(): void
     {
         $tagRepository = $this->em->getRepository(Tag::class);
-        \assert($tagRepository instanceof TagRepository);
+        $this->assertInstanceOf(TagRepository::class, $tagRepository);
 
         $matchingTag = (new Tag('alpha_tag'))->setDescription('Contains the test keyword.');
         $otherTag    = (new Tag('beta_tag'))->setDescription('No relevant text here.');

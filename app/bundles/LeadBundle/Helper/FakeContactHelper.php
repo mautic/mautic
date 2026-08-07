@@ -40,7 +40,7 @@ class FakeContactHelper
         ]);
 
         array_walk($fields, function (&$field): void {
-            $field = "[$field]";
+            $field = "[{$field}]";
         });
 
         $fields['id'] = 0;

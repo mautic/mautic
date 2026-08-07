@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -12,8 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SegmentDateValidator extends ConstraintValidator
 {
     public function __construct(
-        private ContactSegmentFilterFactory $contactSegmentFilterFactory,
-        private TranslatorInterface $translator,
+        private readonly ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -24,14 +25,14 @@ final class SegmentDateValidator extends ConstraintValidator
     {
         foreach ($filters as $filter) {
             if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'])) {
+                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains', OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                    continue;
+                }
+
                 $segmentFilter  = $this->contactSegmentFilterFactory->factorSegmentFilter($filter);
                 $parameterValue = $segmentFilter->getParameterValue();
 
                 if (is_array($parameterValue)) {
-                    continue;
-                }
-
-                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains'])) {
                     continue;
                 }
 

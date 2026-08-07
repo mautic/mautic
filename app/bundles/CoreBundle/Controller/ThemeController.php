@@ -12,16 +12,12 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ThemeController extends FormController
+final class ThemeController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper)
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -32,7 +28,7 @@ class ThemeController extends FormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['core:themes:view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $dir    = $pathsHelper->getSystemPath('themes', true);
@@ -102,16 +98,14 @@ class ThemeController extends FormController
 
     /**
      * Download a theme.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
     {
         $flashes = [];
         $error   = false;
 
         if (!$this->security->isGranted('core:themes:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $themeName = $objectId;
@@ -218,7 +212,7 @@ class ThemeController extends FormController
                 ];
             }
 
-            if ($error) {
+            if ([] !== $error) {
                 $flashes = array_merge($flashes, $error);
             }
         }
@@ -230,12 +224,7 @@ class ThemeController extends FormController
         );
     }
 
-    /**
-     * Deletes a theme.
-     *
-     * @return array
-     */
-    public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName)
+    public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];
 
@@ -246,7 +235,7 @@ class ThemeController extends FormController
                 'msgVars' => ['%theme%' => $themeName],
             ];
         } elseif (!$this->security->isGranted('core:themes:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (in_array($themeName, $themeHelper->getDefaultThemes())) {
             $flashes[] = [
                 'type'    => 'error',
@@ -299,7 +288,7 @@ class ThemeController extends FormController
     public function visibilityAction(string $objectId, Request $request, CorePermissions $corePermissions, ThemeHelperInterface $themeHelper): Response
     {
         if (!$corePermissions->isGranted('core:themes:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $flashes = [];

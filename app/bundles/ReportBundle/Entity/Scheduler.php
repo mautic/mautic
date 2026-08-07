@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -33,14 +35,12 @@ class Scheduler
     }
 
     public function __construct(
-        private Report $report,
-        private \DateTimeInterface $scheduleDate,
+        private readonly Report $report,
+        private readonly \DateTimeInterface $scheduleDate,
     ) {
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -48,18 +48,12 @@ class Scheduler
         return $this->id;
     }
 
-    /**
-     * @return Report
-     */
-    public function getReport()
+    public function getReport(): Report
     {
         return $this->report;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getScheduleDate()
+    public function getScheduleDate(): \DateTimeInterface
     {
         return $this->scheduleDate;
     }

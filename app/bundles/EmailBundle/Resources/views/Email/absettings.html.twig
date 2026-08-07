@@ -1,0 +1,29 @@
+{{ form_start(form) }}
+    <div class="row mt-10">
+        <div class="col-xs-4">
+            <p class="mt-5">{{ 'mautic.core.ab_test.form.traffic_total_weight'|trans }}</p>
+        </div>
+        <div class="col-xs-3">
+            {{ form_widget(form.totalWeight) }}
+        </div>
+    </div>
+    <div class="row mt-10">
+        <div class="col-xs-4">
+            <p class="mt-5">{{ 'mautic.core.ab_test.form.winner.delay'|trans }}</p>
+        </div>
+        <div class="col-xs-3">
+            {{ form_widget(form.sendWinnerDelay) }}
+        </div>
+    </div>
+    <div class="row mt-10">
+        <div class="col-xs-4">
+            <p class="mt-5">{{ 'mautic.core.ab_test.form.winner'|trans }}</p>
+        </div>
+        <div class="col-xs-6">
+            {{ form_widget(form.winnerCriteria) }}
+        </div>
+    </div>
+    <div class="hide">
+        {{ form_rest(form) }}
+    </div>
+{{ form_end(form) }}

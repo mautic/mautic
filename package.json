@@ -2,6 +2,13 @@
   "name": "mautic",
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
+  "overrides": {
+    "ajv": ">=8.18.0",
+    "yaml": ">=2.8.3",
+    "raw-loader": {
+      "schema-utils": "^4.0.0"
+    }
+  },
   "devDependencies": {
     "patch-package": "^8.0.1",
     "webpack-cli": "^5.1.4"
@@ -19,7 +26,6 @@
     "@ckeditor/ckeditor5-ckfinder": "^48.0.1",
     "@ckeditor/ckeditor5-cloud-services": "^48.0.1",
     "@ckeditor/ckeditor5-core": "^48.0.1",
-    "@ckeditor/ckeditor5-dev-translations": "^56.4.0",
     "@ckeditor/ckeditor5-dev-utils": "^56.4.0",
     "@ckeditor/ckeditor5-easy-image": "^48.0.1",
     "@ckeditor/ckeditor5-editor-classic": "^48.0.1",

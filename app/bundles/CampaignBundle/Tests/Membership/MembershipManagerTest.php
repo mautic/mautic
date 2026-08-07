@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,25 +15,25 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit\Framework\TestCase
+final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Adder|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Adder
      */
     private \PHPUnit\Framework\MockObject\MockObject $adder;
 
     /**
-     * @var Remover|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Remover
      */
     private \PHPUnit\Framework\MockObject\MockObject $remover;
 
     /**
-     * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcher
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
@@ -108,9 +110,10 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreAddedOrUpdated(): void
     {
-        $contact = new class extends Lead {
-            public function __construct(private int $id = 1)
-            {
+        $contact = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
             }
 
             public function getId(): int
@@ -118,9 +121,10 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
                 return $this->id;
             }
         };
-        $contact2 = new class extends Lead {
-            public function __construct(private int $id = 2)
-            {
+        $contact2 = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
             }
 
             public function getId(): int
@@ -159,9 +163,10 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreRemoved(): void
     {
-        $contact = new class extends Lead {
-            public function __construct(private int $id = 1)
-            {
+        $contact = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
             }
 
             public function getId(): int
@@ -169,9 +174,10 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
                 return $this->id;
             }
         };
-        $contact2 = new class extends Lead {
-            public function __construct(private int $id = 2)
-            {
+        $contact2 = new class() extends Lead {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
             }
 
             public function getId(): int

@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(RedirectUrlTokensFinder::class)]
-class RedirectUrlTokensFinderTest extends TestCase
+final class RedirectUrlTokensFinderTest extends TestCase
 {
     private const NOT_VALID_URLS = [
         'ttps://example.com',
@@ -346,13 +346,13 @@ class RedirectUrlTokensFinderTest extends TestCase
     #[DataProvider('provideUrlToCheck')]
     public function testHasTokens(string $url, bool $expected): void
     {
-        self::assertSame($expected, $this->redirectUrlTokensFinder->hasTokens($url));
+        $this->assertSame($expected, $this->redirectUrlTokensFinder->hasTokens($url));
     }
 
     #[DataProvider('provideUrlToReplace')]
     public function testReplaceTokensWithDummyData(string $url, string $expected): void
     {
-        self::assertSame($expected, $this->redirectUrlTokensFinder->replaceTokensWithDummyData($url));
+        $this->assertSame($expected, $this->redirectUrlTokensFinder->replaceTokensWithDummyData($url));
     }
 
     protected function setUp(): void

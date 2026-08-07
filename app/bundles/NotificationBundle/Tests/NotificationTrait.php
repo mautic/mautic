@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -51,7 +52,7 @@ trait NotificationTrait
     private function setupIntegration(ContainerInterface $container, EntityManagerInterface $em, string $apiId, string $restApiId): void
     {
         /** @var AbstractIntegration $integration */
-        $integration = $container->get('mautic.helper.integration')
+        $integration = $container->get(IntegrationHelper::class)
             ->getIntegrationObject('OneSignal');
         $integrationSettings = $integration->getIntegrationSettings();
         $integrationSettings->setIsPublished(true);

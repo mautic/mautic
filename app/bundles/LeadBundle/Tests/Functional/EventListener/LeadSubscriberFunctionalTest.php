@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 
-class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
+final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testUpdateLead(): void
     {
@@ -41,7 +41,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $leadMergeEvent = new LeadMergeEvent($contactB, $contactA);
 
         $subscriber = self::getContainer()->get(LeadSubscriber::class);
-        \assert($subscriber instanceof LeadSubscriber);
+        $this->assertInstanceOf(LeadSubscriber::class, $subscriber);
 
         $subscriber->onLeadMerge($leadMergeEvent);
 

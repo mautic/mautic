@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Option;
 
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class ExportOptionTest extends \PHPUnit\Framework\TestCase
+final class ExportOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testReportId(): void
     {

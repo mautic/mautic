@@ -6,10 +6,11 @@ namespace Mautic\CoreBundle\Tests\Functional\Doctrine\Paginator;
 
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 
-class SimplePaginatorTest extends MauticMysqlTestCase
+final class SimplePaginatorTest extends MauticMysqlTestCase
 {
     /**
      * Enable debug for enabling DBAL query logger.
@@ -24,8 +25,8 @@ class SimplePaginatorTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $debugDataHolder = static::getContainer()->get('doctrine.debug_data_holder');
-        \assert($debugDataHolder instanceof DebugDataHolder);
+        $debugDataHolder = self::getContainer()->get('doctrine.debug_data_holder');
+        $this->assertInstanceOf(DebugDataHolder::class, $debugDataHolder);
         $debugDataHolder->reset();
 
         $this->debugDataHolder = $debugDataHolder;
@@ -42,7 +43,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
         $this->em->persist($ipAddress3);
         $this->em->flush();
 
-        $repository = $this->em->getRepository(IpAddress::class);
+        $repository = self::getContainer()->get(IpAddressRepository::class);
 
         $paginator  = $repository->getEntities([
             'use_simple_paginator' => true,
@@ -59,7 +60,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
             $ipAddress3->getId() => $ipAddress3,
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
-        $prefix  = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix  = self::getContainer()->getParameter('mautic.db_table_prefix');
         $queries = $this->debugDataHolder->getData()['default'];
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');

@@ -16,12 +16,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Webhook>
  */
-class WebhookApiController extends CommonApiController
+final class WebhookApiController extends CommonApiController
 {
     /**
      * @var WebhookModel|null
@@ -35,15 +36,13 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        WebhookModel $webhookModel,
     ) {
-        $webhookModel = $modelFactory->getModel('webhook');
-        \assert($webhookModel instanceof WebhookModel);
-
         $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
@@ -63,12 +62,12 @@ class WebhookApiController extends CommonApiController
     }
 
     /**
-     * @param Webhook              &$entity
+     * @param Webhook              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         $eventsToKeep = [];
 
@@ -88,7 +87,7 @@ class WebhookApiController extends CommonApiController
         }
     }
 
-    public function getTriggersAction()
+    public function getTriggersAction(): Response
     {
         return $this->handleView(
             $this->view(

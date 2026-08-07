@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -9,9 +11,10 @@ use Mautic\CoreBundle\Entity\IpAddress;
 class LeadPointLog
 {
     public const TABLE_NAME = 'point_lead_action_log';
+
     /**
      * @var Point
-     **/
+     */
     private $point;
 
     /**
@@ -26,7 +29,7 @@ class LeadPointLog
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

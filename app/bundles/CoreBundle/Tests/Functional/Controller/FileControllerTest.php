@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileControllerTest extends MauticMysqlTestCase
+final class FileControllerTest extends MauticMysqlTestCase
 {
     private ?string $uploadedFilePath = null;
 
@@ -19,12 +18,12 @@ class FileControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertEquals(true, $responseData['uploaded']);
-        Assert::arrayHasKey('url');
-        Assert::assertNotEmpty($responseData['url']);
+        $this->assertEquals(true, $responseData['uploaded']);
+        $this->arrayHasKey('url');
+        $this->assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
-        $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
-        Assert::assertTrue(file_exists($uploadedImage));
+        $uploadedImage    = self::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
+        $this->assertFileExists($uploadedImage);
     }
 
     public function testImageUploadFailure(): void
@@ -35,8 +34,8 @@ class FileControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
-        Assert::assertEquals(false, $responseData['uploaded']);
-        Assert::assertEquals('The uploaded image does not have an allowed mime type', $responseData['error']['message']);
+        $this->assertEquals(false, $responseData['uploaded']);
+        $this->assertEquals('The uploaded image does not have an allowed mime type', $responseData['error']['message']);
     }
 
     private function createUploadFile(string $fileName, string $tmpFile): UploadedFile
@@ -44,13 +43,12 @@ class FileControllerTest extends MauticMysqlTestCase
         $filePath = $this->getFixurePath();
         copy($filePath.$fileName, $filePath.$tmpFile);
         $this->uploadedFilePath = $filePath.$tmpFile;
-        $image                  = new UploadedFile(
+
+        return new UploadedFile(
             $filePath.$tmpFile,
             $tmpFile,
             'image/png'
         );
-
-        return $image;
     }
 
     private function getFixurePath(): string

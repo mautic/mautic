@@ -10,10 +10,11 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventLogCleanupSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventLogCleanupSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FailedLeadEventLogRepository $failedLeadEventLogRepository)
-    {
+    public function __construct(
+        private FailedLeadEventLogRepository $failedLeadEventLogRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle;
 
 /**
@@ -826,6 +828,7 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
+
     /**
      * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
      *

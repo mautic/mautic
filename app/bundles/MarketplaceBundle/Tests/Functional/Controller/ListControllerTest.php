@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\MarketplaceBundle\Service\Allowlist;
 use Mautic\MarketplaceBundle\Service\Config;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ListControllerTest extends MauticMysqlTestCase
@@ -28,40 +26,35 @@ final class ListControllerTest extends MauticMysqlTestCase
 
     public function testMarketplaceListTableWithNoAllowList(): void
     {
-        /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
         self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        Assert::assertSame(
-            [
-                'Mautic Saelos Bundle',
-                'Mautic Recaptcha Bundle',
-                'Mautic Ldap Auth Bundle',
-                'Mautic Referrals Bundle',
-                'Mautic Do Not Contact Extras Bundle',
-            ],
-            array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
-                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-            )
-        );
+        $this->assertSame([
+            'Mautic Saelos Bundle',
+            'Mautic Recaptcha Bundle',
+            'Mautic Ldap Auth Bundle',
+            'Mautic Referrals Bundle',
+            'Mautic Do Not Contact Extras Bundle',
+        ], array_map(
+            trim(...),
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        ));
     }
 
     public function testMarketplaceListTableWithAllowList(): void
     {
         $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
 
-        /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
@@ -70,22 +63,19 @@ final class ListControllerTest extends MauticMysqlTestCase
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get(Allowlist::class);
         $allowlist->clearCache();
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
         self::assertResponseIsSuccessful();
 
-        Assert::assertSame(
-            [
-                'KocoCaptcha',
-                'Mautic Referrals Bundle',
-            ],
-            array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
-                $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
-            )
-        );
+        $this->assertSame([
+            'KocoCaptcha',
+            'Mautic Referrals Bundle',
+        ], array_map(
+            trim(...),
+            $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
+        ));
     }
 }

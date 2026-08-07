@@ -12,21 +12,28 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class FieldController extends FormController
+final class FieldController extends FormController
 {
+    private FieldModel $fieldModel;
+
+    #[Required]
+    public function autowireFieldController(
+        FieldModel $fieldModel,
+    ): void {
+        $this->fieldModel = $fieldModel;
+    }
+
     /**
      * Generate's default list view.
      *
      * @param int $page
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function indexAction(Request $request, FieldModel $fieldModel, $page = 1)
+    public function indexAction(Request $request, FieldModel $fieldModel, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
@@ -34,7 +41,7 @@ class FieldController extends FormController
         $session = $request->getSession();
 
         if (!$permissions['lead:fields:view'] && !$permissions['lead:fields:full']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -117,25 +124,20 @@ class FieldController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, ?LeadField $entity = null)
+    public function newAction(Request $request, ?LeadField $entity = null): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
         $field = $entity instanceof LeadField ? $entity : new LeadField();
-
-        /** @var FieldModel $model */
-        $model = $this->getModel('lead.field');
         // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
         $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
         // get the user form factory
-        $form = $model->createForm($field, $this->formFactory, $action);
+        $form = $this->fieldModel->createForm($field, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
@@ -144,7 +146,7 @@ class FieldController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $requestData = $request->request->all();
                     if (isset($requestData['leadfield']['properties'])) {
-                        $result = $model->setFieldProperties($field, $requestData['leadfield']['properties']);
+                        $result = $this->fieldModel->setFieldProperties($field, $requestData['leadfield']['properties']);
                         if (true !== $result) {
                             // set the error
                             $form->get('properties')->addError(
@@ -160,7 +162,7 @@ class FieldController extends FormController
                         $flashMessage = 'mautic.core.notice.created';
                         try {
                             // form is valid so process the data
-                            $model->saveEntity($field);
+                            $this->fieldModel->saveEntity($field);
                         } catch (\Doctrine\DBAL\Exception $ee) {
                             $flashMessage = $ee->getMessage();
                         } catch (AbortColumnCreateException) {
@@ -206,15 +208,15 @@ class FieldController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid) {
-                return $this->editAction($request, $field->getId(), true);
-            } elseif (!$valid) {
-                // some bug in Symfony prevents repopulating list options on errors
-                $field   = $form->getData();
-                $newForm = $model->createForm($field, $this->formFactory, $action);
-                $this->copyErrorsRecursively($form, $newForm);
-                $form = $newForm;
             }
+            if ($valid) {
+                return $this->editAction($request, $field->getId(), true);
+            }
+            // some bug in Symfony prevents repopulating list options on errors
+            $field   = $form->getData();
+            $newForm = $this->fieldModel->createForm($field, $this->formFactory, $action);
+            $this->copyErrorsRecursively($form, $newForm);
+            $form = $newForm;
         }
 
         return $this->delegateView(
@@ -237,18 +239,13 @@ class FieldController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
-
-        /** @var FieldModel $model */
-        $model = $this->getModel('lead.field');
-        $field = $model->getEntity($objectId);
+        $field = $this->fieldModel->getEntity($objectId);
 
         // set the return URL
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
@@ -274,13 +271,14 @@ class FieldController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($field)) {
+        }
+        if ($this->fieldModel->isLocked($field)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $field, 'lead.field');
         }
 
         $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($field, $this->formFactory, $action);
+        $form   = $this->fieldModel->createForm($field, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
@@ -289,7 +287,7 @@ class FieldController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $requestData = $request->request->all();
                     if (isset($requestData['leadfield']['properties'])) {
-                        $result = $model->setFieldProperties($field, $requestData['leadfield']['properties']);
+                        $result = $this->fieldModel->setFieldProperties($field, $requestData['leadfield']['properties']);
                         if (true !== $result) {
                             // set the error
                             $form->get('properties')->addError(new FormError(
@@ -304,7 +302,7 @@ class FieldController extends FormController
 
                         // form is valid so process the data
                         try {
-                            $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                            $this->fieldModel->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                         } catch (AbortColumnUpdateException) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.update_pushed_to_background');
                         } catch (SchemaException $e) {
@@ -325,7 +323,7 @@ class FieldController extends FormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($field);
+                $this->fieldModel->unlockEntity($field);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -336,20 +334,21 @@ class FieldController extends FormController
                     ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
-                $form   = $model->createForm($field, $this->formFactory, $action);
+                $form   = $this->fieldModel->createForm($field, $this->formFactory, $action);
             } else {
                 // some bug in Symfony prevents repopulating list options on errors
                 $field   = $form->getData();
-                $newForm = $model->createForm($field, $this->formFactory, $action);
+                $newForm = $this->fieldModel->createForm($field, $this->formFactory, $action);
                 $this->copyErrorsRecursively($form, $newForm);
                 $form = $newForm;
             }
         } else {
             // lock the entity
-            $model->lockEntity($field);
+            $this->fieldModel->lockEntity($field);
         }
 
         return $this->delegateView([
@@ -399,13 +398,11 @@ class FieldController extends FormController
 
     /**
      * Delete a field.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
@@ -421,9 +418,7 @@ class FieldController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var FieldModel $model */
-            $model = $this->getModel('lead.field');
-            $field = $model->getEntity($objectId);
+            $field = $this->fieldModel->getEntity($objectId);
 
             if (null === $field) {
                 $flashes[] = [
@@ -431,15 +426,15 @@ class FieldController extends FormController
                     'msg'     => 'mautic.lead.field.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif ($model->isLocked($field)) {
+            } elseif ($this->fieldModel->isLocked($field)) {
                 return $this->isLocked($postActionVars, $field, 'lead.field');
             } elseif ($field->isFixed()) {
                 // cannot delete fixed fields
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             try {
-                $model->deleteEntity($field);
+                $this->fieldModel->deleteEntity($field);
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.core.notice.deleted',
@@ -467,13 +462,11 @@ class FieldController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
@@ -489,8 +482,6 @@ class FieldController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var FieldModel $model */
-            $model     = $this->getModel('lead.field');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -501,9 +492,9 @@ class FieldController extends FormController
             }
 
             // Delete everything we are able to
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
-                    $entities = $model->deleteEntities($deleteIds);
+                    $entities = $this->fieldModel->deleteEntities($deleteIds);
                     if ($entities) {
                         $flashes[] = [
                             'type'    => 'notice',
@@ -537,9 +528,7 @@ class FieldController extends FormController
      */
     private function checkEntityForDeletion(int $objectId, array &$deleteIds, array $postActionVars): array
     {
-        /** @var FieldModel $model */
-        $model     = $this->getModel('lead.field');
-        $entity    = $model->getEntity($objectId);
+        $entity    = $this->fieldModel->getEntity($objectId);
         $flashes   = [];
         if (null === $entity) {
             $flashes[] = [
@@ -548,8 +537,8 @@ class FieldController extends FormController
                 'msgVars' => ['%id%' => $objectId],
             ];
         } elseif ($entity->isFixed()) {
-            $flashes[] = $this->accessDenied(true);
-        } elseif ($model->isLocked($entity)) {
+            $flashes[] = $this->getAccessDeniedFlash();
+        } elseif ($this->fieldModel->isLocked($entity)) {
             $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.field', true);
         } else {
             $deleteIds[] = $objectId;
@@ -571,7 +560,7 @@ class FieldController extends FormController
         $deletedEntities        = $e->getDeletedEntities();
         $unableToDeleteEntities = $e->getUnableToDeleteEntities();
 
-        if ($deletedEntities) {
+        if ([] !== $deletedEntities) {
             $flashes[] = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.lead.field.notice.batch_deleted',
@@ -579,7 +568,7 @@ class FieldController extends FormController
             ];
         }
 
-        if ($unableToDeleteEntities) {
+        if ([] !== $unableToDeleteEntities) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.core.notice.used.fields',

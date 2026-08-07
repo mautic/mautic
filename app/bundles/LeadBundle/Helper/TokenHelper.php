@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class TokenHelper
+final class TokenHelper
 {
     public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
@@ -100,7 +100,7 @@ class TokenHelper
     /**
      * @return mixed
      */
-    private static function getTokenValue(array $lead, $alias, $defaultValue)
+    private static function getTokenValue(array $lead, string $alias, string $defaultValue)
     {
         $value = '';
         if (isset($lead[$alias])) {
@@ -152,7 +152,7 @@ class TokenHelper
         return '' !== $value ? $value : $defaultValue;
     }
 
-    private static function getTokenDefaultValue($match): string
+    private static function getTokenDefaultValue(string $match): string
     {
         $fallbackCheck = explode('|', $match);
         if (!isset($fallbackCheck[1])) {
@@ -162,7 +162,7 @@ class TokenHelper
         return $fallbackCheck[1];
     }
 
-    private static function getFieldAlias($match): string
+    private static function getFieldAlias(string $match): string
     {
         $fallbackCheck = explode('|', $match);
 
@@ -170,11 +170,9 @@ class TokenHelper
     }
 
     /**
-     * @param string $parameter
-     *
      * @return mixed
      */
-    private static function getParameter($parameter)
+    private static function getParameter(string $parameter)
     {
         if (null === self::$parameters) {
             self::$parameters = (new ParamsLoaderHelper())->getParameters();

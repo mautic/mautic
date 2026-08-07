@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
@@ -29,7 +29,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
     public function __construct(
         protected CorePermissions $security,
-        protected EntityManager $entityManager,
+        protected EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -79,9 +79,9 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
                     if ('lead:leads' === $permBase) {
                         // Acknowledge owner then created_by
-                        $where['value'] = "IF ($tableAlias.owner_id IS NOT NULL, $tableAlias.owner_id, $tableAlias.created_by) = $userId";
+                        $where['value'] = "IF ({$tableAlias}.owner_id IS NOT NULL, {$tableAlias}.owner_id, {$tableAlias}.created_by) = {$userId}";
                     } else {
-                        $where['value'] = "$tableAlias.created_by = $userId";
+                        $where['value'] = "{$tableAlias}.created_by = {$userId}";
                     }
                     $event->addWhere($where);
 

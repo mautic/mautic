@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\TagMergeEvent;
 use PHPUnit\Framework\TestCase;
 
-class TagMergeEventTest extends TestCase
+final class TagMergeEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

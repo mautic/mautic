@@ -20,46 +20,45 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LeadSubscriberTest extends TestCase
+final class LeadSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|FieldChangeRepository
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
     /**
-     * @var MockObject|ObjectMappingRepository
+     * @var MockObject&ObjectMappingRepository
      */
     private MockObject $objectMappingRepository;
 
     /**
-     * @var MockObject|VariableExpresserHelperInterface
+     * @var MockObject&VariableExpresserHelperInterface
      */
     private MockObject $variableExpresserHelper;
 
     /**
-     * @var MockObject|SyncIntegrationsHelper
+     * @var MockObject&SyncIntegrationsHelper
      */
     private MockObject $syncIntegrationsHelper;
 
     /**
-     * @var MockObject|CompanyEvent
+     * @var MockObject&CompanyEvent
      */
     private MockObject $companyEvent;
 
     private LeadSubscriber $subscriber;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcherInterfaceMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -80,16 +79,13 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        Assert::assertEquals(
-            [
-                LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-                LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
-                LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-                LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
-                LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
-            ],
-            LeadSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
+            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
+            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
+        ], LeadSubscriber::getSubscribedEvents());
     }
 
     public function testOnLeadPostSaveAnonymousLead(): void
@@ -257,11 +253,11 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Lead::class);
+            ->with($deletedId, Lead::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+            ->with($deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
 
         $this->subscriber->onLeadPostDelete(new LeadEvent($lead));
     }
@@ -402,22 +398,24 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Company::class);
+            ->with($deletedId, Company::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+            ->with($deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
-    /** @param array<string, array{0: mixed, 1: mixed}> $fieldChanges */
+    /**
+     * @param array<string, array{0: mixed, 1: mixed}> $fieldChanges
+     */
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
-        $this->syncIntegrationsHelper->expects($this->any())
+        $this->syncIntegrationsHelper
             ->method('getEnabledIntegrations')
             ->willReturn($enabledIntegrations);
 
@@ -433,7 +431,7 @@ class LeadSubscriberTest extends TestCase
         $matcher = $this->exactly(1);
 
         $this->variableExpresserHelper->expects($matcher)->method('encodeVariable')
-                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs) {
+                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs): EncodedValueDAO {
                     $this->assertSame($values[$matcher->numberOfInvocations() - 1], $parameters);
 
                     return $valueDAOs[0];
@@ -460,8 +458,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
                 parent::__construct();
             }
@@ -493,8 +491,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
             }
 

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Loader;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use PHPUnit\Framework\TestCase;
 
-class ParameterLoaderTest extends TestCase
+final class ParameterLoaderTest extends TestCase
 {
     public function testParametersAreLoaded(): void
     {

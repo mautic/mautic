@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -18,14 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class SubmitActionEmailType extends AbstractType
+final class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
     public function __construct(
         private TranslatorInterface $translator,
-        protected CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -51,7 +51,7 @@ class SubmitActionEmailType extends AbstractType
             $message = '';
 
             foreach ($fields as $token => $label) {
-                $message .= "<strong>$label</strong>: $token<br />";
+                $message .= "<strong>{$label}</strong>: {$token}<br />";
             }
         } else {
             $message = $options['data']['message'];

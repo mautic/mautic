@@ -9,16 +9,16 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PluginUpdateEvent extends Event
+final class PluginUpdateEvent extends Event
 {
     /**
      * @param array<class-string, ClassMetadata>|null $metadata null value is when the plugin does not have Entities (an Entity directory)
      */
     public function __construct(
-        private Plugin $plugin,
-        private string $oldVersion,
-        private ?array $metadata,
-        private ?Schema $installedSchema,
+        private readonly Plugin $plugin,
+        private readonly string $oldVersion,
+        private readonly ?array $metadata,
+        private readonly ?Schema $installedSchema,
     ) {
     }
 

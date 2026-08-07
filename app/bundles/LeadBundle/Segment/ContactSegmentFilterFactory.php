@@ -8,10 +8,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterFactory
+final class ContactSegmentFilterFactory
 {
     public const CUSTOM_OPERATOR = 'custom_operator';
 
@@ -21,10 +21,10 @@ class ContactSegmentFilterFactory
     private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        private TableSchemaColumnsCache $schemaCache,
-        private Container $container,
-        private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly ContainerInterface $container,
+        private readonly DecoratorFactory $decoratorFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -122,21 +122,21 @@ class ContactSegmentFilterFactory
                 // Don't group date/datetime type filters - they require special processing
                 // by DateOptionFactory and don't support IN operator with arrays
                 if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'], true)) {
-                    array_push($shrinkedFilters, $filter);
+                    $shrinkedFilters[] = $filter;
                 } else {
                     if (!isset($arrStacks[$key])) {
                         $arrStacks[$key] = [];
                     }
-                    array_push($arrStacks[$key], $filter);
+                    $arrStacks[$key][] = $filter;
                 }
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
-                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
                     $previousFilter = array_pop($arrStacks[$previousKey]);
-                    array_push($shrinkedFilters, $previousFilter);
+                    $shrinkedFilters[] = $previousFilter;
                 }
 
-                array_push($shrinkedFilters, $filter);
+                $shrinkedFilters[] = $filter;
             }
 
             $previousKey = $key;
@@ -145,7 +145,7 @@ class ContactSegmentFilterFactory
         // add all grouped conditions back
         foreach ($arrStacks as $stack) {
             $groupedFilter = $this->groupFilters($stack);
-            if (!empty($groupedFilter)) {
+            if ([] !== $groupedFilter) {
                 $shrinkedFilters[] = $groupedFilter;
             }
         }
@@ -160,7 +160,7 @@ class ContactSegmentFilterFactory
      */
     private function groupFilters(array $stack): array
     {
-        if (empty($stack)) {
+        if ([] === $stack) {
             return [];
         }
 
@@ -170,7 +170,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(fn ($ele): mixed => $ele['filter'], $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn (array $ele): mixed => $ele['filter'], $stack);
 
         return $filter;
     }

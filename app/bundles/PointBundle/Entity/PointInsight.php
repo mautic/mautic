@@ -48,7 +48,7 @@ class PointInsight extends FormEntity
 
     /**
      * @var Category|null
-     **/
+     */
     private $category;
 
     public function __clone()
@@ -89,17 +89,11 @@ class PointInsight extends FormEntity
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank([
-            'message' => 'mautic.point.insight.type.required',
-        ]));
+        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank(message: 'mautic.point.insight.type.required'));
 
-        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank([
-            'message' => 'mautic.point.insight.action.required',
-        ]));
+        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank(message: 'mautic.point.insight.action.required'));
     }
 
     /**
@@ -127,28 +121,17 @@ class PointInsight extends FormEntity
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return PointInsight
-     */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -166,10 +149,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param string|null $description
-     *
-     * @return PointInsight
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -187,10 +168,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param string|null $insightType
-     *
-     * @return PointInsight
      */
-    public function setInsightType($insightType)
+    public function setInsightType($insightType): static
     {
         $this->isChanged('insightType', $insightType);
         $this->insightType = $insightType;
@@ -208,10 +187,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param string|null $insightAction
-     *
-     * @return PointInsight
      */
-    public function setInsightAction($insightAction)
+    public function setInsightAction($insightAction): static
     {
         $this->isChanged('insightAction', $insightAction);
         $this->insightAction = $insightAction;
@@ -229,10 +206,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param string|null $customField
-     *
-     * @return PointInsight
      */
-    public function setCustomField($customField)
+    public function setCustomField($customField): static
     {
         $this->isChanged('customField', $customField);
         $this->customField = $customField;
@@ -250,10 +225,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param array<int> $pointGroups
-     *
-     * @return PointInsight
      */
-    public function setPointGroups($pointGroups)
+    public function setPointGroups($pointGroups): static
     {
         $this->isChanged('pointGroups', $pointGroups);
         $this->pointGroups = $pointGroups;
@@ -271,10 +244,8 @@ class PointInsight extends FormEntity
 
     /**
      * @param Category|null $category
-     *
-     * @return PointInsight
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -305,7 +276,7 @@ class PointInsight extends FormEntity
      *
      * @return PointInsight
      */
-    public function setActive($active)
+    public function setActive($active): FormEntity
     {
         return $this->setIsPublished($active);
     }

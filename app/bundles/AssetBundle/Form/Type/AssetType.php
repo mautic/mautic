@@ -26,11 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Asset>
  */
-class AssetType extends AbstractType
+final class AssetType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
+        private readonly AssetModel $assetModel,
     ) {
     }
 
@@ -77,7 +77,7 @@ class AssetType extends AbstractType
                     'tooltip'      => 'mautic.asset.asset.form.disallow.crawlers.descr',
                     'data-show-on' => '{"asset_storageLocation_0":"checked"}',
                 ],
-                'data'=> empty($options['data']->getDisallow()) ? false : true,
+                'data'=> !empty($options['data']->getDisallow()),
             ]
         );
 
@@ -133,9 +133,7 @@ class AssetType extends AbstractType
             'required'    => true,
             'constraints' => [
                 new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ],
         ]);

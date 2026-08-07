@@ -28,8 +28,8 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     private GeneratedColumns $generatedColumns;
 
     public function __construct(
-        private VersionProviderInterface $versionProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly VersionProviderInterface $versionProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
         $this->generatedColumns = new GeneratedColumns();
     }

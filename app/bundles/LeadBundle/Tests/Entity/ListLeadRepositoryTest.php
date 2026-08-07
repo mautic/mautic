@@ -14,11 +14,11 @@ final class ListLeadRepositoryTest extends MauticMysqlTestCase
 {
     private ListLeadRepository $listLeadRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->listLeadRepository = static::getContainer()->get(ListLeadRepository::class);
+        $this->listLeadRepository = self::getContainer()->get(ListLeadRepository::class);
     }
 
     public function testGetContactsCountBySegment(): void

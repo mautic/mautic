@@ -20,13 +20,22 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Category>
  */
-class CategoryApiController extends CommonApiController
+final class CategoryApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $categoryModel = $modelFactory->getModel('category');
-        \assert($categoryModel instanceof CategoryModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        CategoryModel $categoryModel,
+    ) {
         $this->model            = $categoryModel;
         $this->entityClass      = Category::class;
         $this->entityNameOne    = 'category';
@@ -41,10 +50,8 @@ class CategoryApiController extends CommonApiController
      *
      * @param Category $entity
      * @param string   $action view|create|edit|publish|delete
-     *
-     * @return bool
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess($entity, $action = 'view'): bool
     {
         if (!$bundle = $entity->getBundle()) {
             $bundle = 'category';
@@ -58,13 +65,13 @@ class CategoryApiController extends CommonApiController
         }
 
         if ('create' != $action) {
-            $ownPerm   = "$permissionBase:{$action}own";
-            $otherPerm = "$permissionBase:{$action}other";
+            $ownPerm   = "{$permissionBase}:{$action}own";
+            $otherPerm = "{$permissionBase}:{$action}other";
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
         }
 
-        return $this->security->isGranted("$permissionBase:create");
+        return $this->security->isGranted("{$permissionBase}:create");
     }
 
     /**

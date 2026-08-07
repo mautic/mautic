@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 class ContactSegmentFilterOperator
 {
     public function __construct(
-        private FilterOperatorProviderInterface $filterOperatorProvider,
+        private readonly FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
     }
 

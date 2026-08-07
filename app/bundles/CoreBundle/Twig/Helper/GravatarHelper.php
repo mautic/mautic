@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class GravatarHelper
+final readonly class GravatarHelper
 {
     private bool $devMode;
 

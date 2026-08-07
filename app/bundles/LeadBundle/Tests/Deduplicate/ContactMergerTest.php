@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
@@ -18,45 +21,36 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContactMergerTest extends \PHPUnit\Framework\TestCase
+final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&MergeRecordRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject&Logger
      */
     private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
 
+    private \PHPUnit\Framework\MockObject\MockObject&LeadRepository $leadRepository;
+
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->leadRepo        = $this->createMock(LeadRepository::class);
+        $this->leadRepository  = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
-        $this->dispatcher      = $this->createMock(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
+        $this->leadRepository->method('getFieldValues')->willReturn([]);
     }
 
     public function testMergeTimestamps(): void
@@ -527,7 +521,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $matcher3 = $this->exactly(3);
 
         $winner->expects($matcher3)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3): void {
                 if (1 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('winner@test.com', $parameters[1]);
@@ -562,7 +556,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeOwners($winner, $loser);
         $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
-        $winner->setOwner(null);
+        $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null
@@ -616,7 +610,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     public function testFullMerge(): void
     {
         $winner = $this->createMock(Lead::class);
-        $winner->expects($this->any())
+        $winner
             ->method('getId')
             ->willReturn(1);
         $winner->expects($this->once())
@@ -633,7 +627,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new \DateTime('-30 minutes'));
 
         $loser = $this->createMock(Lead::class);
-        $loser->expects($this->any())
+        $loser
             ->method('getId')
             ->willReturn(2);
         $loser->expects($this->once())
@@ -765,7 +759,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
         $loserCompanyLead->setPrimary(true);
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, []],
@@ -773,15 +767,16 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
-            ->with($this->callback(function (array $companyLeads) use ($winner, $company): bool {
+            ->willReturnCallback(function (array $companyLeads, bool $new) use ($winner, $company): void {
                 $this->assertCount(1, $companyLeads);
                 $this->assertSame($winner, $companyLeads[0]->getLead());
                 $this->assertSame($company, $companyLeads[0]->getCompany());
                 // The winner had no primary company so it inherits the loser's
+
                 $this->assertTrue($companyLeads[0]->getPrimary());
 
-                return true;
-            }), false);
+                $this->assertFalse($new);
+            });
 
         $this->getMerger()->mergeCompanies($winner, $loser);
     }
@@ -805,7 +800,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
         $loserCompanyLead->setPrimary(true);
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
@@ -813,13 +808,13 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
-            ->with($this->callback(function (array $companyLeads): bool {
+            ->willReturnCallback(function (array $companyLeads, bool $isNew): void {
                 $this->assertCount(1, $companyLeads);
                 // The winner already has a primary company so the loser's company is added as non-primary
                 $this->assertFalse((bool) $companyLeads[0]->getPrimary());
 
-                return true;
-            }), false);
+                $this->assertFalse($isNew);
+            });
 
         $this->getMerger()->mergeCompanies($winner, $loser);
     }
@@ -844,7 +839,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setLead($loser);
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
@@ -858,24 +853,21 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private function getCompany(int $id): Company
     {
-        $company    = new Company();
-        $reflection = new \ReflectionProperty(Company::class, 'id');
-        $reflection->setValue($company, $id);
+        $company = new Company();
+        ReflectionHelper::setValue($company, 'id', $id);
 
         return $company;
     }
 
-    /**
-     * @return ContactMerger
-     */
-    private function getMerger()
+    private function getMerger(): ContactMerger
     {
         return new ContactMerger(
             $this->leadModel,
             $this->mergeRecordRepo,
-            $this->dispatcher,
+            $this->createStub(EventDispatcher::class),
             $this->logger,
-            $this->companyLeadRepo
+            $this->companyLeadRepo,
+            $this->leadRepository
         );
     }
 }

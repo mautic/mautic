@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -61,7 +62,7 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('harmfulTwigPayloadsProvider')]
+    #[DataProvider('harmfulTwigPayloadsProvider')]
     public function testHarmfulTwigPayloadsAreBlockedOnPagePreview(string $payload): void
     {
         $themeName = $this->createMaliciousTheme($payload);

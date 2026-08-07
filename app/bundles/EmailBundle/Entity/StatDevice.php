@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -11,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
+
     /**
      * @var string
      */

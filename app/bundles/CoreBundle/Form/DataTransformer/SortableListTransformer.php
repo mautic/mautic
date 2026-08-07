@@ -8,7 +8,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<mixed>, array<mixed>>
  */
-class SortableListTransformer implements DataTransformerInterface
+final class SortableListTransformer implements DataTransformerInterface
 {
     /**
      * @param bool $withLabels
@@ -73,7 +73,7 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @return array<mixed>
      */
-    private function transformKeyValuePair($array): array
+    private function transformKeyValuePair(?array $array): array
     {
         if (null === $array) {
             return ['list' => []];

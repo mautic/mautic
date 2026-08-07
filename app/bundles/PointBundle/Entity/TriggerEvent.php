@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -156,10 +158,10 @@ class TriggerEvent implements UuidInterface
             ->build();
     }
 
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -181,10 +183,8 @@ class TriggerEvent implements UuidInterface
 
     /**
      * @param int $order
-     *
-     * @return TriggerEvent
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
 
@@ -203,10 +203,8 @@ class TriggerEvent implements UuidInterface
 
     /**
      * @param array $properties
-     *
-     * @return TriggerEvent
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -223,10 +221,7 @@ class TriggerEvent implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @return self
-     */
-    public function setTrigger(Trigger $trigger)
+    public function setTrigger(Trigger $trigger): static
     {
         $this->trigger = $trigger;
 
@@ -243,10 +238,8 @@ class TriggerEvent implements UuidInterface
 
     /**
      * @param string $type
-     *
-     * @return TriggerEvent
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -269,10 +262,8 @@ class TriggerEvent implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return TriggerEvent
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -290,10 +281,8 @@ class TriggerEvent implements UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return TriggerEvent
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -309,10 +298,7 @@ class TriggerEvent implements UuidInterface
         return $this->name;
     }
 
-    /**
-     * @return self
-     */
-    public function addLog(LeadTriggerLog $log)
+    public function addLog(LeadTriggerLog $log): static
     {
         $this->log[] = $log;
 
@@ -334,6 +320,6 @@ class TriggerEvent implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getTrigger()->getCreatedBy();
+        return $this->trigger->getCreatedBy();
     }
 }

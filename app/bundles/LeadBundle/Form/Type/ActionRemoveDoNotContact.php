@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -7,7 +9,7 @@ use Symfony\Component\Form\AbstractType;
 /**
  * @extends AbstractType<mixed>
  */
-class ActionRemoveDoNotContact extends AbstractType
+final class ActionRemoveDoNotContact extends AbstractType
 {
     public function getBlockPrefix(): string
     {

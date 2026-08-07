@@ -44,14 +44,15 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
+        $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
             // Distinct is required here to get the correct count when group by is used due to applied filters
-            $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
             $dq->select($countSelect.' as count');
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
-            if ($groupBy = $dq->getQueryPart('groupBy')) {
+            if ($groupBy) {
                 $dq->resetQueryPart('groupBy');
             }
 
@@ -183,10 +184,8 @@ trait CustomFieldRepositoryTrait
     /**
      * @param bool   $byGroup
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldValues($id, $byGroup = true, $object = 'lead')
+    public function getFieldValues($id, $byGroup = true, $object = 'lead'): array
     {
         // use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
@@ -219,7 +218,7 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("DISTINCT $col")
+            ->select("DISTINCT {$col}")
             ->from($table, 'l');
 
         $q->where(
@@ -230,7 +229,7 @@ trait CustomFieldRepositoryTrait
         );
 
         if (!empty($search)) {
-            $q->andWhere("$col LIKE :search")
+            $q->andWhere("{$col} LIKE :search")
                 ->setParameter('search', "{$search}%");
         }
 
@@ -257,6 +256,10 @@ trait CustomFieldRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     * @param bool   $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         $this->preSaveEntity($entity);
@@ -264,7 +267,7 @@ trait CustomFieldRepositoryTrait
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
-            $this->getEntityManager()->flush($entity);
+            $this->getEntityManager()->flush();
         }
 
         // Includes prefix
@@ -288,10 +291,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $fixedFields
      */
-    protected function removeNonFieldColumns(&$r, $fixedFields = [])
+    protected function removeNonFieldColumns(array &$r, array $fixedFields = []): void
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
@@ -323,7 +324,7 @@ trait CustomFieldRepositoryTrait
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
 
-                if (!is_null($r)) {
+                if (null !== $r) {
                     switch ($fields[$k]['type']) {
                         case 'number':
                             $r = (float) $r;
@@ -398,7 +399,7 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {
@@ -444,7 +445,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity)
+    protected function postSaveEntity($entity): void
     {
         // Inherit and use if required
     }

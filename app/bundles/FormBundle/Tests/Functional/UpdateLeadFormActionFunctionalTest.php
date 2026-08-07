@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
+final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -28,7 +28,7 @@ class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         foreach ($leadData as $field => $value) {
             $method = 'set'.ucfirst($field);
             if (method_exists($lead, $method)) {
-                $lead->$method($value);
+                $lead->{$method}($value);
             }
         }
 
@@ -49,7 +49,7 @@ class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 
         $formValues = [];
         foreach ($formData as $field => $value) {
-            $formValues["mauticform[$field]"] = $value;
+            $formValues["mauticform[{$field}]"] = $value;
         }
 
         $formElement->setValues($formValues);
@@ -63,7 +63,7 @@ class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
                 $diff        = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
                 $this->assertLessThan(60, $diff, "The {$field} is not within 60 seconds of now.");
             } else {
-                $this->assertEquals($value, $leadFieldValue ?? null, "Field $field does not match");
+                $this->assertEquals($value, $leadFieldValue ?? null, "Field {$field} does not match");
             }
         }
     }

@@ -24,16 +24,6 @@
     {{ include('@MauticProject/Modules/projects.html.twig', {'item': email}) }}
 {% endblock %}
 
-{% set variantContent = include('@MauticCore/Variant/index.html.twig', {
-        'activeEntity': email,
-        'variants': variants,
-        'abTestResults': abTestResults,
-        'model': 'email',
-        'actionRoute': 'mautic_email_action',
-}) %}
-
-{% set showVariants = variantContent is defined and variantContent|trim is not empty %}
-
 {% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {
         'activeEntity'      : email,
@@ -52,7 +42,7 @@
 {% set customButtons = [] %}
 
 {% if not isEmbedded %}
-    {% if 'list' == emailType %}
+    {% if 'list' == emailType and not email.isEnableAbTest() %}
         {% set sendButton = {
             'attr'      : {
                 'data-toggle' : 'ajax',
@@ -61,7 +51,6 @@
             'iconClass' : 'ri-send-plane-line',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
-            'priority'  : 500,
         } %}
         {% if email.isBackgroundSending() %}
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
@@ -70,21 +59,20 @@
 
         {% set customButtons = customButtons|merge([sendButton]) %}
     {% endif %}
-    {% set sendButtons = [] %}
-    {% if 'list' == emailType %}
+    {% if 'list' == emailType and not email.isEnableAbTest() %}
         {% set scheduleButton = {
-            'attr': {
+            'attr' : {
                 'class'       : 'btn btn-tertiary btn-nospin',
-                'data-toggle': 'ajaxmodal',
-                'data-target': '#MauticSharedModal',
-                'href': path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': email.getId()}),
-                'data-header': 'mautic.email.send.schedule'|trans
+                'data-toggle' : 'ajaxmodal',
+                'data-target' : '#MauticSharedModal',
+                'href'        : path('mautic_email_action', {'objectAction' : 'scheduleSend', 'objectId' : email.getId()}),
+                'data-header' : 'mautic.email.send.schedule'|trans,
             },
-            'iconClass': 'ri-calendar-schedule-line',
-            'btnText': 'mautic.email.send.schedule',
-            'primary': true,
-            'priority': 400
+            'iconClass' : 'ri-calendar-schedule-line',
+            'btnText'   : 'mautic.email.send.schedule',
+            'primary'   : true,
         } %}
+
         {% set customButtons = customButtons|merge([scheduleButton]) %}
     {% endif %}
     {% set sendExampleButton = {
@@ -98,8 +86,6 @@
         },
         'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
-        'primary'   : true,
-        'priority': 300
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
@@ -146,6 +132,7 @@
 
 {# Only show A/B test button if not already a translation of an a/b test #}
 {% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
+{% set parentId = email.isEnableAbTest() and email.getVariantParent() ? email.getVariantParent().getId() : email.getId() %}
 
 {% block publishStatus %}
     {% if not isEmbedded %}
@@ -233,7 +220,6 @@
                     email.getCreatedBy(),
                 ),
                 'clone'  : permissions['email:emails:create'],
-                'abtest' : (allowAbTest and permissions['email:emails:create']),
                 'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],
@@ -252,21 +238,11 @@
       <!-- left section -->
       <div class="col-md-9 height-auto">
           <div>
-              <!-- email detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div>{{ email.subject }}</div>
-                          <div class="text-secondary">{{ emailPreview }}</div>
-                      </div>
-                  </div>
-              </div>
-              <!--/ email detail header -->
 
-              <!-- email detail collapseable -->
-              <div class="collapse pr-md pl-md" id="email-details">
-                  <div class="pr-md pl-md pb-md">
-                      <div class="panel shd-none mb-0">
+          <!-- email detail collapseable -->
+          <div class="collapse pr-md pl-md" id="email-details">
+              <div class="pr-md pl-md pb-md">
+                  <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
                               {{- include('@MauticCore/Helper/details.html.twig', {'entity': email}) -}}
@@ -342,18 +318,6 @@
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>
-                              {% if emailType == 'list' and email.lists|length > 0 %}
-                              <tr>
-                                  <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.lead.lead.lists'|trans }}</span>
-                                  </td>
-                                  <td>
-                                      {% for list in email.lists %}
-                                          <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">{{ list.name|purify }}</a>{% if not loop.last %}, {% endif %}
-                                      {% endfor %}
-                                  </td>
-                              </tr>
-                              {% endif %}
                               </tbody>
                           </table>
                       </div>
@@ -373,7 +337,7 @@
               </div>
               <!--/ email detail collapseable toggler -->
 
-              {% set isVariant = showTranslations or showVariants ?: 0 %}
+              {% set isVariant = showTranslations or (variants.children|length > 0) ?: 0 %}
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
@@ -479,13 +443,6 @@
                           {{ 'mautic.email.associated.contacts'|trans }}
                       </a>
                   </li>
-                  {% if showVariants %}
-                      <li>
-                          <a href="#variants-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.variants'|trans }}
-                          </a>
-                      </li>
-                  {% endif %}
                   {% if showTranslations %}
                       <li>
                           <a href="#translation-container" role="tab" data-toggle="tab">
@@ -513,14 +470,6 @@
                   {{ contacts | raw }}
               </div>
 
-              {% if showVariants %}
-                  <!-- #variants-container -->
-                  <div class="tab-pane bdr-w-0" id="variants-container">
-                      {{ variantContent|raw }}
-                  </div>
-                  <!--/ #variants-container -->
-              {% endif %}
-
               <!-- #translation-container -->
               {% if showTranslations %}
                   <div class="tab-pane bdr-w-0" id="translation-container">
@@ -532,7 +481,7 @@
           {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
               'entity': email,
               'routeBase': 'email',
-              'showVariants': showVariants,
+              'showVariants': (variants.children|length > 0),
               'showTranslations': showTranslations,
               'allowAbTest': allowAbTest
           }) }}
@@ -541,12 +490,20 @@
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
-          <!-- preview URL -->
+          <!-- email preview -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
+                  <iframe
+                      id="content_preview_frame"
+                      class="mb-md"
+                      src="{{ previewUrl|e }}"
+                      sandbox="allow-popups allow-popups-to-escape-sandbox"
+                      title="{{ 'mautic.email.preview.iframe_title'|trans }}"
+                      style="width: 100%; height: 600px; border: 0; zoom: 0.35; overflow: hidden;">
+                  </iframe>
                   {% if previewSettingsForm.translation is defined %}
                   <div class="row">
                       <div class="form-group col-xs-12 ">
@@ -606,6 +563,40 @@
                   </div>
               </div>
           </div>
+          <!--/ email preview -->
+
+          {% if emailType == 'list' and email.lists|length > 0 %}
+              <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" id="email-segments-used">
+                  <div class="panel-heading">
+                      <div class="panel-title">{{ 'mautic.email.segments.used'|trans }}</div>
+                  </div>
+                  <div class="panel-body pt-xs d-flex fw-wrap gap-xs">
+                      {% set segmentTagColors = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
+                      {% for segment in email.lists %}
+                          {% set canViewSegment = securityHasEntityAccess(
+                              permissions['lead:lists:viewown'],
+                              permissions['lead:lists:viewother'],
+                              segment.createdBy
+                          ) %}
+                          {% set segmentTag = {
+                              label: segment.name,
+                              color: cycle(segmentTagColors, loop.index0)
+                          } %}
+                          {% if canViewSegment %}
+                              {% set segmentTag = segmentTag|merge({
+                                  attributes: {
+                                      href: path('mautic_segment_action', {'objectAction': 'view', 'objectId': segment.id}),
+                                      'data-toggle': 'ajax'
+                                  }
+                              }) %}
+                          {% endif %}
+                          {% include '@MauticCore/Helper/_tag.html.twig' with {tags: [segmentTag]} %}
+                      {% endfor %}
+                  </div>
+              </div>
+          {% endif %}
+
+          {{ customContent('right.section.start', _context) }}
 
           <!-- Draft preview URL -->
           {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}

@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 
-final class GroupScoreChangeEvent
+final readonly class GroupScoreChangeEvent
 {
     public function __construct(
         private GroupContactScore $groupContactScore,

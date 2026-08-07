@@ -65,7 +65,6 @@ class DoNotContact implements MauticModelInterface
      *
      * @param Lead|int|string|null $contact
      * @param string|mixed[]       $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string               $comments
      * @param int                  $reason                   Must be a class constant from the DoNotContact class
      * @param bool                 $persist
      * @param bool                 $checkCurrentStatus
@@ -78,7 +77,7 @@ class DoNotContact implements MauticModelInterface
         $contact,
         $channel,
         $reason = DNC::BOUNCED,
-        $comments = '',
+        ?string $comments = '',
         $persist = true,
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false,
@@ -167,7 +166,7 @@ class DoNotContact implements MauticModelInterface
         return DNC::IS_CONTACTABLE;
     }
 
-    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
+    public function createDncRecord(Lead $contact, $channel, $reason, ?string $comments = null): DNC
     {
         $dnc = new DNC();
 
@@ -189,7 +188,7 @@ class DoNotContact implements MauticModelInterface
         return $dnc;
     }
 
-    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null): void
+    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, ?string $comments = null): void
     {
         // Update the DNC entry
         $dnc->setChannel($channel);
@@ -222,10 +221,7 @@ class DoNotContact implements MauticModelInterface
         return $reasonChannelCombinations;
     }
 
-    /**
-     * @return DoNotContactRepository
-     */
-    public function getDncRepo()
+    public function getDncRepo(): DoNotContactRepository
     {
         return $this->dncRepo;
     }

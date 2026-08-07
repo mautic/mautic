@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,19 +16,22 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, mixed>
@@ -40,61 +45,59 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configTo = [
+    private array $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
     /**
-     * @return array<int, array<string, array<int, string>|bool|int|null>>
+     * @return \Iterator<int, array<string, (array<int, string>|bool|int|null)>>
      */
-    public static function provideFormDNC(): array
+    public static function provideFormDNC(): \Iterator
     {
-        return [
-            [
-                'reason'   => 1,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 3,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 1,
-            ],
-            [
-                'reason'   => 2,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => true,
-                'dncLead'  => 2,
-            ],
-            [
-                'reason'   => null,
-                'channels' => ['email'],
-                'expected' => false,
-                'dncLead'  => 0,
-            ],
+        yield [
+            'reason'   => 1,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 3,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 1,
+        ];
+        yield [
+            'reason'   => 2,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => true,
+            'dncLead'  => 2,
+        ];
+        yield [
+            'reason'   => null,
+            'channels' => ['email'],
+            'expected' => false,
+            'dncLead'  => 0,
         ];
     }
 
     /**
      * @var array<string, string>
      */
-    private $configPageHit = [
+    private array $configPageHit = [
         'startDate'         => '2022-06-08 12:45:22.0',
         'endDate'           => '2023-06-08 12:45:22.0',
         'page'              => '1',
@@ -105,7 +108,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHit = [
+    private array $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -116,7 +119,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHitWithoutSpentTime = [
+    private array $configUrlPageHitWithoutSpentTime = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -125,56 +128,48 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
-    private $mockLeadModel;
+    private MockObject $mockLeadModel;
 
     /**
-     * @var CompanyModel|MockObject
+     * @var MockObject&CompanyModel
      */
-    private $mockCompanyModel;
+    private MockObject $mockCompanyModel;
+
+    private CampaignSubscriber $subscriber;
 
     /**
-     * @var CampaignSubscriber
+     * @var MockObject&DoNotContact
      */
-    private $subscriber;
-
-    private FilterOperatorProvider $filterOperatorProvider;
-
-    /**
-     * @var DoNotContact|MockObject
-     */
-    private $doNotContact;
+    private MockObject $doNotContact;
 
     protected function setUp(): void
     {
-        $mockIpLookupHelper           = $this->createMock(IpLookupHelper::class);
         $this->mockLeadModel          = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel           = $this->createMock(FieldModel::class);
-        $mockListModel                = $this->createMock(ListModel::class);
         $this->mockCompanyModel       = $this->createMock(CompanyModel::class);
-        $mockCampaignModel            = $this->createMock(CampaignModel::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
-        $mockGroupModel               = $this->createMock(PointGroupModel::class);
-        $this->filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
+        $filterOperatorProvider       = new FilterOperatorProvider(
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('getDefaultTimezone')
             ->willReturn('UTC');
 
         $this->subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
+            $this->createStub(FieldModel::class),
             $this->mockCompanyModel,
-            $mockCampaignModel,
+            $this->createStub(CampaignModel::class),
             $mockCoreParametersHelper,
             $this->doNotContact,
-            $mockGroupModel,
-            $this->filterOperatorProvider
+            $this->createStub(PointGroupModel::class),
+            $filterOperatorProvider,
+            $this->createStub(LeadListRepository::class),
+            $this->createStub(LeadRepository::class),
+            $this->createStub(LeadFieldRepository::class)
         );
     }
 
@@ -207,7 +202,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([$companyEntityTo]);
 
-        $this->mockCompanyModel->expects($this->any())
+        $this->mockCompanyModel
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
@@ -220,11 +215,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($lead): void {
-                $lead->setPrimaryCompany($this->configTo);
-            }
-        );
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')
+            ->willReturnCallback(
+                function () use ($lead): array {
+                    $lead->setPrimaryCompany($this->configTo);
+
+                    return ['oldPrimary' => $this->configTo['id'], 'newPrimary' => $this->configTo['id']];
+                }
+            );
 
         $args = [
             'lead'  => $lead,
@@ -237,7 +235,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
@@ -249,7 +246,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string> $channels
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormDNC')]
+    #[DataProvider('provideFormDNC')]
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -275,7 +272,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
@@ -319,7 +315,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -364,7 +359,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -409,7 +403,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -417,7 +410,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionUpdateLead(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $properties    = [
             'points' => 10,
         ];

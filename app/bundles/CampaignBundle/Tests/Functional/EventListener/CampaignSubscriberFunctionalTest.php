@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private CampaignSubscriber $campaignSubscriber;
 
     protected function setUp(): void
@@ -66,12 +67,11 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        /** @phpstan-ignore new.deprecated */
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $result);
-        $this->assertTrue($result->getResult());
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+
+        $this->assertTrue($campaignExecutionEvent->getResult());
     }
 
     /**
@@ -88,7 +88,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

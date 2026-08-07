@@ -3,9 +3,12 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\TagEvent;
@@ -13,16 +16,49 @@ use Mautic\LeadBundle\Event\TagMergeEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Tag>
  */
 class TagModel extends FormModel
 {
+    private ReportRepository $reportRepository;
+
+    private LeadListRepository $leadListRepository;
+
+    private TriggerEventRepository $triggerEventRepository;
+
+    private ActionRepository $actionRepository;
+
+    private EventRepository $eventRepository;
+
+    private TagRepository $tagRepository;
+
+    #[Required]
+    public function autowireTagModel(
+        TagRepository $tagRepository,
+        EventRepository $eventRepository,
+        ActionRepository $actionRepository,
+        TriggerEventRepository $triggerEventRepository,
+        LeadListRepository $leadListRepository,
+        ReportRepository $reportRepository,
+    ): void {
+        $this->tagRepository = $tagRepository;
+        $this->eventRepository = $eventRepository;
+        $this->actionRepository = $actionRepository;
+        $this->triggerEventRepository = $triggerEventRepository;
+        $this->leadListRepository = $leadListRepository;
+        $this->reportRepository = $reportRepository;
+    }
+
     /**
      * @var array<int, string>
      */
@@ -32,12 +68,9 @@ class TagModel extends FormModel
         'tags',
     ];
 
-    /**
-     * @return TagRepository
-     */
-    public function getRepository()
+    public function getRepository(): TagRepository
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->tagRepository;
     }
 
     public function getPermissionBase(): string
@@ -52,7 +85,7 @@ class TagModel extends FormModel
      */
     public function getEntity($id = null): ?Tag
     {
-        if (is_null($id)) {
+        if (null === $id) {
             return new Tag();
         }
 
@@ -63,7 +96,7 @@ class TagModel extends FormModel
      * @param Tag   $entity
      * @param array $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
@@ -103,7 +136,7 @@ class TagModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new TagEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -168,19 +201,19 @@ class TagModel extends FormModel
         $secondaryTagId = (int) $secondaryTag->getId();
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(CampaignEvent::class)->findBy(['type' => ['lead.changetags', 'lead.tags']]),
+            $this->eventRepository->findBy(['type' => ['lead.changetags', 'lead.tags']]),
             $primaryTag,
             $secondaryTag,
         );
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(Action::class)->findBy(['type' => 'lead.changetags']),
+            $this->actionRepository->findBy(['type' => 'lead.changetags']),
             $primaryTag,
             $secondaryTag,
         );
 
         $this->replaceTagPropertiesInEntities(
-            $this->em->getRepository(TriggerEvent::class)->findBy(['type' => 'lead.changetags']),
+            $this->triggerEventRepository->findBy(['type' => 'lead.changetags']),
             $primaryTag,
             $secondaryTag,
         );
@@ -214,7 +247,7 @@ class TagModel extends FormModel
     private function replaceTagFiltersInSegments(int $primaryTagId, int $secondaryTagId): void
     {
         /** @var LeadList $segment */
-        foreach ($this->em->getRepository(LeadList::class)->createQueryBuilder('l')
+        foreach ($this->leadListRepository->createQueryBuilder('l')
             ->where('l.filters LIKE :tagFilter')
             ->setParameter('tagFilter', '%"tags"%')
             ->getQuery()
@@ -234,7 +267,7 @@ class TagModel extends FormModel
     private function replaceTagFiltersInReports(int $primaryTagId, int $secondaryTagId): void
     {
         /** @var Report $report */
-        foreach ($this->em->getRepository(Report::class)->createQueryBuilder('r')
+        foreach ($this->reportRepository->createQueryBuilder('r')
             ->where('r.filters LIKE :tagFilter')
             ->setParameter('tagFilter', '%tag"%')
             ->getQuery()

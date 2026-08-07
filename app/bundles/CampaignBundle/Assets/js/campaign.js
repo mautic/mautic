@@ -35,10 +35,10 @@ Mautic.campaignOnLoad = function (container, response) {
         // set hover and double click functions for the event buttons
         if (!isCampaignPreview) {
             mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
-                .on('mouseover.eventbuttons', function() {
+                .on('mouseenter.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').removeClass('hide');
                 })
-                .on('mouseout.eventbuttons', function() {
+                .on('mouseleave.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').addClass('hide');
                 })
                 .on('dblclick.eventbuttons', function(event) {
@@ -503,10 +503,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
         mQuery(eventId + " a[data-toggle='ajax-delete']").off("click.ajax").on("click.ajax", Mautic.handleEventDeleteClick);
 
         mQuery(eventId).off('.eventbuttons')
-            .on('mouseover.eventbuttons', function() {
+            .on('mouseenter.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
-            .on('mouseout.eventbuttons', function() {
+            .on('mouseleave.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').addClass('hide');
             })
             .on('dblclick.eventbuttons', function(event) {
@@ -693,10 +693,10 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         });
 
         mQuery(eventId).off('.eventbuttons')
-            .on('mouseover.eventbuttons', function() {
+            .on('mouseenter.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
-            .on('mouseout.eventbuttons', function() {
+            .on('mouseleave.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').addClass('hide');
             })
             .on('dblclick.eventbuttons', function(event) {
@@ -1520,7 +1520,7 @@ Mautic.campaignToggleTimeframes = function() {
  */
 Mautic.closeCampaignBuilder = function() {
     // Disable buttons
-    mQuery('.btns-builder').find('button').prop('disabled', true);
+    mQuery('#campaign-builder .header__action').prop('disabled', true);
     var builderCss = {
         margin: "0",
         padding: "0",
@@ -1541,14 +1541,13 @@ Mautic.closeCampaignBuilder = function() {
 
     Mautic.updateConnections(function(err, response) {
         mQuery('body').css('overflow-y', '');
+        mQuery('#builder-overlay').remove();
+        mQuery('#campaign-builder .header__action').prop('disabled', false);
 
         if (!err) {
-            mQuery('#builder-overlay').remove();
             mQuery('body').css('overflow-y', '');
             if (response.success) {
                 mQuery('#campaign-builder').trigger('campaign-builder:hide');
-                // Enable buttons
-                mQuery('.btns-builder').find('button').prop('disabled', false);
             }
         }
     });
@@ -1557,10 +1556,10 @@ Mautic.closeCampaignBuilder = function() {
 
 Mautic.saveCampaignFromBuilder = function() {
     // Disable buttons
-    mQuery('.btns-builder').find('button').prop('disabled', true);
+    mQuery('#campaign-builder .header__action').prop('disabled', true);
     Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
-    Mautic.updateConnections(function(err) {
-        if (!err) {
+    Mautic.updateConnections(function(err, response) {
+        if (!err && response.success) {
             var applyBtn = mQuery('.btn-apply');
             mQuery('#campaign_campaignElements').val(JSON.stringify(Mautic.campaignBuilderCampaignElements));
             Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
@@ -1572,6 +1571,9 @@ Mautic.saveCampaignFromBuilder = function() {
 
             // Call our handler initialization function
             Mautic.ensureCampaignEventHandlers();
+        } else {
+            Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
+            mQuery('#campaign-builder .header__action').prop('disabled', false);
         }
     });
 };

@@ -2,7 +2,7 @@
 
 namespace Page\Acceptance;
 
-class ContactPage
+final class ContactPage
 {
     public static $URL = '/s/contacts';
 
@@ -94,7 +94,7 @@ class ContactPage
     /**
      * @var \AcceptanceTester;
      */
-    protected $acceptanceTester;
+    private $acceptanceTester;
 
     public function __construct(\AcceptanceTester $I)
     {

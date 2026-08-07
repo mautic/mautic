@@ -25,16 +25,14 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return \Iterator<int, array<int, string>>
      */
-    public static function emailProvider(): array
+    public static function emailProvider(): \Iterator
     {
-        return [
-            ['test@example.com', 'test@example.com'],
-            ['TEST@example.com', 'test@example.com'],
-            ['test+suffix@example.com', 'test+suffix@example.com'],
-            ['!#$%^&*()@example.com', '@example.com'],
-        ];
+        yield ['test@example.com', 'test@example.com'];
+        yield ['TEST@example.com', 'test@example.com'];
+        yield ['test+suffix@example.com', 'test+suffix@example.com'];
+        yield ['!#$%^&*()@example.com', '@example.com'];
     }
 
     /**
@@ -50,15 +48,13 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
-     * @return array<int, array<int, array<int, string>|string>>
+     * @return \Iterator<int, array<int, (array<int, string>|string)>>
      */
-    public static function variationsProvider(): array
+    public static function variationsProvider(): \Iterator
     {
-        return [
-            ['test@example.com', ['test@example.com']],
-            ['TEST@example.com', ['TEST@example.com', 'test@example.com']],
-            ['test+suffix@example.com', ['test+suffix@example.com', 'test@example.com']],
-            ['!#$%^&*()@example.com', ['!#$%^&*()@example.com', '@example.com']],
-        ];
+        yield ['test@example.com', ['test@example.com']];
+        yield ['TEST@example.com', ['TEST@example.com', 'test@example.com']];
+        yield ['test+suffix@example.com', ['test+suffix@example.com', 'test@example.com']];
+        yield ['!#$%^&*()@example.com', ['!#$%^&*()@example.com', '@example.com']];
     }
 }

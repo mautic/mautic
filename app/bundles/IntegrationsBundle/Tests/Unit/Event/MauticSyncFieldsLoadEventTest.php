@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Event;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use PHPUnit\Framework\TestCase;
 
-class MauticSyncFieldsLoadEventTest extends TestCase
+final class MauticSyncFieldsLoadEventTest extends TestCase
 {
     public function testWorkflow(): void
     {

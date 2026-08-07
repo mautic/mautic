@@ -20,7 +20,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 class ObjectChangeGenerator
 {
     public function __construct(
-        private ValueHelper $valueHelper,
+        private readonly ValueHelper $valueHelper,
     ) {
     }
 

@@ -6,8 +6,10 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -19,20 +21,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Update contacts in smart segments based on new contact data.',
     aliases: ['mautic:segments:rebuild']
 )]
-class UpdateLeadListsCommand extends ModeratedCommand
+final class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 
     public function __construct(
-        private ListModel $listModel,
-        private TranslatorInterface $translator,
+        private readonly ListModel $listModel,
+        private readonly TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -84,7 +87,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $excludeSegments       = $input->getOption('exclude');
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -97,7 +100,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
 
             // Track already rebuilt lists to avoid rebuilding them multiple times
@@ -122,7 +125,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     'force' => [
                         [
                             'expr'   => 'notIn',
-                            'column' => $this->listModel->getRepository()->getTableAlias().'.id',
+                            'column' => $this->leadListRepository->getTableAlias().'.id',
                             'value'  => $excludeSegments,
                         ],
                     ],
@@ -161,7 +164,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**

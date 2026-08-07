@@ -7,9 +7,8 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CampaignBundle\Controller\SourceController;
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -17,7 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class SourceControllerUnitTest extends TestCase
+final class SourceControllerUnitTest extends TestCase
 {
     public function testNewActionBuildsBooleanModifiedSourceMap(): void
     {
@@ -123,8 +122,8 @@ class SourceControllerUnitTest extends TestCase
     public function testDeleteActionRemovesSubmittedSourceTypeFromModifiedSources(): void
     {
         $controller = $this->createController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(CampaignModel::class)
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(CampaignModel::class)
         );
 
         $request = $this->ajaxRequest('POST', [
@@ -137,7 +136,6 @@ class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request, 1);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(1, $payload['success']);
         $this->assertSame(1, $payload['deleted']);
@@ -148,8 +146,8 @@ class SourceControllerUnitTest extends TestCase
     public function testDeleteActionWithNonPostRequestReturnsUnsuccessfulResponse(): void
     {
         $controller = $this->createController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(CampaignModel::class)
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(CampaignModel::class)
         );
 
         $request = $this->ajaxRequest('GET', [
@@ -159,7 +157,6 @@ class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request, 1);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(['success' => 0], $payload);
     }
@@ -175,9 +172,8 @@ class SourceControllerUnitTest extends TestCase
             ->onlyMethods(['getModel', 'generateUrl', 'isFormCancelled', 'isFormValid', 'renderView'])
             ->getMock();
 
-        $controller->method('getModel')
-            ->with('campaign')
-            ->willReturn($campaignModel);
+        $controller->autowireSourceController($campaignModel);
+
         $controller->method('isFormCancelled')
             ->willReturn(false);
         $controller->method('isFormValid')
@@ -201,8 +197,8 @@ class SourceControllerUnitTest extends TestCase
         $security->method('isGranted')
             ->willReturn(true);
 
-        $this->setProperty($controller, AbstractStandardFormController::class, 'formFactory', $formFactory);
-        $this->setProperty($controller, CommonController::class, 'security', $security);
+        ReflectionHelper::setValue($controller, 'formFactory', $formFactory);
+        ReflectionHelper::setValue($controller, 'security', $security);
 
         return $controller;
     }
@@ -216,11 +212,5 @@ class SourceControllerUnitTest extends TestCase
         $request->setMethod($method);
 
         return $request;
-    }
-
-    private function setProperty(object $object, string $className, string $propertyName, mixed $value): void
-    {
-        $reflectionProperty = new \ReflectionProperty($className, $propertyName);
-        $reflectionProperty->setValue($object, $value);
     }
 }

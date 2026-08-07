@@ -6,6 +6,7 @@ namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Form\Type\UserInviteType;
@@ -24,17 +26,39 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class UserController extends FormController
+final class UserController extends FormController
 {
+    private RoleRepository $roleRepository;
+
+    private AuditLogRepository $auditLogRepository;
+
+    private UserModel $userModel;
+
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireUserController(
+        UserModel $userModel,
+        AuditLogModel $auditLogModel,
+        RoleModel $roleModel,
+        AuditLogRepository $auditLogRepository,
+        RoleRepository $roleRepository,
+    ): void {
+        $this->userModel = $userModel;
+        $this->auditLogModel = $auditLogModel;
+        $this->auditLogRepository = $auditLogRepository;
+        $this->roleRepository = $roleRepository;
+    }
+
     /**
      * Generate's default user list.
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         $pageHelper = $pageHelperFactory->make('mautic.user', $page);
 
@@ -52,7 +76,7 @@ class UserController extends FormController
         // do some default filtering
         $filter = ['string' => $search, 'force' => ''];
         $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $users  = $this->getModel('user.user')->getEntities(
+        $users  = $this->userModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -120,7 +144,7 @@ class UserController extends FormController
     public function inviteAction(Request $request, UserModel $model): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'invite']);
         $form   = $this->createForm(UserInviteType::class, [], ['action' => $action]);
@@ -145,7 +169,7 @@ class UserController extends FormController
                         'redirect'   => $this->generateUrl('mautic_user_index'),
                     ]);
                 } else {
-                    $response = $this->redirect($this->generateUrl('mautic_user_index'));
+                    $response = $this->redirectToRoute('mautic_user_index');
                 }
             }
 
@@ -177,39 +201,36 @@ class UserController extends FormController
         ]);
     }
 
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper): JsonResponse|Response
+    public function newAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        /** @var UserModel $model */
-        $model = $this->getModel('user.user');
-
         // retrieve the user entity
-        $user = $model->getEntity();
+        $user = $this->userModel->getEntity();
 
         // get the user form factory
         $action   = $this->generateUrl('mautic_user_action', ['objectAction' => 'new']);
-        $form     = $model->createForm($user, $this->formFactory, $action);
+        $form     = $this->userModel->createForm($user, $this->formFactory, $action);
         $response = null;
 
         // Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
-            $response = $this->handleNewUserPost($request, $languageHelper, $hasher, $samlHelper, $model, $user, $form);
+            $response = $this->handleNewUserPost($request, $languageHelper, $samlHelper, $user, $form);
         }
 
         return $response ?? $this->renderNewUserForm($form, $action);
     }
 
-    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, UserModel $model, User $user, FormInterface $form): JsonResponse|Response|null
+    private function handleNewUserPost(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, User $user, FormInterface $form): JsonResponse|Response|null
     {
         $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = false;
 
         if (!$cancelled) {
-            $valid = $this->saveNewUserIfValid($request, $languageHelper, $hasher, $model, $user, $form);
+            $valid = $this->saveNewUserIfValid($request, $languageHelper, $user, $form);
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -223,23 +244,23 @@ class UserController extends FormController
                 ],
             ]);
         } elseif ($valid) {
-            $response = $this->editAction($request, $languageHelper, $hasher, $samlHelper, $user->getId(), true);
+            $response = $this->editAction($request, $languageHelper, $samlHelper, $user->getId(), true);
         }
 
         return $response;
     }
 
-    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, UserModel $model, User $user, FormInterface $form): bool
+    private function saveNewUserIfValid(Request $request, LanguageHelper $languageHelper, User $user, FormInterface $form): bool
     {
         $formUser          = $request->request->all()['user'] ?? [];
         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-        $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+        $password          = $this->userModel->checkNewPassword($user, $submittedPassword);
         $valid             = $this->isFormValid($form);
 
         if ($valid) {
             $user->setPassword($password);
-            $model->saveEntity($user);
-            $this->loadNewUserLocale($languageHelper, $model, $user);
+            $this->userModel->saveEntity($user);
+            $this->loadNewUserLocale($languageHelper, $user);
 
             $this->addFlashMessage('mautic.core.notice.created', [
                 '%name%'      => $user->getName(),
@@ -254,7 +275,7 @@ class UserController extends FormController
         return $valid;
     }
 
-    private function loadNewUserLocale(LanguageHelper $languageHelper, UserModel $model, User $user): void
+    private function loadNewUserLocale(LanguageHelper $languageHelper, User $user): void
     {
         $installedLanguages = $languageHelper->getSupportedLanguages();
 
@@ -263,7 +284,7 @@ class UserController extends FormController
 
             if ($fetchLanguage['error']) {
                 $user->setLocale(null);
-                $model->saveEntity($user);
+                $this->userModel->saveEntity($user);
                 $this->addFlashMessage(
                     $fetchLanguage['message'] ?? 'mautic.core.could.not.set.language',
                     $fetchLanguage['vars'] ?? []
@@ -290,17 +311,13 @@ class UserController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, SAMLHelper $samlHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, SAMLHelper $samlHelper, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('user:users:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
-        $model = $this->getModel('user.user');
-        \assert($model instanceof UserModel);
-        $user = $model->getEntity($objectId);
+        $user = $this->userModel->getEntity($objectId);
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_user_index'),
@@ -313,18 +330,12 @@ class UserController extends FormController
                 ],
             ]);
         }
+
         $oldEmail = $user->getEmail();
 
-        /** @var AuditLogModel $auditLogModel */
-        $auditLogModel      = $this->getModel('core.auditlog');
-        $auditLogRepository = $auditLogModel->getRepository();
-        $userActivity       = $auditLogRepository->getLogsForUser($user);
-        $users              = $model->getEntities();
-
-        $roleModel = $this->getModel('user.role');
-        \assert($roleModel instanceof RoleModel);
-        $roleRepository     = $roleModel->getRepository();
-        $roles              = $roleRepository->getEntities();
+        $userActivity       = $this->auditLogRepository->getLogsForUser($user);
+        $users              = $this->userModel->getEntities();
+        $roles              = $this->roleRepository->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
@@ -342,13 +353,13 @@ class UserController extends FormController
             ],
         ];
 
-        if ($model->isLocked($user)) {
+        if ($this->userModel->isLocked($user)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }
 
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($user, $this->formFactory, $action);
+        $form   = $this->userModel->createForm($user, $this->formFactory, $action);
 
         $isSamlUser    = $samlHelper->isSamlSession();
         if ($isSamlUser) {
@@ -363,19 +374,19 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->all()['user'] ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+                $password          = $this->userModel->checkNewPassword($user, $submittedPassword);
                 $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     $user->setPassword($password);
-                    $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->userModel->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     if (!empty($submittedPassword)) {
-                        $model->sendChangePasswordInfo($user);
+                        $this->userModel->sendChangePasswordInfo($user);
                     }
 
                     if ($newEmail !== $oldEmail) {
-                        $model->sendChangeEmailInfo($oldEmail, $user);
+                        $this->userModel->sendChangeEmailInfo($oldEmail, $user);
                     }
 
                     // check if the user's locale has been downloaded already, fetch it if not
@@ -387,7 +398,7 @@ class UserController extends FormController
                         // If there is an error, we need to reset the user's locale to the default
                         if ($fetchLanguage['error']) {
                             $user->setLocale(null);
-                            $model->saveEntity($user);
+                            $this->userModel->saveEntity($user);
                             $message     = 'mautic.core.could.not.set.language';
                             $messageVars = [];
 
@@ -414,7 +425,7 @@ class UserController extends FormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($user);
+                $this->userModel->unlockEntity($user);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
@@ -422,7 +433,7 @@ class UserController extends FormController
             }
         } else {
             // lock the entity
-            $model->lockEntity($user);
+            $this->userModel->lockEntity($user);
         }
 
         return $this->delegateView([
@@ -447,13 +458,11 @@ class UserController extends FormController
      * Deletes a user object.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('user:users:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $currentUser    = $this->user;
@@ -475,9 +484,7 @@ class UserController extends FormController
         if ('POST' === $request->getMethod()) {
             // ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model = $this->getModel('user.user');
-                \assert($model instanceof UserModel);
-                $entity = $model->getEntity($objectId);
+                $entity = $this->userModel->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -485,10 +492,10 @@ class UserController extends FormController
                         'msg'     => 'mautic.user.user.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif ($model->isLocked($entity)) {
+                } elseif ($this->userModel->isLocked($entity)) {
                     return $this->isLocked($postActionVars, $entity, 'user.user');
                 } else {
-                    $model->deleteEntity($entity);
+                    $this->userModel->deleteEntity($entity);
                     $name      = $entity->getName();
                     $flashes[] = [
                         'type'    => 'notice',
@@ -521,8 +528,7 @@ class UserController extends FormController
      */
     public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        $user  = $this->userModel->getEntity($objectId);
 
         // user not found
         if (null === $user) {
@@ -588,9 +594,7 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $ipLookupHelper->getIpAddressFromRequest(),
                     ];
-                    $auditLogModel = $this->getModel('core.auditlog');
-                    \assert($auditLogModel instanceof AuditLogModel);
-                    $auditLogModel->writeToLog($log);
+                    $this->auditLogModel->writeToLog($log);
 
                     $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }
@@ -653,15 +657,13 @@ class UserController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model = $this->getModel('user');
-            \assert($model instanceof UserModel);
             $ids         = json_decode($request->query->get('ids', ''));
             $deleteIds   = [];
             $currentUser = $this->user;
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $entity = $this->userModel->getEntity($objectId);
 
                 if ((int) $currentUser->getId() === (int) $objectId) {
                     $flashes[] = [
@@ -675,8 +677,8 @@ class UserController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->isGranted('user:users:delete')) {
-                    $flashes[] = $this->accessDenied(true);
-                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->getAccessDeniedFlash();
+                } elseif ($this->userModel->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'user', true);
                 } else {
                     $deleteIds[] = $objectId;
@@ -684,8 +686,8 @@ class UserController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
+            if ([] !== $deleteIds) {
+                $entities = $this->userModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
                     'type'    => 'notice',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -7,10 +9,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
+
     /**
      * @var string
      */
@@ -27,7 +31,7 @@ class Stat
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
+     * @var LeadList|null
      */
     private $list;
 
@@ -113,7 +117,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -299,7 +303,7 @@ class Stat
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadList|null
+     * @return LeadList|null
      */
     public function getList()
     {
@@ -393,10 +397,8 @@ class Stat
 
     /**
      * @param mixed $clickCount
-     *
-     * @return Stat
      */
-    public function setClickCount($clickCount)
+    public function setClickCount($clickCount): static
     {
         $this->clickCount = $clickCount;
 
@@ -412,10 +414,8 @@ class Stat
 
     /**
      * Up the sent count.
-     *
-     * @return Stat
      */
-    public function upClickCount()
+    public function upClickCount(): static
     {
         $count            = (int) $this->clickCount + 1;
         $this->clickCount = $count;
@@ -431,10 +431,7 @@ class Stat
         return $this->lastClicked;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setLastClicked(\DateTime $lastClicked)
+    public function setLastClicked(\DateTime $lastClicked): static
     {
         $this->lastClicked = $lastClicked;
 
@@ -451,10 +448,8 @@ class Stat
 
     /**
      * @param mixed $clickDetails
-     *
-     * @return Stat
      */
-    public function setClickDetails($clickDetails)
+    public function setClickDetails($clickDetails): static
     {
         $this->clickDetails = $clickDetails;
 
@@ -471,10 +466,8 @@ class Stat
 
     /**
      * @param \DateTime $dateRead
-     *
-     * @return Stat
      */
-    public function setDateRead($dateRead)
+    public function setDateRead($dateRead): static
     {
         $this->dateRead = $dateRead;
 

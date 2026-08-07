@@ -1,24 +1,36 @@
 includes:
-	- phpstan-baseline.neon
+    - phpstan-baseline.neon
 
 parameters:
 	tmpDir: ./var/phpstan-cache
 	level: 6
-	reportUnmatchedIgnoredErrors: false
+
+	#reportUnmatchedIgnoredErrors: false
+
 	treatPhpDocTypesAsCertain: false
 	parallel:
-		maximumNumberOfProcesses: 2
 		processTimeout: 1000.0
+    # see https://github.com/tomasVotruba/type-coverage
+	type_coverage:
+		return: 88.3
+		param: 75.7
+		property: 71.6
+		# wait for PHP 8.3 before changing
+		constant: 3
+		declare: 73
 	paths:
 		- app/bundles
 		- app/migrations
 		- plugins
+		- utils
 	excludePaths:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
 		- plugins/*/node_modules/*
 		- plugins/*/vendor/*
+		- */Fixture/*
+		- */Source/*
 		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
@@ -28,31 +40,39 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# ReportGenerator keeps a nullable form factory for its lazy build flow
+		-
+			identifier: mautic.noNullableServiceInConstructor
+			path: app/bundles/ReportBundle/Generator/ReportGenerator.php
+		# these services have no class name alias in the container, so only the string name can fetch them
+		-
+			identifier: mautic.noContainerGet
+			paths:
+				- app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
+				- app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
+				- app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
+				- app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
+				- app/bundles/CoreBundle/Tests/Traits/LoggerTrait.php
+				- app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
+				- app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 		- identifier: missingType.generics
+		# controllers - group missing parameter types to fix later
+		-
+			identifier: missingType.parameter
+			path: *Controller.php
 		# not all IDEs are as smart as PHPSTAN and need the type hint
 		- identifier: function.alreadyNarrowedType
 		- identifier: instanceof.alwaysTrue
 		# Symfony 7.4 deprecation - Request->get() to be fixed before Symfony 8.0
 		- '#Call to deprecated method get\(\) of class Symfony\\Component\\HttpFoundation\\Request#'
 		- '/Variable \$\w+ might not be defined\./'
-		# resolve later with translator interface generics
-		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'
-		# resolve later with generics
-		- '#Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel::\$model has unknown class Mautic\\CoreBundle\\Model\\T as its type#'
-		- '#Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel::\$model \(Mautic\\CoreBundle\\Model\\AbstractCommonModel<Mautic\\CoreBundle\\Model\\T>\) does not accept Mautic\\CoreBundle\\Model\\AbstractCommonModel<T of object>#'
 		# test on purpose
 		- '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
-		# mocks
-		- '#Parameter (.*?) class (.*?) expects (.*?)PHPUnit\\Framework\\MockObject\\MockObject given#'
 		# handle later - ideally with custom interface
 		-
 			message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
 			path: plugins/*/Api/*
 		- '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
-		# collection vs array
-		-
-			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
-			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
 		# Doctrine expects concrete types but traits use interfaces with generics
 		-
 			message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
@@ -70,22 +90,156 @@ parameters:
 		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
 		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
-		# on purpose
-		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+
+		# on purposelater
+		#- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+
 		# can't figure out what the right type should be for FormBuilderInterface
 		- '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
 		# on purpose type check
 		-
 			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
 			paths:
-			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
-			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-		-
-			message: '#Method Mautic\\CampaignBundle\\Executioner\\ContactFinder\\InactiveContactFinder::getDatesAdded\(\) should return Doctrine\\Common\\Collections\\ArrayCollection but returns array<string, DateTimeInterface>\|null#'
-			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php
+				 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
+				 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
 		-
 			message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
 			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
+
+        # deprecation
+		-
+			identifier: return.deprecatedClass
+			message: '#Return type of method (Mautic|MauticPlugin)\\(.*?)\\EventListener\\CampaignSubscriber::(.*?) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent#'
+		-
+			identifier: return.deprecatedClass
+			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		-
+			identifier: argument.type
+			path: app/bundles/CacheBundle/Tests/EventListener/CacheClearSubscriberTest.php
+
+		-
+			identifier: class.extendsDeprecatedClass
+			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		-
+			identifier: classConstant.deprecatedClass
+			paths:
+				- app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
+				- app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
+				- app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+		-
+			message: '#Anonymous class implements deprecated interface Doctrine\\DBAL\\Logging\\SQLLogger#'
+			path: app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
+
+		# false positive, reflection reference method call
+		-
+			identifier: method.impossibleType
+			paths:
+				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+				- app/bundles/NotificationBundle/Tests/Unit/Api/OneSignalApiTest.php
+		-
+			identifier: method.alreadyNarrowedType
+			paths:
+				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+		# exception handler as both handler and standalone method
+		-
+			identifier: argument.type
+			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
+		# handle after native type declarations are covered
+		-
+			identifier: missingType.iterableValue
+			paths:
+				- app
+				- plugins
+
+		# mautic deprecations
+		-
+			identifier: staticMethod.deprecated
+			message: '#class\s+Mautic#'
+		-
+			identifier: parameter.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: property.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: class.extendsDeprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: method.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: method.deprecated
+			message: '#class\s+Mautic#'
+		-
+			identifier: return.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: classConstant.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: new.deprecatedClass
+			message: '#class\s+Mautic#'
+		-
+			identifier: classConstant.deprecated
+			message: '#class\s+Mautic#'
+
+		# handle later
+		- '#Call to method convertToPHPValue\(\) of deprecated class Doctrine\\DBAL\\Types\\ArrayType#'
+
+		# child class generic
+		-
+			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
+			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
+
+		-
+			message: '#Parameter (.*?) of method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController::createTagModifyResponse\(\) expects MauticPlugin\\MauticTagManagerBundle\\Entity\\Tag, Mautic\\LeadBundle\\Entity\\Tag given#'
+			path: plugins/MauticTagManagerBundle/Controller/TagController.php
+
+		-
+			identifier: mautic.noTablePrefixDefinitionInTests
+			path: app/bundles/CoreBundle/Test/EventListener/MaintenanceSubscriberTest.php
+
+		# not useful, rather pedantic from phsptan-* extensions
+		-
+			identifier: argument.templateType
+			path: app/bundles/CoreBundle/Helper/CookieHelper.php
+			count: 1
+		# repository is resolved from a dynamic entity class name
+		-
+			identifier: argument.templateType
+			paths:
+				- app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
+				- app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
+		-
+			message: '#Method PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker::willReturnOnConsecutiveCalls\(\) invoked with unpacked array with possibly string key#'
+			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolverTest.php
+		-
+			message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
+			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
+		# intentional, as overrides the property
+		-
+			identifier: symplify.noJustPropertyAssign
+			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
+		-
+			identifier: typePerfect.noArrayAccessOnObject
+		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
+		-
+			identifier: mautic.noServiceJuggling
+			path: app/bundles/LeadBundle/Model/LeadModel.php
+
+		# mixed return
+		-
+			identifier: return.unusedType
+			message: '#Method Mautic(.*?)::getParameterValue\(\)#'
+		# string operations
+		-
+			identifier: parameterByRef.type
+			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
+
+	scanDirectories:
+		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
+		- vendor/javer/sp-bundle/src
+		- vendor/javer/symfony-bridge/src
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -96,3 +250,40 @@ parameters:
 	symfony:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
+
+
+rules:
+	- Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
+	- Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+	- Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
+	- Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
+	- Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
+	- Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
+	- Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
+	- Utils\PHPStan\Rule\ConstraintMustHaveAttributeRule
+	- Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+	- Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+	- Utils\PHPStan\Rule\NoContainerGetRule
+	- Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
+	- Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
+	- Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
+	- Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
+
+	- Utils\PHPStan\Rule\NoServicesInBundleConfigRule
+	#- Utils\PHPStan\Rule\NoUnusedServiceAliasRule
+	- Utils\PHPStan\Rule\NoParentConstructorForwardingRule
+	- Utils\PHPStan\Rule\NoServiceJugglingRule
+
+#services:
+#	-
+#		class: Utils\PHPStan\Collector\ServiceAliasCollector
+#		tags:
+#			- phpstan.collector
+#	-
+#		class: Utils\PHPStan\Collector\ServiceNameUsageCollector
+#		tags:
+#			- phpstan.collector
+#	-
+#		class: Utils\PHPStan\Collector\ServiceTypeUsageCollector
+#		tags:
+#			- phpstan.collector

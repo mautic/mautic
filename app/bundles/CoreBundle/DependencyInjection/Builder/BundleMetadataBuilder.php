@@ -6,7 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\EntityMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetadata;
 
-class BundleMetadataBuilder
+final class BundleMetadataBuilder
 {
     private array $ipLookupServices = [];
 
@@ -19,7 +19,7 @@ class BundleMetadataBuilder
     private array $coreMetadata = [];
 
     public function __construct(
-        private array $symfonyBundles,
+        private readonly array $symfonyBundles,
         private array $paths,
     ) {
         $this->buildMetadata();

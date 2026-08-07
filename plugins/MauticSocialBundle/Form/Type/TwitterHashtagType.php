@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class TwitterHashtagType extends TwitterAbstractType
+final class TwitterHashtagType extends TwitterAbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

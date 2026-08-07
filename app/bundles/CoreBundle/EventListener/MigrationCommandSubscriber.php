@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
@@ -96,10 +96,6 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
     {
         $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
 
-        if (isset($tableColumns[$generatedColumn->getColumnName()])) {
-            return true;
-        }
-
-        return false;
+        return isset($tableColumns[$generatedColumn->getColumnName()]);
     }
 }

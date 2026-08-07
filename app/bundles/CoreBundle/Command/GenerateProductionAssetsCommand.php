@@ -22,29 +22,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:assets:generate',
-    description: 'Combines and minifies asset files into single production files'
-)]
-class GenerateProductionAssetsCommand extends Command
-{
-    public function __construct(
-        private AssetGenerationHelper $assetGenerationHelper,
-        private PathsHelper $pathsHelper,
-        private TranslatorInterface $translator,
-        private Filesystem $filesystem,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setHelp(
-                <<<'EOT'
+    description: 'Combines and minifies asset files into single production files',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command builds Symfony Asset Mapper assets, combines and minifies legacy files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into production files stored in root/media/css and root/media/js respectively. It also runs the command elfinder:install internally to install ElFinder assets.
 
 <info>php %command.full_name%</info>
-EOT
-            );
+TXT
+)]
+final class GenerateProductionAssetsCommand extends Command
+{
+    public function __construct(
+        private readonly AssetGenerationHelper $assetGenerationHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly Filesystem $filesystem,
+    ) {
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

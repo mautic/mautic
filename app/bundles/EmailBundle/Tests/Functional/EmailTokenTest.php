@@ -11,11 +11,12 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailTokenTest extends MauticMysqlTestCase
+final class EmailTokenTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -60,7 +61,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->sendEmail(
             $email,
             [
@@ -104,21 +105,20 @@ class EmailTokenTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertNotNull($emailStat);
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 
         $body = $crawler->filter('body');
 
         // Remove the tracking tags that are causing troubles with different Mautic configurations.
-        $body->filter('a,img,div')->each(function (Crawler $crawler) {
+        $body->filter('a,img,div')->each(function (Crawler $crawler): void {
             foreach ($crawler as $node) {
                 $node->parentNode->removeChild($node);
             }
         });
 
-        Assert::assertSame(
-            $this->stripWhiteSpaces('Dear Test Lead,
+        $this->assertSame($this->stripWhiteSpaces('Dear Test Lead,
             
             Check these fields:
             Mobile: 012
@@ -142,9 +142,7 @@ class EmailTokenTest extends MauticMysqlTestCase
             Textarea: This is a paragraph
             Time: 20:00
             Timezone: Kolkata
-            URL: www.example.com'),
-            $this->stripWhiteSpaces($body->html())
-        );
+            URL: www.example.com'), $this->stripWhiteSpaces($body->html()));
     }
 
     /**
@@ -173,8 +171,10 @@ class EmailTokenTest extends MauticMysqlTestCase
 
     private function createLeadWithAllFields(): Lead
     {
-        $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        /** @var LeadModel $leadModel */
+        $leadModel  = self::getContainer()->get(LeadModel::class);
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $lead = new Lead();
         $lead->setFirstname('Test');

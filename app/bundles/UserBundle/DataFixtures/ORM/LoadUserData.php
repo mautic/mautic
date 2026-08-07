@@ -7,9 +7,9 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {
@@ -17,7 +17,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     public function __construct(
-        private UserPasswordHasher $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
     ) {
     }
 
@@ -48,7 +48,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-user', $user);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 2;
     }

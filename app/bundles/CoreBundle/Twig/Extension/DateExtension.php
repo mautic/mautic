@@ -8,25 +8,25 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class DateExtension extends AbstractExtension
+final class DateExtension extends AbstractExtension
 {
     public function __construct(
-        protected DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('dateToText', [$this, 'toText'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToTime', [$this, 'toTime'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
-            new TwigFunction('dateFormatRange', [$this, 'formatRange'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToHumanized', [$this, 'toHumanized'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToTextShort', [$this, 'toTextShort'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToText', $this->toText(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToFull', $this->toFull(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToFullConcat', $this->toFullConcat(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToDate', $this->toDate(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToTime', $this->toTime(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToShort', $this->toShort(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateFormatRange', $this->formatRange(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToHumanized', $this->toHumanized(...), ['is_safe' => ['all']]),
+            new TwigFunction('dateToTextShort', $this->toTextShort(...), ['is_safe' => ['all']]),
         ];
     }
 
@@ -65,12 +65,10 @@ class DateExtension extends AbstractExtension
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }

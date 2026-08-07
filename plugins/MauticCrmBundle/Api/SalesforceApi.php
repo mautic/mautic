@@ -13,7 +13,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 /**
  * @property SalesforceIntegration $integration
  */
-class SalesforceApi extends CrmApi
+final class SalesforceApi extends CrmApi
 {
     /**
      * This regular expression parses missing field's name from the error message.
@@ -22,17 +22,17 @@ class SalesforceApi extends CrmApi
      */
     public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
 
-    protected $object          = 'Lead';
+    private string $object          = 'Lead';
 
-    protected $requestSettings = [
+    private $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
-    protected $apiRequestCounter   = 0;
+    private int $apiRequestCounter   = 0;
 
-    protected $requestCounter      = 1;
+    private int $requestCounter      = 1;
 
-    protected $maxLockRetries      = 3;
+    private int $maxLockRetries      = 3;
 
     private bool $optOutFieldAccessible = true;
 
@@ -110,7 +110,7 @@ class SalesforceApi extends CrmApi
         ];
 
         // try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
+        if (isset($config['objects']) && in_array('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[]    = 'Id';
@@ -153,7 +153,7 @@ class SalesforceApi extends CrmApi
         $appendToQuery = '';
 
         // try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
+        if (isset($config['objects']) && in_array('company', $config['objects']) && !empty($data['company']['Name'])) {
             $fields = $this->integration->getFieldsForQuery('Account');
 
             if (!empty($data['company']['BillingCountry'])) {
@@ -253,7 +253,7 @@ class SalesforceApi extends CrmApi
         $mActivityObjectName = $namespace.'mautic_timeline__c';
         $activityData        = [];
 
-        if (!empty($activity)) {
+        if ([] !== $activity) {
             foreach ($activity as $sfId => $records) {
                 foreach ($records['records'] as $record) {
                     $body = [
@@ -279,14 +279,14 @@ class SalesforceApi extends CrmApi
                 }
             }
 
-            if (!empty($activityData)) {
+            if ([] !== $activityData) {
                 $request              = [];
                 $request['allOrNone'] = 'false';
                 $chunked              = array_chunk($activityData, 25);
                 $results              = [];
                 foreach ($chunked as $chunk) {
                     // We can only submit 25 at a time
-                    if ($chunk) {
+                    if ([] !== $chunk) {
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;
@@ -365,8 +365,8 @@ class SalesforceApi extends CrmApi
         }
         $fields = array_unique($fields);
 
-        $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
-        if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
+        $ignoreConvertedLeads = ('Lead' === $object) ? ' and ConvertedContactId = NULL' : '';
+        if (!$this->optOutFieldAccessible) { // If not opt-out is supported; unset it
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
         }
 
@@ -445,10 +445,10 @@ class SalesforceApi extends CrmApi
     public function checkCampaignMembership($campaignId, $object, array $people): array
     {
         $campaignMembers = [];
-        if (!empty($people)) {
+        if ([] !== $people) {
             $idField = "{$object}Id";
-            $query   = "Select Id, $idField from CampaignMember where CampaignId = '".$campaignId
-                ."' and $idField in ('".implode("','", $people)."')";
+            $query   = "Select Id, {$idField} from CampaignMember where CampaignId = '".$campaignId
+                ."' and {$idField} in ('".implode("','", $people)."')";
 
             $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
@@ -474,10 +474,7 @@ class SalesforceApi extends CrmApi
         return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
     }
 
-    /**
-     * @return int
-     */
-    public function getRequestCounter()
+    public function getRequestCounter(): int
     {
         $count                   = $this->apiRequestCounter;
         $this->apiRequestCounter = 0;
@@ -492,7 +489,7 @@ class SalesforceApi extends CrmApi
      */
     public function getCompaniesByName(array $names, $requiredFieldString)
     {
-        $names     = array_map([$this, 'escapeQueryValue'], $names);
+        $names     = array_map($this->escapeQueryValue(...), $names);
         $queryUrl  = $this->integration->getQueryUrl();
         $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
 
@@ -558,7 +555,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function processError(array $error, $isRetry)
+    private function processError(array $error, bool $isRetry)
     {
         switch ($error['errorCode']) {
             case 'INVALID_SESSION_ID':
@@ -580,7 +577,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function revalidateSession($isRetry): void
+    private function revalidateSession(bool $isRetry): void
     {
         if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
             throw new ApiErrorException($refreshError);
@@ -612,7 +609,7 @@ class SalesforceApi extends CrmApi
     /**
      * @return array<mixed>
      */
-    private function parseMissingField(string $errorMessage)
+    private function parseMissingField(string $errorMessage): array
     {
         $matches = [];
         preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);
@@ -620,10 +617,7 @@ class SalesforceApi extends CrmApi
         return isset($matches[1]) ? [$matches[1], $matches[2]] : [null, null];
     }
 
-    /**
-     * @return bool|float|mixed|string
-     */
-    private function escapeQueryValue($value)
+    private function escapeQueryValue(string $value): string
     {
         // SF uses backslashes as escape delimeter
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
@@ -633,9 +627,7 @@ class SalesforceApi extends CrmApi
         $value = $this->integration->cleanPushData($value);
 
         // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
-        return $value;
+        return str_replace("'", "\'", $value);
     }
 
     public function isOptOutFieldAccessible(): bool
@@ -643,7 +635,7 @@ class SalesforceApi extends CrmApi
         return $this->optOutFieldAccessible;
     }
 
-    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): self
     {
         $this->optOutFieldAccessible = $optOutFieldAccessible;
 
@@ -663,11 +655,11 @@ class SalesforceApi extends CrmApi
     {
         if (10 === $tries) {
             $this->integration->logIntegrationError(new \Exception(
-                sprintf('Maximum tries exceeded for handling missing field scenarios')
+                'Maximum tries exceeded for handling missing field scenarios'
             ));
         }
         try {
-            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $leadsQuery = sprintf($baseQuery, implode(', ', $fields));
             $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
         } catch (ApiErrorException $e) {
             [$missingField, $entityType] = $this->parseMissingField($e->getMessage());

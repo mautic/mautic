@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class SegmentsPage
+final class SegmentsPage
 {
     public static $URL                   = '/s/segments';
     public static $NEW_BUTTON            = '.list-toolbar > a#new > i';

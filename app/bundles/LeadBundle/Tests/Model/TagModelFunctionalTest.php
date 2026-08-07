@@ -9,12 +9,12 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
 
-class TagModelFunctionalTest extends MauticMysqlTestCase
+final class TagModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeleteOrphanTags(): void
     {
         /** @var TagModel $model */
-        $model = self::getContainer()->get('mautic.lead.model.tag');
+        $model = self::getContainer()->get(TagModel::class);
 
         $tags = [
             'tag1',

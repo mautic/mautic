@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PathsHelperTest extends TestCase
+final class PathsHelperTest extends TestCase
 {
     private string $cacheDir = __DIR__.'/resource/paths/cache';
 
@@ -19,12 +21,7 @@ class PathsHelperTest extends TestCase
     private string $rootDir  = __DIR__.'/resource/paths';
 
     /**
-     * @var MockObject|UserHelper
-     */
-    private MockObject $userHelper;
-
-    /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -32,74 +29,73 @@ class PathsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userHelper           = $this->createMock(UserHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn (string $key) => match ($key) {
+                fn (string $key): string => match ($key) {
                     'image_path' => 'media/images',
                     'tmp_path'   => __DIR__.'/resource/paths/tmp',
                     default      => '',
                 }
             );
         $this->helper = new PathsHelper(
-            $this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
+            $this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
         );
     }
 
     public function testGetLocalConfigFile(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
+        $this->assertSame(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
     }
 
     public function testGetCachePath(): void
     {
-        $this->assertEquals($this->cacheDir, $this->helper->getCachePath());
+        $this->assertSame($this->cacheDir, $this->helper->getCachePath());
     }
 
     public function testGetRootPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths', $this->helper->getRootPath());
+        $this->assertSame(__DIR__.'/resource/paths', $this->helper->getRootPath());
     }
 
     public function testGetTemporaryPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/tmp', $this->helper->getTemporaryPath());
+        $this->assertSame(__DIR__.'/resource/paths/tmp', $this->helper->getTemporaryPath());
     }
 
     public function testGetLogsPath(): void
     {
-        $this->assertEquals($this->logsDir, $this->helper->getLogsPath());
+        $this->assertSame($this->logsDir, $this->helper->getLogsPath());
     }
 
     public function testGetImagesPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
+        $this->assertSame(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
     }
 
     public function testGetTranslationsPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
+        $this->assertSame(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
     }
 
     public function testGetThemesPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/themes', $this->helper->getThemesPath());
+        $this->assertSame(__DIR__.'/resource/paths/themes', $this->helper->getThemesPath());
     }
 
     public function testGetAssetsPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/media', $this->helper->getAssetsPath());
+        $this->assertSame(__DIR__.'/resource/paths/media', $this->helper->getAssetsPath());
     }
 
     public function testGetCoreBundlesPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/app/bundles', $this->helper->getCoreBundlesPath());
+        $this->assertSame(__DIR__.'/resource/paths/app/bundles', $this->helper->getCoreBundlesPath());
     }
 
     public function testGetPluginsPath(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
+        $this->assertSame(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
     }
 
     public function testGetImportCampaignsPath(): void
@@ -109,19 +105,17 @@ class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                function (string $key) use ($campaignImportPath) {
-                    return match ($key) {
-                        'import_campaigns_dir' => $campaignImportPath,
-                        'image_path'           => 'media/images',
-                        'tmp_path'             => __DIR__.'/resource/paths/tmp',
-                        default                => '',
-                    };
+                fn (string $key): string => match ($key) {
+                    'import_campaigns_dir' => $campaignImportPath,
+                    'image_path'           => 'media/images',
+                    'tmp_path'             => __DIR__.'/resource/paths/tmp',
+                    default                => '',
                 }
             );
 
-        $helper = new PathsHelper($this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
+        $helper = new PathsHelper($this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
 
-        $this->assertEquals($campaignImportPath, $helper->getImportCampaignsPath());
+        $this->assertSame($campaignImportPath, $helper->getImportCampaignsPath());
     }
 
     public function testTempDirectoryIsCreatedIfItDoesNotExist(): void
@@ -129,19 +123,15 @@ class PathsHelperTest extends TestCase
         $tempPath = __DIR__.'/resource/paths/no_exist/tmp';
 
         /** @var UserHelper&MockObject $userHelper */
-        $userHelper = $this->createMock(UserHelper::class);
+        $userHelper = $this->createStub(UserHelper::class);
 
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                function (string $key) use ($tempPath) {
-                    switch ($key) {
-                        case 'tmp_path':
-                            return $tempPath;
-                        default:
-                            return '';
-                    }
+                fn (string $key): string => match ($key) {
+                    'tmp_path' => $tempPath,
+                    default    => '',
                 }
             );
 
@@ -174,13 +164,9 @@ class PathsHelperTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                function (string $key) use ($dashboardDir) {
-                    switch ($key) {
-                        case 'dashboard_import_dir':
-                            return $dashboardDir;
-                        default:
-                            return '';
-                    }
+                fn (string $key): string => match ($key) {
+                    'dashboard_import_dir' => $dashboardDir,
+                    default                => '',
                 }
             );
 

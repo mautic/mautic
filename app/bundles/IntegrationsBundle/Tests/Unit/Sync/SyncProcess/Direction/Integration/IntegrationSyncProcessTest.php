@@ -25,39 +25,33 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\Integration
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 use PHPUnit\Framework\TestCase;
 
-class IntegrationSyncProcessTest extends TestCase
+final class IntegrationSyncProcessTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SyncDateHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
-     * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
-     * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectChangeGenerator
      */
     private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
-     * @var SyncDataExchangeInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SyncDataExchangeInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
+    private IntegrationSyncProcess $integrationSyncProcess;
 
     protected function setUp(): void
     {
@@ -93,7 +87,7 @@ class IntegrationSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) use ($objectName) {
+                function (RequestDAO $requestDAO) use ($objectName): ReportDAO {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 
@@ -199,7 +193,7 @@ class IntegrationSyncProcessTest extends TestCase
         $fromSyncDateTime = new \DateTimeImmutable();
         $matcher          = $this->exactly(2);
         $this->syncDateHelper->expects($matcher)
-            ->method('getSyncFromDateTime')->willReturnCallback(function (...$parameters) use ($matcher, $fromSyncDateTime) {
+            ->method('getSyncFromDateTime')->willReturnCallback(function (...$parameters) use ($matcher, $fromSyncDateTime): \DateTimeImmutable {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(self::INTEGRATION_NAME, $parameters[0]);
                     $this->assertSame('Contact', $parameters[1]);

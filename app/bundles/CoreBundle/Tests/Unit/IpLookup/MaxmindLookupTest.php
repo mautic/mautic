@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
@@ -14,13 +16,19 @@ use PHPUnit\Framework\MockObject\MockObject;
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated.
  */
-class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
+final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
-    protected MockObject $mockHttp;
+    /**
+     * @var MockObject&Client
+     */
+    private MockObject $mockHttp;
 
-    protected MockObject $mockCoreParamsHelper;
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
+    private MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void
     {
@@ -196,7 +204,9 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    /** @param array<string, string> $details */
+    /**
+     * @param array<string, string> $details
+     */
     private function checkDetails(array $details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);

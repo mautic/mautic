@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private RealTimeExecutioner $realTimeExecutioner,
@@ -54,24 +54,29 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
 
         if (null == $eventDetails) {
-            return $event->setResult(true);
+            $event->setResult(true);
+
+            return;
         }
 
         if (!$eventDetails instanceof Asset) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $assetId       = $eventDetails->getId();
         $limitToAssets = $event->getConfig()['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            // no points change
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $event->setResult(true);

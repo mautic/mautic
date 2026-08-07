@@ -8,9 +8,10 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends AbstractController
+final class EmailGraphStatsController extends AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.
@@ -31,7 +32,7 @@ class EmailGraphStatsController extends AbstractController
         $isVariant,
         $dateFrom = null,
         $dateTo = null,
-    ): \Symfony\Component\HttpFoundation\Response {
+    ): Response {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
 

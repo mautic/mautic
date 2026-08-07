@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class PathsHelper
@@ -16,28 +17,33 @@ class PathsHelper
      */
     private $theme;
 
-    private string $imagePath;
+    private readonly string $imagePath;
 
-    private string $dashboardImportDir;
+    private readonly string $dashboardImportDir;
 
-    private string $dashboardUserImportDir;
+    private readonly string $dashboardUserImportDir;
 
-    private string $kernelCacheDir;
+    private readonly string $kernelCacheDir;
 
-    private string $kernelLogsDir;
+    private readonly string $kernelLogsDir;
 
-    private string $kernelRootDir;
+    private readonly string $kernelRootDir;
 
-    private string $temporaryDir;
+    private readonly string $temporaryDir;
 
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    private string $importLeadsDir;
+    private readonly string $importLeadsDir;
 
-    private string $importCampaignDir;
+    private readonly string $importCampaignDir;
 
-    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
-    {
+    public function __construct(
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        string $cacheDir,
+        string $logsDir,
+        string $rootDir,
+    ) {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();
@@ -133,7 +139,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }
@@ -177,7 +183,7 @@ class PathsHelper
                 // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ('dashboard.global' == $name) {
+                if ('dashboard.global' === $name) {
                     return $globalPath;
                 }
 
@@ -206,7 +212,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 

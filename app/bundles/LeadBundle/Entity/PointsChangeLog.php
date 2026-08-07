@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +12,7 @@ use Mautic\PointBundle\Entity\Group;
 class PointsChangeLog
 {
     public const TABLE_NAME = 'lead_points_change_log';
+
     /**
      * @var string
      */
@@ -87,22 +90,15 @@ class PointsChangeLog
         $builder->addDateAdded();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return PointsChangeLog
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
 
@@ -110,8 +106,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -120,13 +114,9 @@ class PointsChangeLog
     }
 
     /**
-     * Set eventName.
-     *
      * @param string $eventName
-     *
-     * @return PointsChangeLog
      */
-    public function setEventName($eventName)
+    public function setEventName($eventName): static
     {
         $this->eventName = $eventName;
 
@@ -134,8 +124,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get eventName.
-     *
      * @return string
      */
     public function getEventName()
@@ -144,13 +132,9 @@ class PointsChangeLog
     }
 
     /**
-     * Set actionName.
-     *
      * @param string $actionName
-     *
-     * @return PointsChangeLog
      */
-    public function setActionName($actionName)
+    public function setActionName($actionName): static
     {
         $this->actionName = $actionName;
 
@@ -158,8 +142,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get actionName.
-     *
      * @return string
      */
     public function getActionName()
@@ -168,13 +150,9 @@ class PointsChangeLog
     }
 
     /**
-     * Set delta.
-     *
      * @param int $delta
-     *
-     * @return PointsChangeLog
      */
-    public function setDelta($delta)
+    public function setDelta($delta): static
     {
         $this->delta = $delta;
 
@@ -182,8 +160,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get delta.
-     *
      * @return int
      */
     public function getDelta()
@@ -192,13 +168,9 @@ class PointsChangeLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
-     *
-     * @return PointsChangeLog
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -206,8 +178,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -215,12 +185,7 @@ class PointsChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     * Set lead.
-     *
-     * @return PointsChangeLog
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -228,8 +193,6 @@ class PointsChangeLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead
      */
     public function getLead()
@@ -237,10 +200,7 @@ class PointsChangeLog
         return $this->lead;
     }
 
-    /**
-     * @return PointsChangeLog
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
