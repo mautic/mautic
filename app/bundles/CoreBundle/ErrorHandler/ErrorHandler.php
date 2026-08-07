@@ -123,7 +123,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
                 switch (true) {
-                    case $level & E_STRICT:
                     case $level & E_NOTICE:
                     case $level & E_USER_NOTICE:
                         $logLevel = LogLevel::NOTICE;

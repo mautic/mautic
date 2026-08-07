@@ -22,9 +22,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - php-versions: '8.2'
+          - php-versions: '8.4'
             db-types: 'mysql:8.4'
-          - php-versions: '8.2'
+          - php-versions: '8.4'
             db-types: 'mariadb:10.11'
           - php-versions: '8.5'
             db-types: 'mysql:9.2'
@@ -38,7 +38,7 @@ jobs:
       # do it where the report is actually uploaded: on the mautic/mautic repository, for merges and
       # for the nightly schedule. Pull requests skip it, which also stops fork PRs from generating a
       # coverage report that is then discarded.
-      COVERAGE: ${{ matrix.php-versions == '8.2'
+      COVERAGE: ${{ matrix.php-versions == '8.4'
         && matrix.db-types == 'mariadb:10.11'
         && github.repository == 'mautic/mautic'
         && (github.event_name == 'push' || github.event_name == 'schedule') }}
@@ -74,7 +74,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11'}}
+      if: ${{matrix.php-versions == '8.4' && matrix.db-types == 'mariadb:10.11'}}
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/phpunit
@@ -187,7 +187,7 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'composer install', 'composer lock check']
-        php-versions: ['8.2']
+        php-versions: ['8.4']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
