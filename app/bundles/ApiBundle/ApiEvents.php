@@ -77,4 +77,13 @@ final class ApiEvents
      * @var string
      */
     public const API_POST_SERIALIZATION_CONTEXT = 'mautic.api_post_serialization_context';
+
+    /**
+     * The mautic.api_platform_permission_context event is dispatched before API Platform permission checks are evaluated.
+     *
+     * The event listener receives a Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent instance.
+     *
+     * @var string
+     */
+    public const API_PLATFORM_PERMISSION_CONTEXT = 'mautic.api_platform_permission_context';
 }

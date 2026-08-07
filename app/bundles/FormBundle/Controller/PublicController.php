@@ -51,16 +51,13 @@ final class PublicController extends CommonFormController
 
     private array $tokens = [];
 
-    /**
-     * @return RedirectResponse|Response
-     */
     public function submitAction(
         Request $request,
         DateHelper $dateTemplateHelper,
         PageTokenHelper $pageTokenHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
-    ) {
+    ): Response {
         if ('POST' !== $request->getMethod()) {
             $this->throwAccessDenied();
         }

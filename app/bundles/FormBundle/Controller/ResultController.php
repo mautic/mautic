@@ -386,10 +386,7 @@ final class ResultController extends CommonFormController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
     }
