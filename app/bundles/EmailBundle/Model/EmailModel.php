@@ -317,12 +317,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param string|null $action
+     * @param array       $options
+     *
      * @return FormInterface<Email>
      */
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
         }

@@ -108,10 +108,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
         }

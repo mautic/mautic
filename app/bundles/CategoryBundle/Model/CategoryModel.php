@@ -90,10 +90,12 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         parent::saveEntity($entity, $unlock);
     }
 
-    public function createForm($entity, mixed ...$args): FormInterface
+    /**
+     * @param string|null $action
+     * @param array       $options
+     */
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
         }

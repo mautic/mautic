@@ -76,14 +76,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param object $entity
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
         }

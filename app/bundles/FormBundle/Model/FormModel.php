@@ -90,10 +90,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
         }

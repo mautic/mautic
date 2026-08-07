@@ -28,12 +28,12 @@ final class TagModel extends BaseTagModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Tag $entity
+     * @param Tag         $entity
+     * @param string|null $action
+     * @param array       $options
      */
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
         }

@@ -85,14 +85,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @param object $entity
+     * @param object  $entity
+     * @param mixed[] $options
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, mixed ...$args): FormInterface
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!empty($action)) {
             $options['action'] = $action;
         }

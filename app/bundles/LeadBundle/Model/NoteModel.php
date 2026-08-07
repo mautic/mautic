@@ -55,10 +55,12 @@ final class NoteModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function createForm($entity, mixed ...$args): FormInterface
+    /**
+     * @param string|null $action
+     * @param array       $options
+     */
+    public function createForm($entity, $action = null, $options = []): FormInterface
     {
-        [$action, $options] = $this->resolveCreateFormArgs($args);
-
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
         }
