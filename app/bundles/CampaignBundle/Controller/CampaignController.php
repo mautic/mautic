@@ -169,7 +169,7 @@ class CampaignController extends AbstractStandardFormController
             return new JsonResponse([
                 'error'   => $this->translator->trans('mautic.campaign.error.export.file_not_found', ['%path%' => $filePath], 'flashes'),
                 'flashes' => $this->getFlashContent(),
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
@@ -260,7 +260,7 @@ class CampaignController extends AbstractStandardFormController
             return new JsonResponse([
                 'error'   => $this->translator->trans('mautic.campaign.error.export.no_campaigns_selected', [], 'flashes'),
                 'flashes' => $this->getFlashContent(),
-            ], 400);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         foreach ($objectIds as $objectId) {

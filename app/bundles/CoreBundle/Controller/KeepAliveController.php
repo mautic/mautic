@@ -10,6 +10,6 @@ final class KeepAliveController
 {
     public function keepAliveAction(): Response
     {
-        return new Response('', 200);
+        return new Response('', Response::HTTP_OK);
     }
 }

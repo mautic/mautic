@@ -698,7 +698,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertEquals(403, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
 
         $this->em->refresh($segment);
         $this->assertTrue($segment->isPublished());

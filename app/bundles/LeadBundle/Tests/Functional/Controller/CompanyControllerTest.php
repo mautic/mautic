@@ -25,7 +25,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request('GET', '/s/companies/merge/1');
         $clientResponse         = $this->client->getResponse();
-        $this->assertEquals(403, $clientResponse->getStatusCode());
+        $this->assertEquals(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode());
     }
 
     private function createAndLoginUser(): User

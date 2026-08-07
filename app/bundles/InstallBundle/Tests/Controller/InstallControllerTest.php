@@ -91,6 +91,6 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(PathsHelper::class),
             InstallService::CHECK_STEP
         );
-        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_FOUND, $response->getStatusCode());
     }
 }

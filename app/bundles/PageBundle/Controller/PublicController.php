@@ -109,7 +109,7 @@ final class PublicController extends AbstractFormController
                 if ($requestUri != $url) {
                     $model->hitPage($entity, $request, 301, $lead, $query);
 
-                    return $this->redirect($url, 301);
+                    return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
                 }
             }
 
@@ -121,7 +121,7 @@ final class PublicController extends AbstractFormController
                 $model->hitPage($entity, $request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
-                return $this->redirect($url, 301);
+                return $this->redirect($url, Response::HTTP_MOVED_PERMANENTLY);
             }
 
             // First determine the A/B test to display if applicable
@@ -236,7 +236,7 @@ final class PublicController extends AbstractFormController
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
 
-                            return $this->redirect($url, 302);
+                            return $this->redirect($url, Response::HTTP_FOUND);
                         }
                     }
                 }

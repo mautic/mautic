@@ -22,7 +22,7 @@ final class JsController extends CommonController
 
         return new Response(
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-            200,
+            Response::HTTP_OK,
             [
                 'Content-Type' => 'application/json',
             ]
@@ -33,7 +33,7 @@ final class JsController extends CommonController
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",
-            200,
+            Response::HTTP_OK,
             [
                 'Service-Worker-Allowed' => '/',
                 'Content-Type'           => 'application/javascript',
@@ -45,7 +45,7 @@ final class JsController extends CommonController
     {
         return new Response(
             "importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.js');",
-            200,
+            Response::HTTP_OK,
             [
                 'Service-Worker-Allowed' => '/',
                 'Content-Type'           => 'application/javascript',
