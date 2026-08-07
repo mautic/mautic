@@ -424,10 +424,8 @@ final class CategoryController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, ?string $bundle, $objectId)
+    public function deleteAction(Request $request, ?string $bundle, $objectId): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
