@@ -284,8 +284,6 @@ final class ReportController extends FormController
      *
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
-     *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
     {
@@ -854,8 +852,6 @@ final class ReportController extends FormController
     /**
      * @param int    $reportId
      * @param string $format
-     *
-     * @return BinaryFileResponse
      *
      * @throws \Exception
      */

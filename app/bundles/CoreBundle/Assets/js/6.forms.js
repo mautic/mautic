@@ -447,8 +447,9 @@ Mautic.updateEntitySelect = function (response) {
     if (response.id) {
         // New entity added through a popup so update the chosen
         var newOption = mQuery('<option />').val(response.id);
-        newOption.html(response.name);
         var el = '#' + response.updateSelect;
+        var optionName = response.optionLabel || response.name;
+        newOption.html(optionName);
 
         var sortOptions = function (options) {
             return options.sort(function (a, b) {
@@ -488,7 +489,7 @@ Mautic.updateEntitySelect = function (response) {
                     var firstOptions = mQuery(this).children();
                     for (var i = 0; i < firstOptions.length; i++) {
                         if (firstOptions[i].value === response.id.toString()) {
-                            firstOptions[i].text = response.name;
+                            firstOptions[i].text = optionName;
                             isUpdateOption = true;
                             break;
                         }
@@ -531,8 +532,7 @@ Mautic.updateEntitySelect = function (response) {
         }
 
         newOption.prop('selected', true);
-        mQueryParent(el).trigger("chosen:updated");
-        mQueryParent(el).val(response.id).trigger("change");
+        mQueryParent(el).val(response.id).trigger("chosen:updated").trigger("change");
     }
 
     if (window.opener) {
