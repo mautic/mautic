@@ -42,16 +42,16 @@ final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTes
         $this->client->request(Request::METHOD_GET, '/');
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker = static::getContainer()->get(ContactTracker::class);
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
         $contactTracker->setUseSystemContact(true);
         $contactTracker->setSystemContact($lead);
 
         /** @var FormModel $formModel */
-        $formModel = static::getContainer()->get(FormModel::class);
+        $formModel = self::getContainer()->get(FormModel::class);
         $form      = $formModel->getEntity($formId);
 
         /** @var RequestStack $requestStack */
-        $requestStack = static::getContainer()->get(RequestStack::class);
+        $requestStack = self::getContainer()->get(RequestStack::class);
         $requestStack->push(Request::create('/form/'.$formId, Request::METHOD_GET));
 
         try {
