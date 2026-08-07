@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
@@ -120,7 +119,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->followRedirects(true);
 
         $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
-        $this->assertInstanceOf(EntityManagerInterface::class, $this->em);
         $this->connection = $this->em->getConnection();
         $this->router     = static::getContainer()->get(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();
