@@ -266,7 +266,7 @@ final class ConfigType extends AbstractType
                     new NotBlank(
                         message: 'mautic.core.email.required'
                     ),
-                    new EmailOrEmailTokenList(['allowMultiple' => false]),
+                    new EmailOrEmailTokenList(allowMultiple: false),
                 ],
             ]
         );

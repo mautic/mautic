@@ -13,8 +13,6 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\SubmitButton;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -494,10 +492,8 @@ final class MonitoringController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
+    public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
             $this->throwAccessDenied();
@@ -603,7 +599,7 @@ final class MonitoringController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->monitoringModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -628,15 +624,13 @@ final class MonitoringController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1,
-    ) {
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

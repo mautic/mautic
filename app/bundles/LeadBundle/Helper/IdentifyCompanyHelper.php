@@ -27,14 +27,14 @@ final class IdentifyCompanyHelper
             return [null, false, null];
         }
 
-        if (!empty($companies)) {
+        if ([] !== $companies) {
             $companyEntity = end($companies);
             $companyData   = $companyEntity->getProfileFields();
 
             if ($lead) {
                 $companyLeadRepo = $companyModel->getCompanyLeadRepository();
                 $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
-                if (!empty($companyLead)) {
+                if ([] !== $companyLead) {
                     $addContactToCompany = false;
                 }
             }
@@ -66,7 +66,7 @@ final class IdentifyCompanyHelper
         }
 
         $companyData     = $parameters;
-        if (!empty($companyEntities)) {
+        if ([] !== $companyEntities) {
             $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
         }

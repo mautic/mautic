@@ -44,7 +44,7 @@ class LanguageHelper
      */
     public function getSupportedLanguages(): array
     {
-        if (!empty($this->supportedLanguages)) {
+        if ([] !== $this->supportedLanguages) {
             return $this->supportedLanguages;
         }
 
@@ -298,7 +298,7 @@ class LanguageHelper
 
         foreach (array_merge($mauticBundles, $pluginBundles) as $bundle) {
             // Apply the bundle filter.
-            if (!empty($forBundles) && !in_array($bundle['bundle'], $forBundles)) {
+            if ([] !== $forBundles && !in_array($bundle['bundle'], $forBundles)) {
                 continue;
             }
 

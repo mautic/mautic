@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final readonly class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadFieldRepository $leadFieldRepository,
+        private LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

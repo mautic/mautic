@@ -63,7 +63,7 @@ final readonly class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
                 'properties' => ['type' => 'select', 'list' => $choices],

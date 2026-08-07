@@ -29,7 +29,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
     public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
     {
         /** @var FormModel $formModel */
-        $formModel = static::getContainer()->get(FormModel::class);
+        $formModel = self::getContainer()->get(FormModel::class);
 
         // Parent session key must contain 'new' so FormConditionalSubscriber resolves it to a persisted field ID.
         $sessionFields = ConditionalFieldOrderTestData::createSessionFields([

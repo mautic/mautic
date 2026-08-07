@@ -37,9 +37,9 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->listModel  = static::getContainer()->get(ListModel::class);
-        $this->prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator = static::getContainer()->get(TranslatorInterface::class);
+        $this->listModel  = self::getContainer()->get(ListModel::class);
+        $this->prefix     = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->translator = self::getContainer()->get(TranslatorInterface::class);
     }
 
     protected function beforeBeginTransaction(): void

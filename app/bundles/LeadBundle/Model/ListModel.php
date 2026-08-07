@@ -94,7 +94,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
     public function getRepository(): LeadListRepository
     {
         $this->leadListRepository->setDispatcher($this->dispatcher);
-        $this->leadListRepository->setTranslator($this->translator);
 
         return $this->leadListRepository;
     }
@@ -626,7 +625,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($searchForLists)) {
+            if ([] !== $searchForLists) {
                 $listEntities = $this->getEntities([
                     'filter' => [
                         'force' => [
@@ -713,7 +712,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if (!empty($persistLists)) {
+        if ([] !== $persistLists) {
             $this->getRepository()->saveEntities($persistLists);
         }
 
@@ -723,7 +722,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
@@ -763,7 +762,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($searchForLists)) {
+            if ([] !== $searchForLists) {
                 $listEntities = $this->getEntities([
                     'filter' => [
                         'force' => [
@@ -837,11 +836,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($listLead);
         }
 
-        if (!empty($persistLists)) {
+        if ([] !== $persistLists) {
             $this->getRepository()->saveEntities($persistLists);
         }
 
-        if (!empty($deleteLists)) {
+        if ([] !== $deleteLists) {
             $this->getRepository()->deleteEntities($deleteLists);
         }
 
@@ -852,7 +851,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
@@ -1440,7 +1439,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $criteria['createdBy'] = $this->userHelper->getUser()->getId();
         }
 
-        if (!empty($segmentsFilter)) {
+        if ([] !== $segmentsFilter) {
             $criteria['id'] = $segmentsFilter;
         }
 

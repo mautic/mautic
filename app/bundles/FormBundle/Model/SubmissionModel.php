@@ -180,7 +180,7 @@ final class SubmissionModel extends CommonFormModel
 
             if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
-                if (!empty($captcha)) {
+                if ([] !== $captcha) {
                     $props = $f->getProperties();
                     // check for a custom message
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
@@ -319,12 +319,12 @@ final class SubmissionModel extends CommonFormModel
         }
 
         // return errors if there any
-        if (!empty($validationErrors)) {
+        if ([] !== $validationErrors) {
             return ['errors' => $validationErrors];
         }
 
         // Create/update lead
-        if (!empty($leadFieldMatches)) {
+        if ([] !== $leadFieldMatches) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
@@ -1146,7 +1146,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
-        if (!empty($companyFieldMatches)) {
+        if ([] !== $companyFieldMatches) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             $companyChangeLog                      = null;
             if ($leadAdded) {
@@ -1177,7 +1177,7 @@ final class SubmissionModel extends CommonFormModel
     protected function validateFieldValue(Field $field, $value)
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
-        if (!empty($standardValidation)) {
+        if ([] !== $standardValidation) {
             return $standardValidation;
         }
 
