@@ -109,7 +109,6 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             [$eventOne->getId(), $eventTwo->getId(), $eventThree->getId()],
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
-        $this->assertInstanceOf(Lead::class, $leadTwo);
 
         $this->assertEquals(new CountResult(1, $leadTwo->getId(), $leadTwo->getId()), $result, 'Only lead two should match as it is the only one who has a non-matching rotation.');
     }

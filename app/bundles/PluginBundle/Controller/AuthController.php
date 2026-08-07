@@ -15,8 +15,6 @@ final class AuthController extends FormController
 {
     /**
      * @param string $integration
-     *
-     * @return JsonResponse
      */
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
     {

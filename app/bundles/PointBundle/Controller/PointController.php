@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -203,10 +202,8 @@ final class PointController extends AbstractFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): Response
     {
         $entity = $this->pointModel->getEntity($objectId);
 
@@ -354,10 +351,8 @@ final class PointController extends AbstractFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.point.page', 1);
         $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $page]);
