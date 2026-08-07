@@ -3,8 +3,6 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,10 +28,8 @@ final class GroupController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -53,20 +49,16 @@ final class GroupController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }
