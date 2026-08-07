@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'menu' => [
         'admin' => [
@@ -124,57 +126,6 @@ return [
             'mautic_saml_login_retry' => [
                 'path'       => '/saml/login_retry',
                 'controller' => 'Mautic\UserBundle\Controller\SecurityController::samlLoginRetryAction',
-            ],
-        ],
-    ],
-
-    'services' => [
-        'other' => [
-            // Authentication
-            'mautic.user.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\User::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.permission.manager' => [
-                'class'     => Doctrine\ORM\EntityManager::class,
-                'arguments' => Mautic\UserBundle\Entity\Permission::class,
-                'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.security.logout_handler' => [
-                'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
-                'tagArguments' => [
-                    'event'      => Symfony\Component\Security\Http\Event\LogoutEvent::class,
-                ],
-                'tag'          => 'kernel.event_listener',
-                'arguments'    => [
-                    'mautic.user.model.user',
-                    'event_dispatcher',
-                    'mautic.helper.user',
-                ],
-            ],
-
-            'mautic.security.saml.entity_descriptor_provider' => [
-                'class'     => LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder::class,
-                'factory'   => [Mautic\UserBundle\Security\SAML\EntityDescriptorProviderFactory::class, 'build'],
-                'arguments' => [
-                    '%lightsaml.own.entity_id%',
-                    'router',
-                    '%lightsaml.route.login_check%',
-                    'lightsaml.own.credential_store',
-                ],
-            ],
-
-            'mautic.security.saml.username_mapper' => [
-                'class'     => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
-                'arguments' => [
-                    [
-                        'email'     => '%mautic.saml_idp_email_attribute%',
-                        'username'  => '%mautic.saml_idp_username_attribute%',
-                        'firstname' => '%mautic.saml_idp_firstname_attribute%',
-                        'lastname'  => '%mautic.saml_idp_lastname_attribute%',
-                    ],
-                ],
             ],
         ],
     ],

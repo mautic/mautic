@@ -48,7 +48,7 @@ final class TableHeaderTest extends TestCase
             },
         ];
 
-        return (string) $this->twig->render('tableheader.html.twig', $context);
+        return $this->twig->render('tableheader.html.twig', $context);
     }
 
     public function testTooltipIsRenderedOnNonSortableHeaderWithoutSessionVar(): void

@@ -15,8 +15,9 @@ class AuditLogModel extends AbstractCommonModel
     private AuditLogRepository $auditLogRepository;
 
     #[Required]
-    public function autowireAuditLogModel(AuditLogRepository $auditLogRepository): void
-    {
+    public function autowireAuditLogModel(
+        AuditLogRepository $auditLogRepository,
+    ): void {
         $this->auditLogRepository = $auditLogRepository;
     }
 

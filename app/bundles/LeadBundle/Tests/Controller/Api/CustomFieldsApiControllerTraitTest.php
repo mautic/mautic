@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Form;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
@@ -65,7 +66,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     /**
      * @param array<string, mixed> $expectedParameters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('numericValueProvider')]
+    #[DataProvider('numericValueProvider')]
     public function testSetCustomFieldValuesFiltersOnlyNumericZero(mixed $value, array $expectedParameters): void
     {
         $model = new class() {

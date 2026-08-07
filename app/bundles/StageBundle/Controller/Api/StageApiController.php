@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Stage>
  */
-class StageApiController extends CommonApiController
+final class StageApiController extends CommonApiController
 {
     use LeadAccessTrait;
 

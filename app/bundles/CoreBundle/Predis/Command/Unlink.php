@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Predis\Command;
 use Predis\Command\Command;
 use Predis\Command\PrefixableCommandInterface;
 
-class Unlink extends Command implements PrefixableCommandInterface
+final class Unlink extends Command implements PrefixableCommandInterface
 {
     public const ID = 'UNLINK';
 

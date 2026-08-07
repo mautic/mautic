@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Stats\FetchOptions;
 
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 
-class EmailStatOptions extends FetchOptions
+final class EmailStatOptions extends FetchOptions
 {
     private array $ids = [];
 

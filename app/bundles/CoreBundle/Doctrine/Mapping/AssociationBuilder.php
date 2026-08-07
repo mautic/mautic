@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 /**
@@ -8,7 +10,7 @@ namespace Mautic\CoreBundle\Doctrine\Mapping;
  *
  * Also gives support for allowing a many-to-one to be the primary key
  */
-class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilder
+final class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilder
 {
     /**
      * Set orphanRemoval.

@@ -50,8 +50,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
     public function testInjectViewCustomContentExitsWhenPluginNotPublished(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
+        $requestStack = new RequestStack([new Request()]);
         $this->config->method('isPublished')->willReturn(false);
 
         $subscriber = new InjectCustomContentSubscriber($this->config, $this->createStub(GrapesJsBuilderModel::class), $this->twig, $requestStack, $this->router, $this->grapesJsBuilderRepository);
@@ -71,8 +70,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
         ]);
         $request->setMethod('POST');
 
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
+        $requestStack = new RequestStack([$request]);
 
         $this->grapesJsBuilderRepository->method('findOneBy')->willReturn(null);
 
@@ -93,8 +91,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
     public function testInjectViewCustomContentUsesStoredMjmlOnGet(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET']));
+        $requestStack = new RequestStack([new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET'])]);
 
         $grapesJsBuilder = $this->createMock(GrapesJsBuilder::class);
         $grapesJsBuilder->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
@@ -118,8 +115,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
     public function testInjectViewCustomContentInjectsPageHeaderVars(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
+        $requestStack = new RequestStack([new Request()]);
 
         $this->config->method('isPublished')->willReturn(true);
 

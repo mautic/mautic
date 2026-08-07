@@ -6,12 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TableSchemaColumnsCache
 {
-    private array $cache;
+    private array $cache = [];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
     ) {
-        $this->cache         = [];
     }
 
     /**

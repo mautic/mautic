@@ -41,7 +41,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Lead>
  */
-class LeadApiController extends CommonApiController
+final class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
@@ -404,10 +404,8 @@ class LeadApiController extends CommonApiController
 
     /**
      * Adds a DNC to the contact.
-     *
-     * @return Response
      */
-    public function addDncAction(Request $request, $id, $channel)
+    public function addDncAction(Request $request, $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -476,10 +474,8 @@ class LeadApiController extends CommonApiController
      * @param int              $id
      * @param string           $method
      * @param array<mixed>|int $data
-     *
-     * @return Response
      */
-    protected function applyUtmTagsAction($id, $method, $data)
+    protected function applyUtmTagsAction($id, $method, $data): Response
     {
         $entity = $this->model->getEntity((int) $id);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -324,115 +326,6 @@ return [
     'categories' => [
         'segment' => [
             'class' => Mautic\LeadBundle\Entity\LeadList::class,
-        ],
-    ],
-    'services' => [
-        'events' => [
-            'mautic.lead.serializer.subscriber' => [
-                'class'     => Mautic\LeadBundle\EventListener\SerializerSubscriber::class,
-                'arguments' => [
-                    'request_stack',
-                ],
-                'tag'          => 'jms_serializer.event_subscriber',
-                'tagArguments' => [
-                    'event' => JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
-                ],
-            ],
-        ],
-        'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator::class,
-                'arguments' => ['mautic.lead.model.list'],
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
-            Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
-                'tag'       => 'validator.constraint_validator',
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.helper.field.alias',
-                    '@doctrine.orm.entity_manager',
-                    'translator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class => [
-                'class'     => Mautic\CoreBundle\Form\Validator\Constraints\FileEncodingValidator::class,
-                'tag'       => 'validator.constraint_validator',
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.helper.field.alias',
-                ],
-            ],
-            'mautic.lead.constraint.alias' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class,
-                'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'uniqueleadlist',
-            ],
-            'mautic.lead_list.constraint.in_use' => [
-                'class'     => Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUseValidator::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                ],
-                'tag'   => 'validator.constraint_validator',
-                'alias' => 'segment_in_use',
-            ],
-        ],
-        'helpers' => [
-            'mautic.helper.twig.avatar' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\AvatarHelper::class,
-                'arguments' => [
-                    'twig.helper.assets',
-                    'mautic.helper.paths',
-                    'mautic.helper.twig.gravatar',
-                    'mautic.helper.twig.default_avatar',
-                ],
-                'alias' => 'lead_avatar',
-            ],
-            'mautic.helper.twig.default_avatar' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
-                'arguments' => [
-                    'twig.helper.assets',
-                ],
-                'alias' => 'default_avatar',
-            ],
-            'mautic.helper.twig.dnc_reason' => [
-                'class'     => Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class,
-                'arguments' => ['translator'],
-                'alias'     => 'lead_dnc_reason',
-            ],
-        ],
-        'fixtures' => [
-            'mautic.lead.fixture.test.page_hit' => [
-                'class'    => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
-                'tag'      => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional' => true,
-            ],
-            'mautic.lead.fixture.test.segment' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.click' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.dnc' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
-            ],
-            'mautic.lead.fixture.test.tag' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional'  => true,
-            ],
         ],
     ],
     'parameters' => [

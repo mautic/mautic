@@ -7,7 +7,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-class TagRepository extends BaseTagRepository
+final class TagRepository extends BaseTagRepository
 {
     /**
      * @return string[][]
