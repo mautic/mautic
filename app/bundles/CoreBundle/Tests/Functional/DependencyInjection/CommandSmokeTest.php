@@ -11,7 +11,7 @@ final class CommandSmokeTest extends AbstractContainerSmokeTestCase
     /**
      * There are 63 local commands in the container, keep a small reserve for removed ones.
      */
-    private const MINIMAL_COMMAND_COUNT = 60;
+    private const int MINIMAL_COMMAND_COUNT = 60;
 
     public function testAllCommandsCanBeCreated(): void
     {

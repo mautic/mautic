@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class TagControllerTest extends MauticMysqlTestCase
 {
-    private const MERGE_ROUTE_BASE = '/s/tags/merge/';
+    private const string MERGE_ROUTE_BASE = '/s/tags/merge/';
 
     private TagRepository $tagRepository;
 

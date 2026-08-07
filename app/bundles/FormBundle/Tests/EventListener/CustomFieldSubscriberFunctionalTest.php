@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    private const CUSTOM_FIELD_ALIAS = 'test_select_field';
+    private const string CUSTOM_FIELD_ALIAS = 'test_select_field';
 
     protected $useCleanupRollback = false;
 

@@ -30,7 +30,7 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
      *
      * @var string[]
      */
-    private const SKIPPED_SERVICE_IDS = [
+    private const array SKIPPED_SERVICE_IDS = [
         // requires a database connection in the constructor
         DynamicContentFilterEntryType::class,
         DynamicContentType::class,

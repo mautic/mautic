@@ -18,7 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class SyncCommandTest extends TestCase
 {
-    private const INTEGRATION_NAME = 'Test';
+    private const string INTEGRATION_NAME = 'Test';
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface

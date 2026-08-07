@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 final class MauticCoreExtension extends Extension
 {
-    public const DEFAULT_EXCLUDES = [
+    public const array DEFAULT_EXCLUDES = [
         'Config',
         'Crate',
         'DataObject',

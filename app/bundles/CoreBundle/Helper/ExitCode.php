@@ -14,21 +14,21 @@ final class ExitCode
     /**
      * The command completed successfully.
      */
-    public const SUCCESS = Command::SUCCESS;
+    public const int SUCCESS = Command::SUCCESS;
 
     /**
      * The command exited with some kind of error.
      */
-    public const FAILURE = Command::FAILURE;
+    public const int FAILURE = Command::FAILURE;
 
     /**
      * Indicating something that is not really an error. This means that a mailer
      * (e.g.) could not create a connection, and the request should be reattempted later.
      */
-    public const TEMPORARY_FAILURE = 75;
+    public const int TEMPORARY_FAILURE = 75;
 
     /**
      * The command was terminated with the SIGTERM signal.
      */
-    public const TERMINATED = 143;
+    public const int TERMINATED = 143;
 }

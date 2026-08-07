@@ -19,10 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class RemoveAnonymousContactsCommand extends Command
 {
-    /**
-     * @var string
-     */
-    public const COMMAND_NAME = 'mautic:remove:anonymous_contacts';
+    public const string COMMAND_NAME = 'mautic:remove:anonymous_contacts';
 
     public function __construct(
         private readonly ListLeadRepository $listLeadRepository,

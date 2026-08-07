@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 )]
 final class EntityExportCommand extends ModeratedCommand
 {
-    public const COMMAND_NAME = 'mautic:entity:export';
+    public const string COMMAND_NAME = 'mautic:entity:export';
 
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,

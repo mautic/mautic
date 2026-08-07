@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 final readonly class CampaignContactCountHelper
 {
-    private const CACHE_TTL = 43200;
+    private const int CACHE_TTL = 43200;
 
     public function __construct(
         private CacheProviderInterface $cacheProvider,

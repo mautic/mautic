@@ -14,15 +14,9 @@ final class NotificationControllerTest extends MauticMysqlTestCase
 {
     use NotificationTrait;
 
-    /**
-     * @var string
-     */
-    private const REST_API_ID = 'restApiID';
+    private const string REST_API_ID = 'restApiID';
 
-    /**
-     * @var string
-     */
-    private const API_ID = 'apiID';
+    private const string API_ID = 'apiID';
 
     /**
      * Smoke test to ensure the '/s/notifications' route loads.

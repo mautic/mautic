@@ -14,7 +14,7 @@ use Mautic\MarketplaceBundle\Exception\ApiException;
  */
 class Allowlist
 {
-    private const MARKETPLACE_ALLOWLIST_CACHE_KEY = 'marketplace_allowlist';
+    private const string MARKETPLACE_ALLOWLIST_CACHE_KEY = 'marketplace_allowlist';
 
     public function __construct(
         private readonly Config $config,

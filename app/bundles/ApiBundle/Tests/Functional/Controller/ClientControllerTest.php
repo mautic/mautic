@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ClientControllerTest extends MauticMysqlTestCase
 {
-    private const TOTAL_COUNT = 6;
+    private const int TOTAL_COUNT = 6;
 
     #[RunInSeparateProcess]
     public function testIndexActionForPager(): void

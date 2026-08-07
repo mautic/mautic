@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class AssetsSubscriber implements EventSubscriberInterface
 {
-    private const ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const string ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 
     public function __construct(
         private Config $config,

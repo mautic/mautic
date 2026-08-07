@@ -11,11 +11,11 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class FieldChangeRepositoryTest extends MauticMysqlTestCase
 {
-    private const INTEGRATION = 'someIntegration';
+    private const string INTEGRATION = 'someIntegration';
 
-    private const COLUMN_NAME = 'some_column';
+    private const string COLUMN_NAME = 'some_column';
 
-    private const OBJECT_ID   = 100;
+    private const int OBJECT_ID   = 100;
 
     private FieldChangeRepository $repository;
 

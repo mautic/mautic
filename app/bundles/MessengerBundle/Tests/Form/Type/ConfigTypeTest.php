@@ -10,13 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ConfigTypeTest extends MauticMysqlTestCase
 {
-    private const MULTIPLIER_FIELD = 'config[messengerconfig][messenger_retry_strategy_multiplier]';
+    private const string MULTIPLIER_FIELD = 'config[messengerconfig][messenger_retry_strategy_multiplier]';
 
     /**
      * The multiplier uses GreaterThanOrEqual(1); the other retry fields use
      * GreaterThanOrEqual(0), so this exact message is unique to the multiplier.
      */
-    private const MIN_MULTIPLIER_ERROR = 'greater than or equal to 1';
+    private const string MIN_MULTIPLIER_ERROR = 'greater than or equal to 1';
 
     /**
      * Regression for https://github.com/mautic/mautic/issues/16017.

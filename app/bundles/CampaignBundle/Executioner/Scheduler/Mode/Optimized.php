@@ -10,14 +10,14 @@ use Mautic\LeadBundle\Services\PeakInteractionTimer;
 
 final readonly class Optimized implements ScheduleModeInterface
 {
-    public const OPTIMIZED_TIME         = 0;
+    public const int OPTIMIZED_TIME         = 0;
 
-    public const OPTIMIZED_DAY_AND_TIME = 1;
+    public const int OPTIMIZED_DAY_AND_TIME = 1;
 
     /**
      * @var string[]
      */
-    public const AVAILABLE_FOR_EVENTS = ['email.send', 'message.send', 'plugin.leadpush', 'campaign.sendwebhook'];
+    public const array AVAILABLE_FOR_EVENTS = ['email.send', 'message.send', 'plugin.leadpush', 'campaign.sendwebhook'];
 
     public function __construct(
         private PeakInteractionTimer $peakInteractionTimer,

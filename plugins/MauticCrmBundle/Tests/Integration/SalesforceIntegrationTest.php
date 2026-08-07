@@ -21,15 +21,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
-    public const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
+    public const string SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
 
-    public const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
+    public const string SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
 
-    public const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
+    public const string SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
 
-    public const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
+    public const string SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
 
-    public const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
+    public const string SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
     /**
      * @var array<string, int>

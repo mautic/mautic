@@ -6,7 +6,7 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 final class TwitterIntegration extends SocialIntegration
 {
-    public const NAME = 'Twitter';
+    public const string NAME = 'Twitter';
 
     public function getName(): string
     {

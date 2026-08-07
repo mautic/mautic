@@ -17,7 +17,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    private const TEST_PAYLOAD = [
+    private const array TEST_PAYLOAD = [
         'name'        => 'API form',
         'description' => 'Form created via API test',
         'formType'    => 'standalone',

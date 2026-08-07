@@ -6,7 +6,7 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
 final readonly class ReportCleanup
 {
-    public const KEEP_FILE_DAYS = 7;
+    public const int KEEP_FILE_DAYS = 7;
 
     public function __construct(
         private FileHandler $fileHandler,

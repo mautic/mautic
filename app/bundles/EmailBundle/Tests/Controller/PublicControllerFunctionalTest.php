@@ -32,7 +32,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Tests that use the classic unsubscribe page. Not preference center.
      */
-    private const UNSUBSCRIBE_TESTS = [
+    private const array UNSUBSCRIBE_TESTS = [
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
         'testHeadRequestWithNoShowContactPreferences',

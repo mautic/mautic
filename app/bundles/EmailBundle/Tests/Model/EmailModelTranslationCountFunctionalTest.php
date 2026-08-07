@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 final class EmailModelTranslationCountFunctionalTest extends MauticMysqlTestCase
 {
-    private const CONTACT_COUNT = 10;
+    private const int CONTACT_COUNT = 10;
 
     public function testEmailTranslationCount(): void
     {

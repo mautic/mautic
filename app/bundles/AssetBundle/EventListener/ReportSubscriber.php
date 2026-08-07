@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_ASSET          = 'assets';
+    public const string CONTEXT_ASSET          = 'assets';
 
-    public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
+    public const string CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     public function __construct(
         private CompanyReportData $companyReportData,

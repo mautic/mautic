@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class NotWeak extends Constraint
 {
-    public const TOO_WEAK = 'f61e730a-284e-11eb-adc1-0242ac120002';
+    public const string TOO_WEAK = 'f61e730a-284e-11eb-adc1-0242ac120002';
 
     protected const ERROR_NAMES = [
         self::TOO_WEAK => 'PASSWORD_TOO_WEAK_ERROR',

@@ -8,7 +8,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 final class BouncedHelper extends AbstractHelper
 {
-    public const NAME = 'email-bounced';
+    public const string NAME = 'email-bounced';
 
     public function getName(): string
     {

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class ProcessWebhookQueuesCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:webhooks:process';
+    public const string COMMAND_NAME = 'mautic:webhooks:process';
 
     public function __construct(
         private readonly WebhookModel $webhookModel,

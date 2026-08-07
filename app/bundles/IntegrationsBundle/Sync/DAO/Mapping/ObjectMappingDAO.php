@@ -6,11 +6,11 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 final class ObjectMappingDAO
 {
-    public const SYNC_TO_MAUTIC       = 'mautic';
+    public const string SYNC_TO_MAUTIC       = 'mautic';
 
-    public const SYNC_TO_INTEGRATION  = 'integration';
+    public const string SYNC_TO_INTEGRATION  = 'integration';
 
-    public const SYNC_BIDIRECTIONALLY = 'bidirectional';
+    public const string SYNC_BIDIRECTIONALLY = 'bidirectional';
 
     private array $internalIdMapping = [];
 

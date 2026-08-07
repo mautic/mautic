@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
-    private const SEGMENTS_ROUTE = '/s/segments';
+    private const string SEGMENTS_ROUTE = '/s/segments';
 
     private User $nonAdminUser;
 

@@ -12,7 +12,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class MonitoringControllerTest extends MauticMysqlTestCase
 {
-    public const USERNAME = 'jhony';
+    public const string USERNAME = 'jhony';
 
     public function testIndex(): void
     {

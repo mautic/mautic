@@ -41,10 +41,8 @@ final class CheckStep implements StepInterface
 
     /**
      * Recommended minimum memory limit for Mautic.
-     *
-     * @var string
      */
-    public const RECOMMENDED_MEMORY_LIMIT = '512M';
+    public const string RECOMMENDED_MEMORY_LIMIT = '512M';
 
     /**
      * @param Configurator $configurator Configurator service

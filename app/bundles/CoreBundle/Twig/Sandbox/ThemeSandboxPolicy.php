@@ -24,7 +24,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const DENIED_FUNCTIONS = [
+    private const array DENIED_FUNCTIONS = [
         'configGetParameter', // leaks DB password, secret key, etc.
         'getEntity',          // arbitrary ORM data extraction
         'getEntities',        // arbitrary ORM data extraction
@@ -44,7 +44,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const DENIED_FILTERS = [
+    private const array DENIED_FILTERS = [
         'map',    // {{ ['id']|map('system')|join }} → RCE
         'reduce', // {{ ['id']|reduce('system') }} → RCE
         'filter', // {{ ['id']|filter('system') }} → RCE

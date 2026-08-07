@@ -35,7 +35,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    private const IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
+    private const string IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
 
     public function testImportWithoutFile(): void
     {

@@ -18,11 +18,11 @@ final class EntityImportEvent extends Event
      */
     private array $dependencies = [];
 
-    public const UPDATE = 'update';
+    public const string UPDATE = 'update';
 
-    public const NEW    = 'new';
+    public const string NEW    = 'new';
 
-    public const ERRORS = 'errors';
+    public const string ERRORS = 'errors';
 
     /**
      * @var array<string, array<string, mixed>>

@@ -14,11 +14,11 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
  */
 final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
-    public const INTEGRATION        = 'someIntegration';
+    public const string INTEGRATION        = 'someIntegration';
 
-    public const INTEGRATION_ENTITY = 'someIntegrationEntity';
+    public const string INTEGRATION_ENTITY = 'someIntegrationEntity';
 
-    public const INTERNAL_ENTITY    = 'lead';
+    public const string INTERNAL_ENTITY    = 'lead';
 
     private string $prefix;
 

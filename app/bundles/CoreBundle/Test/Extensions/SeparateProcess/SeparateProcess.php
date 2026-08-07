@@ -26,7 +26,7 @@ final class SeparateProcess implements Extension
      */
     private array $problematicTests = [];
 
-    private const PROBLEMATIC_CONSTANTS = [
+    private const array PROBLEMATIC_CONSTANTS = [
         'MAUTIC_INTEGRATION_SYNC_IN_PROGRESS',
     ];
 

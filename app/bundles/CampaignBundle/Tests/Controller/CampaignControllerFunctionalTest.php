@@ -17,9 +17,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
-    private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
+    private const string CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
-    private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
+    private const string CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
     private CampaignModel $campaignModel;
 

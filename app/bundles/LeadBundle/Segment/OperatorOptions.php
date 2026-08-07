@@ -6,63 +6,63 @@ namespace Mautic\LeadBundle\Segment;
 
 final class OperatorOptions
 {
-    public const EQUAL_TO              = '=';
+    public const string EQUAL_TO              = '=';
 
-    public const NOT_EQUAL_TO          = '!=';
+    public const string NOT_EQUAL_TO          = '!=';
 
-    public const GREATER_THAN          = 'gt';
+    public const string GREATER_THAN          = 'gt';
 
-    public const GREATER_THAN_OR_EQUAL = 'gte';
+    public const string GREATER_THAN_OR_EQUAL = 'gte';
 
-    public const LESS_THAN             = 'lt';
+    public const string LESS_THAN             = 'lt';
 
-    public const LESS_THAN_OR_EQUAL    = 'lte';
+    public const string LESS_THAN_OR_EQUAL    = 'lte';
 
-    public const EMPTY                 = 'empty';
+    public const string EMPTY                 = 'empty';
 
-    public const NOT_EMPTY             = '!empty';
+    public const string NOT_EMPTY             = '!empty';
 
-    public const LIKE                  = 'like';
+    public const string LIKE                  = 'like';
 
-    public const NOT_LIKE              = '!like';
+    public const string NOT_LIKE              = '!like';
 
-    public const BETWEEN               = 'between';
+    public const string BETWEEN               = 'between';
 
-    public const NOT_BETWEEN           = '!between';
+    public const string NOT_BETWEEN           = '!between';
 
     /**
      * @deprecated Use OperatorOptions::INCLUDING_ANY
      */
-    public const IN                    = 'in';
+    public const string IN                    = 'in';
 
     /**
      * @deprecated Use OperatorOptions::EXCLUDING_ANY
      */
-    public const NOT_IN                = '!in';
+    public const string NOT_IN                = '!in';
 
-    public const INCLUDING_ANY         = 'in';
+    public const string INCLUDING_ANY         = 'in';
 
-    public const EXCLUDING_ANY         = '!in';
+    public const string EXCLUDING_ANY         = '!in';
 
-    public const INCLUDING_ALL         = 'in_all';
+    public const string INCLUDING_ALL         = 'in_all';
 
-    public const EXCLUDING_ALL         = '!in_all';
+    public const string EXCLUDING_ALL         = '!in_all';
 
-    public const REGEXP                = 'regexp';
+    public const string REGEXP                = 'regexp';
 
-    public const NOT_REGEXP            = '!regexp';
+    public const string NOT_REGEXP            = '!regexp';
 
-    public const DATE                  = 'date';
+    public const string DATE                  = 'date';
 
-    public const STARTS_WITH           = 'startsWith';
+    public const string STARTS_WITH           = 'startsWith';
 
-    public const ENDS_WITH             = 'endsWith';
+    public const string ENDS_WITH             = 'endsWith';
 
-    public const CONTAINS              = 'contains';
+    public const string CONTAINS              = 'contains';
 
-    public const IN_LAST               = 'inLast';
+    public const string IN_LAST               = 'inLast';
 
-    public const IN_NEXT               = 'inNext';
+    public const string IN_NEXT               = 'inNext';
 
     /**
      * @var array<string,array<string,string|bool>>

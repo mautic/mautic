@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class SyncCommand extends Command
 {
-    public const NAME = 'mautic:integrations:sync';
+    public const string NAME = 'mautic:integrations:sync';
 
     public function __construct(
         private readonly SyncServiceInterface $syncService,

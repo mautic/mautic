@@ -24,10 +24,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    public const DATE = '2019-07-07 15:00:00';
+    public const string DATE = '2019-07-07 15:00:00';
 
     private MessageQueueModel $messageQueue;
 

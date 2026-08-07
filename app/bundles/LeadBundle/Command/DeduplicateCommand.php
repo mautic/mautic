@@ -27,7 +27,7 @@ TXT
 )]
 final class DeduplicateCommand extends Command
 {
-    public const NAME = 'mautic:contacts:deduplicate';
+    public const string NAME = 'mautic:contacts:deduplicate';
 
     public function __construct(
         private readonly ContactDeduper $contactDeduper,

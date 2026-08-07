@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 final class HttpFactory implements AuthProviderInterface
 {
-    public const NAME = 'oauth1a_two_legged';
+    public const string NAME = 'oauth1a_two_legged';
 
     /**
      * Cache of initialized clients.

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class DeleteWebhookLogsCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:webhooks:delete_logs';
+    public const string COMMAND_NAME = 'mautic:webhooks:delete_logs';
 
     private readonly \Mautic\WebhookBundle\Entity\LogRepository $logRepository;
 

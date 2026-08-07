@@ -36,20 +36,11 @@ final class LeadSubscriberTest extends CommonMocks
      */
     private MockObject $statRepository;
 
-    /**
-     * @var string
-     */
-    private const EVENT_TYPE_VIEW_NAME = 'Focus view';
+    private const string EVENT_TYPE_VIEW_NAME = 'Focus view';
 
-    /**
-     * @var string
-     */
-    private const EVENT_TYPE_CLICK_NAME = 'Focus click';
+    private const string EVENT_TYPE_CLICK_NAME = 'Focus click';
 
-    /**
-     * @var string
-     */
-    private const FOCUS_NAME = 'test Focus Item';
+    private const string FOCUS_NAME = 'test Focus Item';
 
     protected function setUp(): void
     {

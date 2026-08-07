@@ -38,7 +38,7 @@ TXT
 )]
 final class PushTransifexCommand extends Command
 {
-    public const NAME = 'mautic:transifex:push';
+    public const string NAME = 'mautic:transifex:push';
 
     public function __construct(
         private readonly TransifexFactory $transifexFactory,

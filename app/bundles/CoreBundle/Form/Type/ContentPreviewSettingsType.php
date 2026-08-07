@@ -20,13 +20,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ContentPreviewSettingsType extends AbstractType
 {
-    public const TYPE_EMAIL = 'email';
+    public const string TYPE_EMAIL = 'email';
 
-    public const TYPE_PAGE  = 'page';
+    public const string TYPE_PAGE  = 'page';
 
-    private const CHOICE_TYPE_TRANSLATION = 'translation';
+    private const string CHOICE_TYPE_TRANSLATION = 'translation';
 
-    private const CHOICE_TYPE_VARIANT     = 'variant';
+    private const string CHOICE_TYPE_VARIANT     = 'variant';
 
     public function __construct(
         private readonly TranslatorInterface $translator,

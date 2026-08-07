@@ -35,11 +35,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ImportController extends AbstractFormController
 {
     // Steps of the import
-    public const STEP_UPLOAD_ZIP      = 1;
+    public const int STEP_UPLOAD_ZIP      = 1;
 
-    public const STEP_PROGRESS_BAR    = 2;
+    public const int STEP_PROGRESS_BAR    = 2;
 
-    public const STEP_IMPORT_FROM_ZIP = 3;
+    public const int STEP_IMPORT_FROM_ZIP = 3;
 
     private UserHelper $userHelper;
 

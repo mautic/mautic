@@ -18,7 +18,7 @@ final class MauticSsoFactory extends AbstractFactory implements AuthenticatorFac
      * SSO Authenticator will be executed only if it has same options as form_login + request
      * will have 'integration_parameter' in the Request.
      */
-    public const PRIORITY = -25;
+    public const int PRIORITY = -25;
 
     public function __construct()
     {

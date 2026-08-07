@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Helper;
 
 final class BlockedFreeEmailProvidersHelper
 {
-    private const JSON_FILE_PATH = __DIR__.'/../Assets/json/blocked_free_email_providers.json';
+    private const string JSON_FILE_PATH = __DIR__.'/../Assets/json/blocked_free_email_providers.json';
 
     /**
      * Load blocked free email providers from JSON file.

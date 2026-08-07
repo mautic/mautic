@@ -14,7 +14,7 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback     = false;
 
-    private const ADMINISTRATOR_VALUE = "administrator's";
+    private const string ADMINISTRATOR_VALUE = "administrator's";
 
     public function testCompareValueEqualsOperator(): void
     {

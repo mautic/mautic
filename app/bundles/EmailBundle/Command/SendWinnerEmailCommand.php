@@ -30,7 +30,7 @@ final class SendWinnerEmailCommand extends ModeratedCommand
 {
     protected static string $defaultDescription = 'Send winner email variant to remaining contacts';
 
-    public const COMMAND_NAME                   = 'mautic:email:sendwinner';
+    public const string COMMAND_NAME                   = 'mautic:email:sendwinner';
 
     public function __construct(
         private readonly SendWinnerService $sendWinnerService,

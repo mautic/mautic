@@ -10,9 +10,9 @@ use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 final readonly class VariableExpresserHelper implements VariableExpresserHelperInterface
 {
-    public const TRUE_BOOLEAN_VALUE  = 'true';
+    public const string TRUE_BOOLEAN_VALUE  = 'true';
 
-    public const FALSE_BOOLEAN_VALUE = 'false';
+    public const string FALSE_BOOLEAN_VALUE = 'false';
 
     private ValueNormalizer $valueNormalizer;
 

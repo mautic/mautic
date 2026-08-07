@@ -8,15 +8,15 @@ use Symfony\Component\Routing\RouterInterface;
 
 final readonly class RouteProvider
 {
-    public const ROUTE_LIST = 'mautic_marketplace_list';
+    public const string ROUTE_LIST = 'mautic_marketplace_list';
 
-    public const ROUTE_DETAIL = 'mautic_marketplace_detail';
+    public const string ROUTE_DETAIL = 'mautic_marketplace_detail';
 
-    public const ROUTE_INSTALL = 'mautic_marketplace_install';
+    public const string ROUTE_INSTALL = 'mautic_marketplace_install';
 
-    public const ROUTE_REMOVE = 'mautic_marketplace_remove';
+    public const string ROUTE_REMOVE = 'mautic_marketplace_remove';
 
-    public const ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
+    public const string ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
 
     public function __construct(
         private RouterInterface $router,

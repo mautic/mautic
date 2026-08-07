@@ -36,13 +36,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class ImportController extends FormController
 {
     // Steps of the import
-    public const STEP_UPLOAD_CSV      = 1;
+    public const int STEP_UPLOAD_CSV      = 1;
 
-    public const STEP_MATCH_FIELDS    = 2;
+    public const int STEP_MATCH_FIELDS    = 2;
 
-    public const STEP_PROGRESS_BAR    = 3;
+    public const int STEP_PROGRESS_BAR    = 3;
 
-    public const STEP_IMPORT_FROM_CSV = 4;
+    public const int STEP_IMPORT_FROM_CSV = 4;
 
     private LoggerInterface $logger;
 

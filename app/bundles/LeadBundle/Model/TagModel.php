@@ -61,7 +61,7 @@ class TagModel extends FormModel
     /**
      * @var array<int, string>
      */
-    private const TAG_PROPERTY_KEYS = [
+    private const array TAG_PROPERTY_KEYS = [
         'add_tags',
         'remove_tags',
         'tags',

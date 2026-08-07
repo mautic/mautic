@@ -46,7 +46,7 @@ use Twig\Environment;
 
 final class MailHelperTest extends TestCase
 {
-    private const MINIFY_HTML = '<!doctype html>
+    private const string MINIFY_HTML = '<!doctype html>
     <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
       <head>
         <title>Test</title>

@@ -15,7 +15,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const SALES_USER = 'sales';
+    private const string SALES_USER = 'sales';
 
     public function testIndexActionsIsSuccessful(): void
     {

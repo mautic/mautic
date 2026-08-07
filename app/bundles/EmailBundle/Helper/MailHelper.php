@@ -61,7 +61,7 @@ class MailHelper
 
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
-    private const DEFAULT_BODY            = [
+    private const array DEFAULT_BODY            = [
         'content'     => '',
         'contentType' => 'text/html',
         'charset'     => null,

@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public const FORM_PREFIX = 'form-';
+    public const string FORM_PREFIX = 'form-';
 
     /**
      * @var array<int, Form>

@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentReportSubscriber implements EventSubscriberInterface
 {
-    public const SEGMENT_MEMBERSHIP = 'segment.membership';
+    public const string SEGMENT_MEMBERSHIP = 'segment.membership';
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,

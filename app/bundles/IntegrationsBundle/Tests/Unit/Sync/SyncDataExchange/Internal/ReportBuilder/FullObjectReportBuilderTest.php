@@ -29,9 +29,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FullObjectReportBuilderTest extends TestCase
 {
-    private const INTEGRATION_NAME = 'Test';
+    private const string INTEGRATION_NAME = 'Test';
 
-    private const TEST_EMAIL = 'test@test.com';
+    private const string TEST_EMAIL = 'test@test.com';
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider

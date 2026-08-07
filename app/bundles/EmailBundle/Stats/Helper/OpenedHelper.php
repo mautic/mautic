@@ -7,7 +7,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 final class OpenedHelper extends AbstractHelper
 {
-    public const NAME = 'email-opened';
+    public const string NAME = 'email-opened';
 
     public function getName(): string
     {

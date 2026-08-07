@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 final class Interval implements ScheduleModeInterface
 {
-    public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
+    public const string LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
     private ?\DateTimeZone $defaultTimezone = null;
 

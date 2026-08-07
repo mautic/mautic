@@ -29,7 +29,7 @@ TXT
 )]
 final class InstallCommand extends Command
 {
-    public const COMMAND = 'mautic:install';
+    public const string COMMAND = 'mautic:install';
 
     public function __construct(
         private readonly InstallService $installer,

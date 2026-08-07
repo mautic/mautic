@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class ConfigType extends AbstractType
 {
-    public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
+    public const string SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
 
     public function __construct(
         private readonly TransportChain $transportChain,

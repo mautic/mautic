@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class CampaignMapStatsController extends AbstractController
 {
-    public const MAP_OPTIONS = [
+    public const array MAP_OPTIONS = [
         'contacts' => [
             'label' => 'mautic.lead.leads',
             'unit'  => 'Contact',
@@ -30,7 +30,7 @@ final class CampaignMapStatsController extends AbstractController
         ],
     ];
 
-    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
+    public const string LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
     public function __construct(
         private readonly CampaignModel $model,

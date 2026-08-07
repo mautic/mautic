@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class DeleteLeadListsCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:segment:delete';
+    public const string COMMAND_NAME = 'mautic:segment:delete';
 
     public function __construct(
         private readonly ListModel $listModel,

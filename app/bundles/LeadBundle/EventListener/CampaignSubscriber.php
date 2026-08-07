@@ -53,7 +53,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignSubscriber implements EventSubscriberInterface
 {
-    public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+    public const string ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     private ?array $fields = null;
 

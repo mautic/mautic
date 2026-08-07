@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ContactSegmentFilterFactory
 {
-    public const CUSTOM_OPERATOR = 'custom_operator';
+    public const string CUSTOM_OPERATOR = 'custom_operator';
 
     /**
      * @var array|string[]

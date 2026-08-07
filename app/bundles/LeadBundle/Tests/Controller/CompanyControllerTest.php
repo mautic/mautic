@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyControllerTest extends MauticMysqlTestCase
 {
-    private const COUNTRY_UNITED_STATES = 'United States';
+    private const string COUNTRY_UNITED_STATES = 'United States';
 
     private int $company1Id;
 

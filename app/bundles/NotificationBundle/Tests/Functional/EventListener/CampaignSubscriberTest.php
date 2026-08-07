@@ -30,20 +30,11 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     use NotificationTrait;
 
-    /**
-     * @var string
-     */
-    private const REST_API_ID = 'restApiID';
+    private const string REST_API_ID = 'restApiID';
 
-    /**
-     * @var string
-     */
-    private const API_ID = 'apiID';
+    private const string API_ID = 'apiID';
 
-    /**
-     * @var string
-     */
-    private const ONESIGNAL_API_BASE_URL = 'https://onesignal.com/api/v1/notifications';
+    private const string ONESIGNAL_API_BASE_URL = 'https://onesignal.com/api/v1/notifications';
 
     public function testLeadNotContactable(): void
     {

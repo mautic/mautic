@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[CoversClass(FormValidationSubscriber::class)]
 final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private const MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
+    private const string MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
 
     private MockObject&TranslatorInterface $translator;
 

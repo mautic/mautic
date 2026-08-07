@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 {
-    public const SAVE_AND_CLOSE = 'Save & Close';
+    public const string SAVE_AND_CLOSE = 'Save & Close';
 
     /**
      * Disabled because testNewEmailFormPreselectsConfiguredPreferenceCenterAndUtmDefaults

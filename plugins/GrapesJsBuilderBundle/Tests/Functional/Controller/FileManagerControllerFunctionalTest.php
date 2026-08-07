@@ -10,17 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const ASSETS_ENDPOINT = '/s/grapesjsbuilder/media';
+    private const string ASSETS_ENDPOINT = '/s/grapesjsbuilder/media';
 
-    private const UPLOAD_ENDPOINT = '/s/grapesjsbuilder/upload';
+    private const string UPLOAD_ENDPOINT = '/s/grapesjsbuilder/upload';
 
-    private const DELETE_ENDPOINT = '/s/grapesjsbuilder/delete';
+    private const string DELETE_ENDPOINT = '/s/grapesjsbuilder/delete';
 
-    private const IMAGE_COUNT     = 3;
+    private const int IMAGE_COUNT     = 3;
 
-    private const SVG_WIDTH       = 120;
+    private const int SVG_WIDTH       = 120;
 
-    private const SVG_HEIGHT      = 80;
+    private const int SVG_HEIGHT      = 80;
 
     /**
      * @var array<string>

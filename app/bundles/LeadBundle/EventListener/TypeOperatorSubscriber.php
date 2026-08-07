@@ -35,7 +35,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
-    private const EMAIL_ALIAS = 'email';
+    private const string EMAIL_ALIAS = 'email';
 
     public function __construct(
         private LeadModel $leadModel,

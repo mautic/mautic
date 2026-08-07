@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class InstallCommand extends Command
 {
-    public const NAME = 'mautic:marketplace:install';
+    public const string NAME = 'mautic:marketplace:install';
 
     public function __construct(
         private readonly ComposerHelper $composer,

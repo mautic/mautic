@@ -8,7 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class FormatterHelper
 {
-    public const FLOAT_PRECISION = 4;
+    public const int FLOAT_PRECISION = 4;
 
     public function __construct(
         private DateHelper $dateHelper,

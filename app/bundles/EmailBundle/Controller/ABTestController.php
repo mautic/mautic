@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ABTestController extends AbstractFormController
 {
-    public const DEFAULT_DELAY = 24;
+    public const int DEFAULT_DELAY = 24;
 
-    public const TOTAL_WEIGHT = 10;
+    public const int TOTAL_WEIGHT = 10;
 
     public function generateABTestAction(Request $request, EmailModel $emailModel, int $objectId): Response
     {

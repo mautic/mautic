@@ -20,15 +20,15 @@ final class PageModelTest extends MauticMysqlTestCase
 {
     private HitRepository $pageHitRepository;
 
-    private const DO_NOT_TRACK_IP = '218.30.65.10';
+    private const string DO_NOT_TRACK_IP = '218.30.65.10';
 
-    private const BOT_BLOCKED_IP = '218.30.65.11';
+    private const string BOT_BLOCKED_IP = '218.30.65.11';
 
-    private const IP_NOT_IN_ANY_BLOCK_LIST = '218.30.65.12';
+    private const string IP_NOT_IN_ANY_BLOCK_LIST = '218.30.65.12';
 
-    private const IP_NOT_IN_ANY_BLOCK_LIST2 = '218.30.65.111';
+    private const string IP_NOT_IN_ANY_BLOCK_LIST2 = '218.30.65.111';
 
-    private const BOT_BLOCKED_USER_AGENTS = [
+    private const array BOT_BLOCKED_USER_AGENTS = [
         'AHC/2.1',
         'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6',
         'Mozilla/5.0 (compatible; Codewisebot/2.0; +http://www.nosite.com/somebot.htm)',

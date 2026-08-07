@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_AUDIT_LOG = 'audit.log';
+    public const string CONTEXT_AUDIT_LOG = 'audit.log';
 
     public function __construct(
         private CorePermissions $security,
